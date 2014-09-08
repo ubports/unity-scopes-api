@@ -1,3 +1,27 @@
+unity-scopes-api (0.6.5-0ubuntu1) UNRELEASED; urgency=medium
+
+  * Added support for expandable widgets.
+
+ -- Pawel Stolowski <pawel.stolowski@ubuntu.com>  Fri, 29 Aug 2014 12:10:32 +0200
+
+unity-scopes-api (0.6.4+14.10.20140828.1-0ubuntu1) utopic; urgency=medium
+
+  [ Pawel Stolowski ]
+  * Execute SDK DBus callback on scope start and stop in debug mode.
+
+  [ Ubuntu daily release ]
+  * debian/libunity-scopes3.symbols: auto-update to released version
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Thu, 28 Aug 2014 14:01:50 +0000
+
+unity-scopes-api (0.6.3+14.10.20140826-0ubuntu1) utopic; urgency=medium
+
+  [ Pawel Stolowski ]
+  * Fix two-way invoke thread pool - fixes lp:1359582.
+  * Fix ABI break caused by introduction of explicit destructor.
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Tue, 26 Aug 2014 13:44:05 +0000
+
 unity-scopes-api (0.6.3+14.10.20140820.is.0.6.1+14.10.20140809-0ubuntu2) UNRELEASED; urgency=medium
 
   * Removed duplicates from symbols file. Symbols file now maintained

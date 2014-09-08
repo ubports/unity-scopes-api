@@ -14,6 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
+ *              Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
 #include <unity/scopes/internal/smartscopes/SmartScope.h>
@@ -61,17 +62,94 @@ void SmartQuery::run(SearchReplyProxy const& reply)
         }
     }
 
-    ///! TODO: session_id, query_id, country (+location data)
-    search_handle_ = ss_client_->search(base_url_, query_.query_string(), query_.department_id(), "session_id", 0, hints_.form_factor(), settings(), query_.filter_state().serialize(), hints_.locale(), "", hints_.cardinality());
-
-    SearchRequestResults results = search_handle_->get_search_results();
-    std::map<std::string, Category::SCPtr> categories;
-
-    if (std::get<0>(results)) // are there any departments?
+    struct FiltersHandler
     {
+        FiltersHandler(SearchReplyProxy reply, std::string const& scope_id):
+            reply(reply),
+            scope_id(scope_id),
+            has_filters(false),
+            has_state(false)
+        {}
+
+        void push() {
+            if (has_filters && has_state) {
+                try
+                {
+                    reply->push(filters, state);
+                }
+                catch (std::exception const& e)
+                {
+                    std::cerr << "SmartScope::run(): Failed to register filters for scope '" << scope_id << "': "
+                        << e.what() << std::endl;
+                }
+            }
+        }
+
+        void set(Filters const& f) {
+            filters = f;
+            has_filters = true;
+            push();
+        }
+
+        void set(FilterState const& s) {
+            state = s;
+            has_state = true;
+            push();
+        }
+
+        SearchReplyProxy reply;
+        std::string scope_id;
+        bool has_filters;
+        bool has_state;
+        Filters filters;
+        FilterState state;
+    } filters_data(reply, scope_id_);
+
+    SearchReplyHandler handler;
+    handler.filters_handler = [&filters_data](Filters const &filters) {
+        filters_data.set(filters);
+    };
+    handler.filter_state_handler = [&filters_data](FilterState const& state) {
+        filters_data.set(state);
+    };
+    handler.category_handler = [this, reply](std::shared_ptr<SearchCategory> const& category) {
+        const CategoryRenderer rdr(category->renderer_template);
         try
         {
-            auto const& deptinfo = std::get<0>(results);
+            reply->register_category(category->id, category->title, category->icon, rdr);
+        }
+        catch (std::exception const& e)
+        {
+            std::cerr << "SmartScope: failed to register category: \"" << category->id
+                << "\" for scope \"" << scope_id_ << "\" and query: \""
+                << query_.query_string() << std::endl;
+        }
+    };
+    handler.result_handler = [this, reply](SearchResult const& result) {
+        auto cat = reply->lookup_category(result.category_id);
+        if (cat)
+        {
+            CategorisedResult res(cat);
+            res.set_uri(result.uri);
+            res["result_json"] = result.json;
+
+            auto other_params = result.other_params;
+            for (auto& param : other_params)
+            {
+                res[param.first] = param.second->to_variant();
+            }
+
+            reply->push(res);
+        }
+        else
+        {
+            std::cerr << "SmartScope: result for query: \"" << scope_id_ << "\": \"" << query_.query_string()
+                      << "\" returned an invalid cat_id. Skipping result." << std::endl;
+        }
+    };
+    handler.departments_handler = [this, reply](std::shared_ptr<DepartmentInfo> const& deptinfo) {
+        try
+        {
             Department::SCPtr root = create_department(deptinfo);
             reply->register_departments(root);
         }
@@ -80,58 +158,32 @@ void SmartQuery::run(SearchReplyProxy const& reply)
             std::cerr << "SmartScope::run(): Failed to register departments for scope '" << scope_id_ << "': "
                       << e.what() << std::endl;
         }
-    }
+    };
 
-    auto const& filters = std::get<1>(results);
-    if (!filters.empty())
+    ///! TODO: country (+location data)
+    int query_id = 0;
+    std::string session_id;
+    auto const metadata = search_metadata();
+    if (metadata.contains_hint("session-id") && metadata["session-id"].which() == Variant::String)
     {
-        auto const& filter_state = std::get<2>(results);
-        try
-        {
-            reply->push(filters, filter_state);
-        }
-        catch (std::exception const& e)
-        {
-            std::cerr << "SmartScope::run(): Failed to register filters for scope '" << scope_id_ << "': "
-                      << e.what() << std::endl;
-        }
+        session_id = metadata["session-id"].get_string();
     }
-
-    for (auto& result : std::get<3>(results))
+    else
     {
-        if (!result.category)
-        {
-            std::cerr << "SmartScope: result for query: \"" << scope_id_ << "\": \"" << query_.query_string()
-                      << "\" returned an invalid cat_id. Skipping result." << std::endl;
-            continue;
-        }
-
-        Category::SCPtr cat;
-
-        auto cat_it = categories.find(result.category->id);
-        if (cat_it == end(categories))
-        {
-            CategoryRenderer rdr(result.category->renderer_template);
-            cat = reply->register_category(result.category->id, result.category->title, result.category->icon, rdr);
-            categories[result.category->id] = cat;
-        }
-        else
-        {
-            cat = cat_it->second;
-        }
-
-        CategorisedResult res(cat);
-        res.set_uri(result.uri);
-        res["result_json"] = result.json;
-
-        auto other_params = result.other_params;
-        for (auto& param : other_params)
-        {
-            res[param.first] = param.second->to_variant();
-        }
-
-        reply->push(res);
+        session_id = "session_id_missing";
+        std::cout << "SmartScope: missing or invalid session id for \"" << scope_id_ << "\": \"" << query_.query_string() << "\"" << std::endl;
     }
+    if (metadata.contains_hint("query-id") && metadata["query-id"].which() == Variant::Int)
+    {
+        query_id = metadata["query-id"].get_int();
+    }
+    else
+    {
+        std::cout << "SmartScope: missing or invalid query id for \"" << scope_id_ << "\": \"" << query_.query_string() << "\"" << std::endl;
+    }
+
+    search_handle_ = ss_client_->search(handler, base_url_, query_.query_string(), query_.department_id(), session_id, query_id, hints_.form_factor(), settings(), query_.filter_state().serialize(), hints_.locale(), "", hints_.cardinality());
+    search_handle_->wait();
 
     std::cout << "SmartScope: query for \"" << scope_id_ << "\": \"" << query_.query_string() << "\" complete" << std::endl;
 }
@@ -173,41 +225,47 @@ void SmartPreview::cancelled()
 
 void SmartPreview::run(PreviewReplyProxy const& reply)
 {
-    ///! TODO: session_id, widgets_api_version, country (+location data)
-    preview_handle_ = ss_client_->preview(base_url_, result_["result_json"].get_string(), "session_id", hints_.form_factor(), 0, settings(), hints_.locale(), "");
-
-    auto results = preview_handle_->get_preview_results();
-    PreviewHandle::Columns columns = results.first;
-    PreviewHandle::Widgets widgets = results.second;
-
-    // register layout
-    if (columns.size() > 0)
-    {
-        ColumnLayoutList layout_list;
-
-        for (auto& column : columns)
+    PreviewReplyHandler handler;
+    handler.widget_handler = [reply](std::string const& widget_json) {
+        reply->push({PreviewWidget(widget_json)});
+    };
+    handler.columns_handler = [reply](PreviewHandle::Columns const &columns) {
+        if (columns.size() > 0)
         {
-            ColumnLayout layout(column.size());
-            for (auto& widget_lo : column)
+            // register layout
+            ColumnLayoutList layout_list;
+
+            for (auto& column : columns)
             {
-                layout.add_column(widget_lo);
+                ColumnLayout layout(column.size());
+                for (auto& widget_lo : column)
+                {
+                    layout.add_column(widget_lo);
+                }
+
+                layout_list.emplace_back(layout);
             }
 
-            layout_list.emplace_back(layout);
+            reply->register_layout(layout_list);
         }
+    };
 
-        reply->register_layout(layout_list);
-    }
-
-    // push wigdets
-    PreviewWidgetList widget_list;
-
-    for (auto& widget_json : widgets)
+    ///! TODO: widgets_api_version, country (+location data)
+    std::string session_id;
+    auto const metadata = action_metadata();
+    if (metadata.contains_hint("session-id") && metadata["session-id"].which() == Variant::String)
     {
-        widget_list.emplace_back(PreviewWidget(widget_json));
+        session_id = metadata["session-id"].get_string();
+    }
+    else
+    {
+        session_id = "session_id_missing";
+        std::cout << "SmartScope: missing or invalid session id for \"" << scope_id_ << "\" preview: \"" << result().uri() << "\"" << std::endl;
     }
 
-    reply->push(widget_list);
+    preview_handle_ = ss_client_->preview(handler, base_url_, result_["result_json"].get_string(), session_id, hints_.form_factor(), 0, settings(), hints_.locale(), "");
+
+    preview_handle_->wait();
 
     std::cout << "SmartScope: preview for \"" << scope_id_ << "\": \"" << result().uri() << "\" complete" << std::endl;
 }

@@ -40,7 +40,8 @@ public:
     void wait_until_finished()
     {
         std::unique_lock<std::mutex> lock(mutex_);
-        cond_.wait(lock, [this] { return this->query_complete_; });
+        auto ok = cond_.wait_for(lock, std::chrono::seconds(2), [this] { return this->query_complete_; });
+        ASSERT_TRUE(ok) << "query did not complete after 2 seconds";
     }
 
 protected:
@@ -53,7 +54,7 @@ protected:
     }
 
 private:
-    bool query_complete_;
+    bool query_complete_ = false;
     std::mutex mutex_;
     std::condition_variable cond_;
 };
@@ -69,8 +70,9 @@ public:
         this->filter_state = filter_state;
     }
 
-    virtual void finished(CompletionDetails const&) override
+    virtual void finished(CompletionDetails const& details) override
     {
+        ASSERT_EQ(CompletionDetails::OK, details.status()) << details.message();
         notify();
     }
 
@@ -82,14 +84,13 @@ template <typename ScopeType>
 struct RaiiScopeThread
 {
     ScopeType scope;
-    Runtime::SPtr runtime;
+    Runtime::UPtr runtime;
     std::thread scope_thread;
 
-    RaiiScopeThread(std::string const& scope_id, std::string const& configfile)
-        : runtime(Runtime::create_scope_runtime(scope_id, configfile)),
+    RaiiScopeThread(Runtime::UPtr rt, std::string const& configfile)
+        : runtime(move(rt)),
           scope_thread([this, configfile]{ runtime->run_scope(&scope, configfile, ""); })
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
 
     ~RaiiScopeThread()
@@ -104,8 +105,8 @@ std::unique_ptr<core::posix::ChildProcess::DeathObserver> death_observer(core::p
 
 RuntimeImpl::SPtr run_test_registry()
 {
-    RuntimeImpl::SPtr runtime = RuntimeImpl::create("TestRegistry", "Runtime.ini");
-    MiddlewareBase::SPtr middleware = runtime->factory()->create("TestRegistry", "Zmq", "Zmq.ini");
+    RuntimeImpl::SPtr runtime = RuntimeImpl::create("TestRegistry", TEST_DIR "/Runtime.ini");
+    MiddlewareBase::SPtr middleware = runtime->factory()->create("TestRegistry", "Zmq", TEST_DIR "/Zmq.ini");
     RegistryObject::SPtr reg_obj(std::make_shared<RegistryObject>(*death_observer, std::make_shared<Executor>(), middleware));
     middleware->add_registry_object("TestRegistry", reg_obj);
     return runtime;
@@ -114,11 +115,13 @@ RuntimeImpl::SPtr run_test_registry()
 TEST(Filters, scope)
 {
     auto reg_rt = run_test_registry();
-    RaiiScopeThread<TestScope> scope_thread("TestScope", "Runtime.ini");
+
+    auto scope_rt = Runtime::create_scope_runtime("TestScope", TEST_DIR "/Runtime.ini");
+    RaiiScopeThread<TestScope> scope_thread(move(scope_rt), TEST_DIR "/Runtime.ini");
 
     // parent: connect to scope and run a query
-    auto rt = internal::RuntimeImpl::create("", "Runtime.ini");
-    auto mw = rt->factory()->create("TestScope", "Zmq", "Zmq.ini");
+    auto rt = internal::RuntimeImpl::create("", TEST_DIR "/Runtime.ini");
+    auto mw = rt->factory()->create("TestScope", "Zmq", TEST_DIR "/Zmq.ini");
     mw->start();
     auto proxy = mw->create_scope_proxy("TestScope");
     auto scope = internal::ScopeImpl::create(proxy, rt.get(), "TestScope");
@@ -131,7 +134,7 @@ TEST(Filters, scope)
     auto filter_state = receiver->filter_state; // copy filter state, it will be sent with 2nd query
     {
         auto filters = receiver->filters;
-        EXPECT_EQ(1u, filters.size());
+        ASSERT_EQ(1u, filters.size());
         EXPECT_EQ("f1", filters.front()->id());
         auto filter_type = filters.front()->filter_type();
         EXPECT_EQ("option_selector", filter_type);
@@ -151,7 +154,7 @@ TEST(Filters, scope)
         auto filters = receiver->filters;
         auto filter_state2 = receiver->filter_state;
         auto selector = std::dynamic_pointer_cast<const OptionSelectorFilter>(filters.front());
-        EXPECT_EQ(1u, selector->active_options(filter_state2).size());
+        ASSERT_EQ(1u, selector->active_options(filter_state2).size());
         auto option1 = *(selector->active_options(filter_state2).begin());
         EXPECT_EQ("o1", option1->id());
     }

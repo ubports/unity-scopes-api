@@ -19,7 +19,6 @@
 // You may also include individual headers if you prefer.
 #include <unity-scopes.h>
 
-#include <unity/scopes/internal/max_align_clang_bug.h>  // TODO: remove this once clang 3.5.2 is released
 #include <boost/filesystem.hpp>
 #include <condition_variable>
 #include <cstdlib>
@@ -115,6 +114,29 @@ std::string to_string(Variant const& var)
             break;
          default:
             assert(0);
+    }
+    return str.str();
+}
+
+std::string to_string(PreviewWidget const& widget, std::string const& indent = "")
+{
+    std::ostringstream str;
+    str << indent << "widget: id=" << widget.id() << ", type=" << widget.widget_type() << endl
+        << indent << "attributes: " << to_string(Variant(widget.attribute_values())) << endl
+        << indent << "components: {";
+    for (const auto kv: widget.attribute_mappings())
+    {
+        str << "\"" << kv.first << "\": \"" << kv.second << "\", ";
+    }
+    str << "}" << endl;
+    if (widget.widget_type() == "expandable")
+    {
+        str << indent << "\twidgets = {";
+        for (const auto w: widget.widgets())
+        {
+            str << to_string(w, indent + "\t\t");
+        }
+        str << "}" << std::endl;
     }
     return str.str();
 }
@@ -287,14 +309,7 @@ public:
         cout << "\tGot preview widgets:" << endl;
         for (auto it = widgets.begin(); it != widgets.end(); ++it)
         {
-            cout << "\t\twidget: id=" << it->id() << ", type=" << it->widget_type() << endl
-                 << "\t\t attributes: " << to_string(Variant(it->attribute_values())) << endl
-                 << "\t\t components: {";
-            for (const auto kv: it->attribute_mappings())
-            {
-                cout << "\"" << kv.first << "\": \"" << kv.second << "\", ";
-            }
-            cout << "}" << endl;
+            cout << to_string(*it) << endl;
         }
     }
 

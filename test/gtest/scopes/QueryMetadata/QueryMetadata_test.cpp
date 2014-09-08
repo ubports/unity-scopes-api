@@ -184,6 +184,12 @@ TEST(ActionMetadata, basic)
         var["foo"] = "bar";
         ActionMetadata meta("pl", "phone");
         meta.set_scope_data(Variant(var));
+        meta["foo"] = "bar";
+        meta.set_hint("baz", Variant(1000));
+        EXPECT_EQ("bar", meta["foo"].get_string());
+        EXPECT_EQ("bar", meta.hints()["foo"].get_string());
+        EXPECT_EQ(1000, meta.hints()["baz"].get_int());
+        EXPECT_TRUE(meta.contains_hint("foo"));
 
         EXPECT_EQ("pl", meta.locale());
         EXPECT_EQ("phone", meta.form_factor());

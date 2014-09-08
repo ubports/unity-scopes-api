@@ -101,8 +101,6 @@ public:
 };
 ~~~
 
-The derived class gets passed an instance of RegistryProxy in the virtual method
-start(), so aggregating scopes need to override the default implementation.
 In addition, the library must provide two functions with "C" linkage:
  - a create function that must return a pointer to the derived instance
  - a destroy function that is passed the pointer returned by the create function
@@ -177,7 +175,7 @@ public:
     run() passes a thread of control to the scope to do with as it sees fit, for example, to run an event loop.
     During finalization, the scopes run time joins with the thread that called run(). This means that, if
     the scope implementation does not return from run(), it is expected to arrange for run() to complete
-    in timely manner in response to a call to stop(). Failure to do so will cause deadlock during finalization.
+    in a timely manner in response to a call to stop(). Failure to do so will cause deadlock during finalization.
 
     If run() throws an exception, the run time handles the exception and calls stop() in response.
     */

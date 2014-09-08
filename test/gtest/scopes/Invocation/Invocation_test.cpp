@@ -16,12 +16,6 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <signal.h>
-#include <sys/types.h>
-#include <unistd.h>
-
-#include <mutex>
-
 #include <unity/scopes/ActionMetadata.h>
 #include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/internal/MWScope.h>
@@ -39,6 +33,13 @@
 #include "EmptyScope.h"
 #include "TestScope.h"
 #include "DebugTestScope.h"
+
+#include <fstream>
+#include <mutex>
+
+#include <signal.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 using namespace std;
 using namespace unity::scopes;
@@ -224,9 +225,14 @@ int main(int argc, char **argv)
     Runtime::SPtr dsrt = move(Runtime::create_scope_runtime("DebugTestScope", "Runtime.ini"));
     std::thread debugtestscope_t(debugtestscope_thread, dsrt, "Runtime.ini");
 
-    // Give threads some time to bind to endpoints, to avoid getting ObjectNotExistException
+    // Give threads some time to bind to endpoints, to avoid getting a TimeoutException
     // from a synchronous remote call.
     this_thread::sleep_for(chrono::milliseconds(500));
+
+    std::ifstream la("/proc/loadavg");
+    std::string avg[3];
+    la >> avg[0] >> avg[1] >> avg[2];
+    std::cerr << "load average: " << avg[0] << " " << avg[1] << " " << avg[2] << std::endl;
 
     auto rc = RUN_ALL_TESTS();
 

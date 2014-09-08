@@ -191,7 +191,7 @@ set(UNITY_SCOPES_LIB unity-scopes)
 # API version
 set(UNITY_SCOPES_MAJOR 0)
 set(UNITY_SCOPES_MINOR 6)
-set(UNITY_SCOPES_MICRO 3)
+set(UNITY_SCOPES_MICRO 5)
 set(UNITY_SCOPES_SOVERSION 3)
 
 # Version for testing, with all symbols visible
@@ -241,14 +241,7 @@ set(OTHER_LIBS
 # All the libraries we need to link a normal executable that uses Unity scopes
 set(LIBS ${UNITY_SCOPES_LIB})
 
-# All the libraries we need to link a gtest executable. (We link the tests against a static version
-# so we can do whitebox testing on internal classes.
-
-# TODO: HACK: static linking of the tests doesn't work because the tests won't pull in virtual methods in a
-# base class from a static library without an unresolved dependency. But, without static linking, we can't
-# do whitebox tests because of the visibility=hidden compile flags. For now, we link dynamically and
-# with visbility=default.
-
+# Test version of ${UNITY_SCOPES_LIB}, with internal symbols visible
 set(TESTLIBS ${UNITY_SCOPES_TEST_LIB})
 
 # Library install prefix

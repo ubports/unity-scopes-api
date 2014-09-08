@@ -121,17 +121,17 @@ public:
     //@}
 
     /**
-     \brief Get canned query of this search request.
+     \brief Get a canned query for this search request.
 
-     \return canned query
-     \throws unity::LogicException if canned query was not initialized (the default ctor was used).
+     \return The canned query.
+     \throws unity::LogicException if the canned query was not initialized (was default-constructed).
      */
     CannedQuery query() const;
 
     /**
      \brief Get metadata for this search request.
-     \return search metadata
-     \throws unity::LogicException if search metadata was not initialized (the default ctor was used).
+     \return The search metadata.
+     \throws unity::LogicException if search metadata was not initialized (was default-constructed).
     */
     SearchMetadata search_metadata() const;
 

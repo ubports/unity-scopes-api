@@ -21,8 +21,6 @@
 
 #include <unity/scopes/internal/ThreadSafeQueue.h>
 #include <unity/scopes/internal/TaskWrapper.h>
-#include <unity/UnityExceptions.h>
-#include <unity/util/DefinesPtrs.h>
 
 #include <future>
 
@@ -45,21 +43,26 @@ public:
     NONCOPYABLE(ThreadPool);
     UNITY_DEFINES_PTRS(ThreadPool);
 
-    ThreadPool(int size);
+    ThreadPool(int num_threads);         // Create pool with specified number of threads
     ~ThreadPool();
 
-    template<typename F>
-    std::future<typename std::result_of<F()>::type> submit(F f);
+    void destroy() noexcept;             // Destroys whether queue is empty or not; waits for threads to exit.
+    void destroy_once_empty() noexcept;  // Waits for queue to become empty, then calls destroy().
+    void wait_for_destroy() noexcept;    // Blocks until destruction is complete.
 
-    void run();
+    template<typename F>
+    std::future<typename std::result_of<F()>::type> submit(F f);  // Pushes processing task onto queue.
 
 private:
+    void run();
+
     typedef ThreadSafeQueue<unity::scopes::internal::TaskWrapper> TaskQueue;
     std::unique_ptr<TaskQueue> queue_;
     std::vector<std::thread> threads_;
     std::mutex mutex_;
-    std::promise<void> threads_ready_;
-    int num_threads_;
+    std::condition_variable cond_;
+    enum State { Created, Waiting, Destroying, Destroyed };
+    State state_;
 };
 
 template<typename F>
@@ -67,6 +70,13 @@ std::future<typename std::result_of<F()>::type> ThreadPool::submit(F f)
 {
     typedef typename std::result_of<F()>::type ResultType;
 
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        if (state_ != Created)
+        {
+            throw std::runtime_error("ThreadPool::submit(): cannot accept task for destroyed pool");
+        }
+    }
     std::packaged_task<ResultType()> task(std::move(f));
     std::future<ResultType> result(task.get_future());
     queue_->push(move(task));

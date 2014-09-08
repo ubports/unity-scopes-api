@@ -14,6 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
+ *              Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
 #include <unity/scopes/internal/FilterBaseImpl.h>
@@ -68,9 +69,9 @@ SearchHandle::~SearchHandle()
     cancel_search();
 }
 
-SearchRequestResults SearchHandle::get_search_results()
+void SearchHandle::wait()
 {
-    return ssc_->get_search_results(search_id_);
+    ssc_->wait_for_search(search_id_);
 }
 
 void SearchHandle::cancel_search()
@@ -91,9 +92,9 @@ PreviewHandle::~PreviewHandle()
     cancel_preview();
 }
 
-std::pair<PreviewHandle::Columns, PreviewHandle::Widgets> PreviewHandle::get_preview_results()
+void PreviewHandle::wait()
 {
-    return ssc_->get_preview_results(preview_id_);
+    ssc_->wait_for_preview(preview_id_);
 }
 
 void PreviewHandle::cancel_preview()
@@ -166,10 +167,12 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
         }
 
         std::cout << "SmartScopesClient.get_remote_scopes(): GET " << remote_scopes_uri.str() << std::endl;
-        HttpResponseHandle::SPtr response = http_client_->get(remote_scopes_uri.str());
+
+        HttpResponseHandle::SPtr response = http_client_->get(remote_scopes_uri.str(), [&response_str](std::string const& replyLine) {
+                response_str += replyLine; // accumulate all reply lines
+        });
         response->wait();
 
-        response_str = response->get();
         std::cout << "SmartScopesClient.get_remote_scopes(): Remote scopes:" << std::endl << response_str << std::endl;
     }
     catch (std::exception const& e)
@@ -321,11 +324,12 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
     return !using_cache;
 }
 
-SearchHandle::UPtr SmartScopesClient::search(std::string const& base_url,
+SearchHandle::UPtr SmartScopesClient::search(SearchReplyHandler const& handler,
+                                             std::string const& base_url,
                                              std::string const& query,
                                              std::string const& department_id,
                                              std::string const& session_id,
-                                             uint query_id,
+                                             int query_id,
                                              std::string const& platform,
                                              VariantMap const& settings,
                                              VariantMap const& filter_state,
@@ -339,7 +343,7 @@ SearchHandle::UPtr SmartScopesClient::search(std::string const& base_url,
     // mandatory parameters
     search_uri << "q=" << http_client_->to_percent_encoding(query);
 
-    search_uri << "&session_id=" << session_id;
+    search_uri << "&session_id=" << http_client_->to_percent_encoding(session_id);
     search_uri << "&query_id=" << std::to_string(query_id);
     search_uri << "&platform=" << platform;
 
@@ -377,12 +381,22 @@ SearchHandle::UPtr SmartScopesClient::search(std::string const& base_url,
     uint search_id = ++query_counter_;
 
     std::cout << "SmartScopesClient.search(): GET " << search_uri.str() << std::endl;
-    query_results_[search_id] = http_client_->get(search_uri.str());
+    query_results_[search_id] = http_client_->get(search_uri.str(), [this, handler](std::string const& lineData) {
+            try
+            {
+                parse_line(lineData, handler);
+            }
+            catch (std::exception const &e)
+            {
+                std::cerr << "Failed to parse: " << e.what() << std::endl;
+            }
+    });
 
     return SearchHandle::UPtr(new SearchHandle(search_id, shared_from_this()));
 }
 
-PreviewHandle::UPtr SmartScopesClient::preview(std::string const& base_url,
+PreviewHandle::UPtr SmartScopesClient::preview(PreviewReplyHandler const& handler,
+                                               std::string const& base_url,
                                                std::string const& result,
                                                std::string const& session_id,
                                                std::string const& platform,
@@ -397,7 +411,7 @@ PreviewHandle::UPtr SmartScopesClient::preview(std::string const& base_url,
     // mandatory parameters
 
     preview_uri << "result=" << http_client_->to_percent_encoding(result);
-    preview_uri << "&session_id=" << session_id;
+    preview_uri << "&session_id=" << http_client_->to_percent_encoding(session_id);
     preview_uri << "&platform=" << platform;
     preview_uri << "&widgets_api_version=" << std::to_string(widgets_api_version);
 
@@ -424,18 +438,153 @@ PreviewHandle::UPtr SmartScopesClient::preview(std::string const& base_url,
     uint preview_id = ++query_counter_;
 
     std::cout << "SmartScopesClient.preview(): GET " << preview_uri.str() << std::endl;
-    query_results_[preview_id] = http_client_->get(preview_uri.str());
+    query_results_[preview_id] = http_client_->get(preview_uri.str(), [this, handler](std::string const& lineData) {
+            try
+            {
+                parse_line(lineData, handler);
+            }
+            catch (std::exception const &e)
+            {
+                std::cerr << "Failed to parse: " << e.what() << std::endl;
+            }
+    });
 
     return PreviewHandle::UPtr(new PreviewHandle(preview_id, shared_from_this()));
 }
 
-SearchRequestResults SmartScopesClient::get_search_results(uint search_id)
+void SmartScopesClient::parse_line(std::string const& json, PreviewReplyHandler const& handler)
+{
+    JsonNodeInterface::SPtr root_node;
+    JsonNodeInterface::SPtr child_node;
+    {
+        std::lock_guard<std::mutex> lock(json_node_mutex_);
+        json_node_->read_json(json);
+        root_node = json_node_->get_node();
+    }
+
+    if (root_node->has_node("columns"))
+    {
+        PreviewHandle::Columns columns;
+        child_node = root_node->get_node("columns");
+
+        // for each column
+        for (int column_i = 0; column_i < child_node->size(); ++column_i)
+        {
+            auto column_node = child_node->get_node(column_i);
+
+            // for each widget layout within the column
+            std::vector<std::vector<std::string>> widget_layouts;
+            for (int widget_lo_i = 0; widget_lo_i < column_node->size(); ++widget_lo_i)
+            {
+                auto widget_lo_node = column_node->get_node(widget_lo_i);
+
+                // for each widget within the widget layout
+                std::vector<std::string> widget_ids;
+                for (int widget_i = 0; widget_i < widget_lo_node->size(); ++widget_i)
+                {
+                    auto widget_node = widget_lo_node->get_node(widget_i);
+                    widget_ids.push_back(widget_node->as_string());
+                }
+
+                widget_layouts.push_back(widget_ids);
+            }
+
+            columns.push_back(widget_layouts);
+        }
+        handler.columns_handler(columns);
+    }
+    else if (root_node->has_node("widget"))
+    {
+        child_node = root_node->get_node("widget");
+        handler.widget_handler(child_node->to_json_string());
+    }
+}
+
+void SmartScopesClient::parse_line(std::string const& json, SearchReplyHandler const& handler)
+{
+    JsonNodeInterface::SPtr root_node;
+    JsonNodeInterface::SPtr child_node;
+
+    {
+        std::lock_guard<std::mutex> lock(json_node_mutex_);
+        json_node_->read_json(json);
+        root_node = json_node_->get_node();
+    }
+
+    if (root_node->has_node("category"))
+    {
+        child_node = root_node->get_node("category");
+        auto category = std::make_shared<SearchCategory>();
+
+        std::vector<std::string> members = child_node->member_names();
+        for (auto& member : members)
+        {
+            if (member == "icon")
+            {
+                category->icon = child_node->get_node(member)->as_string();
+            }
+            else if (member == "id")
+            {
+                category->id = child_node->get_node(member)->as_string();
+            }
+            else if (member == "render_template")
+            {
+                category->renderer_template = child_node->get_node(member)->as_string();
+            }
+            else if (member == "title")
+            {
+                category->title = child_node->get_node(member)->as_string();
+            }
+        }
+        handler.category_handler(category);
+    }
+    else if (root_node->has_node("result"))
+    {
+        child_node = root_node->get_node("result");
+        SearchResult result;
+        result.json = child_node->to_json_string();
+
+        std::vector<std::string> members = child_node->member_names();
+        for (auto& member : members)
+        {
+            if (member == "uri")
+            {
+                result.uri = child_node->get_node(member)->as_string();
+            }
+            else if (member == "cat_id")
+            {
+                std::string category = child_node->get_node(member)->as_string();
+                result.category_id = category;
+            }
+            else
+            {
+                result.other_params[member] = child_node->get_node(member);
+            }
+        }
+        handler.result_handler(result);
+    }
+    else if (root_node->has_node("departments"))
+    {
+        auto departments = parse_departments(root_node->get_node("departments"));
+        handler.departments_handler(departments);
+    }
+    else if (root_node->has_node("filters"))
+    {
+        auto filters = parse_filters(root_node->get_node("filters"));
+        handler.filters_handler(filters);
+    }
+    else if (root_node->has_node("filter_state"))
+    {
+        auto filter_state = parse_filter_state(root_node->get_node("filter_state"));
+        handler.filter_state_handler(filter_state);
+    }
+}
+
+void SmartScopesClient::wait_for_search(uint search_id)
 {
     try
     {
         HttpResponseHandle::SPtr query_result;
-        std::string response_str;
-
         {
             std::lock_guard<std::mutex> lock(query_results_mutex_);
 
@@ -449,110 +598,16 @@ SearchRequestResults SmartScopesClient::get_search_results(uint search_id)
         }
 
         query_result->wait();
-        response_str = query_result->get();
-
-        {
-            std::lock_guard<std::mutex> lock(query_results_mutex_);
-
-            std::cout << "SmartScopesClient.get_search_results():" << std::endl << response_str << std::endl;
-            query_results_.erase(search_id);
-        }
-
-        std::vector<SearchResult> results;
-        std::map<std::string, std::shared_ptr<SearchCategory>> categories;
-        std::shared_ptr<DepartmentInfo> departments;
-        Filters filters;
-        FilterState filter_state;
-
-        std::vector<std::string> jsons = extract_json_stream(response_str);
-
-        for (std::string& json : jsons)
-        {
-            JsonNodeInterface::SPtr root_node;
-            JsonNodeInterface::SPtr child_node;
-
-            {
-                std::lock_guard<std::mutex> lock(json_node_mutex_);
-                json_node_->read_json(json);
-                root_node = json_node_->get_node();
-            }
-
-            if (root_node->has_node("category"))
-            {
-                child_node = root_node->get_node("category");
-                auto category = std::make_shared<SearchCategory>();
-
-                std::vector<std::string> members = child_node->member_names();
-                for (auto& member : members)
-                {
-                    if (member == "icon")
-                    {
-                        category->icon = child_node->get_node(member)->as_string();
-                    }
-                    else if (member == "id")
-                    {
-                        category->id = child_node->get_node(member)->as_string();
-                    }
-                    else if (member == "render_template")
-                    {
-                        category->renderer_template = child_node->get_node(member)->as_string();
-                    }
-                    else if (member == "title")
-                    {
-                        category->title = child_node->get_node(member)->as_string();
-                    }
-                }
-
-                categories[category->id] = category;
-            }
-            else if (root_node->has_node("result"))
-            {
-                child_node = root_node->get_node("result");
-                SearchResult result;
-                result.json = child_node->to_json_string();
-
-                std::vector<std::string> members = child_node->member_names();
-                for (auto& member : members)
-                {
-                    if (member == "uri")
-                    {
-                        result.uri = child_node->get_node(member)->as_string();
-                    }
-                    else if (member == "cat_id")
-                    {
-                        std::string category = child_node->get_node(member)->as_string();
-                        result.category = categories.find(category) != categories.end() ? categories[category] : nullptr;
-                    }
-                    else
-                    {
-                        result.other_params[member] = child_node->get_node(member);
-                    }
-                }
-                results.push_back(result);
-            }
-            else if (root_node->has_node("departments"))
-            {
-                departments = parse_departments(root_node->get_node("departments"));
-            }
-            else if (root_node->has_node("filters"))
-            {
-                filters = parse_filters(root_node->get_node("filters"));
-            }
-            else if (root_node->has_node("filter_state"))
-            {
-                filter_state = parse_filter_state(root_node->get_node("filter_state"));
-            }
-        }
-
-        std::cout << "SmartScopesClient.get_search_results(): Retrieved search results for query " << search_id << std::endl;
-
-        return std::tie(departments, filters, filter_state, results);
+        query_result->get(); // may throw on error
     }
     catch (std::exception const& e)
     {
         std::cerr << "SmartScopesClient.get_search_results(): Failed to retrieve search results for query " << search_id << ": " << e.what() << std::endl;
         throw;
     }
+
+    std::lock_guard<std::mutex> lock(query_results_mutex_);
+    query_results_.erase(search_id);
 }
 
 std::shared_ptr<DepartmentInfo> SmartScopesClient::parse_departments(JsonNodeInterface::SPtr node)
@@ -627,13 +682,11 @@ FilterState SmartScopesClient::parse_filter_state(JsonNodeInterface::SPtr node)
     return FilterStateImpl::deserialize(node->to_variant().get_dict());
 }
 
-std::pair<PreviewHandle::Columns, PreviewHandle::Widgets> SmartScopesClient::get_preview_results(uint preview_id)
+void SmartScopesClient::wait_for_preview(uint preview_id)
 {
     try
     {
         HttpResponseHandle::SPtr query_result;
-        std::string response_str;
-
         {
             std::lock_guard<std::mutex> lock(query_results_mutex_);
 
@@ -647,75 +700,16 @@ std::pair<PreviewHandle::Columns, PreviewHandle::Widgets> SmartScopesClient::get
         }
 
         query_result->wait();
-        response_str = query_result->get();
-
-        {
-            std::lock_guard<std::mutex> lock(query_results_mutex_);
-
-            std::cout << "SmartScopesClient.get_preview_results():" << std::endl << response_str << std::endl;
-            query_results_.erase(preview_id);
-        }
-
-        PreviewHandle::Columns columns;
-        PreviewHandle::Widgets widgets;
-
-        std::vector<std::string> jsons = extract_json_stream(response_str);
-
-        for (std::string& json : jsons)
-        {
-            JsonNodeInterface::SPtr root_node;
-            JsonNodeInterface::SPtr child_node;
-
-            {
-                std::lock_guard<std::mutex> lock(json_node_mutex_);
-                json_node_->read_json(json);
-                root_node = json_node_->get_node();
-            }
-
-            if (root_node->has_node("columns"))
-            {
-                child_node = root_node->get_node("columns");
-
-                // for each column
-                for (int column_i = 0; column_i < child_node->size(); ++column_i)
-                {
-                    auto column_node = child_node->get_node(column_i);
-
-                    // for each widget layout within the column
-                    std::vector<std::vector<std::string>> widget_layouts;
-                    for (int widget_lo_i = 0; widget_lo_i < column_node->size(); ++widget_lo_i)
-                    {
-                        auto widget_lo_node = column_node->get_node(widget_lo_i);
-
-                        // for each widget within the widget layout
-                        std::vector<std::string> widget_ids;
-                        for (int widget_i = 0; widget_i < widget_lo_node->size(); ++widget_i)
-                        {
-                            auto widget_node = widget_lo_node->get_node(widget_i);
-                            widget_ids.push_back(widget_node->as_string());
-                        }
-
-                        widget_layouts.push_back(widget_ids);
-                    }
-
-                    columns.push_back(widget_layouts);
-                }
-            }
-            else if (root_node->has_node("widget"))
-            {
-                child_node = root_node->get_node("widget");
-                widgets.push_back(child_node->to_json_string());
-            }
-        }
-
-        std::cout << "SmartScopesClient.get_preview_results(): Retrieved preview results for query " << preview_id << std::endl;
-        return std::make_pair(columns, widgets);
+        query_result->get(); // may throw on error
     }
     catch (std::exception const& e)
     {
         std::cerr << "SmartScopesClient.get_preview_results(): Failed to retrieve preview results for query " << preview_id << std::endl;
         throw;
     }
+
+    std::lock_guard<std::mutex> lock(query_results_mutex_);
+    query_results_.erase(preview_id);
 }
 
 std::vector<std::string> SmartScopesClient::extract_json_stream(std::string const& json_stream)

@@ -14,6 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
+ *              Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
 #include "unity/scopes/internal/smartscopes/HttpClientQtThread.h"
@@ -22,6 +23,8 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QTimer>
+#include <cassert>
+#include <iostream>
 
 namespace unity
 {
@@ -35,9 +38,10 @@ namespace internal
 namespace smartscopes
 {
 
-HttpClientQtThread::HttpClientQtThread(const QUrl& url, uint timeout)
+HttpClientQtThread::HttpClientQtThread(const QUrl& url, uint timeout, std::function<void(std::string const&)> const& lineData)
     : QThread()
     , url_(url)
+    , lineDataCallback_(lineData)
     , timeout_(timeout)
     , success_(false)
 {
@@ -65,16 +69,18 @@ void HttpClientQtThread::run()
     QNetworkRequest request(url_);
 
     QNetworkReply* reply = manager->get(request);
+    reply->setReadBufferSize(0); // unlimited buffer
 
-    connect(manager, &QNetworkAccessManager::finished, this, &HttpClientQtThread::got_reply, Qt::DirectConnection);
+    connect(manager, SIGNAL(finished(QNetworkReply *)), this, SLOT(got_reply(QNetworkReply *)));
+    connect(reply, SIGNAL(readyRead()), this, SLOT(dataReady()));
     connect(this, &HttpClientQtThread::abort, reply, &QNetworkReply::abort);
 
     QTimer timeout;
     timeout.singleShot(timeout_, this, SLOT(timeout()));
     QThread::exec();  // enter event loop
 
-    delete reply;
-    delete manager;
+    reply->deleteLater();
+    manager->deleteLater();
 }
 
 void HttpClientQtThread::cancel()
@@ -97,6 +103,20 @@ void HttpClientQtThread::timeout()
 
     emit HttpClientQtThread::abort();
     quit();
+}
+
+void HttpClientQtThread::dataReady()
+{
+    QNetworkReply* net_reply = qobject_cast<QNetworkReply*>(sender());
+    if (net_reply)
+    {
+        if (net_reply->canReadLine())
+        {
+            QByteArray data = net_reply->readLine();
+            const std::string replyLine(data.constData(), data.size());
+            lineDataCallback_(replyLine);
+        }
+    }
 }
 
 void HttpClientQtThread::got_reply(QNetworkReply* reply)
@@ -129,8 +149,18 @@ void HttpClientQtThread::got_reply(QNetworkReply* reply)
     else
     {
         success_ = true;
-        QByteArray byte_array = reply->readAll();
-        reply_ = std::string(byte_array.constData(), byte_array.size());
+        // read any remaining lines
+        while (reply->canReadLine())
+        {
+            const QByteArray byte_array = reply->readLine();
+            lineDataCallback_(std::string(byte_array.constData(), byte_array.size()));
+        }
+        // there may be data left which is not "\n" terminated
+        if (reply->bytesAvailable())
+        {
+            const QByteArray byte_array = reply->readAll();
+            lineDataCallback_(std::string(byte_array.constData(), byte_array.size()));
+        }
     }
 
     quit();

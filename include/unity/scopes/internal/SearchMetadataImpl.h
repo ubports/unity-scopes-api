@@ -22,7 +22,6 @@
 #include <unity/scopes/internal/QueryMetadataImpl.h>
 #include <unity/scopes/SearchMetadata.h>
 
-#include <unity/scopes/internal/max_align_clang_bug.h>  // TODO: remove this once clang 3.5.2 is released
 #include <boost/optional.hpp>
 
 namespace unity
@@ -56,12 +55,6 @@ public:
     Location location() const;
     bool has_location() const;
 
-    bool contains_hint(std::string const& key) const;
-    void set_hint(std::string const& key, Variant const& value);
-    VariantMap hints() const;
-    Variant& hint(std::string const& key);
-    Variant const& hint(std::string const& key) const;
-
     virtual VariantMap serialize() const override;
 
     static SearchMetadata create(VariantMap const& var);
@@ -74,7 +67,6 @@ protected:
 
 private:
     int cardinality_;
-    VariantMap hints_;
     boost::optional<Location> location_;
 };
 

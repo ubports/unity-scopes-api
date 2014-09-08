@@ -21,7 +21,7 @@
 #include <unity/scopes/ScopeExceptions.h>
 
 #include <cassert>
-#include <iostream>
+#include <iostream>  // TODO: remove this once logging is added
 
 using namespace std;
 
@@ -70,29 +70,8 @@ StopPublisher::StopPublisher(zmqpp::context* context, string const& inproc_name)
 
 StopPublisher::~StopPublisher()
 {
-    try
-    {
-        stop();
-    }
-    // LCOV_EXCL_START
-    catch (std::exception const& e)
-    {
-        cerr << "~StopPublisher(): exception from stop(): " << e.what() << endl;
-        // TODO: log this
-    }
-    catch (...)
-    {
-        cerr << "~StopPublisher(): unknown exception from stop()" << endl;
-        // TODO: log this
-    }
-    // LCOV_EXCL_STOP
-
-    {
-        // The destructor may not be called from the same thread as
-        // the constructor, so we need a full fence here.
-        lock_guard<mutex> lock(m_);
-    }
-
+    stop();
+    wait_until_stopped();
     if (thread_.joinable())
     {
         thread_.join();
@@ -152,7 +131,7 @@ zmqpp::socket StopPublisher::subscribe()
 // The stopper thread sends a stop message only once; subsequent calls
 // to stop() are no-ops.
 
-void StopPublisher::stop()
+void StopPublisher::stop() noexcept
 {
     unique_lock<mutex> lock(m_);
 
@@ -160,22 +139,11 @@ void StopPublisher::stop()
     {
         case Stopping:
         case Stopped:
-        {
-            return;  // no-op
-        }
-        // LCOV_EXCL_START
         case Failed:
         {
-            try
-            {
-                rethrow_exception(ex_);
-            }
-            catch (...)
-            {
-                throw MiddlewareException("StopPublisher::stop(): cannot stop failed publisher");
-            }
+            cond_.notify_all();
+            return;  // no-op
         }
-        // LCOV_EXCL_STOP
         default:
         {
             assert(state_ == Started);
@@ -183,6 +151,12 @@ void StopPublisher::stop()
             cond_.notify_all();
         }
     }
+}
+
+void StopPublisher::wait_until_stopped() noexcept
+{
+    unique_lock<mutex> lock(m_);
+    cond_.wait(lock, [this]{ return state_ == Stopped || state_ == Failed; });
 }
 
 void StopPublisher::stopper_thread() noexcept
@@ -194,9 +168,9 @@ void StopPublisher::stopper_thread() noexcept
         assert(state_ == Starting);
 
         // Create the publishing socket.
-        zmqpp::socket pub_socket(zmqpp::socket(*context_, zmqpp::socket_type::publish));
+        zmqpp::socket pub_socket(*context_, zmqpp::socket_type::publish);
         // Allow time for stop message to be buffered, so close() won't discard it.
-        pub_socket.set(zmqpp::socket_option::linger, 5000);
+        pub_socket.set(zmqpp::socket_option::linger, 200);
         pub_socket.bind(endpoint_);
 
         // Notify that we are ready. This ensures that subscribers
@@ -215,10 +189,11 @@ void StopPublisher::stopper_thread() noexcept
         if (!stop_sent_)
         {
             stop_sent_ = true;
-            pub_socket.send("");
+            pub_socket.send("");  // Fails if context was terminated
             pub_socket.close();
         }
         state_ = Stopped;
+        cond_.notify_all();
     }
     catch (...)
     {

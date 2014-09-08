@@ -161,6 +161,35 @@ Review any changes in /tmp/symbols.diff. If they are OK:
     $ cd -
     $ patch -p0 < /tmp/symbols.diff
 
+ABI compliance test
+-------------------
+To use this, install abi-compliance-checker package from the archives.
+
+You can use abi-compliance-checker to test whether a particular build
+is ABI compatible with another build. The tool does some source-level
+analysis in addition to checking library symbols, so it catches things
+that are potentially dangerous, but won't be picked up by just looking
+at the symbol table.
+
+Assume you have built devel in src/devel, and you have a later build
+in src/mybranch and want to check that mybranch is still compatible.
+To run the compliance test:
+
+$ cd src
+$ abi-compliance-checker -lib libunity-scopes.so -old devel/build/test/abi-compliance/abi.xml -new mybranch/build/test/abi-compliance/abi.xml
+
+The script will take about two minutes to run.
+
+You will get a message about compilation errors. These are caused by a Qt macro and
+can be ignored. (The log file in src/logs/libunity-scopes.so/[version]/log.txt
+contains the details.)
+
+Now point your browser at 
+
+src/compat_reports/libunity-scopes.so/[version]_to_[version]/compat_report.html
+
+The report provides a nicely layed-out page with all the details.
+
 Debugging IPC
 -------------
 

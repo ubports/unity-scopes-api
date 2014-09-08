@@ -16,12 +16,6 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include <signal.h>
-#include <sys/types.h>
-#include <unistd.h>
-
-#include <mutex>
-
 #include <unity/scopes/ActionMetadata.h>
 #include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/internal/MWScope.h>
@@ -39,6 +33,13 @@
 #include "PusherScope.h"
 #include "SlowCreateScope.h"
 #include "TestScope.h"
+
+#include <fstream>
+#include <mutex>
+
+#include <signal.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 using namespace std;
 using namespace unity::scopes;
@@ -88,6 +89,7 @@ public:
         EXPECT_EQ("art", result.art());
         EXPECT_EQ("dnd_uri", result.dnd_uri());
         count_++;
+        lock_guard<mutex> lock(mutex_);
         last_result_ = std::make_shared<Result>(result);
     }
 
@@ -111,11 +113,14 @@ public:
         EXPECT_EQ(1, annotation_count_);
         EXPECT_EQ(2, info_count_);
 
-        ASSERT_EQ(2, details.info_list().size());
-        EXPECT_EQ(OperationInfo::NoInternet, details.info_list()[0].code());
-        EXPECT_EQ("Partial results returned due to no internet connection.", details.info_list()[0].message());
-        EXPECT_EQ(OperationInfo::PoorInternet, details.info_list()[1].code());
-        EXPECT_EQ("Partial results returned due to poor internet connection.", details.info_list()[1].message());
+        EXPECT_EQ(2, details.info_list().size());
+        if (details.info_list().size() == 2)
+        {
+            EXPECT_EQ(OperationInfo::NoInternet, details.info_list()[0].code());
+            EXPECT_EQ("Partial results returned due to no internet connection.", details.info_list()[0].message());
+            EXPECT_EQ(OperationInfo::PoorInternet, details.info_list()[1].code());
+            EXPECT_EQ("Partial results returned due to poor internet connection.", details.info_list()[1].message());
+        }
 
         // Signal that the query has completed.
         unique_lock<mutex> lock(mutex_);
@@ -146,6 +151,7 @@ public:
 
     std::shared_ptr<Result> last_result()
     {
+        lock_guard<mutex> lock(mutex_);
         return last_result_;
     }
 
@@ -153,10 +159,10 @@ private:
     bool query_complete_;
     mutex mutex_;
     condition_variable cond_;
-    int count_;
-    int dep_count_;
-    int annotation_count_;
-    int info_count_;
+    atomic_int count_;
+    atomic_int dep_count_;
+    atomic_int annotation_count_;
+    atomic_int info_count_;
     std::shared_ptr<Result> last_result_;
 };
 
@@ -195,11 +201,14 @@ public:
         EXPECT_EQ(2, data_pushes_);
         EXPECT_EQ(2, info_count_);
 
-        ASSERT_EQ(2, details.info_list().size());
-        EXPECT_EQ(OperationInfo::NoLocationData, details.info_list()[0].code());
-        EXPECT_EQ("", details.info_list()[0].message());
-        EXPECT_EQ(OperationInfo::InaccurateLocationData, details.info_list()[1].code());
-        EXPECT_EQ("Partial results returned due to inaccurate location data.", details.info_list()[1].message());
+        EXPECT_EQ(2, details.info_list().size());
+        if (details.info_list().size() == 2)
+        {
+            EXPECT_EQ(OperationInfo::NoLocationData, details.info_list()[0].code());
+            EXPECT_EQ("", details.info_list()[0].message());
+            EXPECT_EQ(OperationInfo::InaccurateLocationData, details.info_list()[1].code());
+            EXPECT_EQ("Partial results returned due to inaccurate location data.", details.info_list()[1].message());
+        }
 
         // Signal that the query has completed.
         unique_lock<mutex> lock(mutex_);
@@ -232,9 +241,9 @@ private:
     bool query_complete_;
     mutex mutex_;
     condition_variable cond_;
-    int widgets_pushes_;
-    int data_pushes_;
-    int info_count_;
+    atomic_int widgets_pushes_;
+    atomic_int data_pushes_;
+    atomic_int info_count_;
 };
 
 class PushReceiver : public SearchListenerBase
@@ -366,14 +375,16 @@ TEST(Runtime, preview)
     receiver->wait_until_finished();
 
     auto result = receiver->last_result();
-    ASSERT_TRUE(result.get() != nullptr);
+    EXPECT_TRUE(result.get() != nullptr);
 
-    auto target = result->target_scope_proxy();
-    EXPECT_TRUE(target != nullptr);
-
-    auto previewer = make_shared<PreviewReceiver>();
-    auto preview_ctrl = target->preview(*(result.get()), ActionMetadata("en", "phone"), previewer);
-    previewer->wait_until_finished();
+    if (result.get() != nullptr)
+    {
+        auto target = result->target_scope_proxy();
+        EXPECT_TRUE(target != nullptr);
+        auto previewer = make_shared<PreviewReceiver>();
+        auto preview_ctrl = target->preview(*(result.get()), ActionMetadata("en", "phone"), previewer);
+        previewer->wait_until_finished();
+    }
 }
 
 TEST(Runtime, cardinality)
@@ -454,16 +465,18 @@ TEST(Runtime, early_cancel)
     auto ctrl = scope->search("test", SearchMetadata("unused", "unused"), receiver);
     // Allow some time for the search message to get there.
     this_thread::sleep_for(chrono::milliseconds(100));
+
     // search() in the scope doesn't return for some time, so the cancel() that follows
     // is sent to the "fake" QueryCtrlProxy.
     ctrl->cancel();
     receiver->wait_until_finished();
+
     // The receiver receives its cancel from the client-side run time instead of the
     // scope because the run time short-cuts sending the cancel locally instead
     // of waiting for the cancel message from the scope. Allow some time for the
     // cancel to reach the scope before shutting down the run time, so the scope
     // can test that it received the cancel.
-    this_thread::sleep_for(chrono::milliseconds(300));
+    this_thread::sleep_for(chrono::milliseconds(500));
 }
 
 void scope_thread(Runtime::SPtr const& rt, string const& runtime_ini_file)
@@ -488,6 +501,8 @@ int main(int argc, char **argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
 
+    int rc = 0;
+
     Runtime::SPtr srt = move(Runtime::create_scope_runtime("TestScope", "Runtime.ini"));
     std::thread scope_t(scope_thread, srt, "Runtime.ini");
 
@@ -501,7 +516,12 @@ int main(int argc, char **argv)
     // from a synchronous remote call.
     this_thread::sleep_for(chrono::milliseconds(500));
 
-    auto rc = RUN_ALL_TESTS();
+    std::ifstream la("/proc/loadavg");
+    std::string avg[3];
+    la >> avg[0] >> avg[1] >> avg[2];
+    std::cerr << "load average: " << avg[0] << " " << avg[1] << " " << avg[2] << std::endl;
+
+    rc = RUN_ALL_TESTS();
 
     srt->destroy();
     scope_t.join();

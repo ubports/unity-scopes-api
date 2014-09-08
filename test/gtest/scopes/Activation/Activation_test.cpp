@@ -42,10 +42,12 @@ public:
     {
         push_func_ = push_func;
     };
+
     void push(CategorisedResult result) override
     {
         push_func_(result);
     }
+
     void finished(CompletionDetails const&) override {}
 
     std::function<void(CategorisedResult)> push_func_;
@@ -57,7 +59,8 @@ public:
     void wait_until_finished()
     {
         std::unique_lock<std::mutex> lock(mutex_);
-        cond_.wait(lock, [this] { return this->query_complete_; });
+        auto ok = cond_.wait_for(lock, std::chrono::seconds(2), [this] { return this->query_complete_; });
+        ASSERT_TRUE(ok) << "query did not complete after 2 seconds";
     }
 
 protected:
@@ -70,10 +73,9 @@ protected:
     }
 
 private:
-    bool query_complete_;
+    bool query_complete_ = false;
     std::mutex mutex_;
     std::condition_variable cond_;
-
 };
 
 class SearchReceiver : public SearchListenerBase, public WaitUntilFinished
@@ -84,8 +86,9 @@ public:
         this->result = std::make_shared<Result>(result);
     }
 
-    virtual void finished(CompletionDetails const&) override
+    virtual void finished(CompletionDetails const& details) override
     {
+        EXPECT_EQ(CompletionDetails::OK, details.status()) << details.message();
         notify();
     }
 
@@ -145,7 +148,7 @@ TEST(Activation, direct_activation)
     {
         std::shared_ptr<CategorisedResult> received_result;
         auto df = []() -> void {};
-        auto runtime = internal::RuntimeImpl::create("", "Runtime.ini");
+        auto runtime = internal::RuntimeImpl::create("", TEST_DIR "/Runtime.ini");
         auto receiver = std::make_shared<DummyReceiver>([&received_result](CategorisedResult result)
                 {
                     received_result.reset(new CategorisedResult(result));
@@ -178,7 +181,7 @@ TEST(Activation, direct_activation_agg_scope_doesnt_store)
     {
         std::shared_ptr<CategorisedResult> received_result;
         auto df = []() -> void {};
-        auto runtime = internal::RuntimeImpl::create("", "Runtime.ini");
+        auto runtime = internal::RuntimeImpl::create("", TEST_DIR "/Runtime.ini");
         auto receiver = std::make_shared<DummyReceiver>([&received_result](CategorisedResult result)
                 {
                     received_result.reset(new CategorisedResult(result));
@@ -230,7 +233,7 @@ TEST(Activation, direct_activation_agg_scope_stores)
     {
         std::shared_ptr<CategorisedResult> received_result;
         auto df = []() -> void {};
-        auto runtime = internal::RuntimeImpl::create("", "Runtime.ini");
+        auto runtime = internal::RuntimeImpl::create("", TEST_DIR "/Runtime.ini");
         auto receiver = std::make_shared<DummyReceiver>([&received_result](CategorisedResult result)
                 {
                     received_result.reset(new CategorisedResult(result));
@@ -288,7 +291,7 @@ TEST(Activation, agg_scope_doesnt_store_and_doesnt_intercept)
     {
         std::shared_ptr<CategorisedResult> received_result;
         auto df = []() -> void {};
-        auto runtime = internal::RuntimeImpl::create("", "Runtime.ini");
+        auto runtime = internal::RuntimeImpl::create("", TEST_DIR "/Runtime.ini");
         auto receiver = std::make_shared<DummyReceiver>([&received_result](CategorisedResult result)
                 {
                     received_result.reset(new CategorisedResult(result));
@@ -342,7 +345,7 @@ TEST(Activation, agg_scope_doesnt_store_and_sets_intercept)
     {
         std::shared_ptr<CategorisedResult> received_result;
         auto df = []() -> void {};
-        auto runtime = internal::RuntimeImpl::create("", "Runtime.ini");
+        auto runtime = internal::RuntimeImpl::create("", TEST_DIR "/Runtime.ini");
         auto receiver = std::make_shared<DummyReceiver>([&received_result](CategorisedResult result)
                 {
                     received_result.reset(new CategorisedResult(result));
@@ -397,7 +400,7 @@ TEST(Activation, agg_scope_stores_and_doesnt_intercept)
     {
         std::shared_ptr<CategorisedResult> received_result;
         auto df = []() -> void {};
-        auto runtime = internal::RuntimeImpl::create("", "Runtime.ini");
+        auto runtime = internal::RuntimeImpl::create("", TEST_DIR "/Runtime.ini");
         auto receiver = std::make_shared<DummyReceiver>([&received_result](CategorisedResult result)
                 {
                     received_result.reset(new CategorisedResult(result));
@@ -456,7 +459,7 @@ TEST(Activation, agg_scope_stores_and_intercepts)
     {
         std::shared_ptr<CategorisedResult> received_result;
         auto df = []() -> void {};
-        auto runtime = internal::RuntimeImpl::create("", "Runtime.ini");
+        auto runtime = internal::RuntimeImpl::create("", TEST_DIR "/Runtime.ini");
         auto receiver = std::make_shared<DummyReceiver>([&received_result](CategorisedResult result)
                 {
                     received_result.reset(new CategorisedResult(result));
@@ -510,14 +513,13 @@ template <typename ScopeType>
 struct RaiiScopeThread
 {
     ScopeType scope;
-    Runtime::SPtr runtime;
+    Runtime::UPtr runtime;
     std::thread scope_thread;
 
-    RaiiScopeThread(std::string const& scope_id, std::string const& configfile)
-        : runtime(Runtime::create_scope_runtime(scope_id, configfile)),
+    RaiiScopeThread(Runtime::UPtr rt, std::string const& configfile)
+        : runtime(move(rt)),
           scope_thread([this, configfile]{ runtime->run_scope(&scope, configfile, ""); })
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
 
     ~RaiiScopeThread()
@@ -532,8 +534,8 @@ std::unique_ptr<core::posix::ChildProcess::DeathObserver> death_observer(core::p
 
 RuntimeImpl::SPtr run_test_registry()
 {
-    RuntimeImpl::SPtr runtime = RuntimeImpl::create("TestRegistry", "Runtime.ini");
-    MiddlewareBase::SPtr middleware = runtime->factory()->create("TestRegistry", "Zmq", "Zmq.ini");
+    RuntimeImpl::SPtr runtime = RuntimeImpl::create("TestRegistry", TEST_DIR "/Runtime.ini");
+    MiddlewareBase::SPtr middleware = runtime->factory()->create("TestRegistry", "Zmq", TEST_DIR "/Zmq.ini");
     RegistryObject::SPtr reg_obj(std::make_shared<RegistryObject>(*death_observer, std::make_shared<Executor>(), middleware));
     middleware->add_registry_object("TestRegistry", reg_obj);
     return runtime;
@@ -543,11 +545,13 @@ RuntimeImpl::SPtr run_test_registry()
 TEST(Activation, scope)
 {
     auto reg_rt = run_test_registry();
-    RaiiScopeThread<TestScope> scope_thread("TestScope", "Runtime.ini");
+
+    auto scope_rt = Runtime::create_scope_runtime("TestScope", TEST_DIR "/Runtime.ini");
+    RaiiScopeThread<TestScope> scope_thread(move(scope_rt), TEST_DIR "/Runtime.ini");
 
     // parent: connect to scope and run a query
-    auto rt = internal::RuntimeImpl::create("", "Runtime.ini");
-    auto mw = rt->factory()->create("TestScope", "Zmq", "Zmq.ini");
+    auto rt = internal::RuntimeImpl::create("", TEST_DIR "/Runtime.ini");
+    auto mw = rt->factory()->create("TestScope", "Zmq", TEST_DIR "/Zmq.ini");
     mw->start();
     auto proxy = mw->create_scope_proxy("TestScope");
     auto scope = internal::ScopeImpl::create(proxy, rt.get(), "TestScope");

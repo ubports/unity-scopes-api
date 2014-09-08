@@ -54,6 +54,7 @@ ReplyObject::ReplyObject(ListenerBase::SPtr const& receiver_base, RuntimeImpl co
 
     if (dont_reap == false)
     {
+        unique_lock<mutex> lock(mutex_);  // Make sure that when lambda fires, it sees current values.
         reap_item_ = runtime->reply_reaper()->add([this] {
             string msg = "No activity on ReplyObject for scope " + this->origin_proxy_ + ": ReplyObject destroyed";
             this->finished(CompletionDetails(CompletionDetails::Error, msg));
@@ -156,9 +157,14 @@ void ReplyObject::finished(CompletionDetails const& details) noexcept
 
     // Only one thread can reach this point, any others were thrown out above.
 
-    if (reap_item_)
+    ReapItem::SPtr ri;
     {
-        reap_item_->destroy();
+        unique_lock<mutex> lock(mutex_);  // If finished() is called by reaper, the
+        ri = reap_item_;                  // callback needs to see the current value of reap_item_.
+    }
+    if (ri)
+    {
+        ri->cancel();
     }
 
     // Wait until all currently executing calls to push() have completed.
