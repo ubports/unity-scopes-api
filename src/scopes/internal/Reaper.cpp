@@ -38,7 +38,7 @@ namespace internal
 ReapItem::ReapItem(weak_ptr<Reaper> const& reaper, reaper_private::Reaplist::iterator it) :
     reaper_(reaper),
     it_(it),
-    destroyed_(false)
+    cancelled_(false)
 {
 }
 
@@ -46,7 +46,7 @@ ReapItem::~ReapItem()
 {
     // If we go out of scope, we remove ourselves from the reaper list. This
     // ensures that no callback will be made.
-    destroy();
+    cancel();
 }
 
 void ReapItem::refresh() noexcept
@@ -58,9 +58,9 @@ void ReapItem::refresh() noexcept
         lock_guard<mutex> reaper_lock(reaper->mutex_, adopt_lock);
         lock_guard<mutex> item_lock(mutex_, adopt_lock);
 
-        if (destroyed_)
+        if (cancelled_)
         {
-            return;  // A reaping pass may have destroyed this ReapItem already.
+            return;  // A reaping pass may have cancelled this ReapItem already.
         }
 
         // Move our Item to the head of the list after updating the time stamp.
@@ -75,21 +75,21 @@ void ReapItem::refresh() noexcept
     {
         // The reaper has gone away, so we disable ourself.
         lock_guard<mutex> item_lock(mutex_);
-        destroyed_ = true;
+        cancelled_ = true;
     }
 }
 
-void ReapItem::destroy() noexcept
+void ReapItem::cancel() noexcept
 {
     auto const reaper = reaper_.lock();  // Reaper may no longer be around
     if (reaper)
     {
         {
             // Wait for a concurrent reaping pass to complete only
-            // if destroy() is not called by the reaper. This ensures
-            // that destroy() does not return until after the callback
+            // if cancel() is not called by the reaper. This ensures
+            // that cancel() does not return until after the callback
             // function for this reap item has completed, and avoids
-            // deadlock if the callback function tries to destroy its
+            // deadlock if the callback function tries to cancel its
             // own reap item.
             unique_lock<mutex> reap_lock(reaper->reap_mutex_);
             if (reaper->reap_thread_id_ != this_thread::get_id())
@@ -98,11 +98,11 @@ void ReapItem::destroy() noexcept
             }
 
             lock_guard<mutex> item_lock(mutex_);
-            if (destroyed_)
+            if (cancelled_)
             {
-                return;  // A reaping pass may have destroyed this ReapItem already.
+                return;  // A reaping pass may have cancelled this ReapItem already.
             }
-            destroyed_ = true;
+            cancelled_ = true;
         }
 
         // Remove our Item from the reaper's list.
@@ -115,7 +115,7 @@ void ReapItem::destroy() noexcept
     {
         // The reaper has gone away, so we disable ourself.
         lock_guard<mutex> item_lock(mutex_);
-        destroyed_ = true;
+        cancelled_ = true;
     }
 }
 
@@ -151,7 +151,7 @@ Reaper::~Reaper()
 // Instantiate a new reaper. We call set_self() after instantiation so the reaper
 // can keep a weak_ptr to itself. That weak_ptr in turn is passed to each ReapItem,
 // so the ReapItem can manipulate the reap list. If the reaper goes out of scope
-// before a ReapItem, the ReapItem will notice this and deactivate itself.
+// before a ReapItem, the ReapItem will notice this and disable itself.
 
 Reaper::SPtr Reaper::create(int reap_interval, int expiry_interval, DestroyPolicy p)
 {
@@ -314,7 +314,7 @@ void Reaper::reap_func()
 
 void Reaper::remove_zombies(reaper_private::Reaplist const& zombies) noexcept
 {
-    // reap_in_progress prevents ReapItem::destroy() from returning
+    // reap_in_progress prevents ReapItem::cancel() from returning
     // before its callback has completed.
     {
         lock_guard<mutex> reap_lock(reap_mutex_);
@@ -333,12 +333,12 @@ void Reaper::remove_zombies(reaper_private::Reaplist const& zombies) noexcept
 
         {
             lock_guard<mutex> item_lock(ri->mutex_);
-            if (ri->destroyed_)
+            if (ri->cancelled_)
             {
-                // ReapItem::destroy() was called during this pass, it has already completed destruction.
+                // ReapItem::cancel() was called during this pass, it has already completed cancellation.
                 continue;
             }
-            ri->destroyed_ = true;
+            ri->cancelled_ = true;
         }
 
         {
