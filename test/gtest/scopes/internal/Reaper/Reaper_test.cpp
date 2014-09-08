@@ -138,13 +138,13 @@ TEST(Reaper, basic)
         EXPECT_EQ(0, c.get());
 
         v[0]->refresh(); // Does nothing
-        v[1]->destroy(); // Does nothing
-        v[1]->destroy(); // Safe to call more than once
-        v[1]->refresh(); // Safe to call after destroy
+        v[1]->cancel();  // Does nothing
+        v[1]->cancel();  // Safe to call more than once
+        v[1]->refresh(); // Safe to call after cancel
     }
 
     {
-        // Make sure that calling destroy on a ReapItem removes that item from the reaper.
+        // Make sure that calling cancel on a ReapItem removes that item from the reaper.
         Counter c;
         vector<ReapItem::SPtr> v;
         {
@@ -154,22 +154,22 @@ TEST(Reaper, basic)
                 v.push_back(r->add(bind(&Counter::increment, &c)));
             }
             EXPECT_EQ(10u, r->size());
-            v[0]->destroy();
-            v[4]->destroy();
-            v[9]->destroy();
+            v[0]->cancel();
+            v[4]->cancel();
+            v[9]->cancel();
             EXPECT_EQ(7u, r->size());
-            // We call destroy again, to make sure that it's safe to call it twice even though the first time
-            // around, the destroy actually removed the item.
-            v[0]->destroy();
-            v[4]->destroy();
-            v[9]->destroy();
+            // We call cancel again, to make sure that it's safe to call it twice even though the first time
+            // around, the cancel actually removed the item.
+            v[0]->cancel();
+            v[4]->cancel();
+            v[9]->cancel();
             EXPECT_EQ(7u, r->size());
         }
         EXPECT_EQ(0, c.get());
     }
 
     {
-        // Make sure that, after refreshing an item, it still can be destroyed, that is, that the ReapItem
+        // Make sure that, after refreshing an item, it still can be cancelled, that is, that the ReapItem
         // is correctly located in the reaper list even after having been moved.
         Counter c;
         vector<ReapItem::SPtr> v;
@@ -182,34 +182,34 @@ TEST(Reaper, basic)
 
             v[0]->refresh(); // Moves this element from the tail to the head
             EXPECT_EQ(3u, r->size());
-            v[0]->destroy();
+            v[0]->cancel();
             EXPECT_EQ(2u, r->size());
-            v[0]->destroy();            // no-op
+            v[0]->cancel();            // no-op
             EXPECT_EQ(2u, r->size());
-            v[1]->destroy();
-            v[2]->destroy();
+            v[1]->cancel();
+            v[2]->cancel();
             EXPECT_EQ(0u, r->size());
         }
         EXPECT_EQ(0, c.get());
     }
 
     {
-        // Make sure that destroying a reap item after explicitly destroying
+        // Make sure that cancelling a reap item after explicitly destroying
         // the reaper still works and correctly removes the item from the list.
         auto r = Reaper::create(5, 5);
         auto e1 = r->add([]{});
         auto e2 = r->add([]{});
         auto e3 = r->add([]{});
         EXPECT_EQ(3, r->size());
-        e2->destroy();
+        e2->cancel();
         EXPECT_EQ(2, r->size());
 
         r->destroy();
 
         EXPECT_EQ(2, r->size());
-        e3->destroy();
+        e3->cancel();
         EXPECT_EQ(1, r->size());
-        e1->destroy();
+        e1->cancel();
         EXPECT_EQ(0, r->size());
     }
 }
@@ -249,7 +249,7 @@ TEST(Reaper, expiry)
     }
 }
 
-TEST(Reaper, destroy_during_expiry)
+TEST(Reaper, cancel_during_expiry)
 {
     {
         Counter c1;
@@ -315,7 +315,7 @@ TEST(Reaper, destroy_during_expiry)
         EXPECT_EQ(0, c2.get());
         EXPECT_EQ(0, c3.get());
 
-        // We destroy e2, which cancels the callback for it.
+        // We destroy e2, so its callback won't be called.
         e2 = nullptr;
         EXPECT_EQ(1u, r->size());  // e3 is still there because it is expired, but not reaped.
         EXPECT_EQ(1, c1.get());
@@ -335,9 +335,9 @@ TEST(Reaper, destroy_during_expiry)
 TEST(Reaper, wait_during_expiry)
 {
     {
-        // Make sure that calls to destroy() wait if a reaping pass is
+        // Make sure that calls to cancel() wait if a reaping pass is
         // is in progress so the expiry callback is guaranteed to have
-        // completed by the time destroy() returns.
+        // completed by the time cancel() returns.
 
         // t == 0
         Timer t;
@@ -380,7 +380,7 @@ TEST(Reaper, wait_during_expiry)
     }
 }
 
-TEST(Reaper, self_destroy)
+TEST(Reaper, self_cancel)
 {
     {
         auto r = Reaper::create(1, 1, Reaper::CallbackOnDestroy);
@@ -397,7 +397,7 @@ TEST(Reaper, self_destroy)
             void expired()
             {
                 lock_guard<mutex> lock(m);
-                ri->destroy();
+                ri->cancel();
                 cb_called = true;
             }
 
@@ -413,7 +413,7 @@ TEST(Reaper, self_destroy)
             mutex m;
         };
 
-        // Make sure that a callback that calls destroy() on its own
+        // Make sure that a callback that calls cancel() on its own
         // reap item doesn't deadlock.
         SelfDestroy sd(r);
         this_thread::sleep_for(chrono::milliseconds(1500));
@@ -425,7 +425,7 @@ TEST(Reaper, self_destroy)
 TEST(Reaper, no_reap_thread)
 {
     // Check that, with disabled reaper thread, we can still add,
-    // refresh, and destroy entries, and that the callbacks for
+    // refresh, and cancel entries, and that the callbacks for
     // entries that are still around at destruction time are
     // invoked (because CallbackOnDestroy is set).
     {
@@ -439,7 +439,7 @@ TEST(Reaper, no_reap_thread)
         auto e3 = r->add(bind(&Counter::increment, &c3));
 
         e1->refresh();
-        e2->destroy();
+        e2->cancel();
         EXPECT_EQ(2, r->size());
         EXPECT_EQ(0, c1.get());
         EXPECT_EQ(0, c2.get());
@@ -464,7 +464,7 @@ TEST(Reaper, no_reap_thread)
         auto e3 = r->add(bind(&Counter::increment, &c3));
 
         e1->refresh();
-        e2->destroy();
+        e2->cancel();
         EXPECT_EQ(2, r->size());
         EXPECT_EQ(0, c1.get());
         EXPECT_EQ(0, c2.get());

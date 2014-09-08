@@ -68,25 +68,25 @@ class Reaper;
 
 // Simple refresh class returned from Reaper::add().
 // refresh() renews the timestamp of an entry.
-// destroy() removes the entry from the reaper's list *without* invoking the callback.
-// Calls to refresh() or destroy() after destroy() do nothing.
+// cancel() removes the entry from the reaper's list *without* invoking the callback.
+// Calls to refresh() or cancel() after cancel() do nothing.
 //
 // It is safe to continue to call methods on a ReapItem even its reaper has gone out of scope.
-// In that case, refresh() and destroy() do nothing.
+// In that case, refresh() and cancel() do nothing.
 //
-// Letting a ReapItem go out of scope automatically calls destroy(), meaning that the item's callback
+// Letting a ReapItem go out of scope automatically calls cancel(), meaning that the item's callback
 // is *not* invoked when a ReapItem is destroyed.
 //
-// If a ReapItem is destroyed (by calling its destroy() method or implicitly, by letting it go out of scope),
+// If a ReapItem is disabled (by calling its cancel() method or implicitly, by letting it go out of scope),
 // it is possible for the reaper to concurrently invoke the callback for the ReapItem (if the ReapItem
-// happens to expire at just the right time). The implementation guarantees that, by the time destroy()
+// happens to expire at just the right time). The implementation guarantees that, by the time cancel()
 // returns, the expire callback either has completed already, or will not happen at all. That is,
-// a callback never arrives after a call to destroy() has returned.
+// a callback never arrives after a call to cancel() has returned.
 //
 // It is safe to call methods on a ReapItem or the Reaper from within the callback function that
 // is passed to Reaper::add(). However, the callback function must make such calls on the thread
 // that called it; it cannot delegate such calls to a different thread. This allows the callback
-// function for a ReapItem to call destroy() on itself without deadlock.
+// function for a ReapItem to call cancel() on itself without deadlock.
 
 class ReapItem final
 {
@@ -95,7 +95,7 @@ public:
     UNITY_DEFINES_PTRS(ReapItem);
 
     void refresh() noexcept; // Update time stamp on item to keep it alive. O(1) performance.
-    void destroy() noexcept; // Removes this item from the reaper *without* invoking the callback. O(1) performance.
+    void cancel() noexcept;  // Removes this item from the reaper *without* invoking the callback. O(1) performance.
 
     ~ReapItem();
 
@@ -105,7 +105,7 @@ private:
 
     std::weak_ptr<Reaper> reaper_;                      // The reaper this item belongs with
     reaper_private::Reaplist::iterator it_;             // Position of self in reap list
-    bool destroyed_;
+    bool cancelled_;
     std::mutex mutex_;
 
     friend struct Item;
@@ -152,7 +152,7 @@ public:
     // not be reaped on the next pass.
     //
     // If both reap_interval and expiry_interval are set to -1, entries have infinite expiry time.
-    // Reaper::add(), ReapItem::refresh(), and ReapItem::destroy() can still be called.
+    // Reaper::add(), ReapItem::refresh(), and ReapItem::cancel() can still be called.
     // Callbacks are invoked in this case only if the reaper is destroyed while it still holds
     // entries and CallbackOnDestroy is set.
     //

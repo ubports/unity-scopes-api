@@ -164,7 +164,7 @@ void ReplyObject::finished(CompletionDetails const& details) noexcept
     }
     if (ri)
     {
-        ri->destroy();
+        ri->cancel();
     }
 
     // Wait until all currently executing calls to push() have completed.
