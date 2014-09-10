@@ -25,8 +25,6 @@ using namespace unity::scopes;
 
 TEST(OnlineAccountClient, basic)
 {
-    OnlineAccountClient x("com.ubuntu.scopes.youtube_youtube", "sharing", "google");
-    auto y = x.get_service_statuses();
-    int i = 0;
-    ++i;
+    OnlineAccountClient oa_client("com.ubuntu.scopes.youtube_youtube", "sharing", "google");
+    auto service_statuses = oa_client.get_service_statuses();
 }
