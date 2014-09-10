@@ -25,7 +25,6 @@
 #include <unity/UnityExceptions.h>
 #include <unity/util/ResourcePtr.h>
 
-#include <unity/scopes/internal/max_align_clang_bug.h>  // TODO: remove this once clang 3.5.2 is released
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 #include <core/posix/child_process.h>
@@ -341,7 +340,7 @@ void RegistryObject::on_state_received(std::string const& scope_id, StateReceive
     // simply ignore states from scopes the registry does not know about
 }
 
-RegistryObject::ScopeProcess::ScopeProcess(ScopeExecData exec_data, MWPublisher::SPtr publisher)
+RegistryObject::ScopeProcess::ScopeProcess(ScopeExecData exec_data, std::weak_ptr<MWPublisher> const& publisher)
     : exec_data_(exec_data)
     , reg_publisher_(publisher)
     , manually_started_(false)
@@ -522,13 +521,18 @@ void RegistryObject::ScopeProcess::clear_handle_unlocked()
 
 void RegistryObject::ScopeProcess::update_state_unlocked(ProcessState new_state)
 {
+    auto reg_publisher = reg_publisher_.lock();
     if (new_state == state_)
     {
         return;
     }
     else if (new_state == Running)
     {
-        publish_state_change(Running);
+        if (reg_publisher)
+        {
+            // Send a "started" message to subscribers to inform them that this scope (topic) has started
+            reg_publisher->send_message("started", exec_data_.scope_id);
+        }
 
         if (state_ != Starting)
         {
@@ -540,7 +544,11 @@ void RegistryObject::ScopeProcess::update_state_unlocked(ProcessState new_state)
     }
     else if (new_state == Stopped)
     {
-        publish_state_change(Stopped);
+        if (reg_publisher)
+        {
+            // Send a "stopped" message to subscribers to inform them that this scope (topic) has stopped
+            reg_publisher->send_message("stopped", exec_data_.scope_id);
+        }
 
         if (state_ != Stopping)
         {
@@ -550,7 +558,11 @@ void RegistryObject::ScopeProcess::update_state_unlocked(ProcessState new_state)
     }
     else if (new_state == Stopping && manually_started_)
     {
-        publish_state_change(Stopped);
+        if (reg_publisher)
+        {
+            // Send a "stopped" message to subscribers to inform them that this scope (topic) has stopped
+            reg_publisher->send_message("stopped", exec_data_.scope_id);
+        }
 
         cout << "RegistryObject::ScopeProcess: Manually started process for scope: \""
              << exec_data_.scope_id << "\" exited" << endl;
@@ -658,12 +670,14 @@ std::vector<std::string> RegistryObject::ScopeProcess::expand_custom_exec()
 
 void RegistryObject::ScopeProcess::publish_state_change(ProcessState scope_state)
 {
+    auto reg_publisher = reg_publisher_.lock();
+
     if (scope_state == Running)
     {
-        if (reg_publisher_)
+        if (reg_publisher)
         {
             // Send a "started" message to subscribers to inform them that this scope (topic) has started
-            reg_publisher_->send_message("started", exec_data_.scope_id);
+            reg_publisher->send_message("started", exec_data_.scope_id);
         }
         if (exec_data_.debug_mode)
         {
@@ -680,10 +694,10 @@ void RegistryObject::ScopeProcess::publish_state_change(ProcessState scope_state
     }
     else if (scope_state == Stopped)
     {
-        if (reg_publisher_)
+        if (reg_publisher)
         {
             // Send a "stopped" message to subscribers to inform them that this scope (topic) has stopped
-            reg_publisher_->send_message("stopped", exec_data_.scope_id);
+            reg_publisher->send_message("stopped", exec_data_.scope_id);
         }
         if (exec_data_.debug_mode)
         {

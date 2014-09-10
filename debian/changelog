@@ -1,3 +1,17 @@
+unity-scopes-api (0.6.5-0ubuntu1) UNRELEASED; urgency=medium
+
+  [ Pawel Stolowski ]
+  * Added support for expandable widgets.
+  * Enhanced ActionMetadata with hints, similar to SearchMetadata. (LP: #1308585)
+  * Push smart scopes online results immediately as they become available. (LP: #1359177)
+
+  [ Michi Henning ]
+  * Various fixes for race conditions and test stability.
+    - This results in *safe* internal symbol changes.
+  * Updates to scope tutorial and documentation.
+
+ -- Pawel Stolowski <pawel.stolowski@ubuntu.com>  Fri, 29 Aug 2014 12:10:32 +0200
+
 unity-scopes-api (0.6.4+14.10.20140828.1-0ubuntu1) utopic; urgency=medium
 
   [ Pawel Stolowski ]

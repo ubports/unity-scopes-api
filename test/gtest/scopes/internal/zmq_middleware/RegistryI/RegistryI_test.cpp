@@ -33,7 +33,6 @@
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
-#include <unity/scopes/internal/max_align_clang_bug.h>  // TODO: remove this once clang 3.5.2 is released
 #include <boost/range/adaptor/filtered.hpp>
 #include <boost/range/algorithm/copy.hpp>
 #include <boost/filesystem.hpp>
@@ -596,20 +595,26 @@ TEST_F(RegistryITest, locate_all)
 class Receiver : public SearchListenerBase
 {
 public:
+    Receiver()
+        : query_complete_(false)
+    {
+    }
+
     void push(CategorisedResult) override {}
 
     void finished(CompletionDetails const&) override
     {
         // Signal that the query is complete
-        unique_lock<std::mutex> lock(mutex_);
+        lock_guard<std::mutex> lock(mutex_);
         query_complete_ = true;
-        cond_.notify_one();
+        cond_.notify_all();
     }
 
     void wait_until_finished()
     {
         unique_lock<std::mutex> lock(mutex_);
-        cond_.wait(lock, [this] { return this->query_complete_; });
+        EXPECT_TRUE(cond_.wait_for(lock, chrono::seconds(5), [this] { return this->query_complete_; }))
+            << "Receiver: finished message did not arrive";
     }
 
 private:
@@ -743,6 +748,18 @@ TEST_F(RegistryITest, locate_idle_timeout)
     // check now that the scope has shutdown automatically (timed out after 2s)
     EXPECT_FALSE(reg->is_scope_running("testscopeB"));
 
-    // check that 1 new process was started
+    // check that the process is gone
     EXPECT_EQ(0, process_count());
+}
+
+int main(int argc, char **argv)
+{
+    ::testing::InitGoogleTest(&argc, argv);
+
+    ifstream la("/proc/loadavg");
+    string avg[3];
+    la >> avg[0] >> avg[1] >> avg[2];
+    cerr << "load average: " << avg[0] << " " << avg[1] << " " << avg[2] << endl;
+
+    return RUN_ALL_TESTS();
 }

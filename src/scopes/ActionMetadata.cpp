@@ -71,6 +71,33 @@ Variant ActionMetadata::scope_data() const
     return static_cast<internal::ActionMetadataImpl*>(p.get())->scope_data();
 }
 
+void ActionMetadata::set_hint(std::string const& key, Variant const& value)
+{
+    static_cast<internal::ActionMetadataImpl*>(p.get())->hint(key) = value;
+}
+
+VariantMap ActionMetadata::hints() const
+{
+    return static_cast<internal::ActionMetadataImpl*>(p.get())->hints();
+}
+
+Variant& ActionMetadata::operator[](std::string const& key)
+{
+    return static_cast<internal::ActionMetadataImpl*>(p.get())->hint(key);
+}
+
+Variant const& ActionMetadata::operator[](std::string const& key) const
+{
+    // force const hint() method
+    return static_cast<internal::ActionMetadataImpl const*>(p.get())->hint(key);
+}
+
+bool ActionMetadata::contains_hint(std::string const& key) const
+{
+    return static_cast<internal::ActionMetadataImpl*>(p.get())->contains_hint(key);
+}
+
+
 } // namespace scopes
 
 } // namespace unity

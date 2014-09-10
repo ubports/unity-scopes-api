@@ -25,6 +25,8 @@
 
 #include "SlowSearchScope.h"
 
+#include <fstream>
+
 using namespace std;
 using namespace unity::scopes;
 using namespace unity::scopes::internal;
@@ -138,31 +140,21 @@ TEST(IdleTimeout, server_idle_timeout_while_operation_in_progress)
         slowsearchscope_t.join();
     }
 
-    // Check that the run time doesn't shut down until
-    // the search in the scope has completed, which takes 4 seconds.
-    // We allow 4 - 11 seconds for things to shut down. Typically,
-    // the finished() message will be received just after the
-    // search operation completes in the scope. However, occasionally
-    // the finished() message can get lost, depending on timing
-    // of the closure of the outgoing socket in the server for oneway
-    // invocations (which we cannot control). In that case, the test
-    // terminates after 10 seconds, when the client-side idle timeout
-    // expires. This is harmless: a scope should not take longer than
-    // the server idle timeout to respond to a search request.
+    // We allow 4 - 8 seconds for things to shut down.
+    // If no finished message has arrived by then, something is broken.
     auto duration = chrono::steady_clock::now() - start_time;
-    EXPECT_TRUE(duration > chrono::seconds(4));
-    if (duration > chrono::seconds(6))
-    {
-        cout << "finished() message not received after server timeout." << endl;
-        cout << "Test finished due to client-side timeout." << endl;
-    }
+    EXPECT_GT(duration, chrono::seconds(4));
+    EXPECT_LT(duration, chrono::seconds(8));
 }
 
 int main(int argc, char **argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
 
-    auto rc = RUN_ALL_TESTS();
+    std::ifstream la("/proc/loadavg");
+    std::string avg[3];
+    la >> avg[0] >> avg[1] >> avg[2];
+    std::cerr << "load average: " << avg[0] << " " << avg[1] << " " << avg[2] << std::endl;
 
-    return rc;
+    return RUN_ALL_TESTS();
 }

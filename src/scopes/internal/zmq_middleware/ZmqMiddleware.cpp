@@ -149,8 +149,9 @@ ZmqMiddleware::~ZmqMiddleware()
         stop();
         wait_for_shutdown();
 
+        // TODO:
         // We terminate explicitly here instead of relying
-        // on the destructor so we can measure how long it
+        // on the context_ destructor so we can measure how long it
         // takes. There is an intermittent problem with
         // zmq taking several seconds to terminate the context.
         // Until we figure out what's going on here, we measure
@@ -162,8 +163,10 @@ ZmqMiddleware::~ZmqMiddleware()
         auto millisecs = chrono::duration_cast<chrono::milliseconds>(end_time - start_time).count();
         if (millisecs > 100)
         {
-            cerr << "warning: ~ZmqMiddleware(): context_.terminate() took " << millisecs
-                 << " ms to complete for " << server_name_ << endl;
+            ostringstream s;
+            s << "warning: ~ZmqMiddleware(): context_.terminate() took " << millisecs
+              << " ms to complete for " << server_name_ << endl;
+            cerr << s.str();
         }
     }
     catch (std::exception const& e)
@@ -197,18 +200,29 @@ void ZmqMiddleware::start()
         {
             {
                 lock_guard<mutex> lock(data_mutex_);
-                oneway_invoker_.reset(new ThreadPool(1));  // Oneway pool must have a single thread
-                // N.B. We absolutely MUST have AT LEAST 5 two-way invoke threads:
-                // * 3 threads are required to execute a standard scope invocation as both
-                //   rebinding and debug_mode requests could be invoked within a single two-way
-                //   invocation.
-                // * We then need an extra thread available per layer of hierarchy under an
-                //   aggregating scope as an aggregator may invoke a nested scope while running in
-                //   a thread of its own.
-                // * 5 threads therefore, at least allows for an aggregating scope to invoke nested
-                //   aggregators.
-                // (NOTE: To be safe, we should keep some headroom above this 5 thread minimum)
-                twoway_invokers_.reset(new ThreadPool(8));  // TODO: get pool size from config
+                try
+                {
+                    oneway_invoker_.reset(new ThreadPool(1));  // Oneway pool must have a single thread
+                    // N.B. We absolutely MUST have AT LEAST 5 two-way invoke threads:
+                    // * 3 threads are required to execute a standard scope invocation as both
+                    //   rebinding and debug_mode requests could be invoked within a single two-way
+                    //   invocation.
+                    // * We then need an extra thread available per layer of hierarchy under an
+                    //   aggregating scope as an aggregator may invoke a nested scope while running in
+                    //   a thread of its own.
+                    // * 5 threads therefore, at least allows for an aggregating scope to invoke nested
+                    //   aggregators.
+                    // (NOTE: To be safe, we should keep some headroom above this 5 thread minimum)
+                    twoway_invokers_.reset(new ThreadPool(8));  // TODO: get pool size from config
+                }
+                catch (std::exception const& e)
+                {
+                    throw MiddlewareException(string("Cannot create outgoing invocation pools: ") + e.what());
+                }
+                catch (...)
+                {
+                    throw MiddlewareException("Cannot create outgoing invocation pools: unknown exception");
+                }
             }
             shutdown_flag = false;
             state_ = Started;
@@ -238,8 +252,12 @@ void ZmqMiddleware::stop()
             lock_guard<mutex> lock(data_mutex_);
 
             // No more outgoing invocations
-            twoway_invokers_.reset();
-            oneway_invoker_.reset();
+            assert((oneway_invoker_ && twoway_invokers_) || (!oneway_invoker_ && !twoway_invokers_));
+            if (oneway_invoker_)
+            {
+                twoway_invokers_->destroy();            // Destroy immediately, because invocations can take time.
+                oneway_invoker_->destroy_once_empty();  // Wait for queued oneways to go out first.
+            }
 
             // Initiate shutdown of all adapters
             for (auto& pair : am_)

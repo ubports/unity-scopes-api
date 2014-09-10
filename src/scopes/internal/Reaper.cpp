@@ -35,40 +35,35 @@ namespace scopes
 namespace internal
 {
 
-mutex ReapItem::mutex_;
-
 ReapItem::ReapItem(weak_ptr<Reaper> const& reaper, reaper_private::Reaplist::iterator it) :
     reaper_(reaper),
     it_(it),
-    destroyed_(false)
+    cancelled_(false)
 {
 }
 
 ReapItem::~ReapItem()
 {
     // If we go out of scope, we remove ourselves from the reaper list. This
-    // ensures that no more callbacks will be sent.
-    destroy();
+    // ensures that no callback will be made.
+    cancel();
 }
 
 void ReapItem::refresh() noexcept
 {
-    if (destroyed_.load())
-    {
-        return; // Calling refresh() after destroy() has no effect.
-    }
-
-    // If the reaper is still around, remove the entry from the list
-    // and put it back on the front, updating the time stamp.
-    weak_ptr<Reaper> wp_reaper;
-    {
-        lock_guard<mutex> lock(mutex_);
-        wp_reaper = reaper_;
-    }
-    auto const reaper = wp_reaper.lock();
+    auto const reaper = reaper_.lock();  // Reaper may no longer be around
     if (reaper)
     {
-        lock_guard<mutex> reaper_lock(reaper->mutex_);
+        std::lock(mutex_, reaper->mutex_);
+        lock_guard<mutex> reaper_lock(reaper->mutex_, adopt_lock);
+        lock_guard<mutex> item_lock(mutex_, adopt_lock);
+
+        if (cancelled_)
+        {
+            return;  // A reaping pass may have cancelled this ReapItem already.
+        }
+
+        // Move our Item to the head of the list after updating the time stamp.
         assert(it_ != reaper->list_.end());
         reaper_private::Item item(*it_);
         item.timestamp = chrono::steady_clock::now();
@@ -79,40 +74,57 @@ void ReapItem::refresh() noexcept
     else
     {
         // The reaper has gone away, so we disable ourself.
-        destroyed_.store(true);
+        lock_guard<mutex> item_lock(mutex_);
+        cancelled_ = true;
     }
 }
 
-void ReapItem::destroy() noexcept
+void ReapItem::cancel() noexcept
 {
-    if (destroyed_.exchange(true))  // Only the first call to destroy has any effect.
-    {
-        return;
-    }
-
-    weak_ptr<Reaper> wp_reaper;
-    {
-        lock_guard<mutex> lock(mutex_);
-        wp_reaper = reaper_;
-    }
-    auto const reaper = wp_reaper.lock();
+    auto const reaper = reaper_.lock();  // Reaper may no longer be around
     if (reaper)
     {
-        lock_guard<mutex> reaper_lock(reaper->mutex_);
+        {
+            // Wait for a concurrent reaping pass to complete only
+            // if cancel() is not called by the reaper. This ensures
+            // that cancel() does not return until after the callback
+            // function for this reap item has completed, and avoids
+            // deadlock if the callback function tries to cancel its
+            // own reap item.
+            unique_lock<mutex> reap_lock(reaper->reap_mutex_);
+            if (reaper->reap_thread_id_ != this_thread::get_id())
+            {
+                reaper->reap_done_.wait(reap_lock, [&reaper]{ return !reaper->reap_in_progress_; });
+            }
+
+            lock_guard<mutex> item_lock(mutex_);
+            if (cancelled_)
+            {
+                return;  // A reaping pass may have cancelled this ReapItem already.
+            }
+            cancelled_ = true;
+        }
+
+        // Remove our Item from the reaper's list.
+        lock_guard<mutex> lock(reaper->mutex_);
         assert(it_ != reaper->list_.end());
         reaper->list_.erase(it_);
+        it_ = reaper->list_.end();
     }
-
-#ifndef NDEBUG
-    it_ = reaper->list_.end();
-#endif
+    else
+    {
+        // The reaper has gone away, so we disable ourself.
+        lock_guard<mutex> item_lock(mutex_);
+        cancelled_ = true;
+    }
 }
 
 Reaper::Reaper(int reap_interval, int expiry_interval, DestroyPolicy p) :
     reap_interval_(chrono::seconds(reap_interval)),
     expiry_interval_(chrono::seconds(expiry_interval)),
     policy_(p),
-    finish_(false)
+    finish_(false),
+    reap_in_progress_(false)
 {
     if (reap_interval != -1 && expiry_interval != -1)
     {
@@ -133,13 +145,13 @@ Reaper::Reaper(int reap_interval, int expiry_interval, DestroyPolicy p) :
 
 Reaper::~Reaper()
 {
-    destroy();
+    destroy();  // noexcept
 }
 
 // Instantiate a new reaper. We call set_self() after instantiation so the reaper
 // can keep a weak_ptr to itself. That weak_ptr in turn is passed to each ReapItem,
 // so the ReapItem can manipulate the reap list. If the reaper goes out of scope
-// before a ReapItem, the ReapItem will notice this and deactivate itself.
+// before a ReapItem, the ReapItem will notice this and disable itself.
 
 Reaper::SPtr Reaper::create(int reap_interval, int expiry_interval, DestroyPolicy p)
 {
@@ -160,6 +172,8 @@ void Reaper::set_self() noexcept
 void Reaper::start()
 {
     reap_thread_ = thread(&Reaper::reap_func, this);
+    lock_guard<mutex> reap_lock(reap_mutex_);
+    reap_thread_id_ = reap_thread_.get_id();
 }
 
 void Reaper::destroy()
@@ -170,6 +184,13 @@ void Reaper::destroy()
         if (finish_)
         {
             return;
+        }
+        // If the reaper thread was never started, but there
+        // are entries to be reaped, start the thread, so it
+        // will invoke the callbacks for any remaining entries.
+        if (reap_interval_.count() == -1 && list_.size() != 0 && policy_ == CallbackOnDestroy)
+        {
+            start();
         }
         finish_ = true;
         do_work_.notify_one();
@@ -190,7 +211,7 @@ ReapItem::SPtr Reaper::add(ReaperCallback const& cb)
         throw unity::InvalidArgumentException("Reaper: invalid null callback passed to add().");
     }
 
-    lock_guard<mutex> lock(mutex_);
+    unique_lock<mutex> lock(mutex_);
 
     if (finish_)
     {
@@ -198,10 +219,10 @@ ReapItem::SPtr Reaper::add(ReaperCallback const& cb)
     }
 
     // Put new Item at the head of the list.
-    reaper_private::Reaplist::iterator ri;
+    reaper_private::Reaplist::iterator li;
     Item item(cb);
     list_.push_front(item); // LRU order
-    ri = list_.begin();
+    li = list_.begin();
     if (list_.size() == 1)
     {
         do_work_.notify_one();  // Wake up reaper thread
@@ -209,9 +230,9 @@ ReapItem::SPtr Reaper::add(ReaperCallback const& cb)
 
     // Make a new ReapItem.
     assert(self_.lock());
-    ReapItem::SPtr reap_item(new ReapItem(self_, ri));
-    // Now that the ReapItem is created, we can set the disable callback
-    ri->disable_reap_item = [reap_item] { reap_item->destroy(); };
+    ReapItem::SPtr reap_item(new ReapItem(self_, li));
+    // Now that the ReapItem is created, we can set the back-pointer.
+    li->reap_item = reap_item;
     return reap_item;
 }
 
@@ -240,14 +261,13 @@ void Reaper::reap_func()
             // There is at least one item on the list, we wait with a timeout.
             // The first-to-expire item is at the tail of the list. We sleep at least long enough
             // for that item to get a chance to expire. (There is no point in waking up earlier.)
-            // But, if have just done a scan, we sleep for at least reap_interval_, so there is
+            // But, if we have just done a scan, we sleep for at least reap_interval_, so there is
             // at most one pass every reap_interval_.
             auto const now = chrono::steady_clock::now();
             auto const oldest_item_age = chrono::duration_cast<chrono::milliseconds>(now - list_.back().timestamp);
             auto const reap_interval = chrono::duration_cast<chrono::milliseconds>(reap_interval_);
             auto const sleep_interval = max(expiry_interval_ - oldest_item_age, reap_interval);
-            auto const wakeup_time = now + sleep_interval;
-            do_work_.wait_until(lock, wakeup_time, [this]{ return finish_; });
+            do_work_.wait_for(lock, sleep_interval, [this]{ return finish_; });
         }
 
         if (finish_ && policy_ == NoCallbackOnDestroy)
@@ -266,16 +286,12 @@ void Reaper::reap_func()
             // Final pass for CallbackOnDestroy. We simply call back on everything.
             zombies.assign(list_.begin(), list_.end());
         }
-        else
+        else if (reap_interval_.count() != -1)  // Look only if we have non-infinite expiry time.
         {
-            // finish_ may or may not be set here. If it is set, we still do one final
-            // reaping pass before returning below so, if the reaper is destroyed
-            // while there are still entries on it, expired entries have their callbacks
-            // invoked at destruction time.
-            auto const now = chrono::steady_clock::now();
+            // Find any entries that have expired.
             for (auto it = list_.rbegin(); it != list_.rend(); ++it)
             {
-                if (now < it->timestamp + expiry_interval_)
+                if (chrono::steady_clock::now() < it->timestamp + expiry_interval_)
                 {
                     break;  // LRU order. Once we find an entry that's not expired, we can stop looking.
                 }
@@ -298,20 +314,55 @@ void Reaper::reap_func()
 
 void Reaper::remove_zombies(reaper_private::Reaplist const& zombies) noexcept
 {
+    // reap_in_progress prevents ReapItem::cancel() from returning
+    // before its callback has completed.
+    {
+        lock_guard<mutex> reap_lock(reap_mutex_);
+        reap_in_progress_ = true;
+    }
+
     for (auto& item : zombies)
     {
-        assert(item.disable_reap_item);
-        item.disable_reap_item();           // Calls destroy() on the ReapItem, so it removes itself from list_
+        auto ri = item.reap_item.lock();
+        if (!ri)
+        {
+            // ReapItem was deallocated after this reaping pass started,
+            // but before we got around to dealing with this ReapItem.
+            continue;
+        }
 
-        assert(item.cb);
+        {
+            lock_guard<mutex> item_lock(ri->mutex_);
+            if (ri->cancelled_)
+            {
+                // ReapItem::cancel() was called during this pass, it has already completed cancellation.
+                continue;
+            }
+            ri->cancelled_ = true;
+        }
+
+        {
+            lock_guard<mutex> lock(mutex_);
+            assert(ri->it_ != list_.end());
+            list_.erase(ri->it_);
+            ri->it_ = list_.end();
+        }
+
         try
         {
+            assert(item.cb);
             item.cb();                      // Informs the caller that the item timed out.
         }
         catch (...)
         {
             // Ignore exceptions raised by the application's callback function.
         }
+    }
+
+    {
+        lock_guard<mutex> reap_lock(reap_mutex_);
+        reap_in_progress_ = false;
+        reap_done_.notify_all();
     }
 }
 

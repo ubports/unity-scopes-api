@@ -50,8 +50,6 @@ SearchMetadataImpl::SearchMetadataImpl(VariantMap const& var)
     auto it = find_or_throw("SearchMetadataImpl()", var, "cardinality");
     cardinality_ = it->second.get_int();
     check_cardinality("SearchMetadataImpl(VariantMap)", cardinality_);
-    it = find_or_throw("SearchMetadataImpl()", var, "hints");
-    hints_ = it->second.get_dict();
     try
     {
         it = find_or_throw("SearchMetadataImpl()", var, "location");
@@ -92,54 +90,6 @@ bool SearchMetadataImpl::has_location() const
     return location_;
 }
 
-Variant& SearchMetadataImpl::hint(std::string const& key)
-{
-    if (key.empty())
-    {
-        throw InvalidArgumentException("SearchMetadata::hint(): Invalid empty key string");
-    }
-    return hints_[key];
-}
-
-Variant const& SearchMetadataImpl::hint(std::string const& key) const
-{
-    if (key.empty())
-    {
-        throw InvalidArgumentException("SearchMetadata::hint(): Invalid empty key string");
-    }
-
-    auto const& it = hints_.find(key);
-    if (it != hints_.end())
-    {
-        return it->second;
-    }
-    std::ostringstream s;
-    s << "SearchMetadataImpl::hint(): requested key " << key << " doesn't exist";
-    throw unity::LogicException(s.str());
-}
-
-void SearchMetadataImpl::set_hint(std::string const& key, Variant const& value)
-{
-    if (key.empty())
-    {
-        throw InvalidArgumentException("SearchMetadata::set_hint(): Invalid empty key string");
-    }
-    hints_[key] = value;
-}
-
-VariantMap SearchMetadataImpl::hints() const
-{
-    return hints_;
-}
-
-bool SearchMetadataImpl::contains_hint(std::string const& key) const
-{
-    if (key.empty())
-    {
-        throw InvalidArgumentException("SearchMetadata::contains_hint(): Invalid empty key string");
-    }
-    return hints_.find(key) != hints_.end();
-}
 
 std::string SearchMetadataImpl::metadata_type() const
 {
@@ -151,7 +101,6 @@ void SearchMetadataImpl::serialize(VariantMap& var) const
 {
     QueryMetadataImpl::serialize(var);
     var["cardinality"] = Variant(cardinality_);
-    var["hints"] = hints_;
     if (location_)
     {
         var["location"] = location_->serialize();

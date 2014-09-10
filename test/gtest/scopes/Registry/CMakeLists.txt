@@ -14,7 +14,7 @@ add_definitions(-DTEST_SCOPE_A_PATH="${CMAKE_CURRENT_BINARY_DIR}/scopes/testscop
 add_executable(Registry_test Registry_test.cpp)
 target_link_libraries(Registry_test ${TESTLIBS})
 
-add_dependencies(Registry_test scoperegistry)
+add_dependencies(Registry_test scoperegistry scoperunner)
 
 add_test(Registry Registry_test)
 add_subdirectory(scopes)

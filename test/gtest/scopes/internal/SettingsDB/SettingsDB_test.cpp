@@ -22,13 +22,11 @@
 
 #include <unity/UnityExceptions.h>
 
-#include <unity/scopes/internal/max_align_clang_bug.h>  // TODO: remove this once clang 3.5.2 is released
 #define BOOST_NO_CXX11_SCOPED_ENUMS // We need this to successfully link against Boost when calling
                                     // copy_file. See https://svn.boost.org/trac/boost/ticket/6779
 #include <boost/filesystem/operations.hpp>
 #undef BOOST_NO_CXX11_SCOPED_ENUMS
 
-#include <unity/scopes/internal/max_align_clang_bug.h>  // TODO: remove this once clang 3.5.2 is released
 #include <boost/regex.hpp>  // Use Boost implementation until http://gcc.gnu.org/bugzilla/show_bug.cgi?id=53631 is fixed.
 #include <gtest/gtest.h>
 #include <ctime>

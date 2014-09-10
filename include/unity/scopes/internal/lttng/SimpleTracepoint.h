@@ -19,7 +19,6 @@
 #ifndef SIMPLETRACEPOINT_H_
 #define SIMPLETRACEPOINT_H_
 
-#include <unity/scopes/internal/max_align_clang_bug.h>  /* TODO: remove this once clang 3.5.2 is released */
 #include <lttng/tracepoint.h>
 
 /* simple_tracepoint */

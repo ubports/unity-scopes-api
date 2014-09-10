@@ -76,7 +76,7 @@ struct SearchResult
     std::string json;
     std::string uri;
     std::map<std::string, JsonNodeInterface::SPtr > other_params;
-    std::shared_ptr<SearchCategory> category;
+    std::string category_id;
 };
 
 struct DepartmentInfo
@@ -88,8 +88,6 @@ struct DepartmentInfo
     std::vector<std::shared_ptr<DepartmentInfo>> subdepartments;
 };
 
-using SearchRequestResults = std::tuple<std::shared_ptr<DepartmentInfo>, Filters, FilterState, std::vector<SearchResult>>;
-
 class SearchHandle
 {
 public:
@@ -98,7 +96,7 @@ public:
 
     ~SearchHandle();
 
-    SearchRequestResults get_search_results();
+    void wait();
     void cancel_search();
 
 private:
@@ -121,7 +119,7 @@ public:
     using Columns = std::vector<std::vector<std::vector<std::string>>>;
     using Widgets = std::vector<std::string>;
 
-    std::pair<Columns, Widgets> get_preview_results();
+    void wait();
     void cancel_preview();
 
 private:
@@ -131,6 +129,21 @@ private:
 private:
     unsigned int preview_id_;
     std::shared_ptr<SmartScopesClient> ssc_;
+};
+
+struct SearchReplyHandler
+{
+    std::function<void(SearchResult const&)> result_handler;
+    std::function<void(std::shared_ptr<SearchCategory> const&)> category_handler;
+    std::function<void(std::shared_ptr<DepartmentInfo> const&)> departments_handler;
+    std::function<void(Filters const&)> filters_handler;
+    std::function<void(FilterState const&)> filter_state_handler;
+};
+
+struct PreviewReplyHandler
+{
+    std::function<void(std::string const&)> widget_handler;
+    std::function<void(PreviewHandle::Columns const&)> columns_handler;
 };
 
 class SmartScopesClient : public std::enable_shared_from_this<SmartScopesClient>
@@ -150,11 +163,12 @@ public:
 
     bool get_remote_scopes(std::vector<RemoteScope>& scopes, std::string const& locale = "", bool caching_enabled = true);
 
-    SearchHandle::UPtr search(std::string const& base_url,
+    SearchHandle::UPtr search(SearchReplyHandler const& handler,
+                              std::string const& base_url,
                               std::string const& query,
                               std::string const& department_id,
                               std::string const& session_id,
-                              unsigned int query_id,
+                              int query_id,
                               std::string const& platform,
                               VariantMap const& settings = VariantMap(),
                               VariantMap const& filter_state = VariantMap(),
@@ -162,7 +176,8 @@ public:
                               std::string const& country = "",
                               const unsigned int limit = 0);
 
-    PreviewHandle::UPtr preview(std::string const& base_url,
+    PreviewHandle::UPtr preview(PreviewReplyHandler const& handler,
+                                std::string const& base_url,
                                 std::string const& result,
                                 std::string const& session_id,
                                 std::string const& platform,
@@ -175,11 +190,13 @@ private:
     friend class SearchHandle;
     friend class PreviewHandle;
 
-    SearchRequestResults get_search_results(unsigned int search_id);
-    std::pair<PreviewHandle::Columns, PreviewHandle::Widgets> get_preview_results(unsigned int preview_id);
+    void wait_for_search(unsigned int search_id);
+    void wait_for_preview(unsigned int preview_id);
     std::shared_ptr<DepartmentInfo> parse_departments(JsonNodeInterface::SPtr node);
     Filters parse_filters(JsonNodeInterface::SPtr node);
     FilterState parse_filter_state(JsonNodeInterface::SPtr node);
+    void parse_line(std::string const& json, SearchReplyHandler const& handler);
+    void parse_line(std::string const& json, PreviewReplyHandler const& handler);
 
     std::vector<std::string> extract_json_stream(std::string const& json_stream);
 

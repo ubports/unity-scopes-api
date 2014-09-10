@@ -24,6 +24,7 @@
 #include <unity/scopes/internal/zmq_middleware/ZmqException.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqReceiver.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqSender.h>
+#include <unity/UnityExceptions.h>
 #include <unity/util/ResourcePtr.h>
 #include <zmqpp/message.hpp>
 #include <zmqpp/poller.hpp>
@@ -391,7 +392,10 @@ void ObjectAdapter::wait_for_shutdown()
 
     {
         unique_lock<mutex> lock(state_mutex_);
-        stopper_ = nullptr;
+        if (stopper_)
+        {
+            stopper_->wait_until_stopped();
+        }
     }
 
     if (state == Failed)
@@ -553,6 +557,10 @@ void ObjectAdapter::broker_thread()
         catch (...) // LCOV_EXCL_LINE
         {
             // TODO: log error
+            {
+                lock_guard<mutex> lock(state_mutex_);
+                stopper_->stop();
+            }
             lock_guard<mutex> lock(ready_mutex_);
             ready_.set_exception(current_exception());
             return;
@@ -622,6 +630,10 @@ void ObjectAdapter::broker_thread()
     }
     catch (...)
     {
+        {
+            lock_guard<mutex> lock(state_mutex_);
+            stopper_->stop();
+        }
         MiddlewareException e("ObjectAdapter: broker thread failure (adapter: " + name_ + ")");
         store_exception(e);
         // We may not have signaled the parent yet, depending on where things went wrong.

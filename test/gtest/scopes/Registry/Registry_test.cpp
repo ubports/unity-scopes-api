@@ -23,10 +23,10 @@
 #include <unity/scopes/CategorisedResult.h>
 #include <gtest/gtest.h>
 
-#include <unity/scopes/internal/max_align_clang_bug.h>  // TODO: remove this once clang 3.5.2 is released
 #include <boost/filesystem/operations.hpp>
 
 #include <condition_variable>
+#include <fstream>
 #include <functional>
 #include <mutex>
 #include <signal.h>
@@ -151,8 +151,6 @@ TEST(Registry, scope_state_notify)
     // Configure testscopeA scope_state_callback
     auto connA = r->set_scope_state_callback("testscopeA", [&updateA_received, &testscopeA_state, &mutex, &cond](bool is_running)
     {
-        std::cerr << "scopeA updated, running: " << is_running << std::endl;
-        //std::cerr << ts() << " scopeA updated, running: " << is_running << std::endl;
         std::lock_guard<std::mutex> lock(mutex);
         updateA_received = true;
         testscopeA_state = is_running;
@@ -162,7 +160,6 @@ TEST(Registry, scope_state_notify)
     // Configure testscopeB scope_state_callback
     auto connB = r->set_scope_state_callback("testscopeB", [&updateB_received, &testscopeB_state, &mutex, &cond](bool is_running)
     {
-        std::cerr << "scopeB updated, running: " << is_running << std::endl;
         std::lock_guard<std::mutex> lock(mutex);
         updateB_received = true;
         testscopeB_state = is_running;
@@ -270,8 +267,15 @@ TEST(Registry, no_idle_timeout_in_debug_mode)
         return success;
     };
 
-    // Move testscopeC into the scopes folder
-    filesystem::rename(TEST_RUNTIME_PATH "/other_scopes/testscopeC", TEST_RUNTIME_PATH "/scopes/testscopeC");
+    system::error_code ec;
+
+    // Copy testscopeC into the scopes folder
+    filesystem::create_directory(TEST_RUNTIME_PATH "/scopes/testscopeC", ec);
+    ASSERT_EQ("Success", ec.message());
+    filesystem::copy(TEST_RUNTIME_PATH "/other_scopes/testscopeC/testscopeC.ini", TEST_RUNTIME_PATH "/scopes/testscopeC/testscopeC.ini", ec);
+    ASSERT_EQ("Success", ec.message());
+    filesystem::copy(TEST_RUNTIME_PATH "/other_scopes/testscopeC/libtestscopeC.so", TEST_RUNTIME_PATH "/scopes/testscopeC/libtestscopeC.so", ec);
+    ASSERT_EQ("Success", ec.message());
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
     auto meta = r->get_metadata("testscopeC");
@@ -297,8 +301,9 @@ TEST(Registry, no_idle_timeout_in_debug_mode)
     EXPECT_FALSE(wait_for_state_update());
     EXPECT_TRUE(r->is_scope_running("testscopeC"));
 
-    // Move testscopeC back into the other_scopes folder
-    filesystem::rename(TEST_RUNTIME_PATH "/scopes/testscopeC", TEST_RUNTIME_PATH "/other_scopes/testscopeC");
+    // Remove testscopeC from the scopes folder
+    filesystem::remove_all(TEST_RUNTIME_PATH "/scopes/testscopeC", ec);
+    ASSERT_EQ("Success", ec.message());
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
 }
 
@@ -328,8 +333,15 @@ TEST(Registry, manually_started_scope)
         return success;
     };
 
-    // Move testscopeC into the scopes folder
-    filesystem::rename(TEST_RUNTIME_PATH "/other_scopes/testscopeC", TEST_RUNTIME_PATH "/scopes/testscopeC");
+    system::error_code ec;
+
+    // Copy testscopeC into the scopes folder
+    filesystem::create_directory(TEST_RUNTIME_PATH "/scopes/testscopeC", ec);
+    ASSERT_EQ("Success", ec.message());
+    filesystem::copy(TEST_RUNTIME_PATH "/other_scopes/testscopeC/testscopeC.ini", TEST_RUNTIME_PATH "/scopes/testscopeC/testscopeC.ini", ec);
+    ASSERT_EQ("Success", ec.message());
+    filesystem::copy(TEST_RUNTIME_PATH "/other_scopes/testscopeC/libtestscopeC.so", TEST_RUNTIME_PATH "/scopes/testscopeC/libtestscopeC.so", ec);
+    ASSERT_EQ("Success", ec.message());
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
     // testscopeC should not be running at this point
@@ -361,9 +373,12 @@ TEST(Registry, manually_started_scope)
     EXPECT_TRUE(wait_for_state_update());
     EXPECT_FALSE(r->is_scope_running("testscopeC"));
 
-    // Move testscopeC back into the other_scopes folder
-    filesystem::rename(TEST_RUNTIME_PATH "/scopes/testscopeC", TEST_RUNTIME_PATH "/other_scopes/testscopeC");
+    // Remove testscopeC from the scopes folder
+    filesystem::remove_all(TEST_RUNTIME_PATH "/scopes/testscopeC", ec);
+    ASSERT_EQ("Success", ec.message());
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+    rt->destroy();
 }
 
 TEST(Registry, list_update_notify_before_click_folder_exists)
@@ -407,7 +422,7 @@ TEST(Registry, list_update_notify_before_click_folder_exists)
     EXPECT_EQ(list.end(), list.find("testscopeD"));
 
     std::cout << "Create click folder: " TEST_RUNTIME_PATH "/click" << std::endl;
-    filesystem::create_directory(TEST_RUNTIME_PATH "/click");
+    filesystem::create_directory(TEST_RUNTIME_PATH "/click", ec);
     ASSERT_EQ("Success", ec.message());
 
     std::cout << "Make a symlink to testscopeC in the scopes folder" << std::endl;
@@ -424,7 +439,8 @@ TEST(Registry, list_update_notify_before_click_folder_exists)
     EXPECT_EQ(list.end(), list.find("testscopeD"));
 
     std::cout << "Remove click folder" << std::endl;
-    filesystem::remove_all(TEST_RUNTIME_PATH "/click");
+    filesystem::remove_all(TEST_RUNTIME_PATH "/click",ec);
+    ASSERT_EQ("Success", ec.message());
 }
 
 TEST(Registry, list_update_notify)
@@ -467,9 +483,11 @@ TEST(Registry, list_update_notify)
     EXPECT_EQ(list.end(), list.find("testscopeC"));
     EXPECT_EQ(list.end(), list.find("testscopeD"));
 
-    // Move testscopeC into the scopes folder
+    // Copy testscopeC into the scopes folder
     std::cout << "Move testscopeC into the scopes folder" << std::endl;
-    filesystem::rename(TEST_RUNTIME_PATH "/other_scopes/testscopeC", TEST_RUNTIME_PATH "/scopes/testscopeC", ec);
+    filesystem::create_directory(TEST_RUNTIME_PATH "/scopes/testscopeC", ec);
+    ASSERT_EQ("Success", ec.message());
+    filesystem::copy(TEST_RUNTIME_PATH "/other_scopes/testscopeC/testscopeC.ini", TEST_RUNTIME_PATH "/scopes/testscopeC/testscopeC.ini", ec);
     ASSERT_EQ("Success", ec.message());
     EXPECT_TRUE(wait_for_update());
 
@@ -495,9 +513,9 @@ TEST(Registry, list_update_notify)
     EXPECT_NE(list.end(), list.find("testscopeC"));
     EXPECT_NE(list.end(), list.find("testscopeD"));
 
-    // Move testscopeC back into the other_scopes folder
+    // Remove testscopeC from the scopes folder
     std::cout << "Move testscopeC back into the other_scopes folder" << std::endl;
-    filesystem::rename(TEST_RUNTIME_PATH "/scopes/testscopeC", TEST_RUNTIME_PATH "/other_scopes/testscopeC", ec);
+    filesystem::remove_all(TEST_RUNTIME_PATH "/scopes/testscopeC", ec);
     ASSERT_EQ("Success", ec.message());
     EXPECT_TRUE(wait_for_update());
 
@@ -576,6 +594,7 @@ TEST(Registry, list_update_notify)
     std::cout << "Make a symlink to testscopeB-settings.ini in scopes/testscopeB" << std::endl;
     filesystem::create_symlink(TEST_SRC_PATH "/scopes/testscopeB/testscopeB-settings.ini",
                                TEST_RUNTIME_PATH "/scopes/testscopeB/testscopeB-settings.ini", ec);
+    ASSERT_EQ("Success", ec.message());
     EXPECT_TRUE(wait_for_update());
 
     // Must be able to see the new definitions now
@@ -587,6 +606,7 @@ TEST(Registry, list_update_notify)
     // Remove settings definition
     std::cout << "Remove symlink to testscopeB-settings.ini in scopes/testscopeB" << std::endl;
     filesystem::remove(TEST_RUNTIME_PATH "/scopes/testscopeB/testscopeB-settings.ini", ec);
+    ASSERT_EQ("Success", ec.message());
     EXPECT_TRUE(wait_for_update());
 
     // Definition must be gone now
@@ -599,8 +619,14 @@ int main(int argc, char **argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
 
+    int rc = 0;
+
     // Unlink in case we left the link behind from an earlier interrupted run.
     system::error_code ec;
+    filesystem::remove_all(TEST_RUNTIME_PATH "/scopes/testscopeC", ec);
+    filesystem::remove_all(TEST_RUNTIME_PATH "/click",ec);
+    filesystem::remove(TEST_RUNTIME_PATH "/scopes/testscopeD", ec);
+    filesystem::remove_all(TEST_RUNTIME_PATH "/scopes/testfolder", ec);
     filesystem::remove(TEST_RUNTIME_PATH "/scopes/testscopeB/testscopeB-settings.ini", ec);
 
     auto rpid = fork();
@@ -615,14 +641,20 @@ int main(int argc, char **argv)
     }
     else if (rpid > 0)
     {
-        auto rc = RUN_ALL_TESTS();
+        std::ifstream la("/proc/loadavg");
+        std::string avg[3];
+        la >> avg[0] >> avg[1] >> avg[2];
+        std::cerr << "load average: " << avg[0] << " " << avg[1] << " " << avg[2] << std::endl;
+
+        rc = RUN_ALL_TESTS();
+
         kill(rpid, SIGTERM);
         waitpid(rpid, nullptr, 0);
-        return rc;
     }
     else
     {
         perror("Failed to fork:");
     }
-    return 1;
+
+    return rc;
 }
