@@ -133,6 +133,7 @@ static void service_update_cb(AgAccountService* account_service, gboolean enable
             return;
         }
 
+        // Get authorization parameters then attempt to signon
         info->auth_params.reset(
             g_variant_ref_sink(ag_auth_data_get_login_parameters(auth_data.get(), nullptr)), [](GVariant* v){ if (v) g_variant_unref(v); });
 
@@ -208,15 +209,28 @@ OnlineAccountClientImpl::OnlineAccountClientImpl(std::string const& service_name
     : service_name_(service_name)
     , service_type_(service_type)
     , provider_name_(provider_name)
-    , main_loop_thread_(std::thread(&OnlineAccountClientImpl::main_loop_thread, this))
     , use_external_main_loop_(main_loop_select == OnlineAccountClient::RunInExternalMainLoop)
     , main_loop_is_running_(false)
     , client_stopping_(false)
     , logins_busy_(0)
 {
-    // Wait here until either the main loop begins running, or the thread exits
-    std::unique_lock<std::mutex> lock(mutex_);
-    cond_.wait(lock, [this] { return main_loop_is_running_; });
+    // If we are responsible for the main loop
+    if (!use_external_main_loop_)
+    {
+        // Wait here until either the main loop begins running, or the thread exits
+        std::unique_lock<std::mutex> lock(mutex_);
+        main_loop_thread_ = std::thread(&OnlineAccountClientImpl::main_loop_thread, this);
+        cond_.wait(lock, [this] { return main_loop_is_running_; });
+    }
+
+    manager_.reset(ag_manager_new_for_service_type(service_type_.c_str()), g_object_unref);
+
+    // Watch for changes to accounts
+    account_enabled_signal_id_ = g_signal_connect(manager_.get(), "enabled-event", G_CALLBACK(account_enabled_cb), this);
+    account_deleted_signal_id_ = g_signal_connect(manager_.get(), "account-deleted", G_CALLBACK(account_deleted_cb), this);
+
+    // Now check initial state
+    refresh_service_statuses();
 }
 
 OnlineAccountClientImpl::~OnlineAccountClientImpl()
@@ -242,10 +256,10 @@ OnlineAccountClientImpl::~OnlineAccountClientImpl()
     {
         // Quit the main loop, causing the thread to exit
         g_main_loop_quit(main_loop_.get());
-    }
-    if (main_loop_thread_.joinable())
-    {
-        main_loop_thread_.join();
+        if (main_loop_thread_.joinable())
+        {
+            main_loop_thread_.join();
+        }
     }
 }
 
@@ -403,28 +417,16 @@ void OnlineAccountClientImpl::dec_logins()
 
 void OnlineAccountClientImpl::main_loop_thread()
 {
-    // If we are not responsible for the main loop (hense this thread doesn't block on g_main_loop_run),
-    // the destruction of this pointer will break the constructor from its wait
+    // If something goes wrong causing the main loop not to run, the destruction of this pointer
+    // will break the constructor from its wait
     std::shared_ptr<void> thread_exit_notifier(nullptr, [this](void*){ main_loop_state_notify(true); });
 
-    manager_.reset(ag_manager_new_for_service_type(service_type_.c_str()), g_object_unref);
+    // Stick a method call into the main loop to notify the constructor when the main loop begins running
+    g_idle_add(main_loop_is_running_cb, this);
 
-    // Watch for changes to accounts
-    account_enabled_signal_id_ = g_signal_connect(manager_.get(), "enabled-event", G_CALLBACK(account_enabled_cb), this);
-    account_deleted_signal_id_ = g_signal_connect(manager_.get(), "account-deleted", G_CALLBACK(account_deleted_cb), this);
-
-    // Now check initial state
-    refresh_service_statuses();
-
-    if (!use_external_main_loop_)
-    {
-        // Stick a method call into the main loop to notify the constructor when the main loop begins running
-        g_idle_add(main_loop_is_running_cb, this);
-
-        // Run the main loop
-        main_loop_.reset(g_main_loop_new(nullptr, true), g_main_loop_unref);
-        g_main_loop_run(main_loop_.get());
-    }
+    // Run the main loop
+    main_loop_.reset(g_main_loop_new(nullptr, true), g_main_loop_unref);
+    g_main_loop_run(main_loop_.get());
 }
 
 }  // namespace internal
