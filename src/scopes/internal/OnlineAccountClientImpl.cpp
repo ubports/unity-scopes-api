@@ -234,12 +234,6 @@ OnlineAccountClientImpl::~OnlineAccountClientImpl()
     {
         std::unique_lock<std::mutex> lock(mutex_);
         client_stopping_ = true;
-
-        // Cancel all pending login sessions
-        for (auto info : accounts_)
-        {
-            signon_auth_session_cancel(info.second->session.get());
-        }
     }
     flush_pending_sessions();
 

@@ -136,35 +136,36 @@
 # False positives for memory leaks in glib
 
 {
-   malloc[Memcheck:Leak]
+   calloc[Memcheck:Leak]
    Memcheck:Leak
+   fun:calloc
+   fun:g_malloc0
    ...
-   fun:malloc
-   fun:g_malloc
+   fun:call_init.part.0
+   fun:call_init
+   fun:_dl_init
+}
+
+{
+   realloc[Memcheck:Leak]
+   Memcheck:Leak
+   fun:realloc
+   fun:g_realloc
+   fun:g_datalist_id_set_data_full
 }
 
 {
    calloc[Memcheck:Leak]
    Memcheck:Leak
    ...
-   fun:calloc
-   fun:g_malloc0
+   fun:g_socket_create_source
 }
 
 {
-   realloc[Memcheck:Leak]
+   calloc[Memcheck:Leak]
    Memcheck:Leak
    ...
-   fun:realloc
-   fun:g_realloc
-}
-
-{
-   g_object_new[Memcheck:Leak]
-   Memcheck:Leak
-   ...
-   fun:g_object_newv
-   fun:g_object_new
+   fun:g_signal_connect_data
 }
 
 {
@@ -193,6 +194,20 @@
    Memcheck:Leak
    ...
    fun:g_type_add_interface_static
+}
+
+{
+   malloc[Memcheck:Leak]
+   Memcheck:Leak
+   ...
+   fun:signon_auth_session_new
+}
+
+{
+   malloc[Memcheck:Leak]
+   Memcheck:Leak
+   ...
+   fun:signon_auth_session_process_async
 }
 
 {
