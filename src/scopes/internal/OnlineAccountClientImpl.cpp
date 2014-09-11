@@ -116,12 +116,6 @@ static void service_update_cb(AgAccountService* account_service, gboolean enable
     GError* error = nullptr;
     util::ResourcePtr<GError*, decltype(&g_error_free)> error_cleanup(error, [](GError* e){ if (e) g_error_free(e); });
 
-    if (info->service_enabled == enabled)
-    {
-        // No change
-        return;
-    }
-
     // Service state has updated, clear the old session data
     info->service_enabled = enabled;
     clear_session_info(info);
@@ -217,14 +211,12 @@ static void account_deleted_cb(AgManager*, AgAccountId account_id, OnlineAccount
 OnlineAccountClientImpl::OnlineAccountClientImpl(std::string const& service_name,
                                                  std::string const& service_type,
                                                  std::string const& provider_name,
-                                                 OnlineAccountClient::ServiceUpdateCallback callback,
                                                  OnlineAccountClient::MainLoopSelect main_loop_select)
     : service_name_(service_name)
     , service_type_(service_type)
     , provider_name_(provider_name)
-    , callback_(callback)
-    , use_external_main_loop_(main_loop_select == OnlineAccountClient::RunInExternalMainLoop)
     , main_loop_thread_(std::thread(&OnlineAccountClientImpl::main_loop_thread, this))
+    , use_external_main_loop_(main_loop_select == OnlineAccountClient::RunInExternalMainLoop)
     , main_loop_is_running_(false)
     , client_stopping_(false)
     , logins_busy_(0)
@@ -232,6 +224,7 @@ OnlineAccountClientImpl::OnlineAccountClientImpl(std::string const& service_name
     // Wait here until either the main loop begins running, or the thread exits
     std::unique_lock<std::mutex> lock(mutex_);
     cond_.wait(lock, [this] { return main_loop_is_running_; });
+    flush_statuses(lock);
 }
 
 OnlineAccountClientImpl::~OnlineAccountClientImpl()
@@ -256,17 +249,7 @@ OnlineAccountClientImpl::~OnlineAccountClientImpl()
             signon_auth_session_cancel(info.second->session.get());
         }
 
-        std::shared_ptr<GMainLoop> event_loop;
-        event_loop.reset(g_main_loop_new(nullptr, true), g_main_loop_unref);
-        while(logins_busy_ > 0)
-        {
-            // We need to wait inside an event loop to allow for the main application loop to
-            // process its pending events
-            g_timeout_add(100, wake_up_event_loop_cb, event_loop.get());
-            lock.unlock();
-            g_main_loop_run(event_loop.get());
-            lock.lock();
-        }
+        flush_statuses(lock);
     }
 
     // If we are responsible for the main loop, quit it on destruction
@@ -281,25 +264,15 @@ OnlineAccountClientImpl::~OnlineAccountClientImpl()
     }
 }
 
+void OnlineAccountClientImpl::set_service_update_callback(OnlineAccountClient::ServiceUpdateCallback callback)
+{
+    std::lock_guard<std::mutex> lock(callback_mutex_);
+    callback_ = callback;
+}
+
 std::vector<OnlineAccountClient::ServiceStatus> OnlineAccountClientImpl::get_service_statuses()
 {
-    std::unique_lock<std::mutex> lock(mutex_);
-
-    // Wait until all currently running login sessions are done
-    // (ensures that accounts_ is up to date before returning statuses)
-    {
-        std::shared_ptr<GMainLoop> event_loop;
-        event_loop.reset(g_main_loop_new(nullptr, true), g_main_loop_unref);
-        while(logins_busy_ > 0)
-        {
-            // We need to wait inside an event loop to allow for the main application loop to
-            // process its pending events
-            g_timeout_add(100, wake_up_event_loop_cb, event_loop.get());
-            lock.unlock();
-            g_main_loop_run(event_loop.get());
-            lock.lock();
-        }
-    }
+    std::lock_guard<std::mutex> lock(mutex_);
 
     // Return all service statuses
     std::vector<OnlineAccountClient::ServiceStatus> service_statuses;
@@ -346,6 +319,25 @@ void OnlineAccountClientImpl::register_account_login_item(PreviewWidget& widget,
     widget.add_attribute_value("online_account_details", Variant(account_details_map));
 }
 
+void OnlineAccountClientImpl::flush_statuses(std::unique_lock<std::mutex>& lock)
+{
+    // Wait until all currently running login sessions are done
+    // (ensures that accounts_ is up to date)
+    {
+        std::shared_ptr<GMainLoop> event_loop;
+        event_loop.reset(g_main_loop_new(nullptr, true), g_main_loop_unref);
+        while(logins_busy_ > 0)
+        {
+            // We need to wait inside an event loop to allow for the main application loop to
+            // process its pending events
+            g_timeout_add(100, wake_up_event_loop_cb, event_loop.get());
+            lock.unlock();
+            g_main_loop_run(event_loop.get());
+            lock.lock();
+        }
+    }
+}
+
 void OnlineAccountClientImpl::main_loop_state_notify(bool is_running)
 {
     std::lock_guard<std::mutex> lock(mutex_);
@@ -361,7 +353,7 @@ std::string OnlineAccountClientImpl::service_name()
 
 void OnlineAccountClientImpl::callback(OnlineAccountClient::ServiceStatus const& service_status)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(callback_mutex_);
     if (callback_)
     {
         callback_(service_status);

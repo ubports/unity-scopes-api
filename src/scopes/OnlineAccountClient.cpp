@@ -28,13 +28,17 @@ namespace scopes
 OnlineAccountClient::OnlineAccountClient(std::string const& service_name,
                                          std::string const& service_type,
                                          std::string const& provider_name,
-                                         ServiceUpdateCallback callback,
                                          MainLoopSelect main_loop_select)
-    : p(new internal::OnlineAccountClientImpl(service_name, service_type, provider_name, callback, main_loop_select))
+    : p(new internal::OnlineAccountClientImpl(service_name, service_type, provider_name, main_loop_select))
 {
 }
 
 OnlineAccountClient::~OnlineAccountClient() = default;
+
+void OnlineAccountClient::set_service_update_callback(ServiceUpdateCallback callback)
+{
+    p->set_service_update_callback(callback);
+}
 
 std::vector<OnlineAccountClient::ServiceStatus> OnlineAccountClient::get_service_statuses()
 {

@@ -59,9 +59,10 @@ public:
     OnlineAccountClientImpl(std::string const& service_name,
                             std::string const& service_type,
                             std::string const& provider_name,
-                            OnlineAccountClient::ServiceUpdateCallback callback,
                             OnlineAccountClient::MainLoopSelect main_loop_select);
     ~OnlineAccountClientImpl();
+
+    void set_service_update_callback(OnlineAccountClient::ServiceUpdateCallback callback);
 
     std::vector<OnlineAccountClient::ServiceStatus> get_service_statuses();
 
@@ -75,6 +76,8 @@ public:
                                      OnlineAccountClient::PostLoginAction login_failed_action);
 
     // Methods used only by impl
+    void flush_statuses(std::unique_lock<std::mutex>& lock);
+
     void main_loop_state_notify(bool is_running);
 
     std::string service_name();
@@ -95,6 +98,7 @@ private:
     bool use_external_main_loop_;
 
     std::thread main_loop_thread_;
+    std::mutex callback_mutex_;
     std::mutex mutex_;
     std::condition_variable cond_;
     bool main_loop_is_running_;

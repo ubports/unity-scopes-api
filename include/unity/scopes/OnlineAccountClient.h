@@ -66,9 +66,10 @@ public:
     OnlineAccountClient(std::string const& service_name,
                         std::string const& service_type,
                         std::string const& provider_name,
-                        ServiceUpdateCallback callback = nullptr,
                         MainLoopSelect main_loop_select = RunInExternalMainLoop);
     ~OnlineAccountClient();
+
+    void set_service_update_callback(ServiceUpdateCallback callback);
 
     std::vector<ServiceStatus> get_service_statuses();
 
