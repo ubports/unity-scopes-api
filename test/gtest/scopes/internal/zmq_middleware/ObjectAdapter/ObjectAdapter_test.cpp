@@ -745,6 +745,7 @@ private:
 void invoke_thread(ZmqMiddleware* mw, RequestMode t)
 {
     zmqpp::socket s(*mw->context(), t == RequestMode::Twoway ? zmqpp::socket_type::request : zmqpp::socket_type::push);
+    s.set(zmqpp::socket_option::linger, 200);
     s.connect("ipc://testscope");
     ZmqSender sender(s);
     ZmqReceiver receiver(s);
@@ -764,10 +765,6 @@ void invoke_thread(ZmqMiddleware* mw, RequestMode t)
         capnp::SegmentArrayMessageReader reader(reply_segments);
         auto response = reader.getRoot<capnproto::Response>();
         EXPECT_EQ(response.getStatus(), capnproto::ResponseStatus::SUCCESS);
-    }
-    else
-    {
-        wait(50);  // Allow some time for oneway requests to actually make it on the wire.
     }
 }
 
@@ -1062,9 +1059,10 @@ TEST(ObjectAdapter, double_bind)
         }
         catch (MiddlewareException const& e)
         {
-            EXPECT_STREQ("unity::scopes::MiddlewareException: ObjectAdapter::run_workers(): broker thread failure "
+            EXPECT_STREQ("unity::scopes::MiddlewareException: ObjectAdapter: pump thread failure "
                          "(adapter: testscope):\n"
-                         "    unity::scopes::MiddlewareException: safe_bind(): address in use: ipc://testscope", e.what());
+                         "    unity::scopes::MiddlewareException: safe_bind(): address in use: ipc://testscope",
+                         e.what());
         }
 
         {
@@ -1097,9 +1095,10 @@ TEST(ObjectAdapter, double_bind)
         }
         catch (MiddlewareException const& e)
         {
-            EXPECT_STREQ("unity::scopes::MiddlewareException: ObjectAdapter::run_workers(): broker thread failure "
+            EXPECT_STREQ("unity::scopes::MiddlewareException: ObjectAdapter: pump thread failure "
                          "(adapter: testscope):\n"
-                         "    unity::scopes::MiddlewareException: safe_bind(): address in use: ipc://testscope", e.what());
+                         "    unity::scopes::MiddlewareException: safe_bind(): address in use: ipc://testscope",
+                         e.what());
         }
 
         {
@@ -1196,8 +1195,13 @@ TEST(ObjectAdapter, dflt_servant_exceptions)
     }
     catch (MiddlewareException const& e)
     {
-        EXPECT_STREQ("unity::scopes::MiddlewareException: add_dflt_servant(): "
-                     "Object adapter in Failed state (adapter: testscope2)",
+        EXPECT_STREQ("unity::scopes::MiddlewareException: add_dflt_servant(): Object adapter in"
+                     " Failed state (adapter: testscope2)\n"
+                     "    Exception history:\n"
+                     "        Exception #1:\n"
+                     "            unity::scopes::MiddlewareException: ObjectAdapter: pump thread failure"
+                     " (adapter: testscope2):\n"
+                     "                unity::scopes::MiddlewareException: safe_bind(): address in use: ipc://testscope",
                      e.what());
     }
 
@@ -1209,8 +1213,13 @@ TEST(ObjectAdapter, dflt_servant_exceptions)
     }
     catch (MiddlewareException const& e)
     {
-        EXPECT_STREQ("unity::scopes::MiddlewareException: remove_dflt_servant(): "
-                     "Object adapter in Failed state (adapter: testscope2)",
+        EXPECT_STREQ("unity::scopes::MiddlewareException: remove_dflt_servant(): Object adapter in"
+                     " Failed state (adapter: testscope2)\n"
+                     "    Exception history:\n"
+                     "        Exception #1:\n"
+                     "            unity::scopes::MiddlewareException: ObjectAdapter: pump thread failure"
+                     " (adapter: testscope2):\n"
+                     "                unity::scopes::MiddlewareException: safe_bind(): address in use: ipc://testscope",
                      e.what());
     }
 
@@ -1222,8 +1231,13 @@ TEST(ObjectAdapter, dflt_servant_exceptions)
     }
     catch (MiddlewareException const& e)
     {
-        EXPECT_STREQ("unity::scopes::MiddlewareException: find_dflt_servant(): "
-                     "Object adapter in Failed state (adapter: testscope2)",
+        EXPECT_STREQ("unity::scopes::MiddlewareException: find_dflt_servant(): Object adapter in"
+                     " Failed state (adapter: testscope2)\n"
+                     "    Exception history:\n"
+                     "        Exception #1:\n"
+                     "            unity::scopes::MiddlewareException: ObjectAdapter: pump thread failure"
+                     " (adapter: testscope2):\n"
+                     "                unity::scopes::MiddlewareException: safe_bind(): address in use: ipc://testscope",
                      e.what());
     }
 }

@@ -454,54 +454,11 @@ void ObjectAdapter::run_workers()
         }
     }
 
-    // Start a broker thread to forward incoming messages to backend workers and
-    // wait for the broker thread to finish its initialization. The broker
-    // signals after it has connected to the stop socket.
-    {
-        lock_guard<mutex> lock(ready_mutex_);
-        ready_ = promise<void>();
-    }
-    broker_ = thread(&ObjectAdapter::broker_thread, this);
-    {
-        auto f = ready_.get_future();
-        try
-        {
-            f.get();
-        }
-        catch (...) // LCOV_EXCL_LINE
-        {
-            throw MiddlewareException("ObjectAdapter::run_workers(): broker thread failure (adapter: " + name_ + ")"); // LCOV_EXCL_LINE
-        }
-    }
-
-    // Create the appropriate number of worker threads.
-    // The last worker thread to subscribe signals that the workers are ready.
-    // This ensures that we won't send a stop from deactivate() until after
-    // the workers can actually receive it.
-    {
-        lock_guard<mutex> lock(ready_mutex_);
-        ready_ = promise<void>();
-    }
-    {
-        auto f = ready_.get_future();
-        num_workers_.store(pool_size_);
-        for (auto i = 0; i < pool_size_; ++i)
-        {
-            workers_.push_back(thread(&ObjectAdapter::worker_thread, this));
-        }
-        try
-        {
-            f.get();
-        }
-        // LCOV_EXCL_START
-        catch (...) //
-        {
-            lock_guard<mutex> state_lock(state_mutex_);
-            stopper_->stop();
-            throw MiddlewareException("ObjectAdapter::run_workers(): worker thread failure (adapter: " + name_ + ")");
-        }
-        // LCOV_EXCL_STOP
-    }
+    // Start pump.
+    auto ready = promise<void>();
+    auto f = ready.get_future();
+    pump_ = thread(&ObjectAdapter::pump, this, move(ready));
+    f.get();
 }
 
 shared_ptr<ServantBase> ObjectAdapter::find_servant(string const& id, string const& category)
@@ -514,69 +471,59 @@ shared_ptr<ServantBase> ObjectAdapter::find_servant(string const& id, string con
     return servant;
 }
 
-void ObjectAdapter::broker_thread()
+// Load-balancing message pump using router-router sockets (for twoway) or
+// pull-router (for oneway). Loosely follows the "Load Balancing Broker" in the Zmq Guide.
+
+void ObjectAdapter::pump(std::promise<void> ready)
 {
     try
     {
-        // Subscribe to stop socket. Once this socket becomes readable, that's the command to finish.
-        zmqpp::socket stop(*mw_.context(), zmqpp::socket_type::subscribe);
-        {
-            lock_guard<mutex> state_lock(state_mutex_);
-            stop = stopper_->subscribe();
-        }
-
-        // Set up message pump. Router-dealer for twoway adapter, pull-push for oneway adapter.
-        auto socket_type = mode_ == RequestMode::Twoway ? zmqpp::socket_type::router : zmqpp::socket_type::pull;
-        zmqpp::socket frontend(*mw_.context(), socket_type);
-
-        socket_type = mode_ == RequestMode::Twoway ? zmqpp::socket_type::dealer : zmqpp::socket_type::push;
-        zmqpp::socket backend(*mw_.context(), socket_type);
-
         zmqpp::poller poller;
 
-        try
+        zmqpp::socket_type stype = mode_ == RequestMode::Twoway ? zmqpp::socket_type::router : zmqpp::socket_type::pull;
+
+        // Front-end receives incoming requests from clients. (Frontend is in the server role.)
+        zmqpp::socket frontend(*mw_.context(), stype);
+        frontend.set(zmqpp::socket_option::linger, 50);
+        // "Safe" bind: prevents two servers from binding to the same endpoint.
+        safe_bind(frontend, endpoint_);
+        // We do not add the frontend to the poller just yet because we poll the frontend
+        // only when workers are ready to process a request.
+
+        // The backend replies to requests from workers for more work. (Backend is in the server role.)
+        // This means that our *reply* to the request from the worker contains the incoming
+        // request from the client, and the next *request* from the worker contains the result that
+        // is to go back to the client via the frontend (or the ready message for a oneway worker).
+        zmqpp::socket backend(*mw_.context(), zmqpp::socket_type::router);
+        backend.set(zmqpp::socket_option::linger, 50);
+        backend.bind("inproc://" + name_ + "_pump");
+        poller.add(backend);
+
+        // Subscribe to stop socket. Once this socket becomes readable, that's the command to finish.
+        auto stop = stopper_->subscribe();
+        poller.add(stop);
+
+        // Fire up the worker threads.
+        int num_workers = 0;
+        for (int i = 0; i < pool_size_; ++i)
         {
-            poller.add(stop);
-
-            frontend.set(zmqpp::socket_option::linger, 200);
-            // "Safe" bind: prevents two servers from binding to the same endpoint.
-            safe_bind(frontend, endpoint_);
-            poller.add(frontend);
-
-            backend.set(zmqpp::socket_option::linger, 200);
-            backend.bind("inproc://" + name_ + "-worker");
-            poller.add(backend);
-
-            // Tell parent that we are ready
-            {
-                lock_guard<mutex> lock(ready_mutex_);
-                ready_.set_value();
-            }
+            workers_.push_back(thread(&ObjectAdapter::worker, this));
+            ++num_workers;
+            // TODO: dangerous. What if one of these throws?
         }
-        // LCOV_EXCL_START
-        catch (...) // LCOV_EXCL_LINE
-        {
-            // TODO: log error
-            {
-                lock_guard<mutex> lock(state_mutex_);
-                stopper_->stop();
-            }
-            lock_guard<mutex> lock(ready_mutex_);
-            ready_.set_exception(current_exception());
-            return;
-        }
-        // LCOV_EXCL_STOP
 
-        int pending_requests = 0;
+        // Tell parent that we are ready
+        ready.set_value();
+
+        // Start the pump.
         bool shutting_down = false;
+        queue<string> ready_workers;
+
         for (;;)
         {
-            zmqpp::message message;
-            // Poll for incoming messages. If a timeout has been set, and no incoming messages are received for
-            // idle_timeout_ milliseconds, we shutdown the server.
             if (!poller.poll(idle_timeout_))
             {
-                // Shutdown this server by stopping the middleware.
+                // Shut down, no activity for the idle timeout period.
                 mw_.stop();
             }
             if (!shutting_down && poller.has_input(stop))
@@ -586,245 +533,276 @@ void ObjectAdapter::broker_thread()
                 // while there are still replies outstanding.
                 poller.remove(stop);
                 stop.close();
+                if (poller.has(frontend))
+                {
+                    poller.remove(frontend);  // Don't accept any more request from clients.
+                }
                 shutting_down = true;
             }
-            if (!shutting_down && poller.has_input(frontend)) // Once shutting down, we no longer read incoming messages.
+            if (poller.has_input(backend))
             {
-                int flag;
-                do
+                // A worker is asking for more work to do.
+                string worker_id;
+                backend.receive(worker_id);          // First frame: worker ID for LRU routing
+                ready_workers.push(worker_id);       // Thread will be ready again in a sec
+                if (!shutting_down && ready_workers.size() == 1)
                 {
-                    // This is the actual message pump. We read an incoming request and pass it to one of the workers
-                    // for processing. The dealer socket ensures fair sharing.
-                    frontend.receive(message);
-                    flag = frontend.has_more_parts() ? zmqpp::socket::send_more : zmqpp::socket::normal;
-                    backend.send(message, flag);
+                    // We poll the front end when there is at least one worker
+                    poller.add(frontend);
                 }
-                while (flag == zmqpp::socket::send_more);
+                string buf;
+                backend.receive(buf);                // Second frame: empty delimiter frame
+                assert(buf.empty());
+                string client_address;
+                backend.receive(client_address);     // Third frame: "ready" or client reply address
+                if (client_address != "ready")
+                {
+                    backend.receive(buf);            // Fourth frame: empty delimiter frame
+                    assert(buf.empty());
+                    if (mode_ == RequestMode::Twoway)
+                    {
+                        frontend.send(client_address, zmqpp::socket::send_more);   // Client address tells router where to send the reply to
+                        frontend.send("", zmqpp::socket::send_more);               // Empty delimiter frame
+                        // Read reply contents and return them to client via frontend
+                        int flag;
+                        do
+                        {
+                            backend.receive(buf);
+                            flag = backend.has_more_parts() ? zmqpp::socket::send_more : zmqpp::socket::normal;
+                            frontend.send(buf, flag);
+                        } while (flag == zmqpp::socket::send_more);
+                    }
+                }
+            }
+            if (!shutting_down && poller.has(frontend) && poller.has_input(frontend))
+            {
+                // Incoming request from client.
+                string client_address;
                 if (mode_ == RequestMode::Twoway)
                 {
-                    ++pending_requests; // Only twoway requests require us to wait for replies
+                    frontend.receive(client_address);  // First frame: client address
+                    string buf;
+                    frontend.receive(buf);             // Second frame: empty delimiter frame
+                    assert(buf.empty());
                 }
-            }
-            if (pending_requests != 0 && poller.has_input(backend))
-            {
-                // We need to read a reply for an earlier request.
+                string worker_id = ready_workers.front();
+                ready_workers.pop();
+                if (ready_workers.size() == 0)  // Stop polling once all workers are busy.
+                {
+                    poller.remove(frontend);
+                }
+
+                // Give incoming request to worker.
+                backend.send(worker_id, zmqpp::socket::send_more);
+                backend.send("", zmqpp::socket::send_more);
+                backend.send(client_address, zmqpp::socket::send_more);
+                backend.send("", zmqpp::socket::send_more);
                 int flag;
                 do
                 {
-                    // Message pump in the opposite direction, for replies from server to client.
-                    backend.receive(message);
-                    flag = backend.has_more_parts() ? zmqpp::socket::send_more : zmqpp::socket::normal;
-                    frontend.send(message, flag);
-                }
-                while (flag == zmqpp::socket::send_more);
-                assert(pending_requests > 0);
-                --pending_requests;
+                    string buf;
+                    frontend.receive(buf);
+                    flag = frontend.has_more_parts() ? zmqpp::socket::send_more : zmqpp::socket::normal;
+                    backend.send(buf, flag);
+                } while (flag == zmqpp::socket::send_more);
             }
-            if (shutting_down && pending_requests == 0)
+            if (shutting_down)
             {
-                frontend.close();
-                backend.close();
-                return;
+                while (ready_workers.size() > 0)
+                {
+                    string worker_id = ready_workers.front();
+                    ready_workers.pop();
+                    backend.send(worker_id, zmqpp::socket::send_more);
+                    backend.send("", zmqpp::socket::send_more);
+                    backend.send("stop");
+                    if (--num_workers == 0)
+                    {
+                        return;
+                    }
+                }
             }
         }
     }
     catch (...)
     {
-        {
-            lock_guard<mutex> lock(state_mutex_);
-            stopper_->stop();
-        }
-        MiddlewareException e("ObjectAdapter: broker thread failure (adapter: " + name_ + ")");
+        MiddlewareException e("ObjectAdapter: pump thread failure (adapter: " + name_ + ")");
         store_exception(e);
         // We may not have signaled the parent yet, depending on where things went wrong.
         try
         {
-            lock_guard<mutex> lock(ready_mutex_);
-            ready_.set_exception(make_exception_ptr(e));
+            stopper_->stop();
+            ready.set_exception(make_exception_ptr(e));
         }
-        catch (const future_error&)  // LCOV_EXCL_LINE
+        catch (future_error)  // LCOV_EXCL_LINE
         {
         }
     }
 }
 
-void ObjectAdapter::worker_thread()
+void ObjectAdapter::worker()
 {
     try
     {
-        zmqpp::poller poller;
+        zmqpp::socket pump(*mw_.context(), zmqpp::socket_type::req);
+        pump.set(zmqpp::socket_option::linger, 50);
+        //pump.set(zmqpp::socket_option::identity, "worker");
+        pump.connect("inproc://" + name_ + "_pump");
+        pump.send("ready");                             // First message tells pump that we are ready.
 
-        // Subscribe to stop socket. Once this socket becomes readable, that's the command to finish.
-        zmqpp::socket stop(*mw_.context(), zmqpp::socket_type::subscribe);
-        {
-            lock_guard<mutex> lock(state_mutex_);
-            stop = stopper_->subscribe();
-        }
-        poller.add(stop);
-
-        auto socket_type = mode_ == RequestMode::Twoway ? zmqpp::socket_type::reply : zmqpp::socket_type::pull;
-        zmqpp::socket s(*mw_.context(), socket_type);
-        s.set(zmqpp::socket_option::linger, 200);
-        s.connect("inproc://" + name_ + "-worker");
-        poller.add(s);
-
-        ZmqReceiver receiver(s);
-        ZmqSender sender(s);        // Sender is used only by twoway adapters (zero-cost, the class just remembers the passed socket).
-
-        if (--num_workers_ == 0)    // Last worker to reach this point notifies the parent that all workers are ready.
-        {
-            lock_guard<mutex> lock(ready_mutex_);
-            ready_.set_value();
-        }
-
-        Current current;
-        current.adapter = this;     // Stays the same for all invocations, so we set this once only.
-
-        bool finish = false;
         for (;;)
         {
-            if (finish)
+            string client_address;
+            pump.receive(client_address);
+            if (client_address == "stop")  // pump has decided to stop
             {
-                s.close();
                 return;
             }
+            string buf;
+            pump.receive(buf);
+            assert(buf.empty());
+            // Any bytes remaining in the input are the marshaled request payload.
 
-            poller.poll();
-            if (!finish && poller.has_input(stop)) // Parent sent a stop message, so we are supposed to go away.
+            dispatch(pump, client_address);
+
+            if (mode_ == RequestMode::Oneway)
             {
-                poller.remove(stop);
-                stop.close();
-                finish = true;
-            }
-
-            if (!finish && poller.has_input(s)) // We stop reading new incoming messages once told to finish.
-            {
-                // Unmarshal the type-independent part of the message (id, category, operation name, mode).
-                capnproto::Request::Reader req;
-                unique_ptr<capnp::SegmentArrayMessageReader> message;
-                try
-                {
-                    // Unmarshal generic part of the message.
-                    auto segments = receiver.receive();
-                    message.reset(new capnp::SegmentArrayMessageReader(segments));
-                    req = message->getRoot<capnproto::Request>();
-                    current.id = req.getId().cStr();
-                    current.category = req.getCat().cStr();
-                    current.op_name = req.getOpName().cStr();
-                    auto mode = req.getMode();
-                    if (current.id.empty() || current.op_name.empty() ||
-                        (mode != capnproto::RequestMode::TWOWAY && mode != capnproto::RequestMode::ONEWAY))
-                    {
-                        if (mode_ == RequestMode::Twoway)
-                        {
-                            capnp::MallocMessageBuilder b;
-                            auto exr = create_unknown_response(b, "Invalid message header");
-                            sender.send(exr);
-                        }
-                        else
-                        {
-                            // TODO: log error
-                            cerr << "ObjectAdapter: invalid oneway message header "
-                                 << "(id: " << current.id << ", adapter: " << name_ << ", op: " << current.op_name << ")" << endl;
-                        }
-                        continue;
-                    }
-                    auto expected_mode = mode_ == RequestMode::Twoway ? capnproto::RequestMode::TWOWAY : capnproto::RequestMode::ONEWAY;
-                    if (mode != expected_mode) // Can't do oneway on a twoway adapter and vice-versa.
-                    {
-                        if (mode_ == RequestMode::Twoway)
-                        {
-                            ostringstream s;
-                            s << "ObjectAdapter: oneway invocation sent to twoway adapter "
-                              << "(id: " << current.id << ", adapter: " << name_ << ", op: " << current.op_name << ")";
-                            capnp::MallocMessageBuilder b;
-                            auto exr = create_unknown_response(b, s.str());
-                            sender.send(exr);
-                        }
-                        else
-                        {
-                            // TODO: log error
-                            cerr << "ObjectAdapter: twoway invocation sent to oneway adapter "
-                                 << "(id: " << current.id << ", adapter: " << name_ << ", op: " << current.op_name << ")" << endl;
-                        }
-                        continue;
-                    }
-                }
-                catch (std::exception const& e)
-                {
-                    // We get here if header unmarshaling failed.
-                    ostringstream s;
-                    s << "ObjectAdapter: error unmarshaling request header "
-                      << "(id: " << current.id << ", adapter: " << name_ << ", op: " << current.op_name << "): " << e.what();
-                    if (mode_ == RequestMode::Twoway)
-                    {
-                        capnp::MallocMessageBuilder b;
-                        auto exr = create_unknown_response(b, s.str());
-                        sender.send(exr);
-                    }
-                    else
-                    {
-                        // TODO: log error
-                        cerr << s.str() << endl;
-                    }
-                    continue;
-                }
-
-                // Look for a servant with matching id.
-                shared_ptr<ServantBase> servant;
-                try
-                {
-                    servant = find_servant(current.id, current.category);
-                }
-                catch (std::exception const&)
-                {
-                    // Ignore failure to find servant during destruction phase.
-                }
-
-                if (!servant)
-                {
-                    if (mode_ == RequestMode::Twoway)
-                    {
-                        capnp::MallocMessageBuilder b;
-                        auto exr = create_object_not_exist_response(b, current);
-                        sender.send(exr);
-                    }
-                    continue;
-                }
-
-                // We have a target object, so we can ask it to unmarshal the in-params, forward
-                // the invocation to the application-provided method, and to marshal the results.
-                auto in_params = req.getInParams();
-                capnp::MallocMessageBuilder b;
-                auto r = b.initRoot<capnproto::Response>();
-                servant->safe_dispatch_(current, in_params, r); // noexcept
-                if (mode_ == RequestMode::Twoway)
-                {
-                    sender.send(b.getSegmentsForOutput());
-                }
+                pump.send("ready");
             }
         }
     }
     // LCOV_EXCL_START
     catch (...)
     {
-        {
-            lock_guard<mutex> lock(state_mutex_);
-            stopper_->stop();  // Fatal error, we need to stop all other workers and the broker.
-        }
+        stopper_->stop();  // Fatal error, we need to stop all other workers and the pump.
         MiddlewareException e("ObjectAdapter: worker thread failure (adapter: " + name_ + ")");
         store_exception(e);
-        // We may not have signaled the parent yet, depending on where things went wrong.
-        try
-        {
-            lock_guard<mutex> lock(ready_mutex_);
-            ready_.set_exception(make_exception_ptr(e));
-        }
-        catch (const future_error&)
-        {
-        }
     }
     // LCOV_EXCL_STOP
+}
+
+// Unmarshal input parameters, dispatch to servant and, if this is a twoway request,
+// marshal the results (or exception).
+
+void ObjectAdapter::dispatch(zmqpp::socket& pump, string const& client_address)
+{
+    ZmqSender sender(pump);    // Unused for oneway requests
+    capnproto::Request::Reader req;
+    Current current;
+    ZmqReceiver receiver(pump);
+    unique_ptr<capnp::SegmentArrayMessageReader> message;
+
+    try
+    {
+        // Unmarshal the type-independent part of the message (id, category, operation name, mode).
+        auto segments = receiver.receive();
+        message.reset(new capnp::SegmentArrayMessageReader(segments));
+        req = message->getRoot<capnproto::Request>();
+
+        current.adapter = this;
+        current.id = req.getId().cStr();
+        current.category = req.getCat().cStr();
+        current.op_name = req.getOpName().cStr();
+        auto mode = req.getMode();
+        if (current.id.empty() || current.op_name.empty() ||
+            (mode != capnproto::RequestMode::TWOWAY && mode != capnproto::RequestMode::ONEWAY))
+        {
+            if (mode_ == RequestMode::Twoway)
+            {
+                pump.send(client_address, zmqpp::socket::send_more);
+                pump.send("", zmqpp::socket::send_more);
+                capnp::MallocMessageBuilder b;
+                auto exr = create_unknown_response(b, "Invalid message header");
+                sender.send(exr);
+            }
+            else
+            {
+                // TODO: log error
+                cerr << "ObjectAdapter: invalid oneway message header "
+                     << "(id: " << current.id << ", adapter: " << name_ << ", op: " << current.op_name << ")" << endl;
+            }
+            return;
+        }
+        auto expected_mode = mode_ == RequestMode::Twoway ? capnproto::RequestMode::TWOWAY : capnproto::RequestMode::ONEWAY;
+        if (mode != expected_mode) // Can't do oneway on a twoway adapter and vice-versa.
+        {
+            if (mode_ == RequestMode::Twoway)
+            {
+                pump.send(client_address, zmqpp::socket::send_more);
+                pump.send("", zmqpp::socket::send_more);
+                ostringstream s;
+                s << "ObjectAdapter: oneway invocation sent to twoway adapter "
+                  << "(id: " << current.id << ", adapter: " << name_ << ", op: " << current.op_name << ")";
+                capnp::MallocMessageBuilder b;
+                auto exr = create_unknown_response(b, s.str());
+                sender.send(exr);
+            }
+            else
+            {
+                // TODO: log error
+                cerr << "ObjectAdapter: twoway invocation sent to oneway adapter "
+                     << "(id: " << current.id << ", adapter: " << name_ << ", op: " << current.op_name << ")" << endl;
+            }
+            return;
+        }
+    }
+    catch (std::exception const& e)
+    {
+        // We get here if header unmarshaling failed.
+        ostringstream s;
+        s << "ObjectAdapter: error unmarshaling request header "
+          << "(id: " << current.id << ", adapter: " << name_ << ", op: " << current.op_name << "): " << e.what();
+        if (mode_ == RequestMode::Twoway)
+        {
+            pump.send(client_address, zmqpp::socket::send_more);
+            pump.send("", zmqpp::socket::send_more);
+            capnp::MallocMessageBuilder b;
+            auto exr = create_unknown_response(b, s.str());
+            sender.send(exr);
+        }
+        else
+        {
+            // TODO: log error
+            cerr << s.str() << endl;
+        }
+        return;
+    }
+
+    // Look for a servant with matching id.
+    shared_ptr<ServantBase> servant;
+    try
+    {
+        servant = find_servant(current.id, current.category);
+    }
+    catch (std::exception const&)
+    {
+        // Ignore failure to find servant during destruction phase.
+    }
+
+    if (!servant)
+    {
+        if (mode_ == RequestMode::Twoway)
+        {
+            pump.send(client_address, zmqpp::socket::send_more);
+            pump.send("", zmqpp::socket::send_more);
+            capnp::MallocMessageBuilder b;
+            auto exr = create_object_not_exist_response(b, current);
+            sender.send(exr);
+        }
+        return;
+    }
+
+    // We have a target object, so we can ask it to unmarshal the in-params, forward
+    // the invocation to the application-provided method, and to marshal the results.
+    auto in_params = req.getInParams();
+    capnp::MallocMessageBuilder b;
+    auto r = b.initRoot<capnproto::Response>();
+    servant->safe_dispatch_(current, in_params, r); // noexcept
+    if (mode_ == RequestMode::Twoway)
+    {
+        pump.send(client_address, zmqpp::socket::send_more);
+        pump.send("", zmqpp::socket::send_more);
+        sender.send(b.getSegmentsForOutput());
+    }
 }
 
 void ObjectAdapter::cleanup()
@@ -849,9 +827,9 @@ void ObjectAdapter::join_with_all_threads()
             w.join();
         }
     }
-    if (broker_.joinable())
+    if (pump_.joinable())
     {
-        broker_.join();
+        pump_.join();
     }
 }
 
