@@ -71,6 +71,8 @@ public:
 
     void set_service_update_callback(ServiceUpdateCallback callback);
 
+    void refresh_service_statuses();
+
     std::vector<ServiceStatus> get_service_statuses();
 
     enum PostLoginAction

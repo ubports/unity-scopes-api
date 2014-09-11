@@ -64,6 +64,8 @@ public:
 
     void set_service_update_callback(OnlineAccountClient::ServiceUpdateCallback callback);
 
+    void refresh_service_statuses();
+
     std::vector<OnlineAccountClient::ServiceStatus> get_service_statuses();
 
     void register_account_login_item(Result& result,
@@ -76,7 +78,7 @@ public:
                                      OnlineAccountClient::PostLoginAction login_failed_action);
 
     // Methods used only by impl
-    void flush_statuses(std::unique_lock<std::mutex>& lock);
+    void flush_pending_sessions();
 
     void main_loop_state_notify(bool is_running);
 

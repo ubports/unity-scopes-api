@@ -217,7 +217,6 @@ OnlineAccountClientImpl::OnlineAccountClientImpl(std::string const& service_name
     // Wait here until either the main loop begins running, or the thread exits
     std::unique_lock<std::mutex> lock(mutex_);
     cond_.wait(lock, [this] { return main_loop_is_running_; });
-    flush_statuses(lock);
 }
 
 OnlineAccountClientImpl::~OnlineAccountClientImpl()
@@ -241,9 +240,8 @@ OnlineAccountClientImpl::~OnlineAccountClientImpl()
         {
             signon_auth_session_cancel(info.second->session.get());
         }
-
-        flush_statuses(lock);
     }
+    flush_pending_sessions();
 
     // If we are responsible for the main loop, quit it on destruction
     if (main_loop_)
@@ -261,6 +259,23 @@ void OnlineAccountClientImpl::set_service_update_callback(OnlineAccountClient::S
 {
     std::lock_guard<std::mutex> lock(callback_mutex_);
     callback_ = callback;
+}
+
+void OnlineAccountClientImpl::refresh_service_statuses()
+{
+    std::shared_ptr<GList> enabled_accounts(ag_manager_list(manager_.get()), ag_manager_list_free);
+    GList* it;
+    for (it = enabled_accounts.get(); it; it = it->next)
+    {
+        AgAccountId account_id = GPOINTER_TO_UINT(it->data);
+        std::shared_ptr<AgAccount> account(ag_manager_get_account(manager_.get(), account_id), g_object_unref);
+        std::string provider_name = ag_account_get_provider_name(account.get());
+        if (provider_name == provider_name_)
+        {
+            account_enabled_cb(manager_.get(), account_id, this);
+        }
+    }
+    flush_pending_sessions();
 }
 
 std::vector<OnlineAccountClient::ServiceStatus> OnlineAccountClientImpl::get_service_statuses()
@@ -312,10 +327,11 @@ void OnlineAccountClientImpl::register_account_login_item(PreviewWidget& widget,
     widget.add_attribute_value("online_account_details", Variant(account_details_map));
 }
 
-void OnlineAccountClientImpl::flush_statuses(std::unique_lock<std::mutex>& lock)
+void OnlineAccountClientImpl::flush_pending_sessions()
 {
     // Wait until all currently running login sessions are done
     // (ensures that accounts_ is up to date)
+    std::unique_lock<std::mutex> lock(mutex_);
     {
         std::shared_ptr<GMainLoop> event_loop;
         event_loop.reset(g_main_loop_new(nullptr, true), g_main_loop_unref);
@@ -404,18 +420,7 @@ void OnlineAccountClientImpl::main_loop_thread()
     account_deleted_signal_id_ = g_signal_connect(manager_.get(), "account-deleted", G_CALLBACK(account_deleted_cb), this);
 
     // Now check initial state
-    std::shared_ptr<GList> enabled_accounts(ag_manager_list(manager_.get()), ag_manager_list_free);
-    GList* it;
-    for (it = enabled_accounts.get(); it; it = it->next)
-    {
-        AgAccountId account_id = GPOINTER_TO_UINT(it->data);
-        std::shared_ptr<AgAccount> account(ag_manager_get_account(manager_.get(), account_id), g_object_unref);
-        std::string provider_name = ag_account_get_provider_name(account.get());
-        if (provider_name == provider_name_)
-        {
-            account_enabled_cb(manager_.get(), account_id, this);
-        }
-    }
+    refresh_service_statuses();
 
     if (!use_external_main_loop_)
     {

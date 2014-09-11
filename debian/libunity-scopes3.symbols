@@ -317,8 +317,10 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::OnlineAccountClient::register_account_login_item(unity::scopes::PreviewWidget&, unity::scopes::OnlineAccountClient::PostLoginAction, unity::scopes::OnlineAccountClient::PostLoginAction)@Base" 0replaceme
  (c++)"unity::scopes::OnlineAccountClient::register_account_login_item(unity::scopes::Result&, unity::scopes::CannedQuery const&, unity::scopes::OnlineAccountClient::PostLoginAction, unity::scopes::OnlineAccountClient::PostLoginAction)@Base" 0replaceme
  (c++)"unity::scopes::OnlineAccountClient::set_service_update_callback(std::function<void (unity::scopes::OnlineAccountClient::ServiceStatus const&)>)@Base" 0replaceme
+ (c++)"unity::scopes::OnlineAccountClient::refresh_service_statuses()@Base" 0replaceme
  (c++)"unity::scopes::OnlineAccountClient::OnlineAccountClient(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::OnlineAccountClient::MainLoopSelect)@Base" 0replaceme
- (c++)"unity::scopes::OnlineAccountClient::~OnlineAccountClient()@Base" 0replaceme (c++)"unity::scopes::Link::Link(unity::scopes::Link&&)@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::OnlineAccountClient::~OnlineAccountClient()@Base" 0replaceme
+ (c++)"unity::scopes::Link::Link(unity::scopes::Link&&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Link::Link(unity::scopes::Link const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Link::Link(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::CannedQuery const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Link::Link(std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unity::scopes::Variant> > > const&)@Base" 0.4.0+14.04.20140312.1

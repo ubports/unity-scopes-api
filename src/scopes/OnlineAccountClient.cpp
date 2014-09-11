@@ -40,6 +40,11 @@ void OnlineAccountClient::set_service_update_callback(ServiceUpdateCallback call
     p->set_service_update_callback(callback);
 }
 
+void OnlineAccountClient::refresh_service_statuses()
+{
+    p->refresh_service_statuses();
+}
+
 std::vector<OnlineAccountClient::ServiceStatus> OnlineAccountClient::get_service_statuses()
 {
     return p->get_service_statuses();
