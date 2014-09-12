@@ -30,6 +30,22 @@ namespace scopes
 namespace internal
 {
 
+static void free_error(GError* e)
+{
+    if (e)
+    {
+        g_error_free(e);
+    }
+}
+
+static void free_variant(GVariant* v)
+{
+    if (v)
+    {
+        g_variant_unref(v);
+    }
+}
+
 static OnlineAccountClient::ServiceStatus info_to_details(AccountInfo const* info, std::string const& error = "")
 {
     char* client_id = nullptr;
@@ -100,13 +116,13 @@ static gboolean wake_up_event_loop_cb(void* user_data)
 static void service_login_cb(GObject* source, GAsyncResult* result, void* user_data)
 {
     GError* error = nullptr;
-    util::ResourcePtr<GError*, decltype(&g_error_free)> error_cleanup(error, [](GError* e){ if (e) g_error_free(e); });
+    util::ResourcePtr<GError*, decltype(&g_error_free)> error_cleanup(error, free_error);
 
     SignonAuthSession* session = reinterpret_cast<SignonAuthSession*>(source);
     AccountInfo* info = reinterpret_cast<AccountInfo*>(user_data);
 
     // Get session data then send a notification with the login result
-    info->session_data.reset(signon_auth_session_process_finish(session, result, &error), [](GVariant* v){ if (v) g_variant_unref(v); });
+    info->session_data.reset(signon_auth_session_process_finish(session, result, &error), free_variant);
     info->account_client->callback(info_to_details(info, error ? error->message : ""));
     info->account_client->dec_logins();
 }
@@ -114,7 +130,7 @@ static void service_login_cb(GObject* source, GAsyncResult* result, void* user_d
 static void service_update_cb(AgAccountService* account_service, gboolean enabled, AccountInfo* info)
 {
     GError* error = nullptr;
-    util::ResourcePtr<GError*, decltype(&g_error_free)> error_cleanup(error, [](GError* e){ if (e) g_error_free(e); });
+    util::ResourcePtr<GError*, decltype(&g_error_free)> error_cleanup(error, free_error);
 
     // Service state has updated, clear the old session data
     info->service_enabled = enabled;
@@ -135,7 +151,7 @@ static void service_update_cb(AgAccountService* account_service, gboolean enable
 
         // Get authorization parameters then attempt to signon
         info->auth_params.reset(
-            g_variant_ref_sink(ag_auth_data_get_login_parameters(auth_data.get(), nullptr)), [](GVariant* v){ if (v) g_variant_unref(v); });
+            g_variant_ref_sink(ag_auth_data_get_login_parameters(auth_data.get(), nullptr)), free_variant);
 
         if (info->account_client->inc_logins())
         {
