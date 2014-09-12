@@ -742,7 +742,7 @@ private:
     int delay_;
 };
 
-void invoke_thread(ZmqMiddleware* mw, RequestMode t)
+void invoke_thread(ZmqMiddleware* mw, RequestMode t, string const& object_id)
 {
     zmqpp::socket s(*mw->context(), t == RequestMode::Twoway ? zmqpp::socket_type::request : zmqpp::socket_type::push);
     s.set(zmqpp::socket_option::linger, 200);
@@ -753,7 +753,7 @@ void invoke_thread(ZmqMiddleware* mw, RequestMode t)
     capnp::MallocMessageBuilder b;
     auto request = b.initRoot<capnproto::Request>();
     request.setMode(t == RequestMode::Twoway ? capnproto::RequestMode::TWOWAY : capnproto::RequestMode::ONEWAY);
-    request.setId("some_id");
+    request.setId(object_id);
     request.setCat("some_cat");
     request.setOpName("count_op");
 
@@ -788,7 +788,7 @@ TEST(ObjectAdapter, twoway_threading)
         vector<thread> invokers;
         for (auto i = 0; i < num_requests; ++i)
         {
-            invokers.push_back(thread(invoke_thread, &mw, RequestMode::Twoway));
+            invokers.push_back(thread(invoke_thread, &mw, RequestMode::Twoway, "some_id"));
         }
         for (auto& i : invokers)
         {
@@ -822,7 +822,7 @@ TEST(ObjectAdapter, oneway_threading)
         vector<thread> invokers;
         for (auto i = 0; i < num_requests; ++i)
         {
-            invokers.push_back(thread(invoke_thread, &mw, RequestMode::Oneway));
+            invokers.push_back(thread(invoke_thread, &mw, RequestMode::Oneway, "some_id"));
         }
         for (auto& i : invokers)
         {
@@ -842,6 +842,111 @@ TEST(ObjectAdapter, oneway_threading)
 
     EXPECT_EQ(num_requests, o->num_invocations());
     EXPECT_EQ(num_threads, o->max_concurrent());
+}
+
+TEST(ObjectAdapter, load_balancing_twoway)
+{
+    auto rt = RuntimeImpl::create("testscope", runtime_ini);
+    ZmqMiddleware mw("testscope", rt.get(), zmq_ini);
+
+    // Oneway adapter with 3 threads.
+    ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Twoway, 3);
+    a.activate();
+
+    // Add servants that take 100 ms (fast) and 1000 ms (slow)
+    shared_ptr<CountingServant> slow_servant(new CountingServant(1000));
+    shared_ptr<CountingServant> fast_servant(new CountingServant(100));
+    a.add("slow", slow_servant);
+    a.add("fast", fast_servant);
+
+    // Send a single request to the slow servant, and 15 requests to the fast servant.
+    // The slow servant ties up a thread for a second, so the other two threads
+    // should be processing the fast invocations during that time, meaning that the
+    // 16 requests should complete in about a second.
+
+    auto start_time = chrono::system_clock::now();
+
+    vector<thread> invokers;
+    invokers.push_back(thread(invoke_thread, &mw, RequestMode::Twoway, "slow"));
+    for (auto i = 0; i < 15; ++i)
+    {
+        invokers.push_back(thread(invoke_thread, &mw, RequestMode::Twoway, "fast"));
+    }
+    for (auto& i : invokers)
+    {
+        i.join();
+    }
+
+    auto end_time = chrono::system_clock::now();
+    EXPECT_LT(chrono::duration_cast<chrono::seconds>(end_time - start_time).count(), 2);
+
+    // We must have had 1 request on the slow servant, and 15 on the fast servant, with the
+    // fast servant getting at most 2 invocations at the same time.
+    EXPECT_EQ(1, slow_servant->num_invocations());
+    EXPECT_EQ(15, fast_servant->num_invocations());
+    EXPECT_EQ(1, slow_servant->max_concurrent());
+    EXPECT_EQ(2, fast_servant->max_concurrent());
+}
+
+TEST(ObjectAdapter, load_balancing_oneway)
+{
+    auto rt = RuntimeImpl::create("testscope", runtime_ini);
+    ZmqMiddleware mw("testscope", rt.get(), zmq_ini);
+
+    // Oneway adapter with 3 threads.
+    ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Oneway, 3);
+    a.activate();
+
+    // Add servants that take 100 ms (fast) and 1000 ms (slow)
+    shared_ptr<CountingServant> slow_servant(new CountingServant(1000));
+    shared_ptr<CountingServant> fast_servant(new CountingServant(100));
+    a.add("slow", slow_servant);
+    a.add("fast", fast_servant);
+
+    // Socket to invoke on adapter
+    zmqpp::socket s(*mw.context(), zmqpp::socket_type::push);
+    s.set(zmqpp::socket_option::linger, 200);
+    s.connect("ipc://testscope");
+    ZmqSender sender(s);
+
+    // Request for invoking slow servant.
+    capnp::MallocMessageBuilder slow_b;
+    auto slow_req = slow_b.initRoot<capnproto::Request>();
+    slow_req.setMode(capnproto::RequestMode::ONEWAY);
+    slow_req.setId("slow");
+    slow_req.setCat("some_cat");
+    slow_req.setOpName("count_op");
+
+    // Request for invoking fast servant.
+    capnp::MallocMessageBuilder fast_b;
+    auto fast_req = fast_b.initRoot<capnproto::Request>();
+    fast_req.setMode(capnproto::RequestMode::ONEWAY);
+    fast_req.setId("fast");
+    fast_req.setCat("some_cat");
+    fast_req.setOpName("count_op");
+
+    // Send a single request to the slow servant, and 15 requests to the fast servant.
+    // The slow servant ties up a thread for a second, so the other two threads
+    // should be processing the fast invocations during that time, meaning that the
+    // 16 requests should complete in about a second.
+    auto slow_segments = slow_b.getSegmentsForOutput();
+    sender.send(slow_segments);
+
+    auto fast_segments = fast_b.getSegmentsForOutput();
+    for (int i = 0; i < 15; ++i)
+    {
+        sender.send(fast_segments);
+    }
+
+    // Oneway invocations, so we need to give them a chance to get delivered.
+    this_thread::sleep_for(chrono::seconds(2));
+
+    // We must have had 1 request on the slow servant, and 15 on the fast servant, with the
+    // fast servant getting at most 2 invocations at the same time.
+    EXPECT_EQ(1, slow_servant->num_invocations());
+    EXPECT_EQ(15, fast_servant->num_invocations());
+    EXPECT_EQ(1, slow_servant->max_concurrent());
+    EXPECT_EQ(2, fast_servant->max_concurrent());
 }
 
 using namespace std::placeholders;
