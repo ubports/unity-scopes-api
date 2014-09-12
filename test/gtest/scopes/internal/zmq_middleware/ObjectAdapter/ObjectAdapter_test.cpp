@@ -849,26 +849,26 @@ TEST(ObjectAdapter, load_balancing_twoway)
     auto rt = RuntimeImpl::create("testscope", runtime_ini);
     ZmqMiddleware mw("testscope", rt.get(), zmq_ini);
 
-    // Oneway adapter with 3 threads.
+    // Twoway adapter with 3 threads.
     ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Twoway, 3);
     a.activate();
 
-    // Add servants that take 10 ms (fast) and 1000 ms (slow)
+    // Add servants that take 50 ms (fast) and 1000 ms (slow)
     shared_ptr<CountingServant> slow_servant(new CountingServant(1000));
-    shared_ptr<CountingServant> fast_servant(new CountingServant(10));
+    shared_ptr<CountingServant> fast_servant(new CountingServant(50));
     a.add("slow", slow_servant);
     a.add("fast", fast_servant);
 
-    // Send a single request to the slow servant, and 14 requests to the fast servant.
+    // Send a single request to the slow servant, and 30 requests to the fast servant.
     // The slow servant ties up a thread for a second, so the other two threads
     // should be processing the fast invocations during that time, meaning that the
-    // 15 requests should complete in about a second.
+    // 31 requests should complete in about a second.
 
     auto start_time = chrono::system_clock::now();
 
     vector<thread> invokers;
     invokers.push_back(thread(invoke_thread, &mw, RequestMode::Twoway, "slow"));
-    for (auto i = 0; i < 14; ++i)
+    for (auto i = 0; i < 30; ++i)
     {
         invokers.push_back(thread(invoke_thread, &mw, RequestMode::Twoway, "fast"));
     }
@@ -883,7 +883,7 @@ TEST(ObjectAdapter, load_balancing_twoway)
     // We must have had 1 request on the slow servant, and 14 on the fast servant, with the
     // fast servant getting at most 2 invocations at the same time.
     EXPECT_EQ(1, slow_servant->num_invocations());
-    EXPECT_EQ(14, fast_servant->num_invocations());
+    EXPECT_EQ(30, fast_servant->num_invocations());
     EXPECT_EQ(1, slow_servant->max_concurrent());
     EXPECT_EQ(2, fast_servant->max_concurrent());
 }
