@@ -761,6 +761,155 @@ if (it != s.end())                         // Setting does not have a default va
 }
 ~~~
 
+\subsection online_accounts Online Accounts
+
+A scope may require access to an online account in order to evaluate particular results, perform certain actions, or
+perhaps even operate at all. The following section describes how to use online account services from your scope.
+
+\subsubsection oa_step1 Step 1: Update Apparmor manifest.
+
+Firstly, in order for your scope to be granted access to the online accounts backend, the "accounts" policy group needs
+to be added to your Apparmor manifest file, as follows:
+
+\paragraph oa_apparmor Example Apparmor manifest file:
+\code
+{
+    "template": "ubuntu-scope-network",
+    "policy_groups": [
+        "accounts"
+    ],
+    "policy_version": 1.2
+}
+\endcode
+
+\subsubsection oa_step2 Step 2: Account service configuration.
+
+Scopes access accounts at a service level (E.g. YouTube service under a Google account, Ubuntu Store service under an
+Ubuntu One account, etc.), therefore each scope must provide some config to specify its account service requirements.
+
+There are 3 additional files that a scope must supply:
+1. A .service file to specify a method of accessing its particular account provider.
+2. A .desktop file to provide the name of the scope and an icon for the settings UI.
+3. A .application file to link one or more services to your desktop file.
+
+\paragraph oa_service Example .service file:
+\code
+<?xml version="1.0" encoding="UTF-8"?>
+<service id="com.ubuntu.scopes.youtube_youtube">
+  <type>sharing</type>
+  <icon>youtube</icon>
+  <name>YouTube</name>
+  <provider>google</provider>
+  <translations>unity-scope-youtube</translations>
+  <template>
+    <group name="auth">
+      <setting name="method">oauth2</setting>
+      <setting name="mechanism">web_server</setting>
+      <group name="oauth2">
+        <group name="web_server">
+          <setting name="Host">accounts.google.com</setting>
+          <setting name="AuthPath">o/oauth2/auth?access_type=offline</setting>
+          <setting name="TokenPath">o/oauth2/token</setting>
+          <setting name="RedirectUri">https://wiki.ubuntu.com/</setting>
+          <setting name="ResponseType">code</setting>
+          <setting type="as" name="Scope">['https://www.googleapis.com/auth/youtube.readonly']</setting>
+          <setting name="ClientId">xxxx</setting>
+          <setting name="ClientSecret">xxxx</setting>
+          <setting type="as" name="AllowedSchemes">['https','http']</setting>
+        </group>
+      </group>
+    </group>
+  </template>
+</service>
+\endcode
+
+\paragraph oa_desktop Example .desktop file:
+\code
+[Desktop Entry]
+Name=YouTube
+Icon=youtube/icon.png
+Type=Application
+OnlyShowIn=OnlineAccountsSettingsPage
+Exec=
+\endcode
+
+<b>Note:</b> The "Type", "OnlyShowIn", and "Exec" entries in your .desktop file need to be exactly as expressed here
+(This ensures your scope is not treated as a regular launchable application).
+
+\paragraph oa_application Example .application file:
+\code
+<?xml version="1.0" encoding="UTF-8"?>
+<application id="com.ubuntu.scopes.youtube_youtube">
+  <description>YouTube</description>
+  <desktop-entry>com.ubuntu.scopes.youtube_youtube_1.0.12.desktop</desktop-entry>
+  <services>
+    <service id="com.ubuntu.scopes.youtube_youtube">
+      <description>Watch your favorite YouTube videos</description>
+    </service>
+  </services>
+</application>
+\endcode
+
+\subsubsection oa_step3 Step 3: Update Click manifest.
+
+Now that we have added the 3 new files from step 2 to our project, we need to update our click manifest file to include
+them:
+
+\paragraph oa_click Example Click manifest file:
+\code
+{
+    "description": "YouTube scope",
+    "framework": "ubuntu-sdk-14.10-dev2",
+    "architecture": "armhf",
+    "hooks": {
+        "youtube": {
+            "scope": "youtube",
+            "apparmor": "apparmor.json",
+            "account-application": "youtube.application",
+            "account-service": "youtube.service",
+            "desktop": "youtube.desktop"
+        }
+    },
+    "icon": "youtube/icon.png",
+    "maintainer": "Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>",
+    "name": "com.ubuntu.scopes.youtube",
+    "title": "YouTube scope",
+    "version": "1.0.12"
+}
+\endcode
+
+\subsubsection oa_step4 Step 4: Utilize the OnlineAccountClient class.
+
+Finally, we now access online account services from within our scope implementation.
+
+The first thing we need to do is instantiate a unity::scopes::OnlineAccountClient object. On construction we must
+specify our account service name, service type, and provider name (These correspond to the values of the "service_id",
+"type", and "provider" entries in your .service file).
+
+Via this object we can get the statuses of all account services, set a callback for status updates, and register
+results and widgets that require authorization (See the unity::scopes::OnlineAccountClient class documentation for more
+detail).
+
+Here's a simple example of how one could return a "Log-in" result to the dash (If the service is not authorized,
+selecting this result will trigger an authorization request to the user before executing one of the 2 post-login
+actions):
+
+\code
+void Query::run(unity::scopes::SearchReplyProxy const& reply)
+{
+    auto cat = reply->register_category("youtube_login", "", "");
+    unity::scopes::CategorisedResult res(cat);
+    res.set_title("Log-in to YouTube");
+
+    unity::scopes::OnlineAccountClient oa_client("com.ubuntu.scopes.youtube_youtube", "sharing", "google");
+    oa_client.register_account_login_item(res,
+                                          query(),
+                                          unity::scopes::OnlineAccountClient::InvalidateResults,
+                                          unity::scopes::OnlineAccountClient::DoNothing);
+    reply->push(res);
+}
+\endcode
+
 \subsection scopetesting Testing
 
 The Unity Scopes API provides testing helpers based on the well-known and established testing frameworks,

@@ -111,8 +111,8 @@ public:
     /**
     \brief Refresh all service statuses.
 
-    <b>WARNING</b>: If a service update callback is set, this method will invoke that callback for each
-    service monitored. Therefore, DO NOT call this method from within your callback function!
+    <b>WARNING</b>: If a service update callback is set, this method will invoke that callback for
+    each service monitored. Therefore, DO NOT call this method from within your callback function!
     */
     void refresh_service_statuses();
 
@@ -136,11 +136,11 @@ public:
     };
 
     /**
-    \brief Register a result that requires the user to be logged in.
-    \param result The result item that requires account access.
+    \brief Register a result item that requires the user to be logged in.
+    \param result The result item that needs account access.
     \param query The scope's current query.
-    \param login_passed_action The action to take upon a successful login.
-    \param login_failed_action The action to take upon an unsuccessful login.
+    \param login_passed_action The action to take upon successful login.
+    \param login_failed_action The action to take upon unsuccessful login.
     */
     void register_account_login_item(Result& result,
                                      CannedQuery const& query,
@@ -148,10 +148,10 @@ public:
                                      PostLoginAction login_failed_action);
 
     /**
-    \brief Register a widget that requires the user to be logged in.
-    \param widget The widget item that requires account access.
-    \param login_passed_action The action to take upon a successful login.
-    \param login_failed_action The action to take upon an unsuccessful login.
+    \brief Register a widget item that requires the user to be logged in.
+    \param widget The widget item that needs account access.
+    \param login_passed_action The action to take upon successful login.
+    \param login_failed_action The action to take upon unsuccessful login.
     */
     void register_account_login_item(PreviewWidget& widget,
                                      PostLoginAction login_passed_action,
