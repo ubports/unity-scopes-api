@@ -473,6 +473,7 @@ shared_ptr<ServantBase> ObjectAdapter::find_servant(string const& id, string con
 
 // Load-balancing message pump using router-router sockets (for twoway) or
 // pull-router (for oneway). Loosely follows the "Load Balancing Broker" in the Zmq Guide.
+// (Workers use a REQ socket to pull work from the pump.)
 
 void ObjectAdapter::pump(std::promise<void> ready)
 {
@@ -509,7 +510,6 @@ void ObjectAdapter::pump(std::promise<void> ready)
         {
             workers_.push_back(thread(&ObjectAdapter::worker, this));
             ++num_workers;
-            // TODO: dangerous. What if one of these throws?
         }
 
         // Tell parent that we are ready
@@ -530,7 +530,7 @@ void ObjectAdapter::pump(std::promise<void> ready)
             {
                 // When the stop socket becomes ready, we need to get out of here.
                 // We stop reading more requests from the router, but continue processing
-                // while there are still replies outstanding.
+                // while there are still outstanding replies for twoway requests.
                 poller.remove(stop);
                 stop.close();
                 if (poller.has(frontend))
@@ -587,7 +587,7 @@ void ObjectAdapter::pump(std::promise<void> ready)
                 }
                 string worker_id = ready_workers.front();
                 ready_workers.pop();
-                if (ready_workers.size() == 0)  // Stop polling once all workers are busy.
+                if (ready_workers.size() == 0)  // Stop reading from frontend once all workers are busy.
                 {
                     poller.remove(frontend);
                 }
@@ -608,6 +608,10 @@ void ObjectAdapter::pump(std::promise<void> ready)
             }
             if (shutting_down)
             {
+                // Tell each worker that is ready to stop. This automatically
+                // "waits" for executing twoway requests to complete because
+                // a worker that's doing work isn't ready. Once all workers
+                // have been told to stop, we are done.
                 while (ready_workers.size() > 0)
                 {
                     string worker_id = ready_workers.front();
@@ -645,7 +649,6 @@ void ObjectAdapter::worker()
     {
         zmqpp::socket pump(*mw_.context(), zmqpp::socket_type::req);
         pump.set(zmqpp::socket_option::linger, 50);
-        //pump.set(zmqpp::socket_option::identity, "worker");
         pump.connect("inproc://" + name_ + "_pump");
         pump.send("ready");                             // First message tells pump that we are ready.
 
