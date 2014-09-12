@@ -663,12 +663,14 @@ void ObjectAdapter::worker()
             string buf;
             pump.receive(buf);
             assert(buf.empty());
-            // Any bytes remaining in the input are the marshaled request payload.
 
+            // Any bytes remaining in the input are the marshaled request payload.
             dispatch(pump, client_address);
 
             if (mode_ == RequestMode::Oneway)
             {
+                // Oneway requests don't have a reply, so we send a dummy "reply" to tell
+                // the pump that we are ready for another request.
                 pump.send("ready");
             }
         }
@@ -709,6 +711,7 @@ void ObjectAdapter::dispatch(zmqpp::socket& pump, string const& client_address)
         if (current.id.empty() || current.op_name.empty() ||
             (mode != capnproto::RequestMode::TWOWAY && mode != capnproto::RequestMode::ONEWAY))
         {
+            // Something is wrong with the request header.
             if (mode_ == RequestMode::Twoway)
             {
                 pump.send(client_address, zmqpp::socket::send_more);

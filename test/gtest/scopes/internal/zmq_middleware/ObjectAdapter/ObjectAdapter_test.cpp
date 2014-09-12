@@ -853,22 +853,22 @@ TEST(ObjectAdapter, load_balancing_twoway)
     ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Twoway, 3);
     a.activate();
 
-    // Add servants that take 100 ms (fast) and 1000 ms (slow)
+    // Add servants that take 10 ms (fast) and 1000 ms (slow)
     shared_ptr<CountingServant> slow_servant(new CountingServant(1000));
-    shared_ptr<CountingServant> fast_servant(new CountingServant(100));
+    shared_ptr<CountingServant> fast_servant(new CountingServant(10));
     a.add("slow", slow_servant);
     a.add("fast", fast_servant);
 
-    // Send a single request to the slow servant, and 15 requests to the fast servant.
+    // Send a single request to the slow servant, and 14 requests to the fast servant.
     // The slow servant ties up a thread for a second, so the other two threads
     // should be processing the fast invocations during that time, meaning that the
-    // 16 requests should complete in about a second.
+    // 15 requests should complete in about a second.
 
     auto start_time = chrono::system_clock::now();
 
     vector<thread> invokers;
     invokers.push_back(thread(invoke_thread, &mw, RequestMode::Twoway, "slow"));
-    for (auto i = 0; i < 15; ++i)
+    for (auto i = 0; i < 14; ++i)
     {
         invokers.push_back(thread(invoke_thread, &mw, RequestMode::Twoway, "fast"));
     }
@@ -878,12 +878,12 @@ TEST(ObjectAdapter, load_balancing_twoway)
     }
 
     auto end_time = chrono::system_clock::now();
-    EXPECT_LT(chrono::duration_cast<chrono::seconds>(end_time - start_time).count(), 2);
+    EXPECT_LT(chrono::duration_cast<chrono::milliseconds>(end_time - start_time).count(), 2000);
 
-    // We must have had 1 request on the slow servant, and 15 on the fast servant, with the
+    // We must have had 1 request on the slow servant, and 14 on the fast servant, with the
     // fast servant getting at most 2 invocations at the same time.
     EXPECT_EQ(1, slow_servant->num_invocations());
-    EXPECT_EQ(15, fast_servant->num_invocations());
+    EXPECT_EQ(14, fast_servant->num_invocations());
     EXPECT_EQ(1, slow_servant->max_concurrent());
     EXPECT_EQ(2, fast_servant->max_concurrent());
 }
@@ -897,9 +897,9 @@ TEST(ObjectAdapter, load_balancing_oneway)
     ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Oneway, 3);
     a.activate();
 
-    // Add servants that take 100 ms (fast) and 1000 ms (slow)
+    // Add servants that take 10 ms (fast) and 1000 ms (slow)
     shared_ptr<CountingServant> slow_servant(new CountingServant(1000));
-    shared_ptr<CountingServant> fast_servant(new CountingServant(100));
+    shared_ptr<CountingServant> fast_servant(new CountingServant(10));
     a.add("slow", slow_servant);
     a.add("fast", fast_servant);
 
@@ -925,15 +925,15 @@ TEST(ObjectAdapter, load_balancing_oneway)
     fast_req.setCat("some_cat");
     fast_req.setOpName("count_op");
 
-    // Send a single request to the slow servant, and 15 requests to the fast servant.
+    // Send a single request to the slow servant, and 140 requests to the fast servant.
     // The slow servant ties up a thread for a second, so the other two threads
     // should be processing the fast invocations during that time, meaning that the
-    // 16 requests should complete in about a second.
+    // 141 requests should complete in about a second.
     auto slow_segments = slow_b.getSegmentsForOutput();
     sender.send(slow_segments);
 
     auto fast_segments = fast_b.getSegmentsForOutput();
-    for (int i = 0; i < 15; ++i)
+    for (int i = 0; i < 140; ++i)
     {
         sender.send(fast_segments);
     }
@@ -941,10 +941,10 @@ TEST(ObjectAdapter, load_balancing_oneway)
     // Oneway invocations, so we need to give them a chance to get delivered.
     this_thread::sleep_for(chrono::seconds(2));
 
-    // We must have had 1 request on the slow servant, and 15 on the fast servant, with the
+    // We must have had 1 request on the slow servant, and 14 on the fast servant, with the
     // fast servant getting at most 2 invocations at the same time.
     EXPECT_EQ(1, slow_servant->num_invocations());
-    EXPECT_EQ(15, fast_servant->num_invocations());
+    EXPECT_EQ(140, fast_servant->num_invocations());
     EXPECT_EQ(1, slow_servant->max_concurrent());
     EXPECT_EQ(2, fast_servant->max_concurrent());
 }
