@@ -844,6 +844,9 @@ TEST(ObjectAdapter, oneway_threading)
     EXPECT_EQ(num_threads, o->max_concurrent());
 }
 
+// Show that a slow twoway invocation does not delay processing of other twoway invocations if
+// the number of outstanding invocations exceeds the number of worker threads.
+
 TEST(ObjectAdapter, load_balancing_twoway)
 {
     auto rt = RuntimeImpl::create("testscope", runtime_ini);
@@ -877,16 +880,22 @@ TEST(ObjectAdapter, load_balancing_twoway)
         i.join();
     }
 
+    // We set a generous limit of two seconds, even though the entire thing will normally
+    // finish in about 1.1 seconds, in case we are slow on Jenkins.
     auto end_time = chrono::system_clock::now();
     EXPECT_LT(chrono::duration_cast<chrono::milliseconds>(end_time - start_time).count(), 2000);
 
-    // We must have had 1 request on the slow servant, and 14 on the fast servant, with the
-    // fast servant getting at most 2 invocations at the same time.
+    // We must have had 1 request on the slow servant, and 30 on the fast servant, with the
+    // fast servant getting at least 2 invocations at the same time. Depending on scheduling
+    // order, it's possible for a fast request to be sent before the single slow request,
+    // we may have max concurrency of 3 in the fast servant occasionally.)
     EXPECT_EQ(1, slow_servant->num_invocations());
     EXPECT_EQ(30, fast_servant->num_invocations());
-    EXPECT_EQ(1, slow_servant->max_concurrent());
-    EXPECT_EQ(2, fast_servant->max_concurrent());
+    EXPECT_GE(fast_servant->max_concurrent(), 2);
 }
+
+// Show that a slow oneway invocation does not delay processing of other oneway invocations if
+// the number of outstanding invocations exceeds the number of worker threads.
 
 TEST(ObjectAdapter, load_balancing_oneway)
 {
@@ -927,7 +936,7 @@ TEST(ObjectAdapter, load_balancing_oneway)
 
     // Send a single request to the slow servant, and 140 requests to the fast servant.
     // The slow servant ties up a thread for a second, so the other two threads
-    // should be processing the fast invocations during that time, meaning that the
+    // are processing the fast invocations during that time, meaning that the
     // 141 requests should complete in about a second.
     auto slow_segments = slow_b.getSegmentsForOutput();
     sender.send(slow_segments);
@@ -938,14 +947,15 @@ TEST(ObjectAdapter, load_balancing_oneway)
         sender.send(fast_segments);
     }
 
-    // Oneway invocations, so we need to give them a chance to get delivered.
+    // Oneway invocations, so we need to give them a chance to finish.
+    // We set a generous limit of two seconds, even though the entire thing will normally
+    // finish in about 1.1 seconds, in case we are slow on Jenkins.
     this_thread::sleep_for(chrono::seconds(2));
 
-    // We must have had 1 request on the slow servant, and 14 on the fast servant, with the
-    // fast servant getting at most 2 invocations at the same time.
+    // We must have had 1 request on the slow servant, and 140 on the fast servant, with the
+    // fast servant getting 2 invocations concurrently.
     EXPECT_EQ(1, slow_servant->num_invocations());
     EXPECT_EQ(140, fast_servant->num_invocations());
-    EXPECT_EQ(1, slow_servant->max_concurrent());
     EXPECT_EQ(2, fast_servant->max_concurrent());
 }
 
