@@ -827,7 +827,7 @@ There are 3 additional files that a scope must supply:
 \code
 [Desktop Entry]
 Name=YouTube
-Icon=youtube
+Icon=youtube/icon.png
 Type=Application
 OnlyShowIn=X-OnlineAccountsSettingsPage;
 Exec=true
