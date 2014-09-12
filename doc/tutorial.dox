@@ -827,14 +827,15 @@ There are 3 additional files that a scope must supply:
 \code
 [Desktop Entry]
 Name=YouTube
-Icon=youtube/icon.png
+Icon=youtube
 Type=Application
-OnlyShowIn=OnlineAccountsSettingsPage
-Exec=
+OnlyShowIn=X-OnlineAccountsSettingsPage;
+Exec=true
+X-Ubuntu-Touch=true
 \endcode
 
-<b>Note:</b> The "Type", "OnlyShowIn", and "Exec" entries in your .desktop file need to be exactly as expressed here
-(This ensures your scope is not treated as a regular launchable application).
+<b>Note:</b> The "Type", "OnlyShowIn", "Exec", and "X-Ubuntu-Touch" entries in your .desktop file need to be exactly as
+expressed here (This ensures your scope is not treated as a regular launchable application).
 
 \paragraph oa_application Example .application file:
 \code
