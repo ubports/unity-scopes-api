@@ -37,6 +37,10 @@ namespace internal
 class OnlineAccountClientImpl;
 }
 
+/**
+ \brief blah
+*/
+
 class OnlineAccountClient final
 {
 public:
@@ -44,51 +48,97 @@ public:
     NONCOPYABLE(OnlineAccountClient);
     /// @endcond
 
+    /**
+    \brief blah
+    */
     struct ServiceStatus
     {
-        uint account_id;
-        bool service_enabled;
-        std::string client_id;
-        std::string client_secret;
-        std::string access_token;
-        std::string token_secret;
-        std::string error;
+        uint account_id;            ///< blah
+        bool service_enabled;       ///< blah
+        std::string client_id;      ///< blah
+        std::string client_secret;  ///< blah
+        std::string access_token;   ///< blah
+        std::string token_secret;   ///< blah
+        std::string error;          //!< blah
     };
 
+    /**
+    \brief blah
+    */
     typedef std::function<void(ServiceStatus const&)> ServiceUpdateCallback;
 
+    /**
+    \brief blah
+    */
     enum MainLoopSelect
     {
-        RunInExternalMainLoop,
-        CreateInternalMainLoop
+        RunInExternalMainLoop,  ///< blah
+        CreateInternalMainLoop  ///< blah
     };
 
+    /**
+    \brief blah
+    \param service_name blah
+    \param service_type blah
+    \param provider_name blah
+    \param main_loop_select blah
+    */
     OnlineAccountClient(std::string const& service_name,
                         std::string const& service_type,
                         std::string const& provider_name,
                         MainLoopSelect main_loop_select = RunInExternalMainLoop);
-    ~OnlineAccountClient();
 
+    /// @cond
+    ~OnlineAccountClient();
+    /// @endcond
+
+    /**
+    \brief blah
+    \param callback blah
+    */
     void set_service_update_callback(ServiceUpdateCallback callback);
 
+    /**
+    \brief blah
+    */
     void refresh_service_statuses();
 
+    /**
+    \brief blah
+    \return blah
+    */
     std::vector<ServiceStatus> get_service_statuses();
 
+    /**
+    \brief blah
+    */
     enum PostLoginAction
     {
-        Unknown,
-        DoNothing,
-        InvalidateResults,
-        ContinueActivation,
-        LastActionCode_ = ContinueActivation // Dummy end marker
+        Unknown,                                ///< blah
+        DoNothing,                              ///< blah
+        InvalidateResults,                      ///< blah
+        ContinueActivation,                     ///< blah
+        LastActionCode_ = ContinueActivation    ///< blah
     };
 
+    /**
+    \brief blah
+    \param result blah
+    \param query blah
+    \param login_passed_action blah
+    \param login_failed_action blah
+    */
     void register_account_login_item(Result& result,
                                      CannedQuery const& query,
                                      PostLoginAction login_passed_action,
                                      PostLoginAction login_failed_action);
 
+    /**
+    \brief blah
+    \param widget blah
+    \param login_passed_action blah
+    \param login_failed_action blah
+    */
     void register_account_login_item(PreviewWidget& widget,
                                      PostLoginAction login_passed_action,
                                      PostLoginAction login_failed_action);

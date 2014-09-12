@@ -33,7 +33,9 @@ OnlineAccountClient::OnlineAccountClient(std::string const& service_name,
 {
 }
 
+/// @cond
 OnlineAccountClient::~OnlineAccountClient() = default;
+/// @endcond
 
 void OnlineAccountClient::set_service_update_callback(ServiceUpdateCallback callback)
 {
