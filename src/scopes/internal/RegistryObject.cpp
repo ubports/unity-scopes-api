@@ -39,16 +39,6 @@ using namespace std;
 static const char* c_debug_dbus_started_cmd = "dbus-send --type=method_call --dest=com.ubuntu.SDKAppLaunch /ScopeRegistryCallback com.ubuntu.SDKAppLaunch.ScopeLoaded";
 static const char* c_debug_dbus_stopped_cmd = "dbus-send --type=method_call --dest=com.ubuntu.SDKAppLaunch /ScopeRegistryCallback com.ubuntu.SDKAppLaunch.ScopeStopped";
 
-static std::string homedir()
-{
-    static const char* home = getenv("HOME");
-    if (!home)
-    {
-        throw unity::scopes::ConfigException("RegistryObject: HOME not set");
-    }
-    return home;
-}
-
 namespace unity
 {
 
@@ -60,7 +50,8 @@ namespace internal
 
 RegistryObject::RegistryObject(core::posix::ChildProcess::DeathObserver& death_observer,
                                Executor::SPtr const& executor,
-                               MiddlewareBase::SPtr middleware)
+                               MiddlewareBase::SPtr middleware,
+                               bool generate_desktop_files)
     : death_observer_(death_observer),
       death_observer_connection_
       {
@@ -78,7 +69,8 @@ RegistryObject::RegistryObject(core::posix::ChildProcess::DeathObserver& death_o
               on_state_received(id, s);
           })
       },
-      executor_(executor)
+      executor_(executor),
+      generate_desktop_files_(generate_desktop_files)
 {
     if (middleware)
     {
@@ -354,14 +346,38 @@ void RegistryObject::on_state_received(std::string const& scope_id, StateReceive
     // simply ignore states from scopes the registry does not know about
 }
 
+std::string RegistryObject::desktop_files_dir()
+{
+    // First check if a test directory has been set
+    const char* desktop_files_dir = getenv("TEST_DESKTOP_FILES_DIR");
+    if (desktop_files_dir)
+    {
+        return desktop_files_dir;
+    }
+
+    // If no test directory has been set, get the regular applications dir
+    desktop_files_dir = getenv("HOME");
+    if (!desktop_files_dir)
+    {
+        throw unity::scopes::ConfigException("RegistryObject: HOME not set");
+    }
+
+    return std::string(desktop_files_dir) + "/.local/share/applications";
+}
+
 void RegistryObject::create_desktop_file(ScopeMetadata const& metadata)
 {
-    std::string desktop_path = homedir() + "/.local/share/applications/" + metadata.scope_id() + ".desktop";
+    if (!generate_desktop_files_)
+    {
+        return;
+    }
 
-    std::ofstream desktop_file(desktop_path.c_str());
+    std::string desktop_file_path = desktop_files_dir() + "/" + metadata.scope_id() + ".desktop";
+
+    std::ofstream desktop_file(desktop_file_path.c_str());
     if (!desktop_file)
     {
-        throw unity::SyscallException("RegistryObject::create_desktop_file: unable to create desktop file: \"" + desktop_path + "\"", errno);
+        throw unity::SyscallException("RegistryObject::create_desktop_file: unable to create desktop file: \"" + desktop_file_path + "\"", errno);
     }
 
     desktop_file << "[Desktop Entry]" << std::endl;
@@ -374,10 +390,15 @@ void RegistryObject::create_desktop_file(ScopeMetadata const& metadata)
 
 void RegistryObject::remove_desktop_file(std::string const& scope_id)
 {
-    std::string desktop_path = homedir() + "/.local/share/applications/" + scope_id + ".desktop";
-    if (boost::filesystem::exists(desktop_path))
+    if (!generate_desktop_files_)
     {
-        boost::filesystem::remove(desktop_path);
+        return;
+    }
+
+    std::string desktop_file_path = desktop_files_dir() + "/" + scope_id + ".desktop";
+    if (boost::filesystem::exists(desktop_file_path))
+    {
+        boost::filesystem::remove(desktop_file_path);
     }
 }
 
