@@ -898,16 +898,32 @@ actions):
 \code
 void Query::run(unity::scopes::SearchReplyProxy const& reply)
 {
-    auto cat = reply->register_category("youtube_login", "", "");
-    unity::scopes::CategorisedResult res(cat);
-    res.set_title("Log-in to YouTube");
-
     unity::scopes::OnlineAccountClient oa_client("com.ubuntu.scopes.youtube_youtube", "sharing", "google");
-    oa_client.register_account_login_item(res,
-                                          query(),
-                                          unity::scopes::OnlineAccountClient::InvalidateResults,
-                                          unity::scopes::OnlineAccountClient::DoNothing);
-    reply->push(res);
+
+    // Check if at least one account has the specified service enabled
+    bool service_authenticated = false;
+    for (auto const& status : oa_client.get_service_statuses())
+    {
+        if (status.service_authenticated)
+        {
+            service_authenticated = true;
+            break;
+        }
+    }
+
+    // If our service is not authenticated, return a "Log-in" result
+    if (!service_authenticated)
+    {
+        auto cat = reply->register_category("youtube_login", "", "");
+        unity::scopes::CategorisedResult res(cat);
+        res.set_title("Log-in to YouTube");
+
+        oa_client.register_account_login_item(res,
+                                              query(),
+                                              unity::scopes::OnlineAccountClient::InvalidateResults,
+                                              unity::scopes::OnlineAccountClient::DoNothing);
+        reply->push(res);
+    }
 }
 \endcode
 

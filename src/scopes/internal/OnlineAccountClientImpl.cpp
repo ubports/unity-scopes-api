@@ -78,7 +78,7 @@ static OnlineAccountClient::ServiceStatus info_to_details(AccountInfo const* inf
     OnlineAccountClient::ServiceStatus service_status;
     service_status.account_id = info->account_id;
     service_status.service_enabled = info->service_enabled;
-    service_status.service_authenticated = access_token ? true : false;
+    service_status.service_authenticated = access_token ? info->service_enabled : false;
     service_status.client_id = client_id ? client_id : "";
     service_status.client_secret = client_secret ? client_secret : "";
     service_status.access_token = access_token ? access_token : "";
@@ -152,7 +152,7 @@ static void service_update_cb(AgAccountService* account_service, gboolean enable
 
         // Get authorization parameters then attempt to signon
         info->auth_params.reset(
-            g_variant_ref_sink(ag_auth_data_get_login_parameters(auth_data.get(), nullptr)), [](GVariant* v){ if (v) g_variant_unref(v); });
+            g_variant_ref_sink(ag_auth_data_get_login_parameters(auth_data.get(), nullptr)), free_variant);
 
         if (info->account_client->inc_logins())
         {
