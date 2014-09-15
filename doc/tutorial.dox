@@ -881,26 +881,27 @@ them:
 
 \subsubsection oa_step4 Step 4: Utilize the OnlineAccountClient class.
 
-Finally, we now access online account services from within our scope implementation.
+Finally, we can access online account services from within our scope implementation.
 
 The first thing we need to do is instantiate a unity::scopes::OnlineAccountClient object. On construction we must
 specify our account service name, service type, and provider name (These correspond to the values of the "service_id",
 "type", and "provider" entries in your .service file).
 
 Via this object we can get the statuses of all account services, set a callback for status updates, and register
-results and widgets that require authorization (See the unity::scopes::OnlineAccountClient class documentation for more
+results and widgets that require authorization (See: unity::scopes::OnlineAccountClient class documentation for more
 detail).
 
-Here's a simple example of how one could return a "Log-in" result to the dash (If the service is not authorized,
-selecting this result will trigger an authorization request to the user before executing one of the 2 post-login
-actions):
+Here's a simple example of how one could return a "Log-in" result to the dash (Selecting this result from the dash will
+trigger an authorization request to the user before executing one of the 2 post-login actions):
 
+\paragraph oa_usage Example OnlineAccountClient usage:
 \code
 void Query::run(unity::scopes::SearchReplyProxy const& reply)
 {
+    // Instantiate a unity::scopes::OnlineAccountClient object
     unity::scopes::OnlineAccountClient oa_client("com.ubuntu.scopes.youtube_youtube", "sharing", "google");
 
-    // Check if at least one account has the specified service enabled
+    // Check if our service is authenticated under at least one account
     bool service_authenticated = false;
     for (auto const& status : oa_client.get_service_statuses())
     {
