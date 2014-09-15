@@ -366,6 +366,7 @@ void RegistryObject::create_desktop_file(ScopeMetadata const& metadata)
 
     desktop_file << "[Desktop Entry]" << std::endl;
     desktop_file << "Type=Application" << std::endl;
+    desktop_file << "NoDisplay=true" << std::endl;
     desktop_file << "Name=" << metadata.scope_id() << std::endl;
     desktop_file << "Icon=" << metadata.icon() << std::endl;
     desktop_file.close();
