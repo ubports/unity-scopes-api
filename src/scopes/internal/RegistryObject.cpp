@@ -367,12 +367,13 @@ std::string RegistryObject::desktop_files_dir()
 
 void RegistryObject::create_desktop_file(ScopeMetadata const& metadata)
 {
-    if (!generate_desktop_files_)
+    std::string desktop_file_path = desktop_files_dir();
+    if (!generate_desktop_files_ || desktop_file_path.empty())
     {
         return;
     }
 
-    std::string desktop_file_path = desktop_files_dir() + "/" + metadata.scope_id() + ".desktop";
+    desktop_file_path += "/" + metadata.scope_id() + ".desktop";
 
     std::ofstream desktop_file(desktop_file_path.c_str());
     if (!desktop_file)
@@ -383,19 +384,21 @@ void RegistryObject::create_desktop_file(ScopeMetadata const& metadata)
     desktop_file << "[Desktop Entry]" << std::endl;
     desktop_file << "Type=Application" << std::endl;
     desktop_file << "NoDisplay=true" << std::endl;
-    desktop_file << "Name=" << metadata.scope_id() << std::endl;
+    desktop_file << "Name=" << metadata.display_name() << std::endl;
     desktop_file << "Icon=" << metadata.icon() << std::endl;
     desktop_file.close();
 }
 
 void RegistryObject::remove_desktop_file(std::string const& scope_id)
 {
-    if (!generate_desktop_files_)
+    std::string desktop_file_path = desktop_files_dir();
+    if (!generate_desktop_files_ || desktop_file_path.empty())
     {
         return;
     }
 
-    std::string desktop_file_path = desktop_files_dir() + "/" + scope_id + ".desktop";
+    desktop_file_path += "/" + scope_id + ".desktop";
+
     if (boost::filesystem::exists(desktop_file_path))
     {
         boost::filesystem::remove(desktop_file_path);
