@@ -787,10 +787,9 @@ to be added to your Apparmor manifest file, as follows:
 Scopes access accounts at a service level (E.g. YouTube service under a Google account, Ubuntu Store service under an
 Ubuntu One account, etc.), therefore each scope must provide some config to specify its account service requirements.
 
-There are 3 additional files that a scope must supply:
+There are 2 additional files that a scope must supply:
 1. A .service file to specify a method of accessing its particular account provider.
-2. A .desktop file to provide the name of the scope and an icon for the settings UI.
-3. A .application file to link one or more services to your desktop file.
+2. A .application file to link one or more services to your scope.
 
 \paragraph oa_service Example .service file:
 \code
@@ -823,26 +822,12 @@ There are 3 additional files that a scope must supply:
 </service>
 \endcode
 
-\paragraph oa_desktop Example .desktop file:
-\code
-[Desktop Entry]
-Name=YouTube
-Icon=youtube/icon.png
-Type=Application
-OnlyShowIn=X-OnlineAccountsSettingsPage;
-Exec=true
-X-Ubuntu-Touch=true
-\endcode
-
-<b>Note:</b> The "Type", "OnlyShowIn", "Exec", and "X-Ubuntu-Touch" entries in your .desktop file need to be exactly as
-expressed here (This ensures your scope is not treated as a regular launchable application).
-
 \paragraph oa_application Example .application file:
 \code
 <?xml version="1.0" encoding="UTF-8"?>
 <application id="com.ubuntu.scopes.youtube_youtube">
   <description>YouTube</description>
-  <desktop-entry>com.ubuntu.scopes.youtube_youtube_1.0.12.desktop</desktop-entry>
+  <desktop-entry>com.ubuntu.scopes.youtube_youtube.desktop</desktop-entry>
   <services>
     <service id="com.ubuntu.scopes.youtube_youtube">
       <description>Watch your favorite YouTube videos</description>
@@ -853,7 +838,7 @@ expressed here (This ensures your scope is not treated as a regular launchable a
 
 \subsubsection oa_step3 Step 3: Update Click manifest.
 
-Now that we have added the 3 new files from step 2 to our project, we need to update our click manifest file to include
+Now that we have added the new files from the previous step to our project, we need to update our click manifest file to include
 them:
 
 \paragraph oa_click Example Click manifest file:
@@ -867,8 +852,7 @@ them:
             "scope": "youtube",
             "apparmor": "apparmor.json",
             "account-application": "youtube.application",
-            "account-service": "youtube.service",
-            "desktop": "youtube.desktop"
+            "account-service": "youtube.service"
         }
     },
     "icon": "youtube/icon.png",

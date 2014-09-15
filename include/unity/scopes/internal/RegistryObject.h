@@ -80,6 +80,8 @@ public:
 private:
     void on_process_death(core::posix::ChildProcess const& process);
     void on_state_received(std::string const& scope_id, StateReceiverObject::State const& state);
+    static void create_desktop_file(ScopeMetadata const& metadata);
+    static void remove_desktop_file(std::string const& scope_id);
 
     class ScopeProcess
     {

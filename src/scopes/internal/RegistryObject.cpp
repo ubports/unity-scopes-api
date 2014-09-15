@@ -31,12 +31,23 @@
 #include <core/posix/exec.h>
 
 #include <cassert>
+#include <fstream>
 #include <wordexp.h>
 
 using namespace std;
 
 static const char* c_debug_dbus_started_cmd = "dbus-send --type=method_call --dest=com.ubuntu.SDKAppLaunch /ScopeRegistryCallback com.ubuntu.SDKAppLaunch.ScopeLoaded";
 static const char* c_debug_dbus_stopped_cmd = "dbus-send --type=method_call --dest=com.ubuntu.SDKAppLaunch /ScopeRegistryCallback com.ubuntu.SDKAppLaunch.ScopeStopped";
+
+static std::string homedir()
+{
+    static const char* home = getenv("HOME");
+    if (!home)
+    {
+        throw unity::scopes::ConfigException("RegistryObject: HOME not set");
+    }
+    return home;
+}
 
 namespace unity
 {
@@ -252,6 +263,8 @@ bool RegistryObject::add_local_scope(std::string const& scope_id, ScopeMetadata 
         // Send a blank message to subscribers to inform them that the registry has been updated
         publisher_->send_message("");
     }
+
+    create_desktop_file(metadata);
     return return_value;
 }
 
@@ -284,6 +297,7 @@ bool RegistryObject::remove_local_scope(std::string const& scope_id)
             // Send a blank message to subscribers to inform them that the registry has been updated
             publisher_->send_message("");
         }
+        remove_desktop_file(scope_id);
         return true;
     }
 
@@ -338,6 +352,32 @@ void RegistryObject::on_state_received(std::string const& scope_id, StateReceive
         }
     }
     // simply ignore states from scopes the registry does not know about
+}
+
+void RegistryObject::create_desktop_file(ScopeMetadata const& metadata)
+{
+    std::string desktop_path = homedir() + "/.local/share/applications/" + metadata.scope_id() + ".desktop";
+
+    std::ofstream desktop_file(desktop_path.c_str());
+    if (!desktop_file)
+    {
+        throw unity::SyscallException("RegistryObject::create_desktop_file: unable to create desktop file: \"" + desktop_path + "\"", errno);
+    }
+
+    desktop_file << "[Desktop Entry]" << std::endl;
+    desktop_file << "Type=Application" << std::endl;
+    desktop_file << "Name=" << metadata.scope_id() << std::endl;
+    desktop_file << "Icon=" << metadata.icon() << std::endl;
+    desktop_file.close();
+}
+
+void RegistryObject::remove_desktop_file(std::string const& scope_id)
+{
+    std::string desktop_path = homedir() + "/.local/share/applications/" + scope_id + ".desktop";
+    if (boost::filesystem::exists(desktop_path))
+    {
+        boost::filesystem::remove(desktop_path);
+    }
 }
 
 RegistryObject::ScopeProcess::ScopeProcess(ScopeExecData exec_data, std::weak_ptr<MWPublisher> const& publisher)
