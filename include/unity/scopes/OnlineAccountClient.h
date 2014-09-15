@@ -57,6 +57,7 @@ public:
     {
         uint account_id;            ///< A unique ID of the online account parenting this service.
         bool service_enabled;       ///< True if this service is enabled.
+        bool service_authenticated; ///< True if this service is authenticated.
         std::string client_id;      ///< "ConsumerKey" / "ClientId" OAuth (1 / 2) parameter.
         std::string client_secret;  ///< "ClientSecret" / "ConsumerSecret" OAuth (1 / 2) parameter.
         std::string access_token;   ///< "AccessToken" OAuth parameter.
