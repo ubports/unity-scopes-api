@@ -312,6 +312,14 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::ObjectNotExistException::ObjectNotExistException(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ObjectNotExistException::~ObjectNotExistException()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ObjectNotExistException::operator=(unity::scopes::ObjectNotExistException const&)@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::OnlineAccountClient::ServiceStatus::~ServiceStatus()@Base" 0replaceme
+ (c++)"unity::scopes::OnlineAccountClient::get_service_statuses()@Base" 0replaceme
+ (c++)"unity::scopes::OnlineAccountClient::register_account_login_item(unity::scopes::PreviewWidget&, unity::scopes::OnlineAccountClient::PostLoginAction, unity::scopes::OnlineAccountClient::PostLoginAction)@Base" 0replaceme
+ (c++)"unity::scopes::OnlineAccountClient::register_account_login_item(unity::scopes::Result&, unity::scopes::CannedQuery const&, unity::scopes::OnlineAccountClient::PostLoginAction, unity::scopes::OnlineAccountClient::PostLoginAction)@Base" 0replaceme
+ (c++)"unity::scopes::OnlineAccountClient::set_service_update_callback(std::function<void (unity::scopes::OnlineAccountClient::ServiceStatus const&)>)@Base" 0replaceme
+ (c++)"unity::scopes::OnlineAccountClient::refresh_service_statuses()@Base" 0replaceme
+ (c++)"unity::scopes::OnlineAccountClient::OnlineAccountClient(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::OnlineAccountClient::MainLoopSelect)@Base" 0replaceme
+ (c++)"unity::scopes::OnlineAccountClient::~OnlineAccountClient()@Base" 0replaceme
  (c++)"unity::scopes::Link::Link(unity::scopes::Link&&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Link::Link(unity::scopes::Link const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Link::Link(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::CannedQuery const&)@Base" 0.4.0+14.04.20140312.1
@@ -419,6 +427,7 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::testing::OutOfProcessBenchmark::for_query(std::shared_ptr<unity::scopes::ScopeBase> const&, unity::scopes::testing::Benchmark::QueryConfiguration)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::testing::OutOfProcessBenchmark::~OutOfProcessBenchmark()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::testing::TypedScopeFixtureHelper::set_registry(std::shared_ptr<unity::scopes::ScopeBase> const&, std::shared_ptr<unity::scopes::Registry> const&)@Base" 0.6.2+rtm+rtm+rtm+14.09.20140818
+ (c++)"unity::scopes::testing::TypedScopeFixtureHelper::set_scope_directory(std::shared_ptr<unity::scopes::ScopeBase> const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
  (c++)"unity::scopes::testing::Result::Result()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::testing::Result::~Result()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::testing::Benchmark::Result::save_to_xml(std::basic_ostream<char, std::char_traits<char> >&)@Base" 0.4.0+14.04.20140312.1
@@ -521,6 +530,7 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::ScopeProcess(unity::scopes::internal::RegistryObject::ScopeExecData, std::weak_ptr<unity::scopes::internal::MWPublisher> const&)@Base" 0.6.5+14.10.20140910.1
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::ScopeProcess(unity::scopes::internal::RegistryObject::ScopeProcess const&)@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::~ScopeProcess()@Base" 0.4.2+14.04.20140404.2
+ (c++|arch=amd64)"unity::scopes::internal::RegistryObject::ScopeExecData::ScopeExecData(unity::scopes::internal::RegistryObject::ScopeExecData const&)@Base" 0replaceme
  (c++)"unity::scopes::internal::RegistryObject::ScopeExecData::~ScopeExecData()@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::internal::RegistryObject::state_receiver()@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::internal::RegistryObject::add_local_scope(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::ScopeMetadata const&, unity::scopes::internal::RegistryObject::ScopeExecData const&)@Base" 0.4.2+14.04.20140404.2
@@ -530,8 +540,11 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::internal::RegistryObject::remove_local_scope(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RegistryObject::set_remote_registry(std::shared_ptr<unity::scopes::internal::MWRegistry> const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RegistryObject::locate(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::internal::RegistryObject::RegistryObject(core::posix::ChildProcess::DeathObserver&, std::shared_ptr<unity::scopes::internal::Executor> const&, std::shared_ptr<unity::scopes::internal::MiddlewareBase>)@Base" 0.4.8+14.10.20140604.1
+ (c++)"unity::scopes::internal::RegistryObject::RegistryObject(core::posix::ChildProcess::DeathObserver&, std::shared_ptr<unity::scopes::internal::Executor> const&, std::shared_ptr<unity::scopes::internal::MiddlewareBase>, bool)@Base" 0replaceme
  (c++)"unity::scopes::internal::RegistryObject::~RegistryObject()@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::internal::RegistryObject::desktop_files_dir()@Base" 0replaceme
+ (c++)"unity::scopes::internal::RegistryObject::create_desktop_file(unity::scopes::ScopeMetadata const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::RegistryObject::remove_desktop_file(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
  (c++)"unity::scopes::internal::IniSettingsSchema::create_empty()@Base" 0.6.2+rtm+rtm+rtm+14.09.20140818
  (c++)"unity::scopes::internal::IniSettingsSchema::create(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.5.2+14.10.20140709.2
  (c++)"unity::scopes::internal::IniSettingsSchema::IniSettingsSchema()@Base" 0.6.2+rtm+rtm+rtm+14.09.20140818

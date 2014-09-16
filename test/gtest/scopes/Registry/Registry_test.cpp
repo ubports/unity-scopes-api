@@ -629,6 +629,9 @@ int main(int argc, char **argv)
     filesystem::remove_all(TEST_RUNTIME_PATH "/scopes/testfolder", ec);
     filesystem::remove(TEST_RUNTIME_PATH "/scopes/testscopeB/testscopeB-settings.ini", ec);
 
+    // Set the "TEST_DESKTOP_FILES_DIR" env var before forking as not to create desktop files in ~/.local
+    putenv(const_cast<char*>("TEST_DESKTOP_FILES_DIR=" TEST_RUNTIME_PATH));
+
     auto rpid = fork();
     if (rpid == 0)
     {
