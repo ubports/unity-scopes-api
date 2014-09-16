@@ -427,6 +427,7 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::testing::OutOfProcessBenchmark::for_query(std::shared_ptr<unity::scopes::ScopeBase> const&, unity::scopes::testing::Benchmark::QueryConfiguration)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::testing::OutOfProcessBenchmark::~OutOfProcessBenchmark()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::testing::TypedScopeFixtureHelper::set_registry(std::shared_ptr<unity::scopes::ScopeBase> const&, std::shared_ptr<unity::scopes::Registry> const&)@Base" 0.6.2+rtm+rtm+rtm+14.09.20140818
+ (c++)"unity::scopes::testing::TypedScopeFixtureHelper::set_scope_directory(std::shared_ptr<unity::scopes::ScopeBase> const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
  (c++)"unity::scopes::testing::Result::Result()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::testing::Result::~Result()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::testing::Benchmark::Result::save_to_xml(std::basic_ostream<char, std::char_traits<char> >&)@Base" 0.4.0+14.04.20140312.1

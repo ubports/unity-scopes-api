@@ -27,4 +27,9 @@ void TypedScopeFixtureHelper::set_registry(std::shared_ptr<unity::scopes::ScopeB
 {
     scope->p->set_registry(r);
 }
+
+void TypedScopeFixtureHelper::set_scope_directory(std::shared_ptr<unity::scopes::ScopeBase> const& scope, std::string const& path)
+{
+    scope->p->set_scope_directory(path);
+}
 /// @endcond
