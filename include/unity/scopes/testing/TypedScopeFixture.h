@@ -84,7 +84,7 @@ public:
 
     void set_scope_directory(std::string const& path)
     {
-        TypedScopeFixtureHelper::set_registry(scope, path);
+        TypedScopeFixtureHelper::set_scope_directory(scope, path);
     }
 
     void TearDown()
