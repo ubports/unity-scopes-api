@@ -26,7 +26,6 @@
 #include <unity/scopes/internal/zmq_middleware/ZmqMiddleware.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqObjectProxyFwd.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqRegistryProxyFwd.h>
-#include <unity/scopes/internal/zmq_middleware/ZmqReceiver.h>
 
 #include <capnp/message.h>
 
@@ -76,11 +75,28 @@ protected:
 
     void invoke_oneway_(capnp::MessageBuilder& out_params);
 
-    ZmqReceiver invoke_twoway_(capnp::MessageBuilder& out_params);
-    ZmqReceiver invoke_twoway_(capnp::MessageBuilder& out_params, int64_t twoway_timeout, int64_t locate_timeout = -1);
+    // Holds both the receiver for the unmarshaling buffer (which allocates memory)
+    // and the reader that decodes the memory from the unmarshaling buffer.
+    // We use unique_ptr because capnp Builder and Reader types are not movable.
+    struct TwowayOutParams
+    {
+        NONCOPYABLE(TwowayOutParams);
+
+        TwowayOutParams() = default;
+        TwowayOutParams(TwowayOutParams&&) = default;
+        TwowayOutParams& operator=(TwowayOutParams&&) = default;
+
+        std::unique_ptr<ZmqReceiver> receiver;
+        std::unique_ptr<capnp::SegmentArrayMessageReader> reader;
+    };
+
+    TwowayOutParams invoke_twoway_(capnp::MessageBuilder& in_params);
+    TwowayOutParams invoke_twoway_(capnp::MessageBuilder& in_params,
+                                   int64_t twoway_timeout,
+                                   int64_t locate_timeout = -1);
 
 private:
-    ZmqReceiver invoke_twoway__(capnp::MessageBuilder& out_params, int64_t timeout);
+    TwowayOutParams invoke_twoway__(capnp::MessageBuilder& in_params, int64_t timeout);
 
     std::string endpoint_;
     std::string identity_;
