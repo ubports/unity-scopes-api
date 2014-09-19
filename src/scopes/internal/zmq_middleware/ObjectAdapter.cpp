@@ -51,6 +51,13 @@ namespace internal
 namespace zmq_middleware
 {
 
+namespace
+{
+
+char const* pump_suffix = "-pump";
+
+}  // namespace
+
 ObjectAdapter::ObjectAdapter(ZmqMiddleware& mw, string const& name, string const& endpoint, RequestMode m,
                              int pool_size, int64_t idle_timeout) :
     mw_(mw),
@@ -497,7 +504,7 @@ void ObjectAdapter::pump(std::promise<void> ready)
         // is to go back to the client via the frontend (or the ready message for a oneway worker).
         zmqpp::socket backend(*mw_.context(), zmqpp::socket_type::router);
         backend.set(zmqpp::socket_option::linger, 50);
-        backend.bind("inproc://" + name_ + "_pump");
+        backend.bind("inproc://" + name_ + pump_suffix);
         poller.add(backend);
 
         // Subscribe to stop socket. Once this socket becomes readable, that's the command to finish.
@@ -649,7 +656,7 @@ void ObjectAdapter::worker()
     {
         zmqpp::socket pump(*mw_.context(), zmqpp::socket_type::req);
         pump.set(zmqpp::socket_option::linger, 50);
-        pump.connect("inproc://" + name_ + "_pump");
+        pump.connect("inproc://" + name_ + pump_suffix);
         pump.send("ready");                             // First message tells pump that we are ready.
 
         for (;;)
