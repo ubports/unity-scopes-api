@@ -193,7 +193,12 @@ void ZmqObjectProxy::invoke_oneway_(capnp::MessageBuilder& in_params)
     zmqpp::socket& s = pool.find(endpoint_, mode_);
     ZmqSender sender(s);
     auto segments = in_params.getSegmentsForOutput();
-    sender.send(segments);
+    if (!sender.send(segments, ZmqSender::DontWait))
+    {
+        // If there is nothing at the other end, discard the message and trash the socket.
+        pool.remove(endpoint_);
+        return;
+    }
 
 #ifdef ENABLE_IPC_MONITOR
     if (true) {

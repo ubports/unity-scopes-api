@@ -76,6 +76,10 @@ ConnectionPool::CPool::value_type ConnectionPool::create_connection(std::string 
     // have some chance of being sent, and we don't block indefinitely if the
     // peer has gone away.
     s.set(zmqpp::socket_option::linger, 50);
+    // We set a reconnect interval of 20 ms, with exponential back-off up to two seconds, otherwise
+    // Zmq will try once every 100 ms. Unfortunately, there is no way to limit the number of re-tries.
+    s.set(zmqpp::socket_option::reconnect_interval, 20);
+    s.set(zmqpp::socket_option::reconnect_interval_max, 2000);
     s.connect(endpoint);
     return CPool::value_type{ endpoint, SocketData{ move(s), m } };
 }
