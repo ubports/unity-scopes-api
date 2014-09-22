@@ -101,6 +101,16 @@
 }
 
 {
+   QNetworkConfigurationManager
+   Memcheck:Leak
+   match-leak-kinds: possible
+   ...
+   fun:_ZN7QThread5startENS_8PriorityE
+   fun:_ZN35QNetworkConfigurationManagerPrivate10initializeEv
+   fun:_Z35qNetworkConfigurationManagerPrivatev
+}
+
+{
    QFactoryLoader
    Memcheck:Leak
    fun:*alloc
@@ -124,17 +134,4 @@
    ...
    fun:getenv
    ...
-}
-
-# Leak in u1db_open() if database cannot be opened because of missing read permission
-{
-   u1db_open_fail
-   Memcheck:Leak
-   match-leak-kinds: definite
-   fun:malloc
-   obj:/usr/lib/x86_64-linux-gnu/libsqlite3.so.0.8.6
-   ...
-   fun:u1db_open
-   fun:_ZN5unity6scopes8internal10SettingsDB16process_all_docsEv
-   fun:_ZN5unity6scopes8internal10SettingsDB8settingsEv
 }
