@@ -335,6 +335,7 @@ SearchHandle::UPtr SmartScopesClient::search(SearchReplyHandler const& handler,
                                              VariantMap const& filter_state,
                                              std::string const& locale,
                                              std::string const& country,
+                                             std::string const& user_agent_hdr,
                                              uint limit)
 {
     std::ostringstream search_uri;
@@ -375,6 +376,12 @@ SearchHandle::UPtr SmartScopesClient::search(SearchReplyHandler const& handler,
     if (!filter_state.empty())
     {
         search_uri << "&filters=" << http_client_->to_percent_encoding(Variant(filter_state).serialize_json());
+    };
+
+    HttpHeaders headers;
+    if (!user_agent_hdr.empty())
+    {
+        headers.push_back(std::make_pair("User-Agent", user_agent_hdr));
     }
 
     std::lock_guard<std::mutex> lock(query_results_mutex_);
@@ -390,7 +397,7 @@ SearchHandle::UPtr SmartScopesClient::search(SearchReplyHandler const& handler,
             {
                 std::cerr << "Failed to parse: " << e.what() << std::endl;
             }
-    });
+    }, headers);
 
     return SearchHandle::UPtr(new SearchHandle(search_id, shared_from_this()));
 }
@@ -403,6 +410,7 @@ PreviewHandle::UPtr SmartScopesClient::preview(PreviewReplyHandler const& handle
                                                const uint widgets_api_version,
                                                VariantMap const& settings,
                                                std::string const& locale,
+                                               std::string const& user_agent_hdr,
                                                std::string const& country)
 {
     std::ostringstream preview_uri;
@@ -414,6 +422,12 @@ PreviewHandle::UPtr SmartScopesClient::preview(PreviewReplyHandler const& handle
     preview_uri << "&session_id=" << http_client_->to_percent_encoding(session_id);
     preview_uri << "&platform=" << platform;
     preview_uri << "&widgets_api_version=" << std::to_string(widgets_api_version);
+
+    HttpHeaders headers;
+    if (!user_agent_hdr.empty())
+    {
+        headers.push_back(std::make_pair("User-Agent", user_agent_hdr));
+    }
 
     // optional parameters
 
@@ -447,7 +461,7 @@ PreviewHandle::UPtr SmartScopesClient::preview(PreviewReplyHandler const& handle
             {
                 std::cerr << "Failed to parse: " << e.what() << std::endl;
             }
-    });
+    }, headers);
 
     return PreviewHandle::UPtr(new PreviewHandle(preview_id, shared_from_this()));
 }
