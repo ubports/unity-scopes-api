@@ -46,7 +46,7 @@ ConnectionPool::~ConnectionPool()
     pool_.clear();
 }
 
-zmqpp::socket& ConnectionPool::find(std::string const& endpoint, RequestMode m)
+zmqpp::socket& ConnectionPool::find(std::string const& endpoint)
 {
     assert(!endpoint.empty());
 
@@ -54,34 +54,23 @@ zmqpp::socket& ConnectionPool::find(std::string const& endpoint, RequestMode m)
     auto const& it = pool_.find(endpoint);
     if (it != pool_.end())
     {
-        if (it->second.mode != m)
-        {
-            string msg("ConnectionPool::find(): cannot send " + to_string(m) +
-                       " request via " + to_string(it->second.mode) + " connection (endpoint: " + endpoint + ")");
-            throw MiddlewareException(msg);
-        }
-        return it->second.socket;
+        return it->second;
     }
 
     // No existing connection yet, establish one.
-    auto entry = create_connection(endpoint, m);
-    return pool_.emplace(move(entry)).first->second.socket;
+    auto s = create_connection(endpoint);
+    return pool_.emplace(make_pair(endpoint, move(s))).first->second;
 }
 
-ConnectionPool::CPool::value_type ConnectionPool::create_connection(std::string const& endpoint, RequestMode m)
+zmqpp::socket ConnectionPool::create_connection(std::string const& endpoint)
 {
-    zmqpp::socket_type stype = m == RequestMode::Twoway ? zmqpp::socket_type::request : zmqpp::socket_type::push;
-    zmqpp::socket s(context_, stype);
+    zmqpp::socket s(context_, zmqpp::socket_type::push);
     // Allow short linger time so messages written just before we shut down
     // have some chance of being sent, and we don't block indefinitely if the
     // peer has gone away.
     s.set(zmqpp::socket_option::linger, 50);
-    // We set a reconnect interval of 20 ms, with exponential back-off up to two seconds, otherwise
-    // Zmq will try once every 100 ms. Unfortunately, there is no way to limit the number of re-tries.
-    s.set(zmqpp::socket_option::reconnect_interval, 20);
-    s.set(zmqpp::socket_option::reconnect_interval_max, 2000);
     s.connect(endpoint);
-    return CPool::value_type{ endpoint, SocketData{ move(s), m } };
+    return move(s);
 }
 
 void ConnectionPool::remove(std::string const& endpoint)
@@ -95,11 +84,11 @@ void ConnectionPool::remove(std::string const& endpoint)
     }
 }
 
-void ConnectionPool::register_socket(std::string const& endpoint, zmqpp::socket socket, RequestMode m)
+void ConnectionPool::register_socket(std::string const& endpoint, zmqpp::socket socket)
 {
     assert(!endpoint.empty());
 
-    pool_.emplace(endpoint, SocketData{ move(socket), m });
+    pool_.emplace(endpoint, move(socket));
 }
 
 } // namespace zmq_middleware

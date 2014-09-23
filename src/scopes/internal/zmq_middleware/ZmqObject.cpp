@@ -167,7 +167,7 @@ capnproto::Request::Builder ZmqObjectProxy::make_request_(capnp::MessageBuilder&
 }
 
 #ifdef ENABLE_IPC_MONITOR
-void register_monitor_socket (ConnectionPool& pool, zmqpp::context_t const& context)
+void register_monitor_socket(ConnectionPool& pool, zmqpp::context_t const& context)
 {
     thread_local static bool monitor_initialized = false;
     if (!monitor_initialized) {
@@ -175,7 +175,7 @@ void register_monitor_socket (ConnectionPool& pool, zmqpp::context_t const& cont
         zmqpp::socket monitor_socket(context, zmqpp::socket_type::publish);
         monitor_socket.set(zmqpp::socket_option::linger, 0);
         monitor_socket.connect(MONITOR_ENDPOINT);
-        pool.register_socket(MONITOR_ENDPOINT, move(monitor_socket), RequestMode::Oneway);
+        pool.register_socket(MONITOR_ENDPOINT, move(monitor_socket));
     }
 }
 #endif
@@ -190,7 +190,7 @@ void ZmqObjectProxy::invoke_oneway_(capnp::MessageBuilder& in_params)
     lock_guard<mutex> lock(shared_mutex);
 
     assert(mode_ == RequestMode::Oneway);
-    zmqpp::socket& s = pool.find(endpoint_, mode_);
+    zmqpp::socket& s = pool.find(endpoint_);
     ZmqSender sender(s);
     auto segments = in_params.getSegmentsForOutput();
     if (!sender.send(segments, ZmqSender::DontWait))
@@ -203,7 +203,7 @@ void ZmqObjectProxy::invoke_oneway_(capnp::MessageBuilder& in_params)
 #ifdef ENABLE_IPC_MONITOR
     if (true) {
         register_monitor_socket(pool, *mw_base()->context());
-        zmqpp::socket& monitor = pool.find(MONITOR_ENDPOINT, RequestMode::Oneway);
+        zmqpp::socket& monitor = pool.find(MONITOR_ENDPOINT);
         auto word_arr = capnp::messageToFlatArray(segments);
         monitor.send_raw(reinterpret_cast<char*>(&word_arr[0]), word_arr.size() * sizeof(capnp::word));
     }
@@ -272,9 +272,6 @@ ZmqObjectProxy::TwowayOutParams ZmqObjectProxy::invoke_twoway_(capnp::MessageBui
 
 ZmqObjectProxy::TwowayOutParams ZmqObjectProxy::invoke_twoway__(capnp::MessageBuilder& in_params, int64_t timeout)
 {
-    // Each calling thread gets its own pool because zmq sockets are not thread-safe.
-    thread_local static ConnectionPool pool(*mw_base()->context());
-
     RequestMode mode;
     std::string endpoint;
     {
@@ -284,15 +281,24 @@ ZmqObjectProxy::TwowayOutParams ZmqObjectProxy::invoke_twoway__(capnp::MessageBu
     }
 
     assert(mode == RequestMode::Twoway);
-    zmqpp::socket& s = pool.find(endpoint, mode);
+
+    zmqpp::socket s(*mw_base()->context(), zmqpp::socket_type::request);
+    // Allow short linger time so we don't hang indefinitely if the other end disappears.
+    s.set(zmqpp::socket_option::linger, 50);
+    // We set a reconnect interval of 20 ms, so we get to the peer quickly.
+    s.set(zmqpp::socket_option::reconnect_interval, 20);
+    s.connect(endpoint);
     ZmqSender sender(s);
     auto segments = in_params.getSegmentsForOutput();
     sender.send(segments);
 
 #ifdef ENABLE_IPC_MONITOR
+    // Each calling thread gets its own pool because zmq sockets are not thread-safe.
+    thread_local static ConnectionPool pool(*mw_base()->context());
+
     if (true) {
         register_monitor_socket(pool, *mw_base()->context());
-        zmqpp::socket& monitor = pool.find(MONITOR_ENDPOINT, RequestMode::Oneway);
+        zmqpp::socket& monitor = pool.find(MONITOR_ENDPOINT);
         auto word_arr = capnp::messageToFlatArray(segments);
         monitor.send_raw(reinterpret_cast<char*>(&word_arr[0]), word_arr.size() * sizeof(capnp::word));
     }
@@ -312,16 +318,9 @@ ZmqObjectProxy::TwowayOutParams ZmqObjectProxy::invoke_twoway__(capnp::MessageBu
 
     if (!p.has_input(s))
     {
-        // If a request times out, we must trash the corresponding socket, otherwise
-        // zmq gets confused: the reply will never be read, so the socket ends up
-        // in a bad state.
-        // (Removing a socket from the connection pool deletes it, hence closing the socket.)
-        pool.remove(endpoint);
         throw TimeoutException("Request timed out after " + std::to_string(timeout) + " milliseconds");
     }
 
-    // We need to read here rather than in the caller because, otherwise, it is possible for another
-    // twoway request to be sent to this thread before the response has been read from the socket.
     // Because the ZmqReceiver holds the memory for the unmarshaling buffer, we pass both the receiver
     // and the capnp reader in a struct.
     ZmqObjectProxy::TwowayOutParams out_params;
@@ -329,6 +328,7 @@ ZmqObjectProxy::TwowayOutParams ZmqObjectProxy::invoke_twoway__(capnp::MessageBu
     auto params = out_params.receiver->receive();
     out_params.reader.reset(new capnp::SegmentArrayMessageReader(params));
     return out_params;
+    // Outgoing twoway socket closed here.
 }
 
 } // namespace zmq_middleware
