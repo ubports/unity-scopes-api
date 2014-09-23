@@ -1,0 +1,4 @@
+add_executable(OnlineAccountClient_test OnlineAccountClient_test.cpp)
+target_link_libraries(OnlineAccountClient_test ${TESTLIBS})
+
+add_test(OnlineAccountClient OnlineAccountClient_test)

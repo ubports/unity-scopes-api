@@ -9,9 +9,8 @@
     Thread create leak
     Memcheck:Leak
     fun:calloc
-    fun:_dl_allocate_tls
-    fun:pthread_create@@GLIBC_2.2.5
     ...
+    fun:pthread_create@@GLIBC_2.2.5
 }
 
 # Bogus "possibly leaked" reports for glib .ini file parser
@@ -21,7 +20,6 @@
     Memcheck:Leak
     ...
     fun:g_key_file_new
-    ...
 }
 
 {
@@ -29,7 +27,6 @@
     Memcheck:Leak
     ...
     fun:g_key_file_load_from_file
-    ...
 }
 
 # Bogus "possibly lost" report for
@@ -45,7 +42,6 @@
     fun:_ZNSs4_Rep8_M_cloneERKSaIcEm
     fun:_ZNSs7reserveEm
     fun:_ZNSs6appendEPKcm
-    ...
 }
 
 # Leak in dynamic linker
@@ -115,7 +111,6 @@
    Memcheck:Addr1
    ...
    fun:putenv
-   ...
 }
 
 {
@@ -123,7 +118,6 @@
    Memcheck:Addr2
    ...
    fun:getenv
-   ...
 }
 
 # Leak in u1db_open() if database cannot be opened because of missing read permission
@@ -137,4 +131,87 @@
    fun:u1db_open
    fun:_ZN5unity6scopes8internal10SettingsDB16process_all_docsEv
    fun:_ZN5unity6scopes8internal10SettingsDB8settingsEv
+}
+
+# False positives for memory leaks in glib
+
+{
+   calloc[Memcheck:Leak]
+   Memcheck:Leak
+   fun:calloc
+   fun:g_malloc0
+   ...
+   fun:call_init.part.0
+   fun:call_init
+   fun:_dl_init
+}
+
+{
+   realloc[Memcheck:Leak]
+   Memcheck:Leak
+   fun:realloc
+   fun:g_realloc
+   fun:g_datalist_id_set_data_full
+}
+
+{
+   calloc[Memcheck:Leak]
+   Memcheck:Leak
+   ...
+   fun:g_socket_create_source
+}
+
+{
+   calloc[Memcheck:Leak]
+   Memcheck:Leak
+   ...
+   fun:g_signal_connect_data
+}
+
+{
+   g_type_class_ref[Memcheck:Leak]
+   Memcheck:Leak
+   ...
+   fun:g_type_class_ref
+}
+
+{
+   g_type_register_static[Memcheck:Leak]
+   Memcheck:Leak
+   ...
+   fun:g_type_register_static
+}
+
+{
+   g_type_register_fundamental[Memcheck:Leak]
+   Memcheck:Leak
+   ...
+   fun:g_type_register_fundamental
+}
+
+{
+   g_type_add_interface_static[Memcheck:Leak]
+   Memcheck:Leak
+   ...
+   fun:g_type_add_interface_static
+}
+
+{
+   malloc[Memcheck:Leak]
+   Memcheck:Leak
+   ...
+   fun:signon_auth_session_new
+}
+
+{
+   malloc[Memcheck:Leak]
+   Memcheck:Leak
+   ...
+   fun:signon_auth_session_process_async
+}
+
+{
+   ag_auth_data_unref[Memcheck:Cond]
+   Memcheck:Cond
+   fun:ag_auth_data_unref
 }
