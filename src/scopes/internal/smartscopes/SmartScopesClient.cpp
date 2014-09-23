@@ -378,16 +378,18 @@ SearchHandle::UPtr SmartScopesClient::search(SearchReplyHandler const& handler,
         search_uri << "&filters=" << http_client_->to_percent_encoding(Variant(filter_state).serialize_json());
     };
 
-    HttpHeaders headers;
-    if (!user_agent_hdr.empty())
-    {
-        headers.push_back(std::make_pair("User-Agent", user_agent_hdr));
-    }
-
     std::lock_guard<std::mutex> lock(query_results_mutex_);
     uint search_id = ++query_counter_;
 
     std::cout << "SmartScopesClient.search(): GET " << search_uri.str() << std::endl;
+
+    HttpHeaders headers;
+    if (!user_agent_hdr.empty())
+    {
+        std::cout << "User agent: " << user_agent_hdr;
+        headers.push_back(std::make_pair("User-Agent", user_agent_hdr));
+    }
+
     query_results_[search_id] = http_client_->get(search_uri.str(), [this, handler](std::string const& lineData) {
             try
             {
