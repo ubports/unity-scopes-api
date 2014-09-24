@@ -67,6 +67,8 @@ pkg_check_modules(APPARMOR REQUIRED libapparmor REQUIRED)
 pkg_check_modules(LTTNG_UST lttng-ust REQUIRED)
 pkg_check_modules(LIBURCU_BP liburcu-bp REQUIRED)
 pkg_check_modules(JSONCPP jsoncpp REQUIRED)
+pkg_check_modules(LIBACCOUNTS REQUIRED libaccounts-glib)
+pkg_check_modules(LIBSIGNON REQUIRED libsignon-glib)
 
 find_program(LTTNG_EXECUTABLE lttng)
 if (NOT LTTNG_EXECUTABLE)
@@ -109,8 +111,10 @@ if(NOT CAPNPC_BIN)
 endif()
 set(CAPNPC_FLAGS "" CACHE STRING "Extra flags for capnpc.")
 
-set(OTHER_INCLUDE_DIRS ${OTHER_INCLUDE_DIRS} ${UNITY_API_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${JSONCPP_INCLUDE_DIRS} ${PROCESS_CPP_INCLUDE_DIRS} ${APPARMOR_INCLUDE_DIRS})
-set(OTHER_LIBS ${UNITY_API_LDFLAGS} ${APPARMOR_LDFLAGS} ${OTHER_LIBS})
+set(OTHER_INCLUDE_DIRS ${OTHER_INCLUDE_DIRS} ${UNITY_API_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS}
+                       ${JSONCPP_INCLUDE_DIRS} ${PROCESS_CPP_INCLUDE_DIRS} ${APPARMOR_INCLUDE_DIRS}
+                       ${LIBACCOUNTS_INCLUDE_DIRS} ${LIBSIGNON_INCLUDE_DIRS})
+set(OTHER_LIBS ${OTHER_LIBS} ${UNITY_API_LDFLAGS} ${APPARMOR_LDFLAGS} ${LIBACCOUNTS_LIBRARIES} ${LIBSIGNON_LIBRARIES})
 
 # Standard install paths
 include(GNUInstallDirs)
@@ -191,7 +195,7 @@ set(UNITY_SCOPES_LIB unity-scopes)
 # API version
 set(UNITY_SCOPES_MAJOR 0)
 set(UNITY_SCOPES_MINOR 6)
-set(UNITY_SCOPES_MICRO 5)
+set(UNITY_SCOPES_MICRO 6)
 set(UNITY_SCOPES_SOVERSION 3)
 
 # Version for testing, with all symbols visible

@@ -42,6 +42,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/MWStateReceiver.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MWSubscriber.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ObjectImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/OnlineAccountClientImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/OperationInfoImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/OptionSelectorFilterImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewQueryObject.cpp

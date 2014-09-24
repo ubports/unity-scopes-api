@@ -21,6 +21,7 @@
 #include <unity/UnityExceptions.h>
 
 #include <gtest/gtest.h>
+#include <valgrind/valgrind.h>
 
 using namespace std;
 using namespace unity::scopes::internal;
@@ -120,16 +121,19 @@ TEST(ThreadPool, exception)
         EXPECT_STREQ("ThreadPool::submit(): cannot accept task for destroyed pool", e.what());
     }
 
-    try
+    if (!RUNNING_ON_VALGRIND)  // Valgrind can't handle the attempt to create that many threads.
     {
-        ThreadPool p(100000000);  // A hundred million threads is impossible
-        FAIL();
-    }
-    catch (unity::ResourceException const& e)
-    {
-        EXPECT_STREQ("unity::ResourceException: ThreadPool(): exception during pool creation:\n"
-                     "    Resource temporarily unavailable",
-                     e.what());
+        try
+        {
+            ThreadPool p(100000000);  // A hundred million threads is impossible
+            FAIL();
+        }
+        catch (unity::ResourceException const& e)
+        {
+            EXPECT_STREQ("unity::ResourceException: ThreadPool(): exception during pool creation:\n"
+                         "    Resource temporarily unavailable",
+                         e.what());
+        }
     }
 }
 
