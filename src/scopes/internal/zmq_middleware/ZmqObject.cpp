@@ -268,7 +268,7 @@ ZmqObjectProxy::TwowayOutParams ZmqObjectProxy::invoke_twoway_(capnp::MessageBui
 
 // Get a socket to the endpoint for this proxy and write the request on the wire.
 // Poll for the reply with the given timeout.
-// Return a socket for the response or throw if the timeout expires.
+// Return a reader for the response or throw if the timeout expires.
 
 ZmqObjectProxy::TwowayOutParams ZmqObjectProxy::invoke_twoway__(capnp::MessageBuilder& in_params, int64_t timeout)
 {
@@ -285,8 +285,14 @@ ZmqObjectProxy::TwowayOutParams ZmqObjectProxy::invoke_twoway__(capnp::MessageBu
     zmqpp::socket s(*mw_base()->context(), zmqpp::socket_type::request);
     // Allow short linger time so we don't hang indefinitely if the other end disappears.
     s.set(zmqpp::socket_option::linger, 50);
-    // We set a reconnect interval of 20 ms, so we get to the peer quickly.
+    // We set a reconnect interval of 20 ms, so we get to the peer quickly, in case
+    // the peer hasn't finished binding to its endpoint yet after being exec'd.
+    // We back off exponentially to half the call timeout. If we haven't connected
+    // by then, the poll below will time out anyway. For inifinite timeout, we try
+    // a second.
+    auto reconnect_max = timeout == -1 : 1000 : timeout / 2;
     s.set(zmqpp::socket_option::reconnect_interval, 20);
+    s.set(zmqpp::socket_option::reconnect_interval_max, reconnect_max);
     s.connect(endpoint);
     ZmqSender sender(s);
     auto segments = in_params.getSegmentsForOutput();

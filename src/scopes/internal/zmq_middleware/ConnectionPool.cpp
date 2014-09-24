@@ -69,6 +69,14 @@ zmqpp::socket ConnectionPool::create_connection(std::string const& endpoint)
     // have some chance of being sent, and we don't block indefinitely if the
     // peer has gone away.
     s.set(zmqpp::socket_option::linger, 50);
+    // We set a reconnect interval of 20 ms, so we get to the peer quickly, in case
+    // the peer hasn't finished binding to its endpoint yet after the first query
+    // is sent. We back off exponentially to one second.
+    // TODO: This still doesn't entirely stop the reconnection attempts that are
+    //       made by Zmq behind the scenes. We'll have to add a garbage collection
+    //       thread that closes outgoing connections after some idle time.
+    s.set(zmqpp::socket_option::reconnect_interval, 20);
+    s.set(zmqpp::socket_option::reconnect_interval_max, 1000);
     s.connect(endpoint);
     return move(s);
 }
