@@ -376,7 +376,7 @@ SearchHandle::UPtr SmartScopesClient::search(SearchReplyHandler const& handler,
     if (!filter_state.empty())
     {
         search_uri << "&filters=" << http_client_->to_percent_encoding(Variant(filter_state).serialize_json());
-    };
+    }
 
     std::lock_guard<std::mutex> lock(query_results_mutex_);
     uint search_id = ++query_counter_;
