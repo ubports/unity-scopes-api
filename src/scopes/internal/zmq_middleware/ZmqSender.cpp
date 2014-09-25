@@ -40,18 +40,26 @@ ZmqSender::ZmqSender(zmqpp::socket& s) :
 }
 
 // Send a message provided as a capnp segment list. Each segment is sent as a separate zmq message part.
+// Return true for a successful send, false otherwise. (The send can fail if DontWait is
+// passed by the caller and we are writing to a push socket without a peer.)
 
-void ZmqSender::send(kj::ArrayPtr<kj::ArrayPtr<capnp::word const> const> segments)
+bool ZmqSender::send(kj::ArrayPtr<kj::ArrayPtr<capnp::word const> const> segments, ZmqSender::WaitFlag flag)
 {
+    int flags = flag == DontWait ? zmqpp::socket::dont_wait : zmqpp::socket::normal;
     auto it = segments.begin();
     auto i = segments.size();
     assert(i != 0);
     while (--i != 0)
     {
-        s_.send_raw(reinterpret_cast<char const*>(&(*it)[0]), it->size() * sizeof(capnp::word), zmqpp::socket::send_more);
+        if (!s_.send_raw(reinterpret_cast<char const*>(&(*it)[0]), it->size() * sizeof(capnp::word),
+                         zmqpp::socket::send_more | flags))
+        {
+            return false;
+        }
         ++it;
     }
-    s_.send_raw(reinterpret_cast<char const*>(&(*it)[0]), it->size() * sizeof(capnp::word), zmqpp::socket::normal);
+    return s_.send_raw(reinterpret_cast<char const*>(&(*it)[0]), it->size() * sizeof(capnp::word),
+                       zmqpp::socket::normal | flags);
 }
 
 } // namespace zmq_middleware
