@@ -25,6 +25,8 @@
 #include <future>
 #include <string>
 #include <functional>
+#include <list>
+#include <tuple>
 
 namespace unity
 {
@@ -40,6 +42,8 @@ namespace smartscopes
 
 class HttpResponseHandle;
 
+typedef std::list<std::pair<std::string, std::string>> HttpHeaders;
+
 class HttpClientInterface : public std::enable_shared_from_this<HttpClientInterface>
 {
 public:
@@ -50,7 +54,8 @@ public:
     virtual ~HttpClientInterface() = default;
 
     virtual std::shared_ptr<HttpResponseHandle> get(std::string const& request_url,
-            std::function<void(std::string const&)> const& lineData = [](std::string const&) {}) = 0;
+            std::function<void(std::string const&)> const& lineData = [](std::string const&) {},
+            HttpHeaders const& headers = HttpHeaders()) = 0;
 
     virtual std::string to_percent_encoding(std::string const& string) = 0;
 

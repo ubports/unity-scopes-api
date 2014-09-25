@@ -154,3 +154,22 @@ ActivationResponse (returned by serialize())
 ============================================
  'status'      : int (corresponds to ActivationResponse::Status enum)
  'scope_data'  : variant
+
+QueryMetadata (returned by serialize())
+=======================================
+ 'type'        : string (metadata type)
+ 'locale'      : string
+ 'form_factor' : string
+ 'hints'       : dict
+ 'internet_connectivity' : bool (optional)
+
+SearchMetadata (returned by serialize())
+========================================
+  all QueryMetadata attributes
+  'cardinality' : int
+  'location'    : dict
+
+ActionMetadata (returned by serialize())
+========================================
+  all QueryMetadata attributes
+  'scope_data'  : variant
