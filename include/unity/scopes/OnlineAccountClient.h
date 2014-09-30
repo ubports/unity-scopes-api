@@ -37,6 +37,11 @@ namespace internal
 class OnlineAccountClientImpl;
 }
 
+namespace testing
+{
+class OnlineAccountClientTest;
+}
+
 /**
 \brief A simple interface for integrating online accounts access and monitoring into scopes.
 
@@ -162,6 +167,8 @@ public:
 
 private:
     std::unique_ptr<internal::OnlineAccountClientImpl> p;
+
+    friend class testing::OnlineAccountClientTest;
 };
 
 } // namespace scopes
