@@ -19,6 +19,7 @@
 #ifndef UNITY_SCOPES_INTERNAL_ONLINEACCOUNTCLIENTIMPL_H
 #define UNITY_SCOPES_INTERNAL_ONLINEACCOUNTCLIENTIMPL_H
 
+#include <unity/scopes/internal/MiddlewareBase.h>
 #include <unity/scopes/OnlineAccountClient.h>
 
 #include <libaccounts-glib/accounts-glib.h>
@@ -78,34 +79,34 @@ public:
                                      OnlineAccountClient::PostLoginAction login_failed_action);
 
     // Methods used only by impl
-    void flush_pending_sessions();
+    void flush_pending_session(AgAccountId const& account_id, std::unique_lock<std::mutex>& lock);
 
     void main_loop_state_notify(bool is_running);
 
+    std::shared_ptr<AgManager> manager();
     std::string service_name();
+    OnlineAccountClient::MainLoopSelect main_loop_select();
     void callback(OnlineAccountClient::ServiceStatus const& service_status);
+    void publish_authentication();
 
     bool has_account(AgAccountId const& account_id);
     void add_account(AgAccountId const& account_id, std::shared_ptr<AccountInfo> account_info);
     void remove_account(AgAccountId const& account_id);
 
-    bool inc_logins();
-    void dec_logins();
-
 private:
-    std::string service_name_;
-    std::string service_type_;
-    std::string provider_name_;
-    OnlineAccountClient::ServiceUpdateCallback callback_;
-    bool use_external_main_loop_;
+    std::string const service_name_;
+    std::string const service_type_;
+    std::string const provider_name_;
+    OnlineAccountClient::MainLoopSelect const main_loop_select_;
 
-    std::thread main_loop_thread_;
     std::mutex callback_mutex_;
+    OnlineAccountClient::ServiceUpdateCallback callback_;
+
     std::mutex mutex_;
     std::condition_variable cond_;
+    std::thread main_loop_thread_;
     bool main_loop_is_running_;
-    bool client_stopping_;
-    int logins_busy_;
+    std::exception_ptr thread_exception_;
     gulong account_enabled_signal_id_;
     gulong account_deleted_signal_id_;
 
@@ -113,7 +114,12 @@ private:
     std::shared_ptr<AgManager> manager_;
     std::map<AgAccountId, std::shared_ptr<AccountInfo>> accounts_;
 
+    MiddlewareBase::SPtr mw_;
+    MWPublisher::UPtr auth_publisher_;
+    MWSubscriber::UPtr auth_subscriber_;
+
     void main_loop_thread();
+    void auth_callback(std::string const&);
 };
 
 } // namespace internal
