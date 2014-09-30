@@ -156,7 +156,7 @@ static void service_update_cb(AgAccountService* account_service, gboolean enable
         if (error)
         {
             // Send notification that the authorization session failed
-            info->account_client->callback(info_to_details(info, error->message));  // LCOV_EXCL_LINE
+            info->account_client->callback(info_to_details(info, error->message));
             return;
         }
 
@@ -206,7 +206,7 @@ static void account_enabled_cb(AgManager* manager, AgAccountId account_id, Onlin
     if (!account)
     {
         // The account was not found
-        return;  // LCOV_EXCL_LINE
+        return;
     }
     // Find the service we're concerned with
     std::shared_ptr<GList> services(ag_account_list_services(account.get()), ag_service_list_free);
@@ -281,11 +281,11 @@ OnlineAccountClientImpl::OnlineAccountClientImpl(std::string const& service_name
         cond_.wait_for(lock, std::chrono::seconds(5), [this] { return main_loop_is_running_; });
         if (thread_exception_)
         {
-            std::rethrow_exception(thread_exception_);  // LCOV_EXCL_LINE
+            std::rethrow_exception(thread_exception_);
         }
         else if (!main_loop_is_running_)
         {
-            throw unity::ResourceException("OnlineAccountClientImpl(): main_loop_thread failed to start.");  // LCOV_EXCL_LINE
+            throw unity::ResourceException("OnlineAccountClientImpl(): main_loop_thread failed to start.");
         }
     }
 
@@ -305,7 +305,6 @@ OnlineAccountClientImpl::~OnlineAccountClientImpl()
         std::lock_guard<std::mutex> lock(mutex_);
         if (thread_exception_)
         {
-            // LCOV_EXCL_START
             try
             {
                 std::rethrow_exception(thread_exception_);
@@ -319,7 +318,6 @@ OnlineAccountClientImpl::~OnlineAccountClientImpl()
                 std::cerr << "~OnlineAccountClientImpl(): main_loop_thread threw an unknown exception" << std::endl;
             }
         }
-        // LCOV_EXCL_STOP
     }
 
     // Disconnect signal handlers
@@ -349,7 +347,7 @@ void OnlineAccountClientImpl::set_service_update_callback(OnlineAccountClient::S
     std::lock_guard<std::mutex> lock(mutex_);
     if (thread_exception_)
     {
-        std::rethrow_exception(thread_exception_);  // LCOV_EXCL_LINE
+        std::rethrow_exception(thread_exception_);
     }
 
     std::lock_guard<std::mutex> callback_lock(callback_mutex_);
@@ -361,7 +359,7 @@ void OnlineAccountClientImpl::refresh_service_statuses()
     std::unique_lock<std::mutex> lock(mutex_);
     if (thread_exception_)
     {
-        std::rethrow_exception(thread_exception_);  // LCOV_EXCL_LINE
+        std::rethrow_exception(thread_exception_);
     }
 
     std::shared_ptr<GList> enabled_accounts(ag_manager_list(manager_.get()), ag_manager_list_free);
@@ -386,7 +384,7 @@ std::vector<OnlineAccountClient::ServiceStatus> OnlineAccountClientImpl::get_ser
     std::lock_guard<std::mutex> lock(mutex_);
     if (thread_exception_)
     {
-        std::rethrow_exception(thread_exception_);  // LCOV_EXCL_LINE
+        std::rethrow_exception(thread_exception_);
     }
 
     // Return all service statuses
@@ -547,7 +545,6 @@ void OnlineAccountClientImpl::main_loop_thread()
         main_loop_.reset(g_main_loop_new(nullptr, true), g_main_loop_unref);
         g_main_loop_run(main_loop_.get());
     }
-    // LCOV_EXCL_START
     catch (std::exception const& e)
     {
         std::cerr << "OnlineAccountClientImpl::main_loop_thread(): Thread aborted: " << e.what() << std::endl;
@@ -560,7 +557,6 @@ void OnlineAccountClientImpl::main_loop_thread()
         std::lock_guard<std::mutex> lock(mutex_);
         thread_exception_ = std::current_exception();
     }
-    // LCOV_EXCL_STOP
 }
 
 void OnlineAccountClientImpl::auth_callback(std::string const&)
