@@ -74,10 +74,12 @@ public:
     */
     enum MainLoopSelect
     {
-        RunInExternalMainLoop,  ///< An external main loop already exists or the service update
-                                ///  callback is not required.
-        CreateInternalMainLoop  ///< An external main loop does not exist and the service update
-                                ///  callback is required.
+        RunInExternalMainLoop,    ///< An external main loop already exists or the service update
+                                  ///  callback is not required.
+        CreateInternalMainLoop,   ///< An external main loop does not exist and the service update
+                                  ///  callback is required.
+        RunInExternalUiMainLoop,  ///< An external UI main loop exists (Intended for shell use only.
+                                  ///  A scope should not be running a UI main loop).
     };
 
     /**
