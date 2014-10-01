@@ -307,7 +307,7 @@ public:
 } // namespace scopes
 } // namespace unity
 
-TEST(OnlineAccountClient, register_account_login_result)
+TEST_F(OnlineAccountClientTest, register_account_login_result)
 {
     OnlineAccountClient oa_client("test_service_name", "test_service_type", "test_provider");
 
@@ -334,7 +334,7 @@ TEST(OnlineAccountClient, register_account_login_result)
     EXPECT_EQ(OnlineAccountClient::DoNothing, static_cast<OnlineAccountClient::PostLoginAction>(details.at("login_failed_action").get_int()));
 }
 
-TEST(OnlineAccountClient, register_account_login_widget)
+TEST_F(OnlineAccountClientTest, register_account_login_widget)
 {
     OnlineAccountClient oa_client("test_service_name", "test_service_type", "test_provider");
 
