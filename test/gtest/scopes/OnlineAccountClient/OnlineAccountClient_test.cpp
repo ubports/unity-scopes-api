@@ -412,6 +412,46 @@ TEST_F(OnlineAccountClientTest, refresh_services_main_loop)
     EXPECT_EQ(0, statuses.size());
 }
 
+TEST_F(OnlineAccountClientTest, service_update_callback)
+{
+    auto statuses = oa_client()->get_service_statuses();
+    EXPECT_EQ(0, statuses.size());
+
+    oa_client()->set_service_update_callback(std::bind(&OnlineAccountClientTest::service_update_none, this, std::placeholders::_1));
+    create_account();
+    wait_for_service_update();
+
+    statuses = oa_client()->get_service_statuses();
+    EXPECT_EQ(1, statuses.size());
+
+    oa_client()->set_service_update_callback(std::bind(&OnlineAccountClientTest::service_update_enabled, this, std::placeholders::_1));
+    enable_service();
+    wait_for_service_update();
+
+    oa_client()->set_service_update_callback(std::bind(&OnlineAccountClientTest::service_update_disabled, this, std::placeholders::_1));
+    disable_service();
+    wait_for_service_update();
+
+    oa_client()->set_service_update_callback(std::bind(&OnlineAccountClientTest::service_update_enabled, this, std::placeholders::_1));
+    enable_service();
+    wait_for_service_update();
+
+    oa_client()->set_service_update_callback(std::bind(&OnlineAccountClientTest::service_update_disabled, this, std::placeholders::_1));
+    disable_account();
+    wait_for_service_update();
+
+    oa_client()->set_service_update_callback(std::bind(&OnlineAccountClientTest::service_update_enabled, this, std::placeholders::_1));
+    enable_account();
+    wait_for_service_update();
+
+    oa_client()->set_service_update_callback(std::bind(&OnlineAccountClientTest::service_update_disabled, this, std::placeholders::_1));
+    delete_account();
+    wait_for_service_update();
+
+    statuses = oa_client()->get_service_statuses();
+    EXPECT_EQ(0, statuses.size());
+}
+
 TEST_F(OnlineAccountClientTestNoMainLoop, refresh_services_no_main_loop)
 {
     auto statuses = oa_client()->get_service_statuses();
@@ -453,46 +493,6 @@ TEST_F(OnlineAccountClientTestNoMainLoop, refresh_services_no_main_loop)
 
     statuses = oa_client()->get_service_statuses();
     EXPECT_TRUE(statuses[0].service_enabled);
-}
-
-TEST_F(OnlineAccountClientTest, service_update_callback)
-{
-    auto statuses = oa_client()->get_service_statuses();
-    EXPECT_EQ(0, statuses.size());
-
-    oa_client()->set_service_update_callback(std::bind(&OnlineAccountClientTest::service_update_none, this, std::placeholders::_1));
-    create_account();
-    wait_for_service_update();
-
-    statuses = oa_client()->get_service_statuses();
-    EXPECT_EQ(1, statuses.size());
-
-    oa_client()->set_service_update_callback(std::bind(&OnlineAccountClientTest::service_update_enabled, this, std::placeholders::_1));
-    enable_service();
-    wait_for_service_update();
-
-    oa_client()->set_service_update_callback(std::bind(&OnlineAccountClientTest::service_update_disabled, this, std::placeholders::_1));
-    disable_service();
-    wait_for_service_update();
-
-    oa_client()->set_service_update_callback(std::bind(&OnlineAccountClientTest::service_update_enabled, this, std::placeholders::_1));
-    enable_service();
-    wait_for_service_update();
-
-    oa_client()->set_service_update_callback(std::bind(&OnlineAccountClientTest::service_update_disabled, this, std::placeholders::_1));
-    disable_account();
-    wait_for_service_update();
-
-    oa_client()->set_service_update_callback(std::bind(&OnlineAccountClientTest::service_update_enabled, this, std::placeholders::_1));
-    enable_account();
-    wait_for_service_update();
-
-    oa_client()->set_service_update_callback(std::bind(&OnlineAccountClientTest::service_update_disabled, this, std::placeholders::_1));
-    delete_account();
-    wait_for_service_update();
-
-    statuses = oa_client()->get_service_statuses();
-    EXPECT_EQ(0, statuses.size());
 }
 
 TEST_F(OnlineAccountClientTestNoMainLoop, pub_sub_authentication)
