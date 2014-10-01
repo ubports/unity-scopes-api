@@ -89,11 +89,6 @@ static OnlineAccountClient::ServiceStatus info_to_details(AccountInfo const* inf
     service_status.token_secret = token_secret ? token_secret : "";
     service_status.error = error;
 
-    if (service_status.service_authenticated)
-    {
-        info->account_client->publish_authentication();
-    }
-
     return service_status;
 }
 
@@ -131,7 +126,7 @@ static void service_login_cb(GObject* source, GAsyncResult* result, void* user_d
     info->session_data.reset(signon_auth_session_process_finish(session, result, &error), free_variant);
     std::shared_ptr<GError> error_cleanup(error, free_error);
 
-    info->account_client->callback(info_to_details(info, error ? error->message : ""));
+    info->account_client->callback(info, error ? error->message : "");
 
     // Clear session info
     clear_session(info);
@@ -156,7 +151,7 @@ static void service_update_cb(AgAccountService* account_service, gboolean enable
         if (error)
         {
             // Send notification that the authorization session failed
-            info->account_client->callback(info_to_details(info, error->message));
+            info->account_client->callback(info, error->message);
             return;
         }
 
@@ -191,7 +186,7 @@ static void service_update_cb(AgAccountService* account_service, gboolean enable
     else
     {
         // Send notification that account has been disabled
-        info->account_client->callback(info_to_details(info));
+        info->account_client->callback(info);
     }
 }
 
@@ -325,9 +320,16 @@ OnlineAccountClientImpl::~OnlineAccountClientImpl()
     g_signal_handler_disconnect(manager_.get(), account_deleted_signal_id_);
 
     // Remove all accounts
-    for (auto const& info : accounts_)
     {
-        remove_account(info.second->account_id);
+        std::unique_lock<std::mutex> lock(mutex_);
+        for (auto const& info : accounts_)
+        {
+            // Before we nuke the map, ensure that any pending sessions are done
+            g_signal_handler_disconnect(info.second->account_service.get(), info.second->service_update_signal_id_);
+            clear_session(info.second.get());
+            flush_pending_session(info.second->account_id, lock);
+        }
+        accounts_.clear();
     }
 
     // If we are responsible for the main loop, quit it on destruction
@@ -480,18 +482,15 @@ OnlineAccountClient::MainLoopSelect OnlineAccountClientImpl::main_loop_select()
     return main_loop_select_;
 }
 
-void OnlineAccountClientImpl::callback(OnlineAccountClient::ServiceStatus const& service_status)
+void OnlineAccountClientImpl::callback(AccountInfo const* info, std::string const& error)
 {
     std::lock_guard<std::mutex> lock(callback_mutex_);
+    auto service_status = info_to_details(info, error);
     if (callback_)
     {
         callback_(service_status);
     }
-}
-
-void OnlineAccountClientImpl::publish_authentication()
-{
-    if (auth_publisher_)
+    if (service_status.service_authenticated && auth_publisher_)
     {
         auth_publisher_->send_message("");
     }

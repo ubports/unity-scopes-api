@@ -86,8 +86,8 @@ public:
     std::shared_ptr<AgManager> manager();
     std::string service_name();
     OnlineAccountClient::MainLoopSelect main_loop_select();
-    void callback(OnlineAccountClient::ServiceStatus const& service_status);
-    void publish_authentication();
+
+    void callback(AccountInfo const* info, std::string const& error = "");
 
     bool has_account(AgAccountId const& account_id);
     void add_account(AgAccountId const& account_id, std::shared_ptr<AccountInfo> account_info);
