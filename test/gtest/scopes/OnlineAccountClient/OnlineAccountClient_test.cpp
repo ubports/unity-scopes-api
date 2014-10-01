@@ -361,8 +361,6 @@ TEST(OnlineAccountClient, register_account_login_widget)
     EXPECT_EQ(OnlineAccountClient::DoNothing, static_cast<OnlineAccountClient::PostLoginAction>(details.at("login_failed_action").get_int()));
 }
 
-///! Callback/manual create/delete, enable/disable account/service, signin
-
 TEST_F(OnlineAccountClientTest, refresh_services_main_loop)
 {
     auto statuses = oa_client()->get_service_statuses();
