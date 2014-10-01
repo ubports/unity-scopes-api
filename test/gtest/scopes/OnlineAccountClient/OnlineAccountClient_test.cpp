@@ -51,6 +51,7 @@ public:
     {
         boost::filesystem::remove(TEST_DB_DIR "/accounts.db");
 
+        setenv("XDG_RUNTIME_DIR", "/tmp", true);
         setenv("ACCOUNTS", TEST_DB_DIR, false);
         setenv("AG_SERVICES", TEST_DATA_DIR, false);
         setenv("AG_SERVICE_TYPES", TEST_DATA_DIR, false);
@@ -479,18 +480,4 @@ TEST_F(OnlineAccountClientTest, service_update_callback)
 
     statuses = oa_client()->get_service_statuses();
     EXPECT_EQ(0, statuses.size());
-}
-
-
-int main(int argc, char **argv)
-{
-    ::testing::InitGoogleTest(&argc, argv);
-    for (int i = 0; i < 50; ++i)
-    {
-        if (RUN_ALL_TESTS() != 0)
-        {
-            return -1;
-        }
-    }
-    return 0;
 }
