@@ -215,3 +215,17 @@
    Memcheck:Cond
    fun:ag_auth_data_unref
 }
+
+{
+   malloc[Memcheck:Leak]
+   Memcheck:Leak
+   fun:malloc
+   fun:g_malloc
+   fun:g_slice_alloc
+   fun:g_slice_alloc0
+   ...
+   fun:ag_manager_get_service
+   ...
+   fun:ag_manager_list_services_by_type
+   fun:ag_account_list_services
+}
