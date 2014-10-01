@@ -51,6 +51,7 @@ public:
     {
         boost::filesystem::remove(TEST_DB_DIR "/accounts.db");
 
+        setenv("DISPLAY", ":0", true);
         setenv("XDG_RUNTIME_DIR", "/tmp", true);
         setenv("ACCOUNTS", TEST_DB_DIR, false);
         setenv("AG_SERVICES", TEST_DATA_DIR, false);
