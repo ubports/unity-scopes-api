@@ -25,6 +25,8 @@ using namespace unity::scopes;
 
 TEST(OnlineAccountClient, basic)
 {
+    setenv("XDG_RUNTIME_DIR", "/tmp", true);
+
     OnlineAccountClient oa_client("com.ubuntu.scopes.youtube_youtube", "sharing", "google");
     auto service_statuses = oa_client.get_service_statuses();
 }
