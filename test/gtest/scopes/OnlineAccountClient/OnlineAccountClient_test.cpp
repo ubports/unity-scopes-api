@@ -161,6 +161,27 @@ public:
         return result;
     }
 
+    void invoke_callback(std::shared_ptr<OnlineAccountClient> oa_client, AccountInfo const* info, std::string const& error)
+    {
+        oa_client->p->callback(info, error);
+    }
+
+    static void safe_g_error_free_(GError* e)
+    {
+        if (e)
+        {
+            g_error_free(e);
+        }
+    }
+
+    static void safe_g_variant_free_(GVariant* v)
+    {
+        if (v)
+        {
+            g_variant_unref(v);
+        }
+    }
+
 private:
     std::shared_ptr<OnlineAccountClient> oa_client_;
     std::shared_ptr<AgManager> manager_;
@@ -197,7 +218,7 @@ private:
     void create_account_()
     {
         account_.reset(ag_manager_create_account(manager_.get(), "TestProvider"), g_object_unref);
-        ag_account_select_service (account_.get(), nullptr);
+        ag_account_select_service(account_.get(), nullptr);
         ag_account_set_enabled(account_.get(), true);
 
         GError* error = nullptr;
@@ -224,9 +245,9 @@ private:
 
     void enable_service_()
     {
-        auto service = ag_manager_get_service (manager_.get(), "TestService");
-        ag_account_select_service (account_.get(), service);
-        ag_account_set_enabled (account_.get(), true);
+        auto service = ag_manager_get_service(manager_.get(), "TestService");
+        ag_account_select_service(account_.get(), service);
+        ag_account_set_enabled(account_.get(), true);
 
         GError* error = nullptr;
         bool stored = ag_account_store_blocking(account_.get(), &error);
@@ -238,9 +259,9 @@ private:
 
     void disable_service_()
     {
-        auto service = ag_manager_get_service (manager_.get(), "TestService");
-        ag_account_select_service (account_.get(), service);
-        ag_account_set_enabled (account_.get(), false);
+        auto service = ag_manager_get_service(manager_.get(), "TestService");
+        ag_account_select_service(account_.get(), service);
+        ag_account_set_enabled(account_.get(), false);
 
         GError* error = nullptr;
         bool stored = ag_account_store_blocking(account_.get(), &error);
@@ -272,14 +293,6 @@ private:
 
         EXPECT_TRUE(stored);
         EXPECT_EQ(nullptr, error);
-    }
-
-    static void safe_g_error_free_(GError* e)
-    {
-        if (e)
-        {
-            g_error_free(e);
-        }
     }
 };
 
@@ -480,4 +493,45 @@ TEST_F(OnlineAccountClientTest, service_update_callback)
 
     statuses = oa_client()->get_service_statuses();
     EXPECT_EQ(0, statuses.size());
+}
+
+TEST_F(OnlineAccountClientTest, pub_sub_authentication)
+{
+    std::shared_ptr<OnlineAccountClient> shell_oa_client;
+    shell_oa_client.reset(new OnlineAccountClient("TestService2", "sharing", "TestProvider2", OnlineAccountClient::RunInExternalUiMainLoop));
+
+    std::shared_ptr<OnlineAccountClient> scope_oa_client;
+    scope_oa_client.reset(new OnlineAccountClient("TestService2", "sharing", "TestProvider2"));
+
+    std::shared_ptr<AccountInfo> info(new AccountInfo);
+    info->service_enabled = true;
+    {
+        GVariantDict dict;
+        g_variant_dict_init(&dict, nullptr);
+        g_variant_dict_insert(&dict, "ConsumerKey", "s", "x");
+        g_variant_dict_insert(&dict, "ConsumerSecret", "s", "x");
+        info->auth_params.reset(g_variant_ref_sink(g_variant_dict_end(&dict)), safe_g_variant_free_);
+    }
+    {
+        GVariantDict dict;
+        g_variant_dict_init(&dict, nullptr);
+        g_variant_dict_insert(&dict, "AccessToken", "s", "x");
+        g_variant_dict_insert(&dict, "TokenSecret", "s", "x");
+        info->session_data.reset(g_variant_ref_sink(g_variant_dict_end(&dict)), safe_g_variant_free_);
+    }
+
+    invoke_callback(shell_oa_client, info.get(), "");
+}
+
+int main(int argc, char **argv)
+{
+    ::testing::InitGoogleTest(&argc, argv);
+    for (int i = 0; i < 1; ++i)
+    {
+        if (RUN_ALL_TESTS() != 0)
+        {
+            return -1;
+        }
+    }
+    return 0;
 }
