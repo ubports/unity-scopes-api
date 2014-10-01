@@ -495,43 +495,47 @@ TEST_F(OnlineAccountClientTest, service_update_callback)
     EXPECT_EQ(0, statuses.size());
 }
 
-TEST_F(OnlineAccountClientTest, pub_sub_authentication)
+TEST_F(OnlineAccountClientTestNoMainLoop, pub_sub_authentication)
 {
     std::shared_ptr<OnlineAccountClient> shell_oa_client;
-    shell_oa_client.reset(new OnlineAccountClient("TestService2", "sharing", "TestProvider2", OnlineAccountClient::RunInExternalUiMainLoop));
+    shell_oa_client.reset(new OnlineAccountClient("TestService", "sharing", "TestProvider", OnlineAccountClient::RunInExternalUiMainLoop));
 
     std::shared_ptr<OnlineAccountClient> scope_oa_client;
-    scope_oa_client.reset(new OnlineAccountClient("TestService2", "sharing", "TestProvider2"));
+    scope_oa_client.reset(new OnlineAccountClient("TestService", "sharing", "TestProvider", OnlineAccountClient::RunInExternalMainLoop));
 
     std::shared_ptr<AccountInfo> info(new AccountInfo);
     info->service_enabled = true;
     {
         GVariantDict dict;
         g_variant_dict_init(&dict, nullptr);
-        g_variant_dict_insert(&dict, "ConsumerKey", "s", "x");
-        g_variant_dict_insert(&dict, "ConsumerSecret", "s", "x");
+        g_variant_dict_insert(&dict, "ConsumerKey", "s", "isuertbiseruy87srkuthksvu");
+        g_variant_dict_insert(&dict, "ConsumerSecret", "s", "rytwekfgiodng523dr4");
         info->auth_params.reset(g_variant_ref_sink(g_variant_dict_end(&dict)), safe_g_variant_free_);
     }
     {
         GVariantDict dict;
         g_variant_dict_init(&dict, nullptr);
-        g_variant_dict_insert(&dict, "AccessToken", "s", "x");
-        g_variant_dict_insert(&dict, "TokenSecret", "s", "x");
+        g_variant_dict_insert(&dict, "AccessToken", "s", "sfhgbfgutgi9ugwirheg74");
+        g_variant_dict_insert(&dict, "TokenSecret", "s", "qwpeurylsfdg83");
         info->session_data.reset(g_variant_ref_sink(g_variant_dict_end(&dict)), safe_g_variant_free_);
     }
 
-    invoke_callback(shell_oa_client, info.get(), "");
-}
+    // No services should be available on scope_oa_client
+    auto statuses = scope_oa_client->get_service_statuses();
+    EXPECT_EQ(0, statuses.size());
 
-int main(int argc, char **argv)
-{
-    ::testing::InitGoogleTest(&argc, argv);
-    for (int i = 0; i < 1; ++i)
-    {
-        if (RUN_ALL_TESTS() != 0)
-        {
-            return -1;
-        }
-    }
-    return 0;
+    // Create an account
+    create_account();
+
+    // No services should be available as refresh_service_statuses() not yet called on scope_oa_client
+    statuses = scope_oa_client->get_service_statuses();
+    EXPECT_EQ(0, statuses.size());
+
+    // Invoke callback on shell_oa_client which should invoke refresh_service_statuses() on scope_oa_client via pub/sub
+    invoke_callback(shell_oa_client, info.get(), "");
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+    // The services should now be available on scope_oa_client
+    statuses = scope_oa_client->get_service_statuses();
+    EXPECT_EQ(1, statuses.size());
 }
