@@ -31,6 +31,7 @@
 #include <core/posix/exec.h>
 
 #include <cassert>
+#include <fstream>
 #include <wordexp.h>
 
 using namespace std;
@@ -49,7 +50,8 @@ namespace internal
 
 RegistryObject::RegistryObject(core::posix::ChildProcess::DeathObserver& death_observer,
                                Executor::SPtr const& executor,
-                               MiddlewareBase::SPtr middleware)
+                               MiddlewareBase::SPtr middleware,
+                               bool generate_desktop_files)
     : death_observer_(death_observer),
       death_observer_connection_
       {
@@ -67,7 +69,8 @@ RegistryObject::RegistryObject(core::posix::ChildProcess::DeathObserver& death_o
               on_state_received(id, s);
           })
       },
-      executor_(executor)
+      executor_(executor),
+      generate_desktop_files_(generate_desktop_files)
 {
     if (middleware)
     {
@@ -252,6 +255,8 @@ bool RegistryObject::add_local_scope(std::string const& scope_id, ScopeMetadata 
         // Send a blank message to subscribers to inform them that the registry has been updated
         publisher_->send_message("");
     }
+
+    create_desktop_file(metadata);
     return return_value;
 }
 
@@ -284,6 +289,7 @@ bool RegistryObject::remove_local_scope(std::string const& scope_id)
             // Send a blank message to subscribers to inform them that the registry has been updated
             publisher_->send_message("");
         }
+        remove_desktop_file(scope_id);
         return true;
     }
 
@@ -338,6 +344,65 @@ void RegistryObject::on_state_received(std::string const& scope_id, StateReceive
         }
     }
     // simply ignore states from scopes the registry does not know about
+}
+
+std::string RegistryObject::desktop_files_dir()
+{
+    // First check if a test directory has been set
+    const char* desktop_files_dir = getenv("TEST_DESKTOP_FILES_DIR");
+    if (desktop_files_dir)
+    {
+        return desktop_files_dir;
+    }
+
+    // If no test directory has been set, get the regular applications dir
+    desktop_files_dir = getenv("HOME");
+    if (!desktop_files_dir)
+    {
+        throw unity::scopes::ConfigException("RegistryObject: HOME not set");
+    }
+
+    return std::string(desktop_files_dir) + "/.local/share/applications";
+}
+
+void RegistryObject::create_desktop_file(ScopeMetadata const& metadata)
+{
+    std::string desktop_file_path = desktop_files_dir();
+    if (!generate_desktop_files_ || desktop_file_path.empty())
+    {
+        return;
+    }
+
+    desktop_file_path += "/" + metadata.scope_id() + ".desktop";
+
+    std::ofstream desktop_file(desktop_file_path.c_str());
+    if (!desktop_file)
+    {
+        throw unity::SyscallException("RegistryObject::create_desktop_file: unable to create desktop file: \"" + desktop_file_path + "\"", errno);
+    }
+
+    desktop_file << "[Desktop Entry]" << std::endl;
+    desktop_file << "Type=Application" << std::endl;
+    desktop_file << "NoDisplay=true" << std::endl;
+    desktop_file << "Name=" << metadata.display_name() << std::endl;
+    desktop_file << "Icon=" << metadata.icon() << std::endl;
+    desktop_file.close();
+}
+
+void RegistryObject::remove_desktop_file(std::string const& scope_id)
+{
+    std::string desktop_file_path = desktop_files_dir();
+    if (!generate_desktop_files_ || desktop_file_path.empty())
+    {
+        return;
+    }
+
+    desktop_file_path += "/" + scope_id + ".desktop";
+
+    if (boost::filesystem::exists(desktop_file_path))
+    {
+        boost::filesystem::remove(desktop_file_path);
+    }
 }
 
 RegistryObject::ScopeProcess::ScopeProcess(ScopeExecData exec_data, std::weak_ptr<MWPublisher> const& publisher)

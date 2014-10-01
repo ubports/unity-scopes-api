@@ -23,6 +23,7 @@
 #include <unity/scopes/internal/zmq_middleware/VariantConverter.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqException.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqQueryCtrl.h>
+#include <unity/scopes/internal/zmq_middleware/ZmqReceiver.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqReply.h>
 #include <unity/scopes/Result.h>
 #include <unity/scopes/CannedQuery.h>
@@ -93,10 +94,8 @@ QueryCtrlProxy ZmqScope::search(CannedQuery const& query, VariantMap const& hint
 
     auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_scope_(request_builder); });
 
-    auto receiver = future.get();
-    auto segments = receiver.receive();
-    capnp::SegmentArrayMessageReader reader(segments);
-    auto response = reader.getRoot<capnproto::Response>();
+    auto out_params = future.get();
+    auto response = out_params.reader->getRoot<capnproto::Response>();
     throw_if_runtime_exception(response);
 
     auto proxy = response.getPayload().getAs<capnproto::Scope::CreateQueryResponse>().getReturnValue();
@@ -125,10 +124,8 @@ QueryCtrlProxy ZmqScope::activate(VariantMap const& result, VariantMap const& hi
 
     auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_scope_(request_builder); });
 
-    auto receiver = future.get();
-    auto segments = receiver.receive();
-    capnp::SegmentArrayMessageReader reader(segments);
-    auto response = reader.getRoot<capnproto::Response>();
+    auto out_params = future.get();
+    auto response = out_params.reader->getRoot<capnproto::Response>();
     throw_if_runtime_exception(response);
 
     auto proxy = response.getPayload().getAs<capnproto::Scope::CreateQueryResponse>().getReturnValue();
@@ -161,10 +158,8 @@ QueryCtrlProxy ZmqScope::perform_action(VariantMap const& result,
     auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_scope_(request_builder); });
     future.wait();
 
-    auto receiver = future.get();
-    auto segments = receiver.receive();
-    capnp::SegmentArrayMessageReader reader(segments);
-    auto response = reader.getRoot<capnproto::Response>();
+    auto out_params = future.get();
+    auto response = out_params.reader->getRoot<capnproto::Response>();
     throw_if_runtime_exception(response);
 
     auto proxy = response.getPayload().getAs<capnproto::Scope::CreateQueryResponse>().getReturnValue();
@@ -193,10 +188,8 @@ QueryCtrlProxy ZmqScope::preview(VariantMap const& result, VariantMap const& hin
 
     auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_scope_(request_builder); });
 
-    auto receiver = future.get();
-    auto segments = receiver.receive();
-    capnp::SegmentArrayMessageReader reader(segments);
-    auto response = reader.getRoot<capnproto::Response>();
+    auto out_params = future.get();
+    auto response = out_params.reader->getRoot<capnproto::Response>();
     throw_if_runtime_exception(response);
 
     auto proxy = response.getPayload().getAs<capnproto::Scope::CreateQueryResponse>().getReturnValue();
@@ -218,10 +211,8 @@ bool ZmqScope::debug_mode()
         make_request_(request_builder, "debug_mode");
 
         auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_twoway_(request_builder); });
-        auto receiver = future.get();
-        auto segments = receiver.receive();
-        capnp::SegmentArrayMessageReader reader(segments);
-        auto response = reader.getRoot<capnproto::Response>();
+        auto out_params = future.get();
+        auto response = out_params.reader->getRoot<capnproto::Response>();
         throw_if_runtime_exception(response);
 
         auto debug_mode_response = response.getPayload().getAs<capnproto::Scope::DebugModeResponse>();
@@ -231,15 +222,15 @@ bool ZmqScope::debug_mode()
     return *debug_mode_;
 }
 
-ZmqReceiver ZmqScope::invoke_scope_(capnp::MessageBuilder& out_params)
+ZmqObjectProxy::TwowayOutParams ZmqScope::invoke_scope_(capnp::MessageBuilder& in_params)
 {
     // Check if this scope has requested debug mode, if so, disable two-way timeout and set
     // locate timeout to 15s.
     if (debug_mode())
     {
-        return this->invoke_twoway_(out_params, -1, 15000);
+        return this->invoke_twoway_(in_params, -1, 15000);
     }
-    return this->invoke_twoway_(out_params);
+    return this->invoke_twoway_(in_params);
 }
 
 } // namespace zmq_middleware

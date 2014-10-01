@@ -13,23 +13,18 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Pete Woods <pete.woods@canonical.com>
+ * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#include <unity/scopes/ScopeBase.h>
-#include <unity/scopes/internal/ScopeBaseImpl.h>
-#include <unity/scopes/testing/TypedScopeFixture.h>
+#include <gtest/gtest.h>
+#include <unity/scopes/OnlineAccountClient.h>
 
-using namespace unity::scopes::testing;
+#include <thread>
 
-/// @cond
-void TypedScopeFixtureHelper::set_registry(std::shared_ptr<unity::scopes::ScopeBase> const& scope, RegistryProxy const& r)
+using namespace unity::scopes;
+
+TEST(OnlineAccountClient, basic)
 {
-    scope->p->set_registry(r);
+    OnlineAccountClient oa_client("com.ubuntu.scopes.youtube_youtube", "sharing", "google");
+    auto service_statuses = oa_client.get_service_statuses();
 }
-
-void TypedScopeFixtureHelper::set_scope_directory(std::shared_ptr<unity::scopes::ScopeBase> const& scope, std::string const& path)
-{
-    scope->p->set_scope_directory(path);
-}
-/// @endcond

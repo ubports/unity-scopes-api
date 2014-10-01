@@ -60,7 +60,7 @@ public:
     UNITY_DEFINES_PTRS(RegistryObject);
 
     RegistryObject(core::posix::ChildProcess::DeathObserver& death_observer, Executor::SPtr const& executor,
-                   MiddlewareBase::SPtr middleware);
+                   MiddlewareBase::SPtr middleware, bool generate_desktop_files = false);
     virtual ~RegistryObject();
 
     // Remote operation implementations
@@ -80,6 +80,10 @@ public:
 private:
     void on_process_death(core::posix::ChildProcess const& process);
     void on_state_received(std::string const& scope_id, StateReceiverObject::State const& state);
+
+    static std::string desktop_files_dir();
+    void create_desktop_file(ScopeMetadata const& metadata);
+    void remove_desktop_file(std::string const& scope_id);
 
     class ScopeProcess
     {
@@ -140,6 +144,7 @@ private:
     mutable std::mutex mutex_;
 
     MWPublisher::SPtr publisher_;
+    bool generate_desktop_files_;
 };
 
 } // namespace internal

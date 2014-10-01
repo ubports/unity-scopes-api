@@ -140,7 +140,7 @@ TEST_F(SmartScopesClientTest, search)
         dept = deptinfo;
     };
 
-    auto search_handle = ssc_->search(handler, sss_url_ + "/demo", "stuff", "", "session_id", 0, "platform");
+    auto search_handle = ssc_->search(handler, sss_url_ + "/demo", "stuff", "", "session_id", 0, "platform", VariantMap(), VariantMap(), "en_US", "", "ThisIsUserAgentHeader");
     search_handle->wait();
 
     ASSERT_EQ(3u, results.size());
@@ -219,6 +219,32 @@ TEST_F(SmartScopesClientTest, search)
     EXPECT_FALSE(active_options.empty());
     auto active_option = *(active_options.begin());
     EXPECT_EQ(active_option->id(), "salesrank");
+}
+
+TEST_F(SmartScopesClientTest, userAgentHeader)
+{
+    std::vector<SearchResult> results;
+
+    SearchReplyHandler handler;
+    handler.filters_handler = [](Filters const &) {
+    };
+    handler.filter_state_handler = [](FilterState const&) {
+    };
+    handler.category_handler = [](std::shared_ptr<SearchCategory> const&) {
+    };
+    handler.result_handler = [&results](SearchResult const& result) {
+        results.push_back(result);
+    };
+    handler.departments_handler = [](std::shared_ptr<DepartmentInfo> const&) {
+    };
+
+    auto search_handle = ssc_->search(handler, sss_url_ + "/demo", "test_user_agent_header", "", "session_id", 0, "platform", VariantMap(), VariantMap(), "en_US", "", "ThisIsUserAgentHeader");
+    search_handle->wait();
+
+    ASSERT_EQ(4u, results.size());
+
+    // user agent string is expected in the result title
+    EXPECT_EQ("ThisIsUserAgentHeader", results[3].other_params["title"]->as_string());
 }
 
 TEST_F(SmartScopesClientTest, preview)

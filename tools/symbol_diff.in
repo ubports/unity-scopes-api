@@ -1,0 +1,10 @@
+#!/bin/sh
+
+head -n 1 ./debian/libunity-scopes@UNITY_SCOPES_SOVERSION@/DEBIAN/symbols \
+    >new_symbols
+
+sed '1d' ./debian/libunity-scopes@UNITY_SCOPES_SOVERSION@/DEBIAN/symbols | c++filt | \
+    sed 's/^ \(.*@Base\)/ (c++)"\1"/' | sort | uniq >>new_symbols
+
+diff -u debian/libunity-scopes@UNITY_SCOPES_SOVERSION@.symbols new_symbols | \
+    sed 's/^+ \(.*@Base"\)\( .*\)/+ \1 0replaceme/' >/tmp/symbols.diff

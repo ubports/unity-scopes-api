@@ -1,6 +1,10 @@
 Release notes
 =============
 
+Changes in version 0.6.6
+========================
+  - Added support for online accounts (via new OnlineAccountClient class).
+
 Changes in version 0.6.5
 ========================
   - Implemented support for expandable preview widgets. See the documentation of PreviewWidget

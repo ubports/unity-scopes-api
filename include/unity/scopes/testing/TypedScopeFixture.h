@@ -59,6 +59,8 @@ struct TypedScopeFixtureHelper
 private:
     static void set_registry(std::shared_ptr<ScopeBase> const& scope, RegistryProxy const& r);
 
+    static void set_scope_directory(std::shared_ptr<ScopeBase> const& scope, std::string const& path);
+
     template<typename Scope>
     friend class TypedScopeFixture;
 };
@@ -76,8 +78,13 @@ public:
 
     void SetUp()
     {
-        EXPECT_NO_THROW(scope->start(ScopeTraits<Scope>::name()));
-        EXPECT_NO_THROW(scope->run());
+        ASSERT_NO_THROW(scope->start(ScopeTraits<Scope>::name()));
+        ASSERT_NO_THROW(scope->run());
+    }
+
+    void set_scope_directory(std::string const& path)
+    {
+        TypedScopeFixtureHelper::set_scope_directory(scope, path);
     }
 
     void TearDown()

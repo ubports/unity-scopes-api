@@ -47,7 +47,9 @@ public:
 
     ZmqSender(zmqpp::socket& s);
 
-    void send(kj::ArrayPtr<kj::ArrayPtr<capnp::word const> const> segments);
+    enum WaitFlag { Wait, DontWait };
+
+    bool send(kj::ArrayPtr<kj::ArrayPtr<capnp::word const> const> segments, WaitFlag flag = Wait);
 
 private:
     zmqpp::socket& s_;

@@ -174,6 +174,7 @@ public:
                               VariantMap const& filter_state = VariantMap(),
                               std::string const& locale = "",
                               std::string const& country = "",
+                              std::string const& user_agent_hdr = "",
                               const unsigned int limit = 0);
 
     PreviewHandle::UPtr preview(PreviewReplyHandler const& handler,
@@ -184,7 +185,8 @@ public:
                                 const unsigned int widgets_api_version,
                                 VariantMap const& settings = VariantMap(),
                                 std::string const& locale = "",
-                                std::string const& country = "");
+                                std::string const& country = "",
+                                std::string const& user_agent_hdr = "");
 
 private:
     friend class SearchHandle;
