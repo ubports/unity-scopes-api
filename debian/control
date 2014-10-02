@@ -5,7 +5,6 @@ Build-Depends: g++-4.9,
                debhelper (>= 9),
                click-dev (>= 0.2.2),
                cmake,
-               dbus-x11,
                doxygen,
                google-mock,
                graphviz,
@@ -27,6 +26,7 @@ Build-Depends: g++-4.9,
                libjsoncpp-dev,
                libaccounts-glib-dev,
                libsignon-glib-dev,
+               libdbustest1-dev,
 Standards-Version: 3.9.5
 XS-Testsuite: autopkgtest
 Section: libs

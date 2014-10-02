@@ -30,6 +30,7 @@
 #include <functional>
 #include <gtest/gtest.h>
 #include <libaccounts-glib/accounts-glib.h>
+#include <libdbustest/dbus-test.h>
 #include <thread>
 
 using namespace unity;
@@ -51,7 +52,6 @@ public:
     {
         boost::filesystem::remove(TEST_DB_DIR "/accounts.db");
 
-        setenv("DISPLAY", ":0", true);
         setenv("XDG_RUNTIME_DIR", "/tmp", true);
         setenv("ACCOUNTS", TEST_DB_DIR, false);
         setenv("AG_SERVICES", TEST_DATA_DIR, false);
@@ -537,4 +537,14 @@ TEST_F(OnlineAccountClientTestNoMainLoop, pub_sub_authentication)
     // The services should now be available on scope_oa_client
     statuses = scope_oa_client->get_service_statuses();
     EXPECT_EQ(1, statuses.size());
+}
+
+int main(int argc, char **argv)
+{
+    std::shared_ptr<DbusTestService> dbus_test_service;
+    dbus_test_service.reset(dbus_test_service_new(nullptr), g_object_unref);
+    dbus_test_service_run(dbus_test_service.get());
+
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }
