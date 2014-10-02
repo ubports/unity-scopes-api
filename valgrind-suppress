@@ -229,3 +229,10 @@
    fun:ag_manager_list_services_by_type
    fun:ag_account_list_services
 }
+
+{
+   operator new(unsigned long)[Memcheck:Leak]
+   Memcheck:Leak
+   fun:_Znwm
+   fun:_ZNSs4_Rep9_S_createEmmRKSaIcE
+}
