@@ -56,6 +56,7 @@ namespace
     const string idle_timeout_key = "IdleTimeout";
     const string results_ttl_key = "ResultsTtlType";
     const string debug_mode_key = "DebugMode";
+    const string child_scope_ids_key = "ChildScopes";
 
     const string scope_appearance_group = "Appearance";
     const string fg_color_key = "ForegroundColor";
@@ -192,12 +193,26 @@ ScopeConfig::ScopeConfig(string const& configfile) :
 
     try
     {
+        string child_str = parser()->get_string(scope_config_group, child_scope_ids_key);
+        if (child_str.size())
+        {
+            child_scope_ids_ = parse_scope_ids(child_str);
+        }
+    }
+    catch (LogicException const&)
+    {
+    }
+
+    try
+    {
         debug_mode_ = parser()->get_boolean(scope_config_group, debug_mode_key);
     }
     catch (LogicException const&)
     {
         debug_mode_ = false;
     }
+
+
 
     // read all display attributes from scope_appearance_group
     try
@@ -227,7 +242,8 @@ ScopeConfig::ScopeConfig(string const& configfile) :
                scoperunner_key,
                idle_timeout_key,
                results_ttl_key,
-               debug_mode_key
+               debug_mode_key,
+               child_scope_ids_key
            }
         },
         {  scope_appearance_group,
@@ -251,6 +267,47 @@ ScopeConfig::ScopeConfig(string const& configfile) :
 
 ScopeConfig::~ScopeConfig()
 {
+}
+
+
+std::vector<std::string> ScopeConfig::parse_scope_ids(std::string const& val)
+{
+    std::stringstream idstr;
+    std::vector<std::string> ids;
+    for (auto it = val.begin();; it++)
+    {
+        bool last = (it == val.end());
+        if (!last)
+        {
+            // ignore white space
+            if (isspace(*it))
+            {
+                continue;
+            }
+            // append all characters except for commas and process next char
+            if (*it != ',')
+            {
+                idstr << *it;
+                continue;
+            }
+        }
+
+        // end of string or comma
+        std::string scope_id = idstr.str();
+        if (scope_id.size() == 0)
+        {
+            throw_ex("Invalid empty scope id for " + child_scope_ids_key);
+        }
+        ids.push_back(scope_id);
+        idstr.str(std::string());
+        idstr.clear();
+
+        if (last) // end of parsing
+        {
+            break;
+        }
+    };
+    return ids;
 }
 
 void ScopeConfig::parse_appearance_attribute(VariantMap& var, std::string const& key, std::string const& val)
@@ -399,6 +456,11 @@ bool ScopeConfig::debug_mode() const
 VariantMap ScopeConfig::appearance_attributes() const
 {
     return appearance_attributes_;
+}
+
+std::vector<std::string> ScopeConfig::child_scope_ids() const
+{
+    return child_scope_ids_;
 }
 
 } // namespace internal
