@@ -285,6 +285,7 @@ OnlineAccountClientImpl::OnlineAccountClientImpl(std::string const& service_name
         }
         if (!main_loop_is_running_)
         {
+            // LCOV_EXCL_START
             if (main_loop_)
             {
                 // Quit the main loop, causing the thread to exit
@@ -302,6 +303,7 @@ OnlineAccountClientImpl::OnlineAccountClientImpl(std::string const& service_name
             {
                 throw unity::ResourceException("OnlineAccountClientImpl(): main_loop_thread failed to start.");
             }
+            // LCOV_EXCL_STOP
         }
     }
     else
@@ -542,6 +544,11 @@ std::string OnlineAccountClientImpl::service_name()
 OnlineAccountClient::MainLoopSelect OnlineAccountClientImpl::main_loop_select()
 {
     return main_loop_select_;
+}
+
+std::shared_ptr<GMainContext> OnlineAccountClientImpl::main_loop_context()
+{
+    return main_loop_context_;
 }
 
 void OnlineAccountClientImpl::callback(AccountInfo const* info, std::string const& error)

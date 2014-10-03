@@ -89,6 +89,7 @@ public:
     std::shared_ptr<AgManager> manager();
     std::string service_name();
     OnlineAccountClient::MainLoopSelect main_loop_select();
+    std::shared_ptr<GMainContext> main_loop_context();
 
     void callback(AccountInfo const* info, std::string const& error = "");
 

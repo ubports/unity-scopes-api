@@ -61,6 +61,7 @@ public:
         oa_client_.reset(new OnlineAccountClient("TestService", "sharing", "TestProvider", main_loop_select));
 
         manager_ = oa_client_->p->manager();
+        main_loop_context_ = oa_client_->p->main_loop_context();
     }
 
     ~OnlineAccountClientTest()
@@ -187,6 +188,7 @@ private:
     std::shared_ptr<OnlineAccountClient> oa_client_;
     std::shared_ptr<AgManager> manager_;
     std::shared_ptr<AgAccount> account_;
+    std::shared_ptr<GMainContext> main_loop_context_;
 
     bool got_update_;
     std::mutex mutex_;
@@ -195,11 +197,7 @@ private:
 private:
     void run_in_main_loop_(std::function<void()> func)
     {
-        std::shared_ptr<GMainLoop> event_loop;
-        event_loop.reset(g_main_loop_new(nullptr, false), g_main_loop_unref);
-
-        auto cb_data = std::make_pair(&func, event_loop.get());
-        g_idle_add([](void* user_data)
+        auto func_task = [](void* user_data)
         {
             auto cb_data = reinterpret_cast<std::pair<std::function<void()>*, GMainLoop*>*>(user_data);
             auto func = cb_data->first;
@@ -211,8 +209,21 @@ private:
             g_main_loop_quit(event_loop);
 
             return G_SOURCE_REMOVE;
-        }, &cb_data);
+        };
 
+        std::shared_ptr<GMainLoop> event_loop;
+        if (main_loop_context_)
+        {
+            event_loop.reset(g_main_loop_new(main_loop_context_.get(), false), g_main_loop_unref);
+            auto cb_data = std::make_pair(&func, event_loop.get());
+            g_main_context_invoke(main_loop_context_.get(), func_task, &cb_data);
+        }
+        else
+        {
+            event_loop.reset(g_main_loop_new(nullptr, false), g_main_loop_unref);
+            auto cb_data = std::make_pair(&func, event_loop.get());
+            g_idle_add(func_task, &cb_data);
+        }
         g_main_loop_run(event_loop.get());
     }
 
