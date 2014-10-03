@@ -109,6 +109,13 @@ static gboolean main_loop_is_running_cb(void* user_data)
     return G_SOURCE_REMOVE;
 }
 
+static gboolean main_loop_is_stopping_cb(void* user_data)
+{
+    OnlineAccountClientImpl* account_client = reinterpret_cast<OnlineAccountClientImpl*>(user_data);
+    account_client->main_loop_state_notify(false);
+    return G_SOURCE_REMOVE;
+}
+
 static gboolean wake_up_event_loop_cb(void* user_data)
 {
     GMainLoop* event_loop = reinterpret_cast<GMainLoop*>(user_data);
@@ -271,27 +278,36 @@ OnlineAccountClientImpl::OnlineAccountClientImpl(std::string const& service_name
     if (main_loop_select_ == OnlineAccountClient::CreateInternalMainLoop)
     {
         // Wait here until either the main loop begins running, or the thread exits
-        std::unique_lock<std::mutex> lock(mutex_);
-        main_loop_thread_ = std::thread(&OnlineAccountClientImpl::main_loop_thread, this);
-        cond_.wait_for(lock, std::chrono::seconds(5), [this] { return main_loop_is_running_; });
-        if (thread_exception_)
         {
-            std::rethrow_exception(thread_exception_);  // LCOV_EXCL_LINE
+            std::unique_lock<std::mutex> lock(mutex_);
+            main_loop_thread_ = std::thread(&OnlineAccountClientImpl::main_loop_thread, this);
+            cond_.wait_for(lock, std::chrono::seconds(5), [this] { return main_loop_is_running_; });
         }
-        else if (!main_loop_is_running_)
+        if (!main_loop_is_running_)
         {
-            throw unity::ResourceException("OnlineAccountClientImpl(): main_loop_thread failed to start.");  // LCOV_EXCL_LINE
+            if (main_loop_)
+            {
+                // Quit the main loop, causing the thread to exit
+                g_main_loop_quit(main_loop_.get());
+                if (main_loop_thread_.joinable())
+                {
+                    main_loop_thread_.join();
+                }
+            }
+            if (thread_exception_)
+            {
+                std::rethrow_exception(thread_exception_);
+            }
+            else
+            {
+                throw unity::ResourceException("OnlineAccountClientImpl(): main_loop_thread failed to start.");
+            }
         }
     }
-
-    manager_.reset(ag_manager_new_for_service_type(service_type_.c_str()), g_object_unref);
-
-    // Watch for changes to accounts
-    account_enabled_signal_id_ = g_signal_connect(manager_.get(), "enabled-event", G_CALLBACK(account_enabled_cb), this);
-    account_deleted_signal_id_ = g_signal_connect(manager_.get(), "account-deleted", G_CALLBACK(account_deleted_cb), this);
-
-    // Now check initial state
-    refresh_service_statuses();
+    else
+    {
+        construct();
+    }
 }
 
 OnlineAccountClientImpl::~OnlineAccountClientImpl()
@@ -317,32 +333,26 @@ OnlineAccountClientImpl::~OnlineAccountClientImpl()
         }
     }
 
-    // Disconnect signal handlers
-    g_signal_handler_disconnect(manager_.get(), account_enabled_signal_id_);
-    g_signal_handler_disconnect(manager_.get(), account_deleted_signal_id_);
-
-    // Remove all accounts
+    // If we are responsible for the main loop
+    if (main_loop_select_ == OnlineAccountClient::CreateInternalMainLoop)
     {
-        std::unique_lock<std::mutex> lock(mutex_);
-        for (auto const& info : accounts_)
+        // Invoke tear_down() from within the main loop
         {
-            // Before we nuke the map, ensure that any pending sessions are done
-            g_signal_handler_disconnect(info.second->account_service.get(), info.second->service_update_signal_id_);
-            clear_session(info.second.get());
-            flush_pending_session(info.second->account_id, lock);
+            std::unique_lock<std::mutex> lock(mutex_);
+            g_main_context_invoke(main_loop_context_.get(), main_loop_is_stopping_cb, this);
+            cond_.wait(lock, [this] { return !main_loop_is_running_; });
         }
-        accounts_.clear();
-    }
 
-    // If we are responsible for the main loop, quit it on destruction
-    if (main_loop_)
-    {
         // Quit the main loop, causing the thread to exit
         g_main_loop_quit(main_loop_.get());
         if (main_loop_thread_.joinable())
         {
             main_loop_thread_.join();
         }
+    }
+    else
+    {
+        tear_down();
     }
 }
 
@@ -436,6 +446,38 @@ void OnlineAccountClientImpl::register_account_login_item(PreviewWidget& widget,
     widget.add_attribute_value("online_account_details", Variant(account_details_map));
 }
 
+void OnlineAccountClientImpl::construct()
+{
+    manager_.reset(ag_manager_new_for_service_type(service_type_.c_str()), g_object_unref);
+
+    // Watch for changes to accounts
+    account_enabled_signal_id_ = g_signal_connect(manager_.get(), "enabled-event", G_CALLBACK(account_enabled_cb), this);
+    account_deleted_signal_id_ = g_signal_connect(manager_.get(), "account-deleted", G_CALLBACK(account_deleted_cb), this);
+
+    // Now check initial state
+    refresh_service_statuses();
+}
+
+void OnlineAccountClientImpl::tear_down()
+{
+    // Disconnect signal handlers
+    g_signal_handler_disconnect(manager_.get(), account_enabled_signal_id_);
+    g_signal_handler_disconnect(manager_.get(), account_deleted_signal_id_);
+
+    // Remove all accounts
+    {
+        std::unique_lock<std::mutex> lock(mutex_);
+        for (auto const& info : accounts_)
+        {
+            // Before we nuke the map, ensure that any pending sessions are done
+            g_signal_handler_disconnect(info.second->account_service.get(), info.second->service_update_signal_id_);
+            clear_session(info.second.get());
+            flush_pending_session(info.second->account_id, lock);
+        }
+        accounts_.clear();
+    }
+}
+
 void OnlineAccountClientImpl::flush_pending_session(AgAccountId const& account_id, std::unique_lock<std::mutex>& lock)
 {
     // Get account info
@@ -449,12 +491,16 @@ void OnlineAccountClientImpl::flush_pending_session(AgAccountId const& account_i
     // Wait until all currently running login sessions are done
     // (ensures that accounts_ is up to date)
     std::shared_ptr<GMainLoop> event_loop;
-    event_loop.reset(g_main_loop_new(nullptr, true), g_main_loop_unref);
-    while(info->session && main_loop_is_running_)
+    event_loop.reset(g_main_loop_new(g_main_context_get_thread_default(), true), g_main_loop_unref);
+    while(info->session)
     {
         // We need to wait inside an event loop to allow for the main application loop to
         // process its pending events
-        g_timeout_add(10, wake_up_event_loop_cb, event_loop.get());
+        std::shared_ptr<GSource> source;
+        source.reset(g_timeout_source_new(10), g_source_unref);
+        g_source_set_callback(source.get(), wake_up_event_loop_cb, event_loop.get(), NULL);
+        g_source_attach(source.get(), g_main_context_get_thread_default());
+
         lock.unlock();
         g_main_loop_run(event_loop.get());
         lock.lock();
@@ -463,6 +509,20 @@ void OnlineAccountClientImpl::flush_pending_session(AgAccountId const& account_i
 
 void OnlineAccountClientImpl::main_loop_state_notify(bool is_running)
 {
+    bool was_running = false;
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        was_running = main_loop_is_running_;
+    }
+    if (!was_running && is_running)
+    {
+        construct();
+    }
+    else if (was_running && !is_running)
+    {
+        tear_down();
+    }
+
     std::lock_guard<std::mutex> lock(mutex_);
     main_loop_is_running_ = is_running;
     cond_.notify_all();
@@ -539,11 +599,14 @@ void OnlineAccountClientImpl::main_loop_thread()
 
     try
     {
+        main_loop_context_.reset(g_main_context_new(), g_main_context_unref);
+        g_main_context_push_thread_default(main_loop_context_.get());
+
         // Stick a method call into the main loop to notify the constructor when the main loop begins running
-        g_idle_add(main_loop_is_running_cb, this);
+        g_main_context_invoke(main_loop_context_.get(), main_loop_is_running_cb, this);
 
         // Run the main loop
-        main_loop_.reset(g_main_loop_new(nullptr, true), g_main_loop_unref);
+        main_loop_.reset(g_main_loop_new(main_loop_context_.get(), true), g_main_loop_unref);
         g_main_loop_run(main_loop_.get());
     }
     // LCOV_EXCL_START

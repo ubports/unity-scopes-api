@@ -79,6 +79,9 @@ public:
                                      OnlineAccountClient::PostLoginAction login_failed_action);
 
     // Methods used only by impl
+    void construct();
+    void tear_down();
+
     void flush_pending_session(AgAccountId const& account_id, std::unique_lock<std::mutex>& lock);
 
     void main_loop_state_notify(bool is_running);
@@ -111,6 +114,7 @@ private:
     gulong account_deleted_signal_id_;
 
     std::shared_ptr<GMainLoop> main_loop_;
+    std::shared_ptr<GMainContext> main_loop_context_;
     std::shared_ptr<AgManager> manager_;
     std::map<AgAccountId, std::shared_ptr<AccountInfo>> accounts_;
 

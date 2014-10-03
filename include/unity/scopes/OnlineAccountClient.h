@@ -73,18 +73,15 @@ public:
     /**
     \brief Indicates whether an external main loop already exists, or one should be created internally.
 
-    A running main loop is essential in order to receive service update callbacks. When in doubt, set
-    RunInExternalMainLoop and just use refresh_service_statuses() and get_service_statuses() to obtain
-    service statuses.
+    A running main loop is essential in order to receive service updates from the online accounts
+    backend. When in doubt, set to CreateInternalMainLoop.
     */
     enum MainLoopSelect
     {
-        RunInExternalMainLoop,    ///< An external main loop already exists or the service update
-                                  ///  callback is not required.
-        CreateInternalMainLoop,   ///< An external main loop does not exist and the service update
-                                  ///  callback is required.
-        RunInExternalUiMainLoop,  ///< An external UI main loop exists (Intended for shell use only.
-                                  ///  A scope should not be running a UI main loop).
+        RunInExternalMainLoop,    ///< An external main loop already exists and is running.
+        CreateInternalMainLoop,   ///< An external main loop does not exist.
+        RunInExternalUiMainLoop,  ///< An external UI main loop exists and is running (Intended for
+                                  ///  shell use only. A scope should not be running a UI main loop).
     };
 
     /**
@@ -98,7 +95,7 @@ public:
     OnlineAccountClient(std::string const& service_name,
                         std::string const& service_type,
                         std::string const& provider_name,
-                        MainLoopSelect main_loop_select = RunInExternalMainLoop);
+                        MainLoopSelect main_loop_select = CreateInternalMainLoop);
 
     /// @cond
     ~OnlineAccountClient();
