@@ -77,6 +77,7 @@ ScopeMetadata (returned by serialize()):
  'results_ttl_type'      : int, optional
  'settings_definitions'  : dictionary, optional
  'location_data_needed'  : bool, optional
+ 'child_scopes'          : array of strings, optional
 
 Query (returned by serialize())
 ===============================

@@ -385,6 +385,15 @@ VariantMap ScopeMetadataImpl::serialize() const
     {
         var["location_data_needed"] = *location_data_needed_;
     }
+    if (child_scope_ids_.size())
+    {
+        VariantArray va;
+        for (auto const& sid: child_scope_ids_)
+        {
+            va.push_back(Variant(sid));
+        }
+        var["child_scopes"] = Variant(va);
+    }
 
     return var;
 }
@@ -505,6 +514,16 @@ void ScopeMetadataImpl::deserialize(VariantMap const& var)
     if (it != var.end())
     {
         location_data_needed_.reset(new bool(it->second.get_bool()));
+    }
+
+    child_scope_ids_.clear();
+    it = var.find("child_scopes");
+    if (it != var.end())
+    {
+        for (auto const& v: it->second.get_array())
+        {
+            child_scope_ids_.push_back(v.get_string());
+        }
     }
 }
 
