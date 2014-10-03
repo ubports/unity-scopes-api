@@ -623,7 +623,12 @@ void OnlineAccountClientImpl::main_loop_thread()
 
 void OnlineAccountClientImpl::auth_callback(std::string const&)
 {
-    refresh_service_statuses();
+    // Refresh all accounts
+    std::lock_guard<std::mutex> lock(mutex_);
+    for (auto const& info : accounts_)
+    {
+        service_update_cb(info.second->account_service.get(), info.second->service_enabled, info.second.get());
+    }
 }
 
 }  // namespace internal
