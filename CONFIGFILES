@@ -326,6 +326,11 @@ The following keys are recognized in the ScopeConfig group:
 
   The hot key for the scope. The default value is the empty string.
 
+- ChildScopes
+
+  The list of ids of scopes aggregated by this scope (if any). The values in this list
+  should be spearated by commas.
+
 - Invisible
 
   Whether the scope is hidden in the UI. The default value is false.
