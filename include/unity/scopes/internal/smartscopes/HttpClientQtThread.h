@@ -36,6 +36,7 @@
     #include <QUrl>
 #endif
 
+#include <unity/scopes/internal/smartscopes/HttpClientInterface.h>
 #include <unity/util/NonCopyable.h>
 
 #include <mutex>
@@ -62,7 +63,8 @@ class Q_DECL_EXPORT HttpClientQtThread : public QThread
 public:
     NONCOPYABLE(HttpClientQtThread);
 
-    HttpClientQtThread(const QUrl& url, unsigned int timeout, std::function<void(std::string const&)> const& lineData);
+    HttpClientQtThread(const QUrl& url, unsigned int timeout, std::function<void(std::string const&)> const& lineData, const HttpHeaders& headers =
+            HttpHeaders());
     ~HttpClientQtThread();
 
     bool get_reply(std::string& reply);
@@ -82,6 +84,7 @@ Q_SIGNALS:
 private:
     QUrl url_;
     const std::function<void(std::string const&)> lineDataCallback_;
+    HttpHeaders headers_;
     unsigned int timeout_;
     std::mutex reply_mutex_;
 

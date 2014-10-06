@@ -98,8 +98,10 @@ private:
     std::shared_ptr<ServantBase> find_servant(std::string const& id, std::string const& category);
 
     // Thread start functions
-    void broker_thread();
-    void worker_thread();
+    void pump(std::promise<void> ready);
+    void worker();
+
+    void dispatch(zmqpp::socket& s, std::string const& client_address);
 
     void cleanup();
     void join_with_all_threads();
@@ -113,13 +115,10 @@ private:
     int pool_size_;
     int64_t idle_timeout_;
     std::unique_ptr<StopPublisher> stopper_;    // Used to signal threads when it's time to terminate
-    std::thread broker_;                        // Connects router with dealer
+    std::thread pump_;                          // Load-balancing pump: router-router or pull-router
     std::vector<std::thread> workers_;          // Threads for incoming invocations
-    std::atomic_int num_workers_;               // For handshake with parent
-    std::promise<void> ready_;                  // For handshake with child threads
-    std::mutex ready_mutex_;                    // Protects ready_
-    std::once_flag once_;
     std::exception_ptr exception_;              // Failed threads deposit their exception here
+    std::once_flag once_;
 
     AdapterState state_;
     std::condition_variable state_changed_;

@@ -32,6 +32,9 @@ def response(environ, start_response):
     if environ['PATH_INFO'] == '/remote-scopes' and (environ['QUERY_STRING'] == '' or environ['QUERY_STRING'] == 'locale=test_TEST'):
         return [remote_scopes_response]
 
+    if environ['PATH_INFO'] == '/demo/search' and environ['QUERY_STRING'].find('test_user_agent_header') >= 0:
+        return [search_response + '\r\n{"result": {"cat_id": "cat1", "art": "https://dash.ubuntu.com/imgs/cat.png", "uri": "URI", "title": "' + environ['HTTP_USER_AGENT'] + '"}}']
+
     if environ['PATH_INFO'] == '/demo/search' and environ['QUERY_STRING'] != '':
         return [search_response]
 

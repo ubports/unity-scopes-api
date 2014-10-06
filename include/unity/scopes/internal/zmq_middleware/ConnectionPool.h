@@ -27,7 +27,7 @@
 #include <string>
 #include <unordered_map>
 
-// Simple connection pool for invocation threads. Zmq sockets are not thread-safe, which means
+// Simple connection pool for oneway invocations. Zmq sockets are not thread-safe, which means
 // that a proxy cannot directly contain a socket because that would cause invocations on the same proxy by
 // different threads to crash.
 // So, we maintain a pool of invocation threads, with each thread keeping its own cache of sockets.
@@ -53,20 +53,14 @@ public:
     NONCOPYABLE(ConnectionPool);
     ConnectionPool(zmqpp::context& context);
     ~ConnectionPool();
-    zmqpp::socket& find(std::string const& endpoint, RequestMode m);
+    zmqpp::socket& find(std::string const& endpoint);
     void remove(std::string const& endpoint);
-    void register_socket(std::string const& endpoint, zmqpp::socket socket, RequestMode m);
+    void register_socket(std::string const& endpoint, zmqpp::socket socket);
 
 private:
-    struct SocketData
-    {
-        zmqpp::socket socket;
-        RequestMode mode;
-    };
+    typedef std::unordered_map<std::string, zmqpp::socket> CPool;
 
-    typedef std::unordered_map<std::string, SocketData> CPool;
-
-    CPool::value_type create_connection(std::string const& endpoint, RequestMode m);
+    zmqpp::socket create_connection(std::string const& endpoint);
 
     zmqpp::context& context_;
     CPool pool_;

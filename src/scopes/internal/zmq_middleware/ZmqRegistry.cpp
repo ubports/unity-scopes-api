@@ -24,6 +24,7 @@
 #include <unity/scopes/internal/ScopeMetadataImpl.h>
 #include <unity/scopes/internal/zmq_middleware/VariantConverter.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqException.h>
+#include <unity/scopes/internal/zmq_middleware/ZmqReceiver.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqScope.h>
 #include <unity/scopes/ScopeExceptions.h>
 
@@ -88,10 +89,8 @@ ScopeMetadata ZmqRegistry::get_metadata(std::string const& scope_id)
     // Registry operations can be slow during start-up of the phone
     int64_t timeout = mw_base()->registry_timeout();
     auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_twoway_(request_builder, timeout); });
-    auto receiver = future.get();
-    auto segments = receiver.receive();
-    capnp::SegmentArrayMessageReader reader(segments);
-    auto response = reader.getRoot<capnproto::Response>();
+    auto out_params = future.get();
+    auto response = out_params.reader->getRoot<capnproto::Response>();
     throw_if_runtime_exception(response);
 
     auto get_metadata_response = response.getPayload().getAs<capnproto::Registry::GetMetadataResponse>().getResponse();
@@ -124,10 +123,8 @@ MetadataMap ZmqRegistry::list()
     // Registry operations can be slow during start-up of the phone
     int64_t timeout = mw_base()->registry_timeout();
     auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_twoway_(request_builder, timeout); });
-    auto receiver = future.get();
-    auto segments = receiver.receive();
-    capnp::SegmentArrayMessageReader reader(segments);
-    auto response = reader.getRoot<capnproto::Response>();
+    auto out_params = future.get();
+    auto response = out_params.reader->getRoot<capnproto::Response>();
     throw_if_runtime_exception(response);
 
     auto list_response = response.getPayload().getAs<capnproto::Registry::ListResponse>();
@@ -153,10 +150,8 @@ ObjectProxy ZmqRegistry::locate(std::string const& identity, int64_t timeout)
 
     // locate uses a custom timeout because it needs to potentially fork/exec a scope.
     auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_twoway_(request_builder, timeout); });
-    auto receiver = future.get();
-    auto segments = receiver.receive();
-    capnp::SegmentArrayMessageReader reader(segments);
-    auto response = reader.getRoot<capnproto::Response>();
+    auto out_params = future.get();
+    auto response = out_params.reader->getRoot<capnproto::Response>();
     throw_if_runtime_exception(response);
 
     auto locate_response = response.getPayload().getAs<capnproto::Registry::LocateResponse>().getResponse();
@@ -206,10 +201,8 @@ bool ZmqRegistry::is_scope_running(std::string const& scope_id)
     // Registry operations can be slow during start-up of the phone
     int64_t timeout = mw_base()->registry_timeout();
     auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_twoway_(request_builder, timeout); });
-    auto receiver = future.get();
-    auto segments = receiver.receive();
-    capnp::SegmentArrayMessageReader reader(segments);
-    auto response = reader.getRoot<capnproto::Response>();
+    auto out_params = future.get();
+    auto response = out_params.reader->getRoot<capnproto::Response>();
     throw_if_runtime_exception(response);
 
     auto is_scope_running_response = response.getPayload().getAs<capnproto::Registry::IsScopeRunningResponse>().getResponse();
