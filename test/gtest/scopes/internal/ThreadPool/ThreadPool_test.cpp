@@ -121,7 +121,12 @@ TEST(ThreadPool, exception)
         EXPECT_STREQ("ThreadPool::submit(): cannot accept task for destroyed pool", e.what());
     }
 
-    if (!RUNNING_ON_VALGRIND)  // Valgrind can't handle the attempt to create that many threads.
+   // Valgrind can't handle the attempt to create that many threads.
+   // Address sanitizer survives, but takes more than a minute.
+#if defined(__has_feature)
+    #if !__has_feature(address_sanitizer)
+
+    if (!RUNNING_ON_VALGRIND)
     {
         try
         {
@@ -135,6 +140,9 @@ TEST(ThreadPool, exception)
                          e.what());
         }
     }
+
+    #endif
+#endif
 }
 
 TEST(ThreadPool, throwing_task)
