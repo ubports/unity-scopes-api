@@ -154,6 +154,22 @@ public:
         cond_.notify_all();
     }
 
+    void service_update_auth(OnlineAccountClient::ServiceStatus const& status)
+    {
+        EXPECT_EQ(1, status.account_id);
+        EXPECT_EQ(true, status.service_enabled);
+        EXPECT_EQ(true, status.service_authenticated);
+        EXPECT_EQ("isuertbiseruy87srkuthksvu", status.client_id);
+        EXPECT_EQ("rytwekfgiodng523dr4", status.client_secret);
+        EXPECT_EQ("sfhgbfgutgi9ugwirheg74", status.access_token);
+        EXPECT_EQ("qwpeurylsfdg83", status.token_secret);
+        EXPECT_EQ("not really an error, but just to test", status.error);
+
+        std::lock_guard<std::mutex> lock(mutex_);
+        got_update_ = true;
+        cond_.notify_all();
+    }
+
     bool wait_for_service_update()
     {
         std::unique_lock<std::mutex> lock(mutex_);
@@ -513,7 +529,11 @@ TEST_F(OnlineAccountClientTestNoMainLoop, pub_sub_authentication)
     std::shared_ptr<OnlineAccountClient> scope_oa_client;
     scope_oa_client.reset(new OnlineAccountClient("TestService", "sharing", "TestProvider", OnlineAccountClient::RunInExternalMainLoop));
 
+    create_account();
+    scope_oa_client->refresh_service_statuses();
+
     std::shared_ptr<AccountInfo> info(new AccountInfo);
+    info->account_id = 1;
     info->service_enabled = true;
     {
         GVariantDict dict;
@@ -530,24 +550,10 @@ TEST_F(OnlineAccountClientTestNoMainLoop, pub_sub_authentication)
         info->session_data.reset(g_variant_ref_sink(g_variant_dict_end(&dict)), safe_g_variant_free_);
     }
 
-    // No services should be available on scope_oa_client
-    auto statuses = scope_oa_client->get_service_statuses();
-    EXPECT_EQ(0, statuses.size());
-
-    // Create an account
-    create_account();
-
-    // No services should be available as refresh_service_statuses() not yet called on scope_oa_client
-    statuses = scope_oa_client->get_service_statuses();
-    EXPECT_EQ(0, statuses.size());
-
-    // Invoke callback on shell_oa_client which should invoke refresh_service_statuses() on scope_oa_client via pub/sub
-    invoke_callback(shell_oa_client, info.get(), "");
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
-
-    // The services should now be available on scope_oa_client
-    statuses = scope_oa_client->get_service_statuses();
-    EXPECT_EQ(1, statuses.size());
+    // Invoke callback on shell_oa_client which should invoke a callback on scope_oa_client via pub/sub
+    scope_oa_client->set_service_update_callback(std::bind(&OnlineAccountClientTest::service_update_auth, this, std::placeholders::_1));
+    invoke_callback(shell_oa_client, info.get(), "not really an error, but just to test");
+    wait_for_service_update();
 }
 
 int main(int argc, char **argv)
