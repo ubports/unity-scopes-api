@@ -18,6 +18,7 @@
 
 #include <unity/scopes/internal/OnlineAccountClientImpl.h>
 
+#include <unity/scopes/internal/JsonCppNode.h>
 #include <unity/scopes/internal/MiddlewareFactory.h>
 #include <unity/scopes/internal/RuntimeConfig.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
@@ -90,6 +91,40 @@ static OnlineAccountClient::ServiceStatus info_to_details(AccountInfo const* inf
     service_status.error = error;
 
     return service_status;
+}
+
+static std::string details_to_json(OnlineAccountClient::ServiceStatus const& details)
+{
+    VariantMap vm;
+    vm["account_id"] = details.account_id;
+    vm["service_enabled"] = details.service_enabled;
+    vm["service_authenticated"] = details.service_authenticated;
+    vm["client_id"] = details.client_id;
+    vm["client_secret"] = details.client_secret;
+    vm["access_token"] = details.access_token;
+    vm["token_secret"] = details.token_secret;
+    vm["error"] = details.error;
+
+    Variant var(vm);
+    JsonCppNode node(var);
+    return node.to_json_string();
+}
+
+static OnlineAccountClient::ServiceStatus json_to_details(std::string const& json)
+{
+    OnlineAccountClient::ServiceStatus details;
+    JsonCppNode node(json);
+
+    details.account_id = node.get_node("account_id")->as_int();
+    details.service_enabled = node.get_node("service_enabled")->as_bool();
+    details.service_authenticated = node.get_node("service_authenticated")->as_bool();
+    details.client_id = node.get_node("client_id")->as_string();
+    details.client_secret = node.get_node("client_secret")->as_string();
+    details.access_token = node.get_node("access_token")->as_string();
+    details.token_secret = node.get_node("token_secret")->as_string();
+    details.error = node.get_node("error")->as_string();
+
+    return details;
 }
 
 static void clear_session(AccountInfo* info)
@@ -555,13 +590,13 @@ void OnlineAccountClientImpl::callback(AccountInfo const* info, std::string cons
 {
     std::lock_guard<std::mutex> lock(callback_mutex_);
     auto service_status = info_to_details(info, error);
+    if (service_status.service_authenticated && auth_publisher_)
+    {
+        auth_publisher_->send_message(details_to_json(service_status));
+    }
     if (callback_)
     {
         callback_(service_status);
-    }
-    if (service_status.service_authenticated && auth_publisher_)
-    {
-        auth_publisher_->send_message("");
     }
 }
 
@@ -632,9 +667,29 @@ void OnlineAccountClientImpl::main_loop_thread()
     // LCOV_EXCL_STOP
 }
 
-void OnlineAccountClientImpl::auth_callback(std::string const&)
+void OnlineAccountClientImpl::auth_callback(std::string const& details_json)
 {
-    refresh_service_statuses();
+    OnlineAccountClient::ServiceStatus details = json_to_details(details_json);
+
+    // Update account info
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        auto info_it = accounts_.find(details.account_id);
+        if (info_it == accounts_.end())
+        {
+            return;
+        }
+        auto info = info_it->second;
+
+        GVariantDict dict;
+        g_variant_dict_init(&dict, nullptr);
+        g_variant_dict_insert(&dict, "AccessToken", "s", details.access_token.c_str());
+        g_variant_dict_insert(&dict, "TokenSecret", "s", details.token_secret.c_str());
+        info->session_data.reset(g_variant_ref_sink(g_variant_dict_end(&dict)), free_variant);
+    }
+
+    std::lock_guard<std::mutex> lock(callback_mutex_);
+    callback_(details);
 }
 
 }  // namespace internal
