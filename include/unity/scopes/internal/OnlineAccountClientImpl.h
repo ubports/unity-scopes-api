@@ -123,7 +123,7 @@ private:
     MWSubscriber::UPtr auth_subscriber_;
 
     void main_loop_thread();
-    void auth_callback(std::string const&);
+    void auth_callback(std::string const& details_json);
 };
 
 } // namespace internal
