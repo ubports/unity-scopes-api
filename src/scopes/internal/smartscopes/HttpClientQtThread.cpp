@@ -38,10 +38,11 @@ namespace internal
 namespace smartscopes
 {
 
-HttpClientQtThread::HttpClientQtThread(const QUrl& url, uint timeout, std::function<void(std::string const&)> const& lineData)
+HttpClientQtThread::HttpClientQtThread(const QUrl& url, uint timeout, std::function<void(std::string const&)> const& lineData, HttpHeaders const& headers)
     : QThread()
     , url_(url)
     , lineDataCallback_(lineData)
+    , headers_(headers)
     , timeout_(timeout)
     , success_(false)
 {
@@ -67,6 +68,10 @@ void HttpClientQtThread::run()
     QNetworkAccessManager* manager = new QNetworkAccessManager();
 
     QNetworkRequest request(url_);
+    for (auto const& hdr: headers_)
+    {
+        request.setRawHeader(QString::fromStdString(hdr.first).toUtf8(), QString::fromStdString(hdr.second).toUtf8());
+    }
 
     QNetworkReply* reply = manager->get(request);
     reply->setReadBufferSize(0); // unlimited buffer

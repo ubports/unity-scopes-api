@@ -136,6 +136,8 @@ TEST(Registry, metadata)
     EXPECT_FALSE(meta.location_data_needed());
 }
 
+auto const wait_time = std::chrono::milliseconds(1000);
+
 TEST(Registry, scope_state_notify)
 {
     bool updateA_received = false;
@@ -170,7 +172,7 @@ TEST(Registry, scope_state_notify)
     {
         // Wait for an update notification
         std::unique_lock<std::mutex> lock(mutex);
-        bool success = cond.wait_for(lock, std::chrono::milliseconds(500), [&updateA_received] { return updateA_received; });
+        bool success = cond.wait_for(lock, wait_time, [&updateA_received] { return updateA_received; });
         updateA_received = false;
         return success;
     };
@@ -179,7 +181,7 @@ TEST(Registry, scope_state_notify)
     {
         // Wait for an update notification
         std::unique_lock<std::mutex> lock(mutex);
-        bool success = cond.wait_for(lock, std::chrono::milliseconds(500), [&updateB_received] { return updateB_received; });
+        bool success = cond.wait_for(lock, wait_time, [&updateB_received] { return updateB_received; });
         updateB_received = false;
         return success;
     };
@@ -262,7 +264,7 @@ TEST(Registry, no_idle_timeout_in_debug_mode)
     {
         // Wait for an update notification
         std::unique_lock<std::mutex> lock(mutex);
-        bool success = cond.wait_for(lock, std::chrono::milliseconds(500), [&update_received] { return update_received; });
+        bool success = cond.wait_for(lock, wait_time, [&update_received] { return update_received; });
         update_received = false;
         return success;
     };
@@ -276,7 +278,7 @@ TEST(Registry, no_idle_timeout_in_debug_mode)
     ASSERT_EQ("Success", ec.message());
     filesystem::copy(TEST_RUNTIME_PATH "/other_scopes/testscopeC/libtestscopeC.so", TEST_RUNTIME_PATH "/scopes/testscopeC/libtestscopeC.so", ec);
     ASSERT_EQ("Success", ec.message());
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    std::this_thread::sleep_for(wait_time);
 
     auto meta = r->get_metadata("testscopeC");
     auto sp = meta.proxy();
@@ -304,7 +306,7 @@ TEST(Registry, no_idle_timeout_in_debug_mode)
     // Remove testscopeC from the scopes folder
     filesystem::remove_all(TEST_RUNTIME_PATH "/scopes/testscopeC", ec);
     ASSERT_EQ("Success", ec.message());
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    std::this_thread::sleep_for(wait_time);
 }
 
 TEST(Registry, manually_started_scope)
@@ -342,7 +344,7 @@ TEST(Registry, manually_started_scope)
     ASSERT_EQ("Success", ec.message());
     filesystem::copy(TEST_RUNTIME_PATH "/other_scopes/testscopeC/libtestscopeC.so", TEST_RUNTIME_PATH "/scopes/testscopeC/libtestscopeC.so", ec);
     ASSERT_EQ("Success", ec.message());
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    std::this_thread::sleep_for(wait_time);
 
     // testscopeC should not be running at this point
     EXPECT_FALSE(r->is_scope_running("testscopeC"));
@@ -376,7 +378,7 @@ TEST(Registry, manually_started_scope)
     // Remove testscopeC from the scopes folder
     filesystem::remove_all(TEST_RUNTIME_PATH "/scopes/testscopeC", ec);
     ASSERT_EQ("Success", ec.message());
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    std::this_thread::sleep_for(wait_time);
 
     rt->destroy();
 }
@@ -402,7 +404,7 @@ TEST(Registry, list_update_notify_before_click_folder_exists)
         // Flush out update notifications
         std::unique_lock<std::mutex> lock(mutex);
         bool success = false;
-        while (cond.wait_for(lock, std::chrono::milliseconds(500), [&update_received] { return update_received; }))
+        while (cond.wait_for(lock, wait_time, [&update_received] { return update_received; }))
         {
             success = true;
             update_received = false;
@@ -464,7 +466,7 @@ TEST(Registry, list_update_notify)
         // Flush out update notifications
         std::unique_lock<std::mutex> lock(mutex);
         bool success = false;
-        while (cond.wait_for(lock, std::chrono::milliseconds(500), [&update_received] { return update_received; }))
+        while (cond.wait_for(lock, wait_time, [&update_received] { return update_received; }))
         {
             success = true;
             update_received = false;

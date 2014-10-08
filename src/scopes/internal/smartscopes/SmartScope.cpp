@@ -163,6 +163,7 @@ void SmartQuery::run(SearchReplyProxy const& reply)
     ///! TODO: country (+location data)
     int query_id = 0;
     std::string session_id;
+    std::string agent;
     auto const metadata = search_metadata();
     if (metadata.contains_hint("session-id") && metadata["session-id"].which() == Variant::String)
     {
@@ -181,8 +182,13 @@ void SmartQuery::run(SearchReplyProxy const& reply)
     {
         std::cout << "SmartScope: missing or invalid query id for \"" << scope_id_ << "\": \"" << query_.query_string() << "\"" << std::endl;
     }
+    if (metadata.contains_hint("user-agent") && metadata["user-agent"].which() == Variant::String)
+    {
+        agent = metadata["user-agent"].get_string();
+    }
 
-    search_handle_ = ss_client_->search(handler, base_url_, query_.query_string(), query_.department_id(), session_id, query_id, hints_.form_factor(), settings(), query_.filter_state().serialize(), hints_.locale(), "", hints_.cardinality());
+    search_handle_ = ss_client_->search(handler, base_url_, query_.query_string(), query_.department_id(), session_id, query_id, hints_.form_factor(),
+            settings(), query_.filter_state().serialize(), hints_.locale(), "", agent, hints_.cardinality());
     search_handle_->wait();
 
     std::cout << "SmartScope: query for \"" << scope_id_ << "\": \"" << query_.query_string() << "\" complete" << std::endl;
@@ -250,8 +256,9 @@ void SmartPreview::run(PreviewReplyProxy const& reply)
         }
     };
 
-    ///! TODO: widgets_api_version, country (+location data)
+    ///! TODO: country (+location data)
     std::string session_id;
+    std::string agent;
     auto const metadata = action_metadata();
     if (metadata.contains_hint("session-id") && metadata["session-id"].which() == Variant::String)
     {
@@ -263,7 +270,13 @@ void SmartPreview::run(PreviewReplyProxy const& reply)
         std::cout << "SmartScope: missing or invalid session id for \"" << scope_id_ << "\" preview: \"" << result().uri() << "\"" << std::endl;
     }
 
-    preview_handle_ = ss_client_->preview(handler, base_url_, result_["result_json"].get_string(), session_id, hints_.form_factor(), 0, settings(), hints_.locale(), "");
+    if (metadata.contains_hint("user-agent") && metadata["user-agent"].which() == Variant::String)
+    {
+        agent = metadata["user-agent"].get_string();
+    }
+
+    preview_handle_ = ss_client_->preview(handler, base_url_, result_["result_json"].get_string(), session_id, hints_.form_factor(), 0, settings(),
+            hints_.locale(), "", agent);
 
     preview_handle_->wait();
 

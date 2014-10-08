@@ -33,6 +33,7 @@
 #include <cassert>
 #include <fstream>
 #include <wordexp.h>
+#include <iostream>
 
 using namespace std;
 
@@ -385,7 +386,16 @@ void RegistryObject::create_desktop_file(ScopeMetadata const& metadata)
     desktop_file << "Type=Application" << std::endl;
     desktop_file << "NoDisplay=true" << std::endl;
     desktop_file << "Name=" << metadata.display_name() << std::endl;
-    desktop_file << "Icon=" << metadata.icon() << std::endl;
+    desktop_file << "Icon=";
+    try
+    {
+        desktop_file << metadata.icon();
+    }
+    catch (NotFoundException const&)
+    {
+        // Icon is optional.
+    }
+    desktop_file << endl;
     desktop_file.close();
 }
 
