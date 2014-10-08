@@ -1,6 +1,11 @@
 Release notes
 =============
 
+Changes in version 0.6.7
+========================
+  - Added new RunInExternalUiMainLoop option to OnlineAccountClient::MainLoopSelect.
+  - OnlineAccountClient signon UI policy determined by main loop used (shell: show / scope: hide).
+
 Changes in version 0.6.6
 ========================
   - Added support for online accounts (via new OnlineAccountClient class).

@@ -17,7 +17,12 @@
 */
 
 #include <unity/scopes/internal/OnlineAccountClientImpl.h>
-#include <unity/util/ResourcePtr.h>
+
+#include <unity/scopes/internal/JsonCppNode.h>
+#include <unity/scopes/internal/MiddlewareFactory.h>
+#include <unity/scopes/internal/RuntimeConfig.h>
+#include <unity/scopes/internal/RuntimeImpl.h>
+#include <unity/UnityExceptions.h>
 
 #include <iostream>
 
@@ -88,7 +93,41 @@ static OnlineAccountClient::ServiceStatus info_to_details(AccountInfo const* inf
     return service_status;
 }
 
-static void clear_session_info(AccountInfo* info)
+static std::string details_to_json(OnlineAccountClient::ServiceStatus const& details)
+{
+    VariantMap vm;
+    vm["account_id"] = details.account_id;
+    vm["service_enabled"] = details.service_enabled;
+    vm["service_authenticated"] = details.service_authenticated;
+    vm["client_id"] = details.client_id;
+    vm["client_secret"] = details.client_secret;
+    vm["access_token"] = details.access_token;
+    vm["token_secret"] = details.token_secret;
+    vm["error"] = details.error;
+
+    Variant var(vm);
+    JsonCppNode node(var);
+    return node.to_json_string();
+}
+
+static OnlineAccountClient::ServiceStatus json_to_details(std::string const& json)
+{
+    OnlineAccountClient::ServiceStatus details;
+    JsonCppNode node(json);
+
+    details.account_id = node.get_node("account_id")->as_int();
+    details.service_enabled = node.get_node("service_enabled")->as_bool();
+    details.service_authenticated = node.get_node("service_authenticated")->as_bool();
+    details.client_id = node.get_node("client_id")->as_string();
+    details.client_secret = node.get_node("client_secret")->as_string();
+    details.access_token = node.get_node("access_token")->as_string();
+    details.token_secret = node.get_node("token_secret")->as_string();
+    details.error = node.get_node("error")->as_string();
+
+    return details;
+}
+
+static void clear_session(AccountInfo* info)
 {
     if (info->session)
     {
@@ -96,14 +135,19 @@ static void clear_session_info(AccountInfo* info)
         signon_auth_session_cancel(info->session.get());
     }
     info->session = nullptr;
-    info->auth_params = nullptr;
-    info->session_data = nullptr;
 }
 
 static gboolean main_loop_is_running_cb(void* user_data)
 {
     OnlineAccountClientImpl* account_client = reinterpret_cast<OnlineAccountClientImpl*>(user_data);
     account_client->main_loop_state_notify(true);
+    return G_SOURCE_REMOVE;
+}
+
+static gboolean main_loop_is_stopping_cb(void* user_data)
+{
+    OnlineAccountClientImpl* account_client = reinterpret_cast<OnlineAccountClientImpl*>(user_data);
+    account_client->main_loop_state_notify(false);
     return G_SOURCE_REMOVE;
 }
 
@@ -116,58 +160,75 @@ static gboolean wake_up_event_loop_cb(void* user_data)
 
 static void service_login_cb(GObject* source, GAsyncResult* result, void* user_data)
 {
-    GError* error = nullptr;
-    util::ResourcePtr<GError*, decltype(&g_error_free)> error_cleanup(error, free_error);
-
     SignonAuthSession* session = reinterpret_cast<SignonAuthSession*>(source);
     AccountInfo* info = reinterpret_cast<AccountInfo*>(user_data);
 
     // Get session data then send a notification with the login result
+    GError* error = nullptr;
     info->session_data.reset(signon_auth_session_process_finish(session, result, &error), free_variant);
-    info->account_client->callback(info_to_details(info, error ? error->message : ""));
-    info->account_client->dec_logins();
+    std::shared_ptr<GError> error_cleanup(error, free_error);
+
+    info->account_client->callback(info, error ? error->message : "");
+
+    // Clear session info
+    clear_session(info);
 }
 
 static void service_update_cb(AgAccountService* account_service, gboolean enabled, AccountInfo* info)
 {
-    GError* error = nullptr;
-    util::ResourcePtr<GError*, decltype(&g_error_free)> error_cleanup(error, free_error);
-
     // Service state has updated, clear the old session data
     info->service_enabled = enabled;
-    clear_session_info(info);
+    clear_session(info);
 
     if (enabled)
     {
         // Get authorization data then create a new authorization session
         std::shared_ptr<AgAuthData> auth_data(ag_account_service_get_auth_data(account_service), ag_auth_data_unref);
+
+        GError* error = nullptr;
         info->session.reset(signon_auth_session_new(
             ag_auth_data_get_credentials_id(auth_data.get()), ag_auth_data_get_method(auth_data.get()), &error), g_object_unref);
+        std::shared_ptr<GError> error_cleanup(error, free_error);
+
         if (error)
         {
             // Send notification that the authorization session failed
-            info->account_client->callback(info_to_details(info, error->message));
+            info->account_client->callback(info, error->message);
             return;
         }
 
         // Get authorization parameters then attempt to signon
-        info->auth_params.reset(
-            g_variant_ref_sink(ag_auth_data_get_login_parameters(auth_data.get(), nullptr)), free_variant);
+        GVariantBuilder builder;
+        g_variant_builder_init(&builder, G_VARIANT_TYPE_VARDICT);
 
-        if (info->account_client->inc_logins())
+        if (info->account_client->main_loop_select() == OnlineAccountClient::RunInExternalUiMainLoop)
         {
-            signon_auth_session_process_async(info->session.get(),
-                                              info->auth_params.get(),
-                                              ag_auth_data_get_mechanism(auth_data.get()),
-                                              nullptr,
-                                              service_login_cb,
-                                              info);
+            g_variant_builder_add(&builder, "{sv}",
+                                  SIGNON_SESSION_DATA_UI_POLICY,
+                                  g_variant_new_int32(SIGNON_POLICY_DEFAULT));
         }
+        else
+        {
+            g_variant_builder_add(&builder, "{sv}",
+                                  SIGNON_SESSION_DATA_UI_POLICY,
+                                  g_variant_new_int32(SIGNON_POLICY_NO_USER_INTERACTION));
+        }
+
+        info->auth_params.reset(
+            g_variant_ref_sink(ag_auth_data_get_login_parameters(auth_data.get(), g_variant_builder_end(&builder))), free_variant);
+
+        // Start signon process
+        signon_auth_session_process_async(info->session.get(),
+                                          info->auth_params.get(),
+                                          ag_auth_data_get_mechanism(auth_data.get()),
+                                          nullptr,
+                                          service_login_cb,
+                                          info);
     }
     else
     {
         // Send notification that account has been disabled
-        info->account_client->callback(info_to_details(info));
+        info->account_client->callback(info);
     }
 }
 
@@ -193,7 +254,7 @@ static void account_enabled_cb(AgManager* manager, AgAccountId account_id, Onlin
         if (account_client->service_name() == ag_service_get_name(service))
         {
             std::shared_ptr<AgAccountService> account_service(ag_account_service_new(account.get(), service), g_object_unref);
-            std::shared_ptr<AccountInfo> info(new AccountInfo, [](AccountInfo* info){ info->account_client = nullptr; delete info; });
+            std::shared_ptr<AccountInfo> info(new AccountInfo);
             info->service_enabled = false;
             info->account_client = account_client;
             info->account_service.reset(reinterpret_cast<AgAccountService*>(g_object_ref(account_service.get())), g_object_unref);
@@ -226,51 +287,95 @@ OnlineAccountClientImpl::OnlineAccountClientImpl(std::string const& service_name
     : service_name_(service_name)
     , service_type_(service_type)
     , provider_name_(provider_name)
-    , use_external_main_loop_(main_loop_select == OnlineAccountClient::RunInExternalMainLoop)
-    , main_loop_is_running_(false)
-    , client_stopping_(false)
-    , logins_busy_(0)
+    , main_loop_select_(main_loop_select)
+    , main_loop_is_running_(main_loop_select != OnlineAccountClient::CreateInternalMainLoop)
 {
-    // If we are responsible for the main loop
-    if (!use_external_main_loop_)
+    // Set up authentication pub/sub
+    std::string oa_id = provider_name + ":" + service_type + ":" + service_name;
+    RuntimeImpl::UPtr rt = RuntimeImpl::create(oa_id);
+    MiddlewareFactory mw_factory(rt.get());
+    RuntimeConfig rt_config("");
+
+    mw_ = mw_factory.create(oa_id, rt_config.default_middleware(), rt_config.default_middleware_configfile());
+    if (main_loop_select == OnlineAccountClient::RunInExternalUiMainLoop)
     {
-        // Wait here until either the main loop begins running, or the thread exits
-        std::unique_lock<std::mutex> lock(mutex_);
-        main_loop_thread_ = std::thread(&OnlineAccountClientImpl::main_loop_thread, this);
-        cond_.wait(lock, [this] { return main_loop_is_running_; });
+        // If this client was created by the shell, set up as the publisher
+        auth_publisher_ = mw_->create_publisher(oa_id);
+    }
+    else
+    {
+        // If this client was created by a scope, set up as a subscriber
+        auth_subscriber_ = mw_->create_subscriber(oa_id);
+        auth_subscriber_->message_received().connect(std::bind(&OnlineAccountClientImpl::auth_callback, this, std::placeholders::_1));
     }
 
-    manager_.reset(ag_manager_new_for_service_type(service_type_.c_str()), g_object_unref);
-
-    // Watch for changes to accounts
-    account_enabled_signal_id_ = g_signal_connect(manager_.get(), "enabled-event", G_CALLBACK(account_enabled_cb), this);
-    account_deleted_signal_id_ = g_signal_connect(manager_.get(), "account-deleted", G_CALLBACK(account_deleted_cb), this);
-
-    // Now check initial state
-    refresh_service_statuses();
+    // If we are responsible for the main loop
+    if (main_loop_select_ == OnlineAccountClient::CreateInternalMainLoop)
+    {
+        // Wait here until either the main loop begins running, or the thread exits
+        {
+            std::unique_lock<std::mutex> lock(mutex_);
+            main_loop_thread_ = std::thread(&OnlineAccountClientImpl::main_loop_thread, this);
+            cond_.wait_for(lock, std::chrono::seconds(5), [this] { return main_loop_is_running_; });
+        }
+        if (!main_loop_is_running_)
+        {
+            if (main_loop_)
+            {
+                // Quit the main loop, causing the thread to exit
+                g_main_loop_quit(main_loop_.get());
+                if (main_loop_thread_.joinable())
+                {
+                    main_loop_thread_.join();
+                }
+            }
+            if (thread_exception_)
+            {
+                std::rethrow_exception(thread_exception_);
+            }
+            else
+            {
+                throw unity::ResourceException("OnlineAccountClientImpl(): main_loop_thread failed to start.");
+            }
+        }
+    }
+    else
+    {
+        construct();
+    }
 }
 
 OnlineAccountClientImpl::~OnlineAccountClientImpl()
 {
-    // Disconnect all signal handlers
-    g_signal_handler_disconnect(manager_.get(), account_enabled_signal_id_);
-    g_signal_handler_disconnect(manager_.get(), account_deleted_signal_id_);
-
-    for (auto info : accounts_)
     {
-        g_signal_handler_disconnect(info.second->account_service.get(), info.second->service_update_signal_id_);
+        std::lock_guard<std::mutex> lock(mutex_);
+        if (thread_exception_)
+        {
+            try
+            {
+                std::rethrow_exception(thread_exception_);
+            }
+            catch (std::exception const& e)
+            {
+                std::cerr << "~OnlineAccountClientImpl(): main_loop_thread threw an exception: " << e.what() << std::endl;
+            }
+            catch (...)
+            {
+                std::cerr << "~OnlineAccountClientImpl(): main_loop_thread threw an unknown exception" << std::endl;
+            }
+        }
     }
 
-    // Wait until all currently running login sessions are done
+    // If we are responsible for the main loop
+    if (main_loop_select_ == OnlineAccountClient::CreateInternalMainLoop)
     {
-        std::unique_lock<std::mutex> lock(mutex_);
-        client_stopping_ = true;
-    }
-    flush_pending_sessions();
+        // Invoke tear_down() from within the main loop
+        {
+            std::unique_lock<std::mutex> lock(mutex_);
+            g_main_context_invoke(main_loop_context_.get(), main_loop_is_stopping_cb, this);
+            cond_.wait(lock, [this] { return !main_loop_is_running_; });
+        }
 
-    // If we are responsible for the main loop, quit it on destruction
-    if (main_loop_)
-    {
         // Quit the main loop, causing the thread to exit
         g_main_loop_quit(main_loop_.get());
         if (main_loop_thread_.joinable())
@@ -278,16 +383,32 @@ OnlineAccountClientImpl::~OnlineAccountClientImpl()
             main_loop_thread_.join();
         }
     }
+    else
+    {
+        tear_down();
+    }
 }
 
 void OnlineAccountClientImpl::set_service_update_callback(OnlineAccountClient::ServiceUpdateCallback callback)
 {
-    std::lock_guard<std::mutex> lock(callback_mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (thread_exception_)
+    {
+        std::rethrow_exception(thread_exception_);
+    }
+
+    std::lock_guard<std::mutex> callback_lock(callback_mutex_);
     callback_ = callback;
 }
 
 void OnlineAccountClientImpl::refresh_service_statuses()
 {
+    std::unique_lock<std::mutex> lock(mutex_);
+    if (thread_exception_)
+    {
+        std::rethrow_exception(thread_exception_);
+    }
+
     std::shared_ptr<GList> enabled_accounts(ag_manager_list(manager_.get()), ag_manager_list_free);
     GList* it;
     for (it = enabled_accounts.get(); it; it = it->next)
@@ -297,19 +418,25 @@ void OnlineAccountClientImpl::refresh_service_statuses()
         std::string provider_name = ag_account_get_provider_name(account.get());
         if (provider_name == provider_name_)
         {
+            lock.unlock();
             account_enabled_cb(manager_.get(), account_id, this);
+            lock.lock();
         }
+        flush_pending_session(account_id, lock);
     }
-    flush_pending_sessions();
 }
 
 std::vector<OnlineAccountClient::ServiceStatus> OnlineAccountClientImpl::get_service_statuses()
 {
     std::lock_guard<std::mutex> lock(mutex_);
+    if (thread_exception_)
+    {
+        std::rethrow_exception(thread_exception_);
+    }
 
     // Return all service statuses
     std::vector<OnlineAccountClient::ServiceStatus> service_statuses;
-    for (auto const info : accounts_)
+    for (auto const& info : accounts_)
     {
         service_statuses.push_back(info_to_details(info.second.get()));
     }
@@ -352,31 +479,91 @@ void OnlineAccountClientImpl::register_account_login_item(PreviewWidget& widget,
     widget.add_attribute_value("online_account_details", Variant(account_details_map));
 }
 
-void OnlineAccountClientImpl::flush_pending_sessions()
+void OnlineAccountClientImpl::construct()
 {
+    manager_.reset(ag_manager_new_for_service_type(service_type_.c_str()), g_object_unref);
+
+    // Watch for changes to accounts
+    account_enabled_signal_id_ = g_signal_connect(manager_.get(), "enabled-event", G_CALLBACK(account_enabled_cb), this);
+    account_deleted_signal_id_ = g_signal_connect(manager_.get(), "account-deleted", G_CALLBACK(account_deleted_cb), this);
+
+    // Now check initial state
+    refresh_service_statuses();
+}
+
+void OnlineAccountClientImpl::tear_down()
+{
+    // Disconnect signal handlers
+    g_signal_handler_disconnect(manager_.get(), account_enabled_signal_id_);
+    g_signal_handler_disconnect(manager_.get(), account_deleted_signal_id_);
+
+    // Remove all accounts
+    {
+        std::unique_lock<std::mutex> lock(mutex_);
+        for (auto const& info : accounts_)
+        {
+            // Before we nuke the map, ensure that any pending sessions are done
+            g_signal_handler_disconnect(info.second->account_service.get(), info.second->service_update_signal_id_);
+            clear_session(info.second.get());
+            flush_pending_session(info.second->account_id, lock);
+        }
+        accounts_.clear();
+    }
+}
+
+void OnlineAccountClientImpl::flush_pending_session(AgAccountId const& account_id, std::unique_lock<std::mutex>& lock)
+{
+    // Get account info
+    auto info_it = accounts_.find(account_id);
+    if (info_it == accounts_.end())
+    {
+        return;
+    }
+    auto info = info_it->second;
+
     // Wait until all currently running login sessions are done
     // (ensures that accounts_ is up to date)
-    std::unique_lock<std::mutex> lock(mutex_);
+    std::shared_ptr<GMainLoop> event_loop;
+    event_loop.reset(g_main_loop_new(g_main_context_get_thread_default(), true), g_main_loop_unref);
+    while(info->session)
     {
-        std::shared_ptr<GMainLoop> event_loop;
-        event_loop.reset(g_main_loop_new(nullptr, true), g_main_loop_unref);
-        while(logins_busy_ > 0)
-        {
-            // We need to wait inside an event loop to allow for the main application loop to
-            // process its pending events
-            g_timeout_add(100, wake_up_event_loop_cb, event_loop.get());
-            lock.unlock();
-            g_main_loop_run(event_loop.get());
-            lock.lock();
-        }
+        // We need to wait inside an event loop to allow for the main application loop to
+        // process its pending events
+        std::shared_ptr<GSource> source;
+        source.reset(g_timeout_source_new(10), g_source_unref);
+        g_source_set_callback(source.get(), wake_up_event_loop_cb, event_loop.get(), NULL);
+        g_source_attach(source.get(), g_main_context_get_thread_default());
+
+        lock.unlock();
+        g_main_loop_run(event_loop.get());
+        lock.lock();
     }
 }
 
 void OnlineAccountClientImpl::main_loop_state_notify(bool is_running)
 {
+    bool was_running = false;
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        was_running = main_loop_is_running_;
+    }
+    if (!was_running && is_running)
+    {
+        construct();
+    }
+    else if (was_running && !is_running)
+    {
+        tear_down();
+    }
+
     std::lock_guard<std::mutex> lock(mutex_);
     main_loop_is_running_ = is_running;
     cond_.notify_all();
+}
+
+std::shared_ptr<AgManager> OnlineAccountClientImpl::manager()
+{
+    return manager_;
 }
 
 std::string OnlineAccountClientImpl::service_name()
@@ -385,9 +572,19 @@ std::string OnlineAccountClientImpl::service_name()
     return service_name_;
 }
 
-void OnlineAccountClientImpl::callback(OnlineAccountClient::ServiceStatus const& service_status)
+OnlineAccountClient::MainLoopSelect OnlineAccountClientImpl::main_loop_select()
+{
+    return main_loop_select_;
+}
+
+void OnlineAccountClientImpl::callback(AccountInfo const* info, std::string const& error)
 {
     std::lock_guard<std::mutex> lock(callback_mutex_);
+    auto service_status = info_to_details(info, error);
+    if (service_status.service_authenticated && auth_publisher_)
+    {
+        auth_publisher_->send_message(details_to_json(service_status));
+    }
     if (callback_)
     {
         callback_(service_status);
@@ -408,42 +605,80 @@ void OnlineAccountClientImpl::add_account(AgAccountId const& account_id, std::sh
 
 void OnlineAccountClientImpl::remove_account(AgAccountId const& account_id)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
-    accounts_.erase(account_id);
-}
+    std::unique_lock<std::mutex> lock(mutex_);
 
-bool OnlineAccountClientImpl::inc_logins()
-{
-    std::lock_guard<std::mutex> lock(mutex_);
-    if (!client_stopping_)
+    // Get account info
+    auto info_it = accounts_.find(account_id);
+    if (info_it == accounts_.end())
     {
-        // Increment number of logins busy
-        ++logins_busy_;
-        return true;
+        return;
     }
-    // Client is stopping so don't increment
-    return false;
-}
+    auto info = info_it->second;
 
-void OnlineAccountClientImpl::dec_logins()
-{
-    // Decrement number of logins busy
-    std::lock_guard<std::mutex> lock(mutex_);
-    --logins_busy_;
+    // Before we nuke the pointer, ensure that any pending sessions are done
+    g_signal_handler_disconnect(info->account_service.get(), info->service_update_signal_id_);
+    clear_session(info.get());
+    flush_pending_session(account_id, lock);
+
+    // Remove account info from accounts_ map
+    accounts_.erase(account_id);
 }
 
 void OnlineAccountClientImpl::main_loop_thread()
 {
-    // If something goes wrong causing the main loop not to run, the destruction of this pointer
-    // will break the constructor from its wait
-    std::shared_ptr<void> thread_exit_notifier(nullptr, [this](void*){ main_loop_state_notify(true); });
+    // If something goes wrong causing the thread to abort, the destruction of this pointer update the
+    // main_loop_is_running_ state accordingly.
+    std::shared_ptr<void> thread_exit_notifier(nullptr, [this](void*){ main_loop_state_notify(false); });
 
-    // Stick a method call into the main loop to notify the constructor when the main loop begins running
-    g_idle_add(main_loop_is_running_cb, this);
+    try
+    {
+        main_loop_context_.reset(g_main_context_new(), g_main_context_unref);
+        g_main_context_push_thread_default(main_loop_context_.get());
 
-    // Run the main loop
-    main_loop_.reset(g_main_loop_new(nullptr, true), g_main_loop_unref);
-    g_main_loop_run(main_loop_.get());
+        // Stick a method call into the main loop to notify the constructor when the main loop begins running
+        g_main_context_invoke(main_loop_context_.get(), main_loop_is_running_cb, this);
+
+        // Run the main loop
+        main_loop_.reset(g_main_loop_new(main_loop_context_.get(), true), g_main_loop_unref);
+        g_main_loop_run(main_loop_.get());
+    }
+    catch (std::exception const& e)
+    {
+        std::cerr << "OnlineAccountClientImpl::main_loop_thread(): Thread aborted: " << e.what() << std::endl;
+        std::lock_guard<std::mutex> lock(mutex_);
+        thread_exception_ = std::current_exception();
+    }
+    catch (...)
+    {
+        std::cerr << "OnlineAccountClientImpl::main_loop_thread(): Thread aborted: unknown exception" << std::endl;
+        std::lock_guard<std::mutex> lock(mutex_);
+        thread_exception_ = std::current_exception();
+    }
+}
+
+void OnlineAccountClientImpl::auth_callback(std::string const& details_json)
+{
+    OnlineAccountClient::ServiceStatus details = json_to_details(details_json);
+
+    // Update account info
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        auto info_it = accounts_.find(details.account_id);
+        if (info_it == accounts_.end())
+        {
+            return;
+        }
+        auto info = info_it->second;
+
+        GVariantDict dict;
+        g_variant_dict_init(&dict, nullptr);
+        g_variant_dict_insert(&dict, "AccessToken", "s", details.access_token.c_str());
+        g_variant_dict_insert(&dict, "TokenSecret", "s", details.token_secret.c_str());
+        info->session_data.reset(g_variant_ref_sink(g_variant_dict_end(&dict)), free_variant);
+    }
+
+    std::lock_guard<std::mutex> lock(callback_mutex_);
+    callback_(details);
 }
 
 }  // namespace internal
