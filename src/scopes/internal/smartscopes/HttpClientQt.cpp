@@ -48,12 +48,13 @@ HttpClientQt::~HttpClientQt()
 {
 }
 
-HttpResponseHandle::SPtr HttpClientQt::get(std::string const& request_url, std::function<void(std::string const&)> const& lineData)
+HttpResponseHandle::SPtr HttpClientQt::get(std::string const& request_url, std::function<void(std::string const&)> const& lineData,
+        HttpHeaders const& headers)
 {
     std::lock_guard<std::mutex> lock(sessions_mutex_);
 
     // start new session
-    auto session = std::make_shared<HttpSession>(request_url, no_reply_timeout_, lineData);
+    auto session = std::make_shared<HttpSession>(request_url, no_reply_timeout_, lineData, headers);
     sessions_[session_index_] = session;
 
     return std::make_shared<HttpResponseHandle>(shared_from_this(), session_index_++, session->get_future());
@@ -79,17 +80,18 @@ std::string HttpClientQt::to_percent_encoding(std::string const& string)
 
 //-- HttpClientQt::HttpSession
 
-HttpClientQt::HttpSession::HttpSession(std::string const& request_url, uint timeout, std::function<void(std::string const&)> const& lineData)
+HttpClientQt::HttpSession::HttpSession(std::string const& request_url, uint timeout, std::function<void(std::string const&)> const& lineData,
+        HttpHeaders const& headers)
     : qt_thread_(nullptr)
 {
     get_thread_ =
-        std::thread([this, request_url, timeout, lineData]()
+        std::thread([this, request_url, headers, timeout, lineData]()
             {
                 QUrl url(request_url.c_str());
 
                 {
                     std::lock_guard<std::mutex> lock(qt_thread_mutex_);
-                    qt_thread_ = std::unique_ptr<HttpClientQtThread>(new HttpClientQtThread(url, timeout, lineData));
+                    qt_thread_ = std::unique_ptr<HttpClientQtThread>(new HttpClientQtThread(url, timeout, lineData, headers));
                 }
 
                 QEventLoop loop;

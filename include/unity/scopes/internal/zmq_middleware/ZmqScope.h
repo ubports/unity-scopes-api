@@ -66,7 +66,7 @@ public:
     virtual bool debug_mode() override;
 
 private:
-    ZmqReceiver invoke_scope_(capnp::MessageBuilder& out_params);
+    ZmqObjectProxy::TwowayOutParams invoke_scope_(capnp::MessageBuilder& in_params);
     std::mutex debug_mode_mutex_;
     std::unique_ptr<bool> debug_mode_;
 };

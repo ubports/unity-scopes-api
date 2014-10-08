@@ -53,7 +53,7 @@ import shlex
 import subprocess
 import sys
 import tempfile
-
+import concurrent.futures, multiprocessing
 #
 # Write the supplied message to stderr, preceded by the program name.
 #
@@ -110,9 +110,11 @@ def run_compiler(hdr, compiler, copts, verbose):
 #
 def test_files(hdrs, compiler, copts, verbose):
     num_errs = 0
-    for h in hdrs:
+    executor = concurrent.futures.ThreadPoolExecutor(max_workers=multiprocessing.cpu_count())
+    futures = [executor.submit(run_compiler, h, compiler, copts, verbose) for h in hdrs]
+    for f in futures:
         try:
-            if not run_compiler(h, compiler, copts, verbose):
+            if not f.result():
                 num_errs += 1
         except OSError:
             num_errs += 1

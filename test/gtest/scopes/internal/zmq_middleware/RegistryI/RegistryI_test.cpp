@@ -748,6 +748,14 @@ TEST_F(RegistryITest, locate_idle_timeout)
     // check now that the scope has shutdown automatically (timed out after 2s)
     EXPECT_FALSE(reg->is_scope_running("testscopeB"));
 
+    // We wait for up to 10 seconds for the process to disappear, in case
+    // things on Jenkins are slow.
+    auto start_time = chrono::system_clock::now();
+    while (process_count() != 0 && (chrono::system_clock::now() - start_time) < chrono::seconds(10))
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds{100});
+    }
+
     // check that the process is gone
     EXPECT_EQ(0, process_count());
 }
