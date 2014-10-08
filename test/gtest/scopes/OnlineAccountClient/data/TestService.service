@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<service id="TestService">
+  <type>sharing</type>
+  <name>Test Service</name>
+  <provider>TestProvider</provider>
+  <template>
+    <group name="auth">
+      <setting name="method">oauth2</setting>
+      <setting name="mechanism">web_server</setting>
+      <group name="oauth2">
+        <group name="web_server">
+          <setting name="Host">accounts.test.com</setting>
+          
+          <setting name="AuthPath">o/oauth2/auth?access_type=offline</setting>
+          <setting name="TokenPath">o/oauth2/token</setting>
+          <setting name="RedirectUri">https://wiki.ubuntu.com/</setting>
+          <setting name="ResponseType">code</setting>
+          <setting type="as" name="Scope">['https://www.test.com/auth/test.readonly']</setting>
+          <setting name="ClientId">69842936499-sdflkbhslufhgrjamwlicefhb.apps.test.com</setting>
+          <setting name="ClientSecret">lj3i8iorep0w03994jwjef0j</setting>
+          <setting type="as" name="AllowedSchemes">['https','http']</setting>
+        </group>
+      </group>
+    </group>
+  </template>
+</service>
