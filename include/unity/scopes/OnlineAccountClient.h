@@ -37,6 +37,11 @@ namespace internal
 class OnlineAccountClientImpl;
 }
 
+namespace testing
+{
+class OnlineAccountClientTest;
+}
+
 /**
 \brief A simple interface for integrating online accounts access and monitoring into scopes.
 
@@ -55,7 +60,7 @@ public:
     */
     struct ServiceStatus
     {
-        uint account_id;            ///< A unique ID of the online account parenting this service.
+        int account_id;             ///< A unique ID of the online account parenting this service.
         bool service_enabled;       ///< True if this service is enabled.
         bool service_authenticated; ///< True if this service is authenticated.
         std::string client_id;      ///< "ConsumerKey" / "ClientId" OAuth (1 / 2) parameter.
@@ -68,16 +73,15 @@ public:
     /**
     \brief Indicates whether an external main loop already exists, or one should be created internally.
 
-    A running main loop is essential in order to receive service update callbacks. When in doubt, set
-    RunInExternalMainLoop and just use refresh_service_statuses() and get_service_statuses() to obtain
-    service statuses.
+    A running main loop is essential in order to receive service updates from the online accounts
+    backend. When in doubt, set to CreateInternalMainLoop.
     */
     enum MainLoopSelect
     {
-        RunInExternalMainLoop,  ///< An external main loop already exists or the service update
-                                ///  callback is not required.
-        CreateInternalMainLoop  ///< An external main loop does not exist and the service update
-                                ///  callback is required.
+        RunInExternalMainLoop,    ///< An external main loop already exists and is running.
+        CreateInternalMainLoop,   ///< An external main loop does not exist.
+        RunInExternalUiMainLoop,  ///< An external UI main loop exists and is running (Intended for
+                                  ///  shell use only. A scope should not be running a UI main loop).
     };
 
     /**
@@ -91,7 +95,7 @@ public:
     OnlineAccountClient(std::string const& service_name,
                         std::string const& service_type,
                         std::string const& provider_name,
-                        MainLoopSelect main_loop_select = RunInExternalMainLoop);
+                        MainLoopSelect main_loop_select = CreateInternalMainLoop);
 
     /// @cond
     ~OnlineAccountClient();
@@ -160,6 +164,8 @@ public:
 
 private:
     std::unique_ptr<internal::OnlineAccountClientImpl> p;
+
+    friend class testing::OnlineAccountClientTest;
 };
 
 } // namespace scopes
