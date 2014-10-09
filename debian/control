@@ -26,6 +26,8 @@ Build-Depends: g++-4.9,
                libjsoncpp-dev,
                libaccounts-glib-dev,
                libsignon-glib-dev,
+               dbus-test-runner,
+               libdbustest1-dev,
                valgrind,
 Standards-Version: 3.9.5
 XS-Testsuite: autopkgtest
