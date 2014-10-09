@@ -360,7 +360,12 @@ install(TARGETS ${UNITY_SCOPES_LIB} LIBRARY DESTINATION ${LIB_INSTALL_PREFIX})
 # Enable coverage testing
 
 if (cmake_build_type_lower MATCHES coverage)
-  ENABLE_COVERAGE_REPORT(TARGETS ${UNITY_SCOPES_LIB} smartscopes FILTER /usr/include ${CMAKE_SOURCE_DIR}/test/* ${CMAKE_BINARY_DIR}/*)
+  ENABLE_COVERAGE_REPORT(TARGETS ${UNITY_SCOPES_LIB} smartscopes
+                         FILTER /usr/include
+                                ${CMAKE_SOURCE_DIR}/test/*
+                                ${CMAKE_SOURCE_DIR}/debian/tests/*
+                                ${CMAKE_SOURCE_DIR}/demo/*
+                                ${CMAKE_BINARY_DIR}/*)
 endif()
 
 #
