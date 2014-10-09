@@ -80,8 +80,6 @@ public:
     {
         RunInExternalMainLoop,    ///< An external main loop already exists and is running.
         CreateInternalMainLoop,   ///< An external main loop does not exist.
-        RunInExternalUiMainLoop,  ///< An external UI main loop exists and is running (Intended for
-                                  ///  shell use only. A scope should not be running a UI main loop).
     };
 
     /**
