@@ -110,7 +110,7 @@ public:
     {
         EXPECT_EQ(1, status.account_id);
         EXPECT_EQ(true, status.service_enabled);
-        EXPECT_EQ(false, status.service_authenticated);
+        EXPECT_FALSE(status.service_authenticated);
         EXPECT_EQ("69842936499-sdflkbhslufhgrjamwlicefhb.apps.test.com", status.client_id);
         EXPECT_EQ("lj3i8iorep0w03994jwjef0j", status.client_secret);
         EXPECT_EQ("", status.access_token);
@@ -125,8 +125,8 @@ public:
     void service_update_disabled(OnlineAccountClient::ServiceStatus const& status)
     {
         EXPECT_EQ(1, status.account_id);
-        EXPECT_EQ(false, status.service_enabled);
-        EXPECT_EQ(false, status.service_authenticated);
+        EXPECT_FALSE(status.service_enabled);
+        EXPECT_FALSE(status.service_authenticated);
         EXPECT_EQ("69842936499-sdflkbhslufhgrjamwlicefhb.apps.test.com", status.client_id);
         EXPECT_EQ("lj3i8iorep0w03994jwjef0j", status.client_secret);
         EXPECT_EQ("", status.access_token);
@@ -141,8 +141,8 @@ public:
     void service_update_none(OnlineAccountClient::ServiceStatus const& status)
     {
         EXPECT_EQ(1, status.account_id);
-        EXPECT_EQ(false, status.service_enabled);
-        EXPECT_EQ(false, status.service_authenticated);
+        EXPECT_FALSE(status.service_enabled);
+        EXPECT_FALSE(status.service_authenticated);
         EXPECT_EQ("", status.client_id);
         EXPECT_EQ("", status.client_secret);
         EXPECT_EQ("", status.access_token);

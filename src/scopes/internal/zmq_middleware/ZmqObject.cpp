@@ -172,10 +172,10 @@ void register_monitor_socket(ConnectionPool& pool, zmqpp::context_t const& conte
     thread_local static bool monitor_initialized = false;
     if (!monitor_initialized) {
         monitor_initialized = true;
-        zmqpp::socket monitor_socket(context, zmqpp::socket_type::publish);
-        monitor_socket.set(zmqpp::socket_option::linger, 0);
-        monitor_socket.connect(MONITOR_ENDPOINT);
-        pool.register_socket(MONITOR_ENDPOINT, move(monitor_socket));
+        auto monitor_socket = make_shared<zmqpp::socket>(context, zmqpp::socket_type::publish);
+        monitor_socket->set(zmqpp::socket_option::linger, 0);
+        monitor_socket->connect(MONITOR_ENDPOINT);
+        pool.register_socket(MONITOR_ENDPOINT, monitor_socket, false);
     }
 }
 #endif
@@ -190,8 +190,8 @@ void ZmqObjectProxy::invoke_oneway_(capnp::MessageBuilder& in_params)
     lock_guard<mutex> lock(shared_mutex);
 
     assert(mode_ == RequestMode::Oneway);
-    zmqpp::socket& s = pool.find(endpoint_);
-    ZmqSender sender(s);
+    shared_ptr<zmqpp::socket> s = pool.find(endpoint_);
+    ZmqSender sender(*s);
     auto segments = in_params.getSegmentsForOutput();
     if (!sender.send(segments, ZmqSender::DontWait))
     {
@@ -203,9 +203,9 @@ void ZmqObjectProxy::invoke_oneway_(capnp::MessageBuilder& in_params)
 #ifdef ENABLE_IPC_MONITOR
     if (true) {
         register_monitor_socket(pool, *mw_base()->context());
-        zmqpp::socket& monitor = pool.find(MONITOR_ENDPOINT);
+        auto monitor = pool.find(MONITOR_ENDPOINT);
         auto word_arr = capnp::messageToFlatArray(segments);
-        monitor.send_raw(reinterpret_cast<char*>(&word_arr[0]), word_arr.size() * sizeof(capnp::word));
+        monitor->send_raw(reinterpret_cast<char*>(&word_arr[0]), word_arr.size() * sizeof(capnp::word));
     }
 #endif
 }
@@ -304,9 +304,9 @@ ZmqObjectProxy::TwowayOutParams ZmqObjectProxy::invoke_twoway__(capnp::MessageBu
 
     if (true) {
         register_monitor_socket(pool, *mw_base()->context());
-        zmqpp::socket& monitor = pool.find(MONITOR_ENDPOINT);
+        auto monitor = pool.find(MONITOR_ENDPOINT);
         auto word_arr = capnp::messageToFlatArray(segments);
-        monitor.send_raw(reinterpret_cast<char*>(&word_arr[0]), word_arr.size() * sizeof(capnp::word));
+        monitor->send_raw(reinterpret_cast<char*>(&word_arr[0]), word_arr.size() * sizeof(capnp::word));
     }
 #endif
 
