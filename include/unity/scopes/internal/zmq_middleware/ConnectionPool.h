@@ -19,6 +19,7 @@
 #ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_CONNECTIONPOOL_H
 #define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_CONNECTIONPOOL_H
 
+#include <unity/scopes/internal/Reaper.h>
 #include <unity/scopes/internal/zmq_middleware/RequestMode.h>
 #include <unity/util/NonCopyable.h>
 
@@ -31,9 +32,13 @@
 // that a proxy cannot directly contain a socket because that would cause invocations on the same proxy by
 // different threads to crash.
 // So, we maintain a pool of invocation threads, with each thread keeping its own cache of sockets.
-// Sockets are indexed by adapter name and created lazily.
+// Sockets are indexed by endpoint and created lazily.
+// Any socket that has been idle for close_after_idle_seconds is removed from the pool by a reaper.
+// This is to prevent Zmq from endlessly trying to reconnect to the peer.
 //
-// WARNING: No locking anywhere here. The pool is intended for us as a thread_local static member only.
+// WARNING: A separate instance of the pool is required for each calling thread.
+//          The code asserts if different threads call find() or if the thread that
+//          destroys the pool is not the same thread as the one that created it.
 
 namespace unity
 {
@@ -51,19 +56,31 @@ class ConnectionPool final
 {
 public:
     NONCOPYABLE(ConnectionPool);
-    ConnectionPool(zmqpp::context& context);
+    ConnectionPool(zmqpp::context& context, int close_after_idle_seconds = 10);
     ~ConnectionPool();
-    zmqpp::socket& find(std::string const& endpoint);
+    std::shared_ptr<zmqpp::socket> find(std::string const& endpoint);
     void remove(std::string const& endpoint);
-    void register_socket(std::string const& endpoint, zmqpp::socket socket);
+    void register_socket(std::string const& endpoint,
+                         std::shared_ptr<zmqpp::socket> const& socket,
+                         bool idle_timeout = true);
 
 private:
-    typedef std::unordered_map<std::string, zmqpp::socket> CPool;
+    struct PoolEntry
+    {
+        std::string endpoint;
+        std::shared_ptr<zmqpp::socket> socket;
+        ReapItem::SPtr reap_item;
+    };
+    typedef std::unordered_map<std::string, PoolEntry> CPool;
 
-    zmqpp::socket create_connection(std::string const& endpoint);
+    std::shared_ptr<zmqpp::socket> create_connection(std::string const& endpoint);
 
     zmqpp::context& context_;
     CPool pool_;
+
+    Reaper::SPtr reaper_;        // Removes connection from the pool after close_after_idle_seconds of idle time.
+    std::mutex mutex_;
+    std::thread::id thread_id_;  // For debug build, to assert that pool is used as thread_local static only.
 };
 
 } // namespace zmq_middleware
