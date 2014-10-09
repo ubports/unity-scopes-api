@@ -1,10 +1,114 @@
-#!/bin/sh
+#! /usr/bin/env python3
 
-head -n 1 ./debian/libunity-scopes@UNITY_SCOPES_SOVERSION@/DEBIAN/symbols \
-    >new_symbols
+#
+# Copyright (C) 2014 Canonical Ltd
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License version 3 as
+# published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Authored by: Michi Henning <michi.henning@canonical.com>
+#
 
-sed '1d' ./debian/libunity-scopes@UNITY_SCOPES_SOVERSION@/DEBIAN/symbols | c++filt | \
-    sed 's/^ \(.*@Base\)/ (c++)"\1"/' | sort | uniq >>new_symbols
+import re;
+import subprocess;
 
-diff -u debian/libunity-scopes@UNITY_SCOPES_SOVERSION@.symbols new_symbols | \
-    sed 's/^+ \(.*@Base"\)\( .*\)/+ \1 0replaceme/' >/tmp/symbols.diff
+def old_file():
+    return './debian/lib@UNITY_SCOPES_LIB@@UNITY_SCOPES_SOVERSION@.symbols'
+
+def new_file():
+    return './debian/lib@UNITY_SCOPES_LIB@@UNITY_SCOPES_SOVERSION@/DEBIAN/symbols'
+
+def run():
+    # Following the first line, lines in the original symbol file look
+    # like this (note leading single space in each line):
+    #
+    #  (c++|arch=amd64)"unity::scopes::SomeObj::SomeObj(unity::scopes::SomeObj const&)@Base" 0.6.6+14.10.20140916
+    #  (c++)"unity::scopes::C::C(unity::scopes::internal::C const&)@Base" 0.6.6+14.10.20140916
+    #
+    # So lines contain:
+    #
+    # - space
+    # - (c++) or (c++|tag=val...)
+    # - "
+    # - demangled symbol name
+    # - "
+    # - space
+    # - version
+    #
+    # old_regex matches this, remembering the tags, the symbol, and the version
+
+    old_regex = re.compile('^ (\(.*\))"(.*)" (.*)$')
+
+    old_syms = {}                       # Dictionary containing symbol -> ( tag, version )
+
+    file = open(old_file(), encoding='utf=8')
+    lines = file.readlines()
+    for line in lines[1:]:              # skip first line, which is the library name and version
+        mo = old_regex.match(line)
+        if mo:
+            old_syms[mo.group(2)] = ( mo.group(1), mo.group(3) )
+        else:
+            raise Exception('Invalid input line in ' + old_file() + ': ' + line)
+    file.close()
+
+    # Following the first line, lines in the symbol file created by dpkg-builpkg look
+    # like this (note leading single whitespace in each line):
+    #
+    #  _ZTv0_n24_N5unity6scopes11SearchReplyD0Ev@Base 0.4.0+14.04.20140312.1
+    #  _ZTv0_n24_N5unity6scopes11SearchReplyD1Ev@Base 0.4.0+14.04.20140312.1
+    #
+    # So lines contain:
+    #
+    # - space
+    # - mangled symbol name
+    # - space
+    # - version
+    #
+    # new_regex matches this.
+
+    new_regex = re.compile('^ (.*) .+$')
+
+    # Run the new symbols file through "c++filt | sort | uniq". We need
+    # the sort | uniq because, otherwise, we end up with duplicate demangled symbols.
+
+    infile = open(new_file())
+    outfile = open('new_symbols', 'w')
+    p = subprocess.Popen(['c++filt | sort | uniq'], shell=True, stdin=infile, stdout=subprocess.PIPE)
+
+    # For each symbol, if it is in the old dictionary, output the tags from the original
+    # symbol file, followed by the symbol and version. Otherwise, use "(c++)" as the tag
+    # and add " 0replaceme", so the new symbol will be accepted.
+
+    lines = p.stdout.readlines()
+    print(lines[0].decode('utf-8').rstrip('\n'), file=outfile)
+    for line in lines[1:]:
+        mo = new_regex.match(line.decode('utf-8'))
+        if (mo):
+            sym = mo.group(1)
+            item = old_syms.get(sym)
+            if item != None:
+                print(' ', item[0], '"', sym, '" ', item[1], sep='', file=outfile)
+            else:
+                print(' (c++)"', sym, '"', sym, '" 0replaceme', sep='', file=outfile)
+        else:
+            raise Exception('Cannot parse demangled line: ' + line)
+
+    infile.close()
+    outfile.close()
+
+    # Write the diff into /tmp/symbols.diff
+    outfile = open('/tmp/symbols.diff', 'w')
+    subprocess.Popen(['diff', '-u', old_file(), 'new_symbols'], stdout=outfile)
+    
+
+if __name__ == '__main__':
+    run()
