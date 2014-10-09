@@ -1,13 +1,9 @@
 unity-scopes-api (0.6.7-0ubuntu1) UNRELEASED; urgency=medium
 
-  [ Marcus Tomlinson ]
   * Added new RunInExternalUiMainLoop option to OnlineAccountClient::MainLoopSelect.
   * OnlineAccountClient signon UI policy determined by main loop used (shell: show / scope: hide).
 
-  [ Pawel Stolowski ]
-  * Fixed desktop file generation and updated HACKING file.
-
- -- Pawel Stolowski <pawel.stolowski@ubuntu.com>  Wed, 08 Oct 2014 16:31:24 +0200
+ -- Marcus Tomlinson <marcus.tomlinson@canonical.com>  Wed, 01 Oct 2014 15:46:30 +0200
 
 unity-scopes-api (0.6.6+14.10.20141006-0ubuntu1) utopic; urgency=medium
 
