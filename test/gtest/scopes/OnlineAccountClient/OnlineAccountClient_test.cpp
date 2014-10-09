@@ -521,17 +521,8 @@ TEST_F(OnlineAccountClientTestNoMainLoop, refresh_services_no_main_loop)
     EXPECT_TRUE(statuses[0].service_enabled);
 }
 
-TEST_F(OnlineAccountClientTestNoMainLoop, pub_sub_authentication)
+TEST_F(OnlineAccountClientTestNoMainLoop, authentication)
 {
-    std::shared_ptr<OnlineAccountClient> shell_oa_client;
-    shell_oa_client.reset(new OnlineAccountClient("TestService", "sharing", "TestProvider", OnlineAccountClient::RunInExternalUiMainLoop));
-
-    std::shared_ptr<OnlineAccountClient> scope_oa_client;
-    scope_oa_client.reset(new OnlineAccountClient("TestService", "sharing", "TestProvider", OnlineAccountClient::RunInExternalMainLoop));
-
-    create_account();
-    scope_oa_client->refresh_service_statuses();
-
     std::shared_ptr<AccountInfo> info(new AccountInfo);
     info->account_id = 1;
     info->service_enabled = true;
@@ -550,9 +541,9 @@ TEST_F(OnlineAccountClientTestNoMainLoop, pub_sub_authentication)
         info->session_data.reset(g_variant_ref_sink(g_variant_dict_end(&dict)), safe_g_variant_free_);
     }
 
-    // Invoke callback on shell_oa_client which should invoke a callback on scope_oa_client via pub/sub
-    scope_oa_client->set_service_update_callback(std::bind(&OnlineAccountClientTest::service_update_auth, this, std::placeholders::_1));
-    invoke_callback(shell_oa_client, info.get(), "not really an error, but just to test");
+    // Manually invoke the callback with a valid access token, which should result in service_authenticated = true
+    oa_client()->set_service_update_callback(std::bind(&OnlineAccountClientTest::service_update_auth, this, std::placeholders::_1));
+    invoke_callback(oa_client(), info.get(), "not really an error, but just to test");
     wait_for_service_update();
 }
 
