@@ -108,7 +108,6 @@ def run():
     # Write the diff into /tmp/symbols.diff
     outfile = open('/tmp/symbols.diff', 'w')
     subprocess.Popen(['diff', '-u', old_file(), 'new_symbols'], stdout=outfile)
-    
 
 if __name__ == '__main__':
     run()
