@@ -19,7 +19,6 @@
 #ifndef UNITY_SCOPES_INTERNAL_ONLINEACCOUNTCLIENTIMPL_H
 #define UNITY_SCOPES_INTERNAL_ONLINEACCOUNTCLIENTIMPL_H
 
-#include <unity/scopes/internal/MiddlewareBase.h>
 #include <unity/scopes/OnlineAccountClient.h>
 
 #include <libaccounts-glib/accounts-glib.h>
@@ -88,7 +87,6 @@ public:
 
     std::shared_ptr<AgManager> manager();
     std::string service_name();
-    OnlineAccountClient::MainLoopSelect main_loop_select();
     std::shared_ptr<GMainContext> main_loop_context();
 
     void callback(AccountInfo const* info, std::string const& error = "");
@@ -119,12 +117,7 @@ private:
     std::shared_ptr<AgManager> manager_;
     std::map<AgAccountId, std::shared_ptr<AccountInfo>> accounts_;
 
-    MiddlewareBase::SPtr mw_;
-    MWPublisher::UPtr auth_publisher_;
-    MWSubscriber::UPtr auth_subscriber_;
-
     void main_loop_thread();
-    void auth_callback(std::string const& details_json);
 };
 
 } // namespace internal

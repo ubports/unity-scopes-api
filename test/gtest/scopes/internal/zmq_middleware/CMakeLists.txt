@@ -1,3 +1,4 @@
+add_subdirectory(ConnectionPool)
 add_subdirectory(ObjectAdapter)
 add_subdirectory(PubSub)
 add_subdirectory(RegistryI)
