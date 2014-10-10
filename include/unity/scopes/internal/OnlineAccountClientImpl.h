@@ -103,6 +103,7 @@ private:
 
     std::mutex callback_mutex_;
     OnlineAccountClient::ServiceUpdateCallback callback_;
+    std::thread callback_thread_;
 
     std::mutex mutex_;
     std::condition_variable cond_;

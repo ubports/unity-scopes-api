@@ -252,10 +252,10 @@ OnlineAccountClientImpl::OnlineAccountClientImpl(std::string const& service_name
             {
                 // Quit the main loop, causing the thread to exit
                 g_main_loop_quit(main_loop_.get());
-                if (main_loop_thread_.joinable())
-                {
-                    main_loop_thread_.join();
-                }
+            }
+            if (main_loop_thread_.joinable())
+            {
+                main_loop_thread_.join();
             }
             if (thread_exception_)
             {
@@ -318,6 +318,14 @@ OnlineAccountClientImpl::~OnlineAccountClientImpl()
     {
         tear_down();
     }
+
+    std::unique_lock<std::mutex> lock(callback_mutex_);
+    if (callback_thread_.joinable())
+    {
+        lock.unlock();
+        callback_thread_.join();
+        lock.lock();
+    }
 }
 
 void OnlineAccountClientImpl::set_service_update_callback(OnlineAccountClient::ServiceUpdateCallback callback)
@@ -353,13 +361,12 @@ void OnlineAccountClientImpl::refresh_service_statuses()
             account_enabled_cb(manager_.get(), account_id, this);
             lock.lock();
         }
-        flush_pending_session(account_id, lock);
     }
 }
 
 std::vector<OnlineAccountClient::ServiceStatus> OnlineAccountClientImpl::get_service_statuses()
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::unique_lock<std::mutex> lock(mutex_);
     if (thread_exception_)
     {
         std::rethrow_exception(thread_exception_);  // LCOV_EXCL_LINE
@@ -369,6 +376,7 @@ std::vector<OnlineAccountClient::ServiceStatus> OnlineAccountClientImpl::get_ser
     std::vector<OnlineAccountClient::ServiceStatus> service_statuses;
     for (auto const& info : accounts_)
     {
+        flush_pending_session(info.second->account_id, lock);
         service_statuses.push_back(info_to_details(info.second.get()));
     }
     return service_statuses;
@@ -455,7 +463,7 @@ void OnlineAccountClientImpl::flush_pending_session(AgAccountId const& account_i
     // Wait until all currently running login sessions are done
     // (ensures that accounts_ is up to date)
     std::shared_ptr<GMainLoop> event_loop;
-    event_loop.reset(g_main_loop_new(g_main_context_get_thread_default(), true), g_main_loop_unref);
+    event_loop.reset(g_main_loop_new(main_loop_context_.get(), true), g_main_loop_unref);
     while(info->session)
     {
         // We need to wait inside an event loop to allow for the main application loop to
@@ -463,7 +471,7 @@ void OnlineAccountClientImpl::flush_pending_session(AgAccountId const& account_i
         std::shared_ptr<GSource> source;
         source.reset(g_timeout_source_new(10), g_source_unref);
         g_source_set_callback(source.get(), wake_up_event_loop_cb, event_loop.get(), NULL);
-        g_source_attach(source.get(), g_main_context_get_thread_default());
+        g_source_attach(source.get(), main_loop_context_.get());
 
         lock.unlock();
         g_main_loop_run(event_loop.get());
@@ -510,11 +518,23 @@ std::shared_ptr<GMainContext> OnlineAccountClientImpl::main_loop_context()
 
 void OnlineAccountClientImpl::callback(AccountInfo const* info, std::string const& error)
 {
-    std::lock_guard<std::mutex> lock(callback_mutex_);
-    if (callback_)
+    std::unique_lock<std::mutex> lock(callback_mutex_);
+    if (callback_thread_.joinable())
     {
-        callback_(info_to_details(info, error));
+        lock.unlock();
+        callback_thread_.join();
+        lock.lock();
     }
+
+    OnlineAccountClient::ServiceStatus status = info_to_details(info, error);
+    callback_thread_ = std::thread([this, status]
+    {
+        std::lock_guard<std::mutex> lock(callback_mutex_);
+        if (callback_)
+        {
+            callback_(status);
+        }
+    });
 }
 
 bool OnlineAccountClientImpl::has_account(AgAccountId const& account_id)
