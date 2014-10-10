@@ -1,7 +1,8 @@
 unity-scopes-api (0.6.7-0ubuntu1) UNRELEASED; urgency=medium
 
   * OnlineAccountClient fixes: run the internal event loop within its own context to avoid
-    clashing with external main loop (LP: #1374394, LP: #1377147).
+    clashing with external main loop (LP: #1377147).
+  * Introduced new dependencies on dbus-test-runner and libdbustest1-dev.
   * Fix for Zmq infinite reconnection problem (LP: #1374206)
 
  -- Marcus Tomlinson <marcus.tomlinson@canonical.com>  Wed, 01 Oct 2014 15:46:30 +0200
