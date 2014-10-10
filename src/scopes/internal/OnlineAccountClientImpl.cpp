@@ -89,16 +89,6 @@ static OnlineAccountClient::ServiceStatus info_to_details(AccountInfo const* inf
     return service_status;
 }
 
-static void clear_session(AccountInfo* info)
-{
-    if (info->session)
-    {
-        // Cancel the session in case its still busy
-        signon_auth_session_cancel(info->session.get());
-    }
-    info->session = nullptr;
-}
-
 static gboolean main_loop_is_running_cb(void* user_data)
 {
     OnlineAccountClientImpl* account_client = reinterpret_cast<OnlineAccountClientImpl*>(user_data);
@@ -131,16 +121,18 @@ static void service_login_cb(GObject* source, GAsyncResult* result, void* user_d
     std::shared_ptr<GError> error_cleanup(error, free_error);
 
     info->account_client->callback(info, error ? error->message : "");
-
-    // Clear session info
-    clear_session(info);
 }
 
 static void service_update_cb(AgAccountService* account_service, gboolean enabled, AccountInfo* info)
 {
+    // If another session is currently busy, cancel it
+    if (info->session)
+    {
+        signon_auth_session_cancel(info->session.get());
+    }
+
     // Service state has updated, clear the old session data
     info->service_enabled = enabled;
-    clear_session(info);
 
     if (enabled)
     {
@@ -443,7 +435,6 @@ void OnlineAccountClientImpl::tear_down()
         {
             // Before we nuke the map, ensure that any pending sessions are done
             g_signal_handler_disconnect(info.second->account_service.get(), info.second->service_update_signal_id_);
-            clear_session(info.second.get());
             flush_pending_session(info.second->account_id, lock);
         }
         accounts_.clear();
@@ -516,7 +507,7 @@ std::shared_ptr<GMainContext> OnlineAccountClientImpl::main_loop_context()
     return main_loop_context_;
 }
 
-void OnlineAccountClientImpl::callback(AccountInfo const* info, std::string const& error)
+void OnlineAccountClientImpl::callback(AccountInfo* info, std::string const& error)
 {
     std::unique_lock<std::mutex> lock(callback_mutex_);
     if (callback_thread_.joinable())
@@ -535,6 +526,9 @@ void OnlineAccountClientImpl::callback(AccountInfo const* info, std::string cons
             callback_(status);
         }
     });
+
+    // Clear session info
+    info->session = nullptr;
 }
 
 bool OnlineAccountClientImpl::has_account(AgAccountId const& account_id)
@@ -563,7 +557,6 @@ void OnlineAccountClientImpl::remove_account(AgAccountId const& account_id)
 
     // Before we nuke the pointer, ensure that any pending sessions are done
     g_signal_handler_disconnect(info->account_service.get(), info->service_update_signal_id_);
-    clear_session(info.get());
     flush_pending_session(account_id, lock);
 
     // Remove account info from accounts_ map

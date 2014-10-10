@@ -179,7 +179,7 @@ public:
         return result;
     }
 
-    void invoke_callback(std::shared_ptr<OnlineAccountClient> oa_client, AccountInfo const* info, std::string const& error)
+    void invoke_callback(std::shared_ptr<OnlineAccountClient> oa_client, AccountInfo* info, std::string const& error)
     {
         oa_client->p->callback(info, error);
     }
