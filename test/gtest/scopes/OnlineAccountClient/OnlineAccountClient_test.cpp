@@ -206,7 +206,7 @@ private:
     std::shared_ptr<AgAccount> account_;
     std::shared_ptr<GMainContext> main_loop_context_;
 
-    bool got_update_;
+    bool got_update_ = false;
     std::mutex mutex_;
     std::condition_variable cond_;
 
@@ -445,34 +445,34 @@ TEST_F(OnlineAccountClientTest, service_update_callback)
 
     oa_client()->set_service_update_callback(std::bind(&OnlineAccountClientTest::service_update_none, this, std::placeholders::_1));
     create_account();
-    wait_for_service_update();
+    EXPECT_TRUE(wait_for_service_update());
 
     statuses = oa_client()->get_service_statuses();
     EXPECT_EQ(1, statuses.size());
 
     oa_client()->set_service_update_callback(std::bind(&OnlineAccountClientTest::service_update_enabled, this, std::placeholders::_1));
     enable_service();
-    wait_for_service_update();
+    EXPECT_TRUE(wait_for_service_update());
 
     oa_client()->set_service_update_callback(std::bind(&OnlineAccountClientTest::service_update_disabled, this, std::placeholders::_1));
     disable_service();
-    wait_for_service_update();
+    EXPECT_TRUE(wait_for_service_update());
 
     oa_client()->set_service_update_callback(std::bind(&OnlineAccountClientTest::service_update_enabled, this, std::placeholders::_1));
     enable_service();
-    wait_for_service_update();
+    EXPECT_TRUE(wait_for_service_update());
 
     oa_client()->set_service_update_callback(std::bind(&OnlineAccountClientTest::service_update_disabled, this, std::placeholders::_1));
     disable_account();
-    wait_for_service_update();
+    EXPECT_TRUE(wait_for_service_update());
 
     oa_client()->set_service_update_callback(std::bind(&OnlineAccountClientTest::service_update_enabled, this, std::placeholders::_1));
     enable_account();
-    wait_for_service_update();
+    EXPECT_TRUE(wait_for_service_update());
 
     oa_client()->set_service_update_callback(std::bind(&OnlineAccountClientTest::service_update_disabled, this, std::placeholders::_1));
     delete_account();
-    wait_for_service_update();
+    EXPECT_TRUE(wait_for_service_update());
 
     statuses = oa_client()->get_service_statuses();
     EXPECT_EQ(0, statuses.size());
@@ -544,7 +544,7 @@ TEST_F(OnlineAccountClientTestNoMainLoop, authentication)
     // Manually invoke the callback with a valid access token, which should result in service_authenticated = true
     oa_client()->set_service_update_callback(std::bind(&OnlineAccountClientTest::service_update_auth, this, std::placeholders::_1));
     invoke_callback(oa_client(), info.get(), "not really an error, but just to test");
-    wait_for_service_update();
+    EXPECT_TRUE(wait_for_service_update());
 }
 
 int main(int argc, char **argv)
