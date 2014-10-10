@@ -89,7 +89,7 @@ public:
     std::string service_name();
     std::shared_ptr<GMainContext> main_loop_context();
 
-    void callback(AccountInfo const* info, std::string const& error = "");
+    void callback(AccountInfo* info, std::string const& error = "");
 
     bool has_account(AgAccountId const& account_id);
     void add_account(AgAccountId const& account_id, std::shared_ptr<AccountInfo> account_info);
@@ -103,6 +103,7 @@ private:
 
     std::mutex callback_mutex_;
     OnlineAccountClient::ServiceUpdateCallback callback_;
+    std::thread callback_thread_;
 
     std::mutex mutex_;
     std::condition_variable cond_;
