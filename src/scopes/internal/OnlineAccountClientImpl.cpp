@@ -232,11 +232,10 @@ OnlineAccountClientImpl::OnlineAccountClientImpl(std::string const& service_name
     if (main_loop_select_ == OnlineAccountClient::CreateInternalMainLoop)
     {
         // Wait here until either the main loop begins running, or the thread exits
-        {
-            std::unique_lock<std::mutex> lock(mutex_);
-            main_loop_thread_ = std::thread(&OnlineAccountClientImpl::main_loop_thread, this);
-            cond_.wait_for(lock, std::chrono::seconds(5), [this] { return main_loop_is_running_; });
-        }
+        std::unique_lock<std::mutex> lock(mutex_);
+        main_loop_thread_ = std::thread(&OnlineAccountClientImpl::main_loop_thread, this);
+        cond_.wait_for(lock, std::chrono::seconds(5), [this] { return main_loop_is_running_; });
+
         if (!main_loop_is_running_)
         {
             // LCOV_EXCL_START
@@ -247,7 +246,9 @@ OnlineAccountClientImpl::OnlineAccountClientImpl(std::string const& service_name
             }
             if (main_loop_thread_.joinable())
             {
+                lock.unlock();
                 main_loop_thread_.join();
+                lock.lock();
             }
             if (thread_exception_)
             {
@@ -293,17 +294,20 @@ OnlineAccountClientImpl::~OnlineAccountClientImpl()
     if (main_loop_select_ == OnlineAccountClient::CreateInternalMainLoop)
     {
         // Invoke tear_down() from within the main loop
-        {
-            std::unique_lock<std::mutex> lock(mutex_);
-            g_main_context_invoke(main_loop_context_.get(), main_loop_is_stopping_cb, this);
-            cond_.wait(lock, [this] { return !main_loop_is_running_; });
-        }
+        std::unique_lock<std::mutex> lock(mutex_);
+        g_main_context_invoke(main_loop_context_.get(), main_loop_is_stopping_cb, this);
+        cond_.wait(lock, [this] { return !main_loop_is_running_; });
 
-        // Quit the main loop, causing the thread to exit
-        g_main_loop_quit(main_loop_.get());
+        if (main_loop_)
+        {
+            // Quit the main loop, causing the thread to exit
+            g_main_loop_quit(main_loop_.get());
+        }
         if (main_loop_thread_.joinable())
         {
+            lock.unlock();
             main_loop_thread_.join();
+            lock.lock();
         }
     }
     else
@@ -322,14 +326,28 @@ OnlineAccountClientImpl::~OnlineAccountClientImpl()
 
 void OnlineAccountClientImpl::set_service_update_callback(OnlineAccountClient::ServiceUpdateCallback callback)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
-    if (thread_exception_)
     {
-        std::rethrow_exception(thread_exception_);  // LCOV_EXCL_LINE
+        std::lock_guard<std::mutex> lock(mutex_);
+        if (thread_exception_)
+        {
+            std::rethrow_exception(thread_exception_);  // LCOV_EXCL_LINE
+        }
     }
 
-    std::lock_guard<std::mutex> callback_lock(callback_mutex_);
+    if (!callback)
+    {
+        return;
+    }
+
+    std::lock_guard<std::mutex> lock(callback_mutex_);
     callback_ = callback;
+
+    // Flush out any queued up callbacks
+    for (auto const& status : callback_queue_)
+    {
+        callback_(status);
+    }
+    callback_queue_.clear();
 }
 
 void OnlineAccountClientImpl::refresh_service_statuses()
@@ -498,7 +516,6 @@ std::shared_ptr<AgManager> OnlineAccountClientImpl::manager()
 
 std::string OnlineAccountClientImpl::service_name()
 {
-    std::lock_guard<std::mutex> lock(mutex_);
     return service_name_;
 }
 
@@ -524,6 +541,15 @@ void OnlineAccountClientImpl::callback(AccountInfo* info, std::string const& err
         if (callback_)
         {
             callback_(status);
+        }
+        else
+        {
+            // Push current status onto the callback queue in case a callback is set later
+            callback_queue_.push_back(status);
+            if (callback_queue_.size() > 10)
+            {
+                callback_queue_.pop_front();
+            }
         }
     });
 

@@ -106,77 +106,37 @@ public:
         run_in_main_loop_(std::bind(&OnlineAccountClientTest::enable_account_, this));
     }
 
-    void service_update_enabled(OnlineAccountClient::ServiceStatus const& status)
+    void service_update(OnlineAccountClient::ServiceStatus const& status)
     {
-        EXPECT_EQ(1, status.account_id);
-        EXPECT_EQ(true, status.service_enabled);
-        EXPECT_FALSE(status.service_authenticated);
-        EXPECT_EQ("69842936499-sdflkbhslufhgrjamwlicefhb.apps.test.com", status.client_id);
-        EXPECT_EQ("lj3i8iorep0w03994jwjef0j", status.client_secret);
-        EXPECT_EQ("", status.access_token);
-        EXPECT_EQ("", status.token_secret);
-        EXPECT_NE("", status.error);
-
         std::lock_guard<std::mutex> lock(mutex_);
+        last_status_ = status;
         got_update_ = true;
         cond_.notify_all();
     }
 
-    void service_update_disabled(OnlineAccountClient::ServiceStatus const& status)
-    {
-        EXPECT_EQ(1, status.account_id);
-        EXPECT_FALSE(status.service_enabled);
-        EXPECT_FALSE(status.service_authenticated);
-        EXPECT_EQ("69842936499-sdflkbhslufhgrjamwlicefhb.apps.test.com", status.client_id);
-        EXPECT_EQ("lj3i8iorep0w03994jwjef0j", status.client_secret);
-        EXPECT_EQ("", status.access_token);
-        EXPECT_EQ("", status.token_secret);
-        EXPECT_EQ("", status.error);
-
-        std::lock_guard<std::mutex> lock(mutex_);
-        got_update_ = true;
-        cond_.notify_all();
-    }
-
-    void service_update_none(OnlineAccountClient::ServiceStatus const& status)
-    {
-        EXPECT_EQ(1, status.account_id);
-        EXPECT_FALSE(status.service_enabled);
-        EXPECT_FALSE(status.service_authenticated);
-        EXPECT_EQ("", status.client_id);
-        EXPECT_EQ("", status.client_secret);
-        EXPECT_EQ("", status.access_token);
-        EXPECT_EQ("", status.token_secret);
-        EXPECT_EQ("", status.error);
-
-        std::lock_guard<std::mutex> lock(mutex_);
-        got_update_ = true;
-        cond_.notify_all();
-    }
-
-    void service_update_auth(OnlineAccountClient::ServiceStatus const& status)
-    {
-        EXPECT_EQ(1, status.account_id);
-        EXPECT_EQ(true, status.service_enabled);
-        EXPECT_EQ(true, status.service_authenticated);
-        EXPECT_EQ("isuertbiseruy87srkuthksvu", status.client_id);
-        EXPECT_EQ("rytwekfgiodng523dr4", status.client_secret);
-        EXPECT_EQ("sfhgbfgutgi9ugwirheg74", status.access_token);
-        EXPECT_EQ("qwpeurylsfdg83", status.token_secret);
-        EXPECT_EQ("not really an error, but just to test", status.error);
-
-        std::lock_guard<std::mutex> lock(mutex_);
-        got_update_ = true;
-        cond_.notify_all();
-    }
-
-    bool wait_for_service_update()
+    bool wait_for_service_update(OnlineAccountClient::ServiceStatus const& status)
     {
         std::unique_lock<std::mutex> lock(mutex_);
-        EXPECT_TRUE(cond_.wait_for(lock, std::chrono::seconds(1), [this]{ return got_update_; })) << "service update callback not triggered";
-        bool result = got_update_;
-        got_update_ = false;
-        return result;
+        cond_.wait_for(lock, std::chrono::seconds(1), [this]{ return got_update_; });
+        if (got_update_)
+        {
+            EXPECT_EQ(status.account_id, last_status_.account_id);
+            EXPECT_EQ(status.service_enabled, last_status_.service_enabled);
+            EXPECT_EQ(status.service_authenticated, last_status_.service_authenticated);
+            EXPECT_EQ(status.client_id, last_status_.client_id);
+            EXPECT_EQ(status.client_secret, last_status_.client_secret);
+            EXPECT_EQ(status.access_token, last_status_.access_token);
+            EXPECT_EQ(status.token_secret, last_status_.token_secret);
+            EXPECT_EQ(status.error, last_status_.error);
+
+            got_update_ = false;
+            return true;
+        }
+        else
+        {
+            got_update_ = false;
+            return false;
+        }
     }
 
     void invoke_callback(std::shared_ptr<OnlineAccountClient> oa_client, AccountInfo* info, std::string const& error)
@@ -206,6 +166,7 @@ private:
     std::shared_ptr<AgAccount> account_;
     std::shared_ptr<GMainContext> main_loop_context_;
 
+    OnlineAccountClient::ServiceStatus last_status_;
     bool got_update_ = false;
     std::mutex mutex_;
     std::condition_variable cond_;
@@ -440,42 +401,59 @@ TEST_F(OnlineAccountClientTest, refresh_services_main_loop)
 
 TEST_F(OnlineAccountClientTest, service_update_callback)
 {
-    auto statuses = oa_client()->get_service_statuses();
-    EXPECT_EQ(0, statuses.size());
+    OnlineAccountClient::ServiceStatus none_status;
+    none_status.account_id = 1;
+    none_status.service_enabled = false;
+    none_status.service_authenticated = false;
+    none_status.client_id = "";
+    none_status.client_secret = "";
+    none_status.access_token = "";
+    none_status.token_secret = "";
+    none_status.error = "";
 
-    oa_client()->set_service_update_callback(std::bind(&OnlineAccountClientTest::service_update_none, this, std::placeholders::_1));
+    OnlineAccountClient::ServiceStatus enabled_status;
+    enabled_status.account_id = 1;
+    enabled_status.service_enabled = true;
+    enabled_status.service_authenticated = false;
+    enabled_status.client_id = "69842936499-sdflkbhslufhgrjamwlicefhb.apps.test.com";
+    enabled_status.client_secret = "lj3i8iorep0w03994jwjef0j";
+    enabled_status.access_token = "";
+    enabled_status.token_secret = "";
+    enabled_status.error = "GDBus.Error:com.google.code.AccountsSSO.SingleSignOn.Error.MethodNotKnown: Authentication method is not known.";
+
+    OnlineAccountClient::ServiceStatus disabled_status;
+    disabled_status.account_id = 1;
+    disabled_status.service_enabled = false;
+    disabled_status.service_authenticated = false;
+    disabled_status.client_id = "69842936499-sdflkbhslufhgrjamwlicefhb.apps.test.com";
+    disabled_status.client_secret = "lj3i8iorep0w03994jwjef0j";
+    disabled_status.access_token = "";
+    disabled_status.token_secret = "";
+    disabled_status.error = "";
+
     create_account();
-    EXPECT_TRUE(wait_for_service_update());
+    EXPECT_FALSE(wait_for_service_update(none_status));
 
-    statuses = oa_client()->get_service_statuses();
-    EXPECT_EQ(1, statuses.size());
+    oa_client()->set_service_update_callback(std::bind(&OnlineAccountClientTest::service_update, this, std::placeholders::_1));
+    EXPECT_TRUE(wait_for_service_update(none_status));
 
-    oa_client()->set_service_update_callback(std::bind(&OnlineAccountClientTest::service_update_enabled, this, std::placeholders::_1));
     enable_service();
-    EXPECT_TRUE(wait_for_service_update());
+    EXPECT_TRUE(wait_for_service_update(enabled_status));
 
-    oa_client()->set_service_update_callback(std::bind(&OnlineAccountClientTest::service_update_disabled, this, std::placeholders::_1));
     disable_service();
-    EXPECT_TRUE(wait_for_service_update());
+    EXPECT_TRUE(wait_for_service_update(disabled_status));
 
-    oa_client()->set_service_update_callback(std::bind(&OnlineAccountClientTest::service_update_enabled, this, std::placeholders::_1));
     enable_service();
-    EXPECT_TRUE(wait_for_service_update());
+    EXPECT_TRUE(wait_for_service_update(enabled_status));
 
-    oa_client()->set_service_update_callback(std::bind(&OnlineAccountClientTest::service_update_disabled, this, std::placeholders::_1));
     disable_account();
-    EXPECT_TRUE(wait_for_service_update());
+    EXPECT_TRUE(wait_for_service_update(disabled_status));
 
-    oa_client()->set_service_update_callback(std::bind(&OnlineAccountClientTest::service_update_enabled, this, std::placeholders::_1));
     enable_account();
-    EXPECT_TRUE(wait_for_service_update());
+    EXPECT_TRUE(wait_for_service_update(enabled_status));
 
-    oa_client()->set_service_update_callback(std::bind(&OnlineAccountClientTest::service_update_disabled, this, std::placeholders::_1));
     delete_account();
-    EXPECT_TRUE(wait_for_service_update());
-
-    statuses = oa_client()->get_service_statuses();
-    EXPECT_EQ(0, statuses.size());
+    EXPECT_TRUE(wait_for_service_update(disabled_status));
 }
 
 TEST_F(OnlineAccountClientTestNoMainLoop, refresh_services_no_main_loop)
@@ -523,6 +501,16 @@ TEST_F(OnlineAccountClientTestNoMainLoop, refresh_services_no_main_loop)
 
 TEST_F(OnlineAccountClientTestNoMainLoop, authentication)
 {
+    OnlineAccountClient::ServiceStatus auth_status;
+    auth_status.account_id = 1;
+    auth_status.service_enabled = true;
+    auth_status.service_authenticated = true;
+    auth_status.client_id = "isuertbiseruy87srkuthksvu";
+    auth_status.client_secret = "rytwekfgiodng523dr4";
+    auth_status.access_token = "sfhgbfgutgi9ugwirheg74";
+    auth_status.token_secret = "qwpeurylsfdg83";
+    auth_status.error = "not really an error, but just to test";
+
     std::shared_ptr<AccountInfo> info(new AccountInfo);
     info->account_id = 1;
     info->service_enabled = true;
@@ -542,9 +530,9 @@ TEST_F(OnlineAccountClientTestNoMainLoop, authentication)
     }
 
     // Manually invoke the callback with a valid access token, which should result in service_authenticated = true
-    oa_client()->set_service_update_callback(std::bind(&OnlineAccountClientTest::service_update_auth, this, std::placeholders::_1));
+    oa_client()->set_service_update_callback(std::bind(&OnlineAccountClientTest::service_update, this, std::placeholders::_1));
     invoke_callback(oa_client(), info.get(), "not really an error, but just to test");
-    EXPECT_TRUE(wait_for_service_update());
+    EXPECT_TRUE(wait_for_service_update(auth_status));
 }
 
 int main(int argc, char **argv)
@@ -554,5 +542,13 @@ int main(int argc, char **argv)
     dbus_test_service_run(dbus_test_service.get());
 
     ::testing::InitGoogleTest(&argc, argv);
+
+    for (int i = 0; i < 50; ++i)
+    {
+        if (RUN_ALL_TESTS() != 0)
+        {
+            return -1;
+        }
+    }
     return RUN_ALL_TESTS();
 }
