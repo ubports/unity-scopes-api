@@ -334,20 +334,18 @@ void OnlineAccountClientImpl::set_service_update_callback(OnlineAccountClient::S
         }
     }
 
-    if (!callback)
-    {
-        return;
-    }
-
     std::lock_guard<std::mutex> lock(callback_mutex_);
     callback_ = callback;
 
-    // Flush out any queued up callbacks
-    for (auto const& status : callback_queue_)
+    if (callback != nullptr)
     {
-        callback_(status);
+        // Flush out any queued up callbacks
+        for (auto const& status : callback_queue_)
+        {
+            callback_(status);
+        }
+        callback_queue_.clear();
     }
-    callback_queue_.clear();
 }
 
 void OnlineAccountClientImpl::refresh_service_statuses()
