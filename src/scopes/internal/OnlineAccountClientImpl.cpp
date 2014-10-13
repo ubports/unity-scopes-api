@@ -326,25 +326,29 @@ OnlineAccountClientImpl::~OnlineAccountClientImpl()
 
 void OnlineAccountClientImpl::set_service_update_callback(OnlineAccountClient::ServiceUpdateCallback callback)
 {
+    std::unique_lock<std::mutex> lock(mutex_);
+    if (thread_exception_)
     {
-        std::lock_guard<std::mutex> lock(mutex_);
-        if (thread_exception_)
-        {
-            std::rethrow_exception(thread_exception_);  // LCOV_EXCL_LINE
-        }
+        std::rethrow_exception(thread_exception_);  // LCOV_EXCL_LINE
     }
 
-    std::lock_guard<std::mutex> lock(callback_mutex_);
+    std::lock_guard<std::mutex> callback_lock(callback_mutex_);
     callback_ = callback;
 
-    if (callback != nullptr)
+    if (callback_ != nullptr)
     {
-        // Flush out any queued up callbacks
-        for (auto const& status : callback_queue_)
+        std::vector<OnlineAccountClient::ServiceStatus> known_statuses;
+        for (auto const& info : accounts_)
+        {
+            known_statuses.push_back(info_to_details(info.second.get()));
+        }
+
+        // Invoke callback for all known service statuses
+        lock.unlock();
+        for (auto const& status : known_statuses)
         {
             callback_(status);
         }
-        callback_queue_.clear();
     }
 }
 
@@ -539,15 +543,6 @@ void OnlineAccountClientImpl::callback(AccountInfo* info, std::string const& err
         if (callback_)
         {
             callback_(status);
-        }
-        else
-        {
-            // Push current status onto the callback queue in case a callback is set later
-            callback_queue_.push_back(status);
-            if (callback_queue_.size() > 10)
-            {
-                callback_queue_.pop_front();
-            }
         }
     });
 

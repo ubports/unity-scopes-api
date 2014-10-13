@@ -26,7 +26,6 @@
 #include <unity/util/NonCopyable.h>
 
 #include <condition_variable>
-#include <deque>
 #include <map>
 #include <string>
 #include <thread>
@@ -105,7 +104,6 @@ private:
     std::mutex callback_mutex_;
     OnlineAccountClient::ServiceUpdateCallback callback_;
     std::thread callback_thread_;
-    std::deque<OnlineAccountClient::ServiceStatus> callback_queue_;
 
     std::mutex mutex_;
     std::condition_variable cond_;
