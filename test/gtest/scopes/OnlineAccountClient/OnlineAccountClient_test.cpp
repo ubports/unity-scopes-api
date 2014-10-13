@@ -112,6 +112,9 @@ public:
         last_status_ = status;
         got_update_ = true;
         cond_.notify_all();
+
+        // Call get_service_statuses() from within the callback to make sure it does not cause any deadlocks
+        oa_client_->get_service_statuses();
     }
 
     bool wait_for_service_update(OnlineAccountClient::ServiceStatus const& status)

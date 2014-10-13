@@ -41,6 +41,7 @@ namespace internal
 
 struct AccountInfo
 {
+    std::mutex mutex;
     OnlineAccountClientImpl* account_client;
     AgAccountId account_id;
     bool service_enabled;
@@ -81,7 +82,7 @@ public:
     void construct();
     void tear_down();
 
-    void flush_pending_session(AgAccountId const& account_id, std::unique_lock<std::mutex>& lock);
+    void flush_pending_session(AccountInfo* info, std::unique_lock<std::mutex>& lock);
 
     void main_loop_state_notify(bool is_running);
 
