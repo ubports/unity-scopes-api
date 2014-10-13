@@ -542,13 +542,5 @@ int main(int argc, char **argv)
     dbus_test_service_run(dbus_test_service.get());
 
     ::testing::InitGoogleTest(&argc, argv);
-
-    for (int i = 0; i < 50; ++i)
-    {
-        if (RUN_ALL_TESTS() != 0)
-        {
-            return -1;
-        }
-    }
     return RUN_ALL_TESTS();
 }
