@@ -20,10 +20,7 @@
 #include "ScopesWatcher.h"
 
 #include <unity/scopes/internal/IniSettingsSchema.h>
-#include <unity/scopes/internal/MiddlewareFactory.h>
-#include <unity/scopes/internal/MWRegistry.h>
 #include <unity/scopes/internal/RegistryConfig.h>
-#include <unity/scopes/internal/RegistryObject.h>
 #include <unity/scopes/internal/RuntimeConfig.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/ScopeConfig.h>
@@ -31,17 +28,9 @@
 #include <unity/scopes/internal/ScopeMetadataImpl.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
-#include <unity/util/ResourcePtr.h>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem/operations.hpp>
-
-#include <algorithm>
-#include <cassert>
-#include <fstream>
-#include <iostream>
-#include <map>
-#include <set>
 
 #include <sys/stat.h>  // TODO: remove this once hack for creating data root dir is removed
 
