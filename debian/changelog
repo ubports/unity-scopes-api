@@ -1,3 +1,10 @@
+unity-scopes-api (0.6.7+14.10.20141014-0ubuntu1) 14.09; urgency=low
+
+  [ Marcus Tomlinson ]
+  * Merge staging ( (LP: #1380588)
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Tue, 14 Oct 2014 12:06:24 +0000
+
 unity-scopes-api (0.6.7+14.10.20141010.1-0ubuntu1) utopic; urgency=medium
 
   [ Marcus Tomlinson ]
