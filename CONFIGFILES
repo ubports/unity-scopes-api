@@ -102,7 +102,8 @@ The following keys are recognized:
   Note that the actual files are written into subdirectories of
   this directory, for example:
 
-  $HOME/.local/share/unity-scopes/<scope_id>/cache.db
+  $HOME/.local/share/unity-scopes/leaf-net/<scope_id>/some_file (for confined scopes)
+  and $HOME/.local/share/unity-scopes/unconfined/<scope_id>/some_file (for unconfined scopes).
 
 - ConfigDir
 

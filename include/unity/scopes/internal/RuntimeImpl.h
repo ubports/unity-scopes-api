@@ -69,7 +69,11 @@ public:
 private:
     RuntimeImpl(std::string const& scope_id, std::string const& configfile);
     void waiter_thread(ThreadSafeQueue<std::future<void>>::SPtr const& queue) const noexcept;
-    std::string find_cache_dir(std::string& confinement_type) const;
+    std::string demangled_id() const;
+    bool confined() const;
+    std::string confinement_type() const;
+    std::string find_cache_dir() const;
+    std::string find_tmp_dir() const;
 
     bool destroyed_;
     std::string scope_id_;

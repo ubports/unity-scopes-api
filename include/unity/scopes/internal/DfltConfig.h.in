@@ -39,7 +39,6 @@ static constexpr char const* DFLT_ZMQ_MIDDLEWARE_INI = "@CMAKE_INSTALL_PREFIX@/@
 static constexpr char const* DFLT_MIDDLEWARE_INI = DFLT_ZMQ_MIDDLEWARE_INI;
 static constexpr char const* DFLT_SCOPE_INSTALL_DIR = "@CMAKE_INSTALL_PREFIX@/@LIB_INSTALL_PREFIX@/@UNITY_SCOPES_LIB@";
 static constexpr char const* DFLT_OEM_INSTALL_DIR = "/custom/@LIB_INSTALL_PREFIX@/@UNITY_SCOPES_LIB@";
-static constexpr char const* DFLT_CONFINEMENT_TYPE = "leaf-net";
 
 static constexpr int DFLT_SS_HTTP_TIMEOUT = 20;              // seconds
 static constexpr int DFLT_SS_REG_REFRESH_RATE = 86400;       // 24 hours as seconds
