@@ -45,9 +45,9 @@ def run():
     #
     old_regex = re.compile(r'^ (\(.*\))"(.*)" (.*)$')
 
-    old_syms = {}                           # Dictionary containing symbol -> ( tag, version )
+    old_syms = {}                                   # Dictionary containing symbol -> ( tag, version )
     with open(OLD_FILE, encoding='utf=8') as file:
-        file.readline()                     # Skip first line, which is the library name and version
+        file.readline()                             # Skip first line, which is the library name and version
         for line in file:
             mo = old_regex.match(line)
             if mo:
