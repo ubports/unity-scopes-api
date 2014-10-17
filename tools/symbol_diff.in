@@ -55,7 +55,7 @@ def run():
             else:
                 raise Exception('Invalid input line in ' + OLD_FILE + ': ' + line)
 
-    # Following the first line, lines in the symbol file created by dpkg-builpkg look
+    # Following the first line, lines in the symbol file created by dpkg-buildpkg look
     # like this (note leading single whitespace in each line):
     #
     #  _ZTv0_n24_N5unity6scopes11SearchReplyD0Ev@Base 0.4.0+14.04.20140312.1
