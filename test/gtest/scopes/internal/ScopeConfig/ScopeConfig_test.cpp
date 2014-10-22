@@ -122,6 +122,12 @@ TEST(ScopeConfig, bad_child_scope_ids)
     }
 }
 
+TEST(ScopeConfig, empty_scope_ids)
+{
+    ScopeConfig cfg(EMPTY_CHILD_IDS);
+    EXPECT_EQ(cfg.child_scope_ids().size(), 0);
+}
+
 TEST(ScopeConfig, bad_timeout)
 {
     try

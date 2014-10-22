@@ -1,0 +1,5 @@
+[ScopeConfig]
+DisplayName = Scope name
+Description = Scope description
+Author = Canonical
+ChildScopes =
