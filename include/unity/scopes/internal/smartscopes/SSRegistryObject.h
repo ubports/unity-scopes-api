@@ -98,6 +98,7 @@ private:
 
     bool caching_enabled_;
     std::string locale_;
+    MWPublisher::SPtr publisher_;
 };
 
 }  // namespace smartscopes

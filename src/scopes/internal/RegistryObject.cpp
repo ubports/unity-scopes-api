@@ -78,6 +78,15 @@ RegistryObject::RegistryObject(core::posix::ChildProcess::DeathObserver& death_o
         try
         {
             publisher_ = middleware->create_publisher(middleware->runtime()->registry_identity());
+
+            ss_list_update_subscriber_ = middleware->create_subscriber(middleware->runtime()->ss_registry_identity());
+            ss_list_update_connection_ = std::make_shared<core::ScopedConnection>
+            (
+                ss_list_update_subscriber_->message_received().connect([this](string const&)
+                {
+                    ss_list_update();
+                })
+            );
         }
         catch (std::exception const& e)
         {
@@ -412,6 +421,15 @@ void RegistryObject::remove_desktop_file(std::string const& scope_id)
     if (boost::filesystem::exists(desktop_file_path))
     {
         boost::filesystem::remove(desktop_file_path);
+    }
+}
+
+void RegistryObject::ss_list_update()
+{
+    if (publisher_)
+    {
+        // Send a blank message to subscribers to inform them that the samrt scopes proxy has been updated
+        publisher_->send_message("");
     }
 }
 
