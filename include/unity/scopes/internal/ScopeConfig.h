@@ -59,7 +59,6 @@ public:
 
 private:
     static void parse_appearance_attribute(VariantMap& var, std::string const& key, std::string const& val);
-    std::vector<std::string> parse_scope_ids(std::string const& val);
 
     bool overrideable_;
     std::string display_name_;

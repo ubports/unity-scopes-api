@@ -193,14 +193,18 @@ ScopeConfig::ScopeConfig(string const& configfile) :
 
     try
     {
-        string child_str = parser()->get_string(scope_config_group, child_scope_ids_key);
-        if (child_str.size())
-        {
-            child_scope_ids_ = parse_scope_ids(child_str);
-        }
+        child_scope_ids_ = parser()->get_string_array(scope_config_group, child_scope_ids_key);
     }
     catch (LogicException const&)
     {
+    }
+
+    for (auto const& id: child_scope_ids_)
+    {
+        if (id.size() == 0)
+        {
+            throw_ex("Invalid empty scope id for ChildScopes");
+        }
     }
 
     try
@@ -267,47 +271,6 @@ ScopeConfig::ScopeConfig(string const& configfile) :
 
 ScopeConfig::~ScopeConfig()
 {
-}
-
-
-std::vector<std::string> ScopeConfig::parse_scope_ids(std::string const& val)
-{
-    std::stringstream idstr;
-    std::vector<std::string> ids;
-    for (auto it = val.begin();; it++)
-    {
-        bool last = (it == val.end());
-        if (!last)
-        {
-            // ignore white space
-            if (isspace(*it))
-            {
-                continue;
-            }
-            // append all characters except for commas and process next char
-            if (*it != ',')
-            {
-                idstr << *it;
-                continue;
-            }
-        }
-
-        // end of string or comma
-        std::string scope_id = idstr.str();
-        if (scope_id.size() == 0)
-        {
-            throw_ex("Invalid empty scope id for " + child_scope_ids_key);
-        }
-        ids.push_back(scope_id);
-        idstr.str(std::string());
-        idstr.clear();
-
-        if (last) // end of parsing
-        {
-            break;
-        }
-    };
-    return ids;
 }
 
 void ScopeConfig::parse_appearance_attribute(VariantMap& var, std::string const& key, std::string const& val)

@@ -114,7 +114,6 @@ TEST(ScopeConfig, bad_child_scope_ids)
     try
     {
         ScopeConfig cfg(BAD_CHILD_IDS);
-        FAIL();
     }
     catch(ConfigException const& e)
     {
