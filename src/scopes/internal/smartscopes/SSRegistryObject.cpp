@@ -22,6 +22,7 @@
 #include <unity/scopes/internal/JsonSettingsSchema.h>
 #include <unity/scopes/internal/RegistryException.h>
 #include <unity/scopes/internal/RuntimeConfig.h>
+#include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/ScopeImpl.h>
 #include <unity/scopes/internal/ScopeMetadataImpl.h>
 #include <unity/scopes/internal/smartscopes/HttpClientQt.h>
@@ -30,8 +31,6 @@
 #include <unity/UnityExceptions.h>
 
 #include <iostream>
-
-static const char* c_dbussend_cmd = "dbus-send /com/canonical/unity/scopes com.canonical.unity.scopes.InvalidateResults string:smart-scopes";
 
 namespace unity
 {
@@ -86,6 +85,18 @@ SSRegistryObject::SSRegistryObject(MiddlewareBase::SPtr middleware,
     }
 
     refresh_thread_ = std::thread(&SSRegistryObject::refresh_thread, this);
+
+    if (middleware)
+    {
+        try
+        {
+            publisher_ = middleware->create_publisher(middleware->runtime()->ss_registry_identity());
+        }
+        catch (std::exception const& e)
+        {
+            std::cerr << "SSRegistryObject(): failed to create registry publisher: " << e.what() << std::endl;
+        }
+    }
 }
 
 SSRegistryObject::~SSRegistryObject()
@@ -372,11 +383,10 @@ void SSRegistryObject::get_remote_scopes()
         scopes_ = new_scopes_;
     }
 
-    if (changed)
+    if (changed && publisher_)
     {
-        // something has changed, send invalidate signal
-        int result = safe_system_call(c_dbussend_cmd);
-        (void)result;
+        // Send a blank message to subscribers to inform them that the smart scopes registry has been updated
+        publisher_->send_message("");
     }
 }
 
