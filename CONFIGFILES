@@ -329,7 +329,8 @@ The following keys are recognized in the ScopeConfig group:
 - ChildScopes
 
   The list of ids of scopes aggregated by this scope (if any). The values in this list
-  should be spearated by commas.
+  must be separated by semicolons. Note: make sure there are no trailing spaces following
+  the ids, as they will be preserved.
 
 - Invisible
 
