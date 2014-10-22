@@ -1,6 +1,10 @@
 Release notes
 =============
 
+Changes in version 0.6.8
+========================
+  - Replaced dbus-send with "list updated" pub/sub to invalidate smart scopes.
+
 Changes in version 0.6.7
 ========================
   - OnlineAccountClient fixes: run the internal event loop within its own context to avoid
