@@ -191,6 +191,7 @@ public:
     The scope author must ensure that it contains all scopes that an aggregator
     might collect results from. This list may contain scopes that are not currently
     installed and are optional for proper functioning of the aggregator scope.
+
     \return The list of scopes ids aggregated by this scope.
     */
     std::vector<std::string> child_scope_ids() const;
