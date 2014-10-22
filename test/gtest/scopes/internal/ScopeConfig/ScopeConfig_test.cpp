@@ -128,6 +128,12 @@ TEST(ScopeConfig, empty_scope_ids)
     EXPECT_EQ(cfg.child_scope_ids().size(), 0);
 }
 
+TEST(ScopeConfig, single_scope_id)
+{
+    ScopeConfig cfg(SINGLE_CHILD_ID);
+    EXPECT_EQ(cfg.child_scope_ids().size(), 1);
+}
+
 TEST(ScopeConfig, bad_timeout)
 {
     try
