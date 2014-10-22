@@ -41,6 +41,7 @@ namespace internal
 
 struct AccountInfo
 {
+    std::mutex mutex;
     OnlineAccountClientImpl* account_client;
     AgAccountId account_id;
     bool service_enabled;
@@ -78,38 +79,43 @@ public:
                                      OnlineAccountClient::PostLoginAction login_failed_action);
 
     // Methods used only by impl
-    void flush_pending_sessions();
+    void construct();
+    void tear_down();
+
+    void flush_pending_session(AccountInfo* info, std::unique_lock<std::mutex>& lock);
 
     void main_loop_state_notify(bool is_running);
 
+    std::shared_ptr<AgManager> manager();
     std::string service_name();
-    void callback(OnlineAccountClient::ServiceStatus const& service_status);
+    std::shared_ptr<GMainContext> main_loop_context();
+
+    void callback(AccountInfo* info, std::string const& error = "");
 
     bool has_account(AgAccountId const& account_id);
     void add_account(AgAccountId const& account_id, std::shared_ptr<AccountInfo> account_info);
     void remove_account(AgAccountId const& account_id);
 
-    bool inc_logins();
-    void dec_logins();
-
 private:
-    std::string service_name_;
-    std::string service_type_;
-    std::string provider_name_;
-    OnlineAccountClient::ServiceUpdateCallback callback_;
-    bool use_external_main_loop_;
+    std::string const service_name_;
+    std::string const service_type_;
+    std::string const provider_name_;
+    OnlineAccountClient::MainLoopSelect const main_loop_select_;
 
-    std::thread main_loop_thread_;
     std::mutex callback_mutex_;
+    OnlineAccountClient::ServiceUpdateCallback callback_;
+    std::thread callback_thread_;
+
     std::mutex mutex_;
     std::condition_variable cond_;
+    std::thread main_loop_thread_;
     bool main_loop_is_running_;
-    bool client_stopping_;
-    int logins_busy_;
+    std::exception_ptr thread_exception_;
     gulong account_enabled_signal_id_;
     gulong account_deleted_signal_id_;
 
     std::shared_ptr<GMainLoop> main_loop_;
+    std::shared_ptr<GMainContext> main_loop_context_;
     std::shared_ptr<AgManager> manager_;
     std::map<AgAccountId, std::shared_ptr<AccountInfo>> accounts_;
 
