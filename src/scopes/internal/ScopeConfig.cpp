@@ -216,8 +216,6 @@ ScopeConfig::ScopeConfig(string const& configfile) :
         debug_mode_ = false;
     }
 
-
-
     // read all display attributes from scope_appearance_group
     try
     {
