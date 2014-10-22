@@ -350,17 +350,12 @@ void RuntimeImpl::run_scope(ScopeBase* scope_base,
         string config_dir = config_dir_ + "/" + scope_id_;
         string settings_db = config_dir + "/settings.ini";
 
-        string scope_data_dir = data_dir_ + "/" + scope_id_;
         string scope_dir = scope_base->scope_directory();
-
         string settings_schema = scope_dir + "/" + scope_id_ + "-settings.ini";
+
         boost::system::error_code ec;
         if (boost::filesystem::exists(settings_schema, ec))
         {
-            // Make sure the data directories exist. (No permission for group and others; data might be sensitive.)
-            !boost::filesystem::exists(data_dir_, ec) && ::mkdir(data_dir_.c_str(), 0700);
-            !boost::filesystem::exists(scope_data_dir, ec) && ::mkdir(scope_data_dir.c_str(), 0700);
-
             shared_ptr<SettingsDB> db(SettingsDB::create_from_ini_file(settings_db, settings_schema));
             scope_base->p->set_settings_db(db);
         }
@@ -371,25 +366,8 @@ void RuntimeImpl::run_scope(ScopeBase* scope_base,
     }
 
     scope_base->p->set_registry(registry_);
-
-    string confinement_type;
-    scope_base->p->set_cache_directory(find_cache_dir(confinement_type));
-
-    {
-        // Set tmp dir.
-        // We need to create any directories under /run/user/<uid> because they might not
-        // exist. (/run/user/<uid> gets cleaned out periodically.)
-        string path = string("/run/user/") + std::to_string(geteuid());
-        path += "/scopes";
-        boost::system::error_code ec;
-        !boost::filesystem::exists(path, ec) && ::mkdir(path.c_str(), 0700);
-        path += "/" + confinement_type;
-        !boost::filesystem::exists(path, ec) && ::mkdir(path.c_str(), 0700);
-        path += "/" + scope_id_;
-        !boost::filesystem::exists(path, ec) && ::mkdir(path.c_str(), 0700);
-
-        scope_base->p->set_tmp_directory(path);
-    }
+    scope_base->p->set_cache_directory(find_cache_dir());
+    scope_base->p->set_tmp_directory(find_tmp_dir());
 
     try
     {
@@ -508,23 +486,15 @@ string RuntimeImpl::proxy_to_string(ObjectProxy const& proxy) const
     }
 }
 
-string RuntimeImpl::find_cache_dir(string& confinement_type) const
+string RuntimeImpl::demangled_id() const
 {
-    // Find out whether we are confined. aa_getcon() returns -1 in that case.
-    char* con = nullptr;
-    char* mode;
-    int rc = aa_getcon(&con, &mode);
-    // Only con (not mode) must be deallocated
-    free(con);
-    confinement_type = rc == -1 ? "leaf-net" : "unconfined";
-
     // For scopes that are in a click package together with an app,
     // such as YouTube, the cache directory is shared between the app and
     // the scope. The cache directory name is the scope ID up to the first
     // underscore. For example, com.ubuntu.scopes.youtube_youtube is the
     // scope ID, but the cache dir name is com.ubuntu.scopes.youtube.
     auto id = scope_id_;
-    if (confinement_type == "leaf-net")
+    if (confined())
     {
         auto pos = id.find('_');
         if (pos != string::npos)
@@ -532,14 +502,61 @@ string RuntimeImpl::find_cache_dir(string& confinement_type) const
             id = id.substr(0, pos);
         }
     }
+    return id;
+}
 
+bool RuntimeImpl::confined() const
+{
+    auto is_confined = []
+    {
+        // Find out whether we are confined. aa_getcon() returns -1 in that case.
+        char* con = nullptr;
+        char* mode;
+        int rc = aa_getcon(&con, &mode);
+        // Only con (not mode) must be deallocated
+        free(con);
+        return rc == -1;
+    };
+    static bool confined = is_confined();
+    return confined;
+}
+
+string RuntimeImpl::confinement_type() const
+{
+    return confined() ? "leaf-net" : "unconfined";
+}
+
+string RuntimeImpl::find_cache_dir() const
+{
     // Create the data_dir_/<confinement-type>/<id> directories if they don't exist.
     boost::system::error_code ec;
-    !boost::filesystem::exists(data_dir_, ec) && ::mkdir(data_dir_.c_str(), 0700);
-    string dir = data_dir_ + "/" + confinement_type;
+    !confined() && !boost::filesystem::exists(data_dir_, ec) && ::mkdir(data_dir_.c_str(), 0700);
+    string dir = data_dir_ + "/" + confinement_type();
+    !confined() && !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700);
+
+    // A confined scope is allowed to create this dir.
+    dir += "/" + demangled_id();
     !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700);
-    dir += "/" + id;
-    !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700);
+
+    return dir;
+}
+
+string RuntimeImpl::find_tmp_dir() const
+{
+    // Set tmp dir.
+    // We need to create any directories under /run/user/<uid> because they might not
+    // exist. We set the sticky bit because, without this, things in
+    // /run/user may be deleted if not accessed for more than six hours.
+    string dir = string("/run/user/") + std::to_string(geteuid());
+    dir += "/scopes";
+    boost::system::error_code ec;
+    !confined() && !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700 | S_ISVTX);
+    dir += "/" + confinement_type();
+    !confined() && !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700 | S_ISVTX);
+
+    // A confined scope is allowed to create this dir.
+    dir += "/" + scope_id_;  // Not demangled, use the real scope ID.
+    !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700 | S_ISVTX);
 
     return dir;
 }
