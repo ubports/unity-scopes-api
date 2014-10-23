@@ -1,0 +1,12 @@
+add_subdirectory(scopes)
+
+configure_file(Runtime.ini.in Runtime.ini)
+configure_file(Registry.ini.in Registry.ini)
+
+add_definitions(-DDEMO_RUNTIME_PATH="${CMAKE_CURRENT_BINARY_DIR}/Runtime.ini")
+
+add_executable(scopes-stress scopes-stress.cpp)
+# Add_dependencies should be used sparingly. In this case we need the global
+# header to be generated before we start building the client binary.
+add_dependencies(scopes-stress globalheader)
+target_link_libraries(scopes-stress ${UNITY_SCOPES_LIB} ${OTHER_LIBS})
