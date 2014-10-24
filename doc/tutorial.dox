@@ -1067,7 +1067,7 @@ Some of the `Appearance` keys (like `PageHeader.Background`) require background 
 </ul>
 
 The value of `ChildScopes` key is to be used by aggregator scopes. It must be a semicolon separated list of scope identifiers that
-are might be aggregated by this scope, for example:
+might be aggregated by this scope, for example:
 
 `ChildScopes = com.foo.bar;com.foo.bar2`
 
