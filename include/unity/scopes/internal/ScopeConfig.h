@@ -53,6 +53,7 @@ public:
     int idle_timeout() const;              // Optional, returns default value if not present
     ScopeMetadata::ResultsTtlType results_ttl_type() const;  // Optional, returns none if not present
     bool debug_mode() const;               // Optional, returns false if not present
+    std::vector<std::string> child_scope_ids() const;
 
     VariantMap appearance_attributes() const; // Optional, returns empty map if no attributes are present
 
@@ -73,6 +74,7 @@ private:
     int idle_timeout_;
     ScopeMetadata::ResultsTtlType results_ttl_type_;
     bool debug_mode_;
+    std::vector<std::string> child_scope_ids_;
 
     VariantMap appearance_attributes_;
 };

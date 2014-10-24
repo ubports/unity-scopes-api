@@ -1,10 +1,17 @@
 Release notes
 =============
 
+Changes in version 0.6.8
+========================
+  - Added support for ChildScopes scope .ini option to list scopes ids of aggregated scopes.
+  - Replaced dbus-send with "list updated" pub/sub to invalidate smart scopes.
+
 Changes in version 0.6.7
 ========================
-  - Added new RunInExternalUiMainLoop option to OnlineAccountClient::MainLoopSelect.
-  - OnlineAccountClient signon UI policy determined by main loop used (shell: show / scope: hide).
+  - OnlineAccountClient fixes: run the internal event loop within its own context to avoid
+    clashing with external main loop (LP: #1377147).
+  - Introduced new dependencies on dbus-test-runner and libdbustest1-dev.
+  - Fix for Zmq infinite reconnection problem (LP: #1374206)
 
 Changes in version 0.6.6
 ========================

@@ -315,6 +315,7 @@ void add_local_scope(RegistryObject::SPtr const& registry,
     mi->set_author(sc.author());
     mi->set_invisible(sc.invisible());
     mi->set_appearance_attributes(sc.appearance_attributes());
+    mi->set_child_scope_ids(sc.child_scope_ids());
 
     // Prepend scope_dir to pageheader logo path if logo path is relative.
     // TODO: Once we have type-safe parsing in the config files, remove
@@ -486,12 +487,21 @@ int main(int argc, char* argv[])
             // TODO: HACK: We create the root of the data directory for confined scopes,
             //       in case the scope is confined and the dir doesn't exist
             //       yet. This really should be done by the click-installation but,
-            //       prior to RTM, we don't rely on that. We check whether the
-            //       directory exists first to avoid getting noise in the Apparmor log.
+            //       prior to RTM, we don't rely on that.
             string data_root = rt_config.data_directory() + "/leaf-net";
             boost::system::error_code ec;
             !boost::filesystem::exists(data_root, ec) && ::mkdir(data_root.c_str(), 0700);
         } // Release memory for config parser
+
+        // Make sure that the parent directories for confined scope tmp directory exist.
+        {
+            string dir = string("/run/user/") + std::to_string(geteuid());
+            dir += "/scopes";
+            boost::system::error_code ec;
+            !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700 | S_ISVTX);
+            dir += "/leaf-net";
+            !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700 | S_ISVTX);
+        }
 
         // Collect the registry config data.
 

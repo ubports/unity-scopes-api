@@ -17,6 +17,7 @@ ResultsTtlType = large
 LocationDataNeeded = true
 ConfinementType = unconfined
 DebugMode = true
+ChildScopes = com.foo.bar;com.foo.bar2;com.foo.boo
 
 [Appearance]
 arbitrary_key = true

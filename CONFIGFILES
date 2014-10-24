@@ -102,7 +102,8 @@ The following keys are recognized:
   Note that the actual files are written into subdirectories of
   this directory, for example:
 
-  $HOME/.local/share/unity-scopes/<scope_id>/cache.db
+  $HOME/.local/share/unity-scopes/leaf-net/<scope_id>/some_file (for confined scopes)
+  and $HOME/.local/share/unity-scopes/unconfined/<scope_id>/some_file (for unconfined scopes).
 
 - ConfigDir
 
@@ -325,6 +326,15 @@ The following keys are recognized in the ScopeConfig group:
 - HotKey
 
   The hot key for the scope. The default value is the empty string.
+
+- ChildScopes
+
+  The list of ids of scopes aggregated by this scope (if any). The values in this list
+  must be separated by semicolons. This list is translated to the names of
+  children scopes when in the scopes overview page of the Unity Dash.
+
+  Note: make sure there are no trailing spaces following
+  the ids, as they will be preserved.
 
 - Invisible
 

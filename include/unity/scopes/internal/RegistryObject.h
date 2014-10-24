@@ -85,6 +85,8 @@ private:
     void create_desktop_file(ScopeMetadata const& metadata);
     void remove_desktop_file(std::string const& scope_id);
 
+    void ss_list_update();
+
     class ScopeProcess
     {
     public:
@@ -144,6 +146,8 @@ private:
     mutable std::mutex mutex_;
 
     MWPublisher::SPtr publisher_;
+    MWSubscriber::SPtr ss_list_update_subscriber_;
+    std::shared_ptr<core::ScopedConnection> ss_list_update_connection_;
     bool generate_desktop_files_;
 };
 
