@@ -86,7 +86,7 @@ public:
         return query;
     }
 
-    virtual PreviewQueryBase::UPtr preview(Result const& result, ActionMetadata const& metadata) override
+    virtual PreviewQueryBase::UPtr preview(Result const&, ActionMetadata const&) override
     {
         return nullptr;
     }

@@ -62,7 +62,7 @@ public:
             {
                 return;
             }
-            this_thread::sleep_for(chrono::milliseconds(60));
+            this_thread::sleep_for(chrono::milliseconds(110));
         }
     }
 
@@ -86,7 +86,7 @@ public:
         return query;
     }
 
-    virtual PreviewQueryBase::UPtr preview(Result const& result, ActionMetadata const& metadata) override
+    virtual PreviewQueryBase::UPtr preview(Result const&, ActionMetadata const&) override
     {
         return nullptr;
     }

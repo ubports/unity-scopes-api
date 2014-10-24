@@ -111,7 +111,7 @@ TEST(stress, queryThreeScopesInParallel)
     
     const std::list<std::string> scopes {"scope1", "scope2", "scope3"};
 
-    for (int i = 0; i<10; i++)
+    for (int i = 0; i<40; i++)
     {
         cout << "RUN #" << i << endl;
         list<shared_ptr<Receiver>> replies;
