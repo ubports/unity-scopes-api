@@ -230,7 +230,7 @@ set(OTHER_LIBS
     ${JSONCPP_LDFLAGS}
     ${PROCESS_CPP_LDFLAGS}
     ${ZMQPPLIB}
-    ${ZMQLIB}
+    ${ZMQLIB_LDFLAGS}
     ${CAPNPLIB}
     ${KJLIB}
     ${DLLIB}
