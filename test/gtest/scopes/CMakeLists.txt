@@ -1,6 +1,10 @@
 add_subdirectory(internal)
 add_subdirectory(testing)
 
+if(${slowtests})
+  add_subdirectory(stress)
+endif()
+
 add_subdirectory(Activation)
 add_subdirectory(ActivationResponse)
 add_subdirectory(Annotation)
