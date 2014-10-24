@@ -65,7 +65,7 @@ void ZmqReply::push(VariantMap const& result)
     to_value_dict(result, resultBuilder);
 
     auto future = mw_base()->oneway_pool()->submit([&] { return this->invoke_oneway_(request_builder); });
-    future.wait();
+    future.get();
 }
 
 void ZmqReply::finished(CompletionDetails const& details)
@@ -101,7 +101,7 @@ void ZmqReply::finished(CompletionDetails const& details)
     in_params.setMessage(details.message());
 
     auto future = mw_base()->oneway_pool()->submit([&] { return this->invoke_oneway_(request_builder); });
-    future.wait();
+    future.get();
 }
 
 void ZmqReply::info(OperationInfo const& op_info)
@@ -114,7 +114,7 @@ void ZmqReply::info(OperationInfo const& op_info)
     in_params.setMessage(op_info.message());
 
     auto future = mw_base()->oneway_pool()->submit([&] { return this->invoke_oneway_(request_builder); });
-    future.wait();
+    future.get();
 }
 
 } // namespace zmq_middleware
