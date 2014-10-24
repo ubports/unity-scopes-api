@@ -105,10 +105,10 @@ TEST(stress, queryThreeScopesInParallel)
 {
     Runtime::UPtr rt = Runtime::create(TEST_RUNTIME_FILE);
     RegistryProxy r = rt->registry();
-    
+
     auto scopes_meta = r->list();
     EXPECT_EQ(scopes_meta.size(), 3);
-    
+
     const std::list<std::string> scopes {"scope1", "scope2", "scope3"};
 
     for (int i = 0; i<40; i++)
@@ -120,12 +120,12 @@ TEST(stress, queryThreeScopesInParallel)
             auto meta = r->get_metadata(scope_id);
             shared_ptr<Receiver> reply(new Receiver(scope_id));
             replies.push_back(reply);
-            
+
             FilterState filter_state;
             SearchMetadata metadata("C", "phone");
             auto ctrl = meta.proxy()->search("", "", filter_state, metadata, reply);
         }
-        
+
         cout << "waiting for replies to finish" << endl;
         for (auto reply: replies)
         {
