@@ -327,6 +327,15 @@ The following keys are recognized in the ScopeConfig group:
 
   The hot key for the scope. The default value is the empty string.
 
+- ChildScopes
+
+  The list of ids of scopes aggregated by this scope (if any). The values in this list
+  must be separated by semicolons. This list is translated to the names of
+  children scopes when in the scopes overview page of the Unity Dash.
+
+  Note: make sure there are no trailing spaces following
+  the ids, as they will be preserved.
+
 - Invisible
 
   Whether the scope is hidden in the UI. The default value is false.

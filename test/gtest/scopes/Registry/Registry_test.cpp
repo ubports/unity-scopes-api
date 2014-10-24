@@ -104,6 +104,10 @@ TEST(Registry, metadata)
     EXPECT_EQ("boolean", defs[1].get_dict()["type"].get_string());
     EXPECT_EQ(true, defs[1].get_dict()["defaultValue"].get_bool());
     EXPECT_TRUE(meta.location_data_needed());
+    auto children = meta.child_scope_ids();
+    EXPECT_EQ(2u, children.size());
+    EXPECT_EQ("com.foo.bar", children[0]);
+    EXPECT_EQ("com.foo.baz", children[1]);
 
     auto attrs = meta.appearance_attributes();
     EXPECT_EQ("fg_color", attrs["foreground-color"].get_string());
@@ -134,6 +138,7 @@ TEST(Registry, metadata)
     defs = meta.settings_definitions();
     EXPECT_EQ(0, defs.size());
     EXPECT_FALSE(meta.location_data_needed());
+    EXPECT_EQ(0, meta.child_scope_ids().size());
 }
 
 auto const wait_time = std::chrono::milliseconds(1000);

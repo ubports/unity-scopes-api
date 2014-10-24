@@ -57,6 +57,7 @@ ScopeMetadataImpl::ScopeMetadataImpl(ScopeMetadataImpl const& other)
     , author_(other.author_)
     , appearance_attributes_(other.appearance_attributes_)
     , results_ttl_type_(other.results_ttl_type_)
+    , child_scope_ids_(other.child_scope_ids_)
 {
     if (other.art_)
     {
@@ -112,6 +113,7 @@ ScopeMetadataImpl& ScopeMetadataImpl::operator=(ScopeMetadataImpl const& rhs)
         results_ttl_type_ = rhs.results_ttl_type_;
         settings_definitions_.reset(rhs.settings_definitions_ ? new VariantArray(*rhs.settings_definitions_) : nullptr);
         location_data_needed_.reset(rhs.location_data_needed_ ? new bool(*rhs.location_data_needed_) : nullptr);
+        child_scope_ids_ = rhs.child_scope_ids_;
     }
     return *this;
 }
@@ -223,6 +225,11 @@ bool ScopeMetadataImpl::location_data_needed() const
     return false;
 }
 
+std::vector<std::string> ScopeMetadataImpl::child_scope_ids() const
+{
+    return child_scope_ids_;
+}
+
 void ScopeMetadataImpl::set_scope_id(std::string const& scope_id)
 {
     scope_id_ = scope_id;
@@ -296,6 +303,11 @@ void ScopeMetadataImpl::set_settings_definitions(VariantArray const& settings_de
 void ScopeMetadataImpl::set_location_data_needed(bool location_data_needed)
 {
     location_data_needed_.reset(new bool(location_data_needed));
+}
+
+void ScopeMetadataImpl::set_child_scope_ids(std::vector<std::string> const& ids)
+{
+    child_scope_ids_ = ids;
 }
 
 namespace
@@ -372,6 +384,15 @@ VariantMap ScopeMetadataImpl::serialize() const
     if (location_data_needed_)
     {
         var["location_data_needed"] = *location_data_needed_;
+    }
+    if (child_scope_ids_.size())
+    {
+        VariantArray va;
+        for (auto const& sid: child_scope_ids_)
+        {
+            va.push_back(Variant(sid));
+        }
+        var["child_scopes"] = Variant(va);
     }
 
     return var;
@@ -493,6 +514,16 @@ void ScopeMetadataImpl::deserialize(VariantMap const& var)
     if (it != var.end())
     {
         location_data_needed_.reset(new bool(it->second.get_bool()));
+    }
+
+    child_scope_ids_.clear();
+    it = var.find("child_scopes");
+    if (it != var.end())
+    {
+        for (auto const& v: it->second.get_array())
+        {
+            child_scope_ids_.push_back(v.get_string());
+        }
     }
 }
 

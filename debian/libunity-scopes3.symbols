@@ -437,6 +437,7 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::internal::ScopeConfig::appearance_attributes() const@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::internal::ScopeConfig::art() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeConfig::author() const@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::internal::ScopeConfig::child_scope_ids() const@Base" 0replaceme
  (c++)"unity::scopes::internal::ScopeConfig::debug_mode() const@Base" 0.6.2+rtm+rtm+rtm+14.09.20140818
  (c++)"unity::scopes::internal::ScopeConfig::description() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeConfig::display_name() const@Base" 0.4.0+14.04.20140312.1
@@ -475,6 +476,7 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::internal::ScopeMetadataImpl::appearance_attributes() const@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::internal::ScopeMetadataImpl::art() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeMetadataImpl::author() const@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::internal::ScopeMetadataImpl::child_scope_ids() const@Base" 0replaceme
  (c++)"unity::scopes::internal::ScopeMetadataImpl::create(std::unique_ptr<unity::scopes::internal::ScopeMetadataImpl, std::default_delete<unity::scopes::internal::ScopeMetadataImpl> >)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeMetadataImpl::description() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeMetadataImpl::deserialize(std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unity::scopes::Variant> > > const&)@Base" 0.4.0+14.04.20140312.1
@@ -496,6 +498,7 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::internal::ScopeMetadataImpl::set_appearance_attributes(std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unity::scopes::Variant> > > const&)@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::internal::ScopeMetadataImpl::set_art(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeMetadataImpl::set_author(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::internal::ScopeMetadataImpl::set_child_scope_ids(std::vector<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&)@Base" 0replaceme
  (c++)"unity::scopes::internal::ScopeMetadataImpl::set_description(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeMetadataImpl::set_display_name(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeMetadataImpl::set_hot_key(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
@@ -756,6 +759,7 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::ScopeMetadata::appearance_attributes() const@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::ScopeMetadata::art() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ScopeMetadata::author() const@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::ScopeMetadata::child_scope_ids() const@Base" 0replaceme
  (c++)"unity::scopes::ScopeMetadata::description() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ScopeMetadata::display_name() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ScopeMetadata::hot_key() const@Base" 0.4.0+14.04.20140312.1

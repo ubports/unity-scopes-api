@@ -1032,6 +1032,7 @@ following keys:
     SearchHint = hint text displayed to user when viewing scope
     HotKey =
     ResultsTtlType = None, Small, Medium, or Large
+    ChildScopes =
 
     [Appearance]
     ForegroundColor = default text color (defaults to theme-provided foreground color)
@@ -1064,6 +1065,13 @@ Some of the `Appearance` keys (like `PageHeader.Background`) require background 
 <li>/absolute/path/to/image</li>
 <li>http://remote-server.com/path/to/image</li>
 </ul>
+
+The value of `ChildScopes` key is to be used by aggregator scopes. It must be a semicolon separated list of scope identifiers that
+might be aggregated by this scope, for example:
+
+`ChildScopes = com.foo.bar;com.foo.bar2`
+
+This list of scopes is translated to the names of children scopes when in the scopes overview page of the Unity Dash.
 
 \subsection scopetool The scope tool
 

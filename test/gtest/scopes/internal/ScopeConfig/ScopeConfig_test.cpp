@@ -61,6 +61,12 @@ TEST(ScopeConfig, basic)
         EXPECT_EQ("second", attrs["logo"].get_dict()["two"].get_string());
         EXPECT_EQ("abc", attrs["page"].get_dict()["page-header"].get_dict()["logo"].get_string());
         EXPECT_EQ("def", attrs["page"].get_dict()["page-header"].get_dict()["logo2"].get_string());
+
+        auto children = cfg.child_scope_ids();
+        EXPECT_EQ(3u, children.size());
+        EXPECT_EQ("com.foo.bar", children[0]);
+        EXPECT_EQ("com.foo.bar2", children[1]);
+        EXPECT_EQ("com.foo.boo", children[2]);
     }
 
     {
@@ -101,6 +107,31 @@ TEST(ScopeConfig, basic)
         ScopeConfig cfg(TTL_MEDIUM);
         EXPECT_EQ(ScopeMetadata::ResultsTtlType::Medium, cfg.results_ttl_type());
     }
+}
+
+TEST(ScopeConfig, bad_child_scope_ids)
+{
+    try
+    {
+        ScopeConfig cfg(BAD_CHILD_IDS);
+    }
+    catch(ConfigException const& e)
+    {
+        boost::regex r("unity::scopes::ConfigException: \".*\": Invalid empty scope id for ChildScopes");
+        EXPECT_TRUE(boost::regex_match(e.what(), r));
+    }
+}
+
+TEST(ScopeConfig, empty_scope_ids)
+{
+    ScopeConfig cfg(EMPTY_CHILD_IDS);
+    EXPECT_EQ(cfg.child_scope_ids().size(), 0);
+}
+
+TEST(ScopeConfig, single_scope_id)
+{
+    ScopeConfig cfg(SINGLE_CHILD_ID);
+    EXPECT_EQ(cfg.child_scope_ids().size(), 1);
 }
 
 TEST(ScopeConfig, bad_timeout)

@@ -294,11 +294,12 @@ TEST(ScopeMetadataImpl, serialize)
     va.push_back(Variant("world"));
     mi->set_settings_definitions(va);
     mi->set_location_data_needed(false);
+    mi->set_child_scope_ids({"com.foo.bar", "com.foo.baz"});
 
     // Check that serialize() sets the map values correctly
     auto m = ScopeMetadataImpl::create(move(mi));
     auto var = m.serialize();
-    EXPECT_EQ(14u, var.size());
+    EXPECT_EQ(15u, var.size());
     EXPECT_EQ("scope_id", var["scope_id"].get_string());
     EXPECT_EQ("display_name", var["display_name"].get_string());
     EXPECT_EQ("description", var["description"].get_string());
@@ -314,6 +315,9 @@ TEST(ScopeMetadataImpl, serialize)
     EXPECT_FALSE(var["invisible"].get_bool());
     EXPECT_EQ(va, var["settings_definitions"].get_array());
     EXPECT_FALSE(var["location_data_needed"].get_bool());
+    EXPECT_EQ(2u, var["child_scopes"].get_array().size());
+    EXPECT_EQ("com.foo.bar", var["child_scopes"].get_array()[0].get_string());
+    EXPECT_EQ("com.foo.baz", var["child_scopes"].get_array()[1].get_string());
 
     // Make another instance from the VariantMap and check its fields
     ScopeMetadataImpl c(var, &mw);
