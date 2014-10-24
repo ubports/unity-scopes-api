@@ -1,3 +1,0 @@
-[Runtime]
-Registry.Identity = Registry
-Registry.ConfigFile = @CMAKE_CURRENT_BINARY_DIR@/Registry.ini

@@ -1,0 +1,3 @@
+[Zmq]
+EndpointDir = /tmp
+Default.Twoway.Timeout = 2000

@@ -1,5 +1,0 @@
-[Registry]
-Zmq.ConfigFile = @CMAKE_CURRENT_BINARY_DIR@/Zmq.ini
-Scope.InstallDir = @CMAKE_CURRENT_BINARY_DIR@/scopes
-OEM.InstallDir = /custom/usr/lib/@CMAKE_LIBRARY_ARCHITECTURE@/unity/scopes
-Scoperunner.Path = @CMAKE_BINARY_DIR@/scoperunner/scoperunner

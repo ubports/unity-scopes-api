@@ -21,7 +21,6 @@
 #include <thread>
 #include <chrono>
 
-#include <iostream>
 #include <sstream>
 
 #define EXPORT __attribute__ ((visibility ("default")))
@@ -36,12 +35,10 @@ public:
         SearchQueryBase(query, metadata),
         scope_id_(scope_id)
     {
-        cerr << scope_id_ << ": query instance for \"" << query.query_string() << "\" created" << endl;
     }
 
     ~MyQuery()
     {
-        cerr << scope_id_ << ": query instance for \"" << query().query_string() << "\" destroyed" << endl;
     }
 
     virtual void cancelled() override
@@ -52,7 +49,7 @@ public:
     {
         CategoryRenderer rdr;
         auto cat = reply->register_category("cat1", "Category 1", "", rdr);
-        for (int i = 0; i<50; i++)
+        for (int i = 0; i<20; i++)
         {
             std::stringstream s;
             s << i;
@@ -63,13 +60,10 @@ public:
             res.set_dnd_uri("dnd_uri");
             if (!reply->push(res))
             {
-                cerr << "query cancelled for scope " << scope_id_;
                 return;
             }
             this_thread::sleep_for(chrono::milliseconds(80));
         }
-
-        cerr << "query completed for scope " << scope_id_ << endl;
     }
 
 private:

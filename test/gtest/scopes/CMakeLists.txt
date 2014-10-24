@@ -1,5 +1,6 @@
 add_subdirectory(internal)
 add_subdirectory(testing)
+add_subdirectory(stress)
 
 add_subdirectory(Activation)
 add_subdirectory(ActivationResponse)

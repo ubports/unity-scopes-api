@@ -285,7 +285,6 @@ add_subdirectory(smartscopesproxy)
 add_subdirectory(data)
 add_subdirectory(test)
 add_subdirectory(demo)
-add_subdirectory(stress)
 add_subdirectory(tools)
 
 # Custom rules to compile .capnp files
