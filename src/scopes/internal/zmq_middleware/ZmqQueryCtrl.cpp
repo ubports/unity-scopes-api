@@ -59,7 +59,7 @@ void ZmqQueryCtrl::cancel()
     make_request_(request_builder, "cancel");
 
     auto future = mw_base()->oneway_pool()->submit([&] { return this->invoke_oneway_(request_builder); });
-    future.wait();
+    future.get();
 }
 
 void ZmqQueryCtrl::destroy()
@@ -68,7 +68,7 @@ void ZmqQueryCtrl::destroy()
     make_request_(request_builder, "destroy");
 
     auto future = mw_base()->oneway_pool()->submit([&] { return this->invoke_oneway_(request_builder); });
-    future.wait();
+    future.get();
 }
 
 } // namespace zmq_middleware

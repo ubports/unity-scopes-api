@@ -288,8 +288,8 @@ ZmqObjectProxy::TwowayOutParams ZmqObjectProxy::invoke_twoway__(capnp::MessageBu
     // We set a reconnect interval of 20 ms, so we get to the peer quickly, in case
     // the peer hasn't finished binding to its endpoint yet after being exec'd.
     // We back off exponentially to half the call timeout. If we haven't connected
-    // by then, the poll below will time out anyway. For inifinite timeout, we try
-    // a second.
+    // by then, the poll below will time out anyway. For infinite timeout, we try
+    // once a second.
     int reconnect_max = timeout == -1 ? 1000 : timeout / 2;
     s.set(zmqpp::socket_option::reconnect_interval, 20);
     s.set(zmqpp::socket_option::reconnect_interval_max, reconnect_max);
