@@ -69,6 +69,7 @@ pkg_check_modules(LIBURCU_BP liburcu-bp REQUIRED)
 pkg_check_modules(JSONCPP jsoncpp REQUIRED)
 pkg_check_modules(LIBACCOUNTS REQUIRED libaccounts-glib)
 pkg_check_modules(LIBSIGNON REQUIRED libsignon-glib)
+pkg_check_modules(ZMQLIB libzmq REQUIRED)
 
 find_program(LTTNG_EXECUTABLE lttng)
 if (NOT LTTNG_EXECUTABLE)
@@ -200,11 +201,6 @@ set(UNITY_SCOPES_SOVERSION 3)
 
 # Version for testing, with all symbols visible
 set(UNITY_SCOPES_TEST_LIB ${UNITY_SCOPES_LIB}-test)
-
-find_library(ZMQLIB zmq)
-if(NOT ZMQLIB)
-  message(FATAL_ERROR "Zmq lib not found.")
-endif()
 
 find_library(ZMQPPLIB zmqpp)
 if(NOT ZMQPPLIB)
