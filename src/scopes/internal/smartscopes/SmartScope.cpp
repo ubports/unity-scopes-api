@@ -286,7 +286,7 @@ void SmartPreview::run(PreviewReplyProxy const& reply)
     }
 
     preview_handle_ = ss_client_->preview(handler, base_url_, result_["result_json"].get_string(), session_id, hints_.form_factor(), 0, settings(),
-            hints_.locale(), agent, "");
+            hints_.locale(), "", agent);
 
     preview_handle_->wait();
 
