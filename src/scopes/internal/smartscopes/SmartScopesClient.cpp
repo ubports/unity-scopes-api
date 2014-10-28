@@ -412,8 +412,8 @@ PreviewHandle::UPtr SmartScopesClient::preview(PreviewReplyHandler const& handle
                                                const uint widgets_api_version,
                                                VariantMap const& settings,
                                                std::string const& locale,
-                                               std::string const& user_agent_hdr,
-                                               std::string const& country)
+                                               std::string const& country,
+                                               std::string const& user_agent_hdr)
 {
     std::ostringstream preview_uri;
     preview_uri << base_url << c_preview_resource << "?";
