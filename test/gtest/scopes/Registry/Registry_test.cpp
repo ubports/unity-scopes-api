@@ -141,7 +141,7 @@ TEST(Registry, metadata)
     EXPECT_EQ(0, meta.child_scope_ids().size());
 }
 
-auto const wait_time = std::chrono::milliseconds(1000);
+auto const wait_time = std::chrono::milliseconds(3000);
 
 TEST(Registry, scope_state_notify)
 {
