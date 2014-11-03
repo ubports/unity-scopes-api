@@ -16,8 +16,7 @@
  * Authored by: Thomas Voß <thomas.voss@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_TESTING_BENCHMARK_H
-#define UNITY_SCOPES_TESTING_BENCHMARK_H
+#pragma once
 
 #include <unity/scopes/ActionMetadata.h>
 #include <unity/scopes/CannedQuery.h>
@@ -354,5 +353,3 @@ std::ostream& operator<<(std::ostream&, const Benchmark::Result&);
 } // namespace scopes
 
 } // namespace unity
-
-#endif

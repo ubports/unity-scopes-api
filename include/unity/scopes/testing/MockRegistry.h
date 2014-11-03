@@ -16,8 +16,7 @@
  * Authored by: Thomas Voß <thomas.voss@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_TESTING_MOCK_REGISTRY_H
-#define UNITY_SCOPES_TESTING_MOCK_REGISTRY_H
+#pragma once
 
 #include <unity/scopes/Registry.h>
 #include <unity/scopes/testing/MockObject.h>
@@ -61,5 +60,3 @@ public:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

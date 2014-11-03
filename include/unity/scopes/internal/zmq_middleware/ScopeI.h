@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_SCOPEI_H
-#define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_SCOPEI_H
+#pragma once
 
 #include <unity/scopes/internal/MWScope.h>
 #include <unity/scopes/internal/ScopeObjectBase.h>
@@ -66,5 +65,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

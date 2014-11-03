@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_VARIANTCONVERTER_H
-#define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_VARIANTCONVERTER_H
+#pragma once
 
 #include <unity/scopes/Variant.h>
 #include <scopes/internal/zmq_middleware/capnproto/ValueDict.capnp.h>
@@ -52,5 +51,3 @@ VariantArray to_variant_array(capnp::List<capnproto::Value>::Reader const &r);
 } // namespace scopes
 
 } // namespace unity
-
-#endif

@@ -16,8 +16,7 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_COMPLETIONDETAILS_H
-#define UNITY_SCOPES_COMPLETIONDETAILS_H
+#pragma once
 
 #include <unity/scopes/OperationInfo.h>
 
@@ -120,5 +119,3 @@ char const* to_string(CompletionDetails::CompletionStatus status);
 } // namespace scopes
 
 } // namespace unity
-
-#endif

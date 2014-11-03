@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQSENDER_H
-#define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQSENDER_H
+#pragma once
 
 #include <unity/util/NonCopyable.h>
 #include <capnp/common.h>
@@ -62,5 +61,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

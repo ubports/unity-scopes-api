@@ -16,8 +16,7 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_SMARTSCOPES_SSQUERYOBJECT_H
-#define UNITY_SCOPES_INTERNAL_SMARTSCOPES_SSQUERYOBJECT_H
+#pragma once
 
 #include <unity/scopes/internal/QueryObjectBase.h>
 #include <unity/scopes/ReplyProxyFwd.h>
@@ -107,5 +106,3 @@ private:
 }  // namespace scopes
 
 }  // namespace unity
-
-#endif  // UNITY_SCOPES_INTERNAL_SMARTSCOPES_SSQUERYOBJECT_H

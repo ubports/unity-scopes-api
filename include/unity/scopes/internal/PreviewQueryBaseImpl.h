@@ -16,8 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_INTERNAL_PREVIEWQUERYBASEIMPL_H
-#define UNITY_INTERNAL_PREVIEWQUERYBASEIMPL_H
+#pragma once
 
 #include <unity/scopes/internal/QueryBaseImpl.h>
 #include <unity/scopes/Result.h>
@@ -54,5 +53,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

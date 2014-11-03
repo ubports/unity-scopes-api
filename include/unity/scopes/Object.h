@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_OBJECT_H
-#define UNITY_SCOPES_OBJECT_H
+#pragma once
 
 #include <unity/scopes/ObjectProxyFwd.h>
 #include <unity/util/NonCopyable.h>
@@ -84,5 +83,3 @@ protected:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

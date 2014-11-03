@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_CURRENT_H
-#define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_CURRENT_H
+#pragma once
 
 #include <unity/scopes/internal/InvokeInfo.h>
 
@@ -54,5 +53,3 @@ unity::scopes::internal::InvokeInfo to_info(Current const& c);
 } // namespace scopes
 
 } // namespace unity
-
-#endif

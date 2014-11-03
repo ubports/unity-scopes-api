@@ -16,8 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_ACTIVATIONQUERYBASEIMPL_H
-#define UNITY_SCOPES_INTERNAL_ACTIVATIONQUERYBASEIMPL_H
+#pragma once
 
 #include <unity/scopes/internal/QueryBaseImpl.h>
 #include <unity/scopes/ActivationResponse.h>
@@ -65,5 +64,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

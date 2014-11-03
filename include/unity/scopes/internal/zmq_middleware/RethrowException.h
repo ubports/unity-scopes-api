@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_RETHROWEXCEPTION_H
-#define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_RETHROWEXCEPTION_H
+#pragma once
 
 #include <zmqpp/exception.hpp>
 
@@ -44,5 +43,3 @@ void rethrow_zmq_ex(zmqpp::exception const& e);
 } // namespace scopes
 
 } // namespace unity
-
-#endif

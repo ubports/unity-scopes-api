@@ -16,8 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_INTERNAL_VALUESLIDERFILTERIMPL_H
-#define UNITY_INTERNAL_VALUESLIDERFILTERIMPL_H
+#pragma once
 
 #include <unity/scopes/internal/FilterBaseImpl.h>
 #include <unity/scopes/ValueSliderFilter.h>
@@ -74,5 +73,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

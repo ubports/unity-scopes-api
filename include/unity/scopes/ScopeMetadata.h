@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_SCOPEMETADATA_H
-#define UNITY_SCOPES_SCOPEMETADATA_H
+#pragma once
 
 #include <unity/scopes/Scope.h>
 #include <vector>
@@ -206,5 +205,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

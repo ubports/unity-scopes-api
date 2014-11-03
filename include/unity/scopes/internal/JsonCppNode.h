@@ -16,8 +16,7 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_JSONCPPNODE_H
-#define UNITY_SCOPES_INTERNAL_JSONCPPNODE_H
+#pragma once
 
 #include <unity/scopes/internal/JsonNodeInterface.h>
 #include <jsoncpp/json/value.h>
@@ -72,5 +71,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif // UNITY_SCOPES_INTERNAL_JSONCPPNODE_H

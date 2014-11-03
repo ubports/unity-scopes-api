@@ -16,8 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_CATEGORYIMPL_H
-#define UNITY_SCOPES_INTERNAL_CATEGORYIMPL_H
+#pragma once
 
 #include <unity/util/NonCopyable.h>
 #include <unity/scopes/CannedQuery.h>
@@ -66,5 +65,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

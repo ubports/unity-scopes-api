@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_PREVIEWREPLYPROXYFWD_H
-#define UNITY_SCOPES_PREVIEWREPLYPROXYFWD_H
+#pragma once
 
 #include <memory>
 
@@ -37,5 +36,3 @@ typedef std::shared_ptr<PreviewReply> PreviewReplyProxy;
 } // namespace scopes
 
 } // namespace unity
-
-#endif

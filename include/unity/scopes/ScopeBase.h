@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_SCOPEBASE_H
-#define UNITY_SCOPES_SCOPEBASE_H
+#pragma once
 
 #include <unity/scopes/AbstractScopeBase.h>
 #include <unity/scopes/ActionMetadata.h>
@@ -375,5 +374,3 @@ typedef decltype(&UNITY_SCOPE_DESTROY_FUNCTION) DestroyFunction;
 } // namespace scopes
 
 } // namespace unity
-
-#endif

@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef TEST_SLOWSEARCHSCOPE_H
-#define TEST_SLOWSEARCHSCOPE_H
+#pragma once
 
 #include <unity/scopes/ScopeBase.h>
 
@@ -36,5 +35,3 @@ public:
     virtual unity::scopes::PreviewQueryBase::UPtr preview(unity::scopes::Result const&,
                                                           unity::scopes::ActionMetadata const &) override;
 };
-
-#endif

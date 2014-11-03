@@ -16,8 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_ACTIVATIONLISTENERBASE_H
-#define UNITY_SCOPES_ACTIVATIONLISTENERBASE_H
+#pragma once
 
 #include <unity/scopes/ListenerBase.h>
 #include <unity/util/NonCopyable.h>
@@ -71,5 +70,3 @@ protected:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQEXCEPTION_H
-#define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQEXCEPTION_H
+#pragma once
 
 #include <capnp/message.h>
 #include <scopes/internal/zmq_middleware/capnproto/Message.capnp.h>
@@ -58,5 +57,3 @@ void throw_if_runtime_exception(capnproto::Response::Reader const& reader);
 } // namespace scopes
 
 } // namespace unity
-
-#endif

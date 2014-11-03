@@ -16,8 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_CATEGORYREGISTRY_H
-#define UNITY_SCOPES_INTERNAL_CATEGORYREGISTRY_H
+#pragma once
 
 #include <unity/scopes/Category.h>
 #include <unity/scopes/Variant.h>
@@ -80,5 +79,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

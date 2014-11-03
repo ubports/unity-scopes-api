@@ -16,8 +16,7 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_SMARTSCOPES_SMARTSCOPESCLIENT_H
-#define UNITY_SCOPES_INTERNAL_SMARTSCOPES_SMARTSCOPESCLIENT_H
+#pragma once
 
 #include <unity/scopes/FilterBase.h>
 #include <unity/scopes/FilterState.h>
@@ -233,5 +232,3 @@ private:
 }  // namespace scopes
 
 }  // namespace unity
-
-#endif  // UNITY_SCOPES_INTERNAL_SMARTSCOPES_SMARTSCOPESCLIENT_H

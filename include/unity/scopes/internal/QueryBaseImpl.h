@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_QUERYBASEIMPL_H
-#define UNITY_SCOPES_INTERNAL_QUERYBASEIMPL_H
+#pragma once
 
 #include <unity/scopes/Variant.h>
 
@@ -56,5 +55,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

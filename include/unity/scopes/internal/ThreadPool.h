@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_THREADPOOL_H
-#define UNITY_SCOPES_INTERNAL_THREADPOOL_H
+#pragma once
 
 #include <unity/scopes/internal/ThreadSafeQueue.h>
 #include <unity/scopes/internal/TaskWrapper.h>
@@ -88,5 +87,3 @@ std::future<typename std::result_of<F()>::type> ThreadPool::submit(F f)
 } // namespace scopes
 
 } // namespace unity
-
-#endif

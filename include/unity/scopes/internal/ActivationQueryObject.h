@@ -16,8 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_ACTIVATIONQUERYOBJECT_H
-#define UNITY_SCOPES_INTERNAL_ACTIVATIONQUERYOBJECT_H
+#pragma once
 
 #include <unity/scopes/internal/QueryObject.h>
 #include <unity/scopes/internal/MWQueryCtrlProxyFwd.h>
@@ -50,5 +49,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

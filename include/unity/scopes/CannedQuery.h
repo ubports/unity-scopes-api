@@ -16,8 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_CANNEDQUERY_H
-#define UNITY_SCOPES_CANNEDQUERY_H
+#pragma once
 
 #include <unity/util/DefinesPtrs.h>
 #include <string>
@@ -143,5 +142,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif
