@@ -61,6 +61,7 @@ endif()
 
 include(FindPkgConfig)
 find_package(Boost COMPONENTS system filesystem regex serialization REQUIRED)
+find_package(Qt5 COMPONENTS Core Network REQUIRED)
 pkg_check_modules(UNITY_API libunity-api>=0.1.3 REQUIRED)
 pkg_check_modules(PROCESS_CPP process-cpp>=1.0.1 REQUIRED)
 pkg_check_modules(APPARMOR REQUIRED libapparmor REQUIRED)
