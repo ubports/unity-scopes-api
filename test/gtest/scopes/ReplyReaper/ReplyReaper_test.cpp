@@ -90,19 +90,27 @@ TEST(ReplyReaper, reap)
     Runtime::SPtr no_reply_rt = move(Runtime::create_scope_runtime("NoReplyScope", TEST_DIR "/Runtime.ini"));
     std::thread scope_t(scope_thread, no_reply_rt, TEST_DIR "/Runtime.ini");
 
-    // Run a query in the scope. The query will do nothing for 3 seconds,
-    // but the reaper will reap after at most 2 seconds.
-    auto rt = internal::RuntimeImpl::create("", TEST_DIR "/Runtime.ini");
-    auto mw = rt->factory()->create("NoReplyScope", "Zmq", TEST_DIR "/Zmq.ini");
-    mw->start();
-    auto proxy = mw->create_scope_proxy("NoReplyScope");
-    auto scope = internal::ScopeImpl::create(proxy, rt.get(), "NoReplyScope");
+    try
+    {
+        // Run a query in the scope. The query will do nothing for 3 seconds,
+        // but the reaper will reap after at most 2 seconds.
+        auto rt = internal::RuntimeImpl::create("", TEST_DIR "/Runtime.ini");
+        auto mw = rt->factory()->create("NoReplyScope", "Zmq", TEST_DIR "/Zmq.ini");
+        mw->start();
+        auto proxy = mw->create_scope_proxy("NoReplyScope");
+        auto scope = internal::ScopeImpl::create(proxy, rt.get(), "NoReplyScope");
 
-    auto receiver = make_shared<NullReceiver>();
-    scope->search("test", SearchMetadata("en", "phone"), receiver);
-    receiver->wait_until_finished();
+        auto receiver = make_shared<NullReceiver>();
+        scope->search("test", SearchMetadata("en", "phone"), receiver);
+        receiver->wait_until_finished();
 
-    no_reply_rt->destroy();
+        no_reply_rt->destroy();
+    }
+    catch (std::exception const& e)
+    {
+        FAIL() << e.what();
+    }
+
     if (scope_t.joinable())
     {
         scope_t.join();
@@ -156,19 +164,27 @@ TEST(ReplyReaper, no_reap_in_debug_mode)
     Runtime::SPtr no_reply_rt = move(Runtime::create_scope_runtime("NoReplyScope", TEST_DIR "/Runtime.ini"));
     std::thread scope_t(scope_thread_debug_mode, no_reply_rt, TEST_DIR "/Runtime.ini");
 
-    // Run a query in the scope. The query will do nothing for 3 seconds,
-    // but the reaper will reap after at most 2 seconds.
-    auto rt = internal::RuntimeImpl::create("", TEST_DIR "/Runtime.ini");
-    auto mw = rt->factory()->create("NoReplyScope", "Zmq", TEST_DIR "/Zmq.ini");
-    mw->start();
-    auto proxy = mw->create_scope_proxy("NoReplyScope");
-    auto scope = internal::ScopeImpl::create(proxy, rt.get(), "NoReplyScope");
+    try
+    {
+        // Run a query in the scope. The query will do nothing for 3 seconds,
+        // but the reaper will reap after at most 2 seconds.
+        auto rt = internal::RuntimeImpl::create("", TEST_DIR "/Runtime.ini");
+        auto mw = rt->factory()->create("NoReplyScope", "Zmq", TEST_DIR "/Zmq.ini");
+        mw->start();
+        auto proxy = mw->create_scope_proxy("NoReplyScope");
+        auto scope = internal::ScopeImpl::create(proxy, rt.get(), "NoReplyScope");
 
-    auto receiver = make_shared<NoReapReceiver>();
-    scope->search("test", SearchMetadata("en", "phone"), receiver);
-    receiver->wait_until_finished();
+        auto receiver = make_shared<NoReapReceiver>();
+        scope->search("test", SearchMetadata("en", "phone"), receiver);
+        receiver->wait_until_finished();
 
-    no_reply_rt->destroy();
+        no_reply_rt->destroy();
+    }
+    catch (std::exception const& e)
+    {
+        FAIL() << e.what();
+    }
+
     if (scope_t.joinable())
     {
         scope_t.join();
