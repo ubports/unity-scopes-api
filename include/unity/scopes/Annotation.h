@@ -16,8 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_ANNOTATION_H
-#define UNITY_SCOPES_ANNOTATION_H
+#pragma once
 
 #include <unity/scopes/Variant.h>
 #include <unity/scopes/Link.h>
@@ -139,5 +138,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

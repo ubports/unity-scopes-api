@@ -16,8 +16,7 @@
  * Authored by: Thomas Voß <thomas.voss@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_TESTING_TYPED_SCOPE_FIXTURE_H
-#define UNITY_SCOPES_TESTING_TYPED_SCOPE_FIXTURE_H
+#pragma once
 
 #include <unity/scopes/Version.h>
 
@@ -105,4 +104,3 @@ protected:
 } // namespace scopes
 
 } // namespace unity
-#endif

@@ -16,8 +16,7 @@
  * Authored by: Thomas Voß <thomas.voss@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_TESTING_SCOPEMETADATA_BUILDER_H
-#define UNITY_SCOPES_TESTING_SCOPEMETADATA_BUILDER_H
+#pragma once
 
 #include <unity/scopes/ScopeMetadata.h>
 
@@ -109,6 +108,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-
-#endif

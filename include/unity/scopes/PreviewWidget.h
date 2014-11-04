@@ -16,8 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_PREVIEW_WIDGET_H
-#define UNITY_SCOPES_PREVIEW_WIDGET_H
+#pragma once
 
 #include <unity/util/NonCopyable.h>
 #include <unity/util/DefinesPtrs.h>
@@ -182,5 +181,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

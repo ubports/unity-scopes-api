@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQQUERYPROXYFWD_H
-#define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQQUERYPROXYFWD_H
+#pragma once
 
 #include <memory>
 
@@ -43,5 +42,3 @@ typedef std::shared_ptr<ZmqQuery> ZmqQueryProxy;
 } // namespace scopes
 
 } // namespace unity
-
-#endif

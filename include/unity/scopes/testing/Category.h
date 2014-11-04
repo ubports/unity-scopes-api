@@ -16,8 +16,7 @@
  * Authored by: Thomas Voß <thomas.voss@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_TESTING_CATEGORY_H
-#define UNITY_SCOPES_TESTING_CATEGORY_H
+#pragma once
 
 #include <unity/scopes/Category.h>
 
@@ -69,5 +68,3 @@ public:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

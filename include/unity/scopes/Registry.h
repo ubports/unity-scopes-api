@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_REGISTRY_H
-#define UNITY_SCOPES_REGISTRY_H
+#pragma once
 
 #include <core/signal.h>
 #include <unity/scopes/Object.h>
@@ -111,5 +110,3 @@ protected:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

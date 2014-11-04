@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_TESTING_MOCK_OBJECT_H
-#define UNITY_SCOPES_TESTING_MOCK_OBJECT_H
+#pragma once
 
 #include <unity/scopes/Object.h>
 
@@ -53,5 +52,3 @@ public:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

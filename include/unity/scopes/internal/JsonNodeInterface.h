@@ -16,8 +16,7 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_JSONNODEINTERFACE_H
-#define UNITY_SCOPES_INTERNAL_JSONNODEINTERFACE_H
+#pragma once
 
 #include <unity/util/DefinesPtrs.h>
 #include <unity/util/NonCopyable.h>
@@ -76,5 +75,3 @@ public:
 } // namespace scopes
 
 } // namespace unity
-
-#endif // UNITY_SCOPES_INTERNAL_JSONNODEINTERFACE_H

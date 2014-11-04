@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_QUERYI_H
-#define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_QUERYI_H
+#pragma once
 
 #include <unity/scopes/internal/MWQuery.h>
 #include <unity/scopes/internal/QueryObjectBase.h>
@@ -54,5 +53,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

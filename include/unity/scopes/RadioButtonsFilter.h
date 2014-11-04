@@ -16,8 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_RADIOBUTTONSFILTER_H
-#define UNITY_SCOPES_RADIOBUTTONSFILTER_H
+#pragma once
 
 #include <unity/scopes/FilterBase.h>
 #include <unity/scopes/FilterOption.h>
@@ -125,5 +124,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

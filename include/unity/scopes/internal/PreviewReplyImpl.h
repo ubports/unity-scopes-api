@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_PREVIEWREPLYIMPL_H
-#define UNITY_SCOPES_INTERNAL_PREVIEWREPLYIMPL_H
+#pragma once
 
 #include <unity/scopes/ColumnLayout.h>
 #include <unity/scopes/internal/MWReplyProxyFwd.h>
@@ -55,5 +54,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef SCOPELOADERTEST_PERSCOPEVARIABLES
-#define SCOPELOADERTEST_PERSCOPEVARIABLES
+#pragma once
 
 #include "TestExports.h"
 
@@ -28,5 +27,3 @@ int EXPORT get_scopeB_var();
 void EXPORT set_scopeB_var(int val);
 
 void EXPORT clear_vars();
-
-#endif

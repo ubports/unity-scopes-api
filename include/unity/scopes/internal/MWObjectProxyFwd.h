@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_MWOBJECTPROXYFWD_H
-#define UNITY_SCOPES_INTERNAL_MWOBJECTPROXYFWD_H
+#pragma once
 
 #include <memory>
 
@@ -38,5 +37,3 @@ typedef std::shared_ptr<MWObjectProxy> MWProxy;
 } // namespace scopes
 
 } // namespace unity
-
-#endif

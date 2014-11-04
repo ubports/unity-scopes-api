@@ -16,8 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_COLUMNLAYOUT_H
-#define UNITY_SCOPES_COLUMNLAYOUT_H
+#pragma once
 
 #include <unity/scopes/Variant.h>
 #include <memory>
@@ -114,5 +113,3 @@ typedef std::list<ColumnLayout> ColumnLayoutList;
 } // namespace scopes
 
 } // namespace unity
-
-#endif

@@ -16,8 +16,7 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQSTATERECEIVERPROXYFWD_H
-#define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQSTATERECEIVERPROXYFWD_H
+#pragma once
 
 #include <memory>
 
@@ -43,5 +42,3 @@ typedef std::shared_ptr<ZmqStateReceiver> ZmqStateReceiverProxy;
 } // namespace scopes
 
 } // namespace unity
-
-#endif // UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQSTATERECEIVERPROXYFWD_H

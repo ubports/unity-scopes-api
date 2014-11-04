@@ -16,8 +16,7 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_MWSUBSCRIBER_H
-#define UNITY_SCOPES_INTERNAL_MWSUBSCRIBER_H
+#pragma once
 
 #include <core/signal.h>
 #include <unity/util/DefinesPtrs.h>
@@ -54,5 +53,3 @@ protected:
 } // namespace scopes
 
 } // namespace unity
-
-#endif // UNITY_SCOPES_INTERNAL_MWSUBSCRIBER_H

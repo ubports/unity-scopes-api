@@ -16,8 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_ACTIVATIONRESPONSEIMPL_H
-#define UNITY_SCOPES_INTERNAL_ACTIVATIONRESPONSEIMPL_H
+#pragma once
 
 #include <unity/scopes/ActivationResponse.h>
 #include <unity/scopes/CannedQuery.h>
@@ -64,5 +63,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

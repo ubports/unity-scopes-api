@@ -16,8 +16,7 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQPUBLISHER_H
-#define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQPUBLISHER_H
+#pragma once
 
 #include <unity/scopes/internal/MWPublisher.h>
 
@@ -79,5 +78,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif // UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQPUBLISHER_H

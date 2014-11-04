@@ -16,8 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_FILTEROPTIONIMPL_H
-#define UNITY_SCOPES_INTERNAL_FILTEROPTIONIMPL_H
+#pragma once
 
 #include <string>
 
@@ -47,5 +46,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

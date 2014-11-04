@@ -16,8 +16,7 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
 */
 
-#ifndef UNITY_INTERNAL_OPERATIONINFOIMPL_H
-#define UNITY_INTERNAL_OPERATIONINFOIMPL_H
+#pragma once
 
 #include <unity/scopes/OperationInfo.h>
 
@@ -55,5 +54,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

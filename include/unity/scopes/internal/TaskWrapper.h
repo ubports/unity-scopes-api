@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_TASKWRAPPER_H
-#define UNITY_SCOPES_INTERNAL_TASKWRAPPER_H
+#pragma once
 
 #include <memory>
 
@@ -101,5 +100,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif
