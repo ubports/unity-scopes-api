@@ -24,6 +24,7 @@
 #include <gtest/gtest.h>
 
 #include "NoReplyScope.h"
+#include <stdexcept>
 
 using namespace std;
 using namespace unity::scopes;
@@ -105,15 +106,13 @@ TEST(ReplyReaper, reap)
         receiver->wait_until_finished();
 
         no_reply_rt->destroy();
+        scope_t.join();
     }
     catch (std::exception const& e)
     {
-        FAIL() << e.what();
-    }
-
-    if (scope_t.joinable())
-    {
+        no_reply_rt->destroy();
         scope_t.join();
+        FAIL() << e.what();
     }
 }
 
@@ -179,14 +178,12 @@ TEST(ReplyReaper, no_reap_in_debug_mode)
         receiver->wait_until_finished();
 
         no_reply_rt->destroy();
+        scope_t.join();
     }
     catch (std::exception const& e)
     {
-        FAIL() << e.what();
-    }
-
-    if (scope_t.joinable())
-    {
+        no_reply_rt->destroy();
         scope_t.join();
+        FAIL() << e.what();
     }
 }
