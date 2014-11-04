@@ -218,32 +218,32 @@ TEST(Reaper, expiry)
 {
     {
         Counter c;
-        auto r = Reaper::create(1, 2);
+        auto r = Reaper::create(1, 3);
 
-        // Entries expire after 2 seconds.
+        // Entries expire after 3 seconds.
         auto e1 = r->add(bind(&Counter::increment, &c));
         auto e2 = r->add(bind(&Counter::increment, &c));
 
-        // One second later, they still must both be there.
-        this_thread::sleep_for(chrono::milliseconds(1000));
+        // Two seconds later, they still must both be there.
+        this_thread::sleep_for(chrono::milliseconds(2000));
         EXPECT_EQ(2u, r->size());
         EXPECT_EQ(0, c.get());
 
         // Refresh one of the entries.
         e2->refresh();
 
-        // 1.2 seconds later, one of them must have disappeared.
-        this_thread::sleep_for(chrono::milliseconds(1200));
+        // 1.5 seconds later, one of them must have disappeared.
+        this_thread::sleep_for(chrono::milliseconds(1500));
         EXPECT_EQ(1u, r->size());
         EXPECT_EQ(1, c.get());
 
-        // 0.6 seconds later, the second entry must still be around.
-        this_thread::sleep_for(chrono::milliseconds(600));
+        // 0.2 seconds later, the second entry must still be around.
+        this_thread::sleep_for(chrono::milliseconds(200));
         EXPECT_EQ(1u, r->size());
         EXPECT_EQ(1, c.get());
 
-        // 0.4 seconds later, the second entry must have disappeared.
-        this_thread::sleep_for(chrono::milliseconds(400));
+        // 1.5 seconds later, the second entry must have disappeared.
+        this_thread::sleep_for(chrono::milliseconds(1500));
         EXPECT_EQ(0u, r->size());
         EXPECT_EQ(2, c.get());
     }
