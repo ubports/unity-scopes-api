@@ -226,8 +226,7 @@ endif()
 # Stop complaints during the generation phase about executables depending
 # on Qt5::Core and Qt5::Network. They are bogus because only
 # only smartscopes uses these.
-cmake_policy(GET CMP0028 CMP28)
-if(NOT CMP28)
+if(POLICY CMP0028)
     cmake_policy(SET CMP0028 OLD)
 endif()
 
