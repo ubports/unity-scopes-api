@@ -227,7 +227,7 @@ endif()
 # on Qt5::Core and Qt5::Network. They are bogus because only
 # only smartscopes uses these.
 cmake_policy(GET CMP0028 CMP28)
-if(NOT VARIABLE)
+if(NOT CMP28)
     cmake_policy(SET CMP0028 OLD)
 endif()
 
