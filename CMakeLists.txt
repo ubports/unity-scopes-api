@@ -61,7 +61,6 @@ endif()
 
 include(FindPkgConfig)
 find_package(Boost COMPONENTS system filesystem regex serialization REQUIRED)
-find_package(Qt5 COMPONENTS Core Network REQUIRED)
 pkg_check_modules(UNITY_API libunity-api>=0.1.3 REQUIRED)
 pkg_check_modules(PROCESS_CPP process-cpp>=1.0.1 REQUIRED)
 pkg_check_modules(APPARMOR REQUIRED libapparmor REQUIRED)
@@ -223,6 +222,11 @@ if(NOT DLLIB)
   message(FATAL_ERROR "Dl lib not found.")
 endif()
 
+
+# Stop complaints during the generation phase about executables depending
+# on Qt5::Core and Qt5::Network. They are bogus because only
+# only smartscopes uses these.
+cmake_policy(SET CMP0028 OLD)
 
 # Other libraries we depend on
 set(OTHER_LIBS
