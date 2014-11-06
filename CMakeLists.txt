@@ -223,6 +223,13 @@ if(NOT DLLIB)
 endif()
 
 
+# Stop complaints during the generation phase about executables depending
+# on Qt5::Core and Qt5::Network. They are bogus because only
+# only smartscopes uses these.
+if(POLICY CMP0028)
+    cmake_policy(SET CMP0028 OLD)
+endif()
+
 # Other libraries we depend on
 set(OTHER_LIBS
     ${OTHER_LIBS}
