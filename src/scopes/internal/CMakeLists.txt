@@ -11,6 +11,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/ActivationReplyObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ActivationResponseImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/AnnotationImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/BufferedResultForwarderImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/CannedQueryImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/CategorisedResultImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/CategoryImpl.cpp
