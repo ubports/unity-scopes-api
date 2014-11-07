@@ -40,6 +40,11 @@ void BufferedResultForwarder::set_ready()
     // disables buffering
 }
 
+unity::scopes::SearchReplyProxy const& BufferedResultForwarder::upstream()
+{
+    return p->upstream();
+}
+
 void BufferedResultForwarder::push_upstream(Department::SCPtr const& parent)
 {
     p->push_upstream(parent);

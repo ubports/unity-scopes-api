@@ -5,6 +5,7 @@
 #include <unity/scopes/Category.h>
 #include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/FilterBase.h>
+#include <unity/scopes/SearchReplyProxyFwd.h>
 #include <unity/scopes/utility/BufferedResultForwarder.h>
 #include <unity/scopes/ReplyProxyFwd.h>
 
@@ -26,6 +27,7 @@ public:
     BufferedResultForwarderImpl(utility::BufferedResultForwarder::SPtr const& previous_forwarder, unity::scopes::SearchReplyProxy const& upstream);
     BufferedResultForwarderImpl(unity::scopes::SearchReplyProxy const& upstream);
 
+    unity::scopes::SearchReplyProxy const& upstream();
     bool is_ready() const;
     void set_ready();
 
@@ -44,7 +46,7 @@ public:
 private:
     bool ready_;
     bool buffer_;
-    unity::scopes::SearchReplyProxy const& upstream_;
+    unity::scopes::SearchReplyProxy const upstream_;
     std::vector<CategorisedResult> results_;
     std::weak_ptr<utility::BufferedResultForwarder> prev_;
     std::weak_ptr<utility::BufferedResultForwarder> next_;

@@ -1,4 +1,5 @@
 #include <unity/scopes/internal/BufferedResultForwarderImpl.h>
+#include <unity/scopes/internal/BufferedSearchReplyImpl.h>
 #include <unity/scopes/SearchReply.h>
 
 namespace unity
@@ -13,15 +14,20 @@ namespace internal
 BufferedResultForwarderImpl::BufferedResultForwarderImpl(utility::BufferedResultForwarder::SPtr const& previous_forwarder, unity::scopes::SearchReplyProxy const& upstream)
     : ready_(false),
       buffer_(true),
-      upstream_(upstream)
+      upstream_(std::make_shared<internal::BufferedSearchReplyImpl>(upstream))
 {
 }
 
 BufferedResultForwarderImpl::BufferedResultForwarderImpl(unity::scopes::SearchReplyProxy const& upstream)
     : ready_(false),
       buffer_(true),
-      upstream_(upstream)
+      upstream_(std::make_shared<internal::BufferedSearchReplyImpl>(upstream))
 {
+}
+
+unity::scopes::SearchReplyProxy const& BufferedResultForwarderImpl::upstream()
+{
+    return upstream_;
 }
 
 bool BufferedResultForwarderImpl::is_ready() const

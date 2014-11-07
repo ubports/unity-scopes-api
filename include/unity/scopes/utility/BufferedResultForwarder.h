@@ -47,6 +47,7 @@ public:
 
 protected:
     void set_ready();
+    unity::scopes::SearchReplyProxy const& upstream();
 
     void push_upstream(Department::SCPtr const& parent);
     void push_upstream(CategorisedResult result);
