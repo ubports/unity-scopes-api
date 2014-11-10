@@ -434,6 +434,7 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::internal::RuntimeImpl::ss_registry_identity() const@Base" 0.4.4+14.10.20140508
  (c++)"unity::scopes::internal::RuntimeImpl::string_to_proxy(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RuntimeImpl::waiter_thread(std::shared_ptr<unity::scopes::internal::ThreadSafeQueue<std::future<void> > > const&) const@Base" 0.4.3+14.10.20140428
+ (c++)"unity::scopes::internal::safe_strerror(int)@Base" 0replaceme
  (c++)"unity::scopes::internal::ScopeConfig::appearance_attributes() const@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::internal::ScopeConfig::art() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeConfig::author() const@Base" 0.4.0+14.04.20140312.1
