@@ -17,14 +17,15 @@ BufferedResultForwarder::BufferedResultForwarder(unity::scopes::SearchReplyProxy
 {
 }
 
-BufferedResultForwarder::BufferedResultForwarder(BufferedResultForwarder::SPtr const& previous_forwarder, unity::scopes::SearchReplyProxy const& upstream)
-    : p(new internal::BufferedResultForwarderImpl(previous_forwarder, upstream))
-{
-}
-
 BufferedResultForwarder::BufferedResultForwarder(internal::BufferedResultForwarderImpl *impl)
     : p(impl)
 {
+}
+
+
+void BufferedResultForwarder::attach_after(BufferedResultForwarder::SPtr const& previous_forwarder)
+{
+    p->attach_after(previous_forwarder);
 }
 
 bool BufferedResultForwarder::is_ready() const
@@ -35,9 +36,6 @@ bool BufferedResultForwarder::is_ready() const
 void BufferedResultForwarder::set_ready()
 {
     p->set_ready();
-    // notifies attached forwarder
-    // flushes buffers
-    // disables buffering
 }
 
 unity::scopes::SearchReplyProxy const& BufferedResultForwarder::upstream()
@@ -45,56 +43,10 @@ unity::scopes::SearchReplyProxy const& BufferedResultForwarder::upstream()
     return p->upstream();
 }
 
-void BufferedResultForwarder::push_upstream(Department::SCPtr const& parent)
-{
-    p->push_upstream(parent);
-}
-
-void BufferedResultForwarder::push_upstream(CategorisedResult result)
-{
-    p->push_upstream(result);
-}
-
-void BufferedResultForwarder::push_upstream(experimental::Annotation annotation)
-{
-    p->push_upstream(annotation);
-}
-
-void BufferedResultForwarder::push_upstream(Category::SCPtr const& category)
-{
-    p->push_upstream(category);
-}
-
-void BufferedResultForwarder::push_upstream(Filters const& filters, FilterState const& filter_state)
-{
-    p->push_upstream(filters, filter_state);
-}
-
 void BufferedResultForwarder::finished(CompletionDetails const& details)
 {
     p->finished(details);
 }
-
-/*
-void BufferedResultForwarder::push(Department::SCPtr const& parent)
-{
-}
-
-void BufferedResultForwarder::push(CategorisedResult result)
-{
-}
-
-void BufferedResultForwarder::push(experimental::Annotation annotation)
-{
-}
-
-void BufferedResultForwarder::push(Category::SCPtr const& category)
-{
-}
-
-void BufferedResultForwarder::push(Filters const& filters, FilterState const& filter_state)
-{
-}*/
 
 }
 

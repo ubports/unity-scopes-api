@@ -1,6 +1,7 @@
 #include <unity/scopes/internal/BufferedResultForwarderImpl.h>
 #include <unity/scopes/internal/BufferedSearchReplyImpl.h>
 #include <unity/scopes/SearchReply.h>
+#include <cassert>
 
 namespace unity
 {
@@ -11,18 +12,16 @@ namespace scopes
 namespace internal
 {
 
-BufferedResultForwarderImpl::BufferedResultForwarderImpl(utility::BufferedResultForwarder::SPtr const& previous_forwarder, unity::scopes::SearchReplyProxy const& upstream)
+BufferedResultForwarderImpl::BufferedResultForwarderImpl(unity::scopes::SearchReplyProxy const& upstream)
     : ready_(false),
-      buffer_(true),
       upstream_(std::make_shared<internal::BufferedSearchReplyImpl>(upstream))
 {
 }
 
-BufferedResultForwarderImpl::BufferedResultForwarderImpl(unity::scopes::SearchReplyProxy const& upstream)
-    : ready_(false),
-      buffer_(true),
-      upstream_(std::make_shared<internal::BufferedSearchReplyImpl>(upstream))
+void BufferedResultForwarderImpl::attach_after(BufferedResultForwarder::SPtr const& previous_forwarder)
 {
+    prev_ = previous_forwarder;
+    //prev_->next_ = 
 }
 
 unity::scopes::SearchReplyProxy const& BufferedResultForwarderImpl::upstream()
@@ -35,6 +34,7 @@ bool BufferedResultForwarderImpl::is_ready() const
     utility::BufferedResultForwarder::SPtr prev(prev_.lock());
     if (prev)
     {
+        // note: this recursively visits all forwarders on the list via prev pointers
         return ready_ && prev->is_ready();
     }
     return ready_;
@@ -46,11 +46,9 @@ void BufferedResultForwarderImpl::set_ready()
     {
         ready_ = true;
 
-        // notify next forwarder that this one is ready
-        utility::BufferedResultForwarder::SPtr next(next_.lock());
-        if (next)
+        if (is_ready()) // if preceding forwarders are all ready then flush
         {
-            next->p->notify_ready();
+            flush_and_notify();
         }
     }
 }
@@ -58,50 +56,27 @@ void BufferedResultForwarderImpl::set_ready()
 void BufferedResultForwarderImpl::notify_ready()
 {
     // we got notified that previous forwarder is ready;
-    // if all preceding forwarders and this one are ready, then
-    // disable buffering and flush.
-    if (is_ready())
+    // if we are ready then notify following forwarders
+    if (ready_)
     {
-        buffer_ = false; // disable buffering from now on
-        flush();
+        flush_and_notify();
     }
 }
 
-void BufferedResultForwarderImpl::flush()
+void BufferedResultForwarderImpl::flush_and_notify()
 {
-    for (auto const& res: results_)
+    auto buf = std::dynamic_pointer_cast<internal::BufferedSearchReplyImpl>(upstream_);
+    assert(buf);
+
+    buf->disable_buffer();
+    buf->flush();
+
+    // notify next forwarder that this one is ready
+    utility::BufferedResultForwarder::SPtr next(next_.lock());
+    if (next)
     {
-        upstream_->push(res);
+        next->p->notify_ready();
     }
-    results_.clear();
-}
-
-void BufferedResultForwarderImpl::push_upstream(Department::SCPtr const& parent)
-{
-}
-
-void BufferedResultForwarderImpl::push_upstream(CategorisedResult result)
-{
-    if (buffer_)
-    {
-        results_.push_back(result);
-    }
-    else
-    {
-        upstream_->push(result);
-    }
-}
-
-void BufferedResultForwarderImpl::push_upstream(experimental::Annotation annotation)
-{
-}
-
-void BufferedResultForwarderImpl::push_upstream(Category::SCPtr const& category)
-{
-}
-
-void BufferedResultForwarderImpl::push_upstream(Filters const& filters, FilterState const& filter_state)
-{
 }
 
 void BufferedResultForwarderImpl::finished(CompletionDetails const&)

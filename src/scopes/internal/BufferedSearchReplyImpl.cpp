@@ -10,7 +10,8 @@ namespace internal
 {
 
 BufferedSearchReplyImpl::BufferedSearchReplyImpl(unity::scopes::SearchReplyProxy const& upstream)
-    : upstream_(upstream)
+    : upstream_(upstream),
+      buffer_(true)
 {
 }
 
@@ -33,12 +34,12 @@ Category::SCPtr BufferedSearchReplyImpl::register_category(std::string const& id
         CannedQuery const &query,
         CategoryRenderer const& renderer_template)
 {
-    upstream_->register_category(id, title, icon, query, renderer_template);
+    return upstream_->register_category(id, title, icon, query, renderer_template);
 }
 
 void BufferedSearchReplyImpl::register_category(Category::SCPtr category)
 {
-    upstream_->register_category(category);
+    return upstream_->register_category(category);
 }
 
 Category::SCPtr BufferedSearchReplyImpl::lookup_category(std::string const& id)
@@ -53,7 +54,15 @@ bool BufferedSearchReplyImpl::push(unity::scopes::experimental::Annotation const
 
 bool BufferedSearchReplyImpl::push(unity::scopes::CategorisedResult const& result)
 {
-    return upstream_->push(result); //FIXME
+    if (buffer_)
+    {
+        results_.push_back(result);
+        return true;
+    }
+    else
+    {
+        return upstream_->push(result);
+    }
 }
 
 bool BufferedSearchReplyImpl::push(unity::scopes::Filters const& filters, unity::scopes::FilterState const& filter_state)
@@ -99,6 +108,20 @@ int64_t BufferedSearchReplyImpl::timeout()
 std::string BufferedSearchReplyImpl::to_string()
 {
     return upstream_->to_string();
+}
+
+void BufferedSearchReplyImpl::disable_buffer()
+{
+    buffer_ = false;
+}
+
+void BufferedSearchReplyImpl::flush()
+{
+    for (auto const& res: results_)
+    {
+        upstream_->push(res);
+    }
+    results_.clear();
 }
 
 }

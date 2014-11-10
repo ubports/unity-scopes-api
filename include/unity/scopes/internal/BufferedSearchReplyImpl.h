@@ -2,7 +2,9 @@
 
 #include <unity/scopes/SearchReply.h>
 #include <unity/scopes/SearchReplyProxyFwd.h>
+#include <unity/scopes/CategorisedResult.h>
 #include <memory>
+#include <vector>
 
 namespace unity
 {
@@ -49,8 +51,13 @@ public:
     int64_t timeout() override;
     std::string to_string() override;
 
+    void disable_buffer();
+    void flush();
+
 private:
     unity::scopes::SearchReplyProxy const& upstream_;
+    bool buffer_;
+    std::vector<CategorisedResult> results_;
 };
 
 }
