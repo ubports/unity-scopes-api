@@ -334,11 +334,13 @@ SearchHandle::UPtr SmartScopesClient::search(SearchReplyHandler const& handler,
                                              VariantMap const& settings,
                                              VariantMap const& filter_state,
                                              std::string const& locale,
-                                             std::string const& country,
+                                             LocationInfo const& location,
                                              std::string const& user_agent_hdr,
                                              uint limit)
 {
     std::ostringstream search_uri;
+    search_uri.imbue(std::locale::classic()); // so that doubles use one standard formatting wrt decimal point
+
     search_uri << base_url << c_search_resource << "?";
 
     // mandatory parameters
@@ -365,9 +367,13 @@ SearchHandle::UPtr SmartScopesClient::search(SearchReplyHandler const& handler,
     {
         search_uri << "&locale=" << locale;
     }
-    if (!country.empty())
+    if (location.has_location)
     {
-        search_uri << "&country=" << country;
+        if (!location.country_code.empty())
+        {
+            search_uri << "&country=" << location.country_code;
+        }
+        search_uri << "&latitude=" << location.latitude << "&longitude=" << location.longitude;
     }
     if (limit != 0)
     {

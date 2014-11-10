@@ -140,7 +140,7 @@ TEST_F(SmartScopesClientTest, search)
         dept = deptinfo;
     };
 
-    auto search_handle = ssc_->search(handler, sss_url_ + "/demo", "stuff", "", "session_id", 0, "platform", VariantMap(), VariantMap(), "en_US", "", "ThisIsUserAgentHeader");
+    auto search_handle = ssc_->search(handler, sss_url_ + "/demo", "stuff", "", "session_id", 0, "platform", VariantMap(), VariantMap(), "en_US", LocationInfo(), "ThisIsUserAgentHeader");
     search_handle->wait();
 
     ASSERT_EQ(3u, results.size());
@@ -238,7 +238,7 @@ TEST_F(SmartScopesClientTest, userAgentHeader)
     handler.departments_handler = [](std::shared_ptr<DepartmentInfo> const&) {
     };
 
-    auto search_handle = ssc_->search(handler, sss_url_ + "/demo", "test_user_agent_header", "", "session_id", 0, "platform", VariantMap(), VariantMap(), "en_US", "", "ThisIsUserAgentHeader");
+    auto search_handle = ssc_->search(handler, sss_url_ + "/demo", "test_user_agent_header", "", "session_id", 0, "platform", VariantMap(), VariantMap(), "en_US", LocationInfo(), "ThisIsUserAgentHeader");
     search_handle->wait();
 
     ASSERT_EQ(4u, results.size());

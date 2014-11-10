@@ -87,6 +87,16 @@ struct DepartmentInfo
     std::vector<std::shared_ptr<DepartmentInfo>> subdepartments;
 };
 
+struct LocationInfo
+{
+    bool has_location;
+    std::string country_code;
+    double latitude;
+    double longitude;
+
+    LocationInfo(): has_location(false) {}
+};
+
 class SearchHandle
 {
 public:
@@ -172,7 +182,7 @@ public:
                               VariantMap const& settings = VariantMap(),
                               VariantMap const& filter_state = VariantMap(),
                               std::string const& locale = "",
-                              std::string const& country = "",
+                              LocationInfo const& location = LocationInfo(),
                               std::string const& user_agent_hdr = "",
                               const unsigned int limit = 0);
 

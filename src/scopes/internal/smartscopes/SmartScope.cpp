@@ -187,18 +187,21 @@ void SmartQuery::run(SearchReplyProxy const& reply)
     {
         agent = metadata["user-agent"].get_string();
     }
-    std::string country_code;
+
+    LocationInfo loc;
     if (metadata.has_location())
     {
         auto location = metadata.location();
         if (location.has_country_code())
         {
-            country_code = location.country_code();
+            loc.country_code = location.country_code();
         }
+        loc.longitude = location.longitude();
+        loc.latitude = location.latitude();
     }
 
     search_handle_ = ss_client_->search(handler, base_url_, query_.query_string(), query_.department_id(), session_id, query_id, hints_.form_factor(),
-            settings(), query_.filter_state().serialize(), hints_.locale(), country_code, agent, hints_.cardinality());
+            settings(), query_.filter_state().serialize(), hints_.locale(), loc, agent, hints_.cardinality());
     search_handle_->wait();
 
     std::cout << "SmartScope: query for \"" << scope_id_ << "\": \"" << query_.query_string() << "\" complete" << std::endl;
