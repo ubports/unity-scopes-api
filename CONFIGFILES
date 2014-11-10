@@ -311,6 +311,15 @@ The following keys are recognized in the ScopeConfig group:
 
   The author of the scope (mandatory).
 
+- Version
+
+  A integer describing the scope version. The setting is optional, but we strongly
+  recommend to set it. If the behavior of your scope changes in any way that is
+  visible to the query source (such having added or removed a result attribute),
+  you should increment the version number. This allows an aggregating scope to
+  adjust its behavior according to to which version of your scope is installed.
+  If not set, the default value is 0. You can set the value to any integer >= 1.
+
 - Art
 
   Artwork to be shown for the scope. The default value is the empty string.

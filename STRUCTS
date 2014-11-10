@@ -78,6 +78,7 @@ ScopeMetadata (returned by serialize()):
  'settings_definitions'  : dictionary, optional
  'location_data_needed'  : bool, optional
  'child_scopes'          : array of strings, optional
+ 'version'               : int, optional
 
 Query (returned by serialize())
 ===============================

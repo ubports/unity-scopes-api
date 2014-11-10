@@ -108,6 +108,7 @@ TEST(Registry, metadata)
     EXPECT_EQ(2u, children.size());
     EXPECT_EQ("com.foo.bar", children[0]);
     EXPECT_EQ("com.foo.baz", children[1]);
+    EXPECT_EQ(1, meta.version());
 
     auto attrs = meta.appearance_attributes();
     EXPECT_EQ("fg_color", attrs["foreground-color"].get_string());
@@ -139,6 +140,7 @@ TEST(Registry, metadata)
     EXPECT_EQ(0, defs.size());
     EXPECT_FALSE(meta.location_data_needed());
     EXPECT_EQ(0, meta.child_scope_ids().size());
+    EXPECT_EQ(0, meta.version());
 }
 
 auto const wait_for_update_time = std::chrono::milliseconds(5000);
@@ -477,7 +479,6 @@ TEST(Registry, list_update_notify)
     // Configure registry update callback
     auto conn = r->set_list_update_callback([&update_received, &mutex, &cond]
     {
-    std::cerr << "update" << std::endl;
         std::lock_guard<std::mutex> lock(mutex);
         update_received = true;
         cond.notify_one();

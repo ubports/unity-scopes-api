@@ -58,6 +58,7 @@ public:
     VariantArray settings_definitions() const;                   // optional (default: empty array)
     bool location_data_needed() const;                           // optional (default: false)
     std::vector<std::string> child_scope_ids() const;            // optional (default: empty array)
+    int version() const;                                         // optional (default: 0)
 
     void set_scope_id(std::string const& scope_id);
     void set_proxy(ScopeProxy const& proxy);
@@ -75,6 +76,7 @@ public:
     void set_settings_definitions(VariantArray const& settings_definitions);
     void set_location_data_needed(bool location_data_needed);
     void set_child_scope_ids(std::vector<std::string> const& ids);
+    void set_version(int v);
 
     VariantMap serialize() const;
     void deserialize(VariantMap const& var);
@@ -100,6 +102,7 @@ private:
     std::unique_ptr<VariantArray> settings_definitions_;  // Optional, hence a pointer
     std::unique_ptr<bool> location_data_needed_;          // Optional, hence a pointer
     std::vector<std::string> child_scope_ids_;
+    int version_;
 };
 
 } // namespace internal
