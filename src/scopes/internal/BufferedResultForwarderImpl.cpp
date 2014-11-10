@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2014 Canonical Ltd
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License version 3 as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
+ */
+
 #include <unity/scopes/internal/BufferedResultForwarderImpl.h>
 #include <unity/scopes/internal/BufferedSearchReplyImpl.h>
 #include <unity/scopes/SearchReply.h>
@@ -14,14 +32,18 @@ namespace internal
 
 BufferedResultForwarderImpl::BufferedResultForwarderImpl(unity::scopes::SearchReplyProxy const& upstream)
     : ready_(false),
+      previous_ready_(false),
       upstream_(std::make_shared<internal::BufferedSearchReplyImpl>(upstream))
 {
 }
 
-void BufferedResultForwarderImpl::attach_after(BufferedResultForwarder::SPtr const& previous_forwarder)
+BufferedResultForwarderImpl::BufferedResultForwarderImpl(unity::scopes::SearchReplyProxy const& upstream,
+        unity::scopes::utility::BufferedResultForwarder::SPtr const& next_forwarder)
+    : ready_(false),
+      previous_ready_(false),
+      upstream_(std::make_shared<internal::BufferedSearchReplyImpl>(upstream)),
+      next_(next_forwarder)
 {
-    prev_ = previous_forwarder;
-    //prev_->next_ = 
 }
 
 unity::scopes::SearchReplyProxy const& BufferedResultForwarderImpl::upstream()
@@ -31,22 +53,20 @@ unity::scopes::SearchReplyProxy const& BufferedResultForwarderImpl::upstream()
 
 bool BufferedResultForwarderImpl::is_ready() const
 {
-    utility::BufferedResultForwarder::SPtr prev(prev_.lock());
-    if (prev)
-    {
-        // note: this recursively visits all forwarders on the list via prev pointers
-        return ready_ && prev->is_ready();
-    }
     return ready_;
 }
 
 void BufferedResultForwarderImpl::set_ready()
 {
+    // scope author tells us that results for this forwarder are now ready
+    // to be displayed (or the query has finished); set the 'ready' flag
+    // and if previous forwarder is also ready, then push and disable
+    // futher buffering.
     if (!ready_)
     {
         ready_ = true;
 
-        if (is_ready()) // if preceding forwarders are all ready then flush
+        if (previous_ready_)
         {
             flush_and_notify();
         }
@@ -56,7 +76,8 @@ void BufferedResultForwarderImpl::set_ready()
 void BufferedResultForwarderImpl::notify_ready()
 {
     // we got notified that previous forwarder is ready;
-    // if we are ready then notify following forwarders
+    // if we are ready then notify following forwarder
+    previous_ready_ = true;
     if (ready_)
     {
         flush_and_notify();
@@ -84,8 +105,9 @@ void BufferedResultForwarderImpl::finished(CompletionDetails const&)
     set_ready();
 }
 
-}
+} // namespace internal
 
-}
+} // namespace scopes
 
-}
+} // namespace unity
+

@@ -1,6 +1,22 @@
+/*
+ * Copyright (C) 2014 Canonical Ltd
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License version 3 as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
+ */
+
 #include <unity/scopes/utility/BufferedResultForwarder.h>
-#include <unity/scopes/CategorisedResult.h>
-#include <unity/scopes/FilterState.h>
 #include <unity/scopes/internal/BufferedResultForwarderImpl.h>
 
 namespace unity
@@ -17,15 +33,9 @@ BufferedResultForwarder::BufferedResultForwarder(unity::scopes::SearchReplyProxy
 {
 }
 
-BufferedResultForwarder::BufferedResultForwarder(internal::BufferedResultForwarderImpl *impl)
-    : p(impl)
+BufferedResultForwarder::BufferedResultForwarder(unity::scopes::SearchReplyProxy const& upstream, BufferedResultForwarder::SPtr const& next_forwarder)
+    : p(new internal::BufferedResultForwarderImpl(upstream, next_forwarder))
 {
-}
-
-
-void BufferedResultForwarder::attach_after(BufferedResultForwarder::SPtr const& previous_forwarder)
-{
-    p->attach_after(previous_forwarder);
 }
 
 bool BufferedResultForwarder::is_ready() const
