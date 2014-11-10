@@ -191,6 +191,7 @@ void SmartQuery::run(SearchReplyProxy const& reply)
     LocationInfo loc;
     if (metadata.has_location())
     {
+        loc.has_location = true;
         auto location = metadata.location();
         if (location.has_country_code())
         {
