@@ -195,6 +195,14 @@ public:
     */
     std::vector<std::string> child_scope_ids() const;
 
+    /**
+    \brief Return the version of the scope.
+
+    \return The version or, if the scope does not define its version,
+    the value `0`.
+    */
+    int version() const;
+
 private:
     ScopeMetadata(std::unique_ptr<internal::ScopeMetadataImpl>);           // Instantiable only by ScopeMetadataImpl
     std::unique_ptr<internal::ScopeMetadataImpl> p;

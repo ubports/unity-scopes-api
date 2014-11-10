@@ -188,7 +188,7 @@ scope works. For example, for a music scope, the default results could be someth
 and "Recently Played"; similarly, for a weather scope, the default results could be for the weather
 report for the current location. As the scope author, you need to decide what is most appropriate
 to show in surfacing mode. In the interests of a good user experience, it is important to show _something_
-here (if at all possible), so the user gets to to see at least some results (instead of being confronted with
+here (if at all possible), so the user gets to see at least some results (instead of being confronted with
 a blank screen).
 
 \paragraph querybase Implementing QueryBase
@@ -206,16 +206,15 @@ Two important methods of `SerchReply` are \link unity::scopes::SearchReply::regi
 and \link unity::scopes::SearchReply::push push()\endlink.
 
 `register_category()` is a factory method that registers new categories for the results of this query (see
-\link unity::scopes::Category\endlink). You can create new categories at any point during query processing, 
-but we recommend to create them in advance, if possible. Categories serve to visually group query results
-in some way; the UI typically renders categories in the same order as you registered them (but may choose
-to override the order for some categories). When you push results for a query, you indicate which
+\link unity::scopes::Category\endlink). You can create new categories at any point during query processing. 
+Categories serve to visually group query results in some way;
+when you push results for a query, you indicate which
 category each particular result belongs to, and the UI renders that result in the corresponding
-visual group.
-
-You can create a new category later, after you have already registered some categories and pushed
-a number of results for them. If you do, the newly created category renders after (or below)
-any of the categories you registered initially.
+visual group. Categories are rendered in the order in which they are encountered by the UI
+as you push your results. If you want to control the order in which categories are rendered
+(for examples, such that a "Breaking News" category always appears first), you may need to
+buffer the results you receive from your back-end data source until you get a result for that
+category, and then push that result, plus any other buffered results.
 
 Pre-registering categories is the preferred approach because it allows the UI to reserve space
 and perform layout chores before any query results arrive. (In turn, this permits the UI to
@@ -1027,6 +1026,7 @@ following keys:
     DisplayName = human readable name of scope
     Description = description of scope
     Author = Author
+    Version = 1
     Icon = path to icon representing the scope
     Art = path to screenshot of the scope
     SearchHint = hint text displayed to user when viewing scope
@@ -1051,6 +1051,13 @@ The `ScopeConfig` group is mandatory and must contain settings for at least `Dis
 `DisplayName` and `Description` can (and should) be localized. For example:
 
 `Description[de_DE] = Fu&szlig;ballergebnisse`
+
+The `Version` key is optional, but we strongly recommend that you set it.
+If the behavior of your scope changes in any way that is visible to the query source
+(such having added or removed a result attribute), you should increment the version number.
+This allows an aggregating scope to adjust its behavior according to which version of
+your scope is installed.
+If not set, the default value is 0. You can set the value to any integer >= 1.
 
 In addition to allowing the registry to make the scope available, this information controls how the scope appears
 in the "Scopes" scope.
