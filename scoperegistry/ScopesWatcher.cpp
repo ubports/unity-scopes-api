@@ -50,54 +50,43 @@ void ScopesWatcher::add_install_dir(std::string const& dir, bool notify)
     {
         add_watch(parent_dir(dir));
     }
-    catch (unity::ResourceException const&) {} // Ignore already exists exception
-    catch (unity::SyscallException const& e )
+    catch (unity::FileException const&) {}  // Ignore does not exist exception
+    catch (unity::LogicException const&) {} // Ignore already exists exception
+
+    // Create a new entry for this install dir into idir_to_sdirs_map_
+    if (dir.back() == '/')
     {
-        std::cerr << "ScopesWatcher::add_install_dir(): parent dir watch: " << e.what() << std::endl;
+        std::lock_guard<std::mutex> lock(mutex_);
+        idir_to_sdirs_map_[dir.substr(0, dir.length() - 1)] = std::set<std::string>();
+    }
+    else
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        idir_to_sdirs_map_[dir] = std::set<std::string>();
     }
 
+    // Add watch for root directory
     try
     {
-        // Create a new entry for this install dir into idir_to_sdirs_map_
-        if (dir.back() == '/')
-        {
-            std::lock_guard<std::mutex> lock(mutex_);
-            idir_to_sdirs_map_[dir.substr(0, dir.length() - 1)] = std::set<std::string>();
-        }
-        else
-        {
-            std::lock_guard<std::mutex> lock(mutex_);
-            idir_to_sdirs_map_[dir] = std::set<std::string>();
-        }
+        add_watch(dir);
 
-        // Add watch for root directory (may not exist yet, so we ignore exceptions).
-        bool root_watch_added = false;
-        try
+        // Add watches for each sub directory in root
+        auto subdirs = find_entries(dir, EntryType::Directory);
+        for (auto const& subdir : subdirs)
         {
-            add_watch(dir);
-            root_watch_added = true;
-        }
-        catch (unity::ResourceException const&)
-        {
-        }
-
-        if (root_watch_added)
-        {
-            // Add watches for each sub directory in root
-            auto subdirs = find_entries(dir, EntryType::Directory);
-            for (auto const& subdir : subdirs)
+            try
             {
                 add_scope_dir(subdir, notify);
             }
+            catch (unity::FileException const&)
+            {
+                // Ignore does not exist exception
+            }
         }
     }
-    catch (unity::ResourceException const& e)
+    catch (unity::FileException const&)
     {
-        std::cerr << "ScopesWatcher::add_install_dir(): install dir watch: " << e.what() << std::endl;
-    }
-    catch (unity::SyscallException const& e)
-    {
-        std::cerr << "ScopesWatcher::add_install_dir(): install dir watch: " << e.what() << std::endl;
+        // Ignore does not exist exception
     }
 }
 
@@ -167,7 +156,7 @@ void ScopesWatcher::add_scope_dir(std::string const& dir, bool notify)
     {
         add_watch(dir);
     }
-    catch (unity::ResourceException const&) {}
+    catch (unity::LogicException const&) {}
 }
 
 void ScopesWatcher::remove_scope_dir(std::string const& dir)
@@ -314,8 +303,7 @@ void ScopesWatcher::watch_event(DirWatcher::EventType event_type,
                 {
                     add_scope_dir(path, true);
                 }
-                catch (unity::ResourceException const&) {}
-                catch (unity::SyscallException const&) {}
+                catch (unity::FileException const&) {}
             }
             // A sub directory has been removed
             else if (event_type == DirWatcher::Removed)

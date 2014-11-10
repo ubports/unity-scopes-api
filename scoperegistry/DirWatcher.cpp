@@ -24,6 +24,7 @@
 #include <sys/inotify.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
+#include <string.h>
 
 using namespace unity;
 
@@ -64,8 +65,8 @@ void DirWatcher::add_watch(std::string const& path)
     {
         if (wd.second == path)
         {
-            throw ResourceException("DirWatcher::add_watch(): failed to add watch for path: \"" +
-                                    path + "\". Watch already exists.");
+            throw LogicException("DirWatcher::add_watch(): failed to add watch for path: \"" +
+                                 path + "\". Watch already exists.");
         }
     }
 
@@ -74,9 +75,15 @@ void DirWatcher::add_watch(std::string const& path)
                                                   IN_MODIFY | IN_ATTRIB);
     if (wd < 0)
     {
-        throw ResourceException("DirWatcher::add_watch(): failed to add watch for path: \"" +
-                                path + "\". inotify_add_watch() failed. (fd = " +
-                                std::to_string(fd_) + ", path = " + path + ")");
+        auto msg = "DirWatcher::add_watch(): inotify_add_watch() failed. (fd = " +
+                   std::to_string(fd_) + ", path = " + path + "): " + strerror(errno);
+        if (errno == ENOENT)
+        {
+            // path does not exist.
+            throw FileException(msg, errno);
+        }
+        // Something else went wrong.
+        throw SyscallException(msg, errno);
     }
 
     wds_[wd] = path;

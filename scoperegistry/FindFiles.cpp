@@ -44,7 +44,7 @@ vector<string> find_entries(string const& install_dir, EntryType type)
     DIR* d = opendir(install_dir.c_str());
     if (d == NULL)
     {
-        throw ResourceException("cannot open scope installation directory \"" + install_dir + "\": " + strerror(errno));
+        throw FileException("cannot open scope installation directory \"" + install_dir + "\": " + strerror(errno), errno);
     }
     util::ResourcePtr<DIR*, decltype(&closedir)> dir_ptr(d, closedir);  // Clean up automatically
 
