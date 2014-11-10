@@ -18,6 +18,7 @@
 
 #include "DirWatcher.h"
 
+#include <unity/scopes/internal/Utils.h>
 #include <unity/UnityExceptions.h>
 
 #include <iostream>
@@ -76,7 +77,7 @@ void DirWatcher::add_watch(std::string const& path)
     if (wd < 0)
     {
         auto msg = "DirWatcher::add_watch(): inotify_add_watch() failed. (fd = " +
-                   std::to_string(fd_) + ", path = " + path + "): " + strerror(errno);
+                   std::to_string(fd_) + ", path = " + path + "): " + unity::scopes::internal::safe_strerror(errno);
         if (errno == ENOENT)
         {
             // path does not exist.

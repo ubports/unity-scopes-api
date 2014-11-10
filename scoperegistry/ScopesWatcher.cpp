@@ -45,48 +45,56 @@ ScopesWatcher::~ScopesWatcher()
 
 void ScopesWatcher::add_install_dir(std::string const& dir, bool notify)
 {
-    // Add watch for parent directory
     try
     {
-        add_watch(parent_dir(dir));
-    }
-    catch (unity::FileException const&) {}  // Ignore does not exist exception
-    catch (unity::LogicException const&) {} // Ignore already exists exception
-
-    // Create a new entry for this install dir into idir_to_sdirs_map_
-    if (dir.back() == '/')
-    {
-        std::lock_guard<std::mutex> lock(mutex_);
-        idir_to_sdirs_map_[dir.substr(0, dir.length() - 1)] = std::set<std::string>();
-    }
-    else
-    {
-        std::lock_guard<std::mutex> lock(mutex_);
-        idir_to_sdirs_map_[dir] = std::set<std::string>();
-    }
-
-    // Add watch for root directory
-    try
-    {
-        add_watch(dir);
-
-        // Add watches for each sub directory in root
-        auto subdirs = find_entries(dir, EntryType::Directory);
-        for (auto const& subdir : subdirs)
+        // Add watch for parent directory
+        try
         {
-            try
+            add_watch(parent_dir(dir));
+        }
+        catch (unity::FileException const&) {}  // Ignore does not exist exception
+        catch (unity::LogicException const&) {} // Ignore already exists exception
+
+        // Create a new entry for this install dir into idir_to_sdirs_map_
+        if (dir.back() == '/')
+        {
+            std::lock_guard<std::mutex> lock(mutex_);
+            idir_to_sdirs_map_[dir.substr(0, dir.length() - 1)] = std::set<std::string>();
+        }
+        else
+        {
+            std::lock_guard<std::mutex> lock(mutex_);
+            idir_to_sdirs_map_[dir] = std::set<std::string>();
+        }
+
+        // Add watch for root directory
+        try
+        {
+            add_watch(dir);
+
+            // Add watches for each sub directory in root
+            auto subdirs = find_entries(dir, EntryType::Directory);
+            for (auto const& subdir : subdirs)
             {
-                add_scope_dir(subdir, notify);
-            }
-            catch (unity::FileException const&)
-            {
-                // Ignore does not exist exception
+                try
+                {
+                    add_scope_dir(subdir, notify);
+                }
+                catch (unity::FileException const&)
+                {
+                    // Ignore does not exist exception
+                }
             }
         }
+        catch (unity::FileException const&)
+        {
+            // Ignore does not exist exception
+        }
     }
-    catch (unity::FileException const&)
+    catch (std::exception const& e)
     {
-        // Ignore does not exist exception
+        // TODO: log this
+        std::cerr << "scoperegistry: add_install_dir(): " << e.what() << std::endl;
     }
 }
 
@@ -125,38 +133,46 @@ void ScopesWatcher::remove_install_dir(std::string const& dir)
 
 void ScopesWatcher::add_scope_dir(std::string const& dir, bool notify)
 {
-    auto configs = find_scope_dir_configs(dir, ".ini");
-    if (!configs.empty())
-    {
-        auto config = *configs.cbegin();
-        {
-            std::lock_guard<std::mutex> lock(mutex_);
-
-            // Associate this scope with its install directory
-            if (idir_to_sdirs_map_.find(parent_dir(dir)) != idir_to_sdirs_map_.end())
-            {
-                idir_to_sdirs_map_.at(parent_dir(dir)).insert(dir);
-            }
-
-            // Associate this directory with the contained config file
-            sdir_to_ini_map_[dir] = config.second;
-        }
-
-        // New config found, execute callback
-        if (notify)
-        {
-            ini_added_callback_(config);
-            std::cout << "ScopesWatcher: scope: \"" << config.first << "\" installed to: \""
-                      << dir << "\"" << std::endl;
-        }
-    }
-
-    // Add a watch for this directory (ignore exception if already exists)
     try
     {
-        add_watch(dir);
+        auto configs = find_scope_dir_configs(dir, ".ini");
+        if (!configs.empty())
+        {
+            auto config = *configs.cbegin();
+            {
+                std::lock_guard<std::mutex> lock(mutex_);
+
+                // Associate this scope with its install directory
+                if (idir_to_sdirs_map_.find(parent_dir(dir)) != idir_to_sdirs_map_.end())
+                {
+                    idir_to_sdirs_map_.at(parent_dir(dir)).insert(dir);
+                }
+
+                // Associate this directory with the contained config file
+                sdir_to_ini_map_[dir] = config.second;
+            }
+
+            // New config found, execute callback
+            if (notify)
+            {
+                ini_added_callback_(config);
+                std::cout << "ScopesWatcher: scope: \"" << config.first << "\" installed to: \""
+                          << dir << "\"" << std::endl;
+            }
+        }
+
+        // Add a watch for this directory (ignore exception if already exists)
+        try
+        {
+            add_watch(dir);
+        }
+        catch (unity::LogicException const&) {}
     }
-    catch (unity::LogicException const&) {}
+    catch (std::exception const& e)
+    {
+        // TODO: log this
+        std::cerr << "scoperegistry: add_scope_dir(): " << e.what() << std::endl;
+    }
 }
 
 void ScopesWatcher::remove_scope_dir(std::string const& dir)
