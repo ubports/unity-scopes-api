@@ -321,6 +321,10 @@ void ScopeMetadataImpl::set_child_scope_ids(std::vector<std::string> const& ids)
 
 void ScopeMetadataImpl::set_version(int v)
 {
+    if (v < 0)
+    {
+        throw InvalidArgumentException("ScopeMetadata::set_version(): invalid version: " + std::to_string(v));
+    }
     version_ = v;
 }
 

@@ -188,7 +188,7 @@ scope works. For example, for a music scope, the default results could be someth
 and "Recently Played"; similarly, for a weather scope, the default results could be for the weather
 report for the current location. As the scope author, you need to decide what is most appropriate
 to show in surfacing mode. In the interests of a good user experience, it is important to show _something_
-here (if at all possible), so the user gets to to see at least some results (instead of being confronted with
+here (if at all possible), so the user gets to see at least some results (instead of being confronted with
 a blank screen).
 
 \paragraph querybase Implementing QueryBase
@@ -1055,7 +1055,7 @@ The `ScopeConfig` group is mandatory and must contain settings for at least `Dis
 The `Version` key is optional, but we strongly recommend that you set it.
 If the behavior of your scope changes in any way that is visible to the query source
 (such having added or removed a result attribute), you should increment the version number.
-This allows an aggregating scope to adjust its behavior according to to which version of
+This allows an aggregating scope to adjust its behavior according to which version of
 your scope is installed.
 If not set, the default value is 0. You can set the value to any integer >= 1.
 

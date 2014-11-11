@@ -70,14 +70,25 @@ void ScopesWatcher::add_install_dir(std::string const& dir, bool notify)
             idir_to_sdirs_map_[dir] = std::set<std::string>();
         }
 
-        // Add watch for root directory
-        add_watch(dir);
-
-        // Add watches for each sub directory in root
-        auto subdirs = find_entries(dir, EntryType::Directory);
-        for (auto const& subdir : subdirs)
+        // Add watch for root directory (may not exist yet, so we ignore exceptions).
+        bool root_watch_added = false;
+        try
         {
-            add_scope_dir(subdir, notify);
+            add_watch(dir);
+            root_watch_added = true;
+        }
+        catch (unity::ResourceException const&)
+        {
+        }
+
+        if (root_watch_added)
+        {
+            // Add watches for each sub directory in root
+            auto subdirs = find_entries(dir, EntryType::Directory);
+            for (auto const& subdir : subdirs)
+            {
+                add_scope_dir(subdir, notify);
+            }
         }
     }
     catch (unity::ResourceException const& e)

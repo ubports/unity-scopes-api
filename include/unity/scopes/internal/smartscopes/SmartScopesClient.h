@@ -60,6 +60,7 @@ struct RemoteScope
     std::shared_ptr<std::string> settings;      // optional
     std::shared_ptr<bool> needs_location_data;  // optional
     bool invisible = false;
+    int version;
 };
 
 struct SearchCategory
