@@ -1,3 +1,12 @@
+unity-scopes-api (0.6.9-0ubuntu1) UNRELEASED; urgency=medium
+
+  * Added support for Version attribute in scope.ini file, and added
+    version() accessor to ScopeMetadata.
+  * Added missing methods for settings_definitions(), location_data_needed(),
+    and child_scope_ids() to testing::ScopeMetadataBuilder.
+
+ -- Michi Henning <michi.henning@canonical.com>  Wed Nov 12 2014 16:08:35 +1000
+
 unity-scopes-api (0.6.8-0ubuntu1) UNRELEASED; urgency=medium
 
   * Added support for ChildScopes scope .ini option.
