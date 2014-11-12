@@ -468,7 +468,7 @@ void ScopeMetadataImpl::deserialize(VariantMap const& var)
 
     // Optional fields
 
-    // Version was added in 0.6.9. When serializing, we always
+    // Version was added in 0.6.8. When serializing, we always
     // add the field but, when deserializing, we allow it to
     // be absent because an aggregator compiled with this
     // version of the API may still be talking to a scope
