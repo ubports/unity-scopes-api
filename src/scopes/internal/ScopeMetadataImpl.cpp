@@ -466,6 +466,8 @@ void ScopeMetadataImpl::deserialize(VariantMap const& var)
     it = find_or_throw(var, "author");
     author_ = it->second.get_string();
 
+    // Optional fields
+
     // Version was added in 0.6.9. When serializing, we always
     // add the field but, when deserializing, we allow it to
     // be absent because an aggregator compiled with this
@@ -478,8 +480,6 @@ void ScopeMetadataImpl::deserialize(VariantMap const& var)
         throw InvalidArgumentException("ScopeMetadataImpl::deserialize(): invalid attribute 'version' with value "
                                        + std::to_string(version_));
     }
-
-    // Optional fields
 
     it = var.find("art");
     if (it != var.end())

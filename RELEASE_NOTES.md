@@ -1,10 +1,12 @@
 Release notes
 =============
 
-Changes in version 0.6.8
+Changes in version 0.6.9
 ========================
   - Added support for Version attribute in scope.ini file, and added version() accessor
     to ScopeMetadata.
+  - Added missing methods for settings_definitions(), location_data_needed(),
+    and child_scope_ids() to testing::ScopeMetadataBuilder.
 
 Changes in version 0.6.8
 ========================
