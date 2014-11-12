@@ -44,10 +44,10 @@ public:
     std::string default_middleware_configfile() const;
     int reap_expiry() const;
     int reap_interval() const;
-    std::string data_directory() const;
+    std::string cache_directory() const;
     std::string config_directory() const;
     static std::string default_config_directory();
-    static std::string default_data_directory();
+    static std::string default_cache_directory();
 
 private:
     std::string registry_identity_;
@@ -58,7 +58,7 @@ private:
     std::string default_middleware_configfile_;
     int reap_expiry_;
     int reap_interval_;
-    std::string data_directory_;
+    std::string cache_directory_;
     std::string config_directory_;
 };
 

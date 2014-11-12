@@ -102,7 +102,7 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
             registry_ = make_shared<RegistryImpl>(registry_mw_proxy, this);
         }
 
-        data_dir_ = config.data_directory();
+        cache_dir_ = config.cache_directory();
         config_dir_ = config.config_directory();
     }
     catch (unity::Exception const& e)
@@ -528,10 +528,10 @@ string RuntimeImpl::confinement_type() const
 
 string RuntimeImpl::find_cache_dir() const
 {
-    // Create the data_dir_/<confinement-type>/<id> directories if they don't exist.
+    // Create the cache_dir_/<confinement-type>/<id> directories if they don't exist.
     boost::system::error_code ec;
-    !confined() && !boost::filesystem::exists(data_dir_, ec) && ::mkdir(data_dir_.c_str(), 0700);
-    string dir = data_dir_ + "/" + confinement_type();
+    !confined() && !boost::filesystem::exists(cache_dir_, ec) && ::mkdir(cache_dir_.c_str(), 0700);
+    string dir = cache_dir_ + "/" + confinement_type();
     !confined() && !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700);
 
     // A confined scope is allowed to create this dir.

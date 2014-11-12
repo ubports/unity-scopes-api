@@ -489,9 +489,9 @@ int main(int argc, char* argv[])
             //       in case the scope is confined and the dir doesn't exist
             //       yet. This really should be done by the click-installation but,
             //       prior to RTM, we don't rely on that.
-            string data_root = rt_config.data_directory() + "/leaf-net";
+            string cache_root = rt_config.cache_directory() + "/leaf-net";
             boost::system::error_code ec;
-            !boost::filesystem::exists(data_root, ec) && ::mkdir(data_root.c_str(), 0700);
+            !boost::filesystem::exists(cache_root, ec) && ::mkdir(cache_root.c_str(), 0700);
         } // Release memory for config parser
 
         // Make sure that the parent directories for confined scope tmp directory exist.

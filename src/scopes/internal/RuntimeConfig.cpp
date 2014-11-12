@@ -46,7 +46,7 @@ const string default_middleware_key = "Default.Middleware";
 const string default_middleware_configfile_key = ".ConfigFile";
 const string reap_expiry_key = "Reap.Expiry";
 const string reap_interval_key = "Reap.Interval";
-const string data_dir_key = "DataDir";
+const string cache_dir_key = "CacheDir";
 const string config_dir_key = "ConfigDir";
 
 }  // namespace
@@ -66,7 +66,7 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
         reap_interval_ = DFLT_REAP_INTERVAL;
         try
         {
-            data_directory_ = default_data_directory();
+            cache_directory_ = default_cache_directory();
             config_directory_ = default_config_directory();
         }
         catch (ResourceException const& e)
@@ -94,16 +94,16 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
         {
             throw_ex("Illegal value (" + to_string(reap_interval_) + ") for " + reap_interval_key + ": value must be > 0");
         }
-        data_directory_ = get_optional_string(runtime_config_group, data_dir_key);
-        if (data_directory_.empty())
+        cache_directory_ = get_optional_string(runtime_config_group, cache_dir_key);
+        if (cache_directory_.empty())
         {
             try
             {
-                data_directory_ = default_data_directory();
+                cache_directory_ = default_cache_directory();
             }
             catch (ResourceException const& e)
             {
-                throw_ex("No DataDir configured and failed to get default");
+                throw_ex("No CacheDir configured and failed to get default");
             }
         }
         config_directory_ = get_optional_string(runtime_config_group, config_dir_key);
@@ -131,7 +131,7 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
                                                 default_middleware_ + default_middleware_configfile_key,
                                                 reap_expiry_key,
                                                 reap_interval_key,
-                                                data_dir_key,
+                                                cache_dir_key,
                                                 config_dir_key
                                              }
                                           }
@@ -183,9 +183,9 @@ int RuntimeConfig::reap_interval() const
     return reap_interval_;
 }
 
-string RuntimeConfig::data_directory() const
+string RuntimeConfig::cache_directory() const
 {
-    return data_directory_;
+    return cache_directory_;
 }
 
 string RuntimeConfig::config_directory() const
@@ -203,12 +203,12 @@ string RuntimeConfig::default_config_directory()
     return string(home) + "/.config/unity-scopes";
 }
 
-string RuntimeConfig::default_data_directory()
+string RuntimeConfig::default_cache_directory()
 {
     char const* home = getenv("HOME");
     if (!home || *home == '\0')
     {
-        throw ResourceException("RuntimeConfig::default_data_directory(): $HOME not set");
+        throw ResourceException("RuntimeConfig::default_cache_directory(): $HOME not set");
     }
     return string(home) + "/.local/share/unity-scopes";
 }

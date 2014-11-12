@@ -85,7 +85,7 @@ private:
     mutable std::string ss_registry_identity_;
     int reap_expiry_;
     int reap_interval_;
-    std::string data_dir_;
+    std::string cache_dir_;
     std::string config_dir_;
     std::string tmp_dir_;
     mutable Reaper::SPtr reply_reaper_;

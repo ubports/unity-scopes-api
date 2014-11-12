@@ -92,9 +92,9 @@ The following keys are recognized:
   config group, otherwise the middleware can prematurely conclude that
   a locate() request failed to start a scope.
 
-- DataDir
+- CacheDir
 
-  The parent directory under which the run time writes scope-specific data files
+  The parent directory under which a scope can write scope-specific data files
   (such as caches).
 
   The default value is $HOME/.local/share/unity-scopes.
