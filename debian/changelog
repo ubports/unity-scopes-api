@@ -1,9 +1,13 @@
-unity-scopes-api (0.6.8-0ubuntu1) UNRELEASED; urgency=medium
+unity-scopes-api (0.6.8-0ubuntu2) UNRELEASED; urgency=medium
 
+  [ Pawel Stolowski ]
   * Added support for ChildScopes scope .ini option.
   * Replaced dbus-send with "list updated" pub/sub to invalidate smart scopes.
 
- -- Pawel Stolowski <pawel.stolowski@ubuntu.com>  Wed, 22 Oct 2014 12:00:44 -0400
+  [ Michi Henning ]
+  * Added app_directory() method to ScopeBase.
+
+ -- Michi Henning <michi.henning@canonical.com>  Thu, 13 Nov 2014 13:10:09 +1000
 
 unity-scopes-api (0.6.7+14.10.20141014-0ubuntu1) 14.09; urgency=low
 
