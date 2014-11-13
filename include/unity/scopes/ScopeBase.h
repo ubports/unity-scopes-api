@@ -272,6 +272,23 @@ public:
     virtual std::string cache_directory() const final;
 
     /**
+    \brief Returns a directory that is shared with an app in the same click package.
+
+    If a scope and an app share a single click package, this directory and the
+    files in it are writable by the app, and read-only to the scope. This allows
+    the app to write information into the filesystem that can be read by the scope
+    (but not vice versa).
+
+    \note The app directory is available only after this ScopeBase is instantiated; do not
+    call this method from the constructor!
+
+    \return The root directory of a filesystem sub-tree that the scope shares with
+    an application installed from the same click-package.
+    \throws LogicException if called from the constructor of this instance.
+    */
+    virtual std::string app_directory() const final;
+
+    /**
     \brief Returns a tmp directory that is (exclusively) writable for the scope.
 
     This directory is periodically cleaned of unused files. The exact amount of time

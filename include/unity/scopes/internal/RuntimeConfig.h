@@ -47,9 +47,9 @@ public:
     std::string cache_directory() const;
     std::string app_directory() const;
     std::string config_directory() const;
-    static std::string default_config_directory();
     static std::string default_cache_directory();
     static std::string default_app_directory();
+    static std::string default_config_directory();
 
 private:
     std::string registry_identity_;

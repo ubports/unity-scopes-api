@@ -485,13 +485,17 @@ int main(int argc, char* argv[])
             identity = runtime->registry_identity();
             ss_reg_id = runtime->ss_registry_identity();
 
-            // TODO: HACK: We create the root of the data directory for confined scopes,
-            //       in case the scope is confined and the dir doesn't exist
-            //       yet. This really should be done by the click-installation but,
+            // TODO: HACK: We create the root of the cache and app directories for
+            //       confined scopes, in case the scope is confined and the dir doesn't
+            //       exist yet. This really should be done by the click-installation but,
             //       prior to RTM, we don't rely on that.
-            string cache_root = rt_config.cache_directory() + "/leaf-net";
             boost::system::error_code ec;
+
+            string cache_root = rt_config.cache_directory() + "/leaf-net";
             !boost::filesystem::exists(cache_root, ec) && ::mkdir(cache_root.c_str(), 0700);
+
+            string app_root = rt_config.app_directory();
+            !boost::filesystem::exists(app_root, ec) && ::mkdir(app_root.c_str(), 0700);
         } // Release memory for config parser
 
         // Make sure that the parent directories for confined scope tmp directory exist.
