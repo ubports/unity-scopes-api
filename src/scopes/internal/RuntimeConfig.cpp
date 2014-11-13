@@ -47,6 +47,7 @@ const string default_middleware_configfile_key = ".ConfigFile";
 const string reap_expiry_key = "Reap.Expiry";
 const string reap_interval_key = "Reap.Interval";
 const string cache_dir_key = "CacheDir";
+const string app_dir_key = "AppDir";
 const string config_dir_key = "ConfigDir";
 
 }  // namespace
@@ -67,6 +68,7 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
         try
         {
             cache_directory_ = default_cache_directory();
+            app_directory_ = default_app_directory();
             config_directory_ = default_config_directory();
         }
         catch (ResourceException const& e)
@@ -106,6 +108,18 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
                 throw_ex("No CacheDir configured and failed to get default");
             }
         }
+        app_directory_ = get_optional_string(runtime_config_group, app_dir_key);
+        if (app_directory_.empty())
+        {
+            try
+            {
+                app_directory_ = default_app_directory();
+            }
+            catch (ResourceException const& e)
+            {
+                throw_ex("No AppDir configured and failed to get default");
+            }
+        }
         config_directory_ = get_optional_string(runtime_config_group, config_dir_key);
         if (config_directory_.empty())
         {
@@ -132,6 +146,7 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
                                                 reap_expiry_key,
                                                 reap_interval_key,
                                                 cache_dir_key,
+                                                app_dir_key,
                                                 config_dir_key
                                              }
                                           }
@@ -188,19 +203,14 @@ string RuntimeConfig::cache_directory() const
     return cache_directory_;
 }
 
+string RuntimeConfig::app_directory() const
+{
+    return app_directory_;
+}
+
 string RuntimeConfig::config_directory() const
 {
     return config_directory_;
-}
-
-string RuntimeConfig::default_config_directory()
-{
-    char const* home = getenv("HOME");
-    if (!home || *home == '\0')
-    {
-        throw ResourceException("RuntimeConfig::default_config_directory(): $HOME not set");
-    }
-    return string(home) + "/.config/unity-scopes";
 }
 
 string RuntimeConfig::default_cache_directory()
@@ -213,6 +223,25 @@ string RuntimeConfig::default_cache_directory()
     return string(home) + "/.local/share/unity-scopes";
 }
 
+string RuntimeConfig::default_app_directory()
+{
+    char const* home = getenv("HOME");
+    if (!home || *home == '\0')
+    {
+        throw ResourceException("RuntimeConfig::default_app_directory(): $HOME not set");
+    }
+    return string(home) + "/.local/share";
+}
+
+string RuntimeConfig::default_config_directory()
+{
+    char const* home = getenv("HOME");
+    if (!home || *home == '\0')
+    {
+        throw ResourceException("RuntimeConfig::default_config_directory(): $HOME not set");
+    }
+    return string(home) + "/.config/unity-scopes";
+}
 
 } // namespace internal
 
