@@ -56,9 +56,9 @@ struct ScopeTraits
 class TypedScopeFixtureHelper
 {
     static void set_scope_directory(std::shared_ptr<ScopeBase> const& scope, std::string const& path);
-    static void set_cache_directory(std::string const& path);
-    static void set_app_directory(std::string const& path);
-    static void set_tmp_directory(std::string const& path);
+    static void set_cache_directory(std::shared_ptr<ScopeBase> const& scope, std::string const& path);
+    static void set_app_directory(std::shared_ptr<ScopeBase> const& scope, std::string const& path);
+    static void set_tmp_directory(std::shared_ptr<ScopeBase> const& scope, std::string const& path);
     static void set_registry(std::shared_ptr<ScopeBase> const& scope, RegistryProxy const& r);
 
     template<typename Scope>
