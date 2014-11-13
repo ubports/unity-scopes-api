@@ -282,6 +282,8 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
 
             scope.invisible = child_node->has_node("invisible") ? child_node->get_node("invisible")->as_bool() : false;
 
+            scope.version = child_node->has_node("version") ? child_node->get_node("version")->as_int() : 0;
+
             remote_scopes.push_back(scope);
         }
         catch (std::exception const& e)

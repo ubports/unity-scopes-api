@@ -321,6 +321,10 @@ void ScopeMetadataImpl::set_child_scope_ids(std::vector<std::string> const& ids)
 
 void ScopeMetadataImpl::set_version(int v)
 {
+    if (v < 0)
+    {
+        throw InvalidArgumentException("ScopeMetadata::set_version(): invalid version: " + std::to_string(v));
+    }
     version_ = v;
 }
 
@@ -462,7 +466,9 @@ void ScopeMetadataImpl::deserialize(VariantMap const& var)
     it = find_or_throw(var, "author");
     author_ = it->second.get_string();
 
-    // Version was added in 0.6.9. When serializing, we always
+    // Optional fields
+
+    // Version was added in 0.6.8. When serializing, we always
     // add the field but, when deserializing, we allow it to
     // be absent because an aggregator compiled with this
     // version of the API may still be talking to a scope
@@ -474,8 +480,6 @@ void ScopeMetadataImpl::deserialize(VariantMap const& var)
         throw InvalidArgumentException("ScopeMetadataImpl::deserialize(): invalid attribute 'version' with value "
                                        + std::to_string(version_));
     }
-
-    // Optional fields
 
     it = var.find("art");
     if (it != var.end())

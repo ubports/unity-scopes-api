@@ -93,6 +93,10 @@ public:
     ScopeMetadataBuilder& appearance_attributes(Optional<VariantMap> const& value);
     ScopeMetadataBuilder& scope_directory(Optional<std::string> const& value);
     ScopeMetadataBuilder& results_ttl_type(Optional<ScopeMetadata::ResultsTtlType> const& value);
+    ScopeMetadataBuilder& settings_definitions(Optional<VariantArray> const& value);
+    ScopeMetadataBuilder& location_data_needed(Optional<bool> const& value);
+    ScopeMetadataBuilder& child_scope_ids(Optional<std::vector<std::string>> const& value);
+    ScopeMetadataBuilder& version(Optional<int> const& value);
 
     ScopeMetadata operator()() const;
 

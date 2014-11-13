@@ -3,13 +3,12 @@ Release notes
 
 Changes in version 0.6.8
 ========================
-  - Added support for Version attribute in scope.ini file, and added version() accessor
-    to ScopeMetadata.
-
-Changes in version 0.6.8
-========================
   - Added support for ChildScopes scope .ini option to list scopes ids of aggregated scopes.
   - Replaced dbus-send with "list updated" pub/sub to invalidate smart scopes.
+  - Added support for Version attribute in scope.ini file, and added version() accessor
+    to ScopeMetadata.
+  - Added missing methods for settings_definitions(), location_data_needed(),
+    and child_scope_ids() to testing::ScopeMetadataBuilder.
 
 Changes in version 0.6.7
 ========================
