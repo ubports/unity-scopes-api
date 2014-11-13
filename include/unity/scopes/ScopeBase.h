@@ -292,7 +292,8 @@ public:
     \brief Returns a tmp directory that is (exclusively) writable for the scope.
 
     This directory is periodically cleaned of unused files. The exact amount of time
-    may vary, but is on the order of a few hours.
+    may vary, but is on the order of a few hours. The directory is also cleaned
+    during reboot.
 
     \note The tmp directory is available only after this ScopeBase is instantiated; do not
     call this method from the constructor!
