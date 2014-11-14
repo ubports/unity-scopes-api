@@ -18,6 +18,7 @@
 
 #include <unity/scopes/internal/zmq_middleware/Util.h>
 
+#include <unity/scopes/internal/Utils.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/util/ResourcePtr.h>
 
@@ -84,7 +85,7 @@ void safe_bind(zmqpp::socket& s, string const& endpoint)
         if (fd == -1)
         {
             // LCOV_EXCL_START
-            throw MiddlewareException("safe_bind(): cannot create socket: " + std::string(strerror(errno)));
+            throw MiddlewareException("safe_bind(): cannot create socket: " + std::string(safe_strerror(errno)));
             // LCOV_EXCL_STOP
         }
         util::ResourcePtr<int, decltype(&::close)> close_guard(fd, ::close);

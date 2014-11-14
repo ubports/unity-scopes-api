@@ -54,6 +54,7 @@ template<>
 bool convert_to<bool>(std::string const& val, Variant& out);
 
 int safe_system_call(std::string const& command);
+std::string safe_strerror(int errnum);
 
 } // namespace internal
 
