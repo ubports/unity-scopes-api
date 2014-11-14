@@ -40,6 +40,7 @@ public:
     BufferedResultForwarderImpl(unity::scopes::SearchReplyProxy const& upstream, unity::scopes::utility::BufferedResultForwarder::SPtr const& next_forwarder);
 
     unity::scopes::SearchReplyProxy const& upstream();
+    void push(CategorisedResult result);
     bool is_ready() const;
     void set_ready();
     void notify_ready();

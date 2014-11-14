@@ -54,6 +54,12 @@ unity::scopes::SearchReplyProxy const& BufferedResultForwarderImpl::upstream()
     return upstream_;
 }
 
+void BufferedResultForwarderImpl::push(CategorisedResult result)
+{
+    upstream_->push(result);
+    set_ready();
+}
+
 bool BufferedResultForwarderImpl::is_ready() const
 {
     return ready_;
