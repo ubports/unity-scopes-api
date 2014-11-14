@@ -18,14 +18,6 @@
 
 #pragma once
 
-/*
-   auto scope1fwd = make_shared<BufferedResultForwarder>(upstream_reply);
-   auto scope2fwd = make_shared<BufferedResultForwarder>(upstream_reply, scope1fwd); // force order
-
-   subsearch(scope1proxy, "", "", FilterState(), metadata, scope1fwd);
-   subsearch(scope2proxy, "", "", FilterState(), metadata, scope2fwd);
- */
-
 #include <unity/scopes/SearchListenerBase.h>
 #include <unity/scopes/SearchReplyProxyFwd.h>
 

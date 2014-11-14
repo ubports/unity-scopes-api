@@ -43,10 +43,28 @@ class SearchReceiver : public BufferedResultForwarder
         void push(CategorisedResult result) override
         {
             upstream()->push(result);
-            if (result.title() == "scope1")
-            {
-                set_ready();
-            }
+            set_ready();
+        }
+};
+
+// a receiver that never calls 'set_ready'; results will get flushed when SearchListenerBase::finished() gets called.
+class SearchReceiverWithoutSetReady : public BufferedResultForwarder
+{
+    public:
+        SearchReceiverWithoutSetReady(unity::scopes::SearchReplyProxy const& upstream)
+            : BufferedResultForwarder(upstream)
+        {
+        }
+
+        SearchReceiverWithoutSetReady(unity::scopes::SearchReplyProxy const& upstream, BufferedResultForwarder::SPtr const& next_forwarder)
+            : BufferedResultForwarder(upstream, next_forwarder)
+        {
+        }
+
+        void push(CategorisedResult result) override
+        {
+            // never call set_ready()
+            upstream()->push(result);
         }
 };
 
@@ -60,7 +78,82 @@ MATCHER_P2(ResultProp, prop, value, "")
     return arg.contains(prop) && arg[prop] == unity::scopes::Variant(value);
 }
 
+void push_results(Category::SCPtr const& cat, std::string const& uri, std::string const& title, int count, SearchListenerBase::SPtr const& search_listener)
+{
+    for (int i = 0; i<count; i++)
+    {
+        CategorisedResult res(cat);
+        res.set_uri(uri);
+        res.set_title(title);
+
+        search_listener->push(res);
+    }
+}
+
 TEST(BufferedResultForwarder, basic)
+{
+    const unity::scopes::CategoryRenderer renderer{};
+
+    NiceMock<unity::scopes::testing::MockSearchReply> reply;
+    unity::scopes::SearchReplyProxy upstream
+    {
+        &reply, [](unity::scopes::SearchReply*) {}
+    };
+
+    // results from fwd1 first, then fwd2, then fwd3
+    auto fwd3 = std::make_shared<SearchReceiver>(upstream);
+    auto fwd2 = std::make_shared<SearchReceiver>(upstream, fwd3);
+    auto fwd1 = std::make_shared<SearchReceiver>(upstream, fwd2);
+
+    SearchListenerBase::SPtr base3 = fwd3;
+    SearchListenerBase::SPtr base2 = fwd2;
+    SearchListenerBase::SPtr base1 = fwd1;
+
+    EXPECT_CALL(reply, push(Matcher<unity::scopes::CategorisedResult const&>(ResultProp("title", "scope1")))).Times(3);
+    EXPECT_CALL(reply, push(Matcher<unity::scopes::CategorisedResult const&>(ResultProp("title", "scope2")))).Times(10);
+    EXPECT_CALL(reply, push(Matcher<unity::scopes::CategorisedResult const&>(ResultProp("title", "scope3")))).Times(1);
+
+    // results from scope2 arrive first
+    {
+        EXPECT_FALSE(fwd2->is_ready());
+
+        Category::SCPtr cat = std::make_shared<unity::scopes::testing::Category>("scope2cat", "Scope2", "", renderer);
+        base2->push(cat);
+        push_results(cat, "scope2", "scope2", 10, base2);
+
+        EXPECT_TRUE(fwd2->is_ready());
+    }
+
+    // results coming from scope1
+    {
+
+        EXPECT_FALSE(fwd1->is_ready());
+
+        Category::SCPtr cat = std::make_shared<unity::scopes::testing::Category>("scope1cat", "Scope1", "", renderer);
+        base1->push(cat);
+        push_results(cat, "scope1", "scope1", 3, base1);
+
+        EXPECT_TRUE(fwd1->is_ready());
+    }
+
+    // result from scope3
+    {
+        EXPECT_FALSE(fwd3->is_ready());
+
+        Category::SCPtr cat = std::make_shared<unity::scopes::testing::Category>("scope3cat", "Scope3", "", renderer);
+        base1->push(cat);
+        push_results(cat, "scope3", "scope3", 1, base3);
+
+        EXPECT_TRUE(fwd3->is_ready());
+    }
+
+    CompletionDetails status(CompletionDetails::CompletionStatus::OK);
+    base3->finished(status);
+    base1->finished(status);
+    base2->finished(status);
+}
+
+TEST(BufferedResultForwarder, flush_on_finished)
 {
     const unity::scopes::CategoryRenderer renderer{};
 
@@ -72,48 +165,152 @@ TEST(BufferedResultForwarder, basic)
 
     // results from fwd1 first, then fwd2
     auto fwd2 = std::make_shared<SearchReceiver>(upstream);
-    auto fwd1 = std::make_shared<SearchReceiver>(upstream, fwd2);
+    auto fwd1 = std::make_shared<SearchReceiverWithoutSetReady>(upstream, fwd2);
 
     SearchListenerBase::SPtr base2 = fwd2;
     SearchListenerBase::SPtr base1 = fwd1;
 
-    EXPECT_CALL(reply, push(Matcher<unity::scopes::CategorisedResult const&>(ResultProp("title", "scope1")))).Times(3);
-    EXPECT_CALL(reply, push(Matcher<unity::scopes::CategorisedResult const&>(ResultProp("title", "scope2")))).Times(10);
+    EXPECT_CALL(reply, push(Matcher<unity::scopes::CategorisedResult const&>(ResultProp("title", "scope1")))).Times(2);
+    EXPECT_CALL(reply, push(Matcher<unity::scopes::CategorisedResult const&>(ResultProp("title", "scope2")))).Times(2);
 
-    // simulate a bunch of results coming from scope2
+    // results from scope2 arrive first
     {
-
         Category::SCPtr cat = std::make_shared<unity::scopes::testing::Category>("scope2catA", "Scope2", "", renderer);
         base2->push(cat);
+        push_results(cat, "scope2", "scope2", 2, base2);
 
-
-        for (int i = 0; i<10; i++)
-        {
-            CategorisedResult res(cat);
-            res.set_uri("http://foobar.com/" + std::to_string(i));
-            res.set_title("scope2");
-            base2->push(res);
-        }
+        EXPECT_TRUE(fwd2->is_ready());
     }
 
-    // now a few results coming from scope1
+    // results coming from scope1
     {
-
-        Category::SCPtr cat = std::make_shared<unity::scopes::testing::Category>("scope1catB", "Scope1", "", renderer);
+        Category::SCPtr cat = std::make_shared<unity::scopes::testing::Category>("scope1catA", "Scope1", "", renderer);
         base1->push(cat);
+        push_results(cat, "scope1", "scope1", 2, base1);
 
-        for (int i = 0; i<3; i++)
-        {
-            CategorisedResult res(cat);
-            res.set_uri("scope1");
-            res.set_title("scope1");
-
-            base1->push(res);
-        }
+        EXPECT_FALSE(fwd1->is_ready());
     }
 
     CompletionDetails status(CompletionDetails::CompletionStatus::OK);
     base1->finished(status);
+    EXPECT_TRUE(fwd1->is_ready());
     base2->finished(status);
+}
+
+TEST(BufferedResultForwarder, flush_on_finished_reversed_order)
+{
+    const unity::scopes::CategoryRenderer renderer{};
+
+    NiceMock<unity::scopes::testing::MockSearchReply> reply;
+    unity::scopes::SearchReplyProxy upstream
+    {
+        &reply, [](unity::scopes::SearchReply*) {}
+    };
+
+    // results from fwd1 first, then fwd2
+    auto fwd2 = std::make_shared<SearchReceiver>(upstream);
+    auto fwd1 = std::make_shared<SearchReceiverWithoutSetReady>(upstream, fwd2);
+
+    SearchListenerBase::SPtr base2 = fwd2;
+    SearchListenerBase::SPtr base1 = fwd1;
+
+    EXPECT_CALL(reply, push(Matcher<unity::scopes::CategorisedResult const&>(ResultProp("title", "scope1")))).Times(2);
+    EXPECT_CALL(reply, push(Matcher<unity::scopes::CategorisedResult const&>(ResultProp("title", "scope2")))).Times(2);
+
+    // results from scope2 arrive first
+    {
+        Category::SCPtr cat = std::make_shared<unity::scopes::testing::Category>("scope2catA", "Scope2", "", renderer);
+        base2->push(cat);
+        push_results(cat, "scope2", "scope2", 2, base2);
+    }
+
+    // results coming from scope1
+    {
+        Category::SCPtr cat = std::make_shared<unity::scopes::testing::Category>("scope1catA", "Scope1", "", renderer);
+        base1->push(cat);
+        push_results(cat, "scope1", "scope1", 2, base1);
+    }
+
+    CompletionDetails status(CompletionDetails::CompletionStatus::OK);
+
+    // the order in which finished() is called shouldn't matter - buffers are flushed in the requested order
+    base2->finished(status);
+    base1->finished(status);
+}
+
+TEST(BufferedResultForwarder, flush_on_finished_for_all_scopes)
+{
+    const unity::scopes::CategoryRenderer renderer{};
+
+    NiceMock<unity::scopes::testing::MockSearchReply> reply;
+    unity::scopes::SearchReplyProxy upstream
+    {
+        &reply, [](unity::scopes::SearchReply*) {}
+    };
+
+    // results from fwd1 first, then fwd2
+    auto fwd2 = std::make_shared<SearchReceiverWithoutSetReady>(upstream);
+    auto fwd1 = std::make_shared<SearchReceiverWithoutSetReady>(upstream, fwd2);
+
+    SearchListenerBase::SPtr base2 = fwd2;
+    SearchListenerBase::SPtr base1 = fwd1;
+
+    EXPECT_CALL(reply, push(Matcher<unity::scopes::CategorisedResult const&>(ResultProp("title", "scope1")))).Times(2);
+    EXPECT_CALL(reply, push(Matcher<unity::scopes::CategorisedResult const&>(ResultProp("title", "scope2")))).Times(2);
+
+    // results from scope2 arrive first
+    {
+        Category::SCPtr cat = std::make_shared<unity::scopes::testing::Category>("scope2catA", "Scope2", "", renderer);
+        base2->push(cat);
+        push_results(cat, "scope2", "scope2", 2, base2);
+        EXPECT_FALSE(fwd1->is_ready());
+    }
+
+    // results coming from scope1
+    {
+        Category::SCPtr cat = std::make_shared<unity::scopes::testing::Category>("scope1catA", "Scope1", "", renderer);
+        base1->push(cat);
+        push_results(cat, "scope1", "scope1", 2, base1);
+        EXPECT_FALSE(fwd2->is_ready());
+    }
+
+    CompletionDetails status(CompletionDetails::CompletionStatus::OK);
+
+    base2->finished(status);
+    EXPECT_TRUE(fwd2->is_ready());
+    EXPECT_FALSE(fwd1->is_ready());
+    base1->finished(status);
+    EXPECT_TRUE(fwd1->is_ready());
+}
+
+TEST(BufferedResultForwarder, no_results_from_first_scope)
+{
+    const unity::scopes::CategoryRenderer renderer{};
+
+    NiceMock<unity::scopes::testing::MockSearchReply> reply;
+    unity::scopes::SearchReplyProxy upstream
+    {
+        &reply, [](unity::scopes::SearchReply*) {}
+    };
+
+    // results from fwd1 first, then fwd2
+    auto fwd2 = std::make_shared<SearchReceiver>(upstream);
+    auto fwd1 = std::make_shared<SearchReceiverWithoutSetReady>(upstream, fwd2);
+
+    SearchListenerBase::SPtr base2 = fwd2;
+    SearchListenerBase::SPtr base1 = fwd1;
+
+    EXPECT_CALL(reply, push(Matcher<unity::scopes::CategorisedResult const&>(ResultProp("title", "scope2")))).Times(2);
+
+    // results from scope2 arrive first
+    {
+        Category::SCPtr cat = std::make_shared<unity::scopes::testing::Category>("scope2catA", "Scope2", "", renderer);
+        base2->push(cat);
+        push_results(cat, "scope2", "scope2", 2, base2);
+    }
+
+    CompletionDetails status(CompletionDetails::CompletionStatus::OK);
+    base2->finished(status);
+    base1->finished(status);
 }
 
