@@ -32,6 +32,7 @@ namespace internal
 
 BufferedResultForwarderImpl::BufferedResultForwarderImpl(unity::scopes::SearchReplyProxy const& upstream)
     : ready_(false),
+      has_previous_(false),
       previous_ready_(false),
       upstream_(std::make_shared<internal::BufferedSearchReplyImpl>(upstream))
 {
@@ -40,10 +41,12 @@ BufferedResultForwarderImpl::BufferedResultForwarderImpl(unity::scopes::SearchRe
 BufferedResultForwarderImpl::BufferedResultForwarderImpl(unity::scopes::SearchReplyProxy const& upstream,
         unity::scopes::utility::BufferedResultForwarder::SPtr const& next_forwarder)
     : ready_(false),
+      has_previous_(false),
       previous_ready_(false),
       upstream_(std::make_shared<internal::BufferedSearchReplyImpl>(upstream)),
       next_(next_forwarder)
 {
+    next_forwarder->p->has_previous_ = true;
 }
 
 unity::scopes::SearchReplyProxy const& BufferedResultForwarderImpl::upstream()
@@ -66,7 +69,7 @@ void BufferedResultForwarderImpl::set_ready()
     {
         ready_ = true;
 
-        if (previous_ready_)
+        if (previous_ready_ || !has_previous_)
         {
             flush_and_notify();
         }

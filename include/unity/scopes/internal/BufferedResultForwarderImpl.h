@@ -48,6 +48,7 @@ public:
 
 private:
     bool ready_;
+    bool has_previous_;
     bool previous_ready_;
     unity::scopes::SearchReplyProxy const upstream_;
     std::weak_ptr<utility::BufferedResultForwarder> next_;
