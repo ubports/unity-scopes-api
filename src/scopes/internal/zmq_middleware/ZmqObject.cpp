@@ -324,7 +324,9 @@ ZmqObjectProxy::TwowayOutParams ZmqObjectProxy::invoke_twoway__(capnp::MessageBu
 
     if (!p.has_input(s))
     {
-        throw TimeoutException("Request timed out after " + std::to_string(timeout) + " milliseconds");
+        string op_name = in_params.getRoot<capnproto::Request>().getOpName().cStr();
+        throw TimeoutException("Request timed out after " + std::to_string(timeout) + " milliseconds (endpoint = " +
+                               endpoint + ", op = " + op_name + ")");
     }
 
     // Because the ZmqReceiver holds the memory for the unmarshaling buffer, we pass both the receiver
