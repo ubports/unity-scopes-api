@@ -611,7 +611,7 @@ implementation of BufferedResultForwarder forwards results it recevies and buffe
 at least one result each - which is enough to ensure proper order of categories in the UI - as long as the aggregating scope creates only one category per child
 scope.
 
-If child scopes create more than a single category (which is often the case), it may be neccessary to implement a class derived from BufferedResultForwarder and
+If child scopes create more than a single category (which is often the case), it may be necessary to implement a class derived from BufferedResultForwarder and
 reimplement its BufferedResultForwarder::push(CategorisedResult) method to change category of results and / or call BufferedResultForwarder::set_ready() only
 after receiving all the expected categories.  See the documentation of unity::scopes::utility::BufferedResultForwarder for more details and an example of aggregator
 scope which aggregates results from three child scopes into three separate categories.

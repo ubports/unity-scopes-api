@@ -47,7 +47,7 @@ Please note, that the default implementation only pushes results (and their cate
 forward those to the client, you need to derive from BufferedResultForwarder and override respective methods of base unity::scopes::SearchListenerBase
 interface. Also note, that since the default implementation just forwards received results, it will recreate all the received categories from all child scopes,
 and the order defined by BufferedResultForwarder chaining will only be guaranteed among first received category of each child scope. Therefore in
-many cases it may be neccessary to derive from BufferedResultForwarder and reimplement
+many cases it may be necessary to derive from BufferedResultForwarder and reimplement
 unity::scopes::utility::BufferedResultForwarder::push(unity::scopes::CategorisedResult) to - for example - collapse categories received from a child into one
 target category of the aggregating scope.
 
