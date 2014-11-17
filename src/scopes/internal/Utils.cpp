@@ -14,19 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
- *              Michi Henning <michi.henning@canonical.com>
-*/
-
-// Get XSI-compliant strerror_r()
-#pragma push_macro("_GNU_SOURCE")
-#pragma push_macro("_XOPEN_SOURCE")
-
-#undef _GNU_SOURCE
-#define _XOPEN_SOURCE 700
-#include <string.h>
-
-#pragma pop_macro("_XOPEN_SOURCE")
-#pragma pop_macro("_GNU_SOURCE")
+ */
 
 #include <unity/scopes/internal/Utils.h>
 #include <unity/scopes/ScopeExceptions.h>
@@ -161,35 +149,6 @@ int safe_system_call(std::string const& command)
     static std::mutex system_mutex;
     std::lock_guard<std::mutex> lock(system_mutex);
     return std::system(command.c_str());
-}
-
-std::string safe_strerror(int errnum)
-{
-    char buf[512];
-    int rc = strerror_r(errnum, buf, sizeof(buf));
-    switch (rc)
-    {
-        case 0:
-        {
-            return buf;
-        }
-        case EINVAL:
-        {
-            return "invalid error number " + std::to_string(errnum) + " for strerror_r()";
-        }
-        // LCOV_EXCL_START
-        case ERANGE:
-        {
-            return "buffer size of " + std::to_string(sizeof(buf)) + " is too small for strerror_r(), errnum = "
-                   + std::to_string(errnum);
-        }
-        default:
-        {
-            return "impossible return value " + std::to_string(rc) + " from strerror_r(), errnum = "
-                   + std::to_string(errnum);
-        }
-        // LCOV_EXCL_STOP
-    }
 }
 
 } // namespace internal

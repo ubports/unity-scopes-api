@@ -66,10 +66,3 @@ TEST(Utils, convert_to)
         EXPECT_FALSE(out.get_bool());
     }
 }
-
-TEST(Utils, safe_strerror)
-{
-    EXPECT_EQ("Success", safe_strerror(0));
-    EXPECT_EQ("Operation not permitted", safe_strerror(1));
-    EXPECT_EQ("invalid error number 77777 for strerror_r()", safe_strerror(77777));
-}

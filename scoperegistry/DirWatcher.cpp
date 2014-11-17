@@ -18,7 +18,7 @@
 
 #include "DirWatcher.h"
 
-#include <unity/scopes/internal/Utils.h>
+#include <unity/scopes/internal/safe_strerror.h>
 #include <unity/UnityExceptions.h>
 
 #include <iostream>
