@@ -512,7 +512,7 @@ proxy for the scope.
 
 \paragraph subquery Sub-queries
 
-Tsubsearcho send a query to another scope, use one of the `subsearch()` overloads of \link unity::scopes::SearchQueryBase\endlink
+To send a query to another scope, use one of the `subsearch()` overloads of \link unity::scopes::SearchQueryBase\endlink
 inside your implementation of
 \link unity::scopes::SearchQueryBase::run SearchQueryBase::run()\endlink.
 This method requires the proxy to the child scope to query, the query details (\link unity::scopes::CannedQuery CannedQuery\endlink), plus
@@ -600,6 +600,21 @@ private:
     SearchReplyProxy upstream_reply_;
 };
 \endcode
+
+\paragraph aggbuffering Ensuring fixed order of categories when aggregating from multiple scopes
+
+Categories are displayed in the order their results are pushed, which usually poses a challenge for aggreagor scopes, because results from child scopes arrive
+asynchronously in random order and therefore need to be buffered and potentially re-ordered and re-organised before pushing to appear in desired order. This can
+easily be achieved with unity::scopes::utility::BufferedResultForwarder: aggregator scope needs to create instances of
+BufferedResultForwarder for every child scope and chain them together to define the desired order of categories. The default
+implementation of BufferedResultForwarder forwards results it recevies and buffers them up until prior instances of BufferedResultForwarder in the chain pushed
+at least one result each - which is enough to ensure proper order of categories in the UI - as long as the aggregating scope creates only one category per child
+scope.
+
+If child scopes create more than a single category (which is often the case), it may be neccessary to implement a class derived from BufferedResultForwarder and
+reimplement its BufferedResultForwarder::push(CategorisedResult) method to change category of results and / or call BufferedResultForwarder::set_ready() only
+after receiving all the expected categories.  See the documentation of unity::scopes::utility::BufferedResultForwarder for more details and an example of aggregator
+scope which aggregates results from three child scopes into three separate categories.
 
 \paragraph aggactiv Activation and preview
 
