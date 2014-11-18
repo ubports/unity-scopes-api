@@ -284,7 +284,7 @@ ZmqObjectProxy::TwowayOutParams ZmqObjectProxy::invoke_twoway__(capnp::MessageBu
 
     zmqpp::socket s(*mw_base()->context(), zmqpp::socket_type::request);
     // Allow some linger time so we don't hang indefinitely if the other end disappears.
-    s.set(zmqpp::socket_option::linger, 500);
+    s.set(zmqpp::socket_option::linger, 100);
     // We set a reconnect interval of 20 ms, so we get to the peer quickly, in case
     // the peer hasn't finished binding to its endpoint yet after being exec'd.
     // We back off exponentially to half the call timeout. If we haven't connected

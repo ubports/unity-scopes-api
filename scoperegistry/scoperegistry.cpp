@@ -172,7 +172,7 @@ map<string, string> find_local_scopes(string const& scope_installdir, string con
                 }
             }
         }
-        catch (ResourceException const& e)
+        catch (FileException const& e)
         {
             error(e.what());
             error("could not open OEM installation directory, ignoring OEM scopes");
@@ -210,7 +210,7 @@ map<string, string> find_click_scopes(map<string, string> const& local_scopes, s
                 }
             }
         }
-        catch (ResourceException const& e)
+        catch (FileException const& e)
         {
             error(e.what());
             error("could not open Click installation directory, ignoring Click scopes");
