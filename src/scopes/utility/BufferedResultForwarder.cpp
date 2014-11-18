@@ -150,4 +150,3 @@ void BufferedResultForwarder::finished(CompletionDetails const& details)
 }
 
 }
-

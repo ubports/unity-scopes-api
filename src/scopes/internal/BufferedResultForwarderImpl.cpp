@@ -119,4 +119,3 @@ void BufferedResultForwarderImpl::finished(CompletionDetails const&)
 } // namespace scopes
 
 } // namespace unity
-
