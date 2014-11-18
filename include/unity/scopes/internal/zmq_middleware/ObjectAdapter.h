@@ -19,10 +19,11 @@
 #ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_OBJECTADAPTER_H
 #define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_OBJECTADAPTER_H
 
+#include <unity/scopes/internal/Logger.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqObjectProxy.h>
-
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/util/NonCopyable.h>
+
 #include <zmqpp/socket.hpp>
 
 #include <future>
@@ -123,6 +124,8 @@ private:
     AdapterState state_;
     std::condition_variable state_changed_;
     mutable std::mutex state_mutex_;
+
+    boost::log::sources::severity_channel_logger_mt<>& logger_;
 
     // Map of object identity and servant pairs
     typedef std::unordered_map<std::string, std::shared_ptr<ServantBase>> ServantMap;

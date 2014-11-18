@@ -282,6 +282,10 @@ OnlineAccountClientImpl::~OnlineAccountClientImpl()
         std::lock_guard<std::mutex> lock(mutex_);
         if (thread_exception_)
         {
+            // TODO: We don't have access to the run time here, so we can't write to the log.
+            //       It would be better to have a factory method on Runtime that instantiates
+            //       an OnlineAccoutClient, in which case we could access the logger here.
+            //       But that's an ABI-breaking change...
             // LCOV_EXCL_START
             try
             {
@@ -623,13 +627,11 @@ void OnlineAccountClientImpl::main_loop_thread()
     // LCOV_EXCL_START
     catch (std::exception const& e)
     {
-        std::cerr << "OnlineAccountClientImpl::main_loop_thread(): Thread aborted: " << e.what() << std::endl;
         std::lock_guard<std::mutex> lock(mutex_);
         thread_exception_ = std::current_exception();
     }
     catch (...)
     {
-        std::cerr << "OnlineAccountClientImpl::main_loop_thread(): Thread aborted: unknown exception" << std::endl;
         std::lock_guard<std::mutex> lock(mutex_);
         thread_exception_ = std::current_exception();
     }

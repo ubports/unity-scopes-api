@@ -26,8 +26,6 @@
 #include <QNetworkRequest>
 #include <QNetworkReply>
 
-#include <iostream>
-
 using namespace unity::scopes::internal::smartscopes;
 
 //-- HttpClientQt

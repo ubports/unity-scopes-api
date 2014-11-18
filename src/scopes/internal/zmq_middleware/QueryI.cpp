@@ -48,10 +48,11 @@ interface Query
 
 */
 
-using namespace std::placeholders;
+using namespace std;
+namespace ph = std::placeholders;
 
 QueryI::QueryI(QueryObjectBase::SPtr const& qo) :
-    ServantBase(qo, { { "run", bind(&QueryI::run_, this, _1, _2, _3) } })
+    ServantBase(qo, { { "run", bind(&QueryI::run_, this, ph::_1, ph::_2, ph::_3) } })
 {
 }
 

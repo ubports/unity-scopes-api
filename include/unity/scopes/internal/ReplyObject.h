@@ -61,6 +61,7 @@ public:
     void info(OperationInfo const& op_info) noexcept override;
 
 private:
+    RuntimeImpl const* runtime_;
     ListenerBase::SPtr listener_base_;
     ReapItem::SPtr reap_item_;
     std::atomic_bool finished_;

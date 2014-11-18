@@ -318,7 +318,9 @@ TEST(Runtime, search)
 
 TEST(Runtime, consecutive_search)
 {
+    cerr << "calling run_test_registry" << endl;
     auto reg_rt = run_test_registry();
+    cerr << "done calling run_test_registry" << endl;
     auto rt = internal::RuntimeImpl::create("", "Runtime.ini");
     auto mw = rt->factory()->create("TestScope", "Zmq", "Zmq.ini");
     mw->start();

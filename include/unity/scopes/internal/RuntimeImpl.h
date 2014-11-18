@@ -19,6 +19,7 @@
 #ifndef UNITY_SCOPES_INTERNAL_RUNTIMEIMPL_H
 #define UNITY_SCOPES_INTERNAL_RUNTIMEIMPL_H
 
+#include <unity/scopes/internal/Logger.h>
 #include <unity/scopes/internal/MiddlewareBase.h>
 #include <unity/scopes/internal/MiddlewareFactory.h>
 #include <unity/scopes/internal/Reaper.h>
@@ -53,6 +54,7 @@ public:
     Reaper::SPtr reply_reaper() const;
     ThreadPool::SPtr async_pool() const;
     ThreadSafeQueue<std::future<void>>::SPtr future_queue() const;
+    boost::log::sources::severity_channel_logger_mt<>& logger() const;
     void run_scope(ScopeBase* scope_base,
                    std::string const& scope_ini_file,
                    std::promise<void> ready_promise = std::promise<void>());
@@ -89,6 +91,7 @@ private:
     std::string data_dir_;
     std::string config_dir_;
     std::string tmp_dir_;
+    Logger::UPtr logger_;
     mutable Reaper::SPtr reply_reaper_;
     mutable ThreadPool::SPtr async_pool_;  // Pool of invocation threads for async query creation
     mutable ThreadSafeQueue<std::future<void>>::SPtr future_queue_;

@@ -19,6 +19,8 @@
 #ifndef SCOPEREGISTRY_DIRWATCHER_H
 #define SCOPEREGISTRY_DIRWATCHER_H
 
+#include <unity/scopes/internal/Logger.h>
+
 #include <condition_variable>
 #include <map>
 #include <thread>
@@ -47,7 +49,7 @@ public:
         Directory
     };
 
-    DirWatcher();
+    DirWatcher(boost::log::sources::severity_channel_logger_mt<>& logger);
     virtual ~DirWatcher();
 
     void add_watch(std::string const& path);
@@ -72,6 +74,7 @@ private:
     std::mutex mutex_;
     ThreadState thread_state_;
     std::exception_ptr thread_exception_;
+    boost::log::sources::severity_channel_logger_mt<>& logger_;
 
     void watch_thread();
     virtual void watch_event(EventType, FileType, std::string const&) {}
