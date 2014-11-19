@@ -760,6 +760,34 @@ if (it != s.end())                         // Setting does not have a default va
 }
 ~~~
 
+\subsection directories File system access
+
+Scopes that are installed from click packages are subject to confinement and are not allowed
+to access most parts of the file system. However, a few locations are available to a scope.
+You can access these paths by calling methods on \link unity::scopes::ScopeBase ScopeBase\endlink.
+
+\note Do not call these methods from the constructor of your `ScopeBase` implementation. If you
+do, these methods throw `LogicException`. Instead, call them from
+\link unity::scopes::ScopeBase::start() start()\endlink or any time thereafter.
+
+\link unity::scopes::ScopeBase::scope_directory() scope_directory()\endlink returns the path of the installation
+directory of the scope. This directory contains the scope's `.so` and `.ini` files, plus whatever other
+files you decide to package with your scope. The scope has read-only permission for this directory.
+
+\link unity::scopes::ScopeBase::cache_directory() cache_directory()\endlink returns the path of a
+directory that is (exclusively) writable for the scope. You can use this directory to store
+persistent information, such as a cache of results.
+
+\link unity::scopes::ScopeBase::app_directory() app_directory()\endlink returns the path of a
+read-only directory. If the scope is packaged together with an app, the app has permission to write
+files in this location, that is, this directory can be used make information provided by the app
+available to the scope (but not vice versa).
+
+\link unity::scopes::ScopeBase::tmp_directory() tmp_directory()\endlink returns the path of a
+read-only directory that is (exclusively) writable for the scope. This directory is periodically
+cleaned of unused files. The exact amount of time may vary, but is on the order of a few hours.
+The directory is also cleaned during reboot.
+
 \subsection online_accounts Online Accounts
 
 A scope may require access to an online account in order to evaluate particular results, perform certain actions, or

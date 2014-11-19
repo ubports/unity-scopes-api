@@ -102,7 +102,8 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
             registry_ = make_shared<RegistryImpl>(registry_mw_proxy, this);
         }
 
-        data_dir_ = config.data_directory();
+        cache_dir_ = config.cache_directory();
+        app_dir_ = config.app_directory();
         config_dir_ = config.config_directory();
     }
     catch (unity::Exception const& e)
@@ -340,18 +341,15 @@ void RuntimeImpl::run_scope(ScopeBase* scope_base,
 
     auto mw = factory()->create(scope_id_, reg_conf.mw_kind(), reg_conf.mw_configfile());
 
-    {
-        boost::filesystem::path dir = boost::filesystem::canonical(scope_ini_file).parent_path();
-        scope_base->p->set_scope_directory(dir.native());
-    }
+    boost::filesystem::path scope_dir = boost::filesystem::canonical(scope_ini_file).parent_path();
+    scope_base->p->set_scope_directory(scope_dir.native());
 
     {
         // Try to open the scope settings database, if any.
         string config_dir = config_dir_ + "/" + scope_id_;
         string settings_db = config_dir + "/settings.ini";
 
-        string scope_dir = scope_base->scope_directory();
-        string settings_schema = scope_dir + "/" + scope_id_ + "-settings.ini";
+        string settings_schema = scope_dir.native() + "/" + scope_id_ + "-settings.ini";
 
         boost::system::error_code ec;
         if (boost::filesystem::exists(settings_schema, ec))
@@ -367,6 +365,7 @@ void RuntimeImpl::run_scope(ScopeBase* scope_base,
 
     scope_base->p->set_registry(registry_);
     scope_base->p->set_cache_directory(find_cache_dir());
+    scope_base->p->set_app_directory(find_app_dir());
     scope_base->p->set_tmp_directory(find_tmp_dir());
 
     try
@@ -489,8 +488,8 @@ string RuntimeImpl::proxy_to_string(ObjectProxy const& proxy) const
 string RuntimeImpl::demangled_id() const
 {
     // For scopes that are in a click package together with an app,
-    // such as YouTube, the cache directory is shared between the app and
-    // the scope. The cache directory name is the scope ID up to the first
+    // such as YouTube, the scope id is <scope_id>_<app_id>
+    // The app directory and cache directory names are the scope ID up to the first
     // underscore. For example, com.ubuntu.scopes.youtube_youtube is the
     // scope ID, but the cache dir name is com.ubuntu.scopes.youtube.
     auto id = scope_id_;
@@ -528,15 +527,26 @@ string RuntimeImpl::confinement_type() const
 
 string RuntimeImpl::find_cache_dir() const
 {
-    // Create the data_dir_/<confinement-type>/<id> directories if they don't exist.
+    // Create the cache_dir_/<confinement-type>/<id> directories if they don't exist.
     boost::system::error_code ec;
-    !confined() && !boost::filesystem::exists(data_dir_, ec) && ::mkdir(data_dir_.c_str(), 0700);
-    string dir = data_dir_ + "/" + confinement_type();
+    !confined() && !boost::filesystem::exists(cache_dir_, ec) && ::mkdir(cache_dir_.c_str(), 0700);
+    string dir = cache_dir_ + "/" + confinement_type();
     !confined() && !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700);
 
     // A confined scope is allowed to create this dir.
     dir += "/" + demangled_id();
     !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700);
+
+    return dir;
+}
+
+string RuntimeImpl::find_app_dir() const
+{
+    // Create the app_dir_/<id> directories if they don't exist.
+    boost::system::error_code ec;
+    !confined() && !boost::filesystem::exists(app_dir_, ec) && ::mkdir(app_dir_.c_str(), 0700);
+    string dir = app_dir_ + "/" + demangled_id();
+    !confined() && !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700);
 
     return dir;
 }

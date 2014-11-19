@@ -1,16 +1,17 @@
-unity-scopes-api (0.6.8-0ubuntu2) UNRELEASED; urgency=medium
+unity-scopes-api (0.6.8-0ubuntu1) UNRELEASED; urgency=medium
 
   [ Pawel Stolowski ]
   * Added support for ChildScopes scope .ini option.
   * Replaced dbus-send with "list updated" pub/sub to invalidate smart scopes.
 
   [ Michi Henning ]
+  * Added app_directory() method to ScopeBase.
   * Added support for Version attribute in scope.ini file, and added
     version() accessor to ScopeMetadata.
   * Added missing methods for settings_definitions(), location_data_needed(),
     and child_scope_ids() to testing::ScopeMetadataBuilder.
 
- -- Michi Henning <michi.henning@canonical.com>  Thu, 13 Nov 2014 09:12:20 +1000
+ -- Michi Henning <michi.henning@canonical.com>  Thu, 13 Nov 2014 13:10:09 +1000
 
 unity-scopes-api (0.6.7+14.10.20141014-0ubuntu1) 14.09; urgency=low
 

@@ -82,6 +82,11 @@ std::string ScopeBase::cache_directory() const
     return p->cache_directory();
 }
 
+std::string ScopeBase::app_directory() const
+{
+    return p->app_directory();
+}
+
 std::string ScopeBase::tmp_directory() const
 {
     return p->tmp_directory();
