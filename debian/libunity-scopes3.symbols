@@ -377,7 +377,7 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::internal::RegistryObject::remove_desktop_file(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.6.6+14.10.20140916
  (c++)"unity::scopes::internal::RegistryObject::remove_local_scope(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RegistryObject::ScopeExecData::~ScopeExecData()@Base" 0.4.2+14.04.20140404.2
- (c++|arch=amd64)"unity::scopes::internal::RegistryObject::ScopeExecData::ScopeExecData(unity::scopes::internal::RegistryObject::ScopeExecData const&)@Base" 0.6.6+14.10.20140916
+ (c++)"unity::scopes::internal::RegistryObject::ScopeExecData::ScopeExecData(unity::scopes::internal::RegistryObject::ScopeExecData const&)@Base" 0.6.6+14.10.20140916
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::clear_handle_unlocked()@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::exec(core::posix::ChildProcess::DeathObserver&, std::shared_ptr<unity::scopes::internal::Executor>)@Base" 0.4.3+14.10.20140428
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::expand_custom_exec()@Base" 0.5.0+14.10.20140619
@@ -394,6 +394,7 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::wait_for_state(std::unique_lock<std::mutex>&, unity::scopes::internal::RegistryObject::ScopeProcess::ProcessState) const@Base" 0.4.5+14.10.20140513
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::wait_for_state(unity::scopes::internal::RegistryObject::ScopeProcess::ProcessState) const@Base" 0.4.5+14.10.20140513
  (c++)"unity::scopes::internal::RegistryObject::set_remote_registry(std::shared_ptr<unity::scopes::internal::MWRegistry> const&)@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::internal::RegistryObject::ss_list_update()@Base" 0replaceme
  (c++)"unity::scopes::internal::RegistryObject::state_receiver()@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::internal::RuntimeConfig::config_directory() const@Base" 0.6.2+rtm+rtm+rtm+14.09.20140818
  (c++)"unity::scopes::internal::RuntimeConfig::data_directory() const@Base" 0.5.2+14.10.20140709.2
@@ -410,10 +411,14 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::internal::RuntimeConfig::ss_configfile() const@Base" 0.4.4+14.10.20140508
  (c++)"unity::scopes::internal::RuntimeConfig::ss_registry_identity() const@Base" 0.4.4+14.10.20140508
  (c++)"unity::scopes::internal::RuntimeImpl::async_pool() const@Base" 0.4.3+14.10.20140428
+ (c++)"unity::scopes::internal::RuntimeImpl::confined() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::RuntimeImpl::confinement_type() const@Base" 0replaceme
  (c++)"unity::scopes::internal::RuntimeImpl::create(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::internal::RuntimeImpl::demangled_id() const@Base" 0replaceme
  (c++)"unity::scopes::internal::RuntimeImpl::destroy()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RuntimeImpl::factory() const@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::internal::RuntimeImpl::find_cache_dir(std::basic_string<char, std::char_traits<char>, std::allocator<char> >&) const@Base" 0.6.0+14.10.20140804.1
+ (c++)"unity::scopes::internal::RuntimeImpl::find_cache_dir() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::RuntimeImpl::find_tmp_dir() const@Base" 0replaceme
  (c++)"unity::scopes::internal::RuntimeImpl::future_queue() const@Base" 0.4.3+14.10.20140428
  (c++)"unity::scopes::internal::RuntimeImpl::proxy_to_string(std::shared_ptr<unity::scopes::Object> const&) const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RuntimeImpl::registry_configfile() const@Base" 0.4.0+14.04.20140312.1

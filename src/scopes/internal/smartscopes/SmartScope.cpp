@@ -160,7 +160,8 @@ void SmartQuery::run(SearchReplyProxy const& reply)
         }
     };
 
-    ///! TODO: country (+location data)
+
+    ///! TODO: detailed location data
     int query_id = 0;
     std::string session_id;
     std::string agent;
@@ -186,9 +187,18 @@ void SmartQuery::run(SearchReplyProxy const& reply)
     {
         agent = metadata["user-agent"].get_string();
     }
+    std::string country_code;
+    if (metadata.has_location())
+    {
+        auto location = metadata.location();
+        if (location.has_country_code())
+        {
+            country_code = location.country_code();
+        }
+    }
 
     search_handle_ = ss_client_->search(handler, base_url_, query_.query_string(), query_.department_id(), session_id, query_id, hints_.form_factor(),
-            settings(), query_.filter_state().serialize(), hints_.locale(), "", agent, hints_.cardinality());
+            settings(), query_.filter_state().serialize(), hints_.locale(), country_code, agent, hints_.cardinality());
     search_handle_->wait();
 
     std::cout << "SmartScope: query for \"" << scope_id_ << "\": \"" << query_.query_string() << "\" complete" << std::endl;
@@ -256,7 +266,7 @@ void SmartPreview::run(PreviewReplyProxy const& reply)
         }
     };
 
-    ///! TODO: country (+location data)
+    ///! TODO: country (+location data) - Preview metadata does not currently contain location data
     std::string session_id;
     std::string agent;
     auto const metadata = action_metadata();
