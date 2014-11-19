@@ -373,7 +373,7 @@ SearchHandle::UPtr SmartScopesClient::search(SearchReplyHandler const& handler,
         {
             search_uri << "&country=" << location.country_code;
         }
-        search_uri << std::fixed << std::setprecision(3) << "&latitude=" << location.latitude << "&longitude=" << location.longitude;
+        search_uri << std::fixed << std::setprecision(5) << "&latitude=" << location.latitude << "&longitude=" << location.longitude;
     }
     if (limit != 0)
     {
