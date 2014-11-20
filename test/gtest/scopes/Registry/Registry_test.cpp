@@ -99,14 +99,10 @@ TEST(Registry, metadata)
     EXPECT_EQ("Location", defs[0].get_dict()["displayName"].get_string());
     EXPECT_EQ("string", defs[0].get_dict()["type"].get_string());
     EXPECT_EQ("London", defs[0].get_dict()["defaultValue"].get_string());
-    EXPECT_EQ("internal.location.precision", defs[1].get_dict()["id"].get_string());
+    EXPECT_EQ("internal.location", defs[1].get_dict()["id"].get_string());
     EXPECT_EQ("Enable location data", defs[1].get_dict()["displayName"].get_string());
-    EXPECT_EQ("list", defs[1].get_dict()["type"].get_string());
-    ASSERT_EQ(3, defs[1].get_dict()["displayValues"].get_array().size());
-    EXPECT_EQ("None", defs[1].get_dict()["displayValues"].get_array()[0].get_string());
-    EXPECT_EQ("Approximate", defs[1].get_dict()["displayValues"].get_array()[1].get_string());
-    EXPECT_EQ("Precise", defs[1].get_dict()["displayValues"].get_array()[2].get_string());
-    EXPECT_EQ(0, defs[1].get_dict()["defaultValue"].get_int());
+    EXPECT_EQ("boolean", defs[1].get_dict()["type"].get_string());
+    EXPECT_EQ(true, defs[1].get_dict()["defaultValue"].get_bool());
     EXPECT_TRUE(meta.location_data_needed());
     auto children = meta.child_scope_ids();
     EXPECT_EQ(2u, children.size());

@@ -675,13 +675,10 @@ TEST(JsonSettingsSchema, empty_then_with_location)
         auto defs = s->definitions();
         ASSERT_EQ(1, defs.size());
 
-        EXPECT_EQ("internal.location.precision", defs[0].get_dict()["id"].get_string());
+        EXPECT_EQ("internal.location", defs[0].get_dict()["id"].get_string());
         EXPECT_EQ("Enable location data", defs[0].get_dict()["displayName"].get_string());
-        EXPECT_EQ("list", defs[0].get_dict()["type"].get_string());
-        ASSERT_EQ(3, defs[0].get_dict()["displayValues"].get_array().size());
-        EXPECT_EQ("None", defs[0].get_dict()["displayValues"].get_array()[0].get_string());
-        EXPECT_EQ("Approximate", defs[0].get_dict()["displayValues"].get_array()[1].get_string());
-        EXPECT_EQ("Precise", defs[0].get_dict()["displayValues"].get_array()[2].get_string());
-        EXPECT_EQ(0, defs[0].get_dict()["defaultValue"].get_int());
+        EXPECT_EQ("boolean", defs[0].get_dict()["type"].get_string());
+        EXPECT_TRUE(defs[0].get_dict()["displayValues"].is_null());
+        EXPECT_TRUE(defs[0].get_dict()["defaultValue"].get_bool());
     }
 }
