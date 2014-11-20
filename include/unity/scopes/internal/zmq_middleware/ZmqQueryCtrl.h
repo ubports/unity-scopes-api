@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQQUERYCTRL_H
-#define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQQUERYCTRL_H
+#pragma once
 
 #include <unity/scopes/internal/zmq_middleware/ZmqObjectProxy.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqQueryCtrlProxyFwd.h>
@@ -55,5 +54,3 @@ public:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

@@ -16,8 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_ANNOTATIONIMPL_H
-#define UNITY_SCOPES_INTERNAL_ANNOTATIONIMPL_H
+#pragma once
 
 #include <unity/scopes/CannedQuery.h>
 #include <unity/scopes/Variant.h>
@@ -65,5 +64,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

@@ -16,8 +16,7 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_SMARTSCOPES_SMARTSCOPESCLIENT_H
-#define UNITY_SCOPES_INTERNAL_SMARTSCOPES_SMARTSCOPESCLIENT_H
+#pragma once
 
 #include <unity/scopes/FilterBase.h>
 #include <unity/scopes/FilterState.h>
@@ -62,6 +61,7 @@ struct RemoteScope
     std::shared_ptr<std::string> settings;      // optional
     std::shared_ptr<bool> needs_location_data;  // optional
     bool invisible = false;
+    int version;
 };
 
 struct SearchCategory
@@ -87,6 +87,16 @@ struct DepartmentInfo
     std::string canned_query;
     bool has_subdepartments = false;
     std::vector<std::shared_ptr<DepartmentInfo>> subdepartments;
+};
+
+struct LocationInfo
+{
+    bool has_location;
+    std::string country_code;
+    double latitude;
+    double longitude;
+
+    LocationInfo(): has_location(false) {}
 };
 
 class SearchHandle
@@ -175,7 +185,7 @@ public:
                               VariantMap const& settings = VariantMap(),
                               VariantMap const& filter_state = VariantMap(),
                               std::string const& locale = "",
-                              std::string const& country = "",
+                              LocationInfo const& location = LocationInfo(),
                               std::string const& user_agent_hdr = "",
                               const unsigned int limit = 0);
 
@@ -237,5 +247,3 @@ private:
 }  // namespace scopes
 
 }  // namespace unity
-
-#endif  // UNITY_SCOPES_INTERNAL_SMARTSCOPES_SMARTSCOPESCLIENT_H

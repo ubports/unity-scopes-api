@@ -16,8 +16,7 @@
  * Authored by: Thomas Voß <thomas.voss@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_TESTING_MOCK_PREVIEW_REPLY_H
-#define UNITY_SCOPES_TESTING_MOCK_PREVIEW_REPLY_H
+#pragma once
 
 #include <unity/scopes/PreviewReply.h>
 
@@ -59,5 +58,3 @@ public:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

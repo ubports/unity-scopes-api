@@ -201,6 +201,7 @@ TEST(RuntimeImpl, directories)
         EXPECT_EQ(tmpdir, testscope.tmp_directory());
 
         EXPECT_EQ(TEST_DIR "/cache_dir/unconfined/TestScope", testscope.cache_directory());
+        EXPECT_EQ(TEST_DIR "/app_dir/TestScope", testscope.app_directory());
 
         // Don't destroy the run time until after the scope has finished initializing.
         initialized.wait();
@@ -210,9 +211,9 @@ TEST(RuntimeImpl, directories)
     }
 
     {
-        // Check that scopes that share a cache dir with an app (because
+        // Check that scopes that share an app dir with an app (because
         // the scope is packaged with the app in a single click package)
-        // share the app's cache directory.
+        // return the correct path for cache and app dir.
 
         string const scope_ini_file = TEST_DIR "/TestScope_TestScope.ini";
 
@@ -236,6 +237,7 @@ TEST(RuntimeImpl, directories)
         EXPECT_EQ(tmpdir, testscope.tmp_directory());
 
         EXPECT_EQ(TEST_DIR "/cache_dir/unconfined/TestScope", testscope.cache_directory());
+        EXPECT_EQ(TEST_DIR "/app_dir/TestScope", testscope.app_directory());
 
         // Don't destroy the run time until after the scope has finished initializing.
         initialized.wait();

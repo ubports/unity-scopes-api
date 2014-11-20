@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_RUNTIME_H
-#define UNITY_SCOPES_RUNTIME_H
+#pragma once
 
 #include <unity/scopes/ObjectProxyFwd.h>
 #include <unity/scopes/RegistryProxyFwd.h>
@@ -175,5 +174,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

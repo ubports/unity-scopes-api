@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_PREVIEW_REPLY_H
-#define UNITY_SCOPES_PREVIEW_REPLY_H
+#pragma once
 
 #include <unity/scopes/ColumnLayout.h>
 #include <unity/scopes/PreviewReplyProxyFwd.h>
@@ -74,5 +73,3 @@ protected:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

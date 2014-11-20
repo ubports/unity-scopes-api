@@ -16,8 +16,7 @@
  * Authored by: Michal Hruby <michal.hruby@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_PREVIEWQUERYOBJECT_H
-#define UNITY_SCOPES_INTERNAL_PREVIEWQUERYOBJECT_H
+#pragma once
 
 #include <unity/scopes/internal/QueryObject.h>
 #include <unity/scopes/PreviewQueryBase.h>
@@ -54,5 +53,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

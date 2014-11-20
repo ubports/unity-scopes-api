@@ -16,8 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_ACTIVATIONREPLYOBJECT_H
-#define UNITY_SCOPES_INTERNAL_ACTIVATIONREPLYOBJECT_H
+#pragma once
 
 #include <unity/scopes/internal/ReplyObject.h>
 #include <unity/scopes/ActivationListenerBase.h>
@@ -47,5 +46,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

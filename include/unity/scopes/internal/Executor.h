@@ -16,8 +16,7 @@
  * Authored by: Pete Woods <pete.woods@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_EXECUTOR_H_
-#define UNITY_SCOPES_INTERNAL_EXECUTOR_H_
+#pragma once
 
 #include <core/posix/exec.h>
 #include <unity/util/DefinesPtrs.h>
@@ -26,8 +25,10 @@
 
 namespace unity
 {
+
 namespace scopes
 {
+
 namespace internal
 {
 
@@ -49,7 +50,7 @@ public:
 };
 
 } // namespace internal
-} // namespace scopes
-} // namespace unity
 
-#endif
+} // namespace scopes
+
+} // namespace unity

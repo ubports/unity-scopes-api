@@ -16,8 +16,7 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#ifndef SCOPEREGISTRY_DIRWATCHER_H
-#define SCOPEREGISTRY_DIRWATCHER_H
+#pragma once
 
 #include <unity/scopes/internal/Logger.h>
 
@@ -81,5 +80,3 @@ private:
 };
 
 } // namespace scoperegistry
-
-#endif  // SCOPEREGISTRY_DIRWATCHER_H

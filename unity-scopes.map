@@ -16,6 +16,7 @@ global:
         unity::scopes::internal::RegistryObject::*;
         unity::scopes::internal::RuntimeConfig::*;
         unity::scopes::internal::RuntimeImpl::*;
+        unity::scopes::internal::safe_strerror*;
         unity::scopes::internal::ScopeConfig::*;
         unity::scopes::internal::ScopeImpl::*;
         unity::scopes::internal::ScopeLoader::*;

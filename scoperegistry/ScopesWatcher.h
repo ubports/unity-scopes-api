@@ -16,8 +16,7 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#ifndef SCOPEREGISTRY_SCOPESWATCHER_H
-#define SCOPEREGISTRY_SCOPESWATCHER_H
+#pragma once
 
 #include <DirWatcher.h>
 
@@ -62,5 +61,3 @@ private:
 };
 
 } // namespace scoperegistry
-
-#endif  // SCOPEREGISTRY_SCOPESWATCHER_H

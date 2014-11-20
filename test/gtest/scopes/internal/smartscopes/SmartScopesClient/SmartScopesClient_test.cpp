@@ -71,11 +71,11 @@ TEST_F(SmartScopesClientTest, remote_scopes)
 
     // now try an empty locale
     EXPECT_TRUE(ssc_->get_remote_scopes(scopes, "", false));
-    ASSERT_EQ(4u, scopes.size());
+    ASSERT_EQ(5u, scopes.size());
 
     // now try a valid locale
     EXPECT_TRUE(ssc_->get_remote_scopes(scopes, "test_TEST", false));
-    ASSERT_EQ(4u, scopes.size());
+    ASSERT_EQ(5u, scopes.size());
 
     EXPECT_EQ("dummy.scope", scopes[0].id);
     EXPECT_EQ("Dummy Demo Scope", scopes[0].name);
@@ -85,6 +85,7 @@ TEST_F(SmartScopesClientTest, remote_scopes)
     EXPECT_EQ("icon", *scopes[0].icon);
     EXPECT_EQ(nullptr, scopes[0].art);
     EXPECT_FALSE(scopes[0].invisible);
+    EXPECT_EQ(0, scopes[0].version);
     EXPECT_EQ(nullptr, scopes[0].appearance);
     EXPECT_EQ(nullptr, scopes[0].settings);
 
@@ -96,6 +97,7 @@ TEST_F(SmartScopesClientTest, remote_scopes)
     EXPECT_EQ(nullptr, scopes[1].icon);
     EXPECT_EQ("art", *scopes[1].art);
     EXPECT_TRUE(scopes[1].invisible);
+    EXPECT_EQ(2, scopes[1].version);
     EXPECT_EQ("#00BEEF", (*scopes[1].appearance)["background"].get_string());
     EXPECT_EQ("logo.png", (*scopes[1].appearance)["PageHeader"].get_dict()["logo"].get_string());
     EXPECT_EQ(nullptr, scopes[1].settings);
@@ -143,7 +145,7 @@ TEST_F(SmartScopesClientTest, search)
         dept = deptinfo;
     };
 
-    auto search_handle = ssc_->search(handler, sss_url_ + "/demo", "stuff", "", "session_id", 0, "platform", VariantMap(), VariantMap(), "en_US", "", "ThisIsUserAgentHeader");
+    auto search_handle = ssc_->search(handler, sss_url_ + "/demo", "stuff", "", "session_id", 0, "platform", VariantMap(), VariantMap(), "en_US", LocationInfo(), "ThisIsUserAgentHeader");
     search_handle->wait();
 
     ASSERT_EQ(3u, results.size());
@@ -241,7 +243,7 @@ TEST_F(SmartScopesClientTest, userAgentHeader)
     handler.departments_handler = [](std::shared_ptr<DepartmentInfo> const&) {
     };
 
-    auto search_handle = ssc_->search(handler, sss_url_ + "/demo", "test_user_agent_header", "", "session_id", 0, "platform", VariantMap(), VariantMap(), "en_US", "", "ThisIsUserAgentHeader");
+    auto search_handle = ssc_->search(handler, sss_url_ + "/demo", "test_user_agent_header", "", "session_id", 0, "platform", VariantMap(), VariantMap(), "en_US", LocationInfo(), "ThisIsUserAgentHeader");
     search_handle->wait();
 
     ASSERT_EQ(4u, results.size());

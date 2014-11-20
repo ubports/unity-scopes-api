@@ -16,8 +16,7 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
 */
 
-#ifndef UNITY_INTERNAL_COMPLETIONDETAILSIMPL_H
-#define UNITY_INTERNAL_COMPLETIONDETAILSIMPL_H
+#pragma once
 
 #include <unity/scopes/CompletionDetails.h>
 
@@ -58,5 +57,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

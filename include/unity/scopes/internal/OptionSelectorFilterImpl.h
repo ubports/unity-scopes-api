@@ -16,8 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_OPTIONSELECTORFILTERIMPL_H
-#define UNITY_SCOPES_INTERNAL_OPTIONSELECTORFILTERIMPL_H
+#pragma once
 
 #include <unity/scopes/internal/FilterBaseImpl.h>
 #include <unity/scopes/OptionSelectorFilter.h>
@@ -69,5 +68,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

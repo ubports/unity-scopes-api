@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_OBJECTIMPL_H
-#define UNITY_SCOPES_INTERNAL_OBJECTIMPL_H
+#pragma once
 
 #include<unity/scopes/internal/Logger.h>
 #include<unity/scopes/internal/MWObjectProxyFwd.h>
@@ -71,5 +70,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

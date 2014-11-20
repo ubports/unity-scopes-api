@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_UTIL_H
-#define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_UTIL_H
+#pragma once
 
 #include <zmqpp/socket.hpp>
 
@@ -46,5 +45,3 @@ void safe_bind(zmqpp::socket& s, std::string const& endpoint);
 } // namespace scopes
 
 } // namespace unity
-
-#endif

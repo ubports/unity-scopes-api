@@ -16,8 +16,7 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_REGISTRYOBJECT_H
-#define UNITY_SCOPES_INTERNAL_REGISTRYOBJECT_H
+#pragma once
 
 #include <unity/scopes/internal/Executor.h>
 #include <unity/scopes/internal/MiddlewareBase.h>
@@ -161,5 +160,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

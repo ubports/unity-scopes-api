@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_RUNTIMEIMPL_H
-#define UNITY_SCOPES_INTERNAL_RUNTIMEIMPL_H
+#pragma once
 
 #include <unity/scopes/internal/Logger.h>
 #include <unity/scopes/internal/MiddlewareBase.h>
@@ -75,6 +74,7 @@ private:
     bool confined() const;
     std::string confinement_type() const;
     std::string find_cache_dir() const;
+    std::string find_app_dir() const;
     std::string find_tmp_dir() const;
 
     bool destroyed_;
@@ -88,7 +88,8 @@ private:
     mutable std::string ss_registry_identity_;
     int reap_expiry_;
     int reap_interval_;
-    std::string data_dir_;
+    std::string cache_dir_;
+    std::string app_dir_;
     std::string config_dir_;
     std::string tmp_dir_;
     Logger::UPtr logger_;
@@ -104,5 +105,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

@@ -16,8 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_RANGE_INPUT_FILTER_H
-#define UNITY_SCOPES_RANGE_INPUT_FILTER_H
+#pragma once
 
 #include <unity/scopes/FilterBase.h>
 #include <unity/scopes/Variant.h>
@@ -150,5 +149,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

@@ -16,8 +16,7 @@
  * Authored by: Pete Woods <pete.wods@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_LOCATION_H
-#define UNITY_SCOPES_LOCATION_H
+#pragma once
 
 #include <unity/scopes/Variant.h>
 #include <unity/util/DefinesPtrs.h>
@@ -300,5 +299,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_VARIANT_H
-#define UNITY_SCOPES_VARIANT_H
+#pragma once
 
 #include <memory>
 #include <string>
@@ -208,5 +207,3 @@ void swap(Variant&, Variant&) noexcept;
 } // namespace scopes
 
 } // namespace unity
-
-#endif

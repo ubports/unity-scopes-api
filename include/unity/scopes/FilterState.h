@@ -16,8 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_FILTERSTATE_H
-#define UNITY_SCOPES_FILTERSTATE_H
+#pragma once
 
 #include <unity/scopes/Variant.h>
 #include <unity/util/DefinesPtrs.h>
@@ -91,5 +90,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

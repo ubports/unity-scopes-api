@@ -18,6 +18,7 @@
 
 #include "FindFiles.h"
 
+#include <unity/scopes/internal/safe_strerror.h>
 #include <unity/UnityExceptions.h>
 #include <unity/util/ResourcePtr.h>
 
@@ -44,7 +45,9 @@ vector<string> find_entries(string const& install_dir, EntryType type)
     DIR* d = opendir(install_dir.c_str());
     if (d == NULL)
     {
-        throw ResourceException("cannot open scope installation directory \"" + install_dir + "\": " + strerror(errno));
+        throw FileException("cannot open scope installation directory \"" + install_dir + "\": "
+                                + scopes::internal::safe_strerror(errno),
+                            errno);
     }
     util::ResourcePtr<DIR*, decltype(&closedir)> dir_ptr(d, closedir);  // Clean up automatically
 
@@ -116,18 +119,26 @@ map<string, string> find_install_dir_configs(string const& install_dir,
     auto scope_dirs = find_entries(install_dir, Directory);
     for (auto scope_dir : scope_dirs)
     {
-        auto configs = find_scope_dir_configs(scope_dir, suffix);
-        for (auto config : configs)
+        try
         {
-            auto const it = scopes_seen.find(config.first);
-            if (it != scopes_seen.end())
+            auto configs = find_scope_dir_configs(scope_dir, suffix);
+            for (auto config : configs)
             {
-                error("ignoring second instance of non-unique scope: " + config.second + "\n"
-                      "previous instance: " + it->second);
-                continue;
+                auto const it = scopes_seen.find(config.first);
+                if (it != scopes_seen.end())
+                {
+                    error("ignoring second instance of non-unique scope: " + config.second + "\n"
+                            "previous instance: " + it->second);
+                    continue;
+                }
+                scopes_seen[config.first] = config.second;
+                files.insert(config);
             }
-            scopes_seen[config.first] = config.second;
-            files.insert(config);
+        }
+        catch (FileException const& e)
+        {
+            error(e.what());
+            error("could not open scope directory: " + scope_dir);
         }
     }
 

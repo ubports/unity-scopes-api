@@ -16,8 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_FILTEROPTION_H
-#define UNITY_SCOPES_FILTEROPTION_H
+#pragma once
 
 #include <unity/util/NonCopyable.h>
 #include <unity/util/DefinesPtrs.h>
@@ -73,5 +72,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

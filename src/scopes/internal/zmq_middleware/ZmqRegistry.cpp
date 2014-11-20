@@ -193,8 +193,9 @@ ObjectProxy ZmqRegistry::locate(std::string const& identity)
 
 bool ZmqRegistry::is_scope_running(std::string const& scope_id)
 {
+    string op_name = "is_scope_running";
     capnp::MallocMessageBuilder request_builder;
-    auto request = make_request_(request_builder, "is_scope_running");
+    auto request = make_request_(request_builder, op_name);
     auto in_params = request.initInParams().getAs<capnproto::Registry::IsScopeRunningRequest>();
     in_params.setIdentity(scope_id.c_str());
 
@@ -215,11 +216,11 @@ bool ZmqRegistry::is_scope_running(std::string const& scope_id)
         case capnproto::Registry::IsScopeRunningResponse::Response::NOT_FOUND_EXCEPTION:
         {
             auto ex = is_scope_running_response.getNotFoundException();
-            throw NotFoundException("Registry::is_scope_running(): no such scope", ex.getIdentity().cStr());
+            throw NotFoundException("Registry::" + op_name + "(): no such scope", ex.getIdentity().cStr());
         }
         default:
         {
-            throw MiddlewareException("Registry::is_scope_running(): unknown user exception");
+            throw MiddlewareException("Registry::" + op_name + "(): unknown user exception");
         }
     }
 }

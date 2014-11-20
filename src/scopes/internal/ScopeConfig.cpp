@@ -56,6 +56,7 @@ namespace
     const string results_ttl_key = "ResultsTtlType";
     const string debug_mode_key = "DebugMode";
     const string child_scope_ids_key = "ChildScopes";
+    const string version_key = "Version";
 
     const string scope_appearance_group = "Appearance";
     const string fg_color_key = "ForegroundColor";
@@ -208,6 +209,19 @@ ScopeConfig::ScopeConfig(string const& configfile) :
 
     try
     {
+        version_ = get_int(scope_config_group, version_key);
+        if (version_ <= 0)
+        {
+            throw_ex("Version must be > 0");
+        }
+    }
+    catch (LogicException const&)
+    {
+        version_ = 0;
+    }
+
+    try
+    {
         debug_mode_ = parser()->get_boolean(scope_config_group, debug_mode_key);
     }
     catch (LogicException const&)
@@ -244,7 +258,8 @@ ScopeConfig::ScopeConfig(string const& configfile) :
                idle_timeout_key,
                results_ttl_key,
                debug_mode_key,
-               child_scope_ids_key
+               child_scope_ids_key,
+               version_key
            }
         },
         {  scope_appearance_group,
@@ -421,6 +436,11 @@ VariantMap ScopeConfig::appearance_attributes() const
 std::vector<std::string> ScopeConfig::child_scope_ids() const
 {
     return child_scope_ids_;
+}
+
+int ScopeConfig::version() const
+{
+    return version_;
 }
 
 } // namespace internal

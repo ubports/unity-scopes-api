@@ -289,6 +289,8 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
 
             scope.invisible = child_node->has_node("invisible") ? child_node->get_node("invisible")->as_bool() : false;
 
+            scope.version = child_node->has_node("version") ? child_node->get_node("version")->as_int() : 0;
+
             remote_scopes.push_back(scope);
         }
         catch (std::exception const& e)
@@ -344,11 +346,13 @@ SearchHandle::UPtr SmartScopesClient::search(SearchReplyHandler const& handler,
                                              VariantMap const& settings,
                                              VariantMap const& filter_state,
                                              std::string const& locale,
-                                             std::string const& country,
+                                             LocationInfo const& location,
                                              std::string const& user_agent_hdr,
                                              uint limit)
 {
     std::ostringstream search_uri;
+    search_uri.imbue(std::locale::classic()); // so that doubles use one standard formatting wrt decimal point
+
     search_uri << base_url << c_search_resource << "?";
 
     // mandatory parameters
@@ -375,9 +379,13 @@ SearchHandle::UPtr SmartScopesClient::search(SearchReplyHandler const& handler,
     {
         search_uri << "&locale=" << locale;
     }
-    if (!country.empty())
+    if (location.has_location)
     {
-        search_uri << "&country=" << country;
+        if (!location.country_code.empty())
+        {
+            search_uri << "&country=" << location.country_code;
+        }
+        search_uri << std::fixed << std::setprecision(5) << "&latitude=" << location.latitude << "&longitude=" << location.longitude;
     }
     if (limit != 0)
     {

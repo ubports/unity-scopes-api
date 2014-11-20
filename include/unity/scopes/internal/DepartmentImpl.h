@@ -16,8 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_INTERNAL_DEPARTMENTIMPL_H
-#define UNITY_INTERNAL_DEPARTMENTIMPL_H
+#pragma once
 
 #include <unity/scopes/Department.h>
 #include <unity/scopes/CannedQuery.h>
@@ -75,5 +74,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

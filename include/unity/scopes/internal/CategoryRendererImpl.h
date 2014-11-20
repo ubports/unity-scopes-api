@@ -16,8 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_CATEGORYRENDERERIMPL_H
-#define UNITY_SCOPES_INTERNAL_CATEGORYRENDERERIMPL_H
+#pragma once
 
 #include <unity/scopes/CategoryRenderer.h>
 #include <string>
@@ -48,5 +47,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif
