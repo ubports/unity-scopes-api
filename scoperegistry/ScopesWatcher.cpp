@@ -50,13 +50,15 @@ void ScopesWatcher::add_install_dir(std::string const& dir, bool notify)
 {
     try
     {
-        add_watch(parent_dir(dir));
-    }
-    catch (unity::ResourceException const&) {} // Ignore already exists exception
-    catch (unity::SyscallException const& e )
-    {
-        BOOST_LOG_SEV(logger_, Logger::Error) << "ScopesWatcher::add_install_dir(): parent dir watch: " << e.what();
-    }
+        try
+        {
+            add_watch(parent_dir(dir));
+        }
+        catch (unity::ResourceException const&) {} // Ignore already exists exception
+        catch (unity::SyscallException const& e)
+        {
+            BOOST_LOG_SEV(logger_, Logger::Error) << "ScopesWatcher::add_install_dir(): parent dir watch: " << e.what();
+        }
 
         // Create a new entry for this install dir into idir_to_sdirs_map_
         if (dir.back() == '/')
@@ -176,8 +178,7 @@ void ScopesWatcher::add_scope_dir(std::string const& dir, bool notify)
     }
     catch (std::exception const& e)
     {
-        // TODO: log this
-        std::cerr << "scoperegistry: add_scope_dir(): " << e.what() << std::endl;
+        BOOST_LOG_SEV(logger_, Logger::Error) << "scoperegistry: add_scope_dir(): " << e.what();
     }
 }
 
