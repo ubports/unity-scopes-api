@@ -54,7 +54,8 @@ void ScopesWatcher::add_install_dir(std::string const& dir, bool notify)
         {
             add_watch(parent_dir(dir));
         }
-        catch (unity::ResourceException const&) {} // Ignore already exists exception
+        catch (unity::FileException const&) {}  // Ignore does not exist exception
+        catch (unity::LogicException const&) {} // Ignore already exists exception
         catch (unity::SyscallException const& e)
         {
             BOOST_LOG_SEV(logger_, Logger::Error) << "ScopesWatcher::add_install_dir(): parent dir watch: " << e.what();
