@@ -386,7 +386,7 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::on_process_death(int)@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::publish_state_change(unity::scopes::internal::RegistryObject::ScopeProcess::ProcessState)@Base" 0.6.4+14.10.20140828.1
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::~ScopeProcess()@Base" 0.4.2+14.04.20140404.2
- (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::ScopeProcess(unity::scopes::internal::RegistryObject::ScopeExecData, std::weak_ptr<unity::scopes::internal::MWPublisher> const&)@Base" 0.6.5+14.10.20140910.1
+ (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::ScopeProcess(unity::scopes::internal::RegistryObject::ScopeExecData, std::weak_ptr<unity::scopes::internal::MWPublisher> const&, boost::log::v2_mt_posix::sources::severity_channel_logger_mt<int, std::basic_string<char, std::char_traits<char>, std::allocator<char> > >&)@Base" 0replaceme
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::ScopeProcess(unity::scopes::internal::RegistryObject::ScopeProcess const&)@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::state() const@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::update_state(unity::scopes::internal::RegistryObject::ScopeProcess::ProcessState)@Base" 0.4.2+14.04.20140404.2
@@ -423,6 +423,7 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::internal::RuntimeImpl::find_cache_dir() const@Base" 0replaceme
  (c++)"unity::scopes::internal::RuntimeImpl::find_tmp_dir() const@Base" 0replaceme
  (c++)"unity::scopes::internal::RuntimeImpl::future_queue() const@Base" 0.4.3+14.10.20140428
+ (c++)"unity::scopes::internal::RuntimeImpl::logger() const@Base" 0replaceme
  (c++)"unity::scopes::internal::RuntimeImpl::proxy_to_string(std::shared_ptr<unity::scopes::Object> const&) const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RuntimeImpl::registry_configfile() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RuntimeImpl::registry() const@Base" 0.4.0+14.04.20140312.1
