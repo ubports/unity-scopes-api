@@ -130,9 +130,9 @@ TEST(JsonSettingsSchema, basic)
     EXPECT_EQ("list", defs[1].get_dict()["type"].get_string());
     EXPECT_EQ("Temperature Units", defs[1].get_dict()["displayName"].get_string());
     EXPECT_EQ(1, defs[1].get_dict()["defaultValue"].get_int());
-    EXPECT_EQ(2, defs[1].get_dict()["values"].get_array().size());
-    EXPECT_EQ("Celsius", defs[1].get_dict()["values"].get_array()[0].get_string());
-    EXPECT_EQ("Fahrenheit", defs[1].get_dict()["values"].get_array()[1].get_string());
+    EXPECT_EQ(2, defs[1].get_dict()["displayValues"].get_array().size());
+    EXPECT_EQ("Celsius", defs[1].get_dict()["displayValues"].get_array()[0].get_string());
+    EXPECT_EQ("Fahrenheit", defs[1].get_dict()["displayValues"].get_array()[1].get_string());
 
     EXPECT_EQ("age", defs[2].get_dict()["id"].get_string());
     EXPECT_EQ("number", defs[2].get_dict()["type"].get_string());
@@ -673,12 +673,21 @@ TEST(JsonSettingsSchema, empty_then_with_location)
     s->add_location_setting();
     {
         auto defs = s->definitions();
-        ASSERT_EQ(1, defs.size());
+        ASSERT_EQ(2, defs.size());
 
         EXPECT_EQ("internal.location", defs[0].get_dict()["id"].get_string());
         EXPECT_EQ("Enable location data", defs[0].get_dict()["displayName"].get_string());
         EXPECT_EQ("boolean", defs[0].get_dict()["type"].get_string());
         EXPECT_TRUE(defs[0].get_dict()["displayValues"].is_null());
         EXPECT_TRUE(defs[0].get_dict()["defaultValue"].get_bool());
+
+        EXPECT_EQ("internal.location.precision", defs[1].get_dict()["id"].get_string());
+        EXPECT_EQ("Enable location data", defs[1].get_dict()["displayName"].get_string());
+        EXPECT_EQ("list", defs[1].get_dict()["type"].get_string());
+        ASSERT_EQ(3, defs[1].get_dict()["displayValues"].get_array().size());
+        EXPECT_EQ("None", defs[1].get_dict()["displayValues"].get_array()[0].get_string());
+        EXPECT_EQ("Approximate", defs[1].get_dict()["displayValues"].get_array()[1].get_string());
+        EXPECT_EQ("Precise", defs[1].get_dict()["displayValues"].get_array()[2].get_string());
+        EXPECT_EQ(0, defs[1].get_dict()["defaultValue"].get_int());
     }
 }
