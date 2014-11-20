@@ -19,8 +19,7 @@
 #include <unity/scopes/internal/RegistryImpl.h>
 
 #include <unity/scopes/internal/MWRegistry.h>
-#include <unity/scopes/ScopeExceptions.h>
-#include <unity/UnityExceptions.h>
+#include <unity/scopes/internal/RuntimeImpl.h>
 
 using namespace std;
 
@@ -33,8 +32,8 @@ namespace scopes
 namespace internal
 {
 
-RegistryImpl::RegistryImpl(MWRegistryProxy const& mw_proxy, RuntimeImpl*) :
-    ObjectImpl(mw_proxy)
+RegistryImpl::RegistryImpl(MWRegistryProxy const& mw_proxy, RuntimeImpl* runtime)
+    : ObjectImpl(mw_proxy, runtime->logger())
 {
 }
 

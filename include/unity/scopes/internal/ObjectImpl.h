@@ -19,6 +19,7 @@
 #ifndef UNITY_SCOPES_INTERNAL_OBJECTIMPL_H
 #define UNITY_SCOPES_INTERNAL_OBJECTIMPL_H
 
+#include<unity/scopes/internal/Logger.h>
 #include<unity/scopes/internal/MWObjectProxyFwd.h>
 #include<unity/scopes/Object.h>
 
@@ -36,7 +37,7 @@ namespace internal
 class ObjectImpl : public virtual Object, public virtual std::enable_shared_from_this<ObjectImpl>
 {
 public:
-    ObjectImpl(MWProxy const& mw_proxy);
+    ObjectImpl(MWProxy const& mw_proxy, boost::log::sources::severity_channel_logger_mt<>& logger);
     virtual ~ObjectImpl();
 
     virtual std::string identity() override;
@@ -58,6 +59,8 @@ protected:
 
     MWProxy mw_proxy_;
     std::mutex proxy_mutex_;           // Protects mw_proxy_
+
+    boost::log::sources::severity_channel_logger_mt<>& logger_;
 
 private:
     void check_proxy();                // Throws from operations if mw_proxy_ is null

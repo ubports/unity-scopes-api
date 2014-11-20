@@ -58,7 +58,7 @@ void PreviewQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& /* inf
 {
     assert(self_);
 
-    auto reply_proxy = make_shared<PreviewReplyImpl>(reply, self_);
+    auto reply_proxy = make_shared<PreviewReplyImpl>(reply, self_, logger_);
     assert(reply_proxy);
     reply_proxy_ = reply_proxy;
 

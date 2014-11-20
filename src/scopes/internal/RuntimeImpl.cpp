@@ -73,15 +73,6 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
         // Until we know where the scope's cache directory is,
         // we use a logger that logs to std::clog.
         logger_.reset(new Logger(scope_id_));
-//BOOST_LOG_SEV(logger(), Logger::Error) << "this is a test";
-//BOOST_LOG_SEV(logger(), Logger::Info) << "THIS SHOULD NOT BE VISIBLE";
-//logger_->set_severity_threshold(Logger::Info);
-//BOOST_LOG_SEV(logger(), Logger::Trace) << "this is some trace";
-//logger_->log_to_console(false);
-//BOOST_LOG_SEV(logger(), Logger::Info) << "THIS CONSOLE MSG SHOULD NOT BE VISIBLE";
-//logger_->log_to_console(true);
-//logger_->set_log_file("/tmp/log");
-//BOOST_LOG_SEV(logger(), Logger::Info) << "a file message";
 
         // Create the middleware factory and get the registry identity and config filename.
         RuntimeConfig config(configfile);
@@ -386,6 +377,8 @@ void RuntimeImpl::run_scope(ScopeBase* scope_base,
     scope_base->p->set_registry(registry_);
     scope_base->p->set_cache_directory(find_cache_dir());
     scope_base->p->set_tmp_directory(find_tmp_dir());
+
+    // TODO: redirect log messages to scope-specific file.
 
     try
     {
