@@ -294,21 +294,14 @@ VariantArray IniSettingsSchema::definitions() const
 
 void IniSettingsSchema::add_location_setting()
 {
-    // TODO: HACK #1: This was introduced with commit 448. It shouldn't be here because we can't
-    //                localize the "Enable location data" string.
-    {
-        Setting s("internal.location", "boolean", "Enable location data", VariantArray(), Variant(true));
-        definitions_.push_back(s.to_schema_definition());
-    }
-
-    // TODO: HACK #2: See bug #1393438. After discovering that HACK #1 doesn't work, we decided to
-    //                temporarily work around this problem by adding an entry to each scope's settings
-    //                schema with the tri-state location data (None, Approximate, Precise). The shell
-    //                intercepts this as a "special" setting and takes care of translating the
-    //                display strings. Eventually, we'll need to fix this, removing these hacks
-    //                altogether. Realistically, the shell should not store this user-preference
-    //                in the scope's settings database, and should only pay attention to the scope's
-    //                LocationDataNeeded metadata attribute.
+    // TODO: HACK: See bug #1393438.
+    //             Temporarily work around this problem by adding an entry to each scope's settings
+    //             schema with the tri-state location data (None, Approximate, Precise). The shell
+    //             intercepts this as a "special" setting and takes care of translating the
+    //             display strings. Eventually, we'll need to fix this, removing these hacks
+    //             altogether. Realistically, the shell should not store this user-preference
+    //             in the scope's settings database, and should only pay attention to the scope's
+    //             LocationDataNeeded metadata attribute.
     {
         VariantArray loc_choices = { Variant("None"), Variant("Approximate"), Variant("Precise") };
         auto loc_choice_default = Variant(0);

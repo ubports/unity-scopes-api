@@ -94,23 +94,19 @@ TEST(Registry, metadata)
     EXPECT_EQ("scope-A.SearchHint", meta.search_hint());
     EXPECT_EQ(TEST_RUNTIME_PATH "/scopes/testscopeA", meta.scope_directory());
     auto defs = meta.settings_definitions();
-    ASSERT_EQ(3, defs.size());
+    ASSERT_EQ(2, defs.size());
     EXPECT_EQ("locationSetting", defs[0].get_dict()["id"].get_string());
     EXPECT_EQ("Location", defs[0].get_dict()["displayName"].get_string());
     EXPECT_EQ("string", defs[0].get_dict()["type"].get_string());
     EXPECT_EQ("London", defs[0].get_dict()["defaultValue"].get_string());
-    EXPECT_EQ("internal.location", defs[1].get_dict()["id"].get_string());
+    EXPECT_EQ("internal.location.precision", defs[1].get_dict()["id"].get_string());
     EXPECT_EQ("Enable location data", defs[1].get_dict()["displayName"].get_string());
-    EXPECT_EQ("boolean", defs[1].get_dict()["type"].get_string());
-    EXPECT_EQ(true, defs[1].get_dict()["defaultValue"].get_bool());
-    EXPECT_EQ("internal.location.precision", defs[2].get_dict()["id"].get_string());
-    EXPECT_EQ("Enable location data", defs[2].get_dict()["displayName"].get_string());
-    EXPECT_EQ("list", defs[2].get_dict()["type"].get_string());
-    ASSERT_EQ(3, defs[2].get_dict()["displayValues"].get_array().size());
-    EXPECT_EQ("None", defs[2].get_dict()["displayValues"].get_array()[0].get_string());
-    EXPECT_EQ("Approximate", defs[2].get_dict()["displayValues"].get_array()[1].get_string());
-    EXPECT_EQ("Precise", defs[2].get_dict()["displayValues"].get_array()[2].get_string());
-    EXPECT_EQ(0, defs[2].get_dict()["defaultValue"].get_int());
+    EXPECT_EQ("list", defs[1].get_dict()["type"].get_string());
+    ASSERT_EQ(3, defs[1].get_dict()["displayValues"].get_array().size());
+    EXPECT_EQ("None", defs[1].get_dict()["displayValues"].get_array()[0].get_string());
+    EXPECT_EQ("Approximate", defs[1].get_dict()["displayValues"].get_array()[1].get_string());
+    EXPECT_EQ("Precise", defs[1].get_dict()["displayValues"].get_array()[2].get_string());
+    EXPECT_EQ(0, defs[1].get_dict()["defaultValue"].get_int());
     EXPECT_TRUE(meta.location_data_needed());
     auto children = meta.child_scope_ids();
     EXPECT_EQ(2u, children.size());
@@ -210,7 +206,7 @@ TEST(Registry, scope_state_notify)
 
     auto meta = r->get_metadata("testscopeA");
     auto defs = meta.settings_definitions();
-    EXPECT_EQ(3, defs.size());
+    EXPECT_EQ(2, defs.size());
     auto sp = meta.proxy();
 
     // testscopeA should not be running at this point
