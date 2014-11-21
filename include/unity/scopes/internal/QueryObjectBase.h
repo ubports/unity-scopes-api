@@ -16,8 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_QUERYOBJECTBASE_H
-#define UNITY_SCOPES_INTERNAL_QUERYOBJECTBASE_H
+#pragma once
 
 #include <unity/scopes/internal/AbstractObject.h>
 #include <unity/scopes/internal/InvokeInfo.h>
@@ -54,5 +53,3 @@ public:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

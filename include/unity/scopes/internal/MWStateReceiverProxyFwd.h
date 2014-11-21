@@ -16,8 +16,7 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_MWSTATERECEIVERPROXYFWD_H
-#define UNITY_SCOPES_INTERNAL_MWSTATERECEIVERPROXYFWD_H
+#pragma once
 
 #include <memory>
 
@@ -38,5 +37,3 @@ typedef std::shared_ptr<MWStateReceiver> MWStateReceiverProxy;
 } // namespace scopes
 
 } // namespace unity
-
-#endif // UNITY_SCOPES_INTERNAL_MWSTATERECEIVERPROXYFWD_H

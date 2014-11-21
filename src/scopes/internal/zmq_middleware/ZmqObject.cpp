@@ -283,13 +283,13 @@ ZmqObjectProxy::TwowayOutParams ZmqObjectProxy::invoke_twoway__(capnp::MessageBu
     assert(mode == RequestMode::Twoway);
 
     zmqpp::socket s(*mw_base()->context(), zmqpp::socket_type::request);
-    // Allow short linger time so we don't hang indefinitely if the other end disappears.
-    s.set(zmqpp::socket_option::linger, 50);
+    // Allow some linger time so we don't hang indefinitely if the other end disappears.
+    s.set(zmqpp::socket_option::linger, 100);
     // We set a reconnect interval of 20 ms, so we get to the peer quickly, in case
     // the peer hasn't finished binding to its endpoint yet after being exec'd.
     // We back off exponentially to half the call timeout. If we haven't connected
-    // by then, the poll below will time out anyway. For inifinite timeout, we try
-    // a second.
+    // by then, the poll below will time out anyway. For infinite timeout, we try
+    // once a second.
     int reconnect_max = timeout == -1 ? 1000 : timeout / 2;
     s.set(zmqpp::socket_option::reconnect_interval, 20);
     s.set(zmqpp::socket_option::reconnect_interval_max, reconnect_max);
@@ -324,7 +324,9 @@ ZmqObjectProxy::TwowayOutParams ZmqObjectProxy::invoke_twoway__(capnp::MessageBu
 
     if (!p.has_input(s))
     {
-        throw TimeoutException("Request timed out after " + std::to_string(timeout) + " milliseconds");
+        string op_name = in_params.getRoot<capnproto::Request>().getOpName().cStr();
+        throw TimeoutException("Request timed out after " + std::to_string(timeout) + " milliseconds (endpoint = " +
+                               endpoint + ", op = " + op_name + ")");
     }
 
     // Because the ZmqReceiver holds the memory for the unmarshaling buffer, we pass both the receiver

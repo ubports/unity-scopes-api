@@ -16,8 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_SEARCHMETADATA_H
-#define UNITY_SCOPES_SEARCHMETADATA_H
+#pragma once
 
 #include <unity/scopes/QueryMetadata.h>
 #include <unity/scopes/Location.h>
@@ -161,5 +160,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

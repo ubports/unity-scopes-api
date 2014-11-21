@@ -56,6 +56,8 @@ namespace
     const string idle_timeout_key = "IdleTimeout";
     const string results_ttl_key = "ResultsTtlType";
     const string debug_mode_key = "DebugMode";
+    const string child_scope_ids_key = "ChildScopes";
+    const string version_key = "Version";
 
     const string scope_appearance_group = "Appearance";
     const string fg_color_key = "ForegroundColor";
@@ -192,6 +194,35 @@ ScopeConfig::ScopeConfig(string const& configfile) :
 
     try
     {
+        child_scope_ids_ = parser()->get_string_array(scope_config_group, child_scope_ids_key);
+    }
+    catch (LogicException const&)
+    {
+    }
+
+    for (auto const& id: child_scope_ids_)
+    {
+        if (id.size() == 0)
+        {
+            throw_ex("Invalid empty scope id for ChildScopes");
+        }
+    }
+
+    try
+    {
+        version_ = get_int(scope_config_group, version_key);
+        if (version_ <= 0)
+        {
+            throw_ex("Version must be > 0");
+        }
+    }
+    catch (LogicException const&)
+    {
+        version_ = 0;
+    }
+
+    try
+    {
         debug_mode_ = parser()->get_boolean(scope_config_group, debug_mode_key);
     }
     catch (LogicException const&)
@@ -227,7 +258,9 @@ ScopeConfig::ScopeConfig(string const& configfile) :
                scoperunner_key,
                idle_timeout_key,
                results_ttl_key,
-               debug_mode_key
+               debug_mode_key,
+               child_scope_ids_key,
+               version_key
            }
         },
         {  scope_appearance_group,
@@ -399,6 +432,16 @@ bool ScopeConfig::debug_mode() const
 VariantMap ScopeConfig::appearance_attributes() const
 {
     return appearance_attributes_;
+}
+
+std::vector<std::string> ScopeConfig::child_scope_ids() const
+{
+    return child_scope_ids_;
+}
+
+int ScopeConfig::version() const
+{
+    return version_;
 }
 
 } // namespace internal

@@ -131,6 +131,9 @@ TEST(ScopeMetadataImpl, basic)
     // when "location_data_needed" is not set, false is returned
     EXPECT_FALSE(m.location_data_needed());
 
+    // when "version" is not set, 0 is returned
+    EXPECT_EQ(0, m.version());
+
     // Check that the copy has the same values as the original
     EXPECT_EQ("scope_id", mi2->scope_id());
     EXPECT_EQ("identity", mi2->proxy()->identity());
@@ -140,6 +143,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("author", mi2->author());
     EXPECT_EQ(0, mi2->appearance_attributes().size());
     EXPECT_EQ(ScopeMetadata::ResultsTtlType::Medium, mi2->results_ttl_type());
+    EXPECT_EQ(0, mi2->version());
 
     VariantMap attrs;
     attrs["foo"] = "bar";
@@ -157,6 +161,7 @@ TEST(ScopeMetadataImpl, basic)
     va.push_back(Variant("hello"));
     mi2->set_settings_definitions(va);
     mi2->set_location_data_needed(true);
+    mi2->set_child_scope_ids(vector<string>{"abc", "def"});
 
     // Make another copy, so we get coverage on the entire copy constructor
     unique_ptr<ScopeMetadataImpl> mi3(new ScopeMetadataImpl(*mi2));
@@ -169,6 +174,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("bar", m.appearance_attributes()["foo"].get_string());
     EXPECT_EQ(va, m.settings_definitions());
     EXPECT_TRUE(m.location_data_needed());
+    EXPECT_EQ((vector<string>{"abc", "def"}), m.child_scope_ids());
 
     // Make another value
     unique_ptr<ScopeMetadataImpl> ti(new ScopeMetadataImpl(&mw));
@@ -186,10 +192,12 @@ TEST(ScopeMetadataImpl, basic)
     ti->set_scope_directory("/foo");
     ti->set_appearance_attributes(attrs);
     ti->set_results_ttl_type(ScopeMetadata::ResultsTtlType::Small);
+    ti->set_version(99);
     VariantArray tmp_va;
     tmp_va.push_back(Variant("tmp hello"));
     ti->set_settings_definitions(tmp_va);
     ti->set_location_data_needed(true);
+    ti->set_child_scope_ids(vector<string>{"tmp abc", "tmp def"});
 
     // Check impl assignment operator
     ScopeMetadataImpl ci(&mw);
@@ -210,6 +218,8 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ(ScopeMetadata::ResultsTtlType::Small, ci.results_ttl_type());
     EXPECT_EQ(tmp_va, ci.settings_definitions());
     EXPECT_TRUE(ci.location_data_needed());
+    EXPECT_EQ((vector<string>{"tmp abc", "tmp def"}), ci.child_scope_ids());
+    EXPECT_EQ(99, ci.version());
 
     // Check public assignment operator
     auto tmp = ScopeMetadataImpl::create(move(ti));
@@ -227,9 +237,11 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("/foo", m.scope_directory());
     EXPECT_EQ("bar", m.appearance_attributes()["foo"].get_string());
     EXPECT_EQ(ScopeMetadata::ResultsTtlType::Small, m.results_ttl_type());
+    EXPECT_EQ(99, m.version());
     EXPECT_TRUE(m.invisible());
     EXPECT_EQ(tmp_va, m.settings_definitions());
     EXPECT_TRUE(m.location_data_needed());
+    EXPECT_EQ((vector<string>{"tmp abc", "tmp def"}), m.child_scope_ids());
 
     // Self-assignment
     tmp = tmp;
@@ -246,9 +258,11 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("bar", tmp.appearance_attributes()["foo"].get_string());
     EXPECT_EQ("/foo", tmp.scope_directory());
     EXPECT_EQ(ScopeMetadata::ResultsTtlType::Small, tmp.results_ttl_type());
+    EXPECT_EQ(99, tmp.version());
     EXPECT_TRUE(tmp.invisible());
     EXPECT_EQ(tmp_va, tmp.settings_definitions());
     EXPECT_TRUE(tmp.location_data_needed());
+    EXPECT_EQ((vector<string>{"tmp abc", "tmp def"}), tmp.child_scope_ids());
 
     // Copy constructor
     ScopeMetadata tmp2(tmp);
@@ -265,9 +279,11 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("/foo", tmp2.scope_directory());
     EXPECT_EQ("bar", tmp2.appearance_attributes()["foo"].get_string());
     EXPECT_EQ(ScopeMetadata::ResultsTtlType::Small, tmp2.results_ttl_type());
+    EXPECT_EQ(99, tmp2.version());
     EXPECT_TRUE(tmp2.invisible());
     EXPECT_EQ(tmp_va, tmp2.settings_definitions());
     EXPECT_TRUE(tmp2.location_data_needed());
+    EXPECT_EQ((vector<string>{"tmp abc", "tmp def"}), tmp2.child_scope_ids());
 }
 
 TEST(ScopeMetadataImpl, serialize)
@@ -288,17 +304,22 @@ TEST(ScopeMetadataImpl, serialize)
     mi->set_hot_key("hot_key");
     mi->set_scope_directory("/foo");
     mi->set_invisible(false);
+    VariantMap attrs;
+    attrs["foo"] = "bar";
+    mi->set_appearance_attributes(attrs);
     mi->set_results_ttl_type(ScopeMetadata::ResultsTtlType::Large);
+    mi->set_version(1);
     VariantArray va;
     va.push_back(Variant("hello"));
     va.push_back(Variant("world"));
     mi->set_settings_definitions(va);
     mi->set_location_data_needed(false);
+    mi->set_child_scope_ids({"com.foo.bar", "com.foo.baz"});
 
     // Check that serialize() sets the map values correctly
     auto m = ScopeMetadataImpl::create(move(mi));
     auto var = m.serialize();
-    EXPECT_EQ(14u, var.size());
+    EXPECT_EQ(17u, var.size());
     EXPECT_EQ("scope_id", var["scope_id"].get_string());
     EXPECT_EQ("display_name", var["display_name"].get_string());
     EXPECT_EQ("description", var["description"].get_string());
@@ -309,11 +330,16 @@ TEST(ScopeMetadataImpl, serialize)
     EXPECT_EQ("hot_key", var["hot_key"].get_string());
     EXPECT_EQ("/foo", var["scope_dir"].get_string());
     EXPECT_FALSE(var["invisible"].get_bool());
+    EXPECT_EQ("bar", var["appearance_attributes"].get_dict()["foo"].get_string());
     EXPECT_EQ(ScopeMetadata::ResultsTtlType::Large,
             (ScopeMetadata::ResultsTtlType ) var["results_ttl_type"].get_int());
+    EXPECT_EQ(1, var["version"].get_int());
     EXPECT_FALSE(var["invisible"].get_bool());
     EXPECT_EQ(va, var["settings_definitions"].get_array());
     EXPECT_FALSE(var["location_data_needed"].get_bool());
+    EXPECT_EQ(2u, var["child_scopes"].get_array().size());
+    EXPECT_EQ("com.foo.bar", var["child_scopes"].get_array()[0].get_string());
+    EXPECT_EQ("com.foo.baz", var["child_scopes"].get_array()[1].get_string());
 
     // Make another instance from the VariantMap and check its fields
     ScopeMetadataImpl c(var, &mw);
@@ -329,7 +355,9 @@ TEST(ScopeMetadataImpl, serialize)
     EXPECT_EQ("hot_key", c.hot_key());
     EXPECT_EQ("/foo", c.scope_directory());
     EXPECT_FALSE(c.invisible());
+    EXPECT_EQ("bar", c.appearance_attributes()["foo"].get_string());
     EXPECT_EQ(ScopeMetadata::ResultsTtlType::Large, c.results_ttl_type());
+    EXPECT_EQ(1, c.version());
     EXPECT_FALSE(c.invisible());
     EXPECT_EQ(va, c.settings_definitions());
     EXPECT_FALSE(c.location_data_needed());
@@ -520,6 +548,22 @@ TEST(ScopeMetadataImpl, deserialize_exceptions)
                      "invalid attribute 'results_ttl_type' with value -1",
                      e.what());
     }
+
+    m["results_ttl_type"] = 0;
+    m["version"] = -1;
+    try
+    {
+        ScopeMetadataImpl mi(m, &mw);
+        mi.deserialize(m);
+        FAIL();
+    }
+    catch (InvalidArgumentException const&e)
+    {
+        EXPECT_STREQ("unity::InvalidArgumentException: ScopeMetadataImpl::deserialize(): "
+                     "invalid attribute 'version' with value -1",
+                     e.what());
+    }
+    m["version"] = 0;
 
     // Optional attributes
     m["art"] = "art";

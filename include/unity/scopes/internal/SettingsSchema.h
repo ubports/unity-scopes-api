@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_SETTINGSSCHEMA_H
-#define UNITY_SCOPES_INTERNAL_SETTINGSSCHEMA_H
+#pragma once
 
 #include <unity/util/DefinesPtrs.h>
 #include <unity/util/IniParser.h>
@@ -47,6 +46,9 @@ public:
 
     virtual VariantArray definitions() const = 0;
 
+    // TODO: HACK: See bug #1393438 and the comments in IniSettingsSchema.cpp and
+    //             JsonSettingsSchema.cpp. This method needs to be removed
+    //             once we have fixed this properly.
     virtual void add_location_setting() = 0;
 };
 
@@ -55,5 +57,3 @@ public:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

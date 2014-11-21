@@ -16,8 +16,7 @@
  * Authored by: Thomas Voß <thomas.voss@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_TESTING_MOCK_SEARCHREPLY_H
-#define UNITY_SCOPES_TESTING_MOCK_SEARCHREPLY_H
+#pragma once
 
 #include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/SearchReply.h>
@@ -75,5 +74,3 @@ public:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

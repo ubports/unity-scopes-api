@@ -16,8 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_SCOPEBASEIMPL_H
-#define UNITY_SCOPES_INTERNAL_SCOPEBASEIMPL_H
+#pragma once
 
 #include <unity/scopes/RegistryProxyFwd.h>
 #include <unity/scopes/Variant.h>
@@ -48,6 +47,9 @@ public:
     void set_cache_directory(std::string const& path);
     std::string cache_directory() const;
 
+    void set_app_directory(std::string const& path);
+    std::string app_directory() const;
+
     void set_tmp_directory(std::string const& path);
     std::string tmp_directory() const;
 
@@ -64,6 +66,9 @@ private:
 
     std::string cache_directory_;
     bool cache_dir_initialized_;
+
+    std::string app_directory_;
+    bool app_dir_initialized_;
 
     std::string tmp_directory_;
     bool tmp_dir_initialized_;
@@ -82,5 +87,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

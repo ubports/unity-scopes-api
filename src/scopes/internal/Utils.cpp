@@ -14,11 +14,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
-*/
+ */
 
 #include <unity/scopes/internal/Utils.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
+
 #include <iomanip>
 #include <locale>
 #include <mutex>

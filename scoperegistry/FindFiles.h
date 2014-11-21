@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef SCOPEREGISTRY_FINDFILES_H
-#define SCOPEREGISTRY_FINDFILES_H
+#pragma once
 
 #include <functional>
 #include <string>
@@ -53,5 +52,3 @@ std::map<std::string, std::string> find_install_dir_configs(std::string const& i
                                                             std::function<void(std::string const&)> error);
 
 } // namespace scoperegistry
-
-#endif

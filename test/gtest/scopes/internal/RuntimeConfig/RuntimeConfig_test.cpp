@@ -42,28 +42,44 @@ TEST(RuntimeConfig, basic)
     EXPECT_EQ(DFLT_REAP_INTERVAL, c.reap_interval());
 }
 
-TEST(RuntimeConfig, _default_data_dir)
+TEST(RuntimeConfig, _default_cache_dir)
 {
     setenv("HOME", TEST_SRC_DIR, 1);
 
     RuntimeConfig c("");
-    EXPECT_EQ(TEST_SRC_DIR "/.local/share/unity-scopes", c.data_directory());
+    EXPECT_EQ(TEST_SRC_DIR "/.local/share/unity-scopes", c.cache_directory());
 }
 
-TEST(RuntimeConfig, overridden_data_dir)
+TEST(RuntimeConfig, overridden_cache_dir)
 {
     unsetenv("HOME");
 
-    RuntimeConfig c(TEST_SRC_DIR "/DataDir.ini");
-    EXPECT_EQ("Foo", c.data_directory());
+    RuntimeConfig c(TEST_SRC_DIR "/CacheDir.ini");
+    EXPECT_EQ("cachedir", c.cache_directory());
 }
 
-TEST(RuntimeConfig, overridden_data_dir_with_home_dir)
+TEST(RuntimeConfig, overridden_cache_dir_with_home_dir)
 {
     setenv("HOME", TEST_SRC_DIR, 1);
 
-    RuntimeConfig c(TEST_SRC_DIR "/DataDir.ini");
-    EXPECT_EQ("Foo", c.data_directory());
+    RuntimeConfig c(TEST_SRC_DIR "/CacheDir.ini");
+    EXPECT_EQ("cachedir", c.cache_directory());
+}
+
+TEST(RuntimeConfig, overridden_app_dir)
+{
+    unsetenv("HOME");
+
+    RuntimeConfig c(TEST_SRC_DIR "/CacheDir.ini");
+    EXPECT_EQ("appdir", c.app_directory());
+}
+
+TEST(RuntimeConfig, overridden_app_dir_with_home_dir)
+{
+    setenv("HOME", TEST_SRC_DIR, 1);
+
+    RuntimeConfig c(TEST_SRC_DIR "/ConfigDir.ini");
+    EXPECT_EQ("appdir", c.app_directory());
 }
 
 TEST(RuntimeConfig, overridden_config_dir)
@@ -71,7 +87,7 @@ TEST(RuntimeConfig, overridden_config_dir)
     unsetenv("HOME");
 
     RuntimeConfig c(TEST_SRC_DIR "/ConfigDir.ini");
-    EXPECT_EQ("Foo", c.config_directory());
+    EXPECT_EQ("configdir", c.config_directory());
 }
 
 TEST(RuntimeConfig, overridden_config_dir_with_home_dir)
@@ -79,7 +95,7 @@ TEST(RuntimeConfig, overridden_config_dir_with_home_dir)
     setenv("HOME", TEST_SRC_DIR, 1);
 
     RuntimeConfig c(TEST_SRC_DIR "/ConfigDir.ini");
-    EXPECT_EQ("Foo", c.config_directory());
+    EXPECT_EQ("configdir", c.config_directory());
 }
 
 TEST(RuntimeConfig, exceptions)
@@ -124,14 +140,14 @@ TEST(RuntimeConfig, exceptions)
     {
         unsetenv("HOME");
 
-        RuntimeConfig c(TEST_SRC_DIR "/NoDataDir.ini");
+        RuntimeConfig c(TEST_SRC_DIR "/NoCacheDir.ini");
         FAIL();
-        EXPECT_EQ("Foo", c.data_directory());
+        EXPECT_EQ("cachedir", c.cache_directory());
     }
     catch (ConfigException const& e)
     {
-        EXPECT_STREQ("unity::scopes::ConfigException: \"" TEST_SRC_DIR "/NoDataDir.ini\": No DataDir configured and "
-                     "failed to get default:\n    unity::ResourceException: RuntimeConfig::default_data_directory(): "
+        EXPECT_STREQ("unity::scopes::ConfigException: \"" TEST_SRC_DIR "/NoCacheDir.ini\": No CacheDir configured and "
+                     "failed to get default:\n    unity::ResourceException: RuntimeConfig::default_cache_directory(): "
                      "$HOME not set",
                      e.what());
     }
@@ -142,7 +158,7 @@ TEST(RuntimeConfig, exceptions)
 
         RuntimeConfig c(TEST_SRC_DIR "/NoConfigDir.ini");
         FAIL();
-        EXPECT_EQ("Foo", c.data_directory());
+        EXPECT_EQ("cachedir", c.cache_directory());
     }
     catch (ConfigException const& e)
     {

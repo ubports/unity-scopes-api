@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_REPLYI_H
-#define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_REPLYI_H
+#pragma once
 
 #include <unity/scopes/internal/MWReply.h>
 #include <unity/scopes/internal/ReplyObjectBase.h>
@@ -60,5 +59,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

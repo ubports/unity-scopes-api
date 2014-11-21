@@ -16,6 +16,8 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
+#pragma once
+
 #include <unity/scopes/ActivationListenerBase.h>
 #include <unity/scopes/ActivationQueryBase.h>
 #include <unity/scopes/CategorisedResult.h>
@@ -23,9 +25,6 @@
 #include <unity/scopes/Runtime.h>
 #include <unity/scopes/ScopeBase.h>
 #include <unity/scopes/SearchReply.h>
-
-#ifndef UNITY_SCOPES_TEST_SCOPE_H
-#define UNITY_SCOPES_TEST_SCOPE_H
 
 namespace unity
 {
@@ -128,5 +127,3 @@ public:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

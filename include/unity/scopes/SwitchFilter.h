@@ -16,8 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_SWITCHFILTER_H
-#define UNITY_SCOPES_SWITCHFILTER_H
+#pragma once
 
 #include <unity/scopes/FilterBase.h>
 
@@ -100,5 +99,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

@@ -156,7 +156,6 @@ QueryCtrlProxy ZmqScope::perform_action(VariantMap const& result,
     }
 
     auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_scope_(request_builder); });
-    future.wait();
 
     auto out_params = future.get();
     auto response = out_params.reader->getRoot<capnproto::Response>();

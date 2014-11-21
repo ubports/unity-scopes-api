@@ -17,8 +17,7 @@
  *              Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_INTERNAL_SEARCHQUERYBASEIMPL_H
-#define UNITY_INTERNAL_SEARCHQUERYBASEIMPL_H
+#pragma once
 
 #include <unity/scopes/CannedQuery.h>
 #include <unity/scopes/internal/QueryBaseImpl.h>
@@ -81,5 +80,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

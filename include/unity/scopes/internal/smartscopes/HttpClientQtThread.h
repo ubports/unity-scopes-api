@@ -16,8 +16,7 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_SMARTSCOPES_HTTPCLIENTQTTHREAD_H
-#define UNITY_SCOPES_INTERNAL_SMARTSCOPES_HTTPCLIENTQTTHREAD_H
+#pragma once
 
 // This hack allows unity-scopes-api to be built with
 // clang-3.4+ and versions of Qt before v5.1.1.
@@ -99,5 +98,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif  // UNITY_SCOPES_INTERNAL_SMARTSCOPES_HTTPCLIENTQTTHREAD_H

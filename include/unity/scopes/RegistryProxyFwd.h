@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_REGISTRYPROXYFWD_H
-#define UNITY_SCOPES_REGISTRYPROXYFWD_H
+#pragma once
 
 #include <memory>
 
@@ -36,5 +35,3 @@ typedef std::shared_ptr<Registry> RegistryProxy;
 } // namespace scopes
 
 } // namespace unity
-
-#endif

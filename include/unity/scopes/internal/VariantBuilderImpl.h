@@ -16,8 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_VARIANTBUILDER_H
-#define UNITY_SCOPES_INTERNAL_VARIANTBUILDER_H
+#pragma once
 
 #include <unity/scopes/Variant.h>
 #include <string>
@@ -54,5 +53,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

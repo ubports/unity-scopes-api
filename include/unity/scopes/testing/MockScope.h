@@ -16,8 +16,7 @@
  * Authored by: James Henstridge <james.henstridge@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_TESTING_MOCK_SCOPE_H
-#define UNITY_SCOPES_TESTING_MOCK_SCOPE_H
+#pragma once
 
 #include <unity/scopes/Scope.h>
 
@@ -73,5 +72,3 @@ public:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

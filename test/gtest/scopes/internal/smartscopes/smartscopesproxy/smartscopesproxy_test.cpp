@@ -112,66 +112,70 @@ TEST_F(smartscopesproxytest, ss_registry)
     EXPECT_THROW(reg_->get_metadata("dummy.scope.5"), NotFoundException);
     EXPECT_THROW(reg_->locate("dummy.scope.5"), NotFoundException);
 
-    // list scopes (direct)
-    MetadataMap scopes = reg_->list();
-    EXPECT_EQ(4u, scopes.size());
+    {
+        // list scopes (direct)
+        MetadataMap scopes = reg_->list();
+        EXPECT_EQ(4u, scopes.size());
 
-    // visible scope (direct)
-    ScopeMetadata meta = reg_->get_metadata("dummy.scope");
-    EXPECT_EQ("dummy.scope", meta.scope_id());
-    EXPECT_EQ("Dummy Demo Scope", meta.display_name());
-    EXPECT_EQ("Dummy demo scope.", meta.description());
-    EXPECT_EQ("Mr.Fake", meta.author());
-    EXPECT_EQ("icon", meta.icon());
-    EXPECT_FALSE(meta.invisible());
+        // visible scope (direct)
+        ScopeMetadata meta = reg_->get_metadata("dummy.scope");
+        EXPECT_EQ("dummy.scope", meta.scope_id());
+        EXPECT_EQ("Dummy Demo Scope", meta.display_name());
+        EXPECT_EQ("Dummy demo scope.", meta.description());
+        EXPECT_EQ("Mr.Fake", meta.author());
+        EXPECT_EQ("icon", meta.icon());
+        EXPECT_FALSE(meta.invisible());
 
-    meta = reg_->get_metadata("dummy.scope.3");
-    EXPECT_EQ("dummy.scope.3", meta.scope_id());
-    EXPECT_EQ("Dummy Demo Scope 3", meta.display_name());
-    EXPECT_EQ("Dummy demo scope 3.", meta.description());
-    EXPECT_EQ("Mr.Fake", meta.author());
-    EXPECT_FALSE(meta.invisible());
-    EXPECT_EQ(4, meta.settings_definitions().size());
-    EXPECT_EQ("unitTemp", meta.settings_definitions()[1].get_dict()["id"].get_string());
-    EXPECT_EQ("Temperature Units", meta.settings_definitions()[1].get_dict()["displayName"].get_string());
-    EXPECT_EQ("list", meta.settings_definitions()[1].get_dict()["type"].get_string());
-    EXPECT_EQ(1, meta.settings_definitions()[1].get_dict()["defaultValue"].get_int());
-    EXPECT_EQ(2, meta.settings_definitions()[1].get_dict()["values"].get_array().size());
-    EXPECT_EQ("Celsius", meta.settings_definitions()[1].get_dict()["values"].get_array()[0].get_string());
-    EXPECT_EQ("Fahrenheit", meta.settings_definitions()[1].get_dict()["values"].get_array()[1].get_string());
+        meta = reg_->get_metadata("dummy.scope.3");
+        EXPECT_EQ("dummy.scope.3", meta.scope_id());
+        EXPECT_EQ("Dummy Demo Scope 3", meta.display_name());
+        EXPECT_EQ("Dummy demo scope 3.", meta.description());
+        EXPECT_EQ("Mr.Fake", meta.author());
+        EXPECT_FALSE(meta.invisible());
+        EXPECT_EQ(4, meta.settings_definitions().size());
+        EXPECT_EQ("unitTemp", meta.settings_definitions()[1].get_dict()["id"].get_string());
+        EXPECT_EQ("Temperature Units", meta.settings_definitions()[1].get_dict()["displayName"].get_string());
+        EXPECT_EQ("list", meta.settings_definitions()[1].get_dict()["type"].get_string());
+        EXPECT_EQ(1, meta.settings_definitions()[1].get_dict()["defaultValue"].get_int());
+        EXPECT_EQ(2, meta.settings_definitions()[1].get_dict()["displayValues"].get_array().size());
+        EXPECT_EQ("Celsius", meta.settings_definitions()[1].get_dict()["displayValues"].get_array()[0].get_string());
+        EXPECT_EQ("Fahrenheit", meta.settings_definitions()[1].get_dict()["displayValues"].get_array()[1].get_string());
+    }
 
     // non-existent scope (via mw)
     MWRegistryProxy mw_reg = mw_->registry_proxy();
     EXPECT_THROW(mw_reg->get_metadata("dummy.scope.5"), NotFoundException);
     EXPECT_THROW(mw_reg->locate("dummy.scope.5"), NotFoundException);
 
-    // list scopes (via mw)
-    scopes = mw_reg->list();
-    EXPECT_EQ(4u, scopes.size());
+    {
+        // list scopes (via mw)
+        MetadataMap scopes = mw_reg->list();
+        EXPECT_EQ(4u, scopes.size());
 
-    // visible scope (via mw)
-    meta = mw_reg->get_metadata("dummy.scope");
-    EXPECT_EQ("dummy.scope", meta.scope_id());
-    EXPECT_EQ("Dummy Demo Scope", meta.display_name());
-    EXPECT_EQ("Dummy demo scope.", meta.description());
-    EXPECT_EQ("Mr.Fake", meta.author());
-    EXPECT_EQ("icon", meta.icon());
-    EXPECT_FALSE(meta.invisible());
+        // visible scope (via mw)
+        ScopeMetadata meta = mw_reg->get_metadata("dummy.scope");
+        EXPECT_EQ("dummy.scope", meta.scope_id());
+        EXPECT_EQ("Dummy Demo Scope", meta.display_name());
+        EXPECT_EQ("Dummy demo scope.", meta.description());
+        EXPECT_EQ("Mr.Fake", meta.author());
+        EXPECT_EQ("icon", meta.icon());
+        EXPECT_FALSE(meta.invisible());
 
-    meta = mw_reg->get_metadata("dummy.scope.3");
-    EXPECT_EQ("dummy.scope.3", meta.scope_id());
-    EXPECT_EQ("Dummy Demo Scope 3", meta.display_name());
-    EXPECT_EQ("Dummy demo scope 3.", meta.description());
-    EXPECT_EQ("Mr.Fake", meta.author());
-    EXPECT_FALSE(meta.invisible());
-    EXPECT_EQ(4, meta.settings_definitions().size());
-    EXPECT_EQ("unitTemp", meta.settings_definitions()[1].get_dict()["id"].get_string());
-    EXPECT_EQ("Temperature Units", meta.settings_definitions()[1].get_dict()["displayName"].get_string());
-    EXPECT_EQ("list", meta.settings_definitions()[1].get_dict()["type"].get_string());
-    EXPECT_EQ(1, meta.settings_definitions()[1].get_dict()["defaultValue"].get_int());
-    EXPECT_EQ(2, meta.settings_definitions()[1].get_dict()["values"].get_array().size());
-    EXPECT_EQ("Celsius", meta.settings_definitions()[1].get_dict()["values"].get_array()[0].get_string());
-    EXPECT_EQ("Fahrenheit", meta.settings_definitions()[1].get_dict()["values"].get_array()[1].get_string());
+        meta = mw_reg->get_metadata("dummy.scope.3");
+        EXPECT_EQ("dummy.scope.3", meta.scope_id());
+        EXPECT_EQ("Dummy Demo Scope 3", meta.display_name());
+        EXPECT_EQ("Dummy demo scope 3.", meta.description());
+        EXPECT_EQ("Mr.Fake", meta.author());
+        EXPECT_FALSE(meta.invisible());
+        EXPECT_EQ(4, meta.settings_definitions().size());
+        EXPECT_EQ("unitTemp", meta.settings_definitions()[1].get_dict()["id"].get_string());
+        EXPECT_EQ("Temperature Units", meta.settings_definitions()[1].get_dict()["displayName"].get_string());
+        EXPECT_EQ("list", meta.settings_definitions()[1].get_dict()["type"].get_string());
+        EXPECT_EQ(1, meta.settings_definitions()[1].get_dict()["defaultValue"].get_int());
+        EXPECT_EQ(2, meta.settings_definitions()[1].get_dict()["displayValues"].get_array().size());
+        EXPECT_EQ("Celsius", meta.settings_definitions()[1].get_dict()["displayValues"].get_array()[0].get_string());
+        EXPECT_EQ("Fahrenheit", meta.settings_definitions()[1].get_dict()["displayValues"].get_array()[1].get_string());
+    }
 }
 
 TEST_F(smartscopesproxytest, ss_registry_locale)

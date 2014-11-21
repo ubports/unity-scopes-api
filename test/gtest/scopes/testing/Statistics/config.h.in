@@ -16,8 +16,7 @@
  * Authored by: Thomas Voß <thomas.voss@canonical.com>
  */
 
-#ifndef CONFIG_H
-#define CONFIG_H
+#pragma once
 
 #include <sstream>
 
@@ -37,5 +36,3 @@ const double alpha
 };
 
 } // namespace testing
-
-#endif

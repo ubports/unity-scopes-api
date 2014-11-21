@@ -16,8 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_INTERNAL_UTILS_H
-#define UNITY_INTERNAL_UTILS_H
+#pragma once
 
 #include <unity/scopes/Variant.h>
 #include <string>
@@ -61,5 +60,3 @@ int safe_system_call(std::string const& command);
 } // namespace scopes
 
 } // namespace unity
-
-#endif

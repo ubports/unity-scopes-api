@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_QUERYCTRL_H
-#define UNITY_SCOPES_QUERYCTRL_H
+#pragma once
 
 #include <unity/scopes/Object.h>
 #include <unity/scopes/QueryCtrlProxyFwd.h>
@@ -61,5 +60,3 @@ protected:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

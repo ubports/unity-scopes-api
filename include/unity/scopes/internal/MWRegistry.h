@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_MWREGISTRY_H
-#define UNITY_SCOPES_INTERNAL_MWREGISTRY_H
+#pragma once
 
 #include <unity/scopes/internal/MWObjectProxy.h>
 #include <unity/scopes/internal/MWSubscriber.h>
@@ -63,5 +62,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

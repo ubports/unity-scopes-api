@@ -16,8 +16,7 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_SMARTSCOPES_SSQUERYCTRLOBJECT_H
-#define UNITY_SCOPES_INTERNAL_SMARTSCOPES_SSQUERYCTRLOBJECT_H
+#pragma once
 
 #include <unity/scopes/internal/QueryCtrlObjectBase.h>
 
@@ -65,5 +64,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif  // UNITY_SCOPES_INTERNAL_SMARTSCOPES_SSQUERYCTRLOBJECT_H

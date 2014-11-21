@@ -23,13 +23,30 @@
 using namespace unity::scopes::testing;
 
 /// @cond
-void TypedScopeFixtureHelper::set_registry(std::shared_ptr<unity::scopes::ScopeBase> const& scope, RegistryProxy const& r)
-{
-    scope->p->set_registry(r);
-}
 
 void TypedScopeFixtureHelper::set_scope_directory(std::shared_ptr<unity::scopes::ScopeBase> const& scope, std::string const& path)
 {
     scope->p->set_scope_directory(path);
 }
+
+void TypedScopeFixtureHelper::set_cache_directory(std::shared_ptr<unity::scopes::ScopeBase> const& scope, std::string const& path)
+{
+    scope->p->set_cache_directory(path);
+}
+
+void TypedScopeFixtureHelper::set_app_directory(std::shared_ptr<unity::scopes::ScopeBase> const& scope, std::string const& path)
+{
+    scope->p->set_app_directory(path);
+}
+
+void TypedScopeFixtureHelper::set_tmp_directory(std::shared_ptr<unity::scopes::ScopeBase> const& scope, std::string const& path)
+{
+    scope->p->set_tmp_directory(path);
+}
+
+void TypedScopeFixtureHelper::set_registry(std::shared_ptr<unity::scopes::ScopeBase> const& scope, RegistryProxy const& r)
+{
+    scope->p->set_registry(r);
+}
+
 /// @endcond

@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_SEARCHREPLY_H
-#define UNITY_SCOPES_SEARCHREPLY_H
+#pragma once
 
 #include <unity/scopes/Category.h>
 #include <unity/scopes/CategoryRenderer.h>
@@ -175,5 +174,3 @@ protected:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

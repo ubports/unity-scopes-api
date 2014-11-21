@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_SEARCHLISTENERBASE_H
-#define UNITY_SCOPES_SEARCHLISTENERBASE_H
+#pragma once
 
 #include <unity/scopes/Annotation.h>
 #include <unity/scopes/CategorisedResult.h>
@@ -110,5 +109,3 @@ protected:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

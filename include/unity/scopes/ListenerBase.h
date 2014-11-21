@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_LISTENERBASE_H
-#define UNITY_SCOPES_LISTENERBASE_H
+#pragma once
 
 #include <unity/scopes/CompletionDetails.h>
 #include <unity/scopes/OperationInfo.h>
@@ -84,5 +83,3 @@ protected:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

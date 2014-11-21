@@ -16,8 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_INTERNAL_ACTIONMETADATAIMPL_H
-#define UNITY_INTERNAL_ACTIONMETADATAIMPL_H
+#pragma once
 
 #include <unity/scopes/ActionMetadata.h>
 #include <unity/scopes/internal/QueryMetadataImpl.h>
@@ -65,5 +64,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

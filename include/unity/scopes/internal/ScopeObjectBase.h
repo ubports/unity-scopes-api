@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_SCOPEOBJECTBASE_H
-#define UNITY_SCOPES_INTERNAL_SCOPEOBJECTBASE_H
+#pragma once
 
 #include <unity/scopes/internal/AbstractObject.h>
 #include <unity/scopes/internal/InvokeInfo.h>
@@ -78,5 +77,3 @@ public:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

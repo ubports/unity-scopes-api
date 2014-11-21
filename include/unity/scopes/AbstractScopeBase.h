@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_ABSTRACTSCOPEBASE_H
-#define UNITY_SCOPES_ABSTRACTSCOPEBASE_H
+#pragma once
 
 #include <unity/scopes/ActivationQueryBase.h>
 #include <unity/scopes/PreviewQueryBase.h>
@@ -62,5 +61,3 @@ public:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

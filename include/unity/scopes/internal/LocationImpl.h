@@ -16,8 +16,7 @@
  * Authored by: Pete Woods <pete.woods@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_LOCATIONIMPL_H
-#define UNITY_SCOPES_INTERNAL_LOCATIONIMPL_H
+#pragma once
 
 #include <unity/scopes/Location.h>
 
@@ -104,6 +103,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-
-#endif

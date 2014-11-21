@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef SCOPELOADERTEST_MYSCOPE
-#define SCOPELOADERTEST_MYSCOPE
+#pragma once
 
 #include "Counters.h"
 
@@ -53,5 +52,3 @@ public:
         return nullptr;
     }
 };
-
-#endif

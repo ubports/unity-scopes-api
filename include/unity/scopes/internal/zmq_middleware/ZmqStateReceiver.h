@@ -16,8 +16,7 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQSTATERECEIVER_H
-#define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQSTATERECEIVER_H
+#pragma once
 
 #include <unity/scopes/internal/zmq_middleware/ZmqObjectProxy.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqStateReceiverProxyFwd.h>
@@ -54,5 +53,3 @@ public:
 } // namespace scopes
 
 } // namespace unity
-
-#endif // UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQSTATERECEIVER_H

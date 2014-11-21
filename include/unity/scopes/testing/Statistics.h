@@ -16,8 +16,7 @@
  * Authored by: Thomas Voß <thomas.voss@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_TESTING_STATISTICS_H
-#define UNITY_SCOPES_TESTING_STATISTICS_H
+#pragma once
 
 #include <functional>
 
@@ -207,5 +206,3 @@ struct StudentsTTest
 } // namespace scopes
 
 } // namespace unity
-
-#endif

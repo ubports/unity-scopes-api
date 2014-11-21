@@ -143,7 +143,7 @@ Updating symbols file
 ---------------------
 
 To easily spot new/removed/changed symbols in the library, the debian
-package is maintaining a .symbols file which lists all exported symbols
+package maintains a .symbols file that lists all exported symbols
 present in the library .so. If you add new public symbols to the library,
 it's necessary to refresh the symbols file, otherwise the package will
 fail to build. The easiest way to do that is using bzr-builddeb:
@@ -156,28 +156,7 @@ fail to build. The easiest way to do that is using bzr-builddeb:
 This creates a diff of the symbols in /tmp/symbols.diff.
 (The demangled symbols from the debian build are in ./new_symbols.)
 
-NOTE: We currently have one architecture-specific symbol:
-
-(c++|arch=amd64)"unity::scopes::internal::RegistryObject::ScopeExecData::ScopeExecData(unity::scopes::internal::RegistryObject::ScopeExecData const&)@Base" 0.6.6+14.10.20140916
-
-We need this because the copy-constructor is inlined on i386 and armhf.
-
-The above script can't cope with the arch tag at the moment. Until we get
-around to fixing this, you need to delete the corresponding change from
-the diff output before applying the diff as a patch. The offending diff
-will look something like this:
-
-@@ -377,7 +378,7 @@
-  (c++)"unity::scopes::internal::RegistryObject::remove_desktop_file(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.6.6+14.10.20140916
-  (c++)"unity::scopes::internal::RegistryObject::remove_local_scope(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
-  (c++)"unity::scopes::internal::RegistryObject::ScopeExecData::~ScopeExecData()@Base" 0.4.2+14.04.20140404.2
-- (c++|arch=amd64)"unity::scopes::internal::RegistryObject::ScopeExecData::ScopeExecData(unity::scopes::internal::RegistryObject::ScopeExecData const&)@Base" 0.6.6+14.10.20140916
-+ (c++)"unity::scopes::internal::RegistryObject::ScopeExecData::ScopeExecData(unity::scopes::internal::RegistryObject::ScopeExecData const&)@Base" 0replaceme
- (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::clear_handle_unlocked()@Base" 0.4.2+14.04.20140404.2
- (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::exec(core::posix::ChildProcess::DeathObserver&, std::shared_ptr<unity::scopes::internal::Executor>)@Base" 0.4.3+14.10.20140428
- (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::expand_custom_exec()@Base" 0.5.0+14.10.20140619
-
-Review any other changes in /tmp/symbols.diff. If they are OK:
+Review any changes in /tmp/symbols.diff. If they are OK:
 
     $ cd -
     $ patch -p0 < /tmp/symbols.diff

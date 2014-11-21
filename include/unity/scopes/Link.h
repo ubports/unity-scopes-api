@@ -16,8 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_LINK_H
-#define UNITY_SCOPES_LINK_H
+#pragma once
 
 #include <unity/util/DefinesPtrs.h>
 #include <unity/scopes/CannedQuery.h>
@@ -87,5 +86,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif
