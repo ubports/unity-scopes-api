@@ -31,34 +31,52 @@ namespace utility
 /*!
 \class BufferedResultForwarder
 
-\brief Base class for a client to receive and buffer the results of a query until another BufferedResultForwarder becomes ready.
+\brief Base class for a client to receive and buffer the results of a query until another
+BufferedResultForwarder becomes ready.
 
-This class implements result buffering, useful for aggregator scopes which receive results from multiple child scopes and
-want them displayed in specific order (in terms of Category order). The aggregator scope needs to create an instance of BufferedResultForwarder
-for every child scope it queries. The instances of BufferedResultForwarder need to be chained by passing next
-forwarder to the constructor of prior forwarder. Chaining constitutes the order in which results wil be pushed to client.
+This class implements result buffering, useful for aggregator scopes that receive
+results from multiple child scopes and need to display categories in a specific order.
+The aggregator scope must create an instance of BufferedResultForwarder
+for every child scope it queries and chain the instances together in the desired order.
 
-The default implementation of BufferedResultForwarder just forwards the results it recevies upstream and immediately declares itself "ready" after receiving the
-first result; the results are then buffered till all prior forwarders declare themselves ready. Buffering is very efficient - results are only buffered
-for as long as required to ensure proper order and buffering is disabled for forwarders which don't need to wait for other forwarders to be ready. That means
-that results will be pushed to the client (displayed) as soon as possible.
+The default implementation of BufferedResultForwarder forwards the results it receives upstream
+and declares itself "ready" after receiving the first result. The results are then buffered until
+all prior forwarders have declared themselves ready. Buffering is very efficient&mdash;results are buffered
+only until proper order is guaranteed, and buffering is disabled for forwarders that do not need
+to wait for a predecessor to become ready. This means that results are pushed to the client
+(displayed) as early as possible.
 
-Please note, that the default implementation only pushes results (and their categories) and ignores departments, filters and annotations. If you wish to handle and
-forward those to the client, you need to derive from BufferedResultForwarder and override respective methods of base unity::scopes::SearchListenerBase
-interface. Also note, that since the default implementation just forwards received results, it will recreate all the received categories from all child scopes,
-and the order defined by BufferedResultForwarder chaining will only be guaranteed among first received category of each child scope. Therefore in
-many cases it may be necessary to derive from BufferedResultForwarder and reimplement
-unity::scopes::utility::BufferedResultForwarder::push(unity::scopes::CategorisedResult) to - for example - collapse categories received from a child into one
-target category of the aggregating scope.
+The default implementation only pushes results and their categories, but ignores departments, filters,
+and annotations. If you wish to handle and forward these, you must to derive your own forwarder
+from BufferedResultForwarder and override the appropropriate methods of the
+\link unity::scopes::SearchListenerBase SearchListenerBase\endlink class.
 
-Custom implementation of unity::scopes::utility::BufferedResultForwarder::push(unity::scopes::CategorisedResult) should push results to
-the reply proxy returned by BufferedResultForwarder::upstream() (note that this is a different proxy that the one passed to BufferedResultForwarder
-constructor and it is the one actually responsible for buffering). It should then declare itself ready by calling BufferedResultForwarder::set_ready() as soon
-as it knows it won't push results for any new categories. In typical cases, where aggregator scopes aggregates all results from given child scope into a single
-category, it can call set_ready() immediately after pushing first reasult in that category upstream.
+The default implementation buffers a single result before indicating to its follower that it is ready.
+This means that the first category from each child determines overall order. For example, if each
+child produces results for a single category, the chaining insures the correct order (results from child A
+followed by results from child B, or vice versa). However, if child A produces results for categories A1
+and A2, and child B produces results for categories B1 and B2, the overall order could, for example, be
+A1, B1, A2, B2, or it could be A1, A2, B1, B2, or it could be A1, B2, B1, A2 (among others).
 
-A sample code for aggregating results from three scopes (no matter how many categories they create) into three aggregated categories ("Results from scope1",
-"Results from scope2" and "Results from scope3" - in that fixed order) may look like this:
+If you want to ensure that all categories from child A arrive in a particular order, followed by all categories
+from child B in a particular order, you must override
+\link unity::scopes::utility::BufferedResultForwarder::push(unity::scopes::CategorisedResult) push()\endlink
+to, for example, collapse categories received from a child into a single category, or otherwise buffer
+results yourself until you have established the order you need.
+
+Note that buffering fundamentally conflicts with the need to render results as soon as possible. You should
+avoid buffering more data than absolutely necessary in order for the display to start updating as soon
+as possible after a query was sent.
+
+If you create a custom implementation of a forwarder, you _must_ push results via the proxy returned by
+BufferedResultForwarder::upstream(). (This is a different proxy than the one that is passed to the
+constructor.) Your forwarder then must declare itself ready by calling BufferedResultForwarder::set_ready()
+as soon as it knows it will not push results for any new categories. In the case where your aggregator
+aggregates all results from given child scope into a single category, you can call `set_ready()`
+as soon as you have pushed the first result.
+
+Here is a code example that shows how to write a result forwarder that creates a separate category for
+results from each of three children and controls the order in which these categories are rendered.
 
 \code
 class SearchReceiver : public BufferedResultForwarder

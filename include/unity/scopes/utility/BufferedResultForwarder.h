@@ -49,24 +49,26 @@ public:
     /// @endcond
 
     /**
-    \brief Create BufferedResultForwarder that forwards results to given upstream reply proxy.
+    \brief Create a forwarder that sends results to to its upstream reply proxy.
+
+    \param upstream The reply proxy for the upstream receiver.
     */
     BufferedResultForwarder(unity::scopes::SearchReplyProxy const& upstream);
 
     /**
-    \brief Create BufferedResultForwarder that forwards results to given upstream reply proxy before another forwarder.
+    \brief Create a forwarder that sends (at least one) result to its upstream
+    reply proxy before indicating that it is ready to its follower.
 
-    Create BufferedResultForwarder and chain them with this constructor to define the desired order of categories.
+    \param upstream The reply proxy for the upstream receiver.
+    \param next_forwarder The forwarder that becomes ready once this forwarder calls set_ready().
     */
     BufferedResultForwarder(unity::scopes::SearchReplyProxy const& upstream, BufferedResultForwarder::SPtr const& next_forwarder);
 
     /**
-    \brief Default implementation of result forwarding.
+    \brief Forwards a single result before calling `set_ready()`.
 
-    The default implementation just forwards incoming results unchanged to the upstream reply proxy, and marks this BufferedResultForwarder
-    ready by calling set_ready() after forwarding first result. This makes it work fine when aggregating from a child scope which only has
-    one category, as this is enough to ensure proper order of categories from aggregating scope. When aggregating child scope which
-    creates multiple categories, reimplement this method and call set_ready() as soon as your push() handler isn't going to introduce any new categories.
+    This default implementation forwards incoming results unchanged to the upstream reply proxy and
+    and marks the forwarder ready after forwarding the first result.
 
     This method is called once by the scopes run time for each result that is returned by a query().
 
@@ -75,27 +77,30 @@ public:
     void push(CategorisedResult result) override;
 
     /**
-    \brief Check if this BufferedResultForwarder is ready and results can be pushed directly to the upstream proxy.
+    \brief Check if this forwarder is ready.
 
-    \return true if this forwarder called set_ready().
+    Once ready, the forwarder no longer buffers any results and passes them to the upstream proxy immediately.
+
+    \return `true` if this forwarder called set_ready(), `false` otherwise.
      */
     bool is_ready() const;
 
 protected:
     /**
-     \brief Mark this forwarder as "ready".
+    \brief Mark this forwarder as ready.
 
-     This method should be called from custom implementation of BufferedResultForwarder as soon as it's not going to introduce any new
-     categories.
-     */
+    If you create a custom forwarder, you should call this method as soon as your forwarder will
+    no longer push results for new categories.
+    */
     void set_ready();
 
     /**
-    \brief Get upstream proxy for pushing data to.
+    \brief Get the upstream proxy.
 
-    Returns an instance of buffered reply proxy for all push, register_departments and register_category operations.
+    Returns an instance of buffered reply proxy for all push, register_departments, and register_category operations.
+    Note that this proxy is _not_ the same proxy as the one passed to the constructor.
 
-    \return buffered reply proxy
+    \return The buffered reply proxy.
     */
     unity::scopes::SearchReplyProxy const& upstream();
 
