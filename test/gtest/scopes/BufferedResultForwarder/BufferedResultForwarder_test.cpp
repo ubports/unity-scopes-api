@@ -313,4 +313,3 @@ TEST(BufferedResultForwarder, no_results_from_first_scope)
     base2->finished(status);
     base1->finished(status);
 }
-
