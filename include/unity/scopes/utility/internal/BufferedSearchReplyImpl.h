@@ -23,6 +23,8 @@
 #include <unity/scopes/CategorisedResult.h>
 #include <memory>
 #include <vector>
+#include <mutex>
+#include <atomic>
 
 namespace unity
 {
@@ -76,8 +78,9 @@ public:
     void flush();
 
 private:
+    std::mutex mutex_;
     unity::scopes::SearchReplyProxy const& upstream_;
-    bool buffer_;
+    std::atomic<bool> buffer_;
     std::vector<CategorisedResult> results_;
 };
 

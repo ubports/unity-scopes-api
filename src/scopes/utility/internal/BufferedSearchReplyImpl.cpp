@@ -75,8 +75,9 @@ bool BufferedSearchReplyImpl::push(unity::scopes::experimental::Annotation const
 
 bool BufferedSearchReplyImpl::push(unity::scopes::CategorisedResult const& result)
 {
-    if (buffer_)
+    if (buffer_.load())
     {
+        std::lock_guard<std::mutex> lock(mutex_);
         results_.push_back(result);
         return true;
     }
@@ -93,17 +94,17 @@ bool BufferedSearchReplyImpl::push(unity::scopes::Filters const& filters, unity:
 
 void BufferedSearchReplyImpl::finished()
 {
-    upstream_->finished(); // ???
+    upstream_->finished();
 }
 
 void BufferedSearchReplyImpl::error(std::exception_ptr ex)
 {
-    upstream_->error(ex); // ???
+    upstream_->error(ex);
 }
 
 void BufferedSearchReplyImpl::info(OperationInfo const& op_info)
 {
-    upstream_->info(op_info); // ???
+    upstream_->info(op_info);
 }
 
 std::string BufferedSearchReplyImpl::endpoint()
@@ -133,11 +134,12 @@ std::string BufferedSearchReplyImpl::to_string()
 
 void BufferedSearchReplyImpl::disable_buffer()
 {
-    buffer_ = false;
+    buffer_.store(false);
 }
 
 void BufferedSearchReplyImpl::flush()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     for (auto const& res: results_)
     {
         upstream_->push(res);

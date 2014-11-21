@@ -23,6 +23,7 @@
 
 #include <vector>
 #include <memory>
+#include <atomic>
 
 namespace unity
 {
@@ -51,9 +52,9 @@ public:
     void finished(CompletionDetails const& details);
 
 private:
-    bool ready_;
+    std::atomic<bool> ready_;
     bool has_previous_;
-    bool previous_ready_;
+    std::atomic<bool> previous_ready_;
     unity::scopes::SearchReplyProxy const upstream_;
     std::weak_ptr<utility::BufferedResultForwarder> next_;
 };

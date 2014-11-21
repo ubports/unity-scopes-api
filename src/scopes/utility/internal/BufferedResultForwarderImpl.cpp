@@ -65,7 +65,7 @@ void BufferedResultForwarderImpl::push(CategorisedResult result)
 
 bool BufferedResultForwarderImpl::is_ready() const
 {
-    return ready_;
+    return ready_.load();
 }
 
 void BufferedResultForwarderImpl::set_ready()
@@ -74,11 +74,11 @@ void BufferedResultForwarderImpl::set_ready()
     // to be displayed (or the query has finished); set the 'ready' flag
     // and if previous forwarder is also ready, then push and disable
     // futher buffering.
-    if (!ready_)
+    if (!ready_.load())
     {
-        ready_ = true;
+        ready_.store(true);
 
-        if (previous_ready_ || !has_previous_)
+        if (previous_ready_.load() || !has_previous_)
         {
             flush_and_notify();
         }
@@ -89,8 +89,8 @@ void BufferedResultForwarderImpl::notify_ready()
 {
     // we got notified that previous forwarder is ready;
     // if we are ready then notify following forwarder
-    previous_ready_ = true;
-    if (ready_)
+    previous_ready_.store(true);
+    if (ready_.load())
     {
         flush_and_notify();
     }
