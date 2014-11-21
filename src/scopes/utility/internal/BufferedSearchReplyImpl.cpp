@@ -16,7 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#include <unity/scopes/internal/BufferedSearchReplyImpl.h>
+#include <unity/scopes/utility/internal/BufferedSearchReplyImpl.h>
 
 namespace unity
 {

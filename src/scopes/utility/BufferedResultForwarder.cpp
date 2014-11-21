@@ -17,7 +17,7 @@
  */
 
 #include <unity/scopes/utility/BufferedResultForwarder.h>
-#include <unity/scopes/internal/BufferedResultForwarderImpl.h>
+#include <unity/scopes/utility/internal/BufferedResultForwarderImpl.h>
 
 namespace unity
 {

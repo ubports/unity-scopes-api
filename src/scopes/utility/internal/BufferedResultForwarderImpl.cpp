@@ -16,8 +16,8 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#include <unity/scopes/internal/BufferedResultForwarderImpl.h>
-#include <unity/scopes/internal/BufferedSearchReplyImpl.h>
+#include <unity/scopes/utility/internal/BufferedResultForwarderImpl.h>
+#include <unity/scopes/utility/internal/BufferedSearchReplyImpl.h>
 #include <unity/scopes/SearchReply.h>
 #include <cassert>
 
