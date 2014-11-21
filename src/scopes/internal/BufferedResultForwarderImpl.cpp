@@ -27,6 +27,9 @@ namespace unity
 namespace scopes
 {
 
+namespace utility
+{
+
 namespace internal
 {
 
@@ -115,6 +118,8 @@ void BufferedResultForwarderImpl::finished(CompletionDetails const&)
 }
 
 } // namespace internal
+
+} // utility
 
 } // namespace scopes
 

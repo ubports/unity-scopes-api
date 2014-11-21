@@ -32,13 +32,13 @@ namespace experimental
     class Annotation;
 }
 
+namespace utility
+{
+
 namespace internal
 {
     class BufferedResultForwarderImpl;
 }
-
-namespace utility
-{
 
 class BufferedResultForwarder : public unity::scopes::SearchListenerBase
 {

@@ -30,6 +30,9 @@ namespace unity
 namespace scopes
 {
 
+namespace utility
+{
+
 namespace internal
 {
 
@@ -56,6 +59,8 @@ private:
 };
 
 } // namespace internal
+
+} // namespace utility
 
 } // namespace scopes
 

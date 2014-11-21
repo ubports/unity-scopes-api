@@ -24,6 +24,9 @@ namespace unity
 namespace scopes
 {
 
+namespace utility
+{
+
 namespace internal
 {
 
@@ -142,8 +145,10 @@ void BufferedSearchReplyImpl::flush()
     results_.clear();
 }
 
-}
+} // namespace internal
 
-}
+} // namespace utility
 
-}
+} // namespace scopes
+
+} // namespace unity

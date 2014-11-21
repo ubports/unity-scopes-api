@@ -30,6 +30,9 @@ namespace unity
 namespace scopes
 {
 
+namespace utility
+{
+
 namespace internal
 {
 
@@ -78,8 +81,10 @@ private:
     std::vector<CategorisedResult> results_;
 };
 
-}
+} // namespace internal
 
-}
+} // namespace utility
 
-}
+} // namespace scopes
+
+} // namespace unity
