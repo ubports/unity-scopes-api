@@ -137,9 +137,9 @@ TEST_F(smartscopesproxytest, ss_registry)
         EXPECT_EQ("Temperature Units", meta.settings_definitions()[1].get_dict()["displayName"].get_string());
         EXPECT_EQ("list", meta.settings_definitions()[1].get_dict()["type"].get_string());
         EXPECT_EQ(1, meta.settings_definitions()[1].get_dict()["defaultValue"].get_int());
-        EXPECT_EQ(2, meta.settings_definitions()[1].get_dict()["values"].get_array().size());
-        EXPECT_EQ("Celsius", meta.settings_definitions()[1].get_dict()["values"].get_array()[0].get_string());
-        EXPECT_EQ("Fahrenheit", meta.settings_definitions()[1].get_dict()["values"].get_array()[1].get_string());
+        EXPECT_EQ(2, meta.settings_definitions()[1].get_dict()["displayValues"].get_array().size());
+        EXPECT_EQ("Celsius", meta.settings_definitions()[1].get_dict()["displayValues"].get_array()[0].get_string());
+        EXPECT_EQ("Fahrenheit", meta.settings_definitions()[1].get_dict()["displayValues"].get_array()[1].get_string());
     }
 
     // non-existent scope (via mw)
@@ -172,9 +172,9 @@ TEST_F(smartscopesproxytest, ss_registry)
         EXPECT_EQ("Temperature Units", meta.settings_definitions()[1].get_dict()["displayName"].get_string());
         EXPECT_EQ("list", meta.settings_definitions()[1].get_dict()["type"].get_string());
         EXPECT_EQ(1, meta.settings_definitions()[1].get_dict()["defaultValue"].get_int());
-        EXPECT_EQ(2, meta.settings_definitions()[1].get_dict()["values"].get_array().size());
-        EXPECT_EQ("Celsius", meta.settings_definitions()[1].get_dict()["values"].get_array()[0].get_string());
-        EXPECT_EQ("Fahrenheit", meta.settings_definitions()[1].get_dict()["values"].get_array()[1].get_string());
+        EXPECT_EQ(2, meta.settings_definitions()[1].get_dict()["displayValues"].get_array().size());
+        EXPECT_EQ("Celsius", meta.settings_definitions()[1].get_dict()["displayValues"].get_array()[0].get_string());
+        EXPECT_EQ("Fahrenheit", meta.settings_definitions()[1].get_dict()["displayValues"].get_array()[1].get_string());
     }
 }
 

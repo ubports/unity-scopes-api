@@ -46,6 +46,9 @@ public:
 
     virtual VariantArray definitions() const = 0;
 
+    // TODO: HACK: See bug #1393438 and the comments in IniSettingsSchema.cpp and
+    //             JsonSettingsSchema.cpp. This method needs to be removed
+    //             once we have fixed this properly.
     virtual void add_location_setting() = 0;
 };
 

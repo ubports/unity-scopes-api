@@ -53,10 +53,10 @@ public:
 
     Setting(Json::Value const& v);
     Setting(string const& id,
-                string const& type,
-                string const& display_name,
-                VariantArray const& enumerators,
-                Variant const& default_value);
+            string const& type,
+            string const& display_name,
+            VariantArray const& enumerators,
+            Variant const& default_value);
     ~Setting() = default;
 
     string id() const;
@@ -152,7 +152,7 @@ Variant Setting::to_schema_definition()
     schema["defaultValue"] = default_value_;
     if (type_ == "list")
     {
-        schema["values"] = enumerators_;
+        schema["displayValues"] = enumerators_;
     }
     return Variant(schema);
 }
@@ -415,6 +415,14 @@ JsonSettingsSchema::JsonSettingsSchema()
 
 void JsonSettingsSchema::add_location_setting()
 {
+    // TODO: HACK: See bug #1393438.
+    //             Temporarily work around this problem by adding an entry to each scope's settings
+    //             schema with the location data boolean. The shell
+    //             intercepts this as a "special" setting and takes care of translating the
+    //             display string. Eventually, we'll need to fix this, removing this hack.
+    //             Realistically, the shell should not store this user-preference
+    //             in the scope's settings database, and should only pay attention to the scope's
+    //             LocationDataNeeded metadata attribute.
     Setting s("internal.location", "boolean", "Enable location data", VariantArray(), Variant(true));
     definitions_.push_back(s.to_schema_definition());
 }

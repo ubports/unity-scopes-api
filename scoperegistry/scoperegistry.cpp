@@ -288,9 +288,11 @@ void add_local_scope(RegistryObject::SPtr const& registry,
         {
             schema = IniSettingsSchema::create(settings_schema_path.native());
         }
-        // We always need to create a settings schema if the scope wants location data
         else if (sc.location_data_needed())
         {
+            // TODO: HACK: See bug #1393438 and the comments in IniSettingsSchema.cpp and
+            //             JsonSettingsSchema.cpp.
+            // We always need to create a settings schema if the scope wants location data
             schema = IniSettingsSchema::create_empty();
         }
 
