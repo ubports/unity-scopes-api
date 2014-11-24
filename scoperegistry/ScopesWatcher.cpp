@@ -228,14 +228,12 @@ void ScopesWatcher::watch_event(DirWatcher::EventType event_type,
             std::string scope_id = fs_path.stem().native();
 
             // A .ini has been added / modified
-            if (event_type == DirWatcher::Added || event_type == DirWatcher::Modified)
+            if (event_type == DirWatcher::Added)
             {
                 sdir_to_ini_map_[parent_path] = path;
                 ini_added_callback_(std::make_pair(scope_id, path));
-                std::string const action = event_type == DirWatcher::Added ? "installed" : "modified";
                 BOOST_LOG_SEV(logger_, Logger::Info)
-                    << "ScopesWatcher: scope: \"" << scope_id << "\" .ini " << action << ": \""
-                    << path << "\"";
+                    << "ScopesWatcher: scope: \"" << scope_id << "\" .ini installed: \"" << path << "\"";
             }
             // A .ini has been removed
             else if (event_type == DirWatcher::Removed)
