@@ -44,6 +44,7 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"typeinfo for unity::scopes::testing::Result@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo for unity::scopes::testing::Sample@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo for unity::scopes::TimeoutException@Base" 0.4.0+14.04.20140312.1
+ (c++)"typeinfo for unity::scopes::utility::BufferedResultForwarder@Base" 0replaceme
  (c++)"typeinfo for unity::scopes::VariantBuilder@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo name for unity::scopes::AbstractScopeBase@Base" 0.6.0+14.10.20140804.1
  (c++)"typeinfo name for unity::scopes::ActionMetadata@Base" 0.6.0+14.10.20140804.1
@@ -90,6 +91,7 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"typeinfo name for unity::scopes::testing::Result@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo name for unity::scopes::testing::Sample@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo name for unity::scopes::TimeoutException@Base" 0.4.0+14.04.20140312.1
+ (c++)"typeinfo name for unity::scopes::utility::BufferedResultForwarder@Base" 0replaceme
  (c++)"typeinfo name for unity::scopes::VariantBuilder@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ActionMetadata::~ActionMetadata()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ActionMetadata::ActionMetadata(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
@@ -874,6 +876,14 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::TimeoutException::TimeoutException(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::TimeoutException::TimeoutException(unity::scopes::TimeoutException const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::to_string(unity::scopes::CompletionDetails::CompletionStatus)@Base" 0.6.0+14.10.20140804.1
+ (c++)"unity::scopes::utility::BufferedResultForwarder::~BufferedResultForwarder()@Base" 0replaceme
+ (c++)"unity::scopes::utility::BufferedResultForwarder::BufferedResultForwarder(std::shared_ptr<unity::scopes::SearchReply> const&)@Base" 0replaceme
+ (c++)"unity::scopes::utility::BufferedResultForwarder::BufferedResultForwarder(std::shared_ptr<unity::scopes::SearchReply> const&, std::shared_ptr<unity::scopes::utility::BufferedResultForwarder> const&)@Base" 0replaceme
+ (c++)"unity::scopes::utility::BufferedResultForwarder::finished(unity::scopes::CompletionDetails const&)@Base" 0replaceme
+ (c++)"unity::scopes::utility::BufferedResultForwarder::is_ready() const@Base" 0replaceme
+ (c++)"unity::scopes::utility::BufferedResultForwarder::push(unity::scopes::CategorisedResult)@Base" 0replaceme
+ (c++)"unity::scopes::utility::BufferedResultForwarder::set_ready()@Base" 0replaceme
+ (c++)"unity::scopes::utility::BufferedResultForwarder::upstream()@Base" 0replaceme
  (c++)"unity::scopes::VariantBuilder::add_tuple(std::initializer_list<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::VariantBuilder::add_tuple(std::vector<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant>, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant> > > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::VariantBuilder::end()@Base" 0.4.0+14.04.20140312.1
@@ -979,6 +989,7 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"vtable for unity::scopes::testing::Result@Base" 0.4.0+14.04.20140312.1
  (c++)"vtable for unity::scopes::testing::Sample@Base" 0.4.0+14.04.20140312.1
  (c++)"vtable for unity::scopes::TimeoutException@Base" 0.4.0+14.04.20140312.1
+ (c++)"vtable for unity::scopes::utility::BufferedResultForwarder@Base" 0replaceme
  (c++)"vtable for unity::scopes::VariantBuilder@Base" 0.4.0+14.04.20140312.1
  (c++)"VTT for unity::scopes::ConfigException@Base" 0.4.0+14.04.20140312.1
  (c++)"VTT for unity::scopes::MiddlewareException@Base" 0.4.0+14.04.20140312.1
