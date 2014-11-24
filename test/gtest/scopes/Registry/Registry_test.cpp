@@ -610,39 +610,6 @@ TEST(Registry, list_update_notify)
     EXPECT_NE(list.end(), list.find("testscopeB"));
     EXPECT_EQ(list.end(), list.find("testscopeC"));
     EXPECT_EQ(list.end(), list.find("testscopeD"));
-
-    // Check notifications for settings definitions.
-
-    // Initially, testscopeB doesn't have any settings.
-    auto meta = r->get_metadata("testscopeB");
-    auto defs = meta.settings_definitions();
-    EXPECT_EQ(0, defs.size());
-
-    reset();
-    // Add settings definition
-    std::cout << "Make a symlink to testscopeB-settings.ini in scopes/testscopeB" << std::endl;
-    filesystem::create_symlink(TEST_SRC_PATH "/scopes/testscopeB/testscopeB-settings.ini",
-                               TEST_RUNTIME_PATH "/scopes/testscopeB/testscopeB-settings.ini", ec);
-    ASSERT_EQ("Success", ec.message());
-    EXPECT_TRUE(wait_for_update());
-
-    // Must be able to see the new definitions now
-    meta = r->get_metadata("testscopeB");
-    defs = meta.settings_definitions();
-    ASSERT_EQ(1, defs.size());
-    EXPECT_EQ("tsB id", defs[0].get_dict()["id"].get_string());
-
-    reset();
-    // Remove settings definition
-    std::cout << "Remove symlink to testscopeB-settings.ini in scopes/testscopeB" << std::endl;
-    filesystem::remove(TEST_RUNTIME_PATH "/scopes/testscopeB/testscopeB-settings.ini", ec);
-    ASSERT_EQ("Success", ec.message());
-    EXPECT_TRUE(wait_for_update());
-
-    // Definition must be gone now
-    meta = r->get_metadata("testscopeB");
-    defs = meta.settings_definitions();
-    EXPECT_EQ(0, defs.size());
 }
 
 int main(int argc, char **argv)

@@ -220,29 +220,11 @@ void ScopesWatcher::watch_event(DirWatcher::EventType event_type,
 
     if (file_type == DirWatcher::File && fs_path.extension() == ".ini")
     {
-        std::lock_guard<std::mutex> lock(mutex_);
-        std::string parent_path = fs_path.parent_path().native();
-
-        if (boost::algorithm::ends_with(path, "-settings.ini"))
+        if (!boost::algorithm::ends_with(path, "-settings.ini"))
         {
-            std::string scope_id = fs_path.stem().native();
-            boost::algorithm::replace_last(scope_id, "-settings", "");
+            std::lock_guard<std::mutex> lock(mutex_);
 
-            // For add/remove/modify of a settings definition, we pretend that the scope's
-            // config file was added or modified (provided the .ini file exists). This triggers
-            // re-loading the metadata for the scope.
-            std::string fs_ini_path = parent_path + "/" + scope_id + ".ini";
-            if (boost::filesystem::exists(fs_ini_path))
-            {
-                ini_added_callback_(std::make_pair(scope_id, fs_ini_path));
-                std::string const action = event_type == DirWatcher::Removed ? "uninstalled from" : "installed to";
-                BOOST_LOG_SEV(logger_, Logger::Info)
-                    << "ScopesWatcher: scope: \"" << scope_id << "\" settings definition " << action << ": \""
-                    << parent_path << "\"";
-            }
-        }
-        else
-        {
+            std::string parent_path = fs_path.parent_path().native();
             std::string scope_id = fs_path.stem().native();
 
             // A .ini has been added / modified
