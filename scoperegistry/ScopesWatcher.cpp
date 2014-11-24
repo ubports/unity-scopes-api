@@ -263,10 +263,6 @@ void ScopesWatcher::watch_event(DirWatcher::EventType event_type,
                     BOOST_LOG_SEV(logger_, Logger::Info)
                         << "ScopesWatcher: scope: \"" << scope_id << "\" .ini installed: \"" << path << "\"";
                 }
-                else
-                {
-                    std::cerr << "Ignoring empty file: " << path << std::endl;
-                }
             }
             // A .ini has been removed
             else if (event_type == DirWatcher::Removed)
