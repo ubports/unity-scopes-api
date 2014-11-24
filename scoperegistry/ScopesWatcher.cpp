@@ -235,7 +235,7 @@ void ScopesWatcher::watch_event(DirWatcher::EventType event_type,
                 std::string const action = event_type == DirWatcher::Added ? "installed" : "modified";
                 BOOST_LOG_SEV(logger_, Logger::Info)
                     << "ScopesWatcher: scope: \"" << scope_id << "\" .ini " << action << ": \""
-                    << parent_path << "\"";
+                    << path << "\"";
             }
             // A .ini has been removed
             else if (event_type == DirWatcher::Removed)
@@ -244,7 +244,7 @@ void ScopesWatcher::watch_event(DirWatcher::EventType event_type,
                 registry_->remove_local_scope(scope_id);
                 BOOST_LOG_SEV(logger_, Logger::Info)
                     << "ScopesWatcher: scope: \"" << scope_id << "\" .ini uninstalled from: \""
-                    << parent_path << "\"";
+                    << path << "\"";
             }
         }
     }
