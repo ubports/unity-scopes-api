@@ -206,6 +206,13 @@ void DirWatcher::watch_thread()
                                        "read() failed on inotify fd (fd = " +
                                        std::to_string(fd_) + ")", errno);
             }
+            if (bytes_read != bytes_avail)
+            {
+                throw ResourceException("DirWatcher::watch_thread(): Thread aborted: "
+                                       "read() returned " + std::to_string(bytes_read) +
+                                       " bytes, expected " + std::to_string(bytes_avail) +
+                                       " bytes (fd = " + std::to_string(fd_) + ")");
+            }
 
             // Process event(s) received
             int i = 0;
