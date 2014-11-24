@@ -25,6 +25,8 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 
+#include <sys/stat.h>
+
 using namespace unity::scopes::internal;
 using namespace boost;
 
@@ -165,8 +167,9 @@ void ScopesWatcher::add_scope_dir(std::string const& dir, bool notify)
             if (notify)
             {
                 ini_added_callback_(config);
-                std::cout << "ScopesWatcher: scope: \"" << config.first << "\" installed to: \""
-                          << dir << "\"" << std::endl;
+                BOOST_LOG_SEV(logger_, Logger::Info)
+                    << "ScopesWatcher: scope: \"" << config.first << "\" installed to: \""
+                    << dir << "\"" << std::endl;
             }
         }
 
@@ -228,12 +231,42 @@ void ScopesWatcher::watch_event(DirWatcher::EventType event_type,
             std::string scope_id = fs_path.stem().native();
 
             // A .ini has been added / modified
-            if (event_type == DirWatcher::Added)
+            if (event_type == DirWatcher::Added || event_type == DirWatcher::Modified)
             {
-                sdir_to_ini_map_[parent_path] = path;
-                ini_added_callback_(std::make_pair(scope_id, path));
-                BOOST_LOG_SEV(logger_, Logger::Info)
-                    << "ScopesWatcher: scope: \"" << scope_id << "\" .ini installed: \"" << path << "\"";
+                // We notify only if the file is non-empty.
+                // This avoids notifying twice if things are slow,
+                // because we may get an event for the file creation,
+                // followed by an event for the file modification.
+                // This is not completely free of races because,
+                // by the time we get the create event, the file may
+                // have been *partially* written, in which case
+                // we'll still notify a second time when the file is closed.
+                // But because .ini files are small, we get away with it. (We
+                // rely on the file writer to not write, say, one byte
+                // at a time.)
+                bool non_empty = true;
+                if (event_type == DirWatcher::Added)
+                {
+                    struct stat buf;
+                    if (stat(path.c_str(), &buf) == -1)
+                    {
+                        // We ignore errors because, by the time we get to look,
+                        // the file may no longer be there.
+                        return;
+                    }
+                    non_empty = buf.st_size != 0;
+                }
+                if (non_empty)
+                {
+                    sdir_to_ini_map_[parent_path] = path;
+                    ini_added_callback_(std::make_pair(scope_id, path));
+                    BOOST_LOG_SEV(logger_, Logger::Info)
+                        << "ScopesWatcher: scope: \"" << scope_id << "\" .ini installed: \"" << path << "\"";
+                }
+                else
+                {
+                    std::cerr << "Ignoring empty file: " << path << std::endl;
+                }
             }
             // A .ini has been removed
             else if (event_type == DirWatcher::Removed)

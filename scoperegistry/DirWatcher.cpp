@@ -74,7 +74,7 @@ void DirWatcher::add_watch(std::string const& path)
 
     int wd = inotify_add_watch(fd_, path.c_str(), IN_CREATE | IN_MOVED_TO |
                                                   IN_DELETE | IN_MOVED_FROM |
-                                                  IN_MODIFY | IN_ATTRIB);
+                                                  IN_MODIFY | IN_CLOSE_WRITE);
     if (wd < 0)
     {
         auto msg = "DirWatcher::add_watch(): inotify_add_watch() failed. (fd = " +
@@ -225,10 +225,12 @@ void DirWatcher::watch_thread()
                 {
                     if (event->mask & IN_ISDIR)
                     {
+                        std::cerr << "dir added or moved to: " << event_path << std::endl;
                         watch_event(Added, Directory, event_path);
                     }
                     else
                     {
+                        std::cerr << "file added or moved to: " << event_path << std::endl;
                         watch_event(Added, File, event_path);
                     }
                 }
@@ -236,23 +238,27 @@ void DirWatcher::watch_thread()
                 {
                     if (event->mask & IN_ISDIR)
                     {
+                        std::cerr << "dir deleted: " << event_path << std::endl;
                         watch_event(Removed, Directory, event_path);
                     }
                     else
                     {
+                        std::cerr << "file deleted: " << event_path << std::endl;
                         watch_event(Removed, File, event_path);
                     }
                 }
-                else if (event->mask & IN_MODIFY || event->mask & IN_ATTRIB)
+                else if (event->mask & IN_MODIFY)
                 {
                     if (event->mask & IN_ISDIR)
                     {
+                        std::cerr << "dir modified: " << event_path << std::endl;
                         watch_event(Modified, Directory, event_path);
                     }
-                    else
-                    {
-                        watch_event(Modified, File, event_path);
-                    }
+                }
+                else if (event->mask & IN_CLOSE_WRITE)
+                {
+                    std::cerr << "file written: " << event_path << std::endl;
+                    watch_event(Modified, File, event_path);
                 }
                 i += sizeof(inotify_event) + event->len;
             }
