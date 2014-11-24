@@ -250,8 +250,9 @@ void ScopesWatcher::watch_event(DirWatcher::EventType event_type,
             {
                 sdir_to_ini_map_[parent_path] = path;
                 ini_added_callback_(std::make_pair(scope_id, path));
+                std::string const action = event_type == DirWatcher::Added ? "installed" : "modified";
                 BOOST_LOG_SEV(logger_, Logger::Info)
-                    << "ScopesWatcher: scope: \"" << scope_id << "\" installed to: \""
+                    << "ScopesWatcher: scope: \"" << scope_id << "\" .ini " << action << ": \""
                     << parent_path << "\"";
             }
             // A .ini has been removed
@@ -260,7 +261,7 @@ void ScopesWatcher::watch_event(DirWatcher::EventType event_type,
                 sdir_to_ini_map_.erase(parent_path);
                 registry_->remove_local_scope(scope_id);
                 BOOST_LOG_SEV(logger_, Logger::Info)
-                    << "ScopesWatcher: scope: \"" << scope_id << "\" uninstalled from: \""
+                    << "ScopesWatcher: scope: \"" << scope_id << "\" .ini uninstalled from: \""
                     << parent_path << "\"";
             }
         }
@@ -281,8 +282,9 @@ void ScopesWatcher::watch_event(DirWatcher::EventType event_type,
             if (event_type == DirWatcher::Added || event_type == DirWatcher::Modified)
             {
                 ini_added_callback_(std::make_pair(scope_id, ini_path));
+                std::string const action = event_type == DirWatcher::Added ? "installed" : "modified";
                 BOOST_LOG_SEV(logger_, Logger::Info)
-                    << "ScopesWatcher: scope: \"" << scope_id << "\" installed to: \""
+                    << "ScopesWatcher: scope: \"" << scope_id << "\" .so " << action << ": \""
                     << parent_path << "\"";
             }
             // A .so file has been removed
@@ -290,7 +292,7 @@ void ScopesWatcher::watch_event(DirWatcher::EventType event_type,
             {
                 registry_->remove_local_scope(scope_id);
                 BOOST_LOG_SEV(logger_, Logger::Info)
-                    << "ScopesWatcher: scope: \"" << scope_id << "\" uninstalled from: \""
+                    << "ScopesWatcher: scope: \"" << scope_id << "\" .so uninstalled from: \""
                     << parent_path << "\"";
             }
         }

@@ -258,6 +258,7 @@ bool RegistryObject::add_local_scope(std::string const& scope_id, ScopeMetadata 
     bool return_value = true;
     if (scopes_.find(scope_id) != scopes_.end())
     {
+        // If scope is known already, remove it's details and kill it if it is running.
         scopes_.erase(scope_id);
         scope_processes_.erase(scope_id);
         return_value = false;
