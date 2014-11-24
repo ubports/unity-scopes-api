@@ -243,7 +243,7 @@ void ScopesWatcher::watch_event(DirWatcher::EventType event_type,
                 sdir_to_ini_map_.erase(parent_path);
                 registry_->remove_local_scope(scope_id);
                 BOOST_LOG_SEV(logger_, Logger::Info)
-                    << "ScopesWatcher: scope: \"" << scope_id << "\" .ini uninstalled from: \""
+                    << "ScopesWatcher: scope: \"" << scope_id << "\" .ini uninstalled: \""
                     << path << "\"";
             }
         }
