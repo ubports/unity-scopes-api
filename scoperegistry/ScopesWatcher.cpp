@@ -266,37 +266,6 @@ void ScopesWatcher::watch_event(DirWatcher::EventType event_type,
             }
         }
     }
-    else if (file_type == DirWatcher::File && fs_path.extension() == ".so")
-    {
-        std::lock_guard<std::mutex> lock(mutex_);
-        std::string parent_path = fs_path.parent_path().native();
-
-        // Check if this directory is associate with the config file
-        if (sdir_to_ini_map_.find(parent_path) != sdir_to_ini_map_.end())
-        {
-            std::string ini_path = sdir_to_ini_map_.at(parent_path);
-            filesystem::path fs_ini_path(ini_path);
-            std::string scope_id = fs_ini_path.stem().native();
-
-            // A .so file has been added / modified
-            if (event_type == DirWatcher::Added || event_type == DirWatcher::Modified)
-            {
-                ini_added_callback_(std::make_pair(scope_id, ini_path));
-                std::string const action = event_type == DirWatcher::Added ? "installed" : "modified";
-                BOOST_LOG_SEV(logger_, Logger::Info)
-                    << "ScopesWatcher: scope: \"" << scope_id << "\" .so " << action << ": \""
-                    << parent_path << "\"";
-            }
-            // A .so file has been removed
-            else if (event_type == DirWatcher::Removed)
-            {
-                registry_->remove_local_scope(scope_id);
-                BOOST_LOG_SEV(logger_, Logger::Info)
-                    << "ScopesWatcher: scope: \"" << scope_id << "\" .so uninstalled from: \""
-                    << parent_path << "\"";
-            }
-        }
-    }
     else
     {
         bool is_install_dir = false;
