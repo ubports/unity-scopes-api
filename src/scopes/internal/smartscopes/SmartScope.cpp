@@ -118,7 +118,7 @@ void SmartQuery::run(SearchReplyProxy const& reply)
         catch (std::exception const& e)
         {
             BOOST_LOG_SEV(ss_client_->logger(), Logger::Error)
-                << "SmartScope::run(): Failed to register filters for scope '" << filters_data.scope_id
+                << "SmartScope::run(): Failed to set filter state for scope '" << filters_data.scope_id
                 << "': " << e.what();
         }
     };
