@@ -266,7 +266,7 @@ TEST(Registry, no_idle_timeout_in_debug_mode)
         cond.notify_one();
     });
 
-    auto reset = [&update_received, &mutex, &cond]
+    auto reset = [&update_received, &mutex]
     {
         std::lock_guard<std::mutex> lock(mutex);
         update_received = false;
@@ -356,7 +356,7 @@ TEST(Registry, manually_started_scope)
         cond.notify_one();
     });
 
-    auto reset = [&update_received, &mutex, &cond]
+    auto reset = [&update_received, &mutex]
     {
         std::lock_guard<std::mutex> lock(mutex);
         update_received = false;
@@ -454,7 +454,7 @@ TEST(Registry, list_update_notify_before_click_folder_exists)
         cond.notify_one();
     });
 
-    auto reset = [&update_received, &mutex, &cond]
+    auto reset = [&update_received, &mutex]
     {
         std::lock_guard<std::mutex> lock(mutex);
         update_received = false;
@@ -517,7 +517,7 @@ TEST(Registry, list_update_notify)
         cond.notify_one();
     });
 
-    auto reset = [&update_received, &mutex, &cond]
+    auto reset = [&update_received, &mutex]
     {
         std::lock_guard<std::mutex> lock(mutex);
         update_received = false;
