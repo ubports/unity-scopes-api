@@ -236,7 +236,6 @@ void DirWatcher::watch_thread()
                     }
                     else
                     {
-                        std::cerr << "file added or moved to: " << event_path << std::endl;
                         watch_event(Added, File, event_path);
                     }
                 }
@@ -248,7 +247,6 @@ void DirWatcher::watch_thread()
                     }
                     else
                     {
-                        std::cerr << "file deleted: " << event_path << std::endl;
                         watch_event(Removed, File, event_path);
                     }
                 }
@@ -261,7 +259,6 @@ void DirWatcher::watch_thread()
                 }
                 else if (event->mask & IN_CLOSE_WRITE)
                 {
-                    std::cerr << "file written: " << event_path << std::endl;
                     watch_event(Modified, File, event_path);
                 }
                 i += sizeof(inotify_event) + event->len;
