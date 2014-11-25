@@ -58,6 +58,7 @@ namespace
     const string debug_mode_key = "DebugMode";
     const string child_scope_ids_key = "ChildScopes";
     const string version_key = "Version";
+    const string tags_key = "Tags";
 
     const string scope_appearance_group = "Appearance";
     const string fg_color_key = "ForegroundColor";
@@ -219,6 +220,22 @@ ScopeConfig::ScopeConfig(string const& configfile) :
     catch (LogicException const&)
     {
         version_ = 0;
+    }
+
+    try
+    {
+        tags_ = parser()->get_string_array(scope_config_group, tags_key);
+    }
+    catch (LogicException const&)
+    {
+    }
+
+    for (auto const& tag: tags_)
+    {
+        if (tag.empty())
+        {
+            throw_ex("Invalid empty tag string found in \"Tags\" list");
+        }
     }
 
     try
@@ -442,6 +459,11 @@ std::vector<std::string> ScopeConfig::child_scope_ids() const
 int ScopeConfig::version() const
 {
     return version_;
+}
+
+std::vector<std::string> ScopeConfig::tags() const
+{
+    return tags_;
 }
 
 } // namespace internal

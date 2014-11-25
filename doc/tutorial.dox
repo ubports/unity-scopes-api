@@ -1061,6 +1061,7 @@ following keys:
     HotKey =
     ResultsTtlType = None, Small, Medium, or Large
     ChildScopes =
+    Tags =
 
     [Appearance]
     ForegroundColor = default text color (defaults to theme-provided foreground color)
@@ -1107,6 +1108,10 @@ might be aggregated by this scope, for example:
 `ChildScopes = com.foo.bar;com.foo.bar2`
 
 This list of scopes is translated to the names of children scopes when in the scopes overview page of the Unity Dash.
+
+The `Tags` key is optional, but we recommend that you use it. The value of `Tags` should specify a list of tags your scope falls
+under. Like `ChildScopes`, the value of the `Tags` key should be a semicolon separated list. Tags are used by aggregators to
+collect results from scopes of similar type (E.g. The Music scope will aggregate scopes with the tag "music", and so on).
 
 \subsection scopetool The scope tool
 

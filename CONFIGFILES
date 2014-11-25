@@ -403,6 +403,14 @@ The following keys are recognized in the ScopeConfig group:
 
   If not set, the default value is false.
 
+- Tags
+
+  A list of tags this scope falls under (if any). The values in this list must be separated by semicolons.
+
+  E.g. "Tags = music;video"
+
+  Note: make sure there are no trailing spaces following the tags, as they will be preserved.
+
 
 The following keys are recognized in the Appearance group:
 
