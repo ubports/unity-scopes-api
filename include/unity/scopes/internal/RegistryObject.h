@@ -57,6 +57,7 @@ public:
 
 public:
     UNITY_DEFINES_PTRS(RegistryObject);
+    NONCOPYABLE(RegistryObject);
 
     RegistryObject(core::posix::ChildProcess::DeathObserver& death_observer, Executor::SPtr const& executor,
                    MiddlewareBase::SPtr middleware, bool generate_desktop_files = false);
@@ -89,13 +90,14 @@ private:
     class ScopeProcess
     {
     public:
+        NONCOPYABLE(ScopeProcess);
+
         enum ProcessState
         {
             Stopped, Starting, Running, Stopping
         };
 
         ScopeProcess(ScopeExecData exec_data, std::weak_ptr<MWPublisher> const& publisher);
-        ScopeProcess(ScopeProcess const& other);
         ~ScopeProcess();
 
         ProcessState state() const;
@@ -139,7 +141,7 @@ private:
     Executor::SPtr executor_;
 
     MetadataMap scopes_;
-    typedef std::map<std::string, ScopeProcess> ProcessMap;
+    typedef std::map<std::string, std::shared_ptr<ScopeProcess>> ProcessMap;
     ProcessMap scope_processes_;
     MWRegistryProxy remote_registry_;
     mutable std::mutex mutex_;
