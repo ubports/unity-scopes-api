@@ -435,7 +435,7 @@ void RegistryObject::ss_list_update()
 {
     if (publisher_)
     {
-        // Send a blank message to subscribers to inform them that the samrt scopes proxy has been updated
+        // Send a blank message to subscribers to inform them that the smart scopes proxy has been updated
         publisher_->send_message("");
     }
 }

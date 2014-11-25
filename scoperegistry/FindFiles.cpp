@@ -22,6 +22,7 @@
 #include <unity/UnityExceptions.h>
 #include <unity/util/ResourcePtr.h>
 
+#include <boost/algorithm/string.hpp>
 #include <boost/filesystem/path.hpp>
 
 #include <map>
@@ -81,8 +82,8 @@ vector<string> find_entries(string const& install_dir, EntryType type)
     return entries;
 }
 
-// Return all files of the form dir/<scomescope>.ini that are regular files or
-// symbolic links and have the specified suffix.
+// Return all files of the form dir/<somescope>.ini (but not <somescope>-setttings.ini)
+// that are regular files or symbolic links and have the specified suffix.
 // The empty suffix is legal and causes all regular files and symlinks to be returned.
 
 map<string, string> find_scope_dir_configs(string const& scope_dir, string const& suffix)
@@ -97,6 +98,10 @@ map<string, string> find_scope_dir_configs(string const& scope_dir, string const
         {
             continue;
         }
+        if (boost::ends_with(path, "-settings.ini"))
+        {
+            continue;
+        }
         auto scope_id = fs_path.stem().native();
         files.insert(make_pair(scope_id, path));
     }
@@ -104,14 +109,14 @@ map<string, string> find_scope_dir_configs(string const& scope_dir, string const
     return files;
 }
 
-// Return all files of the form dir/*/<scomescope>.ini that are regular files or
-// symbolic links and have the specified suffix.
+// Return all files of the form dir/*/<somescope>.ini (but not <somescope>-settings.ini)
+// that are regular files or symbolic links and have the specified suffix.
 // The empty suffix is legal and causes all regular files and symlinks to be returned.
 // Print error message for any scopes with an id that was seen previously.
 
 map<string, string> find_install_dir_configs(string const& install_dir,
                                              string const& suffix,
-                                             function<void(string const&)> error)
+                                             std::function<void(string const&)> error)
 {
     map<string, string> files;
     map<string, string> scopes_seen;

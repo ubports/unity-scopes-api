@@ -142,14 +142,42 @@ void ScopesWatcher::remove_install_dir(std::string const& dir)
     remove_watch(dir);
 }
 
+namespace
+{
+
+bool file_is_empty(std::string const& path)
+{
+    struct stat buf;
+    if (stat(path.c_str(), &buf) == -1)
+    {
+        // We ignore errors because, by the time we get to look,
+        // the file may no longer be there.
+        return true;
+    }
+    return buf.st_size == 0;
+}
+
+}
+
 void ScopesWatcher::add_scope_dir(std::string const& dir, bool notify)
 {
     try
     {
+        // Add a watch for this directory (ignore exception if already exists)
+        try
+        {
+            add_watch(dir);
+        }
+        catch (unity::LogicException const&) {}
+
         auto configs = find_scope_dir_configs(dir, ".ini");
         if (!configs.empty())
         {
             auto config = *configs.cbegin();
+            if (file_is_empty(config.second))
+            {
+                return;  // Wait for event indicating non-empty file, so we don't try parsing it too early.
+            }
             {
                 std::lock_guard<std::mutex> lock(mutex_);
 
@@ -172,13 +200,6 @@ void ScopesWatcher::add_scope_dir(std::string const& dir, bool notify)
                     << dir << "\"" << std::endl;
             }
         }
-
-        // Add a watch for this directory (ignore exception if already exists)
-        try
-        {
-            add_watch(dir);
-        }
-        catch (unity::LogicException const&) {}
     }
     catch (std::exception const& e)
     {
@@ -247,14 +268,7 @@ void ScopesWatcher::watch_event(DirWatcher::EventType event_type,
                 bool non_empty = true;
                 if (event_type == DirWatcher::Added)
                 {
-                    struct stat buf;
-                    if (stat(path.c_str(), &buf) == -1)
-                    {
-                        // We ignore errors because, by the time we get to look,
-                        // the file may no longer be there.
-                        return;
-                    }
-                    non_empty = buf.st_size != 0;
+                    non_empty = !file_is_empty(path);
                 }
                 if (non_empty)
                 {

@@ -16,15 +16,17 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#include <unity/scopes/Runtime.h>
-#include <unity/scopes/Registry.h>
-#include <unity/scopes/SearchMetadata.h>
-#include <unity/scopes/SearchListenerBase.h>
 #include <unity/scopes/CategorisedResult.h>
-#include <gtest/gtest.h>
+#include <unity/scopes/Registry.h>
+#include <unity/scopes/Runtime.h>
+#include <unity/scopes/ScopeExceptions.h>
+#include <unity/scopes/SearchListenerBase.h>
+#include <unity/scopes/SearchMetadata.h>
 
 #include <boost/filesystem/operations.hpp>
+#include <gtest/gtest.h>
 
+#include <chrono>
 #include <condition_variable>
 #include <fstream>
 #include <functional>
@@ -288,8 +290,25 @@ TEST(Registry, no_idle_timeout_in_debug_mode)
     ASSERT_EQ("Success", ec.message());
     filesystem::copy(TEST_RUNTIME_PATH "/other_scopes/testscopeC/libtestscopeC.so", TEST_RUNTIME_PATH "/scopes/testscopeC/libtestscopeC.so", ec);
     ASSERT_EQ("Success", ec.message());
-    // Allow some time for the registryto realize that there is a new scope.
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+    // Wait for the registry to realize that there is a new scope.
+    auto const wait_time = std::chrono::seconds(5);
+    auto start_time = std::chrono::system_clock::now();
+    bool ok = false;
+    do
+    {
+        try
+        {
+            // testscopeC should not be running at this point
+            EXPECT_FALSE(r->is_scope_running("testscopeC"));
+            ok = true;
+        }
+        catch (NotFoundException const&)
+        {
+        }
+    }
+    while (!ok && std::chrono::system_clock::now() - start_time < wait_time);
+    EXPECT_TRUE(ok) << "new scope not recognized after " << wait_time.count() << " seconds";
 
     auto meta = r->get_metadata("testscopeC");
     auto sp = meta.proxy();
@@ -362,11 +381,25 @@ TEST(Registry, manually_started_scope)
     ASSERT_EQ("Success", ec.message());
     filesystem::copy(TEST_RUNTIME_PATH "/other_scopes/testscopeC/libtestscopeC.so", TEST_RUNTIME_PATH "/scopes/testscopeC/libtestscopeC.so", ec);
     ASSERT_EQ("Success", ec.message());
-    // Allow some time for the registryto realize that there is a new scope.
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
-    // testscopeC should not be running at this point
-    EXPECT_FALSE(r->is_scope_running("testscopeC"));
+    // Wait for the registry to realize that there is a new scope.
+    auto const wait_time = std::chrono::seconds(5);
+    auto start_time = std::chrono::system_clock::now();
+    bool ok = false;
+    do
+    {
+        try
+        {
+            // testscopeC should not be running at this point
+            EXPECT_FALSE(r->is_scope_running("testscopeC"));
+            ok = true;
+        }
+        catch (NotFoundException const&)
+        {
+        }
+    }
+    while (!ok && std::chrono::system_clock::now() - start_time < wait_time);
+    EXPECT_TRUE(ok) << "new scope not recognized after " << wait_time.count() << " seconds";
 
     reset();
     // start testscopeC manually
