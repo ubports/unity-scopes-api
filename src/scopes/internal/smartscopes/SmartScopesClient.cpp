@@ -283,6 +283,14 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
             scope.invisible = child_node->has_node("invisible") ? child_node->get_node("invisible")->as_bool() : false;
 
             scope.version = child_node->has_node("version") ? child_node->get_node("version")->as_int() : 0;
+            if (scope.version < 0)
+            {
+                std::cerr << "SmartScopesClient.get_remote_scopes(): Scope: \"" << scope.id
+                          << "\" returned a negative \"version\" value" << std::endl;
+                std::cerr << "SmartScopesClient.get_remote_scopes(): Skipping scope: \""
+                          << scope.id << "\"" << std::endl;
+                continue;
+            }
 
             remote_scopes.push_back(scope);
         }
