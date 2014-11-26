@@ -287,7 +287,6 @@ bool RegistryObject::remove_local_scope(std::string const& scope_id)
                                               "with empty id");
     }
 
-    bool erased = false;
     shared_ptr<ScopeProcess> proc;
     {
         unique_lock<decltype(mutex_)> lock(mutex_);
@@ -296,13 +295,6 @@ bool RegistryObject::remove_local_scope(std::string const& scope_id)
         if (proc_it != scope_processes_.end())
         {
             proc = proc_it->second;
-            scope_processes_.erase(proc_it);
-        }
-
-        erased = scopes_.erase(scope_id) == 1;
-        if (erased)
-        {
-            remove_desktop_file(scope_id);
         }
     }
 
@@ -317,6 +309,18 @@ bool RegistryObject::remove_local_scope(std::string const& scope_id)
         catch (...)
         {
             ex = current_exception();
+        }
+    }
+
+    bool erased = false;
+    {
+        unique_lock<decltype(mutex_)> lock(mutex_);
+
+        scope_processes_.erase(scope_id);
+        erased = scopes_.erase(scope_id) == 1;
+        if (erased)
+        {
+            remove_desktop_file(scope_id);
         }
     }
 
