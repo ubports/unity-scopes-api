@@ -95,6 +95,7 @@ public:
 
 private:
     SSRegistryObject::SPtr reg_;
+    SmartScopesClient::SPtr ss_client_;
 };
 
 }  // namespace smartscopes

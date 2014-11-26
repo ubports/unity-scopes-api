@@ -24,7 +24,6 @@
 #include <unity/scopes/internal/Utils.h>
 
 #include <algorithm>
-#include <iostream>
 #include <sstream>
 #include <string>
 

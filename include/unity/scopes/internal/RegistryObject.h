@@ -23,6 +23,7 @@
 #include <unity/scopes/internal/MWPublisher.h>
 #include <unity/scopes/internal/MWRegistryProxyFwd.h>
 #include <unity/scopes/internal/RegistryObjectBase.h>
+#include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/StateReceiverObject.h>
 
 #include <condition_variable>
@@ -97,7 +98,9 @@ private:
             Stopped, Starting, Running, Stopping
         };
 
-        ScopeProcess(ScopeExecData exec_data, std::weak_ptr<MWPublisher> const& publisher);
+        ScopeProcess(ScopeExecData exec_data,
+                     std::weak_ptr<MWPublisher> const& publisher,
+                     boost::log::sources::severity_channel_logger_mt<>& logger);
         ~ScopeProcess();
 
         ProcessState state() const;
@@ -121,7 +124,6 @@ private:
         std::vector<std::string> expand_custom_exec();
         void publish_state_change(ProcessState scope_state);
 
-    private:
         const ScopeExecData exec_data_;
         ProcessState state_ = Stopped;
         mutable std::mutex process_mutex_;
@@ -129,9 +131,12 @@ private:
         core::posix::ChildProcess process_ = core::posix::ChildProcess::invalid();
         std::weak_ptr<MWPublisher> reg_publisher_; // weak_ptr, so processes don't hold publisher alive
         bool manually_started_;
+        boost::log::sources::severity_channel_logger_mt<>& logger_;
     };
 
 private:
+    boost::log::sources::severity_channel_logger_mt<>& logger_;
+
     core::posix::ChildProcess::DeathObserver& death_observer_;
     core::ScopedConnection death_observer_connection_;
 

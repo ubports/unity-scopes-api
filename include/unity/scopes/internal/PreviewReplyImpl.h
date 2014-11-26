@@ -38,7 +38,9 @@ class QueryObjectBase;
 class PreviewReplyImpl : public virtual unity::scopes::PreviewReply, public virtual ReplyImpl
 {
 public:
-    PreviewReplyImpl(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObjectBase>const & qo);
+    PreviewReplyImpl(MWReplyProxy const& mw_proxy,
+                     std::shared_ptr<QueryObjectBase>const & qo,
+                     boost::log::sources::severity_channel_logger_mt<>& logger);
     virtual ~PreviewReplyImpl();
 
     virtual bool register_layout(unity::scopes::ColumnLayoutList const& layouts) override;

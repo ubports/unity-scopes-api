@@ -40,9 +40,13 @@ class ResultReplyObject;
 namespace experimental
 {
 
+// TODO: This class looks a lot like a union: either it's a Link or it's a GroupedLink, and
+//       some methods apply to one, but not the other (and vice versa). This might be
+//       two classes instead?
+
 /**
- * \brief Query link(s) that result in a new search query when clicked by the user.
- */
+\brief Query link(s) that result in a new search query when clicked by the user.
+*/
 
 class Annotation final
 {
@@ -52,18 +56,18 @@ public:
     /// @endcond
 
     /*!
-     \brief Enumeration of supported Annotation types
-     */
+    \brief Enumeration of supported Annotation types
+    */
     enum Type
     {
         Link, /**< A simple link with just a label and/or an icon */
         GroupedLink /**< A group of links, with a label for the group name and labels for all links inside it */
     };
 
-   /**
-     * \brief Creates annotation of given type. The Type imposes attributes that are
-     * supported or required by that annotation.
-     */
+    /**
+    \brief Creates annotation of given type. The Type imposes attributes that are
+    supported or required by that annotation.
+    */
     explicit Annotation(Type atype);
 
     /**@name Copy and assignment
@@ -81,45 +85,55 @@ public:
     /// @endcond
 
     /**
-     * \brief Sets a label for an annotation. This currently makes sense for Type::GroupedLink only.
-     */
+    \brief Sets a label for an annotation.
+
+    \throws InvalidArgumentException if label is the empty string.
+    \throws LogicException if the type is not Type::GroupedLink.
+    */
     void set_label(std::string const& label);
 
     /**
-     * \brief Sets an icon for an annotation. This currently makes sense for Type::Link.
-     */
+    \brief Sets an icon for an annotation.
+
+    \throws InvalidArgumentException if icon is the empty string.
+    \throws LogicException if the type is not Type::Link.
+    */
     void set_icon(std::string const& icon);
 
     /**
-     * \brief Adds a link to the annotation. There needs to be exactly one link
-     * added for the annotations of type Type::Link
-     * and at least one for Type::GroupedLink. This method
-     * throws InvalidArgumentException if these constraints are violated.
-     */
+    \brief Adds a link to the annotation.
+
+    There needs to be exactly one link added for an annotations of type Type::Link
+    and one or more for Type::GroupedLink.
+    \throws InvalidArgumentException if an attempt is made to add more than one annotation and the
+    type is not Type::GroupedLink.
+    */
     void add_link(std::string const& label, CannedQuery const& query);
 
     /**
-     * \brief Returns label assigned to this annotation. This currently makes sense for Type::GroupedLink only.
-     * \return label The label associated with this annotation.
-     */
+    \brief Returns label assigned to this annotation.
+    \return label The label associated with this annotation.
+    \throws LogicException if the type is not Type::GroupedLink.
+    */
     std::string label() const;
 
     /**
-     * \brief Returns icon assigned to this annotation. This currently only makes sense for Type::Link.
-     * \return The icon associated with this annotation.
-     */
+    \brief Returns icon assigned to this annotation.
+    \return The icon associated with this annotation.
+    \throws LogicException if the type is not Type::Link.
+    */
     std::string icon() const;
 
     /**
-     * \brief Returns all links assigned to given position of this annotation.
-     * \return The link at the given position.
-     */
+    \brief Returns all links assigned to given position of this annotation.
+    \return The link at the given position.
+    */
     std::list<Link::SCPtr> links() const;
 
     /**
-     * \brief Returns the type of this annotation.
-     * \return The type of the annotation.
-     */
+    \brief Returns the type of this annotation.
+    \return The type of the annotation.
+    */
     Type annotation_type() const;
 
     /// @cond

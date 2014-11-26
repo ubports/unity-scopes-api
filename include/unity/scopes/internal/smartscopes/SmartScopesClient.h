@@ -22,6 +22,7 @@
 #include <unity/scopes/FilterState.h>
 #include <unity/scopes/internal/smartscopes/HttpClientInterface.h>
 #include <unity/scopes/internal/JsonNodeInterface.h>
+#include <unity/scopes/internal/Logger.h>
 #include <unity/scopes/internal/UniqueID.h>
 
 #include <unity/util/NonCopyable.h>
@@ -164,6 +165,7 @@ public:
 
     SmartScopesClient(HttpClientInterface::SPtr http_client,
                       JsonNodeInterface::SPtr json_node,
+                      boost::log::sources::severity_channel_logger_mt<>& logger_,
                       std::string const& url = ""); // detect url
 
     virtual ~SmartScopesClient();
@@ -198,6 +200,8 @@ public:
                                 std::string const& country = "",
                                 std::string const& user_agent_hdr = "");
 
+    boost::log::sources::severity_channel_logger_mt<>& logger() const;
+
 private:
     friend class SearchHandle;
     friend class PreviewHandle;
@@ -222,7 +226,7 @@ private:
 private:
     HttpClientInterface::SPtr http_client_;
     JsonNodeInterface::SPtr json_node_;
-
+    boost::log::sources::severity_channel_logger_mt<>& logger_;
     std::string url_;
 
     std::map<unsigned int, HttpResponseHandle::SPtr> query_results_;

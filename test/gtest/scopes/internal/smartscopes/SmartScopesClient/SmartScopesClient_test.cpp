@@ -16,10 +16,11 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#include <unity/scopes/OptionSelectorFilter.h>
-#include <unity/scopes/internal/smartscopes/HttpClientQt.h>
 #include <unity/scopes/internal/JsonCppNode.h>
+#include <unity/scopes/internal/Logger.h>
+#include <unity/scopes/internal/smartscopes/HttpClientQt.h>
 #include <unity/scopes/internal/smartscopes/SmartScopesClient.h>
+#include <unity/scopes/OptionSelectorFilter.h>
 
 #include <unity/UnityExceptions.h>
 
@@ -35,6 +36,8 @@ using namespace unity::scopes::internal;
 using namespace unity::scopes::internal::smartscopes;
 using namespace unity::test::scopes::internal::smartscopes;
 
+BOOST_LOG_INLINE_GLOBAL_LOGGER_DEFAULT(test_logger, boost::log::sources::severity_channel_logger_mt<>)
+
 namespace
 {
 
@@ -47,7 +50,7 @@ public:
           server_(FAKE_SSS_PATH)
     {
         sss_url_ = "http://127.0.0.1:" + std::to_string(server_.port_);
-        ssc_ = std::make_shared<SmartScopesClient>(http_client_, json_node_, sss_url_);
+        ssc_ = std::make_shared<SmartScopesClient>(http_client_, json_node_, test_logger::get(), sss_url_);
     }
 
 protected:
