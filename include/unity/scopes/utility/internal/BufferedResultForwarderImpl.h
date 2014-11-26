@@ -43,7 +43,7 @@ public:
     BufferedResultForwarderImpl(unity::scopes::SearchReplyProxy const& upstream);
     BufferedResultForwarderImpl(unity::scopes::SearchReplyProxy const& upstream, unity::scopes::utility::BufferedResultForwarder::SPtr const& next_forwarder);
 
-    unity::scopes::SearchReplyProxy const& upstream();
+    unity::scopes::SearchReplyProxy upstream() const;
     void push(CategorisedResult result);
     bool is_ready() const;
     void set_ready();
@@ -56,7 +56,7 @@ private:
     bool has_previous_;
     std::atomic<bool> previous_ready_;
     unity::scopes::SearchReplyProxy const upstream_;
-    std::weak_ptr<utility::BufferedResultForwarder> next_;
+    BufferedResultForwarder::SPtr next_;
 };
 
 } // namespace internal

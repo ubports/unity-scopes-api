@@ -102,7 +102,7 @@ protected:
 
     \return The buffered reply proxy.
     */
-    unity::scopes::SearchReplyProxy const& upstream();
+    unity::scopes::SearchReplyProxy upstream() const;
 
     void finished(CompletionDetails const& details) override;
 

@@ -52,7 +52,7 @@ BufferedResultForwarderImpl::BufferedResultForwarderImpl(unity::scopes::SearchRe
     next_forwarder->p->has_previous_ = true;
 }
 
-unity::scopes::SearchReplyProxy const& BufferedResultForwarderImpl::upstream()
+unity::scopes::SearchReplyProxy BufferedResultForwarderImpl::upstream() const
 {
     return upstream_;
 }
@@ -105,10 +105,9 @@ void BufferedResultForwarderImpl::flush_and_notify()
     buf->flush();
 
     // notify next forwarder that this one is ready
-    utility::BufferedResultForwarder::SPtr next(next_.lock());
-    if (next)
+    if (next_)
     {
-        next->p->notify_ready();
+        next_->p->notify_ready();
     }
 }
 

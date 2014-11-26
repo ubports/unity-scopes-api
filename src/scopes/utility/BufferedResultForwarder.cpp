@@ -129,12 +129,14 @@ void AggregatorSearchQueryBase::run(SearchReplyProxy const& upstream_reply)
 */
 
 BufferedResultForwarder::BufferedResultForwarder(unity::scopes::SearchReplyProxy const& upstream)
-    : p(new internal::BufferedResultForwarderImpl(upstream))
+    : SearchListenerBase(),
+      p(new internal::BufferedResultForwarderImpl(upstream))
 {
 }
 
 BufferedResultForwarder::BufferedResultForwarder(unity::scopes::SearchReplyProxy const& upstream, BufferedResultForwarder::SPtr const& next_forwarder)
-    : p(new internal::BufferedResultForwarderImpl(upstream, next_forwarder))
+    : SearchListenerBase(),
+      p(new internal::BufferedResultForwarderImpl(upstream, next_forwarder))
 {
 }
 
@@ -153,7 +155,7 @@ void BufferedResultForwarder::push(CategorisedResult result)
     p->push(result);
 }
 
-unity::scopes::SearchReplyProxy const& BufferedResultForwarder::upstream()
+unity::scopes::SearchReplyProxy BufferedResultForwarder::upstream() const
 {
     return p->upstream();
 }

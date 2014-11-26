@@ -31,7 +31,8 @@ namespace internal
 {
 
 BufferedSearchReplyImpl::BufferedSearchReplyImpl(unity::scopes::SearchReplyProxy const& upstream)
-    : upstream_(upstream),
+    : SearchReply(),
+      upstream_(upstream),
       buffer_(true)
 {
 }
