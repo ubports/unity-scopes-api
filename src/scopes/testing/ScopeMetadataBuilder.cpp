@@ -48,6 +48,7 @@ struct testing::ScopeMetadataBuilder::Private
     Optional<bool> location_data_needed;
     Optional<std::vector<std::string>> child_scope_ids;
     Optional<int> version;
+    Optional<std::vector<std::string>> tags;
 };
 
 testing::ScopeMetadataBuilder::ScopeMetadataBuilder() : p(new Private())
@@ -160,6 +161,12 @@ testing::ScopeMetadataBuilder& testing::ScopeMetadataBuilder::version(Optional<i
     return *this;
 }
 
+testing::ScopeMetadataBuilder& testing::ScopeMetadataBuilder::tags(Optional<std::vector<std::string>> const& value)
+{
+    p->tags = value;
+    return *this;
+}
+
 unity::scopes::ScopeMetadata testing::ScopeMetadataBuilder::operator()() const
 {
     auto impl = new unity::scopes::internal::ScopeMetadataImpl(Private::invalid_middleware);
@@ -193,6 +200,8 @@ unity::scopes::ScopeMetadata testing::ScopeMetadataBuilder::operator()() const
         impl->set_child_scope_ids(*p->child_scope_ids);
     if (p->version)
         impl->set_version(*p->version);
+    if (p->tags)
+        impl->set_tags(*p->tags);
 
     return unity::scopes::internal::ScopeMetadataImpl::create(
                 std::move(
