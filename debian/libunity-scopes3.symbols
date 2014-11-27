@@ -879,6 +879,7 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::testing::ScopeMetadataBuilder::ScopeMetadataBuilder()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::testing::ScopeMetadataBuilder::search_hint(unity::scopes::testing::ScopeMetadataBuilder::Optional<std::basic_string<char, std::char_traits<char>, std::allocator<char> > > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::testing::ScopeMetadataBuilder::settings_definitions(unity::scopes::testing::ScopeMetadataBuilder::Optional<std::vector<unity::scopes::Variant, std::allocator<unity::scopes::Variant> > > const&)@Base" 0replaceme
+ (c++)"unity::scopes::testing::ScopeMetadataBuilder::tags(unity::scopes::testing::ScopeMetadataBuilder::Optional<std::vector<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > > const&)@Base" 0replaceme
  (c++)"unity::scopes::testing::ScopeMetadataBuilder::version(unity::scopes::testing::ScopeMetadataBuilder::Optional<int> const&)@Base" 0replaceme
  (c++)"unity::scopes::testing::StudentsTTest::one_sample(unity::scopes::testing::Sample const&, double, double)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::testing::StudentsTTest::Result::~Result()@Base" 0.4.2+14.04.20140404.2
