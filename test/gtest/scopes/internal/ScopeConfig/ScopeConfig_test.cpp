@@ -57,6 +57,11 @@ TEST(ScopeConfig, basic)
         EXPECT_EQ("com.foo.bar2", children[1]);
         EXPECT_EQ("com.foo.boo", children[2]);
 
+        auto tags = cfg.tags();
+        EXPECT_EQ(2u, tags.size());
+        EXPECT_EQ("foo", tags[0]);
+        EXPECT_EQ("bar", tags[1]);
+
         auto attrs = cfg.appearance_attributes();
         EXPECT_EQ(5, attrs.size());
         EXPECT_TRUE(attrs["arbitrary_key"].get_bool());
@@ -178,6 +183,31 @@ TEST(ScopeConfig, bad_version)
         boost::regex r("unity::scopes::ConfigException: \".*\": Version must be > 0");
         EXPECT_TRUE(boost::regex_match(e.what(), r));
     }
+}
+
+TEST(ScopeConfig, bad_tags)
+{
+    try
+    {
+        ScopeConfig cfg(BAD_TAGS);
+    }
+    catch(ConfigException const& e)
+    {
+        boost::regex r("unity::scopes::ConfigException: \".*\": Invalid empty tag string found in \"Tags\" list");
+        EXPECT_TRUE(boost::regex_match(e.what(), r));
+    }
+}
+
+TEST(ScopeConfig, empty_tags)
+{
+    ScopeConfig cfg(EMPTY_TAGS);
+    EXPECT_EQ(cfg.tags().size(), 0);
+}
+
+TEST(ScopeConfig, single_tag)
+{
+    ScopeConfig cfg(SINGLE_TAG);
+    EXPECT_EQ(cfg.tags().size(), 1);
 }
 
 class ScopeConfigWithIntl: public ::testing::Test

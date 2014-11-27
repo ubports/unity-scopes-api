@@ -11,6 +11,7 @@ Changes in version 0.6.9
     not vice versa).
   - Added missing methods for settings_definitions(), location_data_needed(),
     and child_scope_ids() to testing::ScopeMetadataBuilder.
+  - Added support for Tags scope .ini option.
 
 Changes in version 0.6.8
 ========================

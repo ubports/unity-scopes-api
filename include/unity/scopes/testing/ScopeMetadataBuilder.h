@@ -97,6 +97,7 @@ public:
     ScopeMetadataBuilder& location_data_needed(Optional<bool> const& value);
     ScopeMetadataBuilder& child_scope_ids(Optional<std::vector<std::string>> const& value);
     ScopeMetadataBuilder& version(Optional<int> const& value);
+    ScopeMetadataBuilder& tags(Optional<std::vector<std::string>> const& value);
 
     ScopeMetadata operator()() const;
 
