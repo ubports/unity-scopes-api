@@ -49,20 +49,14 @@ public:
     /// @endcond
 
     /**
-    \brief Create a forwarder that sends results to to its upstream reply proxy.
-
-    \param upstream The reply proxy for the upstream receiver.
-    */
-    BufferedResultForwarder(unity::scopes::SearchReplyProxy const& upstream);
-
-    /**
     \brief Create a forwarder that sends (at least one) result to its upstream
     reply proxy before indicating that it is ready to its follower.
 
     \param upstream The reply proxy for the upstream receiver.
     \param next_forwarder The forwarder that becomes ready once this forwarder calls set_ready().
     */
-    BufferedResultForwarder(unity::scopes::SearchReplyProxy const& upstream, BufferedResultForwarder::SPtr const& next_forwarder);
+    BufferedResultForwarder(unity::scopes::SearchReplyProxy const& upstream, BufferedResultForwarder::SPtr const& next_forwarder =
+            BufferedResultForwarder::SPtr());
 
     /**
     \brief Forwards a single result before calling `set_ready()`.

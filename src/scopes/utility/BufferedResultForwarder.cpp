@@ -82,13 +82,8 @@ results from each of three children and controls the order in which these catego
 class SearchReceiver : public BufferedResultForwarder
 {
 public:
-    SearchReceiver(unity::scopes::Category::SCPtr target_cat, unity::scopes::SearchReplyProxy const& upstream)
-        : BufferedResultForwarder(upstream),
-          category_(target_cat)
-    {
-    }
-
-    SearchReceiver(unity::scopes::Category::SCPtr target_cat, unity::scopes::SearchReplyProxy const& upstream, BufferedResultForwarder::SPtr const& next_forwarder)
+    SearchReceiver(unity::scopes::Category::SCPtr target_cat, unity::scopes::SearchReplyProxy const& upstream, BufferedResultForwarder::SPtr const&
+    next_forwarder = BufferedResultForwarder::SPtr())
         : BufferedResultForwarder(upstream, next_forwarder),
           category_(target_cat)
     {
@@ -117,7 +112,7 @@ void AggregatorSearchQueryBase::run(SearchReplyProxy const& upstream_reply)
     auto scope2fwd = std::make_shared<SearchReceiver>(cat2, upstream_reply, scope3fwd);
     auto scope1fwd = std::make_shared<SearchReceiver>(cat1, upstream_reply, scope2fwd);
 
-    // invoke search for child scopes
+    // invoke search for child scopes; make sure you do this only after all forwarders are created
     subsearch(scope1proxy, "", scope1fwd);
     subsearch(scope2proxy, "", scope2fwd);
     subsearch(scope3proxy, "", scope3fwd);
@@ -127,12 +122,6 @@ void AggregatorSearchQueryBase::run(SearchReplyProxy const& upstream_reply)
 
 \see SearchListenerBase.
 */
-
-BufferedResultForwarder::BufferedResultForwarder(unity::scopes::SearchReplyProxy const& upstream)
-    : SearchListenerBase(),
-      p(new internal::BufferedResultForwarderImpl(upstream))
-{
-}
 
 BufferedResultForwarder::BufferedResultForwarder(unity::scopes::SearchReplyProxy const& upstream, BufferedResultForwarder::SPtr const& next_forwarder)
     : SearchListenerBase(),
