@@ -49,7 +49,10 @@ BufferedResultForwarderImpl::BufferedResultForwarderImpl(unity::scopes::SearchRe
       upstream_(std::make_shared<internal::BufferedSearchReplyImpl>(upstream)),
       next_(next_forwarder)
 {
-    next_forwarder->p->has_previous_ = true;
+    if (next_forwarder)
+    {
+        next_forwarder->p->has_previous_ = true;
+    }
 }
 
 unity::scopes::SearchReplyProxy BufferedResultForwarderImpl::upstream() const
