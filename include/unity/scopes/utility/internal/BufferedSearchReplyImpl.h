@@ -79,7 +79,7 @@ public:
 
 private:
     std::mutex mutex_;
-    unity::scopes::SearchReplyProxy const& upstream_;
+    unity::scopes::SearchReplyProxy upstream_;
     std::atomic<bool> buffer_;
     std::vector<CategorisedResult> results_;
 };
