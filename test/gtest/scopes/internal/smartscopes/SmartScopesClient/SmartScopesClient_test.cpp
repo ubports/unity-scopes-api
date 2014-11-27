@@ -68,11 +68,11 @@ TEST_F(SmartScopesClientTest, remote_scopes)
 
     // now try an empty locale
     EXPECT_TRUE(ssc_->get_remote_scopes(scopes, "", false));
-    ASSERT_EQ(5u, scopes.size());
+    ASSERT_EQ(4u, scopes.size());
 
     // now try a valid locale
     EXPECT_TRUE(ssc_->get_remote_scopes(scopes, "test_TEST", false));
-    ASSERT_EQ(5u, scopes.size());
+    ASSERT_EQ(4u, scopes.size());
 
     EXPECT_EQ("dummy.scope", scopes[0].id);
     EXPECT_EQ("Dummy Demo Scope", scopes[0].name);
@@ -85,6 +85,7 @@ TEST_F(SmartScopesClientTest, remote_scopes)
     EXPECT_EQ(0, scopes[0].version);
     EXPECT_EQ(nullptr, scopes[0].appearance);
     EXPECT_EQ(nullptr, scopes[0].settings);
+    EXPECT_TRUE(scopes[0].tags.empty());
 
     EXPECT_EQ("dummy.scope.2", scopes[1].id);
     EXPECT_EQ("Dummy Demo Scope 2", scopes[1].name);
@@ -98,6 +99,7 @@ TEST_F(SmartScopesClientTest, remote_scopes)
     EXPECT_EQ("#00BEEF", (*scopes[1].appearance)["background"].get_string());
     EXPECT_EQ("logo.png", (*scopes[1].appearance)["PageHeader"].get_dict()["logo"].get_string());
     EXPECT_EQ(nullptr, scopes[1].settings);
+    EXPECT_TRUE(scopes[1].tags.empty());
 
     EXPECT_EQ("dummy.scope.3", scopes[2].id);
     EXPECT_EQ("Dummy Demo Scope 3", scopes[2].name);
@@ -115,6 +117,11 @@ TEST_F(SmartScopesClientTest, remote_scopes)
               "\"defaultValue\":23},\"type\":\"number\"},{\"displayName\":\"Enabled\",\"id\":"
               "\"enabled\",\"parameters\":{\"defaultValue\":true},\"type\":\"boolean\"}]\n",
               *scopes[2].settings);
+    ASSERT_EQ(4, scopes[2].tags.size());
+    EXPECT_EQ("music", scopes[2].tags[0]);
+    EXPECT_EQ("video", scopes[2].tags[1]);
+    EXPECT_EQ("news", scopes[2].tags[2]);
+    EXPECT_EQ("games", scopes[2].tags[3]);
 }
 
 TEST_F(SmartScopesClientTest, search)

@@ -157,6 +157,11 @@ int ScopeMetadata::version() const
     return p->version();
 }
 
+std::vector<std::string> ScopeMetadata::tags() const
+{
+    return p->tags();
+}
+
 //! @endcond
 
 } // namespace scopes
