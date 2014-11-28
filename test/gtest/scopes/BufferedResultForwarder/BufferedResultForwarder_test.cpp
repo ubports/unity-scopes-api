@@ -21,6 +21,7 @@
 #include <unity/scopes/CategoryRenderer.h>
 #include <unity/scopes/testing/MockSearchReply.h>
 #include <unity/scopes/testing/Category.h>
+#include <unity/UnityExceptions.h>
 
 using namespace unity::scopes;
 using namespace unity::scopes::utility;
@@ -312,4 +313,17 @@ TEST(BufferedResultForwarder, no_results_from_first_scope)
     CompletionDetails status(CompletionDetails::CompletionStatus::OK);
     base2->finished(status);
     base1->finished(status);
+}
+
+TEST(BufferedResultForwarder, exceptions)
+{
+    NiceMock<unity::scopes::testing::MockSearchReply> reply;
+    unity::scopes::SearchReplyProxy upstream
+    {
+        &reply, [](unity::scopes::SearchReply*) {}
+    };
+
+    auto fwd3 = std::make_shared<SearchReceiver>(upstream);
+    auto fwd2 = std::make_shared<SearchReceiver>(upstream, fwd3);
+    EXPECT_THROW(std::make_shared<SearchReceiver>(upstream, fwd3), unity::InvalidArgumentException);
 }

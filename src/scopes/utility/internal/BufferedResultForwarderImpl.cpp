@@ -19,6 +19,7 @@
 #include <unity/scopes/utility/internal/BufferedResultForwarderImpl.h>
 #include <unity/scopes/utility/internal/BufferedSearchReplyImpl.h>
 #include <unity/scopes/SearchReply.h>
+#include <unity/UnityExceptions.h>
 #include <cassert>
 
 namespace unity
@@ -51,6 +52,10 @@ BufferedResultForwarderImpl::BufferedResultForwarderImpl(unity::scopes::SearchRe
 {
     if (next_forwarder)
     {
+        if (next_forwarder->p->has_previous_)
+        {
+            throw InvalidArgumentException("The next forwarder has already been linked to another BufferedResultForwarder");
+        }
         next_forwarder->p->has_previous_ = true;
     }
 }
