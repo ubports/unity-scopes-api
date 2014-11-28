@@ -21,6 +21,7 @@
 #include <boost/log/attributes.hpp>
 #include <boost/log/core.hpp>
 #include <boost/log/expressions.hpp>
+#include <boost/log/sources/record_ostream.hpp>
 #include <boost/log/support/date_time.hpp>
 #include <boost/log/trivial.hpp>
 #include <boost/utility/empty_deleter.hpp>
@@ -46,27 +47,24 @@ namespace internal
 namespace
 {
 
-// TODO: Not sure how to hook this onto the formatter yet.
-#if 0
-string severity(int s)
+string const& severity(int s)
 {
     static array<string, 5> const severities = { "TRACE", "INFO", "WARNING", "ERROR", "FATAL" };
+    static string const unknown = "UNKNOWN";
 
     if (s < 0 || s >= static_cast<int>(severities.size()))
     {
-        return "UNKNOWN(" + to_string(s) + ")";
+        return unknown;
     }
     return severities[s];
 }
-#endif
 
-boost::log::basic_formatter<char> format(string const& scope_id)
+void formatter(logging::record_view const& rec, logging::formatting_ostream& strm, string const& scope_id)
 {
-    return expr::format("%1% [%2%] %3%: %4%")
-                        % expr::attr<int>("Severity")
-                        % expr::format_date_time<boost::posix_time::ptime>("TimeStamp", "%Y-%m-%d %H:%M:%S.%f")
-                        % scope_id
-                        % expr::smessage;
+    strm << "[" << expr::format_date_time<boost::posix_time::ptime>("TimeStamp", "%Y-%m-%d %H:%M:%S.%f")(rec) << "] "
+         << severity(expr::attr<int>("Severity")(rec).get()) << ": "
+         << scope_id << ": "
+         << rec[expr::smessage];
 }
 
 }
@@ -88,13 +86,15 @@ Logger::Logger(string const& scope_id)
     , logger_(keywords::channel = to_string(reinterpret_cast<ptrdiff_t>(this)))
     , severity_(Logger::Info)
 {
+    namespace ph = std::placeholders;
+
     assert(!scope_id_.empty());
 
     logger_.add_attribute("TimeStamp", attrs::local_clock());
 
     // Set up sink that logs to std::clog.
     clog_sink_ = boost::make_shared<ClogSinkT>();
-    clog_sink_->set_formatter(format(scope_id));
+    clog_sink_->set_formatter(std::bind(formatter, ph::_1, ph::_2, scope_id));
     boost::shared_ptr<std::ostream> console_stream(&std::clog, boost::empty_deleter());
     clog_sink_->locked_backend()->add_stream(console_stream);
     logging::core::get()->add_sink(clog_sink_);
@@ -121,6 +121,8 @@ Logger::operator src::severity_channel_logger_mt<>&()
 
 void Logger::set_log_file(string const& path)
 {
+    namespace ph = std::placeholders;
+
     FileSinkPtr s = boost::make_shared<FileSinkT>(
                         keywords::file_name = path + "_%N.log",
                         keywords::rotation_size = 5 * 1024 * 1024,
@@ -135,7 +137,7 @@ void Logger::set_log_file(string const& path)
     }
     file_sink_ = s;
     set_severity_threshold(severity_);
-    file_sink_->set_formatter(format(scope_id_));
+    file_sink_->set_formatter(std::bind(formatter, ph::_1, ph::_2, scope_id_));
     logging::core::get()->add_sink(s);
 }
 

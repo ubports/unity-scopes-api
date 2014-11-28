@@ -551,9 +551,9 @@ MWQueryCtrlProxy ZmqMiddleware::add_query_ctrl_object(QueryCtrlObjectBase::SPtr 
         proxy = ZmqQueryCtrlProxy(new ZmqQueryCtrl(this, p->endpoint(), p->identity(), ctrl_category));
         adapter->activate();
     }
-    catch (std::exception const& e) // Should never happen unless our implementation is broken
+    catch (std::exception const& e)  // Can happen during shutdown
     {
-        BOOST_LOG_SEV(logger_, Logger::Error) << "unexpected exception in add_query_ctrl_object(): " << e.what();
+        BOOST_LOG_SEV(logger_, Logger::Error) << "exception in add_query_ctrl_object(): " << e.what();
         throw;
     }
     return proxy;
@@ -571,9 +571,9 @@ void ZmqMiddleware::add_dflt_query_ctrl_object(QueryCtrlObjectBase::SPtr const& 
         ctrl->set_disconnect_function(df);
         adapter->activate();
     }
-    catch (std::exception const& e) // Should never happen unless our implementation is broken
+    catch (std::exception const& e)  // Can happen during shutdown
     {
-        BOOST_LOG_SEV(logger_, Logger::Error) << "unexpected exception in add_dflt_query_ctrl_object(): " << e.what();
+        BOOST_LOG_SEV(logger_, Logger::Error) << "exception in add_dflt_query_ctrl_object(): " << e.what();
         throw;
     }
 }
@@ -593,9 +593,9 @@ MWQueryProxy ZmqMiddleware::add_query_object(QueryObjectBase::SPtr const& query)
         proxy = ZmqQueryProxy(new ZmqQuery(this, p->endpoint(), p->identity(), query_category));
         adapter->activate();
     }
-    catch (std::exception const& e) // Should never happen unless our implementation is broken
+    catch (std::exception const& e)  // Can happen during shutdown
     {
-        BOOST_LOG_SEV(logger_, Logger::Error) << "unexpected exception in add_query_object(): " << e.what();
+        BOOST_LOG_SEV(logger_, Logger::Error) << "exception in add_query_object(): " << e.what();
         throw;
     }
     return proxy;
@@ -613,9 +613,9 @@ void ZmqMiddleware::add_dflt_query_object(QueryObjectBase::SPtr const& query)
         query->set_disconnect_function(df);
         adapter->activate();
     }
-    catch (std::exception const& e) // Should never happen unless our implementation is broken
+    catch (std::exception const& e)  // Can happen during shutdown
     {
-        BOOST_LOG_SEV(logger_, Logger::Error) << "unexpected exception in add_dflt_query_object(): " << e.what();
+        BOOST_LOG_SEV(logger_, Logger::Error) << "exception in add_dflt_query_object(): " << e.what();
         throw;
     }
 }
@@ -637,9 +637,9 @@ MWRegistryProxy ZmqMiddleware::add_registry_object(string const& identity, Regis
         proxy = ZmqRegistryProxy(new ZmqRegistry(this, p->endpoint(), p->identity(), registry_category, twoway_timeout_));
         adapter->activate();
     }
-    catch (std::exception const& e) // Should never happen unless our implementation is broken
+    catch (std::exception const& e)  // Can happen during shutdown
     {
-        BOOST_LOG_SEV(logger_, Logger::Error) << "unexpected exception in add_registry_object(): " << e.what();
+        BOOST_LOG_SEV(logger_, Logger::Error) << "exception in add_registry_object(): " << e.what();
         throw;
     }
     return proxy;
@@ -660,9 +660,9 @@ MWReplyProxy ZmqMiddleware::add_reply_object(ReplyObjectBase::SPtr const& reply)
         proxy = ZmqReplyProxy(new ZmqReply(this, p->endpoint(), p->identity(), reply_category));
         adapter->activate();
     }
-    catch (std::exception const& e) // Should never happen unless our implementation is broken
+    catch (std::exception const& e)  // Can happen during shutdown
     {
-        BOOST_LOG_SEV(logger_, Logger::Error) << "unexpected exception in add_reply_object(): " << e.what();
+        BOOST_LOG_SEV(logger_, Logger::Error) << "exception in add_reply_object(): " << e.what();
         throw;
     }
     return proxy;
@@ -684,9 +684,9 @@ MWScopeProxy ZmqMiddleware::add_scope_object(string const& identity, ScopeObject
         proxy = ZmqScopeProxy(new ZmqScope(this, p->endpoint(), p->identity(), scope_category, twoway_timeout_));
         adapter->activate();
     }
-    catch (std::exception const& e) // Should never happen unless our implementation is broken
+    catch (std::exception const& e)  // Can happen during shutdown
     {
-        BOOST_LOG_SEV(logger_, Logger::Error) << "unexpected exception in add_scope_object(): " << e.what();
+        BOOST_LOG_SEV(logger_, Logger::Error) << "exception in add_scope_object(): " << e.what();
         throw;
     }
     return proxy;
@@ -704,9 +704,9 @@ void ZmqMiddleware::add_dflt_scope_object(ScopeObjectBase::SPtr const& scope)
         scope->set_disconnect_function(df);
         adapter->activate();
     }
-    catch (std::exception const& e) // Should never happen unless our implementation is broken
+    catch (std::exception const& e)  // Can happen during shutdown
     {
-        BOOST_LOG_SEV(logger_, Logger::Error) << "unexpected exception in add_dflt_scope_object(): " << e.what();
+        BOOST_LOG_SEV(logger_, Logger::Error) << "exception in add_dflt_scope_object(): " << e.what();
         throw;
     }
 }
@@ -729,9 +729,9 @@ MWStateReceiverProxy ZmqMiddleware::add_state_receiver_object(std::string const&
         proxy = ZmqStateReceiverProxy(new ZmqStateReceiver(this, p->endpoint(), p->identity(), state_category));
         adapter->activate();
     }
-    catch (std::exception const& e) // Should never happen unless our implementation is broken
+    catch (std::exception const& e)  // Can happen during shutdown
     {
-        BOOST_LOG_SEV(logger_, Logger::Error) << "unexpected exception in add_state_receiver_object(): " << e.what();
+        BOOST_LOG_SEV(logger_, Logger::Error) << "exception in add_state_receiver_object(): " << e.what();
         throw;
     }
     return proxy;
