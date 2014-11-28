@@ -54,6 +54,7 @@ public:
 
     \param upstream The reply proxy for the upstream receiver.
     \param next_forwarder The forwarder that becomes ready once this forwarder calls set_ready().
+    \throws unity::InvalidArgumentException when passed next_forwarder that has already been linked to another BufferedResultForwarder.
     */
     BufferedResultForwarder(unity::scopes::SearchReplyProxy const& upstream, BufferedResultForwarder::SPtr const& next_forwarder =
             BufferedResultForwarder::SPtr());
