@@ -57,8 +57,6 @@ namespace internal
 
 RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
 {
-    Logger* logger_p = nullptr;  // Yes, we *really* need a raw pointer here.
-
     try
     {
         lock_guard<mutex> lock(mutex_);
@@ -74,8 +72,7 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
 
         // Until we know where the scope's cache directory is,
         // we use a logger that logs to std::clog.
-        logger_p = new Logger(scope_id_);
-        auto logger = (boost::log::sources::severity_channel_logger_mt<>&)(*logger_p);
+        logger_.reset(new Logger(scope_id_));
 
         // Create the middleware factory and get the registry identity and config filename.
         RuntimeConfig config(configfile);
@@ -98,7 +95,7 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
 
         if (registry_configfile_.empty() || registry_identity_.empty())
         {
-            BOOST_LOG_SEV(logger, Logger::Warning) << "no registry configured";
+            BOOST_LOG_SEV(logger(), Logger::Warning) << "no registry configured";
             registry_identity_ = "";
         }
         else
@@ -112,10 +109,6 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
         cache_dir_ = config.cache_directory();
         app_dir_ = config.app_directory();
         config_dir_ = config.config_directory();
-
-        // Now that nothing can throw anymore, give the logger pointer to logger_,
-        // which will deallocate eventually.
-        logger_.reset(logger_p);
     }
     catch (unity::Exception const& e)
     {
@@ -123,16 +116,7 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
         string msg = "Cannot instantiate run time for " + (scope_id.empty() ? "client" : scope_id) +
                      ", config file: " + configfile;
         ConfigException ex(msg);
-        if (logger_p)
-        {
-            auto logger = (boost::log::sources::severity_channel_logger_mt<>&)(*logger_p);
-            BOOST_LOG_SEV(logger, Logger::Error) << ex.what();
-            delete logger_p;
-        }
-        else
-        {
-            cerr << ex.what() << endl;
-        }
+        BOOST_LOG_SEV(logger(), Logger::Error) << ex.what();
         throw ex;
     }
 }
