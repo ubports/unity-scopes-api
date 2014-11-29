@@ -13,6 +13,9 @@ unity-scopes-api (0.6.9-0ubuntu1) UNRELEASED; urgency=medium
   [ Marcus Tomlinson ]
   * Added support for Tags scope .ini option.
 
+  [ Ubuntu daily release ]
+  * debian/libunity-scopes3.symbols: auto-update to released version
+
  -- Marcus Tomlinson <marcus.tomlinson@canonical.com>  Wed, 26 Nov 2014 09:36:56 +0200
 
 unity-scopes-api (0.6.8+15.04.20141119-0ubuntu1) vivid; urgency=medium
