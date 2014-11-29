@@ -16,8 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_INTERNAL_RADIOBUTTONSFILTERIMPL_H
-#define UNITY_INTERNAL_RADIOBUTTONSFILTERIMPL_H
+#pragma once
 
 #include <unity/scopes/internal/OptionSelectorFilterImpl.h>
 #include <unity/scopes/RadioButtonsFilter.h>
@@ -48,5 +47,3 @@ public:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

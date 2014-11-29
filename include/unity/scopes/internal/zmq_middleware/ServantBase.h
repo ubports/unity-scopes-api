@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_SERVANTBASE_H
-#define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_SERVANTBASE_H
+#pragma once
 
 #include <capnp/dynamic.h>
 #include <scopes/internal/zmq_middleware/capnproto/Message.capnp.h>
@@ -79,5 +78,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

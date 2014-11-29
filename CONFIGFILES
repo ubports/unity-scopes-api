@@ -92,9 +92,9 @@ The following keys are recognized:
   config group, otherwise the middleware can prematurely conclude that
   a locate() request failed to start a scope.
 
-- DataDir
+- CacheDir
 
-  The parent directory under which the run time writes scope-specific data files
+  The parent directory under which a scope can write scope-specific data files
   (such as caches).
 
   The default value is $HOME/.local/share/unity-scopes.
@@ -104,6 +104,22 @@ The following keys are recognized:
 
   $HOME/.local/share/unity-scopes/leaf-net/<scope_id>/some_file (for confined scopes)
   and $HOME/.local/share/unity-scopes/unconfined/<scope_id>/some_file (for unconfined scopes).
+
+- AppDir
+
+  The parent directory under which a scope can read data provided by an
+  app that was installed from the same click package.
+
+  The default value is $HOME/.local/share.
+
+  Note that the actual directory is a subdirectory of
+  this directory, for example:
+
+  $HOME/.local/share/<app-pkgname>
+
+  The app has read/write permission for this directory and the files in it,
+  the scope has read-only permission, so communication is from the app to
+  the scope, not vice versa.
 
 - ConfigDir
 
@@ -115,6 +131,7 @@ The following keys are recognized:
   directory. Specifically:
 
   $HOME/.config/unity-scopes/<scope_id>/settings.ini
+
 
 Zmq.ini
 -------
@@ -311,6 +328,15 @@ The following keys are recognized in the ScopeConfig group:
 
   The author of the scope (mandatory).
 
+- Version
+
+  A integer describing the scope version. The setting is optional, but we strongly
+  recommend to set it. If the behavior of your scope changes in any way that is
+  visible to the query source (such having added or removed a result attribute),
+  you should increment the version number. This allows an aggregating scope to
+  adjust its behavior according to which version of your scope is installed.
+  If not set, the default value is 0. You can set the value to any integer >= 1.
+
 - Art
 
   Artwork to be shown for the scope. The default value is the empty string.
@@ -326,6 +352,15 @@ The following keys are recognized in the ScopeConfig group:
 - HotKey
 
   The hot key for the scope. The default value is the empty string.
+
+- ChildScopes
+
+  The list of ids of scopes aggregated by this scope (if any). The values in this list
+  must be separated by semicolons. This list is translated to the names of
+  children scopes when in the scopes overview page of the Unity Dash.
+
+  Note: make sure there are no trailing spaces following
+  the ids, as they will be preserved.
 
 - Invisible
 
@@ -367,6 +402,14 @@ The following keys are recognized in the ScopeConfig group:
   location data.)
 
   If not set, the default value is false.
+
+- Tags
+
+  A list of tags this scope falls under (if any). The values in this list must be separated by semicolons.
+
+  E.g. "Tags = music;video"
+
+  Note: make sure there are no trailing spaces following the tags, as they will be preserved.
 
 
 The following keys are recognized in the Appearance group:

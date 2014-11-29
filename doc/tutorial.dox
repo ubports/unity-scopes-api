@@ -188,7 +188,7 @@ scope works. For example, for a music scope, the default results could be someth
 and "Recently Played"; similarly, for a weather scope, the default results could be for the weather
 report for the current location. As the scope author, you need to decide what is most appropriate
 to show in surfacing mode. In the interests of a good user experience, it is important to show _something_
-here (if at all possible), so the user gets to to see at least some results (instead of being confronted with
+here (if at all possible), so the user gets to see at least some results (instead of being confronted with
 a blank screen).
 
 \paragraph querybase Implementing QueryBase
@@ -206,16 +206,15 @@ Two important methods of `SerchReply` are \link unity::scopes::SearchReply::regi
 and \link unity::scopes::SearchReply::push push()\endlink.
 
 `register_category()` is a factory method that registers new categories for the results of this query (see
-\link unity::scopes::Category\endlink). You can create new categories at any point during query processing, 
-but we recommend to create them in advance, if possible. Categories serve to visually group query results
-in some way; the UI typically renders categories in the same order as you registered them (but may choose
-to override the order for some categories). When you push results for a query, you indicate which
+\link unity::scopes::Category\endlink). You can create new categories at any point during query processing. 
+Categories serve to visually group query results in some way;
+when you push results for a query, you indicate which
 category each particular result belongs to, and the UI renders that result in the corresponding
-visual group.
-
-You can create a new category later, after you have already registered some categories and pushed
-a number of results for them. If you do, the newly created category renders after (or below)
-any of the categories you registered initially.
+visual group. Categories are rendered in the order in which they are encountered by the UI
+as you push your results. If you want to control the order in which categories are rendered
+(for examples, such that a "Breaking News" category always appears first), you may need to
+buffer the results you receive from your back-end data source until you get a result for that
+category, and then push that result, plus any other buffered results.
 
 Pre-registering categories is the preferred approach because it allows the UI to reserve space
 and perform layout chores before any query results arrive. (In turn, this permits the UI to
@@ -761,6 +760,34 @@ if (it != s.end())                         // Setting does not have a default va
 }
 ~~~
 
+\subsection directories File system access
+
+Scopes that are installed from click packages are subject to confinement and are not allowed
+to access most parts of the file system. However, a few locations are available to a scope.
+You can access these paths by calling methods on \link unity::scopes::ScopeBase ScopeBase\endlink.
+
+\note Do not call these methods from the constructor of your `ScopeBase` implementation. If you
+do, these methods throw `LogicException`. Instead, call them from
+\link unity::scopes::ScopeBase::start() start()\endlink or any time thereafter.
+
+\link unity::scopes::ScopeBase::scope_directory() scope_directory()\endlink returns the path of the installation
+directory of the scope. This directory contains the scope's `.so` and `.ini` files, plus whatever other
+files you decide to package with your scope. The scope has read-only permission for this directory.
+
+\link unity::scopes::ScopeBase::cache_directory() cache_directory()\endlink returns the path of a
+directory that is (exclusively) writable for the scope. You can use this directory to store
+persistent information, such as a cache of results.
+
+\link unity::scopes::ScopeBase::app_directory() app_directory()\endlink returns the path of a
+read-only directory. If the scope is packaged together with an app, the app has permission to write
+files in this location, that is, this directory can be used make information provided by the app
+available to the scope (but not vice versa).
+
+\link unity::scopes::ScopeBase::tmp_directory() tmp_directory()\endlink returns the path of a
+read-only directory that is (exclusively) writable for the scope. This directory is periodically
+cleaned of unused files. The exact amount of time may vary, but is on the order of a few hours.
+The directory is also cleaned during reboot.
+
 \subsection online_accounts Online Accounts
 
 A scope may require access to an online account in order to evaluate particular results, perform certain actions, or
@@ -1027,11 +1054,14 @@ following keys:
     DisplayName = human readable name of scope
     Description = description of scope
     Author = Author
+    Version = 1
     Icon = path to icon representing the scope
     Art = path to screenshot of the scope
     SearchHint = hint text displayed to user when viewing scope
     HotKey =
     ResultsTtlType = None, Small, Medium, or Large
+    ChildScopes =
+    Tags =
 
     [Appearance]
     ForegroundColor = default text color (defaults to theme-provided foreground color)
@@ -1051,6 +1081,13 @@ The `ScopeConfig` group is mandatory and must contain settings for at least `Dis
 
 `Description[de_DE] = Fu&szlig;ballergebnisse`
 
+The `Version` key is optional, but we strongly recommend that you set it.
+If the behavior of your scope changes in any way that is visible to the query source
+(such having added or removed a result attribute), you should increment the version number.
+This allows an aggregating scope to adjust its behavior according to which version of
+your scope is installed.
+If not set, the default value is 0. You can set the value to any integer >= 1.
+
 In addition to allowing the registry to make the scope available, this information controls how the scope appears
 in the "Scopes" scope.
 
@@ -1064,6 +1101,17 @@ Some of the `Appearance` keys (like `PageHeader.Background`) require background 
 <li>/absolute/path/to/image</li>
 <li>http://remote-server.com/path/to/image</li>
 </ul>
+
+The value of `ChildScopes` key is to be used by aggregator scopes. It must be a semicolon separated list of scope identifiers that
+might be aggregated by this scope, for example:
+
+`ChildScopes = com.foo.bar;com.foo.bar2`
+
+This list of scopes is translated to the names of children scopes when in the scopes overview page of the Unity Dash.
+
+The `Tags` key is optional, but we recommend that you use it. Tags are used by aggregators to collect results from scopes of
+similar type (E.g. The Music scope will aggregate scopes with the tag "music", and so on). The value of `Tags` should specify a
+list of tags your scope falls under. Like `ChildScopes`, this value must be a semicolon separated list (E.g. `Tags = music;video`).
 
 \subsection scopetool The scope tool
 

@@ -16,9 +16,6 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef TESTEXPORTS_H
-#define TESTEXPORTS_H
+#pragma once
 
 #define EXPORT __attribute__ ((visibility ("default")))
-
-#endif

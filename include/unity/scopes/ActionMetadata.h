@@ -16,8 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_ACTIONMETADATA_H
-#define UNITY_SCOPES_ACTIONMETADATA_H
+#pragma once
 
 #include <unity/scopes/QueryMetadata.h>
 #include <unity/scopes/Variant.h>
@@ -131,5 +130,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

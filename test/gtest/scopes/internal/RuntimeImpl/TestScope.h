@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef TEST_TESTSCOPE_H
-#define TEST_TESTSCOPE_H
+#pragma once
 
 #include <unity/scopes/ScopeBase.h>
 
@@ -49,5 +48,3 @@ private:
     std::condition_variable cond_;
     bool started_;
 };
-
-#endif

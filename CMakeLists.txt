@@ -69,6 +69,7 @@ pkg_check_modules(LIBURCU_BP liburcu-bp REQUIRED)
 pkg_check_modules(JSONCPP jsoncpp REQUIRED)
 pkg_check_modules(LIBACCOUNTS REQUIRED libaccounts-glib)
 pkg_check_modules(LIBSIGNON REQUIRED libsignon-glib)
+pkg_check_modules(ZMQLIB libzmq REQUIRED)
 
 find_program(LTTNG_EXECUTABLE lttng)
 if (NOT LTTNG_EXECUTABLE)
@@ -195,16 +196,11 @@ set(UNITY_SCOPES_LIB unity-scopes)
 # API version
 set(UNITY_SCOPES_MAJOR 0)
 set(UNITY_SCOPES_MINOR 6)
-set(UNITY_SCOPES_MICRO 8)
+set(UNITY_SCOPES_MICRO 9)
 set(UNITY_SCOPES_SOVERSION 3)
 
 # Version for testing, with all symbols visible
 set(UNITY_SCOPES_TEST_LIB ${UNITY_SCOPES_LIB}-test)
-
-find_library(ZMQLIB zmq)
-if(NOT ZMQLIB)
-  message(FATAL_ERROR "Zmq lib not found.")
-endif()
 
 find_library(ZMQPPLIB zmqpp)
 if(NOT ZMQPPLIB)
@@ -227,6 +223,13 @@ if(NOT DLLIB)
 endif()
 
 
+# Stop complaints during the generation phase about executables depending
+# on Qt5::Core and Qt5::Network. They are bogus because only
+# only smartscopes uses these.
+if(POLICY CMP0028)
+    cmake_policy(SET CMP0028 OLD)
+endif()
+
 # Other libraries we depend on
 set(OTHER_LIBS
     ${OTHER_LIBS}
@@ -234,7 +237,7 @@ set(OTHER_LIBS
     ${JSONCPP_LDFLAGS}
     ${PROCESS_CPP_LDFLAGS}
     ${ZMQPPLIB}
-    ${ZMQLIB}
+    ${ZMQLIB_LDFLAGS}
     ${CAPNPLIB}
     ${KJLIB}
     ${DLLIB}

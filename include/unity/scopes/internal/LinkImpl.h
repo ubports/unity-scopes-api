@@ -16,8 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_HYPERLINKIMPL_H
-#define UNITY_SCOPES_INTERNAL_HYPERLINKIMPL_H
+#pragma once
 
 #include <string>
 #include <memory>
@@ -52,5 +51,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

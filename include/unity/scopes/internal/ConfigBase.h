@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_CONFIGBASE_H
-#define UNITY_SCOPES_INTERNAL_CONFIGBASE_H
+#pragma once
 
 #include <unity/util/IniParser.h>
 
@@ -78,5 +77,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

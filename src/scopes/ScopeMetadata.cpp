@@ -147,6 +147,21 @@ bool ScopeMetadata::location_data_needed() const
     return p->location_data_needed();
 }
 
+std::vector<std::string> ScopeMetadata::child_scope_ids() const
+{
+    return p->child_scope_ids();
+}
+
+int ScopeMetadata::version() const
+{
+    return p->version();
+}
+
+std::vector<std::string> ScopeMetadata::tags() const
+{
+    return p->tags();
+}
+
 //! @endcond
 
 } // namespace scopes

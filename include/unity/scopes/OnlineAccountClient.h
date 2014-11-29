@@ -16,8 +16,7 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_ONLINEACCOUNTCLIENT_H
-#define UNITY_SCOPES_ONLINEACCOUNTCLIENT_H
+#pragma once
 
 #include <unity/scopes/CannedQuery.h>
 #include <unity/scopes/PreviewWidget.h>
@@ -169,5 +168,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

@@ -16,8 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_CATEGORYRENDERER_H
-#define UNITY_SCOPES_CATEGORYRENDERER_H
+#pragma once
 
 #include <string>
 #include <memory>
@@ -134,5 +133,3 @@ bool operator==(const CategoryRenderer&, const CategoryRenderer&);
 } // namespace scopes
 
 } // namespace unity
-
-#endif

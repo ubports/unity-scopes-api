@@ -88,6 +88,13 @@ TEST(ScopeMetadataBuilder, construct_full)
     unity::scopes::VariantMap appearance_attrs;
     appearance_attrs.emplace("background", unity::scopes::Variant("white"));
 
+    unity::scopes::VariantMap a_setting;
+    a_setting.emplace("number", unity::scopes::Variant(42));
+    unity::scopes::VariantArray settings_defs;
+    settings_defs.push_back(unity::scopes::Variant(a_setting));
+
+    std::vector<std::string> child_scope_ids{ "joe", "mary" };
+
     unity::scopes::testing::ScopeMetadataBuilder builder;
     builder.scope_id(scope_id)
         .proxy(std::make_shared<unity::scopes::testing::MockScope>())
@@ -101,7 +108,11 @@ TEST(ScopeMetadataBuilder, construct_full)
         .invisible(true)
         .appearance_attributes(appearance_attrs)
         .scope_directory(std::string("scope_dir"))
-        .results_ttl_type(unity::scopes::ScopeMetadata::ResultsTtlType::Large);
+        .results_ttl_type(unity::scopes::ScopeMetadata::ResultsTtlType::Large)
+        .settings_definitions(settings_defs)
+        .location_data_needed(true)
+        .child_scope_ids(child_scope_ids)
+        .version(42);
     unity::scopes::ScopeMetadata metadata = builder();
     EXPECT_EQ(scope_id, metadata.scope_id());
     EXPECT_EQ("display_name", metadata.display_name());
@@ -115,6 +126,10 @@ TEST(ScopeMetadataBuilder, construct_full)
     EXPECT_EQ(appearance_attrs, metadata.appearance_attributes());
     EXPECT_EQ("scope_dir", metadata.scope_directory());
     EXPECT_EQ(unity::scopes::ScopeMetadata::ResultsTtlType::Large, metadata.results_ttl_type());
+    EXPECT_EQ(settings_defs, metadata.settings_definitions());
+    EXPECT_TRUE(metadata.location_data_needed());
+    EXPECT_EQ(child_scope_ids, metadata.child_scope_ids());
+    EXPECT_EQ(42, metadata.version());
 }
 
 TEST(ScopeMetadataBuilder, construction_in_case_of_missing_mandatory_arguments_aborts)

@@ -1,6 +1,18 @@
 Release notes
 =============
 
+Changes in version 0.6.9
+========================
+  - Added support for ChildScopes scope .ini option to list scopes ids of aggregated scopes.
+  - Added support for Version attribute in scope.ini file, and added version() accessor
+    to ScopeMetadata.
+  - Added app_directory() method ScopeBase for scopes that are installed from the same
+    click package as an app. This allows the app to share data with its scope (but
+    not vice versa).
+  - Added missing methods for settings_definitions(), location_data_needed(),
+    and child_scope_ids() to testing::ScopeMetadataBuilder.
+  - Added support for Tags scope .ini option.
+
 Changes in version 0.6.8
 ========================
   - Replaced dbus-send with "list updated" pub/sub to invalidate smart scopes.

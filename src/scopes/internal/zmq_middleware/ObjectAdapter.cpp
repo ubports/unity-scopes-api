@@ -554,7 +554,7 @@ void ObjectAdapter::pump(std::promise<void> ready)
                 ready_workers.push(worker_id);       // Thread will be ready again in a sec
                 if (!shutting_down && ready_workers.size() == 1)
                 {
-                    // We poll the front end when there is at least one worker
+                    // We poll the front end while there is at least one worker.
                     poller.add(frontend);
                 }
                 string buf;
@@ -570,7 +570,7 @@ void ObjectAdapter::pump(std::promise<void> ready)
                     {
                         frontend.send(client_address, zmqpp::socket::send_more);   // Client address tells router where to send the reply to
                         frontend.send("", zmqpp::socket::send_more);               // Empty delimiter frame
-                        // Read reply contents and return them to client via frontend
+                        // Read reply contents and return them to client via frontend.
                         int flag;
                         do
                         {

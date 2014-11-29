@@ -49,6 +49,18 @@ TEST(ScopeConfig, basic)
         EXPECT_EQ(ScopeMetadata::ResultsTtlType::Large, cfg.results_ttl_type());
         EXPECT_TRUE(cfg.location_data_needed());
         EXPECT_TRUE(cfg.debug_mode());
+        EXPECT_EQ(1, cfg.version());
+
+        auto children = cfg.child_scope_ids();
+        EXPECT_EQ(3u, children.size());
+        EXPECT_EQ("com.foo.bar", children[0]);
+        EXPECT_EQ("com.foo.bar2", children[1]);
+        EXPECT_EQ("com.foo.boo", children[2]);
+
+        auto tags = cfg.tags();
+        EXPECT_EQ(2u, tags.size());
+        EXPECT_EQ("foo", tags[0]);
+        EXPECT_EQ("bar", tags[1]);
 
         auto attrs = cfg.appearance_attributes();
         EXPECT_EQ(5, attrs.size());
@@ -61,6 +73,7 @@ TEST(ScopeConfig, basic)
         EXPECT_EQ("second", attrs["logo"].get_dict()["two"].get_string());
         EXPECT_EQ("abc", attrs["page"].get_dict()["page-header"].get_dict()["logo"].get_string());
         EXPECT_EQ("def", attrs["page"].get_dict()["page-header"].get_dict()["logo2"].get_string());
+
     }
 
     {
@@ -79,6 +92,7 @@ TEST(ScopeConfig, basic)
         EXPECT_EQ(ScopeMetadata::ResultsTtlType::None, cfg.results_ttl_type());
         EXPECT_FALSE(cfg.location_data_needed());
         EXPECT_FALSE(cfg.debug_mode());
+        EXPECT_EQ(0, cfg.version());
 
         EXPECT_EQ(0, cfg.appearance_attributes().size());
 
@@ -101,6 +115,31 @@ TEST(ScopeConfig, basic)
         ScopeConfig cfg(TTL_MEDIUM);
         EXPECT_EQ(ScopeMetadata::ResultsTtlType::Medium, cfg.results_ttl_type());
     }
+}
+
+TEST(ScopeConfig, bad_child_scope_ids)
+{
+    try
+    {
+        ScopeConfig cfg(BAD_CHILD_IDS);
+    }
+    catch(ConfigException const& e)
+    {
+        boost::regex r("unity::scopes::ConfigException: \".*\": Invalid empty scope id for ChildScopes");
+        EXPECT_TRUE(boost::regex_match(e.what(), r));
+    }
+}
+
+TEST(ScopeConfig, empty_scope_ids)
+{
+    ScopeConfig cfg(EMPTY_CHILD_IDS);
+    EXPECT_EQ(cfg.child_scope_ids().size(), 0);
+}
+
+TEST(ScopeConfig, single_scope_id)
+{
+    ScopeConfig cfg(SINGLE_CHILD_ID);
+    EXPECT_EQ(cfg.child_scope_ids().size(), 1);
 }
 
 TEST(ScopeConfig, bad_timeout)
@@ -130,6 +169,45 @@ TEST(ScopeConfig, bad_ttl)
         boost::regex r("unity::scopes::ConfigException: \".*\": Illegal value \\(\"blah\"\\) for ResultsTtlType");
         EXPECT_TRUE(boost::regex_match(e.what(), r));
     }
+}
+
+TEST(ScopeConfig, bad_version)
+{
+    try
+    {
+        ScopeConfig cfg(BAD_VERSION);
+        FAIL();
+    }
+    catch(ConfigException const& e)
+    {
+        boost::regex r("unity::scopes::ConfigException: \".*\": Version must be > 0");
+        EXPECT_TRUE(boost::regex_match(e.what(), r));
+    }
+}
+
+TEST(ScopeConfig, bad_tags)
+{
+    try
+    {
+        ScopeConfig cfg(BAD_TAGS);
+    }
+    catch(ConfigException const& e)
+    {
+        boost::regex r("unity::scopes::ConfigException: \".*\": Invalid empty tag string found in \"Tags\" list");
+        EXPECT_TRUE(boost::regex_match(e.what(), r));
+    }
+}
+
+TEST(ScopeConfig, empty_tags)
+{
+    ScopeConfig cfg(EMPTY_TAGS);
+    EXPECT_EQ(cfg.tags().size(), 0);
+}
+
+TEST(ScopeConfig, single_tag)
+{
+    ScopeConfig cfg(SINGLE_TAG);
+    EXPECT_EQ(cfg.tags().size(), 1);
 }
 
 class ScopeConfigWithIntl: public ::testing::Test

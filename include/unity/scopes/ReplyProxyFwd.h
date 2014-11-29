@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_REPLYPROXYFWD_H
-#define UNITY_SCOPES_REPLYPROXYFWD_H
+#pragma once
 
 #include <memory>
 
@@ -37,5 +36,3 @@ typedef std::shared_ptr<Reply> ReplyProxy;
 } // namespace scopes
 
 } // namespace unity
-
-#endif

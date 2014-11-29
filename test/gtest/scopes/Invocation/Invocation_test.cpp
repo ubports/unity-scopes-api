@@ -28,6 +28,8 @@
 #include <unity/scopes/SearchMetadata.h>
 #include <unity/UnityExceptions.h>
 
+#include <boost/regex.hpp>  // Use Boost implementation until http://gcc.gnu.org/bugzilla/show_bug.cgi?id=53631 is fixed.
+
 #include <gtest/gtest.h>
 
 #include "EmptyScope.h"
@@ -125,7 +127,10 @@ TEST(Invocation, timeout)
     receiver->wait_until_finished();
 
     EXPECT_EQ(CompletionDetails::Error, receiver->status());
-    EXPECT_EQ("unity::scopes::TimeoutException: Request timed out after 500 milliseconds", receiver->error_message());
+    string msg = receiver->error_message();
+    boost::regex r("unity::scopes::TimeoutException: Request timed out after 500 milliseconds "
+                   "\\(endpoint = .*TestScope\\, op = search\\)");
+    EXPECT_TRUE(boost::regex_match(msg, r)) << msg;
 
     // Wait another three seconds, so TestScope is finally able to receive another request.
     this_thread::sleep_for(chrono::seconds(3));

@@ -130,9 +130,9 @@ TEST(JsonSettingsSchema, basic)
     EXPECT_EQ("list", defs[1].get_dict()["type"].get_string());
     EXPECT_EQ("Temperature Units", defs[1].get_dict()["displayName"].get_string());
     EXPECT_EQ(1, defs[1].get_dict()["defaultValue"].get_int());
-    EXPECT_EQ(2, defs[1].get_dict()["values"].get_array().size());
-    EXPECT_EQ("Celsius", defs[1].get_dict()["values"].get_array()[0].get_string());
-    EXPECT_EQ("Fahrenheit", defs[1].get_dict()["values"].get_array()[1].get_string());
+    EXPECT_EQ(2, defs[1].get_dict()["displayValues"].get_array().size());
+    EXPECT_EQ("Celsius", defs[1].get_dict()["displayValues"].get_array()[0].get_string());
+    EXPECT_EQ("Fahrenheit", defs[1].get_dict()["displayValues"].get_array()[1].get_string());
 
     EXPECT_EQ("age", defs[2].get_dict()["id"].get_string());
     EXPECT_EQ("number", defs[2].get_dict()["type"].get_string());

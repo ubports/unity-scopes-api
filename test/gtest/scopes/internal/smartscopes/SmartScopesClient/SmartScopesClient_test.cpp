@@ -82,8 +82,10 @@ TEST_F(SmartScopesClientTest, remote_scopes)
     EXPECT_EQ("icon", *scopes[0].icon);
     EXPECT_EQ(nullptr, scopes[0].art);
     EXPECT_FALSE(scopes[0].invisible);
+    EXPECT_EQ(0, scopes[0].version);
     EXPECT_EQ(nullptr, scopes[0].appearance);
     EXPECT_EQ(nullptr, scopes[0].settings);
+    EXPECT_TRUE(scopes[0].tags.empty());
 
     EXPECT_EQ("dummy.scope.2", scopes[1].id);
     EXPECT_EQ("Dummy Demo Scope 2", scopes[1].name);
@@ -93,9 +95,11 @@ TEST_F(SmartScopesClientTest, remote_scopes)
     EXPECT_EQ(nullptr, scopes[1].icon);
     EXPECT_EQ("art", *scopes[1].art);
     EXPECT_TRUE(scopes[1].invisible);
+    EXPECT_EQ(2, scopes[1].version);
     EXPECT_EQ("#00BEEF", (*scopes[1].appearance)["background"].get_string());
     EXPECT_EQ("logo.png", (*scopes[1].appearance)["PageHeader"].get_dict()["logo"].get_string());
     EXPECT_EQ(nullptr, scopes[1].settings);
+    EXPECT_TRUE(scopes[1].tags.empty());
 
     EXPECT_EQ("dummy.scope.3", scopes[2].id);
     EXPECT_EQ("Dummy Demo Scope 3", scopes[2].name);
@@ -113,6 +117,11 @@ TEST_F(SmartScopesClientTest, remote_scopes)
               "\"defaultValue\":23},\"type\":\"number\"},{\"displayName\":\"Enabled\",\"id\":"
               "\"enabled\",\"parameters\":{\"defaultValue\":true},\"type\":\"boolean\"}]\n",
               *scopes[2].settings);
+    ASSERT_EQ(4, scopes[2].tags.size());
+    EXPECT_EQ("music", scopes[2].tags[0]);
+    EXPECT_EQ("video", scopes[2].tags[1]);
+    EXPECT_EQ("news", scopes[2].tags[2]);
+    EXPECT_EQ("games", scopes[2].tags[3]);
 }
 
 TEST_F(SmartScopesClientTest, search)
@@ -140,7 +149,7 @@ TEST_F(SmartScopesClientTest, search)
         dept = deptinfo;
     };
 
-    auto search_handle = ssc_->search(handler, sss_url_ + "/demo", "stuff", "", "session_id", 0, "platform", VariantMap(), VariantMap(), "en_US", "", "ThisIsUserAgentHeader");
+    auto search_handle = ssc_->search(handler, sss_url_ + "/demo", "stuff", "", "session_id", 0, "platform", VariantMap(), VariantMap(), "en_US", LocationInfo(), "ThisIsUserAgentHeader");
     search_handle->wait();
 
     ASSERT_EQ(3u, results.size());
@@ -238,7 +247,7 @@ TEST_F(SmartScopesClientTest, userAgentHeader)
     handler.departments_handler = [](std::shared_ptr<DepartmentInfo> const&) {
     };
 
-    auto search_handle = ssc_->search(handler, sss_url_ + "/demo", "test_user_agent_header", "", "session_id", 0, "platform", VariantMap(), VariantMap(), "en_US", "", "ThisIsUserAgentHeader");
+    auto search_handle = ssc_->search(handler, sss_url_ + "/demo", "test_user_agent_header", "", "session_id", 0, "platform", VariantMap(), VariantMap(), "en_US", LocationInfo(), "ThisIsUserAgentHeader");
     search_handle->wait();
 
     ASSERT_EQ(4u, results.size());

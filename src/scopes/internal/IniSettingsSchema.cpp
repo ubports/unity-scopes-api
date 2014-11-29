@@ -294,6 +294,14 @@ VariantArray IniSettingsSchema::definitions() const
 
 void IniSettingsSchema::add_location_setting()
 {
+    // TODO: HACK: See bug #1393438.
+    //             Temporarily work around this problem by adding an entry to each scope's settings
+    //             schema with the location data boolean. The shell
+    //             intercepts this as a "special" setting and takes care of translating the
+    //             display string. Eventually, we'll need to fix this, removing this hack.
+    //             Realistically, the shell should not store this user-preference
+    //             in the scope's settings database, and should only pay attention to the scope's
+    //             LocationDataNeeded metadata attribute.
     Setting s("internal.location", "boolean", "Enable location data", VariantArray(), Variant(true));
     definitions_.push_back(s.to_schema_definition());
 }

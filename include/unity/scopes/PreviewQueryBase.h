@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_PREVIEWQUERYBASE_H
-#define UNITY_SCOPES_PREVIEWQUERYBASE_H
+#pragma once
 
 #include <unity/scopes/PreviewReplyProxyFwd.h>
 #include <unity/scopes/QueryCtrlProxyFwd.h>
@@ -117,5 +116,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

@@ -16,8 +16,7 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_QUERYMETADATA_H
-#define UNITY_SCOPES_QUERYMETADATA_H
+#pragma once
 
 #include <unity/scopes/Variant.h>
 #include <string>
@@ -103,5 +102,3 @@ protected:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

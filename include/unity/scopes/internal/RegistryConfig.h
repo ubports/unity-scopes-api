@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_REGISTRYCONFIG_H
-#define UNITY_SCOPES_INTERNAL_REGISTRYCONFIG_H
+#pragma once
 
 #include <unity/scopes/internal/ConfigBase.h>
 
@@ -61,5 +60,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

@@ -1,3 +1,20 @@
+unity-scopes-api (0.6.9-0ubuntu1) UNRELEASED; urgency=medium
+
+  [ Pawel Stolowski ]
+  * Added support for ChildScopes scope .ini option.
+
+  [ Michi Henning ]
+  * Added app_directory() method to ScopeBase.
+  * Added support for Version attribute in scope.ini file, and added
+    version() accessor to ScopeMetadata.
+  * Added missing methods for settings_definitions(), location_data_needed(),
+    and child_scope_ids() to testing::ScopeMetadataBuilder.
+
+  [ Marcus Tomlinson ]
+  * Added support for Tags scope .ini option.
+
+ -- Marcus Tomlinson <marcus.tomlinson@canonical.com>  Wed, 26 Nov 2014 09:36:56 +0200
+
 unity-scopes-api (0.6.8+15.04.20141119-0ubuntu1) vivid; urgency=medium
 
   [ Marcus Tomlinson ]

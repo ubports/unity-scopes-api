@@ -16,8 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_INTERNAL_RATINGFILTERIMPL_H
-#define UNITY_INTERNAL_RATINGFILTERIMPL_H
+#pragma once
 
 #include <unity/scopes/internal/RadioButtonsFilterImpl.h>
 #include <unity/scopes/RatingFilter.h>
@@ -62,5 +61,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

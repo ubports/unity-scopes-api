@@ -7,6 +7,9 @@ Icon = file://scope-A.Icon
 SearchHint = scope-A.SearchHint
 HotKey = scope-A.HotKey
 LocationDataNeeded = true
+ChildScopes = com.foo.bar;com.foo.baz
+Version = 1
+Tags = music;news;foo
 
 [Appearance]
 ForegroundColor = fg_color

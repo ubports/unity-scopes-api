@@ -16,8 +16,7 @@
  * Authored by: Thomas Voß <thomas.voss@canonical.com>
  */
 
-#ifndef CONFIG_H
-#define CONFIG_H
+#pragma once
 
 #include <sstream>
 
@@ -40,6 +39,5 @@ constexpr const char* reference_result_file
 {
     "@CMAKE_CURRENT_SOURCE_DIR@/reference_result.xml"
 };
-} // namespace testing
 
-#endif
+} // namespace testing

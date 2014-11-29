@@ -38,6 +38,7 @@ namespace internal
 ScopeBaseImpl::ScopeBaseImpl()
     : scope_dir_initialized_(false)
     , cache_dir_initialized_(false)
+    , app_dir_initialized_(false)
     , registry_initialized_(false)
     , settings_db_initialized_(false)
 {
@@ -80,6 +81,27 @@ std::string ScopeBaseImpl::cache_directory() const
         throw ConfigException("ScopeBase::cache_directory(): no cache directory available");
     }
     return cache_directory_;
+}
+
+void ScopeBaseImpl::set_app_directory(std::string const& path)
+{
+    lock_guard<mutex> lock(mutex_);
+    app_directory_ = path;
+    app_dir_initialized_ = true;
+}
+
+std::string ScopeBaseImpl::app_directory() const
+{
+    lock_guard<mutex> lock(mutex_);
+    if (!app_dir_initialized_)
+    {
+        throw LogicException("ScopeBase::app_directory() cannot be called from constructor");
+    }
+    if (app_directory_.empty())
+    {
+        throw ConfigException("ScopeBase::app_directory(): no app directory available");
+    }
+    return app_directory_;
 }
 
 void ScopeBaseImpl::set_tmp_directory(std::string const& path)

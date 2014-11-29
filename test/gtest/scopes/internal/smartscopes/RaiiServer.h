@@ -16,8 +16,7 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#ifndef UNITY_TEST_SCOPES_INTERNAL_SMARTSCOPES_RAIISERVER_H
-#define UNITY_TEST_SCOPES_INTERNAL_SMARTSCOPES_RAIISERVER_H
+#pragma once
 
 #include <signal.h>
 #include <sys/wait.h>
@@ -99,5 +98,3 @@ public:
 } // namespace test
 
 } // namespace unity
-
-#endif // UNITY_TEST_SCOPES_INTERNAL_SMARTSCOPES_RAIISERVER_H

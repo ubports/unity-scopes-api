@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_PREVIEWLISTENERBASE_H
-#define UNITY_SCOPES_PREVIEWLISTENERBASE_H
+#pragma once
 
 #include <unity/scopes/ListenerBase.h>
 #include <unity/util/DefinesPtrs.h>
@@ -76,5 +75,3 @@ protected:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

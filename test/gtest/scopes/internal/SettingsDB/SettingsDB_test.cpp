@@ -210,6 +210,25 @@ TEST(SettingsDB, basic)
     }
 }
 
+TEST(SettingsDB, chinese_characters)
+{
+    auto schema = TEST_SRC_DIR "/chinese_schema.ini";
+
+    {
+        unlink(db_name.c_str());
+        auto db = SettingsDB::create_from_ini_file(db_name, schema);
+
+        // If db doesn't exist, default values are returned.
+        EXPECT_EQ(1, db->settings().size());
+        EXPECT_EQ("的", db->settings()["locationSetting"].get_string());
+
+        // Change the location.
+        write_db("db_chinese_location.ini");
+        EXPECT_EQ(1, db->settings().size());
+        TRY_EXPECT_EQ("丈", db->settings()["locationSetting"].get_string());
+    }
+}
+
 TEST(SettingsDB, delete_db)
 {
     auto schema = TEST_SRC_DIR "/schema.ini";

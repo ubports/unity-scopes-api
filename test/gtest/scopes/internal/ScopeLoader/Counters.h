@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef SCOPELOADERTEST_COUNTERS
-#define SCOPELOADERTEST_COUNTERS
+#pragma once
 
 #include "TestExports.h"
 
@@ -34,5 +33,3 @@ int EXPORT num_stop();
 void EXPORT inc_stop();
 
 void EXPORT reset_counters();
-
-#endif

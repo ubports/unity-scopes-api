@@ -16,8 +16,7 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_SMARTSCOPES_HTTPCLIENTINTERFACE_H
-#define UNITY_SCOPES_INTERNAL_SMARTSCOPES_HTTPCLIENTINTERFACE_H
+#pragma once
 
 #include <unity/util/DefinesPtrs.h>
 #include <unity/util/NonCopyable.h>
@@ -111,5 +110,3 @@ private:
 }  // namespace scopes
 
 }  // namespace unity
-
-#endif  // UNITY_SCOPES_INTERNAL_SMARTSCOPES_HTTPCLIENTINTERFACE_H
