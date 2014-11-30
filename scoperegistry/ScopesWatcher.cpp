@@ -48,7 +48,7 @@ ScopesWatcher::~ScopesWatcher()
     cleanup();
 }
 
-void ScopesWatcher::add_install_dir(std::string const& dir, bool notify)
+void ScopesWatcher::add_install_dir(std::string const& dir)
 {
     try
     {
@@ -86,7 +86,7 @@ void ScopesWatcher::add_install_dir(std::string const& dir, bool notify)
             {
                 try
                 {
-                    add_scope_dir(subdir, notify);
+                    add_scope_dir(subdir);
                 }
                 catch (unity::FileException const&)
                 {
@@ -159,7 +159,7 @@ bool file_is_empty(std::string const& path)
 
 }
 
-void ScopesWatcher::add_scope_dir(std::string const& dir, bool notify)
+void ScopesWatcher::add_scope_dir(std::string const& dir)
 {
     try
     {
@@ -192,13 +192,9 @@ void ScopesWatcher::add_scope_dir(std::string const& dir, bool notify)
             }
 
             // New config found, execute callback
-            if (notify)
-            {
-                ini_added_callback_(config);
-                BOOST_LOG_SEV(logger_, Logger::Info)
-                    << "ScopesWatcher: scope: \"" << config.first << "\" installed to: \""
-                    << dir << "\"" << std::endl;
-            }
+            ini_added_callback_(config);
+            BOOST_LOG_SEV(logger_, Logger::Info)
+                << "ScopesWatcher: scope: \"" << config.first << "\" installed to: \"" << dir << "\"";
         }
     }
     catch (std::exception const& e)
@@ -242,51 +238,50 @@ void ScopesWatcher::watch_event(DirWatcher::EventType event_type,
 {
     filesystem::path fs_path(path);
 
-    if (file_type == DirWatcher::File && fs_path.extension() == ".ini")
+    if (file_type == DirWatcher::File
+        && fs_path.extension() == ".ini"
+        && !boost::algorithm::ends_with(path, "-settings.ini"))
     {
-        if (!boost::algorithm::ends_with(path, "-settings.ini"))
+        std::lock_guard<std::mutex> lock(mutex_);
+
+        std::string parent_path = fs_path.parent_path().native();
+        std::string scope_id = fs_path.stem().native();
+
+        // A .ini has been added / modified
+        if (event_type == DirWatcher::Added || event_type == DirWatcher::Modified)
         {
-            std::lock_guard<std::mutex> lock(mutex_);
-
-            std::string parent_path = fs_path.parent_path().native();
-            std::string scope_id = fs_path.stem().native();
-
-            // A .ini has been added / modified
-            if (event_type == DirWatcher::Added || event_type == DirWatcher::Modified)
+            // We notify only if the file is non-empty.
+            // This avoids notifying twice if things are slow,
+            // because we may get an event for the file creation,
+            // followed by an event for the file modification.
+            // This is not completely free of races because,
+            // by the time we get the create event, the file may
+            // have been *partially* written, in which case
+            // we'll still notify a second time when the file is closed.
+            // But because .ini files are small, we get away with it. (We
+            // rely on the file writer to not write, say, one byte
+            // at a time.)
+            bool non_empty = true;
+            if (event_type == DirWatcher::Added)
             {
-                // We notify only if the file is non-empty.
-                // This avoids notifying twice if things are slow,
-                // because we may get an event for the file creation,
-                // followed by an event for the file modification.
-                // This is not completely free of races because,
-                // by the time we get the create event, the file may
-                // have been *partially* written, in which case
-                // we'll still notify a second time when the file is closed.
-                // But because .ini files are small, we get away with it. (We
-                // rely on the file writer to not write, say, one byte
-                // at a time.)
-                bool non_empty = true;
-                if (event_type == DirWatcher::Added)
-                {
-                    non_empty = !file_is_empty(path);
-                }
-                if (non_empty)
-                {
-                    sdir_to_ini_map_[parent_path] = path;
-                    ini_added_callback_(std::make_pair(scope_id, path));
-                    BOOST_LOG_SEV(logger_, Logger::Info)
-                        << "ScopesWatcher: scope: \"" << scope_id << "\" .ini installed: \"" << path << "\"";
-                }
+                non_empty = !file_is_empty(path);
             }
-            // A .ini has been removed
-            else if (event_type == DirWatcher::Removed)
+            if (non_empty)
             {
-                sdir_to_ini_map_.erase(parent_path);
-                registry_->remove_local_scope(scope_id);
+                sdir_to_ini_map_[parent_path] = path;
+                ini_added_callback_(std::make_pair(scope_id, path));
                 BOOST_LOG_SEV(logger_, Logger::Info)
-                    << "ScopesWatcher: scope: \"" << scope_id << "\" .ini uninstalled: \""
-                    << path << "\"";
+                    << "scopeswatcher: scope: \"" << scope_id << "\" .ini installed: \"" << path << "\"";
             }
+        }
+        // a .ini has been removed
+        else if (event_type == DirWatcher::Removed)
+        {
+            sdir_to_ini_map_.erase(parent_path);
+            registry_->remove_local_scope(scope_id);
+            BOOST_LOG_SEV(logger_, Logger::Info)
+                << "scopeswatcher: scope: \"" << scope_id << "\" .ini uninstalled: \""
+                << path << "\"";
         }
     }
     else
@@ -306,7 +301,7 @@ void ScopesWatcher::watch_event(DirWatcher::EventType event_type,
             // An install directory has been added
             if (event_type == DirWatcher::Added)
             {
-                add_install_dir(path, true);
+                add_install_dir(path);
             }
             // An install directory has been removed
             else if (event_type == DirWatcher::Removed)
@@ -315,23 +310,32 @@ void ScopesWatcher::watch_event(DirWatcher::EventType event_type,
             }
         }
         // Else if this path is within an install dir:
-        else if (idir_to_sdirs_map_.find(parent_dir(path)) != idir_to_sdirs_map_.end())
+        else
         {
-            // A new sub directory has been added
-            if (event_type == DirWatcher::Added)
+            bool is_inside_install_dir;
             {
-                // try add this path as a scope folder (ignore failures to add this path as scope dir)
-                // (we need to do this with both files and folders added, as the file added may be a symlink)
-                try
-                {
-                    add_scope_dir(path, true);
-                }
-                catch (unity::FileException const&) {}
+                std::lock_guard<std::mutex> lock(mutex);
+                is_inside_install_dir = idir_to_sdirs_map_.find(parent_dir(path)) != idir_to_sdirs_map_.end();
             }
-            // A sub directory has been removed
-            else if (event_type == DirWatcher::Removed)
+
+            if (is_inside_install_dir)
             {
-                remove_scope_dir(path);
+                // A new sub-directory (or symlink to sub-directory) has been added
+                if (event_type == DirWatcher::Added)
+                {
+                    // try add this path as a scope folder (ignore failures to add this path as scope dir)
+                    // (we need to do this with both files and folders added, as the file added may be a symlink)
+                    try
+                    {
+                        add_scope_dir(path);
+                    }
+                    catch (unity::FileException const& e) {}
+                }
+                // A sub directory has been removed
+                else if (event_type == DirWatcher::Removed)
+                {
+                    remove_scope_dir(path);
+                }
             }
         }
     }

@@ -290,6 +290,40 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
             scope.invisible = child_node->has_node("invisible") ? child_node->get_node("invisible")->as_bool() : false;
 
             scope.version = child_node->has_node("version") ? child_node->get_node("version")->as_int() : 0;
+            if (scope.version < 0)
+            {
+                std::cerr << "SmartScopesClient.get_remote_scopes(): Scope: \"" << scope.id
+                          << "\" returned a negative \"version\" value" << std::endl;
+                std::cerr << "SmartScopesClient.get_remote_scopes(): Skipping scope: \""
+                          << scope.id << "\"" << std::endl;
+                continue;
+            }
+
+            if (child_node->has_node("tags"))
+            {
+                auto node = child_node->get_node("tags");
+                if (node->type() == JsonNodeInterface::NodeType::Array)
+                {
+                    auto tags = node->to_variant().get_array();
+                    for (auto const& tag : tags)
+                    {
+                        try
+                        {
+                            scope.tags.push_back(tag.get_string());
+                        }
+                        catch (unity::LogicException const& e)
+                        {
+                            std::cerr << "SmartScopesClient.get_remote_scopes(): Scope: \""
+                                      << scope.id << "\" returned a non-string tag" << std::endl;
+                        }
+                    }
+                }
+                else
+                {
+                    std::cerr << "SmartScopesClient.get_remote_scopes(): Scope: \""
+                              << scope.id << "\" returned an invalid value type for \"tags\"" << std::endl;
+                }
+            }
 
             remote_scopes.push_back(scope);
         }

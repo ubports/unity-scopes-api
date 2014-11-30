@@ -30,7 +30,6 @@
 #include <core/posix/child_process.h>
 #include <core/posix/exec.h>
 
-#include <cassert>
 #include <fstream>
 #include <wordexp.h>
 
@@ -263,6 +262,7 @@ bool RegistryObject::add_local_scope(std::string const& scope_id, ScopeMetadata 
         // If scope is known already, remove it's details and kill it if it is running.
         scopes_.erase(scope_id);
         scope_processes_.erase(scope_id);
+        remove_desktop_file(scope_id);
         return_value = false;
     }
     scopes_.insert(make_pair(scope_id, metadata));

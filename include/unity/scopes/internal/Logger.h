@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_LOGGER_H
-#define UNITY_SCOPES_INTERNAL_LOGGER_H
+#pragma once
 
 #include <unity/util/DefinesPtrs.h>
 #include <unity/util/ResourcePtr.h>
@@ -74,5 +73,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

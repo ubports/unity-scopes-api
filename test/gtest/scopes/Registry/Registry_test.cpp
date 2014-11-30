@@ -111,6 +111,11 @@ TEST(Registry, metadata)
     EXPECT_EQ("com.foo.bar", children[0]);
     EXPECT_EQ("com.foo.baz", children[1]);
     EXPECT_EQ(1, meta.version());
+    auto tags = meta.tags();
+    EXPECT_EQ(3u, tags.size());
+    EXPECT_EQ("music", tags[0]);
+    EXPECT_EQ("news", tags[1]);
+    EXPECT_EQ("foo", tags[2]);
 
     auto attrs = meta.appearance_attributes();
     EXPECT_EQ("fg_color", attrs["foreground-color"].get_string());
@@ -142,6 +147,7 @@ TEST(Registry, metadata)
     EXPECT_EQ(0, defs.size());
     EXPECT_FALSE(meta.location_data_needed());
     EXPECT_EQ(0, meta.child_scope_ids().size());
+    EXPECT_EQ(0, meta.tags().size());
     EXPECT_EQ(0, meta.version());
 }
 
@@ -539,11 +545,13 @@ TEST(Registry, list_update_notify)
     EXPECT_EQ(list.end(), list.find("testscopeC"));
     EXPECT_EQ(list.end(), list.find("testscopeD"));
 
-    reset();
     // Copy testscopeC into the scopes folder
-    std::cout << "Move testscopeC into the scopes folder" << std::endl;
+    std::cout << "Create testscopeC dir in the scopes folder" << std::endl;
     filesystem::create_directory(TEST_RUNTIME_PATH "/scopes/testscopeC", ec);
     ASSERT_EQ("Success", ec.message());
+
+    reset();
+    std::cout << "Copy testscopeC.ini into the scopes folder" << std::endl;
     filesystem::copy(TEST_RUNTIME_PATH "/other_scopes/testscopeC/testscopeC.ini", TEST_RUNTIME_PATH "/scopes/testscopeC/testscopeC.ini", ec);
     ASSERT_EQ("Success", ec.message());
     EXPECT_TRUE(wait_for_update());
@@ -563,9 +571,37 @@ TEST(Registry, list_update_notify)
     ASSERT_EQ("Success", ec.message());
     EXPECT_TRUE(wait_for_update());
 
-    // Now check that we have 4 scopes registered
-    list = r->list();
-    EXPECT_EQ(4, list.size());
+    // The previous test may emit a single update or two, depending
+    // on whether the copy operation manages to write data
+    // into the .ini file quickly enough. (If so, we get
+    // a single notification. If not, and inotify gives
+    // us two events (one for creation and one for write/close),
+    // we get two updates.) The race is unavoidable because
+    // we *must* emit an update on file creation, because
+    // a file can be linked (instead of copied) into the scope's
+    // config dir. This means that calling reset() before calling
+    // list() below does *not* fix the problem: the second update
+    // from the previous test may arrive *after* we call reset().
+    // So, we wait for up to five seconds for the list() operation
+    // to return the correct result before failing.
+    auto const wait_time = std::chrono::seconds(5);
+    auto start_time = std::chrono::system_clock::now();
+    bool ok = false;
+    do
+    {
+        try
+        {
+            list = r->list();
+            ok = list.size() == 4;
+        }
+        catch (std::exception const& e)
+        {
+            FAIL() << e.what();
+        }
+    }
+    while (!ok && std::chrono::system_clock::now() - start_time < wait_time);
+    EXPECT_TRUE(ok) << "new scope not recognized after " << wait_time.count() << " seconds";
+
     EXPECT_NE(list.end(), list.find("testscopeA"));
     EXPECT_NE(list.end(), list.find("testscopeB"));
     EXPECT_NE(list.end(), list.find("testscopeC"));
@@ -573,7 +609,7 @@ TEST(Registry, list_update_notify)
 
     reset();
     // Remove testscopeC from the scopes folder
-    std::cout << "Move testscopeC back into the other_scopes folder" << std::endl;
+    std::cout << "Remove testscopeC from the scopes folder" << std::endl;
     filesystem::remove_all(TEST_RUNTIME_PATH "/scopes/testscopeC", ec);
     ASSERT_EQ("Success", ec.message());
     EXPECT_TRUE(wait_for_update());
