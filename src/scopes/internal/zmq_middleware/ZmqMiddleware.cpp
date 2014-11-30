@@ -43,7 +43,6 @@
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
-#include <iostream>  // TODO: remove this once logging is added
 #include <sys/stat.h>
 
 using namespace std;
@@ -89,11 +88,15 @@ void create_dir(string const& dir, mode_t mode)
 
 } // namespace
 
+// Some tests use a nullptr for the run time, so we use a different logger in that case.
+BOOST_LOG_INLINE_GLOBAL_LOGGER_DEFAULT(zmqmiddleware_test_logger, boost::log::sources::severity_channel_logger_mt<>)
+
 ZmqMiddleware::ZmqMiddleware(string const& server_name, RuntimeImpl* runtime, string const& configfile) :
     MiddlewareBase(runtime),
     server_name_(server_name),
     state_(Created),
-    shutdown_flag(false)
+    shutdown_flag_(false),
+    logger_(runtime ? runtime->logger() : zmqmiddleware_test_logger::get())
 {
     assert(!server_name.empty());
 
@@ -163,21 +166,18 @@ ZmqMiddleware::~ZmqMiddleware()
         auto millisecs = chrono::duration_cast<chrono::milliseconds>(end_time - start_time).count();
         if (millisecs > 100)
         {
-            ostringstream s;
-            s << "warning: ~ZmqMiddleware(): context_.terminate() took " << millisecs
-              << " ms to complete for " << server_name_ << endl;
-            cerr << s.str();
+            BOOST_LOG_SEV(logger_, Logger::Error)
+                << "warning: ~ZmqMiddleware(): context_.terminate() took " << millisecs
+                << " ms to complete for " << server_name_;
         }
     }
     catch (std::exception const& e)
     {
-        cerr << "~ZmqMiddleware(): " << e.what() << endl;
-        // TODO: log exception
+        BOOST_LOG_SEV(logger_, Logger::Error) << "~ZmqMiddleware(): " << e.what();
     }
     catch (...)
     {
-        cerr << "~ZmqMiddleware(): unknown exception" << endl;
-        // TODO: log exception
+        BOOST_LOG_SEV(logger_, Logger::Error) << "~ZmqMiddleware(): unknown exception";
     }
 }
 
@@ -224,7 +224,7 @@ void ZmqMiddleware::start()
                     throw MiddlewareException("Cannot create outgoing invocation pools: unknown exception");
                 }
             }
-            shutdown_flag = false;
+            shutdown_flag_ = false;
             state_ = Started;
             state_changed_.notify_all();
             break;
@@ -291,7 +291,7 @@ void ZmqMiddleware::wait_for_shutdown()
         // Several threads may see state_ == Stopping here. Exactly one of them
         // waits for the object adapters to shut down; the others wait until
         // shut down is complete.
-        if (shutdown_flag.exchange(true))
+        if (shutdown_flag_.exchange(true))
         {
             // Another thread has been through here already, wait for it
             // to finish shutting down the adapters.
@@ -551,10 +551,9 @@ MWQueryCtrlProxy ZmqMiddleware::add_query_ctrl_object(QueryCtrlObjectBase::SPtr 
         proxy = ZmqQueryCtrlProxy(new ZmqQueryCtrl(this, p->endpoint(), p->identity(), ctrl_category));
         adapter->activate();
     }
-    catch (std::exception const& e) // Should never happen unless our implementation is broken
+    catch (std::exception const& e)  // Can happen during shutdown
     {
-        // TODO: log this
-        cerr << "unexpected exception in add_query_ctrl_object(): " << e.what() << endl;
+        BOOST_LOG_SEV(logger_, Logger::Error) << "exception in add_query_ctrl_object(): " << e.what();
         throw;
     }
     return proxy;
@@ -572,10 +571,9 @@ void ZmqMiddleware::add_dflt_query_ctrl_object(QueryCtrlObjectBase::SPtr const& 
         ctrl->set_disconnect_function(df);
         adapter->activate();
     }
-    catch (std::exception const& e) // Should never happen unless our implementation is broken
+    catch (std::exception const& e)  // Can happen during shutdown
     {
-        // TODO: log this
-        cerr << "unexpected exception in add_dflt_query_ctrl_object(): " << e.what() << endl;
+        BOOST_LOG_SEV(logger_, Logger::Error) << "exception in add_dflt_query_ctrl_object(): " << e.what();
         throw;
     }
 }
@@ -595,10 +593,9 @@ MWQueryProxy ZmqMiddleware::add_query_object(QueryObjectBase::SPtr const& query)
         proxy = ZmqQueryProxy(new ZmqQuery(this, p->endpoint(), p->identity(), query_category));
         adapter->activate();
     }
-    catch (std::exception const& e) // Should never happen unless our implementation is broken
+    catch (std::exception const& e)  // Can happen during shutdown
     {
-        // TODO: log this
-        cerr << "unexpected exception in add_query_object(): " << e.what() << endl;
+        BOOST_LOG_SEV(logger_, Logger::Error) << "exception in add_query_object(): " << e.what();
         throw;
     }
     return proxy;
@@ -616,10 +613,9 @@ void ZmqMiddleware::add_dflt_query_object(QueryObjectBase::SPtr const& query)
         query->set_disconnect_function(df);
         adapter->activate();
     }
-    catch (std::exception const& e) // Should never happen unless our implementation is broken
+    catch (std::exception const& e)  // Can happen during shutdown
     {
-        // TODO: log this
-        cerr << "unexpected exception in add_dflt_query_object(): " << e.what() << endl;
+        BOOST_LOG_SEV(logger_, Logger::Error) << "exception in add_dflt_query_object(): " << e.what();
         throw;
     }
 }
@@ -641,10 +637,9 @@ MWRegistryProxy ZmqMiddleware::add_registry_object(string const& identity, Regis
         proxy = ZmqRegistryProxy(new ZmqRegistry(this, p->endpoint(), p->identity(), registry_category, twoway_timeout_));
         adapter->activate();
     }
-    catch (std::exception const& e) // Should never happen unless our implementation is broken
+    catch (std::exception const& e)  // Can happen during shutdown
     {
-        // TODO: log this
-        cerr << "unexpected exception in add_registry_object(): " << e.what() << endl;
+        BOOST_LOG_SEV(logger_, Logger::Error) << "exception in add_registry_object(): " << e.what();
         throw;
     }
     return proxy;
@@ -665,10 +660,9 @@ MWReplyProxy ZmqMiddleware::add_reply_object(ReplyObjectBase::SPtr const& reply)
         proxy = ZmqReplyProxy(new ZmqReply(this, p->endpoint(), p->identity(), reply_category));
         adapter->activate();
     }
-    catch (std::exception const& e) // Should never happen unless our implementation is broken
+    catch (std::exception const& e)  // Can happen during shutdown
     {
-        // TODO: log this
-        cerr << "unexpected exception in add_reply_object(): " << e.what() << endl;
+        BOOST_LOG_SEV(logger_, Logger::Error) << "exception in add_reply_object(): " << e.what();
         throw;
     }
     return proxy;
@@ -690,10 +684,9 @@ MWScopeProxy ZmqMiddleware::add_scope_object(string const& identity, ScopeObject
         proxy = ZmqScopeProxy(new ZmqScope(this, p->endpoint(), p->identity(), scope_category, twoway_timeout_));
         adapter->activate();
     }
-    catch (std::exception const& e) // Should never happen unless our implementation is broken
+    catch (std::exception const& e)  // Can happen during shutdown
     {
-        // TODO: log this
-        cerr << "unexpected exception in add_scope_object(): " << e.what() << endl;
+        BOOST_LOG_SEV(logger_, Logger::Error) << "exception in add_scope_object(): " << e.what();
         throw;
     }
     return proxy;
@@ -711,10 +704,9 @@ void ZmqMiddleware::add_dflt_scope_object(ScopeObjectBase::SPtr const& scope)
         scope->set_disconnect_function(df);
         adapter->activate();
     }
-    catch (std::exception const& e) // Should never happen unless our implementation is broken
+    catch (std::exception const& e)  // Can happen during shutdown
     {
-        // TODO: log this
-        cerr << "unexpected exception in add_dflt_scope_object(): " << e.what() << endl;
+        BOOST_LOG_SEV(logger_, Logger::Error) << "exception in add_dflt_scope_object(): " << e.what();
         throw;
     }
 }
@@ -737,10 +729,9 @@ MWStateReceiverProxy ZmqMiddleware::add_state_receiver_object(std::string const&
         proxy = ZmqStateReceiverProxy(new ZmqStateReceiver(this, p->endpoint(), p->identity(), state_category));
         adapter->activate();
     }
-    catch (std::exception const& e) // Should never happen unless our implementation is broken
+    catch (std::exception const& e)  // Can happen during shutdown
     {
-        // TODO: log this
-        cerr << "unexpected exception in add_state_receiver_object(): " << e.what() << endl;
+        BOOST_LOG_SEV(logger_, Logger::Error) << "exception in add_state_receiver_object(): " << e.what();
         throw;
     }
     return proxy;

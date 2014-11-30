@@ -41,13 +41,14 @@ namespace internal
 SearchReplyImpl::SearchReplyImpl(MWReplyProxy const& mw_proxy,
                                  std::shared_ptr<QueryObjectBase> const& qo,
                                  int cardinality,
-                                 std::string const& current_department_id) :
-    ObjectImpl(mw_proxy),
-    ReplyImpl(mw_proxy, qo),
-    cat_registry_(new CategoryRegistry()),
-    cardinality_(cardinality),
-    num_pushes_(0),
-    current_department_(current_department_id)
+                                 std::string const& current_department_id,
+                                 boost::log::sources::severity_channel_logger_mt<>& logger)
+    : ObjectImpl(mw_proxy, logger)
+    , ReplyImpl(mw_proxy, qo, logger)
+    , cat_registry_(new CategoryRegistry())
+    , cardinality_(cardinality)
+    , num_pushes_(0)
+    , current_department_(current_department_id)
 {
 }
 

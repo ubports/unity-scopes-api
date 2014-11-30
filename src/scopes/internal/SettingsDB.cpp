@@ -87,13 +87,15 @@ static const char* GROUP_NAME = "General";
 
 }  // namespace
 
-SettingsDB::UPtr SettingsDB::create_from_ini_file(string const& db_path, string const& ini_file_path)
+SettingsDB::UPtr SettingsDB::create_from_ini_file(string const& db_path,
+                                                  string const& ini_file_path,
+                                                  boost::log::sources::severity_channel_logger_mt<>& logger)
 {
     // Parse schema
     try
     {
         SettingsSchema::UPtr schema = IniSettingsSchema::create(ini_file_path);
-        return create_from_schema(db_path, *schema);
+        return create_from_schema(db_path, *schema, logger);
     }
     catch (exception const& e)
     {
@@ -101,13 +103,15 @@ SettingsDB::UPtr SettingsDB::create_from_ini_file(string const& db_path, string 
     }
 }
 
-SettingsDB::UPtr SettingsDB::create_from_json_string(string const& db_path, string const& json_string)
+SettingsDB::UPtr SettingsDB::create_from_json_string(string const& db_path,
+                                                     string const& json_string,
+                                                     boost::log::sources::severity_channel_logger_mt<>& logger)
 {
     // Parse schema
     try
     {
         auto schema = JsonSettingsSchema::create(json_string);
-        return create_from_schema(db_path, *schema);
+        return create_from_schema(db_path, *schema, logger);
     }
     catch (exception const& e)
     {
@@ -115,17 +119,22 @@ SettingsDB::UPtr SettingsDB::create_from_json_string(string const& db_path, stri
     }
 }
 
-SettingsDB::UPtr SettingsDB::create_from_schema(string const& db_path, SettingsSchema const& schema)
+SettingsDB::UPtr SettingsDB::create_from_schema(string const& db_path,
+                                                SettingsSchema const& schema,
+                                                boost::log::sources::severity_channel_logger_mt<>& logger)
 {
-    return UPtr(new SettingsDB(db_path, move(schema)));
+    return UPtr(new SettingsDB(db_path, move(schema), logger));
 }
 
-SettingsDB::SettingsDB(string const& db_path, SettingsSchema const& schema)
+SettingsDB::SettingsDB(string const& db_path,
+                       SettingsSchema const& schema,
+                       boost::log::sources::severity_channel_logger_mt<>& logger)
     : state_changed_(false)
     , db_path_(db_path)
     , fd_(inotify_init(), bind(&close, placeholders::_1))
     , watch_(-1, bind(&watch_deleter, fd_.get(), placeholders::_1))
     , thread_state_(Idle)
+    , logger_(logger)
 {
     // Validate the file descriptor
     if (fd_.get() < 0)
@@ -240,13 +249,13 @@ void SettingsDB::watch_thread()
     }
     catch (exception const& e)
     {
-        cerr << "SettingsDB::watch_thread(): Thread aborted: " << e.what() << endl;
+        BOOST_LOG_SEV(logger_, Logger::Error) << "SettingsDB::watch_thread(): Thread aborted: " << e.what();
         lock_guard<mutex> lock(mutex_);
         thread_state_ = Failed;
     }
     catch (...)
     {
-        cerr << "SettingsDB::watch_thread(): Thread aborted: unknown exception" << endl;
+        BOOST_LOG_SEV(logger_, Logger::Error) << "SettingsDB::watch_thread(): Thread aborted: unknown exception";
         lock_guard<mutex> lock(mutex_);
         thread_state_ = Failed;
     }

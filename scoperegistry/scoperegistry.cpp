@@ -384,7 +384,7 @@ void add_local_scope(RegistryObject::SPtr const& registry,
 
     ScopeProxy proxy = ScopeImpl::create(mw->create_scope_proxy(scope.first), mw->runtime(), scope.first);
     mi->set_proxy(proxy);
-    auto meta = ScopeMetadataImpl::create(move(mi));
+    auto meta = ScopeMetadataImpl::create(std::move(mi));
 
     RegistryObject::ScopeExecData exec_data;
     exec_data.scope_id = scope.first;
@@ -423,7 +423,7 @@ void add_local_scope(RegistryObject::SPtr const& registry,
     exec_data.scope_config = scope.second;
     exec_data.debug_mode = sc.debug_mode();
 
-    registry->add_local_scope(scope.first, move(meta), exec_data);
+    registry->add_local_scope(scope.first, std::move(meta), exec_data);
 }
 
 void add_local_scopes(RegistryObject::SPtr const& registry,
@@ -548,7 +548,7 @@ int main(int argc, char* argv[])
         });
 
         // The registry object stores the local and remote scopes
-        Executor::SPtr executor = make_shared<Executor>();
+        Executor::SPtr executor = std::make_shared<Executor>();
         RegistryObject::SPtr registry(new RegistryObject(*signal_handler_wrapper.death_observer, executor, middleware, true));
 
         // Add the metadata for each scope to the lookup table.
@@ -592,7 +592,7 @@ int main(int argc, char* argv[])
                 error("ignoring installed scope \"" + scope.first + "\": cannot create metadata: " + e.what());
             }
         };
-        ScopesWatcher local_scopes_watcher(registry, local_watch_lambda);
+        ScopesWatcher local_scopes_watcher(registry, local_watch_lambda, runtime->logger());
         local_scopes_watcher.add_install_dir(scope_installdir);
         local_scopes_watcher.add_install_dir(oem_installdir);
 
@@ -608,7 +608,7 @@ int main(int argc, char* argv[])
                 error("ignoring installed scope \"" + scope.first + "\": cannot create metadata: " + e.what());
             }
         };
-        ScopesWatcher click_scopes_watcher(registry, click_watch_lambda);
+        ScopesWatcher click_scopes_watcher(registry, click_watch_lambda, runtime->logger());
         click_scopes_watcher.add_install_dir(click_installdir);
 
         // Let's add the registry's state receiver to the middleware so that scopes can inform

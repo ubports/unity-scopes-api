@@ -20,6 +20,7 @@
 #include <unity/scopes/internal/ScopeBaseImpl.h>
 
 #include <unity/scopes/internal/DfltConfig.h>
+#include <unity/scopes/internal/Logger.h>
 #include <unity/scopes/internal/MWStateReceiver.h>
 #include <unity/scopes/internal/RegistryConfig.h>
 #include <unity/scopes/internal/RegistryImpl.h>
@@ -38,7 +39,6 @@
 #include <cassert>
 #include <cstring>
 #include <future>
-#include <iostream> // TODO: remove this once logging is added
 
 #include <sys/apparmor.h>
 #include <sys/stat.h>
@@ -70,6 +70,10 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
             scope_id_ = "c-" + id.gen();
         }
 
+        // Until we know where the scope's cache directory is,
+        // we use a logger that logs to std::clog.
+        logger_.reset(new Logger(scope_id_));
+
         // Create the middleware factory and get the registry identity and config filename.
         RuntimeConfig config(configfile);
         string default_middleware = config.default_middleware();
@@ -91,7 +95,7 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
 
         if (registry_configfile_.empty() || registry_identity_.empty())
         {
-            cerr << "Warning: no registry configured" << endl;
+            BOOST_LOG_SEV(logger(), Logger::Warning) << "no registry configured";
             registry_identity_ = "";
         }
         else
@@ -111,7 +115,9 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
         destroy();
         string msg = "Cannot instantiate run time for " + (scope_id.empty() ? "client" : scope_id) +
                      ", config file: " + configfile;
-        throw ConfigException(msg);
+        ConfigException ex(msg);
+        BOOST_LOG_SEV(logger(), Logger::Error) << ex.what();
+        throw ex;
     }
 }
 
@@ -123,13 +129,11 @@ RuntimeImpl::~RuntimeImpl()
     }
     catch (std::exception const& e) // LCOV_EXCL_LINE
     {
-        cerr << "~RuntimeImpl(): " << e.what() << endl;
-        // TODO: log error
+        BOOST_LOG_SEV(logger(), Logger::Error) << "~RuntimeImpl(): " << e.what();
     }
     catch (...) // LCOV_EXCL_LINE
     {
-        cerr << "~RuntimeImpl(): unknown exception" << endl;
-        // TODO: log error
+        BOOST_LOG_SEV(logger(), Logger::Error) << "~RuntimeImpl(): unknown exception";
     }
 }
 
@@ -283,6 +287,11 @@ ThreadSafeQueue<future<void>>::SPtr RuntimeImpl::future_queue() const
     return future_queue_;  // Immutable
 }
 
+boost::log::sources::severity_channel_logger_mt<>& RuntimeImpl::logger() const
+{
+    return *logger_;
+}
+
 namespace
 {
 
@@ -354,7 +363,7 @@ void RuntimeImpl::run_scope(ScopeBase* scope_base,
         boost::system::error_code ec;
         if (boost::filesystem::exists(settings_schema, ec))
         {
-            shared_ptr<SettingsDB> db(SettingsDB::create_from_ini_file(settings_db, settings_schema));
+            shared_ptr<SettingsDB> db(SettingsDB::create_from_ini_file(settings_db, settings_schema, logger()));
             scope_base->p->set_settings_db(db);
         }
         else
@@ -367,6 +376,8 @@ void RuntimeImpl::run_scope(ScopeBase* scope_base,
     scope_base->p->set_cache_directory(find_cache_dir());
     scope_base->p->set_app_directory(find_app_dir());
     scope_base->p->set_tmp_directory(find_tmp_dir());
+
+    // TODO: redirect log messages to scope-specific file.
 
     try
     {

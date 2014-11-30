@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <unity/scopes/internal/Logger.h>
 #include <unity/scopes/internal/SettingsSchema.h>
 #include <unity/scopes/Variant.h>
 #include <unity/util/DefinesPtrs.h>
@@ -50,9 +51,15 @@ public:
     NONCOPYABLE(SettingsDB);
     UNITY_DEFINES_PTRS(SettingsDB);
 
-    static UPtr create_from_ini_file(std::string const& db_path, std::string const& ini_file_path);
-    static UPtr create_from_json_string(std::string const& db_path, std::string const& json_string);
-    static UPtr create_from_schema(std::string const& db_path, unity::scopes::internal::SettingsSchema const& schema);
+    static UPtr create_from_ini_file(std::string const& db_path,
+                                     std::string const& ini_file_path,
+                                     boost::log::sources::severity_channel_logger_mt<>& logger);
+    static UPtr create_from_json_string(std::string const& db_path,
+                                        std::string const& json_string,
+                                        boost::log::sources::severity_channel_logger_mt<>& logger);
+    static UPtr create_from_schema(std::string const& db_path,
+                                   unity::scopes::internal::SettingsSchema const& schema,
+                                   boost::log::sources::severity_channel_logger_mt<>& logger);
 
     ~SettingsDB();
 
@@ -70,7 +77,9 @@ private:
         Failed
     };
 
-    SettingsDB(std::string const& db_path, unity::scopes::internal::SettingsSchema const& schema);
+    SettingsDB(std::string const& db_path,
+               unity::scopes::internal::SettingsSchema const& schema,
+               boost::log::sources::severity_channel_logger_mt<>& logger);
 
     void process_doc_(std::string const& id, unity::util::IniParser const& parer);
     void process_all_docs();
@@ -87,6 +96,7 @@ private:
     std::thread thread_;
     std::mutex mutex_;
     ThreadState thread_state_;
+    boost::log::sources::severity_channel_logger_mt<>& logger_;
 };
 
 }  // namespace internal

@@ -18,9 +18,10 @@
 
 #pragma once
 
-#include <unity/scopes/internal/QueryObjectBase.h>
+#include <unity/scopes/internal/Logger.h>
 #include <unity/scopes/internal/MWReplyProxyFwd.h>
 #include <unity/scopes/internal/MWQueryCtrlProxyFwd.h>
+#include <unity/scopes/internal/QueryObjectBase.h>
 #include <unity/scopes/ReplyProxyFwd.h>
 
 namespace unity
@@ -44,11 +45,15 @@ class QueryObject : public QueryObjectBase
 public:
     UNITY_DEFINES_PTRS(QueryObject);
 
-    QueryObject(std::shared_ptr<QueryBase> const& query_base, MWReplyProxy const& reply, MWQueryCtrlProxy const& ctrl);
+    QueryObject(std::shared_ptr<QueryBase> const& query_base,
+                MWReplyProxy const& reply,
+                MWQueryCtrlProxy const& ctrl,
+                boost::log::sources::severity_channel_logger_mt<>&);
     QueryObject(std::shared_ptr<QueryBase> const& query_base,
                 int cardinality,
                 MWReplyProxy const& reply,
-                MWQueryCtrlProxy const& ctrl);
+                MWQueryCtrlProxy const& ctrl,
+                boost::log::sources::severity_channel_logger_mt<>& logger);
     virtual ~QueryObject();
 
     // Remote operation implementations
@@ -71,6 +76,7 @@ protected:
     bool pushable_;
     QueryObjectBase::SPtr self_;
     int cardinality_;
+    boost::log::sources::severity_channel_logger_mt<>& logger_;
     mutable std::mutex mutex_;
 };
 

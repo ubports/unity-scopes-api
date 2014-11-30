@@ -24,7 +24,6 @@
 #include <QNetworkReply>
 #include <QTimer>
 #include <cassert>
-#include <iostream>
 
 namespace unity
 {
