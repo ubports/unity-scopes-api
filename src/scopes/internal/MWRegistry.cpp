@@ -43,6 +43,8 @@ MWRegistry::~MWRegistry()
 
 core::ScopedConnection MWRegistry::set_scope_state_callback(std::string const& scope_id, std::function<void(bool)> callback)
 {
+    lock_guard<mutex> lock(mutex_);
+
     if (scope_state_subscribers_.find(scope_id) == scope_state_subscribers_.end())
     {
         scope_state_subscribers_[scope_id] = mw_base_->create_subscriber(mw_base_->runtime()->registry_identity(), scope_id);
@@ -52,6 +54,8 @@ core::ScopedConnection MWRegistry::set_scope_state_callback(std::string const& s
 
 core::ScopedConnection MWRegistry::set_list_update_callback(std::function<void()> callback)
 {
+    lock_guard<mutex> lock(mutex_);
+
     if (!list_update_subscriber_)
     {
         // Use lazy initialization here to only subscribe to the publisher if a callback is set

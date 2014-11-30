@@ -38,7 +38,7 @@ public:
 
     ~ScopesWatcher();
 
-    void add_install_dir(std::string const& dir, bool notify = false);
+    void add_install_dir(std::string const& dir);
 
 private:
     unity::scopes::internal::RegistryObject::SPtr const registry_;
@@ -52,7 +52,7 @@ private:
 
     void remove_install_dir(std::string const& dir);
 
-    void add_scope_dir(std::string const& dir, bool notify);
+    void add_scope_dir(std::string const& dir);
     void remove_scope_dir(std::string const& dir);
 
     void watch_event(DirWatcher::EventType event_type,

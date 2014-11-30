@@ -30,7 +30,6 @@
 #include <core/posix/child_process.h>
 #include <core/posix/exec.h>
 
-#include <cassert>
 #include <fstream>
 #include <wordexp.h>
 
@@ -258,8 +257,10 @@ bool RegistryObject::add_local_scope(std::string const& scope_id, ScopeMetadata 
     bool return_value = true;
     if (scopes_.find(scope_id) != scopes_.end())
     {
+        // If scope is known already, remove it's details and kill it if it is running.
         scopes_.erase(scope_id);
         scope_processes_.erase(scope_id);
+        remove_desktop_file(scope_id);
         return_value = false;
     }
     scopes_.insert(make_pair(scope_id, metadata));
@@ -434,7 +435,7 @@ void RegistryObject::ss_list_update()
 {
     if (publisher_)
     {
-        // Send a blank message to subscribers to inform them that the samrt scopes proxy has been updated
+        // Send a blank message to subscribers to inform them that the smart scopes proxy has been updated
         publisher_->send_message("");
     }
 }

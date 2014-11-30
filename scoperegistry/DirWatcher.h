@@ -76,7 +76,7 @@ private:
     boost::log::sources::severity_channel_logger_mt<>& logger_;
 
     void watch_thread();
-    virtual void watch_event(EventType, FileType, std::string const&) {}
+    virtual void watch_event(EventType, FileType, std::string const&) = 0;
 };
 
 } // namespace scoperegistry
