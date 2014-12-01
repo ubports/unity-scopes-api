@@ -23,11 +23,16 @@
 #include <unity/scopes/CategorisedResult.h>
 #include <memory>
 #include <vector>
+#include <mutex>
+#include <atomic>
 
 namespace unity
 {
 
 namespace scopes
+{
+
+namespace utility
 {
 
 namespace internal
@@ -73,14 +78,16 @@ public:
     void flush();
 
 private:
-    unity::scopes::SearchReplyProxy const& upstream_;
-    bool buffer_;
+    std::mutex mutex_;
+    unity::scopes::SearchReplyProxy upstream_;
+    std::atomic<bool> buffer_;
     std::vector<CategorisedResult> results_;
 };
 
-}
+} // namespace internal
 
-}
+} // namespace utility
 
-}
+} // namespace scopes
 
+} // namespace unity

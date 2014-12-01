@@ -32,13 +32,13 @@ namespace experimental
     class Annotation;
 }
 
+namespace utility
+{
+
 namespace internal
 {
     class BufferedResultForwarderImpl;
 }
-
-namespace utility
-{
 
 class BufferedResultForwarder : public unity::scopes::SearchListenerBase
 {
@@ -49,20 +49,15 @@ public:
     /// @endcond
 
     /**
-    \brief Create a forwarder that sends results to to its upstream reply proxy.
-
-    \param upstream The reply proxy for the upstream receiver.
-    */
-    BufferedResultForwarder(unity::scopes::SearchReplyProxy const& upstream);
-
-    /**
     \brief Create a forwarder that sends (at least one) result to its upstream
     reply proxy before indicating that it is ready to its follower.
 
     \param upstream The reply proxy for the upstream receiver.
     \param next_forwarder The forwarder that becomes ready once this forwarder calls set_ready().
+    \throws unity::InvalidArgumentException when passed next_forwarder that has already been linked to another BufferedResultForwarder.
     */
-    BufferedResultForwarder(unity::scopes::SearchReplyProxy const& upstream, BufferedResultForwarder::SPtr const& next_forwarder);
+    BufferedResultForwarder(unity::scopes::SearchReplyProxy const& upstream, BufferedResultForwarder::SPtr const& next_forwarder =
+            BufferedResultForwarder::SPtr());
 
     /**
     \brief Forwards a single result before calling `set_ready()`.
@@ -102,7 +97,7 @@ protected:
 
     \return The buffered reply proxy.
     */
-    unity::scopes::SearchReplyProxy const& upstream();
+    unity::scopes::SearchReplyProxy upstream() const;
 
     void finished(CompletionDetails const& details) override;
 

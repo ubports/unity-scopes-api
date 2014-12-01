@@ -1,3 +1,5 @@
+add_subdirectory(internal)
+
 set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/BufferedResultForwarder.cpp
 )

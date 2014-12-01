@@ -16,7 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#include <unity/scopes/internal/BufferedSearchReplyImpl.h>
+#include <unity/scopes/utility/internal/BufferedSearchReplyImpl.h>
 
 namespace unity
 {
@@ -24,11 +24,15 @@ namespace unity
 namespace scopes
 {
 
+namespace utility
+{
+
 namespace internal
 {
 
 BufferedSearchReplyImpl::BufferedSearchReplyImpl(unity::scopes::SearchReplyProxy const& upstream)
-    : upstream_(upstream),
+    : SearchReply(),
+      upstream_(upstream),
       buffer_(true)
 {
 }
@@ -74,6 +78,7 @@ bool BufferedSearchReplyImpl::push(unity::scopes::CategorisedResult const& resul
 {
     if (buffer_)
     {
+        std::lock_guard<std::mutex> lock(mutex_);
         results_.push_back(result);
         return true;
     }
@@ -90,17 +95,17 @@ bool BufferedSearchReplyImpl::push(unity::scopes::Filters const& filters, unity:
 
 void BufferedSearchReplyImpl::finished()
 {
-    upstream_->finished(); // ???
+    upstream_->finished();
 }
 
 void BufferedSearchReplyImpl::error(std::exception_ptr ex)
 {
-    upstream_->error(ex); // ???
+    upstream_->error(ex);
 }
 
 void BufferedSearchReplyImpl::info(OperationInfo const& op_info)
 {
-    upstream_->info(op_info); // ???
+    upstream_->info(op_info);
 }
 
 std::string BufferedSearchReplyImpl::endpoint()
@@ -135,6 +140,7 @@ void BufferedSearchReplyImpl::disable_buffer()
 
 void BufferedSearchReplyImpl::flush()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     for (auto const& res: results_)
     {
         upstream_->push(res);
@@ -142,8 +148,10 @@ void BufferedSearchReplyImpl::flush()
     results_.clear();
 }
 
-}
+} // namespace internal
 
-}
+} // namespace utility
 
-}
+} // namespace scopes
+
+} // namespace unity

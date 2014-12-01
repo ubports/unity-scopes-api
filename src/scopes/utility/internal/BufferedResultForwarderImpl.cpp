@@ -16,15 +16,19 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#include <unity/scopes/internal/BufferedResultForwarderImpl.h>
-#include <unity/scopes/internal/BufferedSearchReplyImpl.h>
+#include <unity/scopes/utility/internal/BufferedResultForwarderImpl.h>
+#include <unity/scopes/utility/internal/BufferedSearchReplyImpl.h>
 #include <unity/scopes/SearchReply.h>
+#include <unity/UnityExceptions.h>
 #include <cassert>
 
 namespace unity
 {
 
 namespace scopes
+{
+
+namespace utility
 {
 
 namespace internal
@@ -46,10 +50,17 @@ BufferedResultForwarderImpl::BufferedResultForwarderImpl(unity::scopes::SearchRe
       upstream_(std::make_shared<internal::BufferedSearchReplyImpl>(upstream)),
       next_(next_forwarder)
 {
-    next_forwarder->p->has_previous_ = true;
+    if (next_forwarder)
+    {
+        if (next_forwarder->p->has_previous_)
+        {
+            throw InvalidArgumentException("The next forwarder has already been linked to another BufferedResultForwarder");
+        }
+        next_forwarder->p->has_previous_ = true;
+    }
 }
 
-unity::scopes::SearchReplyProxy const& BufferedResultForwarderImpl::upstream()
+unity::scopes::SearchReplyProxy BufferedResultForwarderImpl::upstream() const
 {
     return upstream_;
 }
@@ -62,7 +73,7 @@ void BufferedResultForwarderImpl::push(CategorisedResult result)
 
 bool BufferedResultForwarderImpl::is_ready() const
 {
-    return ready_;
+    return ready_.load();
 }
 
 void BufferedResultForwarderImpl::set_ready()
@@ -71,11 +82,11 @@ void BufferedResultForwarderImpl::set_ready()
     // to be displayed (or the query has finished); set the 'ready' flag
     // and if previous forwarder is also ready, then push and disable
     // futher buffering.
-    if (!ready_)
+    if (!ready_.load())
     {
-        ready_ = true;
+        ready_.store(true);
 
-        if (previous_ready_ || !has_previous_)
+        if (previous_ready_.load() || !has_previous_)
         {
             flush_and_notify();
         }
@@ -86,8 +97,8 @@ void BufferedResultForwarderImpl::notify_ready()
 {
     // we got notified that previous forwarder is ready;
     // if we are ready then notify following forwarder
-    previous_ready_ = true;
-    if (ready_)
+    previous_ready_.store(true);
+    if (ready_.load())
     {
         flush_and_notify();
     }
@@ -102,10 +113,9 @@ void BufferedResultForwarderImpl::flush_and_notify()
     buf->flush();
 
     // notify next forwarder that this one is ready
-    utility::BufferedResultForwarder::SPtr next(next_.lock());
-    if (next)
+    if (next_)
     {
-        next->p->notify_ready();
+        next_->p->notify_ready();
     }
 }
 
@@ -116,7 +126,8 @@ void BufferedResultForwarderImpl::finished(CompletionDetails const&)
 
 } // namespace internal
 
+} // utility
+
 } // namespace scopes
 
 } // namespace unity
-
