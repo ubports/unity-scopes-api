@@ -74,12 +74,11 @@ public:
     int64_t timeout() override;
     std::string to_string() override;
 
-    void disable_buffer();
     void flush();
 
 private:
     std::mutex mutex_;
-    unity::scopes::SearchReplyProxy upstream_;
+    unity::scopes::SearchReplyProxy upstream_;  // Immutable
     std::atomic<bool> buffer_;
     std::vector<CategorisedResult> results_;
 };

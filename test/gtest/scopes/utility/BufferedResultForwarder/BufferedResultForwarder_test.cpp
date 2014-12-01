@@ -325,5 +325,5 @@ TEST(BufferedResultForwarder, exceptions)
 
     auto fwd3 = std::make_shared<SearchReceiver>(upstream);
     auto fwd2 = std::make_shared<SearchReceiver>(upstream, fwd3);
-    EXPECT_THROW(std::make_shared<SearchReceiver>(upstream, fwd3), unity::InvalidArgumentException);
+    EXPECT_THROW(std::make_shared<SearchReceiver>(upstream, fwd3), unity::LogicException);
 }

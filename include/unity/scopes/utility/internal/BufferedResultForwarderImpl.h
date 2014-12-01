@@ -47,16 +47,17 @@ public:
     void push(CategorisedResult result);
     bool is_ready() const;
     void set_ready();
-    void notify_ready();
-    void flush_and_notify();
     void finished(CompletionDetails const& details);
 
 private:
+    void notify_ready();
+    void flush_and_notify();
+
     std::atomic<bool> ready_;
-    bool has_previous_;
+    std::atomic<bool> has_previous_;
     std::atomic<bool> previous_ready_;
-    unity::scopes::SearchReplyProxy const upstream_;
-    BufferedResultForwarder::SPtr next_;
+    unity::scopes::SearchReplyProxy const upstream_;  // Immutable
+    BufferedResultForwarder::SPtr next_;              // Immutable
 };
 
 } // namespace internal

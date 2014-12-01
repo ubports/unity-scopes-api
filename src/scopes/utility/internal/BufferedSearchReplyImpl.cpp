@@ -76,16 +76,15 @@ bool BufferedSearchReplyImpl::push(unity::scopes::experimental::Annotation const
 
 bool BufferedSearchReplyImpl::push(unity::scopes::CategorisedResult const& result)
 {
-    if (buffer_)
     {
         std::lock_guard<std::mutex> lock(mutex_);
-        results_.push_back(result);
-        return true;
+        if (buffer_)
+        {
+            results_.push_back(result);
+            return true;
+        }
     }
-    else
-    {
-        return upstream_->push(result);
-    }
+    return upstream_->push(result);
 }
 
 bool BufferedSearchReplyImpl::push(unity::scopes::Filters const& filters, unity::scopes::FilterState const& filter_state)
@@ -133,19 +132,21 @@ std::string BufferedSearchReplyImpl::to_string()
     return upstream_->to_string();
 }
 
-void BufferedSearchReplyImpl::disable_buffer()
-{
-    buffer_ = false;
-}
-
 void BufferedSearchReplyImpl::flush()
 {
-    std::lock_guard<std::mutex> lock(mutex_);
-    for (auto const& res: results_)
+    std::vector<CategorisedResult> r;
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        if (buffer_)
+        {
+            r.swap(results_);
+            buffer_ = false;
+        }
+    }
+    for (auto const& res : r)
     {
         upstream_->push(res);
     }
-    results_.clear();
 }
 
 } // namespace internal

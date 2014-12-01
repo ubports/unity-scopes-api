@@ -54,7 +54,7 @@ public:
 
     \param upstream The reply proxy for the upstream receiver.
     \param next_forwarder The forwarder that becomes ready once this forwarder calls set_ready().
-    \throws unity::InvalidArgumentException when passed next_forwarder that has already been linked to another BufferedResultForwarder.
+    \throws unity::LogicException when passed next_forwarder that has already been linked to another BufferedResultForwarder.
     */
     BufferedResultForwarder(unity::scopes::SearchReplyProxy const& upstream, BufferedResultForwarder::SPtr const& next_forwarder =
             BufferedResultForwarder::SPtr());
@@ -63,11 +63,11 @@ public:
     \brief Forwards a single result before calling `set_ready()`.
 
     This default implementation forwards incoming results unchanged to the upstream reply proxy and
-    and marks the forwarder ready after forwarding the first result.
+    marks the forwarder ready after forwarding the first result.
 
     This method is called once by the scopes run time for each result that is returned by a query().
 
-    \param result The received result
+    \param result The received result.
     */
     void push(CategorisedResult result) override;
 

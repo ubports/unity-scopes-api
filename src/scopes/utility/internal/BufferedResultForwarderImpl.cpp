@@ -52,11 +52,10 @@ BufferedResultForwarderImpl::BufferedResultForwarderImpl(unity::scopes::SearchRe
 {
     if (next_forwarder)
     {
-        if (next_forwarder->p->has_previous_)
+        if (next_forwarder->p->has_previous_.exchange(true))
         {
-            throw InvalidArgumentException("The next forwarder has already been linked to another BufferedResultForwarder");
+            throw LogicException("The next forwarder has already been linked to another BufferedResultForwarder");
         }
-        next_forwarder->p->has_previous_ = true;
     }
 }
 
@@ -73,7 +72,7 @@ void BufferedResultForwarderImpl::push(CategorisedResult result)
 
 bool BufferedResultForwarderImpl::is_ready() const
 {
-    return ready_.load();
+    return ready_;
 }
 
 void BufferedResultForwarderImpl::set_ready()
@@ -82,11 +81,9 @@ void BufferedResultForwarderImpl::set_ready()
     // to be displayed (or the query has finished); set the 'ready' flag
     // and if previous forwarder is also ready, then push and disable
     // futher buffering.
-    if (!ready_.load())
+    if (!ready_.exchange(true))
     {
-        ready_.store(true);
-
-        if (previous_ready_.load() || !has_previous_)
+        if (previous_ready_ || !has_previous_)
         {
             flush_and_notify();
         }
@@ -97,8 +94,8 @@ void BufferedResultForwarderImpl::notify_ready()
 {
     // we got notified that previous forwarder is ready;
     // if we are ready then notify following forwarder
-    previous_ready_.store(true);
-    if (ready_.load())
+    previous_ready_ = true;
+    if (ready_)
     {
         flush_and_notify();
     }
@@ -109,7 +106,6 @@ void BufferedResultForwarderImpl::flush_and_notify()
     auto buf = std::dynamic_pointer_cast<internal::BufferedSearchReplyImpl>(upstream_);
     assert(buf);
 
-    buf->disable_buffer();
     buf->flush();
 
     // notify next forwarder that this one is ready
