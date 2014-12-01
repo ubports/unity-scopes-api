@@ -40,7 +40,6 @@ namespace internal
 class BufferedResultForwarderImpl
 {
 public:
-    BufferedResultForwarderImpl(unity::scopes::SearchReplyProxy const& upstream);
     BufferedResultForwarderImpl(unity::scopes::SearchReplyProxy const& upstream, unity::scopes::utility::BufferedResultForwarder::SPtr const& next_forwarder);
 
     unity::scopes::SearchReplyProxy upstream() const;

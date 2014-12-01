@@ -34,14 +34,6 @@ namespace utility
 namespace internal
 {
 
-BufferedResultForwarderImpl::BufferedResultForwarderImpl(unity::scopes::SearchReplyProxy const& upstream)
-    : ready_(false),
-      has_previous_(false),
-      previous_ready_(false),
-      upstream_(std::make_shared<internal::BufferedSearchReplyImpl>(upstream))
-{
-}
-
 BufferedResultForwarderImpl::BufferedResultForwarderImpl(unity::scopes::SearchReplyProxy const& upstream,
         unity::scopes::utility::BufferedResultForwarder::SPtr const& next_forwarder)
     : ready_(false),
