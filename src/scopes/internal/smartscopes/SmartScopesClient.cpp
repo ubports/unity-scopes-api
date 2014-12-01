@@ -292,10 +292,11 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
             scope.version = child_node->has_node("version") ? child_node->get_node("version")->as_int() : 0;
             if (scope.version < 0)
             {
-                std::cerr << "SmartScopesClient.get_remote_scopes(): Scope: \"" << scope.id
-                          << "\" returned a negative \"version\" value" << std::endl;
-                std::cerr << "SmartScopesClient.get_remote_scopes(): Skipping scope: \""
-                          << scope.id << "\"" << std::endl;
+                BOOST_LOG_SEV(logger_, Logger::Error)
+                    << "SmartScopesClient.get_remote_scopes(): Scope: \"" << scope.id
+                    << "\" returned a negative \"version\" value";
+                BOOST_LOG_SEV(logger_, Logger::Error)
+                    << "SmartScopesClient.get_remote_scopes(): Skipping scope: \"" << scope.id << "\"";
                 continue;
             }
 
@@ -313,15 +314,17 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
                         }
                         catch (unity::LogicException const& e)
                         {
-                            std::cerr << "SmartScopesClient.get_remote_scopes(): Scope: \""
-                                      << scope.id << "\" returned a non-string tag" << std::endl;
+                            BOOST_LOG_SEV(logger_, Logger::Error)
+                                << "SmartScopesClient.get_remote_scopes(): Scope: \"" << scope.id
+                                << "\" returned a non-string tag";
                         }
                     }
                 }
                 else
                 {
-                    std::cerr << "SmartScopesClient.get_remote_scopes(): Scope: \""
-                              << scope.id << "\" returned an invalid value type for \"tags\"" << std::endl;
+                    BOOST_LOG_SEV(logger_, Logger::Error)
+                        << "SmartScopesClient.get_remote_scopes(): Scope: \"" << scope.id
+                        << "\" returned an invalid value type for \"tags\"";
                 }
             }
 
@@ -732,7 +735,7 @@ std::shared_ptr<DepartmentInfo> SmartScopesClient::parse_departments(JsonNodeInt
         if(subdeps->size() > 0 && dep->subdepartments.size() == 0)
         {
             std::stringstream err;
-            err << "SmartScopesClient::parse_departments(): Failed to parse subdepartments of department '" << dep->label;
+            err << "SmartScopesClient::parse_departments(): Failed to parse subdepartments of department '" << dep->label << "'";
             throw LogicException(err.str());
         }
     }

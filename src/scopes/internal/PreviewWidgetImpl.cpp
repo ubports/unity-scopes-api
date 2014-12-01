@@ -200,7 +200,7 @@ void PreviewWidgetImpl::add_widget(PreviewWidget const& widget)
     {
         if (w.id() == widget.id())
         {
-            throw unity::LogicException("PreviewWidget::add_widget(): widget '" + widget.id() + "' already added to widget '" + id_);
+            throw unity::LogicException("PreviewWidget::add_widget(): widget '" + widget.id() + "' already added to widget '" + id_ + "'");
         }
     }
     widgets_.push_back(widget);
@@ -286,7 +286,7 @@ void PreviewWidgetImpl::throw_on_empty(std::string const& name, std::string cons
 {
     if (value.empty())
     {
-        throw InvalidArgumentException("PreviewWidget: required attribute " + name + " is empty");
+        throw InvalidArgumentException("PreviewWidget: required attribute '" + name + "' is empty");
     }
 }
 
