@@ -49,7 +49,7 @@ namespace
 
 string const& severity(int s)
 {
-    static array<string, 5> const severities = { "TRACE", "INFO", "WARNING", "ERROR", "FATAL" };
+    static array<string, 5> const severities = { { "TRACE", "INFO", "WARNING", "ERROR", "FATAL" } };
     static string const unknown = "UNKNOWN";
 
     if (s < 0 || s >= static_cast<int>(severities.size()))
