@@ -169,7 +169,7 @@ std::string CannedQueryImpl::decode_or_throw(std::string const& value, std::stri
     catch (InvalidArgumentException const& e)
     {
         std::stringstream err;
-        err << "Failed to decode key '" << key_name << "' of uri '" << uri;
+        err << "Failed to decode key '" << key_name << "' of uri '" << uri << "'";
         throw InvalidArgumentException(err.str());
     }
 }
