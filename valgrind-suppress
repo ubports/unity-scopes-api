@@ -233,3 +233,11 @@
    fun:_Znwm
    fun:_ZNSs4_Rep9_S_createEmmRKSaIcE
 }
+
+{
+   zmq_sockopt_after_close
+   Memcheck:Addr4
+   fun:_ZN3zmq13socket_base_t9check_tagEv
+   fun:zmq_getsockopt
+}
+
