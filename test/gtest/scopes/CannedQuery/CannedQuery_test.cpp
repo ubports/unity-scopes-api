@@ -151,7 +151,7 @@ TEST(CannedQuery, from_uri)
         }
         catch (unity::InvalidArgumentException const& e)
         {
-            EXPECT_STREQ("unity::InvalidArgumentException: Failed to decode key 'q' of uri 'scope://foo?q=%:\n"
+            EXPECT_STREQ("unity::InvalidArgumentException: Failed to decode key 'q' of uri 'scope://foo?q=%':\n"
                     "    unity::InvalidArgumentException: from_percent_encoding(): too few characters for percent-encoded value",
                     e.what());
         }
@@ -165,7 +165,7 @@ TEST(CannedQuery, from_uri)
         }
         catch (unity::InvalidArgumentException const& e)
         {
-            EXPECT_STREQ("unity::InvalidArgumentException: Failed to decode key 'q' of uri 'scope://foo?q=%0:\n"
+            EXPECT_STREQ("unity::InvalidArgumentException: Failed to decode key 'q' of uri 'scope://foo?q=%0':\n"
                     "    unity::InvalidArgumentException: from_percent_encoding(): too few characters for percent-encoded value",
                     e.what());
         }
@@ -179,7 +179,7 @@ TEST(CannedQuery, from_uri)
         }
         catch (unity::InvalidArgumentException const& e)
         {
-            EXPECT_STREQ("unity::InvalidArgumentException: Failed to decode key 'dep' of uri 'scope://foo?dep=%qy:\n"
+            EXPECT_STREQ("unity::InvalidArgumentException: Failed to decode key 'dep' of uri 'scope://foo?dep=%qy':\n"
                     "    unity::InvalidArgumentException: from_percent_encoding(): unsupported conversion of 'qy':\n        stoi",
                     e.what());
         }
