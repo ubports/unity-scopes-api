@@ -116,8 +116,8 @@ RegistryObject::~RegistryObject()
             // outputting bogus error messages.
             if (is_scope_running(scope_process.first))
             {
-                scope_process.second.update_state(ScopeProcess::Stopping);
-                scope_process.second.kill();
+                scope_process.second->update_state(ScopeProcess::Stopping);
+                scope_process.second->kill();
             }
         }
         catch(std::exception const& e)
@@ -203,7 +203,7 @@ ObjectProxy RegistryObject::locate(std::string const& identity)
     }
 
     ObjectProxy proxy;
-    ProcessMap::iterator proc_it;
+    shared_ptr<ScopeProcess> proc;
     {
         lock_guard<decltype(mutex_)> lock(mutex_);
 
@@ -214,15 +214,17 @@ ObjectProxy RegistryObject::locate(std::string const& identity)
         }
         proxy = scope_it->second.proxy();
 
-        proc_it = scope_processes_.find(identity);
+        auto proc_it = scope_processes_.find(identity);
         if (proc_it == scope_processes_.end())
         {
             throw NotFoundException("RegistryObject::locate(): Tried to exec unknown local scope", identity);
         }
+        proc = proc_it->second;
     }
 
     // Exec after unlocking, so we can start processing another locate()
-    proc_it->second.exec(death_observer_, executor_);
+    assert(proc);
+    proc->exec(death_observer_, executor_);
 
     return proxy;
 }
@@ -234,7 +236,7 @@ bool RegistryObject::is_scope_running(std::string const& scope_id)
     auto it = scope_processes_.find(scope_id);
     if (it != scope_processes_.end())
     {
-        return it->second.state() == ScopeProcess::ProcessState::Running;
+        return it->second->state() == ScopeProcess::ProcessState::Running;
     }
 
     throw NotFoundException("RegistryObject::is_scope_process_running(): no such scope: ",  scope_id);
@@ -264,7 +266,7 @@ bool RegistryObject::add_local_scope(std::string const& scope_id, ScopeMetadata 
         return_value = false;
     }
     scopes_.insert(make_pair(scope_id, metadata));
-    scope_processes_.insert(make_pair(scope_id, ScopeProcess(exec_data, publisher_, logger_)));
+    scope_processes_.insert(make_pair(scope_id, make_shared<ScopeProcess>(exec_data, publisher_, logger_)));
 
     if (publisher_)
     {
@@ -285,31 +287,55 @@ bool RegistryObject::remove_local_scope(std::string const& scope_id)
                                               "with empty id");
     }
 
-    unique_lock<decltype(mutex_)> lock(mutex_);
-
-    auto proc_it = scope_processes_.find(scope_id);
-    if (proc_it != scope_processes_.end())
+    shared_ptr<ScopeProcess> proc;
     {
-        // Kill process after unlocking, so we can handle on_process_death
-        lock.unlock();
-        proc_it->second.kill();
-        lock.lock();
-    }
+        unique_lock<decltype(mutex_)> lock(mutex_);
 
-    scope_processes_.erase(scope_id);
-
-    if (scopes_.erase(scope_id) == 1)
-    {
-        if (publisher_)
+        auto proc_it = scope_processes_.find(scope_id);
+        if (proc_it != scope_processes_.end())
         {
-            // Send a blank message to subscribers to inform them that the registry has been updated
-            publisher_->send_message("");
+            proc = proc_it->second;
         }
-        remove_desktop_file(scope_id);
-        return true;
     }
 
-    return false;
+    // Kill process after unlocking, so we can handle on_process_death
+    exception_ptr ex;
+    if (proc)
+    {
+        try
+        {
+            proc->kill();
+        }
+        catch (...)
+        {
+            ex = current_exception();
+        }
+    }
+
+    bool erased = false;
+    {
+        unique_lock<decltype(mutex_)> lock(mutex_);
+
+        scope_processes_.erase(scope_id);
+        erased = scopes_.erase(scope_id) == 1;
+        if (erased)
+        {
+            remove_desktop_file(scope_id);
+        }
+    }
+
+    if (publisher_ && erased)
+    {
+        // Send a blank message to subscribers to inform them that the registry has been updated
+        publisher_->send_message("");
+    }
+
+    if (ex)
+    {
+        rethrow_exception(ex);
+    }
+
+    return erased;
 }
 
 void RegistryObject::set_remote_registry(MWRegistryProxy const& remote_registry)
@@ -333,7 +359,7 @@ void RegistryObject::on_process_death(core::posix::ChildProcess const& process)
     pid_t pid = process.pid();
     for (auto& scope_process : scope_processes_)
     {
-        if (scope_process.second.on_process_death(pid))
+        if (scope_process.second->on_process_death(pid))
         {
             break;
         }
@@ -350,10 +376,10 @@ void RegistryObject::on_state_received(std::string const& scope_id, StateReceive
         switch (state)
         {
             case StateReceiverObject::ScopeReady:
-                it->second.update_state(ScopeProcess::ProcessState::Running);
+                it->second->update_state(ScopeProcess::ProcessState::Running);
                 break;
             case StateReceiverObject::ScopeStopping:
-                it->second.update_state(ScopeProcess::ProcessState::Stopping);
+                it->second->update_state(ScopeProcess::ProcessState::Stopping);
                 break;
             default:
                 BOOST_LOG_SEV(logger_, Logger::Error)
@@ -447,11 +473,6 @@ RegistryObject::ScopeProcess::ScopeProcess(ScopeExecData exec_data,
     , reg_publisher_(publisher)
     , manually_started_(false)
     , logger_(logger)
-{
-}
-
-RegistryObject::ScopeProcess::ScopeProcess(ScopeProcess const& other)
-    : ScopeProcess(other.exec_data_, other.reg_publisher_, other.logger_)
 {
 }
 
