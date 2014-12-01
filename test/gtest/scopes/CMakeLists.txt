@@ -1,5 +1,6 @@
 add_subdirectory(internal)
 add_subdirectory(testing)
+add_subdirectory(utility)
 
 if(${slowtests})
   add_subdirectory(stress)
