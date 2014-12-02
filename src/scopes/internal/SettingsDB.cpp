@@ -177,7 +177,11 @@ void SettingsDB::watch_thread()
     {
         fd_set fds;
         FD_ZERO(&fds);
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"
         FD_SET(fd_.get(), &fds);
+#pragma GCC diagnostic pop
 
         int bytes_avail = 0;
         string buffer;

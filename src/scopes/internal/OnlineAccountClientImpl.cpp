@@ -22,6 +22,9 @@
 
 #include <iostream>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"  // Lots of warnings from libg otherwise.
+
 namespace unity
 {
 
@@ -637,6 +640,8 @@ void OnlineAccountClientImpl::main_loop_thread()
     }
     // LCOV_EXCL_STOP
 }
+
+#pragma GCC diagnostic pop
 
 }  // namespace internal
 

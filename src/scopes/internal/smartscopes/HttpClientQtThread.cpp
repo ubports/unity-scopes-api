@@ -17,12 +17,19 @@
  *              Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
+#pragma GCC diagnostic ignored "-Wswitch-default"
+
 #include "unity/scopes/internal/smartscopes/HttpClientQtThread.h"
 
 #include <QNetworkRequest>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QTimer>
+
+#pragma GCC diagnostic pop
+
 #include <cassert>
 
 namespace unity
