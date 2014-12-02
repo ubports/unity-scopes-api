@@ -177,9 +177,15 @@ void SettingsDB::watch_thread()
     {
         fd_set fds;
         FD_ZERO(&fds);
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"
         FD_SET(fd_.get(), &fds);
+#pragma GCC diagnostic pop
 
         int bytes_avail = 0;
+        static_assert(std::alignment_of<char*>::value >= std::alignment_of<struct inotify_event>::value,
+                      "cannot use std::string as buffer for inotify events");
         string buffer;
 
         // Poll for notifications until stop is requested
@@ -212,12 +218,19 @@ void SettingsDB::watch_thread()
                                        "read() failed on inotify fd (fd = " +
                                        to_string(fd_.get()) + ")", errno);
             }
+            if (bytes_read != bytes_avail)
+            {
+                throw ResourceException("SettingsDB::watch_thread(): Thread aborted: "
+                                       "read() returned " + std::to_string(bytes_read) +
+                                       " bytes, expected " + std::to_string(bytes_avail) +
+                                       " bytes (fd = " + std::to_string(fd_.get()) + ")");
+            }
 
             // Process event(s) received
             int i = 0;
             while (i < bytes_read)
             {
-                struct inotify_event* event = reinterpret_cast<inotify_event*>(&buffer[i]);
+                auto event = reinterpret_cast<inotify_event const*>(&buffer[i]);
 
                 if (event->mask & IN_DELETE_SELF)
                 {

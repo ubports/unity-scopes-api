@@ -172,9 +172,14 @@ void DirWatcher::watch_thread()
     {
         fd_set fds;
         FD_ZERO(&fds);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"
         FD_SET(fd_, &fds);
+#pragma GCC diagnostic pop
 
         int bytes_avail = 0;
+        static_assert(std::alignment_of<char*>::value >= std::alignment_of<struct inotify_event>::value,
+                      "cannot use std::string as buffer for inotify events");
         std::string buffer;
         std::string event_path;
 
@@ -218,7 +223,7 @@ void DirWatcher::watch_thread()
             int i = 0;
             while (i < bytes_read)
             {
-                struct inotify_event* event = (inotify_event*)&buffer[i];
+                auto event = reinterpret_cast<inotify_event const*>(&buffer[i]);
                 {
                     event_path = "";
                     std::lock_guard<std::mutex> lock(mutex_);

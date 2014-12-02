@@ -144,6 +144,13 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -pedantic -Wno-variadic-macros -Wextra
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=default")
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pedantic -Wall -Wextra")
+
+# Some additional warnings not included by the general flags set above.
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wformat -Wold-style-cast -Wredundant-decls -Wswitch-default")
+
+# TODO: Once AbstractScopeBase gets its virtual destructor, turn on the line below (bug #1360266).
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wnon-virtual-dtor")
+
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic -Wall -Wextra") # Can't use -std=c++11 with C compiler
 
 # -fno-permissive causes warnings with clang, so we only enable it for gcc
