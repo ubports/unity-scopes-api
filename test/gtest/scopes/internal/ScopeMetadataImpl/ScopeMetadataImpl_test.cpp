@@ -372,6 +372,12 @@ TEST(ScopeMetadataImpl, serialize)
     EXPECT_FALSE(c.invisible());
     EXPECT_EQ(va, c.settings_definitions());
     EXPECT_FALSE(c.location_data_needed());
+    EXPECT_EQ(2u, c.child_scope_ids().size());
+    EXPECT_EQ("com.foo.bar", c.child_scope_ids()[0]);
+    EXPECT_EQ("com.foo.baz", c.child_scope_ids()[1]);
+    EXPECT_EQ(2u, c.tags().size());
+    EXPECT_EQ("news", c.tags()[0]);
+    EXPECT_EQ("games", c.tags()[1]);
 }
 
 TEST(ScopeMetadataImpl, serialize_exceptions)

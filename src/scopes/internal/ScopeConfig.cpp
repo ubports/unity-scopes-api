@@ -276,7 +276,8 @@ ScopeConfig::ScopeConfig(string const& configfile) :
                results_ttl_key,
                debug_mode_key,
                child_scope_ids_key,
-               version_key
+               version_key,
+               tags_key
            }
         },
         {  scope_appearance_group,
