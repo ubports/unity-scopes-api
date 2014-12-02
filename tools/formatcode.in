@@ -27,7 +27,7 @@
 astyle="@ASTYLE_COMMAND@"
 format="@CLANG_FORMAT_COMMAND@"
 dos2unix="@DOS2UNIX_COMMAND@"
-style="@CMAKE_SOURCE_DIR@/_clang_format"
+style="@CMAKE_SOURCE_DIR@/_clang-format"
 
 # Check that the format commands were found.
 [ "$astyle" = "ASTYLE_COMMAND-NOTFOUND" -o \
