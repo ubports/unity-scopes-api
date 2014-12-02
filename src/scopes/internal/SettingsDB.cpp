@@ -184,6 +184,8 @@ void SettingsDB::watch_thread()
 #pragma GCC diagnostic pop
 
         int bytes_avail = 0;
+        static_assert(std::alignment_of<char*>::value >= std::alignment_of<struct inotify_event>::value,
+                      "cannot use std::string as buffer for inotify events");
         string buffer;
 
         // Poll for notifications until stop is requested
@@ -215,6 +217,13 @@ void SettingsDB::watch_thread()
                 throw SyscallException("SettingsDB::watch_thread(): Thread aborted: "
                                        "read() failed on inotify fd (fd = " +
                                        to_string(fd_.get()) + ")", errno);
+            }
+            if (bytes_read != bytes_avail)
+            {
+                throw ResourceException("SettingsDB::watch_thread(): Thread aborted: "
+                                       "read() returned " + std::to_string(bytes_read) +
+                                       " bytes, expected " + std::to_string(bytes_avail) +
+                                       " bytes (fd = " + std::to_string(fd_.get()) + ")");
             }
 
             // Process event(s) received

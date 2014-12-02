@@ -178,6 +178,8 @@ void DirWatcher::watch_thread()
 #pragma GCC diagnostic pop
 
         int bytes_avail = 0;
+        static_assert(std::alignment_of<char*>::value >= std::alignment_of<struct inotify_event>::value,
+                      "cannot use std::string as buffer for inotify events");
         std::string buffer;
         std::string event_path;
 
