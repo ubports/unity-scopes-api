@@ -340,7 +340,7 @@ TEST(ScopeMetadataImpl, serialize)
     EXPECT_FALSE(var["invisible"].get_bool());
     EXPECT_EQ("bar", var["appearance_attributes"].get_dict()["foo"].get_string());
     EXPECT_EQ(ScopeMetadata::ResultsTtlType::Large,
-            (ScopeMetadata::ResultsTtlType ) var["results_ttl_type"].get_int());
+              static_cast<ScopeMetadata::ResultsTtlType>(var["results_ttl_type"].get_int()));
     EXPECT_EQ(1, var["version"].get_int());
     EXPECT_FALSE(var["invisible"].get_bool());
     EXPECT_EQ(va, var["settings_definitions"].get_array());

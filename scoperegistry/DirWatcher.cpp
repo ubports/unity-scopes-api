@@ -218,7 +218,7 @@ void DirWatcher::watch_thread()
             int i = 0;
             while (i < bytes_read)
             {
-                struct inotify_event* event = (inotify_event*)&buffer[i];
+                struct inotify_event* event = reinterpret_cast<inotify_event*>(&buffer[i]);
                 {
                     event_path = "";
                     std::lock_guard<std::mutex> lock(mutex_);
