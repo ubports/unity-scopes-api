@@ -48,7 +48,7 @@ namespace testing
 class OnlineAccountClientTest : public ::testing::Test
 {
 public:
-    OnlineAccountClientTest()
+    OnlineAccountClientTest(OnlineAccountClient::MainLoopSelect main_loop_select = OnlineAccountClient::CreateInternalMainLoop)
     {
         boost::filesystem::remove(TEST_DB_DIR "/accounts.db");
 
@@ -58,7 +58,7 @@ public:
         setenv("AG_SERVICE_TYPES", TEST_DATA_DIR, false);
         setenv("AG_PROVIDERS", TEST_DATA_DIR, false);
 
-        oa_client_.reset(new OnlineAccountClient("TestService", "sharing", "TestProvider"));
+        oa_client_.reset(new OnlineAccountClient("TestService", "sharing", "TestProvider", main_loop_select));
 
         manager_ = oa_client_->p->manager();
         main_loop_context_ = oa_client_->p->main_loop_context();
@@ -288,6 +288,13 @@ private:
     }
 };
 
+class OnlineAccountClientTestNoMainLoop : public OnlineAccountClientTest
+{
+public:
+    OnlineAccountClientTestNoMainLoop()
+        : OnlineAccountClientTest(OnlineAccountClient::RunInExternalMainLoop) {}
+};
+
 } // namespace testing
 } // namespace scopes
 } // namespace unity
@@ -452,7 +459,7 @@ TEST_F(OnlineAccountClientTest, service_update_callback)
     EXPECT_TRUE(wait_for_service_update(disabled_status));
 }
 
-TEST_F(OnlineAccountClientTest, authentication)
+TEST_F(OnlineAccountClientTestNoMainLoop, authentication)
 {
     OnlineAccountClient::ServiceStatus auth_status;
     auth_status.account_id = 1;
