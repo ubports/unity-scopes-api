@@ -98,6 +98,7 @@ public:
     ScopeMetadataBuilder& child_scope_ids(Optional<std::vector<std::string>> const& value);
     ScopeMetadataBuilder& version(Optional<int> const& value);
     ScopeMetadataBuilder& keywords(Optional<std::vector<std::string>> const& value);
+    ScopeMetadataBuilder& is_aggregator(Optional<bool> const& value);
 
     ScopeMetadata operator()() const;
 
