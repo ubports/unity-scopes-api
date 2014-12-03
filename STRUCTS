@@ -80,6 +80,7 @@ ScopeMetadata (returned by serialize()):
  'child_scopes'          : array of strings, optional
  'version'               : int, optional
  'tags'                  : array of strings, optional
+ 'is_aggregator'         : bool, optional
 
 Query (returned by serialize())
 ===============================
