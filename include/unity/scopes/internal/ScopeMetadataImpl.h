@@ -108,7 +108,7 @@ private:
     std::vector<std::string> child_scope_ids_;
     int version_;
     std::vector<std::string> keywords_;
-    std::unique_ptr<bool> is_aggregator;                  // Optional, hence a pointer
+    std::unique_ptr<bool> is_aggregator_;                 // Optional, hence a pointer
 };
 
 } // namespace internal
