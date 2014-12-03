@@ -403,13 +403,13 @@ The following keys are recognized in the ScopeConfig group:
 
   If not set, the default value is false.
 
-- Tags
+- Keywords
 
-  A list of tags this scope falls under (if any). The values in this list must be separated by semicolons.
+  A list of keywords this scope falls under (if any). The values in this list must be separated by semicolons.
 
-  E.g. "Tags = music;video"
+  E.g. "Keywords = music;video"
 
-  Note: make sure there are no trailing spaces following the tags, as they will be preserved.
+  Note: make sure there are no trailing spaces following the keywords, as they will be preserved.
 
 - IsAggregator
 
