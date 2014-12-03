@@ -61,7 +61,7 @@ ScopeMetadataImpl::ScopeMetadataImpl(ScopeMetadataImpl const& other)
     , results_ttl_type_(other.results_ttl_type_)
     , child_scope_ids_(other.child_scope_ids_)
     , version_(other.version_)
-    , tags_(other.tags_)
+    , keywords_(other.keywords_)
 {
     if (other.art_)
     {
@@ -119,7 +119,7 @@ ScopeMetadataImpl& ScopeMetadataImpl::operator=(ScopeMetadataImpl const& rhs)
         location_data_needed_.reset(rhs.location_data_needed_ ? new bool(*rhs.location_data_needed_) : nullptr);
         child_scope_ids_ = rhs.child_scope_ids_;
         version_ = rhs.version_;
-        tags_ = rhs.tags_;
+        keywords_ = rhs.keywords_;
     }
     return *this;
 }
@@ -241,9 +241,9 @@ int ScopeMetadataImpl::version() const
     return version_;
 }
 
-std::vector<std::string> ScopeMetadataImpl::tags() const
+std::vector<std::string> ScopeMetadataImpl::keywords() const
 {
-    return tags_;
+    return keywords_;
 }
 
 void ScopeMetadataImpl::set_scope_id(std::string const& scope_id)
@@ -335,9 +335,9 @@ void ScopeMetadataImpl::set_version(int v)
     version_ = v;
 }
 
-void ScopeMetadataImpl::set_tags(std::vector<std::string> const& tags)
+void ScopeMetadataImpl::set_keywords(std::vector<std::string> const& keywords)
 {
-    tags_ = tags;
+    keywords_ = keywords;
 }
 
 namespace
@@ -425,14 +425,14 @@ VariantMap ScopeMetadataImpl::serialize() const
         }
         var["child_scopes"] = Variant(va);
     }
-    if (tags_.size())
+    if (keywords_.size())
     {
         VariantArray va;
-        for (auto const& tag: tags_)
+        for (auto const& keyword: keywords_)
         {
-            va.push_back(Variant(tag));
+            va.push_back(Variant(keyword));
         }
-        var["tags"] = Variant(va);
+        var["keywords"] = Variant(va);
     }
 
     return var;
@@ -579,13 +579,13 @@ void ScopeMetadataImpl::deserialize(VariantMap const& var)
         }
     }
 
-    tags_.clear();
-    it = var.find("tags");
+    keywords_.clear();
+    it = var.find("keywords");
     if (it != var.end())
     {
         for (auto const& v: it->second.get_array())
         {
-            tags_.push_back(v.get_string());
+            keywords_.push_back(v.get_string());
         }
     }
 }

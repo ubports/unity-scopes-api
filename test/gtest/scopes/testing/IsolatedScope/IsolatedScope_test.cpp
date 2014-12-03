@@ -94,7 +94,7 @@ TEST(ScopeMetadataBuilder, construct_full)
     settings_defs.push_back(unity::scopes::Variant(a_setting));
 
     std::vector<std::string> child_scope_ids{ "joe", "mary" };
-    std::vector<std::string> tags{ "people", "things" };
+    std::vector<std::string> keywords{ "people", "things" };
 
     unity::scopes::testing::ScopeMetadataBuilder builder;
     builder.scope_id(scope_id)
@@ -114,7 +114,7 @@ TEST(ScopeMetadataBuilder, construct_full)
         .location_data_needed(true)
         .child_scope_ids(child_scope_ids)
         .version(42)
-        .tags(tags);
+        .keywords(keywords);
     unity::scopes::ScopeMetadata metadata = builder();
     EXPECT_EQ(scope_id, metadata.scope_id());
     EXPECT_EQ("display_name", metadata.display_name());
@@ -132,7 +132,7 @@ TEST(ScopeMetadataBuilder, construct_full)
     EXPECT_TRUE(metadata.location_data_needed());
     EXPECT_EQ(child_scope_ids, metadata.child_scope_ids());
     EXPECT_EQ(42, metadata.version());
-    EXPECT_EQ(tags, metadata.tags());
+    EXPECT_EQ(keywords, metadata.keywords());
 }
 
 TEST(ScopeMetadataBuilder, construction_in_case_of_missing_mandatory_arguments_aborts)

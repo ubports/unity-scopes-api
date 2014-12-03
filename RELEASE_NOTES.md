@@ -1,6 +1,10 @@
 Release notes
 =============
 
+Changes in version 0.6.10
+=========================
+  - Renamed "Tags" scope .ini option to "Keywords"
+
 Changes in version 0.6.9
 ========================
   - Added support for ChildScopes scope .ini option to list scopes ids of aggregated scopes.

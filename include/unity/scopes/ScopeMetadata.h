@@ -204,14 +204,14 @@ public:
     int version() const;
 
     /**
-    \brief Return the list of tags specified by this scope.
+    \brief Return the list of keywords specified by this scope.
 
     The list returned by this method is formulated from the value specified under
-    the "Tags" key in the scope's .ini file.
+    the "Keywords" key in the scope's .ini file.
 
-    \return The list of scope tags specified by this scope.
+    \return The list of scope keywords specified by this scope.
     */
-    std::vector<std::string> tags() const;
+    std::vector<std::string> keywords() const;
 
 private:
     ScopeMetadata(std::unique_ptr<internal::ScopeMetadataImpl>);           // Instantiable only by ScopeMetadataImpl

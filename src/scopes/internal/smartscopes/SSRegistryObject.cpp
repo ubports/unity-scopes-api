@@ -345,7 +345,7 @@ void SSRegistryObject::get_remote_scopes()
 
             metadata->set_version(scope.version);
 
-            metadata->set_tags(scope.tags);
+            metadata->set_keywords(scope.keywords);
 
             ScopeProxy proxy = ScopeImpl::create(middleware_->create_scope_proxy(scope.id, ss_scope_endpoint_),
                                                  middleware_->runtime(),
