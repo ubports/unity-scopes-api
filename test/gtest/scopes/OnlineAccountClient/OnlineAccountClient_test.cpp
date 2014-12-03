@@ -48,7 +48,7 @@ namespace testing
 class OnlineAccountClientTest : public ::testing::Test
 {
 public:
-    OnlineAccountClientTest(OnlineAccountClient::MainLoopSelect main_loop_select = OnlineAccountClient::CreateInternalMainLoop)
+    OnlineAccountClientTest()
     {
         boost::filesystem::remove(TEST_DB_DIR "/accounts.db");
 
@@ -58,7 +58,7 @@ public:
         setenv("AG_SERVICE_TYPES", TEST_DATA_DIR, false);
         setenv("AG_PROVIDERS", TEST_DATA_DIR, false);
 
-        oa_client_.reset(new OnlineAccountClient("TestService", "sharing", "TestProvider", main_loop_select));
+        oa_client_.reset(new OnlineAccountClient("TestService", "sharing", "TestProvider"));
 
         manager_ = oa_client_->p->manager();
         main_loop_context_ = oa_client_->p->main_loop_context();
@@ -288,13 +288,6 @@ private:
     }
 };
 
-class OnlineAccountClientTestNoMainLoop : public OnlineAccountClientTest
-{
-public:
-    OnlineAccountClientTestNoMainLoop()
-        : OnlineAccountClientTest(OnlineAccountClient::RunInExternalMainLoop) {}
-};
-
 } // namespace testing
 } // namespace scopes
 } // namespace unity
@@ -459,50 +452,7 @@ TEST_F(OnlineAccountClientTest, service_update_callback)
     EXPECT_TRUE(wait_for_service_update(disabled_status));
 }
 
-TEST_F(OnlineAccountClientTestNoMainLoop, refresh_services_no_main_loop)
-{
-    auto statuses = oa_client()->get_service_statuses();
-    EXPECT_EQ(0, statuses.size());
-
-    create_account();
-    oa_client()->refresh_service_statuses();
-
-    statuses = oa_client()->get_service_statuses();
-    EXPECT_EQ(1, statuses.size());
-    EXPECT_FALSE(statuses[0].service_enabled);
-
-    enable_service();
-    oa_client()->refresh_service_statuses();
-
-    statuses = oa_client()->get_service_statuses();
-    EXPECT_TRUE(statuses[0].service_enabled);
-
-    disable_service();
-    oa_client()->refresh_service_statuses();
-
-    statuses = oa_client()->get_service_statuses();
-    EXPECT_FALSE(statuses[0].service_enabled);
-
-    enable_service();
-    oa_client()->refresh_service_statuses();
-
-    statuses = oa_client()->get_service_statuses();
-    EXPECT_TRUE(statuses[0].service_enabled);
-
-    disable_account();
-    oa_client()->refresh_service_statuses();
-
-    statuses = oa_client()->get_service_statuses();
-    EXPECT_FALSE(statuses[0].service_enabled);
-
-    enable_account();
-    oa_client()->refresh_service_statuses();
-
-    statuses = oa_client()->get_service_statuses();
-    EXPECT_TRUE(statuses[0].service_enabled);
-}
-
-TEST_F(OnlineAccountClientTestNoMainLoop, authentication)
+TEST_F(OnlineAccountClientTest, authentication)
 {
     OnlineAccountClient::ServiceStatus auth_status;
     auth_status.account_id = 1;
