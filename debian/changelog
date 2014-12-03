@@ -1,3 +1,9 @@
+unity-scopes-api (0.6.10-0ubuntu1) UNRELEASED; urgency=medium
+
+  * Renamed "Tags" scope .ini option to "Keywords"
+
+ -- Marcus Tomlinson <marcus.tomlinson@canonical.com>  Wed, 03 Dec 2014 08:32:29 +0200
+
 unity-scopes-api (0.6.9+15.04.20141129-0ubuntu1) vivid; urgency=medium
 
   [ Pawel Stolowski ]

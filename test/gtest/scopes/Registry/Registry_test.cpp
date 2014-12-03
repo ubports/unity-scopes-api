@@ -111,11 +111,11 @@ TEST(Registry, metadata)
     EXPECT_EQ("com.foo.bar", children[0]);
     EXPECT_EQ("com.foo.baz", children[1]);
     EXPECT_EQ(1, meta.version());
-    auto tags = meta.tags();
-    EXPECT_EQ(3u, tags.size());
-    EXPECT_EQ("music", tags[0]);
-    EXPECT_EQ("news", tags[1]);
-    EXPECT_EQ("foo", tags[2]);
+    auto keywords = meta.keywords();
+    EXPECT_EQ(3u, keywords.size());
+    EXPECT_EQ("music", keywords[0]);
+    EXPECT_EQ("news", keywords[1]);
+    EXPECT_EQ("foo", keywords[2]);
 
     auto attrs = meta.appearance_attributes();
     EXPECT_EQ("fg_color", attrs["foreground-color"].get_string());
@@ -147,7 +147,7 @@ TEST(Registry, metadata)
     EXPECT_EQ(0, defs.size());
     EXPECT_FALSE(meta.location_data_needed());
     EXPECT_EQ(0, meta.child_scope_ids().size());
-    EXPECT_EQ(0, meta.tags().size());
+    EXPECT_EQ(0, meta.keywords().size());
     EXPECT_EQ(0, meta.version());
 }
 
