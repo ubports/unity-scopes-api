@@ -162,6 +162,11 @@ std::vector<std::string> ScopeMetadata::keywords() const
     return p->keywords();
 }
 
+bool ScopeMetadata::is_aggregator() const
+{
+    return p->is_aggregator();
+}
+
 //! @endcond
 
 } // namespace scopes
