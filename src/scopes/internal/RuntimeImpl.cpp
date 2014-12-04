@@ -75,6 +75,7 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
         logger_.reset(new Logger(scope_id_));
 
         // Create the middleware factory and get the registry identity and config filename.
+        runtime_configfile_ = configfile;
         RuntimeConfig config(configfile);
         string default_middleware = config.default_middleware();
         string middleware_configfile = config.default_middleware_configfile();
@@ -329,14 +330,6 @@ void RuntimeImpl::run_scope(ScopeBase* scope_base,
                             string const& scope_ini_file,
                             std::promise<void> ready_promise)
 {
-    run_scope(scope_base, "", scope_ini_file, move(ready_promise));
-}
-
-void RuntimeImpl::run_scope(ScopeBase* scope_base,
-                            string const& runtime_ini_file,
-                            string const& scope_ini_file,
-                            std::promise<void> ready_promise)
-{
     if (!scope_base)
     {
         throw InvalidArgumentException("Runtime::run_scope(): scope_base cannot be nullptr");
@@ -441,7 +434,7 @@ void RuntimeImpl::run_scope(ScopeBase* scope_base,
 
         {
             // mw is now shut down, so we need a separate one to send the state update to the registry.
-            auto sd_runtime = create(scope_id_ + "-shutdown", runtime_ini_file);
+            auto sd_runtime = create(scope_id_ + "-shutdown", runtime_configfile_);
             auto sd_mw = sd_runtime->factory()->find(scope_id_ + "-shutdown", reg_conf.mw_kind());
             auto reg_state_receiver = sd_mw->create_registry_state_receiver_proxy("StateReceiver");
             // Inform the registry that this scope is shutting down

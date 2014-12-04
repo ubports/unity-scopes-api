@@ -163,7 +163,7 @@ int run_scope(std::string const& runtime_config, std::string const& scope_config
             rt = RuntimeImpl::create(scope_id, runtime_config);
         }
 
-        rt->run_scope(loader->scope_base(), runtime_config, scope_config);
+        rt->run_scope(loader->scope_base(), scope_config);
 
         exit_status = 0;
     }

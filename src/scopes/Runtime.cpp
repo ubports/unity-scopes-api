@@ -67,9 +67,9 @@ void Runtime::run_scope(ScopeBase* const scope_base, std::string const& scope_in
     p->run_scope(scope_base, scope_ini_file);
 }
 
-void Runtime::run_scope(ScopeBase* const scope_base, std::string const& runtime_ini_file, std::string const& scope_ini_file)
+void Runtime::run_scope(ScopeBase* const scope_base, std::string const&, std::string const& scope_ini_file)
 {
-    p->run_scope(scope_base, runtime_ini_file, scope_ini_file);
+    p->run_scope(scope_base, scope_ini_file);
 }
 
 ObjectProxy Runtime::string_to_proxy(string const& s) const

@@ -70,7 +70,7 @@ private:
 void slowsearchscope_thread(RuntimeImpl::SPtr const& rt, string const& runtime_ini_file)
 {
     SlowSearchScope scope;
-    rt->run_scope(&scope, runtime_ini_file, "SlowSearchScope.ini");
+    rt->run_scope(&scope, "SlowSearchScope.ini");
 }
 
 // Check that the idle timeout for a server works if no operations are in progress
@@ -84,7 +84,7 @@ TEST(IdleTimeout, server_idle_timeout_while_idle)
 
         // Make a run time for the scope and run the scope.
         auto rt = RuntimeImpl::create("SlowSearchScope", "Runtime.ini");
-        rt->run_scope(&scope, "Runtime.ini", "SlowSearchScope.ini");
+        rt->run_scope(&scope, "SlowSearchScope.ini");
     }
 
     // Check that the scope has indeed timed out. The server shuts down after 2 seconds,
