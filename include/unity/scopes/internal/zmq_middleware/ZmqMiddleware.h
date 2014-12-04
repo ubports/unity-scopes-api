@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <unity/scopes/internal/Logger.h>
 #include <unity/scopes/internal/MiddlewareBase.h>
 #include <unity/scopes/internal/MWRegistryProxyFwd.h>
 #include <unity/scopes/internal/MWReplyProxyFwd.h>
@@ -130,7 +131,8 @@ private:
     State state_;
     std::condition_variable state_changed_;
     mutable std::mutex state_mutex_;            // Protects state_
-    std::atomic_bool shutdown_flag;
+    std::atomic_bool shutdown_flag_;
+    boost::log::sources::severity_channel_logger_mt<>& logger_;
 
     int64_t twoway_timeout_;                    // Default timeout for twoway invocations
     int64_t locate_timeout_;                    // Timeout for registry locate()

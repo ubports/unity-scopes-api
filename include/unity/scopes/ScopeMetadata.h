@@ -195,6 +195,24 @@ public:
     */
     std::vector<std::string> child_scope_ids() const;
 
+    /**
+    \brief Return the version of the scope.
+
+    \return The version or, if the scope does not define its version,
+    the value `0`.
+    */
+    int version() const;
+
+    /**
+    \brief Return the list of keywords specified by this scope.
+
+    The list returned by this method is formulated from the value specified under
+    the "Keywords" key in the scope's .ini file.
+
+    \return The list of scope keywords specified by this scope.
+    */
+    std::vector<std::string> keywords() const;
+
 private:
     ScopeMetadata(std::unique_ptr<internal::ScopeMetadataImpl>);           // Instantiable only by ScopeMetadataImpl
     std::unique_ptr<internal::ScopeMetadataImpl> p;

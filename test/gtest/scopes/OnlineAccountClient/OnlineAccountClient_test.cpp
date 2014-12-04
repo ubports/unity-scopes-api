@@ -459,49 +459,6 @@ TEST_F(OnlineAccountClientTest, service_update_callback)
     EXPECT_TRUE(wait_for_service_update(disabled_status));
 }
 
-TEST_F(OnlineAccountClientTestNoMainLoop, refresh_services_no_main_loop)
-{
-    auto statuses = oa_client()->get_service_statuses();
-    EXPECT_EQ(0, statuses.size());
-
-    create_account();
-    oa_client()->refresh_service_statuses();
-
-    statuses = oa_client()->get_service_statuses();
-    EXPECT_EQ(1, statuses.size());
-    EXPECT_FALSE(statuses[0].service_enabled);
-
-    enable_service();
-    oa_client()->refresh_service_statuses();
-
-    statuses = oa_client()->get_service_statuses();
-    EXPECT_TRUE(statuses[0].service_enabled);
-
-    disable_service();
-    oa_client()->refresh_service_statuses();
-
-    statuses = oa_client()->get_service_statuses();
-    EXPECT_FALSE(statuses[0].service_enabled);
-
-    enable_service();
-    oa_client()->refresh_service_statuses();
-
-    statuses = oa_client()->get_service_statuses();
-    EXPECT_TRUE(statuses[0].service_enabled);
-
-    disable_account();
-    oa_client()->refresh_service_statuses();
-
-    statuses = oa_client()->get_service_statuses();
-    EXPECT_FALSE(statuses[0].service_enabled);
-
-    enable_account();
-    oa_client()->refresh_service_statuses();
-
-    statuses = oa_client()->get_service_statuses();
-    EXPECT_TRUE(statuses[0].service_enabled);
-}
-
 TEST_F(OnlineAccountClientTestNoMainLoop, authentication)
 {
     OnlineAccountClient::ServiceStatus auth_status;

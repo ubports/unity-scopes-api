@@ -65,15 +65,15 @@ interface Scope
 
 */
 
-using namespace std::placeholders;
+using namespace std;
+namespace ph = std::placeholders;
 
 ScopeI::ScopeI(ScopeObjectBase::SPtr const& so) :
-    ServantBase(so, {
-        { "search", bind(&ScopeI::search_, this, _1, _2, _3) },
-        { "preview", bind(&ScopeI::preview_, this, _1, _2, _3) },
-        { "activate", bind(&ScopeI::activate_, this, _1, _2, _3) },
-        { "perform_action", bind(&ScopeI::perform_action_, this, _1, _2, _3) },
-        { "debug_mode", bind(&ScopeI::debug_mode_, this, _1, _2, _3) }
+    ServantBase(so, { { "search", bind(&ScopeI::search_, this, ph::_1, ph::_2, ph::_3) },
+                      { "preview", bind(&ScopeI::preview_, this, ph::_1, ph::_2, ph::_3) },
+                      { "activate", bind(&ScopeI::activate_, this, ph::_1, ph::_2, ph::_3) },
+                      { "perform_action", bind(&ScopeI::perform_action_, this, ph::_1, ph::_2, ph::_3) },
+                      { "debug_mode", bind(&ScopeI::debug_mode_, this, ph::_1, ph::_2, ph::_3) }
     })
 {
 }

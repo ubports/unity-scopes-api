@@ -24,7 +24,6 @@
 #include <unity/scopes/internal/Utils.h>
 
 #include <algorithm>
-#include <iostream>
 #include <sstream>
 #include <string>
 
@@ -57,6 +56,8 @@ namespace
     const string results_ttl_key = "ResultsTtlType";
     const string debug_mode_key = "DebugMode";
     const string child_scope_ids_key = "ChildScopes";
+    const string version_key = "Version";
+    const string keywords_key = "Keywords";
 
     const string scope_appearance_group = "Appearance";
     const string fg_color_key = "ForegroundColor";
@@ -209,6 +210,35 @@ ScopeConfig::ScopeConfig(string const& configfile) :
 
     try
     {
+        version_ = get_int(scope_config_group, version_key);
+        if (version_ <= 0)
+        {
+            throw_ex("Version must be > 0");
+        }
+    }
+    catch (LogicException const&)
+    {
+        version_ = 0;
+    }
+
+    try
+    {
+        keywords_ = parser()->get_string_array(scope_config_group, keywords_key);
+    }
+    catch (LogicException const&)
+    {
+    }
+
+    for (auto const& keyword: keywords_)
+    {
+        if (keyword.empty())
+        {
+            throw_ex("Invalid empty keyword string found in \"Keywords\" list");
+        }
+    }
+
+    try
+    {
         debug_mode_ = parser()->get_boolean(scope_config_group, debug_mode_key);
     }
     catch (LogicException const&)
@@ -245,7 +275,9 @@ ScopeConfig::ScopeConfig(string const& configfile) :
                idle_timeout_key,
                results_ttl_key,
                debug_mode_key,
-               child_scope_ids_key
+               child_scope_ids_key,
+               version_key,
+               keywords_key
            }
         },
         {  scope_appearance_group,
@@ -422,6 +454,16 @@ VariantMap ScopeConfig::appearance_attributes() const
 std::vector<std::string> ScopeConfig::child_scope_ids() const
 {
     return child_scope_ids_;
+}
+
+int ScopeConfig::version() const
+{
+    return version_;
+}
+
+std::vector<std::string> ScopeConfig::keywords() const
+{
+    return keywords_;
 }
 
 } // namespace internal

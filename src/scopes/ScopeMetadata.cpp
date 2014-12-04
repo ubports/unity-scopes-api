@@ -152,6 +152,16 @@ std::vector<std::string> ScopeMetadata::child_scope_ids() const
     return p->child_scope_ids();
 }
 
+int ScopeMetadata::version() const
+{
+    return p->version();
+}
+
+std::vector<std::string> ScopeMetadata::keywords() const
+{
+    return p->keywords();
+}
+
 //! @endcond
 
 } // namespace scopes

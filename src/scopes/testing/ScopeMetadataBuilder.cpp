@@ -44,6 +44,11 @@ struct testing::ScopeMetadataBuilder::Private
     Optional<VariantMap> appearance_attributes;
     Optional<std::string> scope_directory;
     Optional<ScopeMetadata::ResultsTtlType> results_ttl_type;
+    Optional<VariantArray> settings_definitions;
+    Optional<bool> location_data_needed;
+    Optional<std::vector<std::string>> child_scope_ids;
+    Optional<int> version;
+    Optional<std::vector<std::string>> keywords;
 };
 
 testing::ScopeMetadataBuilder::ScopeMetadataBuilder() : p(new Private())
@@ -132,6 +137,36 @@ testing::ScopeMetadataBuilder& testing::ScopeMetadataBuilder::results_ttl_type(O
     return *this;
 }
 
+testing::ScopeMetadataBuilder& testing::ScopeMetadataBuilder::settings_definitions(Optional<VariantArray> const& value)
+{
+    p->settings_definitions = value;
+    return *this;
+}
+
+testing::ScopeMetadataBuilder& testing::ScopeMetadataBuilder::location_data_needed(Optional<bool> const& value)
+{
+    p->location_data_needed = value;
+    return *this;
+}
+
+testing::ScopeMetadataBuilder& testing::ScopeMetadataBuilder::child_scope_ids(Optional<std::vector<std::string>> const& value)
+{
+    p->child_scope_ids = value;
+    return *this;
+}
+
+testing::ScopeMetadataBuilder& testing::ScopeMetadataBuilder::version(Optional<int> const& value)
+{
+    p->version = value;
+    return *this;
+}
+
+testing::ScopeMetadataBuilder& testing::ScopeMetadataBuilder::keywords(Optional<std::vector<std::string>> const& value)
+{
+    p->keywords = value;
+    return *this;
+}
+
 unity::scopes::ScopeMetadata testing::ScopeMetadataBuilder::operator()() const
 {
     auto impl = new unity::scopes::internal::ScopeMetadataImpl(Private::invalid_middleware);
@@ -157,6 +192,16 @@ unity::scopes::ScopeMetadata testing::ScopeMetadataBuilder::operator()() const
         impl->set_scope_directory(*p->scope_directory);
     if (p->results_ttl_type)
         impl->set_results_ttl_type(*p->results_ttl_type);
+    if (p->settings_definitions)
+        impl->set_settings_definitions(*p->settings_definitions);
+    if (p->location_data_needed)
+        impl->set_location_data_needed(*p->location_data_needed);
+    if (p->child_scope_ids)
+        impl->set_child_scope_ids(*p->child_scope_ids);
+    if (p->version)
+        impl->set_version(*p->version);
+    if (p->keywords)
+        impl->set_keywords(*p->keywords);
 
     return unity::scopes::internal::ScopeMetadataImpl::create(
                 std::move(

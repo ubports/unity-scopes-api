@@ -18,9 +18,11 @@
 
 #include "FindFiles.h"
 
+#include <unity/scopes/internal/safe_strerror.h>
 #include <unity/UnityExceptions.h>
 #include <unity/util/ResourcePtr.h>
 
+#include <boost/algorithm/string.hpp>
 #include <boost/filesystem/path.hpp>
 
 #include <map>
@@ -44,7 +46,9 @@ vector<string> find_entries(string const& install_dir, EntryType type)
     DIR* d = opendir(install_dir.c_str());
     if (d == NULL)
     {
-        throw ResourceException("cannot open scope installation directory \"" + install_dir + "\": " + strerror(errno));
+        throw FileException("cannot open scope installation directory \"" + install_dir + "\": "
+                                + scopes::internal::safe_strerror(errno),
+                            errno);
     }
     util::ResourcePtr<DIR*, decltype(&closedir)> dir_ptr(d, closedir);  // Clean up automatically
 
@@ -78,8 +82,8 @@ vector<string> find_entries(string const& install_dir, EntryType type)
     return entries;
 }
 
-// Return all files of the form dir/<scomescope>.ini that are regular files or
-// symbolic links and have the specified suffix.
+// Return all files of the form dir/<somescope>.ini (but not <somescope>-setttings.ini)
+// that are regular files or symbolic links and have the specified suffix.
 // The empty suffix is legal and causes all regular files and symlinks to be returned.
 
 map<string, string> find_scope_dir_configs(string const& scope_dir, string const& suffix)
@@ -94,6 +98,10 @@ map<string, string> find_scope_dir_configs(string const& scope_dir, string const
         {
             continue;
         }
+        if (boost::ends_with(path, "-settings.ini"))
+        {
+            continue;
+        }
         auto scope_id = fs_path.stem().native();
         files.insert(make_pair(scope_id, path));
     }
@@ -101,14 +109,14 @@ map<string, string> find_scope_dir_configs(string const& scope_dir, string const
     return files;
 }
 
-// Return all files of the form dir/*/<scomescope>.ini that are regular files or
-// symbolic links and have the specified suffix.
+// Return all files of the form dir/*/<somescope>.ini (but not <somescope>-settings.ini)
+// that are regular files or symbolic links and have the specified suffix.
 // The empty suffix is legal and causes all regular files and symlinks to be returned.
 // Print error message for any scopes with an id that was seen previously.
 
 map<string, string> find_install_dir_configs(string const& install_dir,
                                              string const& suffix,
-                                             function<void(string const&)> error)
+                                             std::function<void(string const&)> error)
 {
     map<string, string> files;
     map<string, string> scopes_seen;
@@ -116,18 +124,26 @@ map<string, string> find_install_dir_configs(string const& install_dir,
     auto scope_dirs = find_entries(install_dir, Directory);
     for (auto scope_dir : scope_dirs)
     {
-        auto configs = find_scope_dir_configs(scope_dir, suffix);
-        for (auto config : configs)
+        try
         {
-            auto const it = scopes_seen.find(config.first);
-            if (it != scopes_seen.end())
+            auto configs = find_scope_dir_configs(scope_dir, suffix);
+            for (auto config : configs)
             {
-                error("ignoring second instance of non-unique scope: " + config.second + "\n"
-                      "previous instance: " + it->second);
-                continue;
+                auto const it = scopes_seen.find(config.first);
+                if (it != scopes_seen.end())
+                {
+                    error("ignoring second instance of non-unique scope: " + config.second + "\n"
+                            "previous instance: " + it->second);
+                    continue;
+                }
+                scopes_seen[config.first] = config.second;
+                files.insert(config);
             }
-            scopes_seen[config.first] = config.second;
-            files.insert(config);
+        }
+        catch (FileException const& e)
+        {
+            error(e.what());
+            error("could not open scope directory: " + scope_dir);
         }
     }
 

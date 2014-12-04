@@ -49,6 +49,18 @@ TEST(ScopeConfig, basic)
         EXPECT_EQ(ScopeMetadata::ResultsTtlType::Large, cfg.results_ttl_type());
         EXPECT_TRUE(cfg.location_data_needed());
         EXPECT_TRUE(cfg.debug_mode());
+        EXPECT_EQ(1, cfg.version());
+
+        auto children = cfg.child_scope_ids();
+        EXPECT_EQ(3u, children.size());
+        EXPECT_EQ("com.foo.bar", children[0]);
+        EXPECT_EQ("com.foo.bar2", children[1]);
+        EXPECT_EQ("com.foo.boo", children[2]);
+
+        auto keywords = cfg.keywords();
+        EXPECT_EQ(2u, keywords.size());
+        EXPECT_EQ("foo", keywords[0]);
+        EXPECT_EQ("bar", keywords[1]);
 
         auto attrs = cfg.appearance_attributes();
         EXPECT_EQ(5, attrs.size());
@@ -62,11 +74,6 @@ TEST(ScopeConfig, basic)
         EXPECT_EQ("abc", attrs["page"].get_dict()["page-header"].get_dict()["logo"].get_string());
         EXPECT_EQ("def", attrs["page"].get_dict()["page-header"].get_dict()["logo2"].get_string());
 
-        auto children = cfg.child_scope_ids();
-        EXPECT_EQ(3u, children.size());
-        EXPECT_EQ("com.foo.bar", children[0]);
-        EXPECT_EQ("com.foo.bar2", children[1]);
-        EXPECT_EQ("com.foo.boo", children[2]);
     }
 
     {
@@ -85,6 +92,7 @@ TEST(ScopeConfig, basic)
         EXPECT_EQ(ScopeMetadata::ResultsTtlType::None, cfg.results_ttl_type());
         EXPECT_FALSE(cfg.location_data_needed());
         EXPECT_FALSE(cfg.debug_mode());
+        EXPECT_EQ(0, cfg.version());
 
         EXPECT_EQ(0, cfg.appearance_attributes().size());
 
@@ -161,6 +169,45 @@ TEST(ScopeConfig, bad_ttl)
         boost::regex r("unity::scopes::ConfigException: \".*\": Illegal value \\(\"blah\"\\) for ResultsTtlType");
         EXPECT_TRUE(boost::regex_match(e.what(), r));
     }
+}
+
+TEST(ScopeConfig, bad_version)
+{
+    try
+    {
+        ScopeConfig cfg(BAD_VERSION);
+        FAIL();
+    }
+    catch(ConfigException const& e)
+    {
+        boost::regex r("unity::scopes::ConfigException: \".*\": Version must be > 0");
+        EXPECT_TRUE(boost::regex_match(e.what(), r));
+    }
+}
+
+TEST(ScopeConfig, bad_keywords)
+{
+    try
+    {
+        ScopeConfig cfg(BAD_KEYWORDS);
+    }
+    catch(ConfigException const& e)
+    {
+        boost::regex r("unity::scopes::ConfigException: \".*\": Invalid empty keyword string found in \"Keywords\" list");
+        EXPECT_TRUE(boost::regex_match(e.what(), r));
+    }
+}
+
+TEST(ScopeConfig, empty_keywords)
+{
+    ScopeConfig cfg(EMPTY_KEYWORDS);
+    EXPECT_EQ(cfg.keywords().size(), 0);
+}
+
+TEST(ScopeConfig, single_keyword)
+{
+    ScopeConfig cfg(SINGLE_KEYWORD);
+    EXPECT_EQ(cfg.keywords().size(), 1);
 }
 
 class ScopeConfigWithIntl: public ::testing::Test

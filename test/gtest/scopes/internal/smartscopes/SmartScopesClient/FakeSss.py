@@ -78,7 +78,7 @@ remote_scopes_response = '[\
 \
 {"base_url": "http://127.0.0.1:' + str(port) + '/fail2", "name": "Fail Scope 2", "description": "Fails due to no id.", "author": "Mr.Fake", "icon": "icon" },\
 \
-{"base_url": "http://127.0.0.1:' + str(port) + '/demo2", "id" : "dummy.scope.2", "name": "Dummy Demo Scope 2", "description": "Dummy demo scope 2.", "author": "Mr.Fake", "art": "art", "invisible": true,\
+{"base_url": "http://127.0.0.1:' + str(port) + '/demo2", "id" : "dummy.scope.2", "name": "Dummy Demo Scope 2", "description": "Dummy demo scope 2.", "author": "Mr.Fake", "art": "art", "invisible": true, "version": 2,\
 "appearance":\
     {\
         "background": "#00BEEF",\
@@ -88,7 +88,7 @@ remote_scopes_response = '[\
 \
 {"id" : "fail.scope.3", "name": "Fail Scope 3", "description": "Fails due to no base_url.", "author": "Mr.Fake", "art": "art" },\
 \
-{"base_url": "http://127.0.0.1:' + str(port) + '/demo3", "id" : "dummy.scope.3", "name": "Dummy Demo Scope 3", "description": "Dummy demo scope 3.", "author": "Mr.Fake",\
+{"base_url": "http://127.0.0.1:' + str(port) + '/demo3", "id" : "dummy.scope.3", "name": "Dummy Demo Scope 3", "description": "Dummy demo scope 3.", "author": "Mr.Fake", "keywords": ["music", "video", "news", "games"],\
 "settings":\
     [\
         {\
@@ -144,7 +144,9 @@ remote_scopes_response = '[\
                 "defaultValue": false\
             }\
         }\
-    ]}\
+    ]},\
+\
+{"base_url": "http://127.0.0.1:' + str(port) + '/demo", "id" : "fail.scope.4", "name": "Fail Scope 4", "description": "Fails due to negative version.", "author": "Mr.Fake", "icon": "icon", "version": -1 }\
 ]'
 
 search_response = '\

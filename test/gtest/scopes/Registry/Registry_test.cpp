@@ -16,15 +16,17 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#include <unity/scopes/Runtime.h>
-#include <unity/scopes/Registry.h>
-#include <unity/scopes/SearchMetadata.h>
-#include <unity/scopes/SearchListenerBase.h>
 #include <unity/scopes/CategorisedResult.h>
-#include <gtest/gtest.h>
+#include <unity/scopes/Registry.h>
+#include <unity/scopes/Runtime.h>
+#include <unity/scopes/ScopeExceptions.h>
+#include <unity/scopes/SearchListenerBase.h>
+#include <unity/scopes/SearchMetadata.h>
 
 #include <boost/filesystem/operations.hpp>
+#include <gtest/gtest.h>
 
+#include <chrono>
 #include <condition_variable>
 #include <fstream>
 #include <functional>
@@ -108,6 +110,12 @@ TEST(Registry, metadata)
     EXPECT_EQ(2u, children.size());
     EXPECT_EQ("com.foo.bar", children[0]);
     EXPECT_EQ("com.foo.baz", children[1]);
+    EXPECT_EQ(1, meta.version());
+    auto keywords = meta.keywords();
+    EXPECT_EQ(3u, keywords.size());
+    EXPECT_EQ("music", keywords[0]);
+    EXPECT_EQ("news", keywords[1]);
+    EXPECT_EQ("foo", keywords[2]);
 
     auto attrs = meta.appearance_attributes();
     EXPECT_EQ("fg_color", attrs["foreground-color"].get_string());
@@ -139,9 +147,11 @@ TEST(Registry, metadata)
     EXPECT_EQ(0, defs.size());
     EXPECT_FALSE(meta.location_data_needed());
     EXPECT_EQ(0, meta.child_scope_ids().size());
+    EXPECT_EQ(0, meta.keywords().size());
+    EXPECT_EQ(0, meta.version());
 }
 
-auto const wait_time = std::chrono::milliseconds(1000);
+auto const wait_for_update_time = std::chrono::milliseconds(5000);
 
 TEST(Registry, scope_state_notify)
 {
@@ -177,7 +187,7 @@ TEST(Registry, scope_state_notify)
     {
         // Wait for an update notification
         std::unique_lock<std::mutex> lock(mutex);
-        bool success = cond.wait_for(lock, wait_time, [&updateA_received] { return updateA_received; });
+        bool success = cond.wait_for(lock, wait_for_update_time, [&updateA_received] { return updateA_received; });
         updateA_received = false;
         return success;
     };
@@ -186,7 +196,7 @@ TEST(Registry, scope_state_notify)
     {
         // Wait for an update notification
         std::unique_lock<std::mutex> lock(mutex);
-        bool success = cond.wait_for(lock, wait_time, [&updateB_received] { return updateB_received; });
+        bool success = cond.wait_for(lock, wait_for_update_time, [&updateB_received] { return updateB_received; });
         updateB_received = false;
         return success;
     };
@@ -205,7 +215,6 @@ TEST(Registry, scope_state_notify)
 
     // testscopeA should not be running at this point
     EXPECT_FALSE(r->is_scope_running("testscopeA"));
-    EXPECT_FALSE(wait_for_stateA_update());
 
     // search would fail if testscopeA can't be executed
     auto ctrl = sp->search("foo", metadata, reply_A);
@@ -223,7 +232,6 @@ TEST(Registry, scope_state_notify)
 
     // testscopeB should not be running at this point
     EXPECT_FALSE(r->is_scope_running("testscopeB"));
-    EXPECT_FALSE(wait_for_stateB_update());
 
     // search would fail if testscopeB can't be executed
     auto receiver_B = std::make_shared<Receiver>();
@@ -242,7 +250,6 @@ TEST(Registry, scope_state_notify)
     EXPECT_TRUE(r->is_scope_running("testscopeB"));
 
     // check now that we get a callback when testscopeB terminates (timed out after 2s)
-    std::this_thread::sleep_for(std::chrono::seconds{4});
     EXPECT_TRUE(wait_for_stateB_update());
     EXPECT_FALSE(get_stateB());
     EXPECT_FALSE(r->is_scope_running("testscopeB"));
@@ -250,7 +257,7 @@ TEST(Registry, scope_state_notify)
 
 TEST(Registry, no_idle_timeout_in_debug_mode)
 {
-    bool update_received = false;
+    bool update_received;
     std::mutex mutex;
     std::condition_variable cond;
 
@@ -265,11 +272,17 @@ TEST(Registry, no_idle_timeout_in_debug_mode)
         cond.notify_one();
     });
 
+    auto reset = [&update_received, &mutex]
+    {
+        std::lock_guard<std::mutex> lock(mutex);
+        update_received = false;
+    };
+
     auto wait_for_state_update = [&update_received, &mutex, &cond]
     {
         // Wait for an update notification
         std::unique_lock<std::mutex> lock(mutex);
-        bool success = cond.wait_for(lock, wait_time, [&update_received] { return update_received; });
+        bool success = cond.wait_for(lock, wait_for_update_time, [&update_received] { return update_received; });
         update_received = false;
         return success;
     };
@@ -283,15 +296,33 @@ TEST(Registry, no_idle_timeout_in_debug_mode)
     ASSERT_EQ("Success", ec.message());
     filesystem::copy(TEST_RUNTIME_PATH "/other_scopes/testscopeC/libtestscopeC.so", TEST_RUNTIME_PATH "/scopes/testscopeC/libtestscopeC.so", ec);
     ASSERT_EQ("Success", ec.message());
-    std::this_thread::sleep_for(wait_time);
+
+    // Wait for the registry to realize that there is a new scope.
+    auto const wait_time = std::chrono::seconds(5);
+    auto start_time = std::chrono::system_clock::now();
+    bool ok = false;
+    do
+    {
+        try
+        {
+            // testscopeC should not be running at this point
+            EXPECT_FALSE(r->is_scope_running("testscopeC"));
+            ok = true;
+        }
+        catch (NotFoundException const&)
+        {
+        }
+    }
+    while (!ok && std::chrono::system_clock::now() - start_time < wait_time);
+    EXPECT_TRUE(ok) << "new scope not recognized after " << wait_time.count() << " seconds";
 
     auto meta = r->get_metadata("testscopeC");
     auto sp = meta.proxy();
 
     // testscopeC should not be running at this point
     EXPECT_FALSE(r->is_scope_running("testscopeC"));
-    EXPECT_FALSE(wait_for_state_update());
 
+    reset();
     // search would fail if testscopeC can't be executed
     auto receiver = std::make_shared<Receiver>();
     SearchListenerBase::SPtr reply(receiver);
@@ -305,13 +336,13 @@ TEST(Registry, no_idle_timeout_in_debug_mode)
     // check that the scope is still running after 4s
     // (due to "DebugMode = true" and despite "IdleTimeout = 2")
     std::this_thread::sleep_for(std::chrono::seconds{4});
-    EXPECT_FALSE(wait_for_state_update());
     EXPECT_TRUE(r->is_scope_running("testscopeC"));
 
+    reset();
     // Remove testscopeC from the scopes folder
     filesystem::remove_all(TEST_RUNTIME_PATH "/scopes/testscopeC", ec);
     ASSERT_EQ("Success", ec.message());
-    std::this_thread::sleep_for(wait_time);
+    EXPECT_TRUE(wait_for_state_update());
 }
 
 TEST(Registry, manually_started_scope)
@@ -331,6 +362,12 @@ TEST(Registry, manually_started_scope)
         cond.notify_one();
     });
 
+    auto reset = [&update_received, &mutex]
+    {
+        std::lock_guard<std::mutex> lock(mutex);
+        update_received = false;
+    };
+
     auto wait_for_state_update = [&update_received, &mutex, &cond]
     {
         // Wait for an update notification
@@ -342,6 +379,7 @@ TEST(Registry, manually_started_scope)
 
     system::error_code ec;
 
+    reset();
     // Copy testscopeC into the scopes folder
     filesystem::create_directory(TEST_RUNTIME_PATH "/scopes/testscopeC", ec);
     ASSERT_EQ("Success", ec.message());
@@ -349,11 +387,27 @@ TEST(Registry, manually_started_scope)
     ASSERT_EQ("Success", ec.message());
     filesystem::copy(TEST_RUNTIME_PATH "/other_scopes/testscopeC/libtestscopeC.so", TEST_RUNTIME_PATH "/scopes/testscopeC/libtestscopeC.so", ec);
     ASSERT_EQ("Success", ec.message());
-    std::this_thread::sleep_for(wait_time);
 
-    // testscopeC should not be running at this point
-    EXPECT_FALSE(r->is_scope_running("testscopeC"));
+    // Wait for the registry to realize that there is a new scope.
+    auto const wait_time = std::chrono::seconds(5);
+    auto start_time = std::chrono::system_clock::now();
+    bool ok = false;
+    do
+    {
+        try
+        {
+            // testscopeC should not be running at this point
+            EXPECT_FALSE(r->is_scope_running("testscopeC"));
+            ok = true;
+        }
+        catch (NotFoundException const&)
+        {
+        }
+    }
+    while (!ok && std::chrono::system_clock::now() - start_time < wait_time);
+    EXPECT_TRUE(ok) << "new scope not recognized after " << wait_time.count() << " seconds";
 
+    reset();
     // start testscopeC manually
     auto scope_pid = fork();
     if (scope_pid == 0)
@@ -371,6 +425,7 @@ TEST(Registry, manually_started_scope)
     EXPECT_TRUE(wait_for_state_update());
     EXPECT_TRUE(r->is_scope_running("testscopeC"));
 
+    reset();
     // stop testscopeC manually
     kill(scope_pid, SIGTERM);
     int status;
@@ -380,17 +435,17 @@ TEST(Registry, manually_started_scope)
     EXPECT_TRUE(wait_for_state_update());
     EXPECT_FALSE(r->is_scope_running("testscopeC"));
 
+    reset();
     // Remove testscopeC from the scopes folder
     filesystem::remove_all(TEST_RUNTIME_PATH "/scopes/testscopeC", ec);
     ASSERT_EQ("Success", ec.message());
-    std::this_thread::sleep_for(wait_time);
 
     rt->destroy();
 }
 
 TEST(Registry, list_update_notify_before_click_folder_exists)
 {
-    bool update_received = false;
+    bool update_received;
     std::mutex mutex;
     std::condition_variable cond;
 
@@ -404,18 +459,18 @@ TEST(Registry, list_update_notify_before_click_folder_exists)
         update_received = true;
         cond.notify_one();
     });
+
+    auto reset = [&update_received, &mutex]
+    {
+        std::lock_guard<std::mutex> lock(mutex);
+        update_received = false;
+    };
+
     auto wait_for_update = [&update_received, &mutex, &cond]
     {
         // Flush out update notifications
         std::unique_lock<std::mutex> lock(mutex);
-        bool success = false;
-        while (cond.wait_for(lock, wait_time, [&update_received] { return update_received; }))
-        {
-            success = true;
-            update_received = false;
-        }
-        update_received = false;
-        return success;
+        return cond.wait_for(lock, wait_for_update_time, [&update_received] { return update_received; });
     };
 
     system::error_code ec;
@@ -432,6 +487,7 @@ TEST(Registry, list_update_notify_before_click_folder_exists)
     filesystem::create_directory(TEST_RUNTIME_PATH "/click", ec);
     ASSERT_EQ("Success", ec.message());
 
+    reset();
     std::cout << "Make a symlink to testscopeC in the scopes folder" << std::endl;
     filesystem::create_symlink(TEST_RUNTIME_PATH "/other_scopes/testscopeC", TEST_RUNTIME_PATH "/click/testscopeC", ec);
     ASSERT_EQ("Success", ec.message());
@@ -452,7 +508,7 @@ TEST(Registry, list_update_notify_before_click_folder_exists)
 
 TEST(Registry, list_update_notify)
 {
-    bool update_received = false;
+    bool update_received;
     std::mutex mutex;
     std::condition_variable cond;
 
@@ -466,18 +522,17 @@ TEST(Registry, list_update_notify)
         update_received = true;
         cond.notify_one();
     });
+
+    auto reset = [&update_received, &mutex]
+    {
+        std::lock_guard<std::mutex> lock(mutex);
+        update_received = false;
+    };
+
     auto wait_for_update = [&update_received, &mutex, &cond]
     {
-        // Flush out update notifications
         std::unique_lock<std::mutex> lock(mutex);
-        bool success = false;
-        while (cond.wait_for(lock, wait_time, [&update_received] { return update_received; }))
-        {
-            success = true;
-            update_received = false;
-        }
-        update_received = false;
-        return success;
+        return cond.wait_for(lock, wait_for_update_time, [&update_received] { return update_received; });
     };
 
     system::error_code ec;
@@ -491,9 +546,12 @@ TEST(Registry, list_update_notify)
     EXPECT_EQ(list.end(), list.find("testscopeD"));
 
     // Copy testscopeC into the scopes folder
-    std::cout << "Move testscopeC into the scopes folder" << std::endl;
+    std::cout << "Create testscopeC dir in the scopes folder" << std::endl;
     filesystem::create_directory(TEST_RUNTIME_PATH "/scopes/testscopeC", ec);
     ASSERT_EQ("Success", ec.message());
+
+    reset();
+    std::cout << "Copy testscopeC.ini into the scopes folder" << std::endl;
     filesystem::copy(TEST_RUNTIME_PATH "/other_scopes/testscopeC/testscopeC.ini", TEST_RUNTIME_PATH "/scopes/testscopeC/testscopeC.ini", ec);
     ASSERT_EQ("Success", ec.message());
     EXPECT_TRUE(wait_for_update());
@@ -506,22 +564,52 @@ TEST(Registry, list_update_notify)
     EXPECT_NE(list.end(), list.find("testscopeC"));
     EXPECT_EQ(list.end(), list.find("testscopeD"));
 
+    reset();
     // Make a symlink to testscopeD in the scopes folder
     std::cout << "Make a symlink to testscopeD in the scopes folder" << std::endl;
     filesystem::create_symlink(TEST_RUNTIME_PATH "/other_scopes/testscopeD", TEST_RUNTIME_PATH "/scopes/testscopeD", ec);
     ASSERT_EQ("Success", ec.message());
     EXPECT_TRUE(wait_for_update());
 
-    // Now check that we have 4 scopes registered
-    list = r->list();
-    EXPECT_EQ(4, list.size());
+    // The previous test may emit a single update or two, depending
+    // on whether the copy operation manages to write data
+    // into the .ini file quickly enough. (If so, we get
+    // a single notification. If not, and inotify gives
+    // us two events (one for creation and one for write/close),
+    // we get two updates.) The race is unavoidable because
+    // we *must* emit an update on file creation, because
+    // a file can be linked (instead of copied) into the scope's
+    // config dir. This means that calling reset() before calling
+    // list() below does *not* fix the problem: the second update
+    // from the previous test may arrive *after* we call reset().
+    // So, we wait for up to five seconds for the list() operation
+    // to return the correct result before failing.
+    auto const wait_time = std::chrono::seconds(5);
+    auto start_time = std::chrono::system_clock::now();
+    bool ok = false;
+    do
+    {
+        try
+        {
+            list = r->list();
+            ok = list.size() == 4;
+        }
+        catch (std::exception const& e)
+        {
+            FAIL() << e.what();
+        }
+    }
+    while (!ok && std::chrono::system_clock::now() - start_time < wait_time);
+    EXPECT_TRUE(ok) << "new scope not recognized after " << wait_time.count() << " seconds";
+
     EXPECT_NE(list.end(), list.find("testscopeA"));
     EXPECT_NE(list.end(), list.find("testscopeB"));
     EXPECT_NE(list.end(), list.find("testscopeC"));
     EXPECT_NE(list.end(), list.find("testscopeD"));
 
+    reset();
     // Remove testscopeC from the scopes folder
-    std::cout << "Move testscopeC back into the other_scopes folder" << std::endl;
+    std::cout << "Remove testscopeC from the scopes folder" << std::endl;
     filesystem::remove_all(TEST_RUNTIME_PATH "/scopes/testscopeC", ec);
     ASSERT_EQ("Success", ec.message());
     EXPECT_TRUE(wait_for_update());
@@ -534,6 +622,7 @@ TEST(Registry, list_update_notify)
     EXPECT_EQ(list.end(), list.find("testscopeC"));
     EXPECT_NE(list.end(), list.find("testscopeD"));
 
+    reset();
     // Remove symlink to testscopeD from the scopes folder
     std::cout << "Remove symlink to testscopeD from the scopes folder" << std::endl;
     filesystem::remove(TEST_RUNTIME_PATH "/scopes/testscopeD", ec);
@@ -552,7 +641,6 @@ TEST(Registry, list_update_notify)
     std::cout << "Make a folder in scopes named \"testfolder\"" << std::endl;
     filesystem::create_directory(TEST_RUNTIME_PATH "/scopes/testfolder", ec);
     ASSERT_EQ("Success", ec.message());
-    EXPECT_FALSE(wait_for_update());
 
     // Check that no scopes were registered
     list = r->list();
@@ -562,6 +650,7 @@ TEST(Registry, list_update_notify)
     EXPECT_EQ(list.end(), list.find("testscopeC"));
     EXPECT_EQ(list.end(), list.find("testscopeD"));
 
+    reset();
     // Make a symlink to testscopeC.ini in testfolder
     std::cout << "Make a symlink to testscopeC.ini in testfolder" << std::endl;
     filesystem::create_symlink(TEST_RUNTIME_PATH "/other_scopes/testscopeC/testscopeC.ini", TEST_RUNTIME_PATH "/scopes/testfolder/testscopeC.ini", ec);
@@ -576,6 +665,7 @@ TEST(Registry, list_update_notify)
     EXPECT_NE(list.end(), list.find("testscopeC"));
     EXPECT_EQ(list.end(), list.find("testscopeD"));
 
+    reset();
     // Remove testfolder
     std::cout << "Remove testfolder" << std::endl;
     filesystem::remove_all(TEST_RUNTIME_PATH "/scopes/testfolder", ec);
@@ -589,37 +679,6 @@ TEST(Registry, list_update_notify)
     EXPECT_NE(list.end(), list.find("testscopeB"));
     EXPECT_EQ(list.end(), list.find("testscopeC"));
     EXPECT_EQ(list.end(), list.find("testscopeD"));
-
-    // Check notifications for settings definitions.
-
-    // Initially, testscopeB doesn't have any settings.
-    auto meta = r->get_metadata("testscopeB");
-    auto defs = meta.settings_definitions();
-    EXPECT_EQ(0, defs.size());
-
-    // Add settings definition
-    std::cout << "Make a symlink to testscopeB-settings.ini in scopes/testscopeB" << std::endl;
-    filesystem::create_symlink(TEST_SRC_PATH "/scopes/testscopeB/testscopeB-settings.ini",
-                               TEST_RUNTIME_PATH "/scopes/testscopeB/testscopeB-settings.ini", ec);
-    ASSERT_EQ("Success", ec.message());
-    EXPECT_TRUE(wait_for_update());
-
-    // Must be able to see the new definitions now
-    meta = r->get_metadata("testscopeB");
-    defs = meta.settings_definitions();
-    ASSERT_EQ(1, defs.size());
-    EXPECT_EQ("tsB id", defs[0].get_dict()["id"].get_string());
-
-    // Remove settings definition
-    std::cout << "Remove symlink to testscopeB-settings.ini in scopes/testscopeB" << std::endl;
-    filesystem::remove(TEST_RUNTIME_PATH "/scopes/testscopeB/testscopeB-settings.ini", ec);
-    ASSERT_EQ("Success", ec.message());
-    EXPECT_TRUE(wait_for_update());
-
-    // Definition must be gone now
-    meta = r->get_metadata("testscopeB");
-    defs = meta.settings_definitions();
-    EXPECT_EQ(0, defs.size());
 }
 
 int main(int argc, char **argv)

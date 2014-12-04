@@ -22,6 +22,7 @@
 #include <unity/scopes/FilterState.h>
 #include <unity/scopes/internal/smartscopes/HttpClientInterface.h>
 #include <unity/scopes/internal/JsonNodeInterface.h>
+#include <unity/scopes/internal/Logger.h>
 #include <unity/scopes/internal/UniqueID.h>
 
 #include <unity/util/NonCopyable.h>
@@ -60,6 +61,8 @@ struct RemoteScope
     std::shared_ptr<std::string> settings;      // optional
     std::shared_ptr<bool> needs_location_data;  // optional
     bool invisible = false;
+    int version;
+    std::vector<std::string> keywords;          // optional
 };
 
 struct SearchCategory
@@ -85,6 +88,16 @@ struct DepartmentInfo
     std::string canned_query;
     bool has_subdepartments = false;
     std::vector<std::shared_ptr<DepartmentInfo>> subdepartments;
+};
+
+struct LocationInfo
+{
+    bool has_location;
+    std::string country_code;
+    double latitude;
+    double longitude;
+
+    LocationInfo(): has_location(false) {}
 };
 
 class SearchHandle
@@ -153,6 +166,7 @@ public:
 
     SmartScopesClient(HttpClientInterface::SPtr http_client,
                       JsonNodeInterface::SPtr json_node,
+                      boost::log::sources::severity_channel_logger_mt<>& logger_,
                       std::string const& url = ""); // detect url
 
     virtual ~SmartScopesClient();
@@ -172,7 +186,7 @@ public:
                               VariantMap const& settings = VariantMap(),
                               VariantMap const& filter_state = VariantMap(),
                               std::string const& locale = "",
-                              std::string const& country = "",
+                              LocationInfo const& location = LocationInfo(),
                               std::string const& user_agent_hdr = "",
                               const unsigned int limit = 0);
 
@@ -186,6 +200,8 @@ public:
                                 std::string const& locale = "",
                                 std::string const& country = "",
                                 std::string const& user_agent_hdr = "");
+
+    boost::log::sources::severity_channel_logger_mt<>& logger() const;
 
 private:
     friend class SearchHandle;
@@ -211,7 +227,7 @@ private:
 private:
     HttpClientInterface::SPtr http_client_;
     JsonNodeInterface::SPtr json_node_;
-
+    boost::log::sources::severity_channel_logger_mt<>& logger_;
     std::string url_;
 
     std::map<unsigned int, HttpResponseHandle::SPtr> query_results_;

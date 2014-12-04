@@ -20,6 +20,7 @@
 #include <unity/scopes/internal/ScopeBaseImpl.h>
 
 #include <unity/scopes/internal/DfltConfig.h>
+#include <unity/scopes/internal/Logger.h>
 #include <unity/scopes/internal/MWStateReceiver.h>
 #include <unity/scopes/internal/RegistryConfig.h>
 #include <unity/scopes/internal/RegistryImpl.h>
@@ -38,7 +39,6 @@
 #include <cassert>
 #include <cstring>
 #include <future>
-#include <iostream> // TODO: remove this once logging is added
 
 #include <sys/apparmor.h>
 #include <sys/stat.h>
@@ -70,6 +70,10 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
             scope_id_ = "c-" + id.gen();
         }
 
+        // Until we know where the scope's cache directory is,
+        // we use a logger that logs to std::clog.
+        logger_.reset(new Logger(scope_id_));
+
         // Create the middleware factory and get the registry identity and config filename.
         RuntimeConfig config(configfile);
         string default_middleware = config.default_middleware();
@@ -91,7 +95,7 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
 
         if (registry_configfile_.empty() || registry_identity_.empty())
         {
-            cerr << "Warning: no registry configured" << endl;
+            BOOST_LOG_SEV(logger(), Logger::Warning) << "no registry configured";
             registry_identity_ = "";
         }
         else
@@ -102,7 +106,8 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
             registry_ = make_shared<RegistryImpl>(registry_mw_proxy, this);
         }
 
-        data_dir_ = config.data_directory();
+        cache_dir_ = config.cache_directory();
+        app_dir_ = config.app_directory();
         config_dir_ = config.config_directory();
     }
     catch (unity::Exception const& e)
@@ -110,7 +115,9 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
         destroy();
         string msg = "Cannot instantiate run time for " + (scope_id.empty() ? "client" : scope_id) +
                      ", config file: " + configfile;
-        throw ConfigException(msg);
+        ConfigException ex(msg);
+        BOOST_LOG_SEV(logger(), Logger::Error) << ex.what();
+        throw ex;
     }
 }
 
@@ -122,13 +129,11 @@ RuntimeImpl::~RuntimeImpl()
     }
     catch (std::exception const& e) // LCOV_EXCL_LINE
     {
-        cerr << "~RuntimeImpl(): " << e.what() << endl;
-        // TODO: log error
+        BOOST_LOG_SEV(logger(), Logger::Error) << "~RuntimeImpl(): " << e.what();
     }
     catch (...) // LCOV_EXCL_LINE
     {
-        cerr << "~RuntimeImpl(): unknown exception" << endl;
-        // TODO: log error
+        BOOST_LOG_SEV(logger(), Logger::Error) << "~RuntimeImpl(): unknown exception";
     }
 }
 
@@ -282,6 +287,11 @@ ThreadSafeQueue<future<void>>::SPtr RuntimeImpl::future_queue() const
     return future_queue_;  // Immutable
 }
 
+boost::log::sources::severity_channel_logger_mt<>& RuntimeImpl::logger() const
+{
+    return *logger_;
+}
+
 namespace
 {
 
@@ -340,23 +350,20 @@ void RuntimeImpl::run_scope(ScopeBase* scope_base,
 
     auto mw = factory()->create(scope_id_, reg_conf.mw_kind(), reg_conf.mw_configfile());
 
-    {
-        boost::filesystem::path dir = boost::filesystem::canonical(scope_ini_file).parent_path();
-        scope_base->p->set_scope_directory(dir.native());
-    }
+    boost::filesystem::path scope_dir = boost::filesystem::canonical(scope_ini_file).parent_path();
+    scope_base->p->set_scope_directory(scope_dir.native());
 
     {
         // Try to open the scope settings database, if any.
         string config_dir = config_dir_ + "/" + scope_id_;
         string settings_db = config_dir + "/settings.ini";
 
-        string scope_dir = scope_base->scope_directory();
-        string settings_schema = scope_dir + "/" + scope_id_ + "-settings.ini";
+        string settings_schema = scope_dir.native() + "/" + scope_id_ + "-settings.ini";
 
         boost::system::error_code ec;
         if (boost::filesystem::exists(settings_schema, ec))
         {
-            shared_ptr<SettingsDB> db(SettingsDB::create_from_ini_file(settings_db, settings_schema));
+            shared_ptr<SettingsDB> db(SettingsDB::create_from_ini_file(settings_db, settings_schema, logger()));
             scope_base->p->set_settings_db(db);
         }
         else
@@ -367,7 +374,10 @@ void RuntimeImpl::run_scope(ScopeBase* scope_base,
 
     scope_base->p->set_registry(registry_);
     scope_base->p->set_cache_directory(find_cache_dir());
+    scope_base->p->set_app_directory(find_app_dir());
     scope_base->p->set_tmp_directory(find_tmp_dir());
+
+    // TODO: redirect log messages to scope-specific file.
 
     try
     {
@@ -489,8 +499,8 @@ string RuntimeImpl::proxy_to_string(ObjectProxy const& proxy) const
 string RuntimeImpl::demangled_id() const
 {
     // For scopes that are in a click package together with an app,
-    // such as YouTube, the cache directory is shared between the app and
-    // the scope. The cache directory name is the scope ID up to the first
+    // such as YouTube, the scope id is <scope_id>_<app_id>
+    // The app directory and cache directory names are the scope ID up to the first
     // underscore. For example, com.ubuntu.scopes.youtube_youtube is the
     // scope ID, but the cache dir name is com.ubuntu.scopes.youtube.
     auto id = scope_id_;
@@ -528,15 +538,26 @@ string RuntimeImpl::confinement_type() const
 
 string RuntimeImpl::find_cache_dir() const
 {
-    // Create the data_dir_/<confinement-type>/<id> directories if they don't exist.
+    // Create the cache_dir_/<confinement-type>/<id> directories if they don't exist.
     boost::system::error_code ec;
-    !confined() && !boost::filesystem::exists(data_dir_, ec) && ::mkdir(data_dir_.c_str(), 0700);
-    string dir = data_dir_ + "/" + confinement_type();
+    !confined() && !boost::filesystem::exists(cache_dir_, ec) && ::mkdir(cache_dir_.c_str(), 0700);
+    string dir = cache_dir_ + "/" + confinement_type();
     !confined() && !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700);
 
     // A confined scope is allowed to create this dir.
     dir += "/" + demangled_id();
     !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700);
+
+    return dir;
+}
+
+string RuntimeImpl::find_app_dir() const
+{
+    // Create the app_dir_/<id> directories if they don't exist.
+    boost::system::error_code ec;
+    !confined() && !boost::filesystem::exists(app_dir_, ec) && ::mkdir(app_dir_.c_str(), 0700);
+    string dir = app_dir_ + "/" + demangled_id();
+    !confined() && !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700);
 
     return dir;
 }

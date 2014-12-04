@@ -189,7 +189,7 @@ TEST_F(TestRegistryObject, basic)
     EXPECT_CALL(*executor,
             exec("/path/scoperunner", vector<string>
                     {   "/path/runtime.ini", "scope.ini"}, _,
-                    StandardStream::stdin | StandardStream::stdout,
+                    StandardStream::stdin,
                     string())).WillOnce(
             Invoke(this, &TestRegistryObject::mock_exec));
 
@@ -201,7 +201,7 @@ TEST_F(TestRegistryObject, confined)
     EXPECT_CALL(*executor,
             exec("/path/scoperunner", vector<string>
                     {   "/path/runtime.ini", "scope.ini"}, _,
-                    StandardStream::stdin | StandardStream::stdout,
+                    StandardStream::stdin,
                     "confinement profile")).WillOnce(
             Invoke(this, &TestRegistryObject::mock_exec));
 

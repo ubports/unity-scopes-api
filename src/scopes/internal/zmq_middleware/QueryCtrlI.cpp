@@ -46,11 +46,12 @@ interface QueryCtrl
 
 */
 
-using namespace std::placeholders;
+using namespace std;
+namespace ph = std::placeholders;
 
 QueryCtrlI::QueryCtrlI(QueryCtrlObjectBase::SPtr const& qo) :
-    ServantBase(qo, { { "cancel", bind(&QueryCtrlI::cancel_, this, _1, _2, _3) },
-                      { "destroy", bind(&QueryCtrlI::destroy_, this, _1, _2, _3) } })
+    ServantBase(qo, { { "cancel", bind(&QueryCtrlI::cancel_, this, ph::_1, ph::_2, ph::_3) },
+                      { "destroy", bind(&QueryCtrlI::destroy_, this, ph::_1, ph::_2, ph::_3) } })
 
 {
 }

@@ -19,7 +19,6 @@
 #include <unity/scopes/internal/zmq_middleware/ZmqSender.h>
 
 #include <cassert>
-#include <iostream>
 
 using namespace std;
 
@@ -55,17 +54,12 @@ bool ZmqSender::send(kj::ArrayPtr<kj::ArrayPtr<capnp::word const> const> segment
         if (!s_.send_raw(reinterpret_cast<char const*>(&(*it)[0]), it->size() * sizeof(capnp::word),
                          zmqpp::socket::send_more | flags))
         {
-            cerr << "ZmqSender: send_raw() 1 returned false" << endl;
             return false;
         }
         ++it;
     }
     auto r =  s_.send_raw(reinterpret_cast<char const*>(&(*it)[0]), it->size() * sizeof(capnp::word),
                           zmqpp::socket::normal | flags);
-    if (!r)
-    {
-        cerr << "ZmqSender: send_raw() 2 returned false" << endl;
-    }
     return r;
 }
 

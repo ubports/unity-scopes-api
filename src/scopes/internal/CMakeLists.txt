@@ -30,6 +30,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/JsonSettingsSchema.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/LinkImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/LocationImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Logger.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MiddlewareBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MiddlewareFactory.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MWObject.cpp
@@ -69,6 +70,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/ResultReplyObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/RuntimeConfig.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/RuntimeImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/safe_strerror.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeBaseImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeConfig.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeImpl.cpp

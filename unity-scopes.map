@@ -1,12 +1,18 @@
 {
 global:
     extern "C++" {
-        unity::scopes::[!i]*;
-        typeinfo?for?unity::scopes::[!i]*;
-        typeinfo?name?for?unity::scopes::[!i]*;
-        VTT?for?unity::scopes::[!i]*;
-        virtual?thunk?to?unity::scopes::[!i]*;
-        vtable?for?unity::scopes::[!i]*;
+        unity::scopes::utility::[!i]*;
+        unity::scopes::[!iu]*;
+        typeinfo?for?unity::scopes::utility::[!i]*;
+        typeinfo?for?unity::scopes::[!iu]*;
+        typeinfo?name?for?unity::scopes::utility::[!i]*;
+        typeinfo?name?for?unity::scopes::[!iu]*;
+        VTT?for?unity::scopes::utility::[!i]*;
+        VTT?for?unity::scopes::[!iu]*;
+        virtual?thunk?to?unity::scopes::utility::[!i]*;
+        virtual?thunk?to?unity::scopes::[!iu]*;
+        vtable?for?unity::scopes::utility::[!i]*;
+        vtable?for?unity::scopes::[!iu]*;
         unity::scopes::internal::Executor::*;
         unity::scopes::internal::IniSettingsSchema::*;
         unity::scopes::internal::JsonSettingsSchema::*;
@@ -16,6 +22,7 @@ global:
         unity::scopes::internal::RegistryObject::*;
         unity::scopes::internal::RuntimeConfig::*;
         unity::scopes::internal::RuntimeImpl::*;
+        unity::scopes::internal::safe_strerror*;
         unity::scopes::internal::ScopeConfig::*;
         unity::scopes::internal::ScopeImpl::*;
         unity::scopes::internal::ScopeLoader::*;

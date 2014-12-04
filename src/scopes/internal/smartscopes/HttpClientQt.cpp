@@ -16,6 +16,10 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
+#pragma GCC diagnostic ignored "-Wswitch-default"
+
 #include <unity/scopes/internal/smartscopes/HttpClientQt.h>
 #include <unity/scopes/internal/smartscopes/HttpClientQtThread.h>
 #include <unity/UnityExceptions.h>
@@ -26,7 +30,7 @@
 #include <QNetworkRequest>
 #include <QNetworkReply>
 
-#include <iostream>
+#pragma GCC diagnostic pop
 
 using namespace unity::scopes::internal::smartscopes;
 

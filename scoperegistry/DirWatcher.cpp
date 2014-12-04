@@ -18,22 +18,25 @@
 
 #include "DirWatcher.h"
 
+#include <unity/scopes/internal/safe_strerror.h>
 #include <unity/UnityExceptions.h>
 
-#include <iostream>
 #include <sys/inotify.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
+#include <string.h>
 
 using namespace unity;
+using namespace unity::scopes::internal;
 
 namespace scoperegistry
 {
 
-DirWatcher::DirWatcher()
+DirWatcher::DirWatcher(boost::log::sources::severity_channel_logger_mt<>& logger)
     : fd_(inotify_init())
     , thread_state_(Running)
     , thread_exception_(nullptr)
+    , logger_(logger)
 {
     // Validate the file descriptor
     if (fd_ < 0)
@@ -64,19 +67,25 @@ void DirWatcher::add_watch(std::string const& path)
     {
         if (wd.second == path)
         {
-            throw ResourceException("DirWatcher::add_watch(): failed to add watch for path: \"" +
-                                    path + "\". Watch already exists.");
+            throw LogicException("DirWatcher::add_watch(): failed to add watch for path: \"" +
+                                 path + "\". Watch already exists.");
         }
     }
 
     int wd = inotify_add_watch(fd_, path.c_str(), IN_CREATE | IN_MOVED_TO |
                                                   IN_DELETE | IN_MOVED_FROM |
-                                                  IN_MODIFY | IN_ATTRIB);
+                                                  IN_MODIFY | IN_CLOSE_WRITE);
     if (wd < 0)
     {
-        throw ResourceException("DirWatcher::add_watch(): failed to add watch for path: \"" +
-                                path + "\". inotify_add_watch() failed. (fd = " +
-                                std::to_string(fd_) + ", path = " + path + ")");
+        auto msg = "DirWatcher::add_watch(): inotify_add_watch() failed. (fd = " +
+                   std::to_string(fd_) + ", path = " + path + "): " + unity::scopes::internal::safe_strerror(errno);
+        if (errno == ENOENT)
+        {
+            // path does not exist.
+            throw FileException(msg, errno);
+        }
+        // Something else went wrong.
+        throw SyscallException(msg, errno);
     }
 
     wds_[wd] = path;
@@ -128,12 +137,12 @@ void DirWatcher::cleanup()
             }
             catch (std::exception const& e)
             {
-                std::cerr << "~DirWatcher(): " << e.what() << std::endl;
+                BOOST_LOG_SEV(logger_, Logger::Error) << "~DirWatcher(): " << e.what();
             }
             catch (...)
             {
-                std::cerr << "~DirWatcher(): watch_thread was aborted due to an unknown exception"
-                          << std::endl;
+                BOOST_LOG_SEV(logger_, Logger::Error)
+                    << "~DirWatcher(): watch_thread was aborted due to an unknown exception";
             }
         }
         else
@@ -163,9 +172,14 @@ void DirWatcher::watch_thread()
     {
         fd_set fds;
         FD_ZERO(&fds);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"
         FD_SET(fd_, &fds);
+#pragma GCC diagnostic pop
 
         int bytes_avail = 0;
+        static_assert(std::alignment_of<char*>::value >= std::alignment_of<struct inotify_event>::value,
+                      "cannot use std::string as buffer for inotify events");
         std::string buffer;
         std::string event_path;
 
@@ -197,12 +211,19 @@ void DirWatcher::watch_thread()
                                        "read() failed on inotify fd (fd = " +
                                        std::to_string(fd_) + ")", errno);
             }
+            if (bytes_read != bytes_avail)
+            {
+                throw ResourceException("DirWatcher::watch_thread(): Thread aborted: "
+                                       "read() returned " + std::to_string(bytes_read) +
+                                       " bytes, expected " + std::to_string(bytes_avail) +
+                                       " bytes (fd = " + std::to_string(fd_) + ")");
+            }
 
             // Process event(s) received
             int i = 0;
             while (i < bytes_read)
             {
-                struct inotify_event* event = (inotify_event*)&buffer[i];
+                auto event = reinterpret_cast<inotify_event const*>(&buffer[i]);
                 {
                     event_path = "";
                     std::lock_guard<std::mutex> lock(mutex_);
@@ -234,16 +255,16 @@ void DirWatcher::watch_thread()
                         watch_event(Removed, File, event_path);
                     }
                 }
-                else if (event->mask & IN_MODIFY || event->mask & IN_ATTRIB)
+                else if (event->mask & IN_MODIFY)
                 {
                     if (event->mask & IN_ISDIR)
                     {
                         watch_event(Modified, Directory, event_path);
                     }
-                    else
-                    {
-                        watch_event(Modified, File, event_path);
-                    }
+                }
+                else if (event->mask & IN_CLOSE_WRITE)
+                {
+                    watch_event(Modified, File, event_path);
                 }
                 i += sizeof(inotify_event) + event->len;
             }
@@ -260,14 +281,14 @@ void DirWatcher::watch_thread()
     }
     catch (std::exception const& e)
     {
-        std::cerr << e.what() << std::endl;
+        BOOST_LOG_SEV(logger_, Logger::Error) << e.what();
         std::lock_guard<std::mutex> lock(mutex_);
         thread_state_ = Failed;
         thread_exception_ = std::current_exception();
     }
     catch (...)
     {
-        std::cerr << "DirWatcher::watch_thread(): Thread aborted: unknown exception" << std::endl;
+        BOOST_LOG_SEV(logger_, Logger::Error) << "DirWatcher::watch_thread(): Thread aborted: unknown exception";
         std::lock_guard<std::mutex> lock(mutex_);
         thread_state_ = Failed;
         thread_exception_ = std::current_exception();

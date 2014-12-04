@@ -53,12 +53,13 @@ struct ScopeTraits
     }
 };
 
-struct TypedScopeFixtureHelper
+class TypedScopeFixtureHelper
 {
-private:
-    static void set_registry(std::shared_ptr<ScopeBase> const& scope, RegistryProxy const& r);
-
     static void set_scope_directory(std::shared_ptr<ScopeBase> const& scope, std::string const& path);
+    static void set_cache_directory(std::shared_ptr<ScopeBase> const& scope, std::string const& path);
+    static void set_app_directory(std::shared_ptr<ScopeBase> const& scope, std::string const& path);
+    static void set_tmp_directory(std::shared_ptr<ScopeBase> const& scope, std::string const& path);
+    static void set_registry(std::shared_ptr<ScopeBase> const& scope, RegistryProxy const& r);
 
     template<typename Scope>
     friend class TypedScopeFixture;
@@ -84,6 +85,26 @@ public:
     void set_scope_directory(std::string const& path)
     {
         TypedScopeFixtureHelper::set_scope_directory(scope, path);
+    }
+
+    void set_cache_directory(std::string const& path)
+    {
+        TypedScopeFixtureHelper::set_cache_directory(scope, path);
+    }
+
+    void set_app_directory(std::string const& path)
+    {
+        TypedScopeFixtureHelper::set_app_directory(scope, path);
+    }
+
+    void set_tmp_directory(std::string const& path)
+    {
+        TypedScopeFixtureHelper::set_tmp_directory(scope, path);
+    }
+
+    static void set_registry(std::shared_ptr<ScopeBase> const& scope, RegistryProxy const& r)
+    {
+        TypedScopeFixtureHelper::set_registry(scope, r);
     }
 
     void TearDown()

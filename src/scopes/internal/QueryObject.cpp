@@ -29,7 +29,6 @@
 #include <unity/scopes/QueryBase.h>
 #include <unity/scopes/SearchQueryBase.h>
 
-#include <iostream>
 #include <cassert>
 
 using namespace std;
@@ -46,20 +45,23 @@ namespace internal
 
 QueryObject::QueryObject(std::shared_ptr<QueryBase> const& query_base,
                          MWReplyProxy const& reply,
-                         MWQueryCtrlProxy const& ctrl) :
-    QueryObject(query_base, 0, reply, ctrl)
+                         MWQueryCtrlProxy const& ctrl,
+                         boost::log::sources::severity_channel_logger_mt<>& logger)
+    : QueryObject(query_base, 0, reply, ctrl, logger)
 {
 }
 
 QueryObject::QueryObject(std::shared_ptr<QueryBase> const& query_base,
                          int cardinality,
                          MWReplyProxy const& reply,
-                         MWQueryCtrlProxy const& ctrl) :
-    query_base_(query_base),
-    reply_(reply),
-    ctrl_(ctrl),
-    pushable_(true),
-    cardinality_(cardinality)
+                         MWQueryCtrlProxy const& ctrl,
+                         boost::log::sources::severity_channel_logger_mt<>& logger)
+    : query_base_(query_base)
+    , reply_(reply)
+    , ctrl_(ctrl)
+    , pushable_(true)
+    , cardinality_(cardinality)
+    , logger_(logger)
 {
 }
 
@@ -101,7 +103,7 @@ void QueryObject::run(MWReplyProxy const& reply, InvokeInfo const& /* info */) n
     // Create the reply proxy to pass to query_base_ and keep a weak_ptr, which we will need
     // if cancel() is called later.
     assert(self_);
-    auto reply_proxy = make_shared<SearchReplyImpl>(reply, self_, cardinality_, search_query->department_id());
+    auto reply_proxy = make_shared<SearchReplyImpl>(reply, self_, cardinality_, search_query->department_id(), logger_);
     assert(reply_proxy);
     reply_proxy_ = reply_proxy;
 
@@ -121,16 +123,14 @@ void QueryObject::run(MWReplyProxy const& reply, InvokeInfo const& /* info */) n
     catch (std::exception const& e)
     {
         pushable_ = false;
-        // TODO: log error
+        BOOST_LOG_SEV(logger_, Logger::Error) << "ScopeBase::run(): " << e.what();
         reply_->finished(CompletionDetails(CompletionDetails::Error, e.what()));  // Oneway, can't block
-        cerr << "ScopeBase::run(): " << e.what() << endl;
     }
     catch (...)
     {
         pushable_ = false;
-        // TODO: log error
+        BOOST_LOG_SEV(logger_, Logger::Error) << "ScopeBase::run(): unknown exception";
         reply_->finished(CompletionDetails(CompletionDetails::Error, "unknown exception"));  // Oneway, can't block
-        cerr << "ScopeBase::run(): unknown exception" << endl;
     }
 }
 
