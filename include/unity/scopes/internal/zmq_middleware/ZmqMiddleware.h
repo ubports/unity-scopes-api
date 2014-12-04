@@ -70,6 +70,7 @@ public:
     virtual MWQueryProxy create_query_proxy(std::string const& identity, std::string const& endpoint) override;
     virtual MWQueryCtrlProxy create_query_ctrl_proxy(std::string const& identity, std::string const& endpoint) override;
     virtual MWStateReceiverProxy create_state_receiver_proxy(std::string const& identity) override;
+    virtual MWStateReceiverProxy create_registry_state_receiver_proxy(std::string const& identity) override;
 
     virtual MWQueryCtrlProxy add_query_ctrl_object(QueryCtrlObjectBase::SPtr const& ctrl) override;
     virtual void add_dflt_query_ctrl_object(QueryCtrlObjectBase::SPtr const& ctrl) override;

@@ -528,11 +528,17 @@ MWQueryCtrlProxy ZmqMiddleware::create_query_ctrl_proxy(string const& identity, 
     return make_shared<ZmqQueryCtrl>(this, endpoint, identity, ctrl_category);
 }
 
-MWStateReceiverProxy ZmqMiddleware::create_state_receiver_proxy(std::string const& identity)
+MWStateReceiverProxy ZmqMiddleware::create_state_receiver_proxy(string const& identity)
 {
     // Only override endpoint dir for the registry, not the smartscopes registry.
     auto endp_dir = (server_name_ == registry_identity_ ? registry_endpoint_dir_ : public_endpoint_dir_);
     string endpoint = "ipc://" + endp_dir + "/" + server_name_ + state_suffix;
+    return make_shared<ZmqStateReceiver>(this, endpoint, identity, state_category);
+}
+
+MWStateReceiverProxy ZmqMiddleware::create_registry_state_receiver_proxy(string const& identity)
+{
+    string endpoint = "ipc://" + registry_endpoint_dir_ + "/" + registry_identity_ + state_suffix;
     return make_shared<ZmqStateReceiver>(this, endpoint, identity, state_category);
 }
 
