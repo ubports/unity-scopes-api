@@ -57,6 +57,11 @@ TEST(ScopeConfig, basic)
         EXPECT_EQ("com.foo.bar2", children[1]);
         EXPECT_EQ("com.foo.boo", children[2]);
 
+        auto keywords = cfg.keywords();
+        EXPECT_EQ(2u, keywords.size());
+        EXPECT_EQ("foo", keywords[0]);
+        EXPECT_EQ("bar", keywords[1]);
+
         auto attrs = cfg.appearance_attributes();
         EXPECT_EQ(5, attrs.size());
         EXPECT_TRUE(attrs["arbitrary_key"].get_bool());
@@ -178,6 +183,31 @@ TEST(ScopeConfig, bad_version)
         boost::regex r("unity::scopes::ConfigException: \".*\": Version must be > 0");
         EXPECT_TRUE(boost::regex_match(e.what(), r));
     }
+}
+
+TEST(ScopeConfig, bad_keywords)
+{
+    try
+    {
+        ScopeConfig cfg(BAD_KEYWORDS);
+    }
+    catch(ConfigException const& e)
+    {
+        boost::regex r("unity::scopes::ConfigException: \".*\": Invalid empty keyword string found in \"Keywords\" list");
+        EXPECT_TRUE(boost::regex_match(e.what(), r));
+    }
+}
+
+TEST(ScopeConfig, empty_keywords)
+{
+    ScopeConfig cfg(EMPTY_KEYWORDS);
+    EXPECT_EQ(cfg.keywords().size(), 0);
+}
+
+TEST(ScopeConfig, single_keyword)
+{
+    ScopeConfig cfg(SINGLE_KEYWORD);
+    EXPECT_EQ(cfg.keywords().size(), 1);
 }
 
 class ScopeConfigWithIntl: public ::testing::Test

@@ -25,6 +25,8 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 
+#include <sys/stat.h>
+
 using namespace unity::scopes::internal;
 using namespace boost;
 
@@ -46,7 +48,7 @@ ScopesWatcher::~ScopesWatcher()
     cleanup();
 }
 
-void ScopesWatcher::add_install_dir(std::string const& dir, bool notify)
+void ScopesWatcher::add_install_dir(std::string const& dir)
 {
     try
     {
@@ -84,7 +86,7 @@ void ScopesWatcher::add_install_dir(std::string const& dir, bool notify)
             {
                 try
                 {
-                    add_scope_dir(subdir, notify);
+                    add_scope_dir(subdir);
                 }
                 catch (unity::FileException const&)
                 {
@@ -140,14 +142,42 @@ void ScopesWatcher::remove_install_dir(std::string const& dir)
     remove_watch(dir);
 }
 
-void ScopesWatcher::add_scope_dir(std::string const& dir, bool notify)
+namespace
+{
+
+bool file_is_empty(std::string const& path)
+{
+    struct stat buf;
+    if (stat(path.c_str(), &buf) == -1)
+    {
+        // We ignore errors because, by the time we get to look,
+        // the file may no longer be there.
+        return true;
+    }
+    return buf.st_size == 0;
+}
+
+}
+
+void ScopesWatcher::add_scope_dir(std::string const& dir)
 {
     try
     {
+        // Add a watch for this directory (ignore exception if already exists)
+        try
+        {
+            add_watch(dir);
+        }
+        catch (unity::LogicException const&) {}
+
         auto configs = find_scope_dir_configs(dir, ".ini");
         if (!configs.empty())
         {
             auto config = *configs.cbegin();
+            if (file_is_empty(config.second))
+            {
+                return;  // Wait for event indicating non-empty file, so we don't try parsing it too early.
+            }
             {
                 std::lock_guard<std::mutex> lock(mutex_);
 
@@ -162,20 +192,10 @@ void ScopesWatcher::add_scope_dir(std::string const& dir, bool notify)
             }
 
             // New config found, execute callback
-            if (notify)
-            {
-                ini_added_callback_(config);
-                std::cout << "ScopesWatcher: scope: \"" << config.first << "\" installed to: \""
-                          << dir << "\"" << std::endl;
-            }
+            ini_added_callback_(config);
+            BOOST_LOG_SEV(logger_, Logger::Info)
+                << "ScopesWatcher: scope: \"" << config.first << "\" installed to: \"" << dir << "\"";
         }
-
-        // Add a watch for this directory (ignore exception if already exists)
-        try
-        {
-            add_watch(dir);
-        }
-        catch (unity::LogicException const&) {}
     }
     catch (std::exception const& e)
     {
@@ -218,81 +238,50 @@ void ScopesWatcher::watch_event(DirWatcher::EventType event_type,
 {
     filesystem::path fs_path(path);
 
-    if (file_type == DirWatcher::File && fs_path.extension() == ".ini")
+    if (file_type == DirWatcher::File
+        && fs_path.extension() == ".ini"
+        && !boost::algorithm::ends_with(path, "-settings.ini"))
     {
         std::lock_guard<std::mutex> lock(mutex_);
+
         std::string parent_path = fs_path.parent_path().native();
+        std::string scope_id = fs_path.stem().native();
 
-        if (boost::algorithm::ends_with(path, "-settings.ini"))
+        // A .ini has been added / modified
+        if (event_type == DirWatcher::Added || event_type == DirWatcher::Modified)
         {
-            std::string scope_id = fs_path.stem().native();
-            boost::algorithm::replace_last(scope_id, "-settings", "");
-
-            // For add/remove/modify of a settings definition, we pretend that the scope's
-            // config file was added or modified (provided the .ini file exists). This triggers
-            // re-loading the metadata for the scope.
-            std::string fs_ini_path = parent_path + "/" + scope_id + ".ini";
-            if (boost::filesystem::exists(fs_ini_path))
+            // We notify only if the file is non-empty.
+            // This avoids notifying twice if things are slow,
+            // because we may get an event for the file creation,
+            // followed by an event for the file modification.
+            // This is not completely free of races because,
+            // by the time we get the create event, the file may
+            // have been *partially* written, in which case
+            // we'll still notify a second time when the file is closed.
+            // But because .ini files are small, we get away with it. (We
+            // rely on the file writer to not write, say, one byte
+            // at a time.)
+            bool non_empty = true;
+            if (event_type == DirWatcher::Added)
             {
-                ini_added_callback_(std::make_pair(scope_id, fs_ini_path));
-                std::string const action = event_type == DirWatcher::Removed ? "uninstalled from" : "installed to";
-                BOOST_LOG_SEV(logger_, Logger::Info)
-                    << "ScopesWatcher: scope: \"" << scope_id << "\" settings definition " << action << ": \""
-                    << parent_path << "\"";
+                non_empty = !file_is_empty(path);
             }
-        }
-        else
-        {
-            std::string scope_id = fs_path.stem().native();
-
-            // A .ini has been added / modified
-            if (event_type == DirWatcher::Added || event_type == DirWatcher::Modified)
+            if (non_empty)
             {
                 sdir_to_ini_map_[parent_path] = path;
                 ini_added_callback_(std::make_pair(scope_id, path));
                 BOOST_LOG_SEV(logger_, Logger::Info)
-                    << "ScopesWatcher: scope: \"" << scope_id << "\" installed to: \""
-                    << parent_path << "\"";
-            }
-            // A .ini has been removed
-            else if (event_type == DirWatcher::Removed)
-            {
-                sdir_to_ini_map_.erase(parent_path);
-                registry_->remove_local_scope(scope_id);
-                BOOST_LOG_SEV(logger_, Logger::Info)
-                    << "ScopesWatcher: scope: \"" << scope_id << "\" uninstalled from: \""
-                    << parent_path << "\"";
+                    << "scopeswatcher: scope: \"" << scope_id << "\" .ini installed: \"" << path << "\"";
             }
         }
-    }
-    else if (file_type == DirWatcher::File && fs_path.extension() == ".so")
-    {
-        std::lock_guard<std::mutex> lock(mutex_);
-        std::string parent_path = fs_path.parent_path().native();
-
-        // Check if this directory is associate with the config file
-        if (sdir_to_ini_map_.find(parent_path) != sdir_to_ini_map_.end())
+        // a .ini has been removed
+        else if (event_type == DirWatcher::Removed)
         {
-            std::string ini_path = sdir_to_ini_map_.at(parent_path);
-            filesystem::path fs_ini_path(ini_path);
-            std::string scope_id = fs_ini_path.stem().native();
-
-            // A .so file has been added / modified
-            if (event_type == DirWatcher::Added || event_type == DirWatcher::Modified)
-            {
-                ini_added_callback_(std::make_pair(scope_id, ini_path));
-                BOOST_LOG_SEV(logger_, Logger::Info)
-                    << "ScopesWatcher: scope: \"" << scope_id << "\" installed to: \""
-                    << parent_path << "\"";
-            }
-            // A .so file has been removed
-            else if (event_type == DirWatcher::Removed)
-            {
-                registry_->remove_local_scope(scope_id);
-                BOOST_LOG_SEV(logger_, Logger::Info)
-                    << "ScopesWatcher: scope: \"" << scope_id << "\" uninstalled from: \""
-                    << parent_path << "\"";
-            }
+            sdir_to_ini_map_.erase(parent_path);
+            registry_->remove_local_scope(scope_id);
+            BOOST_LOG_SEV(logger_, Logger::Info)
+                << "scopeswatcher: scope: \"" << scope_id << "\" .ini uninstalled: \""
+                << path << "\"";
         }
     }
     else
@@ -312,7 +301,7 @@ void ScopesWatcher::watch_event(DirWatcher::EventType event_type,
             // An install directory has been added
             if (event_type == DirWatcher::Added)
             {
-                add_install_dir(path, true);
+                add_install_dir(path);
             }
             // An install directory has been removed
             else if (event_type == DirWatcher::Removed)
@@ -321,23 +310,32 @@ void ScopesWatcher::watch_event(DirWatcher::EventType event_type,
             }
         }
         // Else if this path is within an install dir:
-        else if (idir_to_sdirs_map_.find(parent_dir(path)) != idir_to_sdirs_map_.end())
+        else
         {
-            // A new sub directory has been added
-            if (event_type == DirWatcher::Added)
+            bool is_inside_install_dir;
             {
-                // try add this path as a scope folder (ignore failures to add this path as scope dir)
-                // (we need to do this with both files and folders added, as the file added may be a symlink)
-                try
-                {
-                    add_scope_dir(path, true);
-                }
-                catch (unity::FileException const&) {}
+                std::lock_guard<std::mutex> lock(mutex);
+                is_inside_install_dir = idir_to_sdirs_map_.find(parent_dir(path)) != idir_to_sdirs_map_.end();
             }
-            // A sub directory has been removed
-            else if (event_type == DirWatcher::Removed)
+
+            if (is_inside_install_dir)
             {
-                remove_scope_dir(path);
+                // A new sub-directory (or symlink to sub-directory) has been added
+                if (event_type == DirWatcher::Added)
+                {
+                    // try add this path as a scope folder (ignore failures to add this path as scope dir)
+                    // (we need to do this with both files and folders added, as the file added may be a symlink)
+                    try
+                    {
+                        add_scope_dir(path);
+                    }
+                    catch (unity::FileException const& e) {}
+                }
+                // A sub directory has been removed
+                else if (event_type == DirWatcher::Removed)
+                {
+                    remove_scope_dir(path);
+                }
             }
         }
     }

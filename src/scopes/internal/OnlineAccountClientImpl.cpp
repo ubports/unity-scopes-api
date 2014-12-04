@@ -22,6 +22,9 @@
 
 #include <iostream>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"  // Lots of warnings from libg otherwise.
+
 namespace unity
 {
 
@@ -381,6 +384,13 @@ void OnlineAccountClientImpl::refresh_service_statuses()
         std::rethrow_exception(thread_exception_);  // LCOV_EXCL_LINE
     }
 
+    // Update the accounts we already know about
+    for (auto const& info : accounts_)
+    {
+        service_update_cb(info.second->account_service.get(), ag_account_service_get_enabled(info.second->account_service.get()), info.second.get());
+    }
+
+    // Find new account we don't yet know about
     std::shared_ptr<GList> enabled_accounts(ag_manager_list(manager_.get()), ag_manager_list_free);
     GList* it;
     for (it = enabled_accounts.get(); it; it = it->next)
@@ -637,6 +647,8 @@ void OnlineAccountClientImpl::main_loop_thread()
     }
     // LCOV_EXCL_STOP
 }
+
+#pragma GCC diagnostic pop
 
 }  // namespace internal
 

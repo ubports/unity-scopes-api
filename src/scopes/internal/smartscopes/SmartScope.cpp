@@ -132,7 +132,7 @@ void SmartQuery::run(SearchReplyProxy const& reply)
         {
             BOOST_LOG_SEV(this->ss_client_->logger(), Logger::Error)
                 << "SmartScope: failed to register category: \"" << category->id
-                << "\" for scope \"" << scope_id_ << "\" and query: \"" << query_.query_string();
+                << "\" for scope \"" << scope_id_ << "\" and query: \"" << query_.query_string() << "\"";
         }
     };
     handler.result_handler = [this, reply](SearchResult const& result) {

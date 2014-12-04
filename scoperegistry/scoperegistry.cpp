@@ -288,9 +288,11 @@ void add_local_scope(RegistryObject::SPtr const& registry,
         {
             schema = IniSettingsSchema::create(settings_schema_path.native());
         }
-        // We always need to create a settings schema if the scope wants location data
         else if (sc.location_data_needed())
         {
+            // TODO: HACK: See bug #1393438 and the comments in IniSettingsSchema.cpp and
+            //             JsonSettingsSchema.cpp.
+            // We always need to create a settings schema if the scope wants location data
             schema = IniSettingsSchema::create_empty();
         }
 
@@ -317,6 +319,7 @@ void add_local_scope(RegistryObject::SPtr const& registry,
     mi->set_appearance_attributes(sc.appearance_attributes());
     mi->set_child_scope_ids(sc.child_scope_ids());
     mi->set_version(sc.version());
+    mi->set_keywords(sc.keywords());
 
     // Prepend scope_dir to pageheader logo path if logo path is relative.
     // TODO: Once we have type-safe parsing in the config files, remove

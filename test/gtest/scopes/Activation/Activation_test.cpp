@@ -41,7 +41,7 @@ public:
     DummyReceiver(std::function<void(CategorisedResult)> push_func)
     {
         push_func_ = push_func;
-    };
+    }
 
     void push(CategorisedResult result) override
     {

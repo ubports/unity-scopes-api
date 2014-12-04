@@ -162,6 +162,7 @@ TEST(ScopeMetadataImpl, basic)
     mi2->set_settings_definitions(va);
     mi2->set_location_data_needed(true);
     mi2->set_child_scope_ids(vector<string>{"abc", "def"});
+    mi2->set_keywords(vector<string>{"music", "video", "news"});
 
     // Make another copy, so we get coverage on the entire copy constructor
     unique_ptr<ScopeMetadataImpl> mi3(new ScopeMetadataImpl(*mi2));
@@ -175,6 +176,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ(va, m.settings_definitions());
     EXPECT_TRUE(m.location_data_needed());
     EXPECT_EQ((vector<string>{"abc", "def"}), m.child_scope_ids());
+    EXPECT_EQ((vector<string>{"music", "video", "news"}), m.keywords());
 
     // Make another value
     unique_ptr<ScopeMetadataImpl> ti(new ScopeMetadataImpl(&mw));
@@ -198,6 +200,7 @@ TEST(ScopeMetadataImpl, basic)
     ti->set_settings_definitions(tmp_va);
     ti->set_location_data_needed(true);
     ti->set_child_scope_ids(vector<string>{"tmp abc", "tmp def"});
+    ti->set_keywords(vector<string>{"music", "video"});
 
     // Check impl assignment operator
     ScopeMetadataImpl ci(&mw);
@@ -220,6 +223,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_TRUE(ci.location_data_needed());
     EXPECT_EQ((vector<string>{"tmp abc", "tmp def"}), ci.child_scope_ids());
     EXPECT_EQ(99, ci.version());
+    EXPECT_EQ((vector<string>{"music", "video"}), ci.keywords());
 
     // Check public assignment operator
     auto tmp = ScopeMetadataImpl::create(move(ti));
@@ -242,6 +246,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ(tmp_va, m.settings_definitions());
     EXPECT_TRUE(m.location_data_needed());
     EXPECT_EQ((vector<string>{"tmp abc", "tmp def"}), m.child_scope_ids());
+    EXPECT_EQ((vector<string>{"music", "video"}), m.keywords());
 
     // Self-assignment
     tmp = tmp;
@@ -263,6 +268,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ(tmp_va, tmp.settings_definitions());
     EXPECT_TRUE(tmp.location_data_needed());
     EXPECT_EQ((vector<string>{"tmp abc", "tmp def"}), tmp.child_scope_ids());
+    EXPECT_EQ((vector<string>{"music", "video"}), tmp.keywords());
 
     // Copy constructor
     ScopeMetadata tmp2(tmp);
@@ -284,6 +290,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ(tmp_va, tmp2.settings_definitions());
     EXPECT_TRUE(tmp2.location_data_needed());
     EXPECT_EQ((vector<string>{"tmp abc", "tmp def"}), tmp2.child_scope_ids());
+    EXPECT_EQ((vector<string>{"music", "video"}), tmp2.keywords());
 }
 
 TEST(ScopeMetadataImpl, serialize)
@@ -315,11 +322,12 @@ TEST(ScopeMetadataImpl, serialize)
     mi->set_settings_definitions(va);
     mi->set_location_data_needed(false);
     mi->set_child_scope_ids({"com.foo.bar", "com.foo.baz"});
+    mi->set_keywords({"news", "games"});
 
     // Check that serialize() sets the map values correctly
     auto m = ScopeMetadataImpl::create(move(mi));
     auto var = m.serialize();
-    EXPECT_EQ(17u, var.size());
+    EXPECT_EQ(18u, var.size());
     EXPECT_EQ("scope_id", var["scope_id"].get_string());
     EXPECT_EQ("display_name", var["display_name"].get_string());
     EXPECT_EQ("description", var["description"].get_string());
@@ -332,7 +340,7 @@ TEST(ScopeMetadataImpl, serialize)
     EXPECT_FALSE(var["invisible"].get_bool());
     EXPECT_EQ("bar", var["appearance_attributes"].get_dict()["foo"].get_string());
     EXPECT_EQ(ScopeMetadata::ResultsTtlType::Large,
-            (ScopeMetadata::ResultsTtlType ) var["results_ttl_type"].get_int());
+              static_cast<ScopeMetadata::ResultsTtlType>(var["results_ttl_type"].get_int()));
     EXPECT_EQ(1, var["version"].get_int());
     EXPECT_FALSE(var["invisible"].get_bool());
     EXPECT_EQ(va, var["settings_definitions"].get_array());
@@ -340,6 +348,9 @@ TEST(ScopeMetadataImpl, serialize)
     EXPECT_EQ(2u, var["child_scopes"].get_array().size());
     EXPECT_EQ("com.foo.bar", var["child_scopes"].get_array()[0].get_string());
     EXPECT_EQ("com.foo.baz", var["child_scopes"].get_array()[1].get_string());
+    EXPECT_EQ(2u, var["keywords"].get_array().size());
+    EXPECT_EQ("news", var["keywords"].get_array()[0].get_string());
+    EXPECT_EQ("games", var["keywords"].get_array()[1].get_string());
 
     // Make another instance from the VariantMap and check its fields
     ScopeMetadataImpl c(var, &mw);
@@ -361,6 +372,12 @@ TEST(ScopeMetadataImpl, serialize)
     EXPECT_FALSE(c.invisible());
     EXPECT_EQ(va, c.settings_definitions());
     EXPECT_FALSE(c.location_data_needed());
+    EXPECT_EQ(2u, c.child_scope_ids().size());
+    EXPECT_EQ("com.foo.bar", c.child_scope_ids()[0]);
+    EXPECT_EQ("com.foo.baz", c.child_scope_ids()[1]);
+    EXPECT_EQ(2u, c.keywords().size());
+    EXPECT_EQ("news", c.keywords()[0]);
+    EXPECT_EQ("games", c.keywords()[1]);
 }
 
 TEST(ScopeMetadataImpl, serialize_exceptions)

@@ -137,9 +137,14 @@ TEST_F(smartscopesproxytest, ss_registry)
         EXPECT_EQ("Temperature Units", meta.settings_definitions()[1].get_dict()["displayName"].get_string());
         EXPECT_EQ("list", meta.settings_definitions()[1].get_dict()["type"].get_string());
         EXPECT_EQ(1, meta.settings_definitions()[1].get_dict()["defaultValue"].get_int());
-        EXPECT_EQ(2, meta.settings_definitions()[1].get_dict()["values"].get_array().size());
-        EXPECT_EQ("Celsius", meta.settings_definitions()[1].get_dict()["values"].get_array()[0].get_string());
-        EXPECT_EQ("Fahrenheit", meta.settings_definitions()[1].get_dict()["values"].get_array()[1].get_string());
+        EXPECT_EQ(2, meta.settings_definitions()[1].get_dict()["displayValues"].get_array().size());
+        EXPECT_EQ("Celsius", meta.settings_definitions()[1].get_dict()["displayValues"].get_array()[0].get_string());
+        EXPECT_EQ("Fahrenheit", meta.settings_definitions()[1].get_dict()["displayValues"].get_array()[1].get_string());
+        ASSERT_EQ(4, meta.keywords().size());
+        EXPECT_EQ("music", meta.keywords()[0]);
+        EXPECT_EQ("video", meta.keywords()[1]);
+        EXPECT_EQ("news", meta.keywords()[2]);
+        EXPECT_EQ("games", meta.keywords()[3]);
     }
 
     // non-existent scope (via mw)
@@ -172,9 +177,9 @@ TEST_F(smartscopesproxytest, ss_registry)
         EXPECT_EQ("Temperature Units", meta.settings_definitions()[1].get_dict()["displayName"].get_string());
         EXPECT_EQ("list", meta.settings_definitions()[1].get_dict()["type"].get_string());
         EXPECT_EQ(1, meta.settings_definitions()[1].get_dict()["defaultValue"].get_int());
-        EXPECT_EQ(2, meta.settings_definitions()[1].get_dict()["values"].get_array().size());
-        EXPECT_EQ("Celsius", meta.settings_definitions()[1].get_dict()["values"].get_array()[0].get_string());
-        EXPECT_EQ("Fahrenheit", meta.settings_definitions()[1].get_dict()["values"].get_array()[1].get_string());
+        EXPECT_EQ(2, meta.settings_definitions()[1].get_dict()["displayValues"].get_array().size());
+        EXPECT_EQ("Celsius", meta.settings_definitions()[1].get_dict()["displayValues"].get_array()[0].get_string());
+        EXPECT_EQ("Fahrenheit", meta.settings_definitions()[1].get_dict()["displayValues"].get_array()[1].get_string());
     }
 }
 

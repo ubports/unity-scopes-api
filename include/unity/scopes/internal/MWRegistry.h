@@ -55,6 +55,7 @@ private:
     MiddlewareBase* mw_base_;
     MWSubscriber::UPtr list_update_subscriber_;
     std::map<std::string, MWSubscriber::UPtr> scope_state_subscribers_;
+    std::mutex mutex_;
 };
 
 } // namespace internal
