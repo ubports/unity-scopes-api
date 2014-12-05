@@ -53,6 +53,8 @@ qt5_use_modules(
     Core
 )
 
+set(LIBS unity-utils-qt)
+
 target_link_libraries(
     unity-utils-qt
     ${UNITY_API_LDFLAGS}
@@ -62,4 +64,5 @@ set_target_properties(unity-utils-qt PROPERTIES
     VERSION "${UNITY_SCOPES_MAJOR}.${UNITY_SCOPES_MINOR}.${UNITY_SCOPES_MICRO}"
     SOVERSION ${UNITY_SCOPES_SOVERSION})
 
+set(LIB_INSTALL_PREFIX lib/${CMAKE_LIBRARY_ARCHITECTURE})
 install(TARGETS unity-utils-qt LIBRARY DESTINATION ${LIB_INSTALL_PREFIX})

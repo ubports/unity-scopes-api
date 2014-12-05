@@ -95,3 +95,15 @@ Depends: ${misc:Depends},
          ${shlibs:Depends}
 Description: Qt utilities library for Unity scopes API
  Library that integrates utilites based on Qt for convenience
+
+Package: libunity-utils-qt-dev
+Architecture: any
+Multi-Arch: same
+Pre-Depends: ${misc:Pre-Depends},
+Depends: libunity-scopes-dev (= ${binary:Version}),
+         libunity-utils-qt (= ${binary:Version}),
+         libnet-cpp-dev (>=1.1.0)
+         ${misc:Depends},
+         ${shlibs:Depends}
+Description: Header files for Qt utilities library for Unity scopes API
+ Library that integrates utilites based on Qt for convenience (dev files)
