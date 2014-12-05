@@ -57,10 +57,6 @@ public:
     void run_scope(ScopeBase* scope_base,
                    std::string const& scope_ini_file,
                    std::promise<void> ready_promise = std::promise<void>());
-    void run_scope(ScopeBase* scope_base,
-                   std::string const& runtime_ini_file,
-                   std::string const& scope_ini_file,
-                   std::promise<void> = std::promise<void>());
 
     ObjectProxy string_to_proxy(std::string const& s) const;
     std::string proxy_to_string(ObjectProxy const& proxy) const;
@@ -81,11 +77,12 @@ private:
     std::string scope_id_;
     MiddlewareFactory::UPtr middleware_factory_;
     MiddlewareBase::SPtr middleware_;
-    mutable RegistryProxy registry_;
-    mutable std::string registry_configfile_;
-    mutable std::string registry_identity_;
-    mutable std::string ss_configfile_;
-    mutable std::string ss_registry_identity_;
+    RegistryProxy registry_;
+    std::string runtime_configfile_;
+    std::string registry_configfile_;
+    std::string registry_identity_;
+    std::string ss_configfile_;
+    std::string ss_registry_identity_;
     int reap_expiry_;
     int reap_interval_;
     std::string cache_dir_;
