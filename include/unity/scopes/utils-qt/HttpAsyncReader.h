@@ -44,11 +44,20 @@ namespace utils
 namespace qt
 {
 
+/**
+\brief Class that downloads http files asynchronously.
+
+Executes a remote HTTP query asynchronously to return different futures about results or a parser.
+The user should define which parser wants to use, and offer a method that given a char* containing the
+data downloaded by this class contructs the parser.
+*/
 class HttpAsyncReader
 {
 public:
+    /// @cond
     NONCOPYABLE(HttpAsyncReader);
     UNITY_DEFINES_PTRS(HttpAsyncReader);
+    /// @endcond
 
     // aliases
     template <typename PARSER>
