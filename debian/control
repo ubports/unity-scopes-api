@@ -30,6 +30,7 @@ Build-Depends: g++-4.9,
                dbus-test-runner,
                libdbustest1-dev,
                valgrind,
+               libnet-cpp-dev (>=1.1.0)
 Standards-Version: 3.9.5
 XS-Testsuite: autopkgtest
 Section: libs
@@ -85,3 +86,12 @@ Multi-Arch: foreign
 Depends: ${misc:Depends},
 Description: Documentation for Unity scopes API
  Library to integrate scopes with the Unity shell (documentation)
+
+Package: libunity-utils-qt
+Architecture: any
+Multi-Arch: same
+Pre-Depends: ${misc:Pre-Depends},
+Depends: ${misc:Depends},
+         ${shlibs:Depends}
+Description: Qt utilities library for Unity scopes API
+ Library that integrates utilites based on Qt for convenience

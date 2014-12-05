@@ -34,7 +34,8 @@ forbidden = {'boost',
 # with one of the specified prefixes.
 #
 allowed = {
-    'unity/shell': { 'Qt' } # Anything under unity/shell can include anything starting with Qt
+    'unity/shell': { 'Qt' }, # Anything under unity/shell can include anything starting with Qt
+    'include/unity/scopes/utils-qt': { 'Qt' } # Anything under unity/scopes/utils-qt can include anything starting with Qt
 }
 
 def check_file(filename, permitted_includes):
