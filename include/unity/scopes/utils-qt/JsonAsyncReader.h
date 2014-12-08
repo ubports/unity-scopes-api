@@ -50,9 +50,19 @@ static bool get_results_json(QJsonDocument& json,
                              ResultsList<B>& results,
                              std::string&);
 
+/**
+\brief Class that downloads http JSON files asynchronously.
+
+Executes a remote HTTP query asynchronously to return different futures about JSON results or a JSON parser.
+The class implements and defines a function that returns a JSON parser filled with the data
+downloaded.
+The class also offers a default function to obtain all objects of a given name in the results.
+The user may define his own parsing function to parse data at he desires.
+*/
 class JsonAsyncReader
 {
 public:
+    /// @cond
     NONCOPYABLE(JsonAsyncReader);
     UNITY_DEFINES_PTRS(JsonAsyncReader);
 
@@ -75,37 +85,152 @@ public:
     JsonAsyncReader();
 
     virtual ~JsonAsyncReader() = default;
+    /// @endcond
 
+    /**
+     * \brief Downloads a HTTP JSON remote file asynchronously and returns a future to a list of results
+     * This method downloads in a separated thread a http document identified by the given URI.
+     * It returns a future of list of results based on a given object name.
+     * If, for example, the document contains a list of objects identified by the tag "ITEM" it
+     * parses the document and returns a list of those objects.
+     *
+     * The user may provide his own function to parse the downloaded data.
+     *
+     * The method has 2 template parameters: the type of results returned and the type of objects when instantiating.
+     * The type of instantiation has to be a derived class of the return type. This is offered for convenience
+     * to return more generic types and get advantage of polymorphism.
+     *
+     * The method checks at compile time that the instantiation type is effectively a derived class of the type
+     * returned.
+     *
+     * \param uri URI to download
+     * \param object_name name of the kind of object we are looking for in the http document
+     * \param parse Function that parses the data downloaded
+     *
+     * \return Future of list of results
+     */
     template <typename BASE, typename TYPE>
     ResultsFuture<BASE> async_get(std::string const& uri,
                                   std::string const& object_name,
                                   ParseFunc<BASE> const& parse = get_results_json<BASE, TYPE>) const;
 
+    /**
+     * \brief Downloads a JSON HTTP remote file asynchronously and returns a future to a list of results
+     * This method downloads in a separated thread a http document identified by the given URI.
+     * It returns a future of list of results based on a given object name.
+     * If, for example, the document contains a list of objects identified by the tag "ITEM" it
+     * parses the document and returns a list of those objects.
+     * The user must provide a function to create the parser for the downloaded data and a parse function
+     * that retrieves the data.
+     *
+     * The method has 1 template parameter: the type of objects returned and the parser type.
+     *
+     * \param uri URI to download
+     * \param object_name name of the kind of object we are looking for in the http document
+     * \param parse Function that parses the data downloaded
+     *
+     * \return Future of list of results
+     */
     template <typename T>
     ResultsFuture<T> async_get(std::string const& uri,
                                std::string const& object_name,
                                ParseFunc<T> const& parse = get_results_json<T, T>) const;
 
+    /**
+     * \brief Downloads a HTTP JSON remote file asynchronously and returns a future to a list of results
+     * This method downloads in a separated thread a http document identified by the given URI.
+     * It returns a future of list of results based on a given object name.
+     * If, for example, the document contains a list of objects identified by the tag "ITEM" it
+     * parses the document and returns a list of those objects.
+     *
+     * The user may provide his own function to parse the downloaded data.
+     *
+     * The method has 2 template parameters: the type of results returned and the type of objects when intantiating.
+     * The type of instantiation has to be a derived class of the return type. This is offered for convenience
+     * to return more generic types and get advantage of polymorphism.
+     *
+     * The method checks at compile time that the instantiation type is effectively a derived class of the type
+     * returned.
+     *
+     * \param host the remote host name
+     * \param params The parameters that wlll build the final query, defined by a list of pairs of key and value
+     * \param object_name name of the kind of object we are looking for in the http document
+     * \param parse Function that parses the data downloaded
+     *
+     * \return Future of list of results
+     */
     template <typename BASE, typename TYPE>
     ResultsFuture<BASE> async_get(std::string const& host,
                                   JsonParameters const& params,
                                   std::string const& object_name,
                                   ParseFunc<BASE> const& parse = get_results_json<BASE, TYPE>) const;
 
+    /**
+     * \brief Downloads a HTTP JSON remote file asynchronously and returns a future to a list of results
+     * This method downloads in a separated thread a http document identified by the given URI.
+     * It returns a future of list of results based on a given object name.
+     * If, for example, the document contains a list of objects identified by the tag "ITEM" it
+     * parses the document and returns a list of those objects.
+     *
+     * The user may provide his own function to parse the downloaded data.
+     *
+     * The method has 1 template parameters: the type of results returned.
+     *
+     * The method checks at compile time that the instantiation type is effectively a derived class of the type
+     * returned.
+     *
+     * \param host the remote host name
+     * \param params The parameters that wlll build the final query, defined by a list of pairs of key and value
+     * \param object_name name of the kind of object we are looking for in the http document
+     * \param parse Function that parses the data downloaded
+     *
+     * \return Future of list of results
+     */
     template <typename T>
     ResultsFuture<T> async_get(std::string const& host,
                                JsonParameters const& params,
                                std::string const& object_name,
                                ParseFunc<T> const& parse = get_results_json<T, T>) const;
 
+    /**
+     * \brief Downloads a HTTP remote file asynchronously and returns a future to a valid JSON parser containing the
+     *data.
+     *
+     * This method downloads a remote http document, fills a valid QJsonDocument parser with the downloaded data and
+     * returns a future to the parser.
+     * \param uri URI to download
+     *
+     * \return Future of valid parser filled with the data downloaded
+     */
     JsonDocumentFuture async_get_parser(std::string const& uri) const;
 
+    /**
+     * \brief Downloads a HTTP remote file asynchronously and returns a future to a valid JSON parser containing the
+     *data.
+     *
+     * This method downloads a remote http document, fills a valid QJsonDocument parser with the downloaded data and
+     * returns a future to the parser.
+     * \param host host name
+     * \param params The parameters that will build the final query, defined by a list of pairs of key and value
+     *
+     * \return Future of valid parser filled with the data downloaded
+     */
     JsonDocumentFuture async_get_parser(std::string const& host, JsonParameters const& params) const;
 
 protected:
+    /**
+     * \brief Creates a QJsonDocument filled with the given data.
+     * \param data The data that contains the JSON document
+     * \param error Returned by the method, contains any possible error string obtained during the creation of the
+     *parser.
+     *
+     * \return shared pointer to the QJsonDocument created
+     */
     static QJsonDocumentSptr create_parser_with_data(std::string const& data, std::string& error);
 
+    /// @cond
     std::shared_ptr<HttpAsyncReader> p_;
+    /// @endcond
 };
 
 template <typename BASE, typename TYPE>

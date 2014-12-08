@@ -57,7 +57,6 @@ public:
     /// @cond
     NONCOPYABLE(HttpAsyncReader);
     UNITY_DEFINES_PTRS(HttpAsyncReader);
-    /// @endcond
 
     // aliases
     template <typename PARSER>
@@ -79,35 +78,104 @@ public:
     HttpAsyncReader();
 
     virtual ~HttpAsyncReader();
+    /// @endcond
 
+    /**
+     * \brief Downloads a HTTP remote file asynchronously and returns a future to a list of results
+     * This method downloads in a separated thread a http document identified by the given URI.
+     * It returns a future of list of results based on a given object name.
+     * If, for example, the document contains a list of objects identified by the tag "ITEM" it
+     * parses the document and returns a list of those objects.
+     * The user must provide a function to create the parser for the downloaded data and a parse function
+     * that retrieves the data.
+     *
+     * The method has 3 template parameters: the type of results returned, the type of objects when intantiating
+     * and the parser type.
+     * The type of instantiation has to be a derived class of the return type. This is offered for convenience
+     * to return more generic types and get advantage of polymorphism.
+     *
+     * The method checks at compile time that the instantiation type is effectively a derived class of the type
+     * returned.
+     *
+     * \param uri URI to download
+     * \param object_name name of the kind of object we are looking for in the http document
+     * \param create Function that returns a valid parser filled with the data contained in the http document
+     * \param parse Function that parses the data downloaded
+     *
+     * \return Future of list of results
+     */
     template <typename BASE, typename TYPE, typename PARSER>
     ResultsFuture<BASE> async_get(std::string const& uri,
                                   std::string const& object_name,
                                   FactoryFunc<PARSER> const& create,
                                   ParseFunc<BASE, PARSER> const& parse) const;
 
+    /**
+     * \brief Downloads a HTTP remote file asynchronously and returns a future to a list of results
+     * This method downloads in a separated thread a http document identified by the given URI.
+     * It returns a future of list of results based on a given object name.
+     * If, for example, the document contains a list of objects identified by the tag "ITEM" it
+     * parses the document and returns a list of those objects.
+     * The user must provide a function to create the parser for the downloaded data and a parse function
+     * that retrieves the data.
+     *
+     * The method has 2 template parameters: the type of objects returned and the parser type.
+     *
+     * \param uri URI to download
+     * \param object_name name of the kind of object we are looking for in the http document
+     * \param create Function that returns a valid parser filled with the data contained in the http document
+     * \param parse Function that parses the data downloaded
+     *
+     * \return Future of list of results
+     */
     template <typename TYPE, typename PARSER>
     ResultsFuture<TYPE> async_get(std::string const& uri,
                                   std::string const& object_name,
                                   FactoryFunc<PARSER> const& create,
                                   ParseFunc<TYPE, PARSER> const& parse) const;
 
+    /**
+     * \brief Downloads a HTTP remote file asynchronously and returns a future to a valid parser containing the data.
+     *
+     * This method downloads a remote http document, fills a valid parser with the downloaded data and
+     * returns a future to the parser.
+     * \param uri URI to download
+     * \param create Function that returns a valid parser filled with the data contained in the http document
+     *
+     * \return Future of valid parser filled with the data downloaded
+     */
     template <typename PARSER>
     ParserFuture<PARSER> async_get_parser(std::string const& uri, FactoryFunc<PARSER> const& create) const;
 
+    /**
+     * \brief Gets the data of the given future in the gived timeout.
+     * If the time given expires and the data in the future is not ready throws a unity::scopes::TimeoutException
+     *exception
+     *
+     * \param f Future
+     * \param seconds Maximum time to wait for the result
+     *
+     * \return Result of the given future.
+     */
     template <typename T>
     static T get_or_throw(std::future<T>& f, int64_t seconds = 10);
 
+    /**
+     * \brief Constructs a URI with the given host and parameters.
+     * This is a convenience method that constructs a uri with a given host and parameterss
+     */
     std::string get_uri(std::string const& host,
                         std::vector<std::pair<std::string, std::string>> const& parameters) const;
 
 protected:
+    /// @cond
     core::net::http::Request::Progress::Next progress_report(core::net::http::Request::Progress const&) const;
 
     void async_execute(core::net::http::Request::Handler const& handler, std::string const& uri) const;
 
     class Priv;
     std::shared_ptr<Priv> p_;
+    /// @endcond
 };
 
 template <typename BASE, typename TYPE, typename PARSER>

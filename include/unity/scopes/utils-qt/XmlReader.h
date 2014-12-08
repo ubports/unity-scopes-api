@@ -36,20 +36,39 @@ namespace qt
 {
 
 class XmlAsyncReader;
+
+/**
+\brief Class that downloads http XML files synchronously.
+
+Executes a remote HTTP query synchronously to return a XML parser filled with the downloaded data.
+*/
 class XmlReader final
 {
 public:
+    /// @cond
     XmlReader();
     ~XmlReader() = default;
 
     typedef std::shared_ptr<QXmlStreamReader> QXmlStreamReaderSptr;
 
     typedef QVector<QPair<QString, QString>> QXmlStreamReaderParameters;
+    /// @endcond
 
-    // Method provided for general use.
-    // The user should parse the Json root.
+    /**
+     * \brief Downloads a remote XML document and returns a parser containing the data.
+     * \param uri URI to download
+     *
+     * \return shared pointer of a QXmlStreamReader containing the downloaded data.
+     */
     QXmlStreamReaderSptr read(QUrl const& uri) const;
 
+    /**
+     * \brief Downloads a remote XML document and returns a parser containing the data.
+     * \param host the remote host name
+     * \param parameters The parameters that will build the final query, defined by a list of pairs of key and value
+     *
+     * \return shared pointer of a QXmlStreamReader containing the downloaded data.
+     */
     QXmlStreamReaderSptr read(QString const& host, QXmlStreamReaderParameters const& parameters) const;
 
 private:

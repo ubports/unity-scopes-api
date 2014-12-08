@@ -37,20 +37,38 @@ namespace qt
 
 class JsonAsyncReader;
 
+/**
+\brief Class that downloads http JSON files synchronously.
+
+Executes a remote HTTP query synchronously to return a JSON parser filled with the downloaded data.
+*/
 class JsonReader final
 {
 public:
+    /// @cond
     JsonReader();
     ~JsonReader() = default;
 
     typedef std::shared_ptr<QJsonDocument> QJsonDocumentSptr;
 
     typedef QVector<QPair<QString, QString>> QJsonParameters;
+    /// @endcond
 
-    // Method provided for general use.
-    // The user should parse the Json root.
+    /**
+     * \brief Downloads a remote JSON document and returns a parser containing the data.
+     * \param uri URI to download
+     *
+     * \return shared pointer of a QJsonDocument containing the downloaded data.
+     */
     QJsonDocumentSptr read(QUrl const& uri) const;
 
+    /**
+     * \brief Downloads a remote JSON document and returns a parser containing the data.
+     * \param host the remote host name
+     * \param parameters The parameters that will build the final query, defined by a list of pairs of key and value
+     *
+     * \return shared pointer of a QJsonDocument containing the downloaded data.
+     */
     QJsonDocumentSptr read(QString const& host, QJsonParameters const& parameters) const;
 
 private:
