@@ -33,6 +33,7 @@
 #include <boost/filesystem/operations.hpp>
 
 #include <sys/stat.h>  // TODO: remove this once hack for creating data root dir is removed
+#include <wordexp.h>
 
 using namespace scoperegistry;
 using namespace std;
@@ -258,6 +259,30 @@ void convert_relative_attribute(VariantMap& inner_map, const string& id, const f
     }
 }
 
+string get_first_component(string const& id, string const& custom_exec)
+{
+    if (custom_exec.empty())
+    {
+        throw unity::InvalidArgumentException("Invalid scope runner executable for scope: " + id);
+    }
+
+    wordexp_t exp;
+    string result;
+
+    // Split command into program and args
+    if (wordexp(custom_exec.c_str(), &exp, WRDE_NOCMD) == 0)
+    {
+        util::ResourcePtr<wordexp_t*, decltype(&wordfree)> free_guard(&exp, wordfree);
+        result = exp.we_wordv[0];
+    }
+    else
+    {
+        throw unity::InvalidArgumentException("Invalid scope runner executable for scope: " + id);
+    }
+
+    return result;
+}
+
 // For each scope, open the config file for the scope, create the metadata info from the config,
 // and add an entry to the RegistryObject.
 // If the scope uses settings, also parse the settings file and add the settings to the metadata.
@@ -410,33 +435,26 @@ void add_local_scope(RegistryObject::SPtr const& registry,
     try
     {
         auto custom_exec = sc.scope_runner();
-        if (custom_exec.empty())
-        {
-            throw unity::InvalidArgumentException("Invalid scope runner executable for scope: " + scope.first);
-        }
-        filesystem::path path(custom_exec);
-        if (path.is_relative())
+        filesystem::path program(get_first_component( scope.first, custom_exec));
+        if (program.is_relative())
         {
             // First look inside the arch-specific directory
-            auto tmp = scope_dir / DEB_HOST_MULTIARCH / custom_exec;
-            if (filesystem::exists(tmp))
+            if (filesystem::exists(scope_dir / DEB_HOST_MULTIARCH / program))
             {
-                exec_data.custom_exec = tmp.native();
+                // Join the full command, not just the program path
+                exec_data.custom_exec = (scope_dir / DEB_HOST_MULTIARCH / custom_exec).native();
+            }
+            // Next try in the non arch-aware directory
+            else if (filesystem::exists(scope_dir / program))
+            {
+                // Join the full command, not just the program path
+                exec_data.custom_exec = (scope_dir / custom_exec).native();
             }
             else
             {
-                // Next try in the non arch-aware directory
-                tmp = scope_dir / custom_exec;
-                if (filesystem::exists(tmp))
-                {
-                    exec_data.custom_exec = tmp.native();
-                }
-                else
-                {
-                    throw unity::InvalidArgumentException(
-                            "Nonexistent scope runner '" + custom_exec
-                                    + "' executable for scope: " + scope.first);
-                }
+                throw unity::InvalidArgumentException(
+                        "Nonexistent scope runner '" + custom_exec
+                                + "' executable for scope: " + scope.first);
             }
         }
         else
