@@ -114,6 +114,9 @@ int run_scope(std::string const& runtime_config, std::string const& scope_config
     {
         // For a scope_id "Fred", we look for the library as "libFred.so", "Fred.so", and "scope.so".
         vector<string> libs;
+        libs.push_back(lib_dir + "/" + DEB_HOST_MULTIARCH + "/lib" + scope_id + ".so");
+        libs.push_back(lib_dir + "/" + DEB_HOST_MULTIARCH + "/" + scope_id + ".so");
+        libs.push_back(lib_dir + "/" + DEB_HOST_MULTIARCH + "/scope.so");
         libs.push_back(lib_dir + "/lib" + scope_id + ".so");
         libs.push_back(lib_dir + "/" + scope_id + ".so");
         libs.push_back(lib_dir + "/scope.so");

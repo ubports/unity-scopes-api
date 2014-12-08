@@ -414,7 +414,35 @@ void add_local_scope(RegistryObject::SPtr const& registry,
         {
             throw unity::InvalidArgumentException("Invalid scope runner executable for scope: " + scope.first);
         }
-        exec_data.custom_exec = relative_scope_path_to_abs_path(custom_exec, scope_dir).native();
+        filesystem::path path(custom_exec);
+        if (path.is_relative())
+        {
+            // First look inside the arch-specific directory
+            auto tmp = scope_dir / DEB_HOST_MULTIARCH / custom_exec;
+            if (filesystem::exists(tmp))
+            {
+                exec_data.custom_exec = tmp.native();
+            }
+            else
+            {
+                // Next try in the non arch-aware directory
+                tmp = scope_dir / custom_exec;
+                if (filesystem::exists(tmp))
+                {
+                    exec_data.custom_exec = tmp.native();
+                }
+                else
+                {
+                    throw unity::InvalidArgumentException(
+                            "Nonexistent scope runner '" + custom_exec
+                                    + "' executable for scope: " + scope.first);
+                }
+            }
+        }
+        else
+        {
+            exec_data.custom_exec = custom_exec;
+        }
     }
     catch (NotFoundException const&)
     {

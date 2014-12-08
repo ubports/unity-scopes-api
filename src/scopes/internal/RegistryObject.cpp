@@ -574,6 +574,7 @@ void RegistryObject::ScopeProcess::exec(
         auto scope_config_path = boost::filesystem::canonical(exec_data_.scope_config);
         string lib_dir = scope_config_path.parent_path().native();
         string scope_ld_lib_path = lib_dir + ":" + lib_dir + "/lib";
+        scope_ld_lib_path.append(":" + lib_dir + "/" + DEB_HOST_MULTIARCH + "/lib");
         string ld_lib_path = core::posix::this_process::env::get("LD_LIBRARY_PATH", "");
         if (!boost::algorithm::starts_with(ld_lib_path, lib_dir))
         {

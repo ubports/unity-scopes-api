@@ -112,6 +112,20 @@ if(NOT CAPNPC_BIN)
 endif()
 set(CAPNPC_FLAGS "" CACHE STRING "Extra flags for capnpc.")
 
+# This command figures out the target architecture
+find_program(DPKG_ARCHITECTURE_EXECUTABLE dpkg-architecture)
+if(NOT DPKG_ARCHITECTURE_EXECUTABLE)
+  message(FATAL_ERROR "dpkg-architecture command not found.")
+endif()
+execute_process(
+  COMMAND ${DPKG_ARCHITECTURE_EXECUTABLE} -qDEB_HOST_MULTIARCH
+  OUTPUT_VARIABLE DEB_HOST_MULTIARCH
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+add_definitions(
+  -DDEB_HOST_MULTIARCH="${DEB_HOST_MULTIARCH}"
+)
+
 set(OTHER_INCLUDE_DIRS ${OTHER_INCLUDE_DIRS} ${UNITY_API_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS}
                        ${JSONCPP_INCLUDE_DIRS} ${PROCESS_CPP_INCLUDE_DIRS} ${APPARMOR_INCLUDE_DIRS}
                        ${LIBACCOUNTS_INCLUDE_DIRS} ${LIBSIGNON_INCLUDE_DIRS})
