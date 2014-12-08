@@ -96,7 +96,7 @@ following directory structure:
     └── libtestscopeA.so
 \endcode
 
-You must also update the manifest file 'architecture' property to enumerate the included archictectures, as follows:
+You must also update the manifest file 'architecture' property to enumerate the included architectures, as follows:
 
 \code
     "architecture": ["armhf", "amd64"]
