@@ -58,6 +58,7 @@ namespace
     const string child_scope_ids_key = "ChildScopes";
     const string version_key = "Version";
     const string keywords_key = "Keywords";
+    const string is_aggregator_key = "IsAggregator";
 
     const string scope_appearance_group = "Appearance";
     const string fg_color_key = "ForegroundColor";
@@ -239,6 +240,15 @@ ScopeConfig::ScopeConfig(string const& configfile) :
 
     try
     {
+        is_aggregator_ = parser()->get_boolean(scope_config_group, is_aggregator_key);
+    }
+    catch (LogicException const&)
+    {
+        is_aggregator_ = false;
+    }
+
+    try
+    {
         debug_mode_ = parser()->get_boolean(scope_config_group, debug_mode_key);
     }
     catch (LogicException const&)
@@ -277,7 +287,8 @@ ScopeConfig::ScopeConfig(string const& configfile) :
                debug_mode_key,
                child_scope_ids_key,
                version_key,
-               keywords_key
+               keywords_key,
+               is_aggregator_key
            }
         },
         {  scope_appearance_group,
@@ -464,6 +475,11 @@ int ScopeConfig::version() const
 std::vector<std::string> ScopeConfig::keywords() const
 {
     return keywords_;
+}
+
+bool ScopeConfig::is_aggregator() const
+{
+    return is_aggregator_;
 }
 
 } // namespace internal

@@ -95,6 +95,10 @@ ScopeMetadataImpl::ScopeMetadataImpl(ScopeMetadataImpl const& other)
     {
         location_data_needed_.reset(new bool(*other.location_data_needed_));
     }
+    if (other.is_aggregator_)
+    {
+        is_aggregator_.reset(new bool(*other.is_aggregator_));
+    }
 }
 
 ScopeMetadataImpl& ScopeMetadataImpl::operator=(ScopeMetadataImpl const& rhs)
@@ -120,6 +124,7 @@ ScopeMetadataImpl& ScopeMetadataImpl::operator=(ScopeMetadataImpl const& rhs)
         child_scope_ids_ = rhs.child_scope_ids_;
         version_ = rhs.version_;
         keywords_ = rhs.keywords_;
+        is_aggregator_.reset(rhs.is_aggregator_ ? new bool(*rhs.is_aggregator_) : nullptr);
     }
     return *this;
 }
@@ -246,6 +251,15 @@ std::vector<std::string> ScopeMetadataImpl::keywords() const
     return keywords_;
 }
 
+bool ScopeMetadataImpl::is_aggregator() const
+{
+    if (is_aggregator_)
+    {
+        return *is_aggregator_;
+    }
+    return false;
+}
+
 void ScopeMetadataImpl::set_scope_id(std::string const& scope_id)
 {
     scope_id_ = scope_id;
@@ -319,6 +333,11 @@ void ScopeMetadataImpl::set_settings_definitions(VariantArray const& settings_de
 void ScopeMetadataImpl::set_location_data_needed(bool location_data_needed)
 {
     location_data_needed_.reset(new bool(location_data_needed));
+}
+
+void ScopeMetadataImpl::set_is_aggregator(bool is_aggregator)
+{
+    is_aggregator_.reset(new bool(is_aggregator));
 }
 
 void ScopeMetadataImpl::set_child_scope_ids(std::vector<std::string> const& ids)
@@ -433,6 +452,10 @@ VariantMap ScopeMetadataImpl::serialize() const
             va.push_back(Variant(keyword));
         }
         var["keywords"] = Variant(va);
+    }
+    if (is_aggregator_)
+    {
+        var["is_aggregator"] = *is_aggregator_;
     }
 
     return var;
@@ -587,6 +610,12 @@ void ScopeMetadataImpl::deserialize(VariantMap const& var)
         {
             keywords_.push_back(v.get_string());
         }
+    }
+
+    it = var.find("is_aggregator");
+    if (it != var.end())
+    {
+        is_aggregator_.reset(new bool(it->second.get_bool()));
     }
 }
 

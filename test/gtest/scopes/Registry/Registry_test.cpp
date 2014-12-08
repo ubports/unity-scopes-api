@@ -116,6 +116,7 @@ TEST(Registry, metadata)
     EXPECT_EQ("music", keywords[0]);
     EXPECT_EQ("news", keywords[1]);
     EXPECT_EQ("foo", keywords[2]);
+    EXPECT_FALSE(meta.is_aggregator());
 
     auto attrs = meta.appearance_attributes();
     EXPECT_EQ("fg_color", attrs["foreground-color"].get_string());
@@ -149,6 +150,7 @@ TEST(Registry, metadata)
     EXPECT_EQ(0, meta.child_scope_ids().size());
     EXPECT_EQ(0, meta.keywords().size());
     EXPECT_EQ(0, meta.version());
+    EXPECT_FALSE(meta.is_aggregator());
 }
 
 auto const wait_for_update_time = std::chrono::milliseconds(5000);

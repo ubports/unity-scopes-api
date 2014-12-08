@@ -411,6 +411,10 @@ The following keys are recognized in the ScopeConfig group:
 
   Note: make sure there are no trailing spaces following the keywords, as they will be preserved.
 
+- IsAggregator
+
+  Whether the scope is an aggregator. The default value is false.
+
 
 The following keys are recognized in the Appearance group:
 

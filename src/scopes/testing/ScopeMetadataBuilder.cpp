@@ -49,6 +49,7 @@ struct testing::ScopeMetadataBuilder::Private
     Optional<std::vector<std::string>> child_scope_ids;
     Optional<int> version;
     Optional<std::vector<std::string>> keywords;
+    Optional<bool> is_aggregator;
 };
 
 testing::ScopeMetadataBuilder::ScopeMetadataBuilder() : p(new Private())
@@ -167,6 +168,12 @@ testing::ScopeMetadataBuilder& testing::ScopeMetadataBuilder::keywords(Optional<
     return *this;
 }
 
+testing::ScopeMetadataBuilder& testing::ScopeMetadataBuilder::is_aggregator(Optional<bool> const& value)
+{
+    p->is_aggregator = value;
+    return *this;
+}
+
 unity::scopes::ScopeMetadata testing::ScopeMetadataBuilder::operator()() const
 {
     auto impl = new unity::scopes::internal::ScopeMetadataImpl(Private::invalid_middleware);
@@ -202,6 +209,8 @@ unity::scopes::ScopeMetadata testing::ScopeMetadataBuilder::operator()() const
         impl->set_version(*p->version);
     if (p->keywords)
         impl->set_keywords(*p->keywords);
+    if (p->is_aggregator)
+        impl->set_is_aggregator(*p->is_aggregator);
 
     return unity::scopes::internal::ScopeMetadataImpl::create(
                 std::move(

@@ -450,6 +450,7 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::internal::ScopeConfig::icon() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeConfig::idle_timeout() const@Base" 0.4.5+14.10.20140513
  (c++)"unity::scopes::internal::ScopeConfig::invisible() const@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::internal::ScopeConfig::is_aggregator() const@Base" 0replaceme
  (c++)"unity::scopes::internal::ScopeConfig::keywords() const@Base" 0.6.9+15.04.20141129
  (c++)"unity::scopes::internal::ScopeConfig::location_data_needed() const@Base" 0.5.2+14.10.20140709.2
  (c++)"unity::scopes::internal::ScopeConfig::overrideable() const@Base" 0.4.0+14.04.20140312.1
@@ -491,6 +492,7 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::internal::ScopeMetadataImpl::hot_key() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeMetadataImpl::icon() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeMetadataImpl::invisible() const@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::internal::ScopeMetadataImpl::is_aggregator() const@Base" 0replaceme
  (c++)"unity::scopes::internal::ScopeMetadataImpl::keywords() const@Base" 0.6.9+15.04.20141129
  (c++)"unity::scopes::internal::ScopeMetadataImpl::location_data_needed() const@Base" 0.5.2+14.10.20140709.2
  (c++)"unity::scopes::internal::ScopeMetadataImpl::operator=(unity::scopes::internal::ScopeMetadataImpl const&)@Base" 0.4.0+14.04.20140312.1
@@ -512,6 +514,7 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::internal::ScopeMetadataImpl::set_hot_key(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeMetadataImpl::set_icon(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeMetadataImpl::set_invisible(bool)@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::internal::ScopeMetadataImpl::set_is_aggregator(bool)@Base" 0replaceme
  (c++)"unity::scopes::internal::ScopeMetadataImpl::set_keywords(std::vector<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&)@Base" 0.6.9+15.04.20141129
  (c++)"unity::scopes::internal::ScopeMetadataImpl::set_location_data_needed(bool)@Base" 0.5.2+14.10.20140709.2
  (c++)"unity::scopes::internal::ScopeMetadataImpl::set_proxy(std::shared_ptr<unity::scopes::Scope> const&)@Base" 0.4.0+14.04.20140312.1
@@ -777,6 +780,7 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::ScopeMetadata::hot_key() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ScopeMetadata::icon() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ScopeMetadata::invisible() const@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::ScopeMetadata::is_aggregator() const@Base" 0replaceme
  (c++)"unity::scopes::ScopeMetadata::keywords() const@Base" 0.6.9+15.04.20141129
  (c++)"unity::scopes::ScopeMetadata::location_data_needed() const@Base" 0.5.2+14.10.20140709.2
  (c++)"unity::scopes::ScopeMetadata::operator=(unity::scopes::ScopeMetadata&&)@Base" 0.4.0+14.04.20140312.1
@@ -870,6 +874,7 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::testing::ScopeMetadataBuilder::hot_key(unity::scopes::testing::ScopeMetadataBuilder::Optional<std::basic_string<char, std::char_traits<char>, std::allocator<char> > > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::testing::ScopeMetadataBuilder::icon(unity::scopes::testing::ScopeMetadataBuilder::Optional<std::basic_string<char, std::char_traits<char>, std::allocator<char> > > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::testing::ScopeMetadataBuilder::invisible(unity::scopes::testing::ScopeMetadataBuilder::Optional<bool> const&)@Base" 0.5.0+14.10.20140619
+ (c++)"unity::scopes::testing::ScopeMetadataBuilder::is_aggregator(unity::scopes::testing::ScopeMetadataBuilder::Optional<bool> const&)@Base" 0replaceme
  (c++)"unity::scopes::testing::ScopeMetadataBuilder::keywords(unity::scopes::testing::ScopeMetadataBuilder::Optional<std::vector<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > > const&)@Base" 0.6.9+15.04.20141129
  (c++)"unity::scopes::testing::ScopeMetadataBuilder::location_data_needed(unity::scopes::testing::ScopeMetadataBuilder::Optional<bool> const&)@Base" 0.6.9+15.04.20141129
  (c++)"unity::scopes::testing::ScopeMetadataBuilder::operator()() const@Base" 0.4.0+14.04.20140312.1

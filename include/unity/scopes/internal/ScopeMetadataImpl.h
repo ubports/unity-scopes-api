@@ -60,6 +60,7 @@ public:
     std::vector<std::string> child_scope_ids() const;            // optional (default: empty array)
     int version() const;                                         // optional (default: 0)
     std::vector<std::string> keywords() const;                   // optional (default: empty array)
+    bool is_aggregator() const;                                  // optional (default: false)
 
     void set_scope_id(std::string const& scope_id);
     void set_proxy(ScopeProxy const& proxy);
@@ -79,6 +80,7 @@ public:
     void set_child_scope_ids(std::vector<std::string> const& ids);
     void set_version(int v);
     void set_keywords(std::vector<std::string> const& keywords);
+    void set_is_aggregator(bool is_aggregator);
 
     VariantMap serialize() const;
     void deserialize(VariantMap const& var);
@@ -106,6 +108,7 @@ private:
     std::vector<std::string> child_scope_ids_;
     int version_;
     std::vector<std::string> keywords_;
+    std::unique_ptr<bool> is_aggregator_;                 // Optional, hence a pointer
 };
 
 } // namespace internal

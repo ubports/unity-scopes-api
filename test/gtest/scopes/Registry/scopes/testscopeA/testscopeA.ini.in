@@ -10,6 +10,7 @@ LocationDataNeeded = true
 ChildScopes = com.foo.bar;com.foo.baz
 Version = 1
 Keywords = music;news;foo
+IsAggregator = false
 
 [Appearance]
 ForegroundColor = fg_color

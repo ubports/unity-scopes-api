@@ -320,6 +320,7 @@ void add_local_scope(RegistryObject::SPtr const& registry,
     mi->set_child_scope_ids(sc.child_scope_ids());
     mi->set_version(sc.version());
     mi->set_keywords(sc.keywords());
+    mi->set_is_aggregator(sc.is_aggregator());
 
     // Prepend scope_dir to pageheader logo path if logo path is relative.
     // TODO: Once we have type-safe parsing in the config files, remove
