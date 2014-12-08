@@ -123,7 +123,13 @@ The following keys are recognized:
 
 - ConfigDir
 
-  The parent directory under which the runtime writes the scope configration files.
+  The parent directory under which the run time writes the scope configration files.
+
+  The default value is $HOME/.cache/unity-scopes.
+
+- LogDir
+
+  The parent directory under which the run time writes the scope configration files.
 
   The default value is $HOME/.config/unity-scopes.
 
@@ -131,7 +137,6 @@ The following keys are recognized:
   directory. Specifically:
 
   $HOME/.config/unity-scopes/<scope_id>/settings.ini
-
 
 Zmq.ini
 -------
@@ -371,7 +376,7 @@ The following keys are recognized in the ScopeConfig group:
   A custom scoperunner command-line to be executed when the scope is invoked.
   The following placeholders can be used to substitute config paths where required:
 
-  - %R - absolute path to the runtime .ini config file
+  - %R - absolute path to the run time .ini config file
   - %S - absolute path to the scope's .ini config file
 
   E.g. "ScopeRunner = /usr/bin/gdb --ex run --args /usr/lib/x86_64-linux-gnu/unity-scopes/scoperunner %R %S"

@@ -98,6 +98,22 @@ TEST(RuntimeConfig, overridden_config_dir_with_home_dir)
     EXPECT_EQ("configdir", c.config_directory());
 }
 
+TEST(RuntimeConfig, overridden_log_dir)
+{
+    unsetenv("HOME");
+
+    RuntimeConfig c(TEST_SRC_DIR "/LogDir.ini");
+    EXPECT_EQ("logdir", c.log_directory());
+}
+
+TEST(RuntimeConfig, overridden_log_dir_with_home_dir)
+{
+    setenv("HOME", TEST_SRC_DIR, 1);
+
+    RuntimeConfig c(TEST_SRC_DIR "/LogDir.ini");
+    EXPECT_EQ("logdir", c.log_directory());
+}
+
 TEST(RuntimeConfig, exceptions)
 {
     try
@@ -164,6 +180,22 @@ TEST(RuntimeConfig, exceptions)
     {
         EXPECT_STREQ("unity::scopes::ConfigException: \"" TEST_SRC_DIR "/NoConfigDir.ini\": No ConfigDir configured and "
                      "failed to get default:\n    unity::ResourceException: RuntimeConfig::default_config_directory(): "
+                     "$HOME not set",
+                     e.what());
+    }
+
+    try
+    {
+        unsetenv("HOME");
+
+        RuntimeConfig c(TEST_SRC_DIR "/NoLogDir.ini");
+        FAIL();
+        EXPECT_EQ("configdir", c.config_directory());
+    }
+    catch (ConfigException const& e)
+    {
+        EXPECT_STREQ("unity::scopes::ConfigException: \"" TEST_SRC_DIR "/NoLogDir.ini\": No LogDir configured and "
+                     "failed to get default:\n    unity::ResourceException: RuntimeConfig::default_log_directory(): "
                      "$HOME not set",
                      e.what());
     }

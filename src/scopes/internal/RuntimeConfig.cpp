@@ -49,6 +49,7 @@ const string reap_interval_key = "Reap.Interval";
 const string cache_dir_key = "CacheDir";
 const string app_dir_key = "AppDir";
 const string config_dir_key = "ConfigDir";
+const string log_dir_key = "LogDir";
 
 }  // namespace
 
@@ -132,6 +133,18 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
                 throw_ex("No ConfigDir configured and failed to get default");
             }
         }
+        log_directory_ = get_optional_string(runtime_config_group, log_dir_key);
+        if (log_directory_.empty())
+        {
+            try
+            {
+                log_directory_ = default_log_directory();
+            }
+            catch (ResourceException const& e)
+            {
+                throw_ex("No LogDir configured and failed to get default");
+            }
+        }
     }
 
     KnownEntries const known_entries = {
@@ -147,7 +160,8 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
                                                 reap_interval_key,
                                                 cache_dir_key,
                                                 app_dir_key,
-                                                config_dir_key
+                                                config_dir_key,
+                                                log_dir_key
                                              }
                                           }
                                        };
@@ -213,6 +227,11 @@ string RuntimeConfig::config_directory() const
     return config_directory_;
 }
 
+string RuntimeConfig::log_directory() const
+{
+    return log_directory_;
+}
+
 string RuntimeConfig::default_cache_directory()
 {
     char const* home = getenv("HOME");
@@ -241,6 +260,16 @@ string RuntimeConfig::default_config_directory()
         throw ResourceException("RuntimeConfig::default_config_directory(): $HOME not set");
     }
     return string(home) + "/.config/unity-scopes";
+}
+
+string RuntimeConfig::default_log_directory()
+{
+    char const* home = getenv("HOME");
+    if (!home || *home == '\0')
+    {
+        throw ResourceException("RuntimeConfig::default_log_directory(): $HOME not set");
+    }
+    return string(home) + "/.cache/unity-scopes";
 }
 
 } // namespace internal
