@@ -582,7 +582,7 @@ void RegistryObject::ScopeProcess::exec(
         env["LD_LIBRARY_PATH"] = scope_ld_lib_path;  // Overwrite any LD_LIBRARY_PATH entry that may already be there.
 
         process_ = executor->exec(program, argv, env,
-                                  core::posix::StandardStream::stdin | core::posix::StandardStream::stdout,
+                                  core::posix::StandardStream::stdin,
                                   exec_data_.confinement_profile);
         if (process_.pid() <= 0)
         {

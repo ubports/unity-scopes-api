@@ -17,7 +17,6 @@
  */
 
 #include <unity/scopes/internal/RuntimeImpl.h>
-#include <unity/scopes/internal/ScopeBaseImpl.h>
 
 #include <unity/scopes/internal/DfltConfig.h>
 #include <unity/scopes/internal/Logger.h>
@@ -25,16 +24,17 @@
 #include <unity/scopes/internal/RegistryConfig.h>
 #include <unity/scopes/internal/RegistryImpl.h>
 #include <unity/scopes/internal/RuntimeConfig.h>
+#include <unity/scopes/internal/ScopeBaseImpl.h>
 #include <unity/scopes/internal/ScopeConfig.h>
 #include <unity/scopes/internal/ScopeObject.h>
 #include <unity/scopes/internal/SettingsDB.h>
 #include <unity/scopes/internal/UniqueID.h>
 #include <unity/scopes/ScopeBase.h>
 #include <unity/scopes/ScopeExceptions.h>
-#include <unity/UnityExceptions.h>
-#include <unity/util/FileIO.h>
 
 #include <boost/filesystem.hpp>
+#include <unity/UnityExceptions.h>
+#include <unity/util/FileIO.h>
 
 #include <cassert>
 #include <cstring>
@@ -75,6 +75,7 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
         logger_.reset(new Logger(scope_id_));
 
         // Create the middleware factory and get the registry identity and config filename.
+        runtime_configfile_ = configfile;
         RuntimeConfig config(configfile);
         string default_middleware = config.default_middleware();
         string middleware_configfile = config.default_middleware_configfile();
@@ -329,25 +330,13 @@ void RuntimeImpl::run_scope(ScopeBase* scope_base,
                             string const& scope_ini_file,
                             std::promise<void> ready_promise)
 {
-    run_scope(scope_base, "", scope_ini_file, move(ready_promise));
-}
-
-void RuntimeImpl::run_scope(ScopeBase* scope_base,
-                            string const& runtime_ini_file,
-                            string const& scope_ini_file,
-                            std::promise<void> ready_promise)
-{
     if (!scope_base)
     {
         throw InvalidArgumentException("Runtime::run_scope(): scope_base cannot be nullptr");
     }
 
-    // Retrieve the registry middleware and create a proxy to its state receiver
+    // Create a middleware for this scope.
     RegistryConfig reg_conf(registry_identity_, registry_configfile_);
-    auto reg_runtime = create(registry_identity_, runtime_ini_file);
-    auto reg_mw = reg_runtime->factory()->find(registry_identity_, reg_conf.mw_kind());
-    auto reg_state_receiver = reg_mw->create_state_receiver_proxy("StateReceiver");
-
     auto mw = factory()->create(scope_id_, reg_conf.mw_kind(), reg_conf.mw_configfile());
 
     boost::filesystem::path scope_dir = boost::filesystem::canonical(scope_ini_file).parent_path();
@@ -434,14 +423,23 @@ void RuntimeImpl::run_scope(ScopeBase* scope_base,
         }
 
         // Inform the registry that this scope is now ready to process requests
-        reg_state_receiver->push_state(scope_id_, StateReceiverObject::State::ScopeReady);
+        {
+            auto reg_state_receiver = mw->create_registry_state_receiver_proxy("StateReceiver");
+            reg_state_receiver->push_state(scope_id_, StateReceiverObject::State::ScopeReady);
+        }
 
         promise.set_value();
         mw->wait_for_shutdown();
         cleanup_scope.dealloc();   // Causes ScopeBase::run() to terminate if the scope is properly written
 
-        // Inform the registry that this scope is shutting down
-        reg_state_receiver->push_state(scope_id_, StateReceiverObject::State::ScopeStopping);
+        {
+            // mw is now shut down, so we need a separate one to send the state update to the registry.
+            auto sd_runtime = create(scope_id_ + "-shutdown", runtime_configfile_);
+            auto sd_mw = sd_runtime->factory()->find(scope_id_ + "-shutdown", reg_conf.mw_kind());
+            auto reg_state_receiver = sd_mw->create_registry_state_receiver_proxy("StateReceiver");
+            // Inform the registry that this scope is shutting down
+            reg_state_receiver->push_state(scope_id_, StateReceiverObject::State::ScopeStopping);
+        }
     }
     catch (...)
     {

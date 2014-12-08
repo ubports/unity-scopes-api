@@ -109,7 +109,7 @@ int main(int argc, char** argv)
     {
         MyScope scope;
         auto runtime = Runtime::create_scope_runtime("testscopeB", rt_config);
-        runtime->run_scope(&scope, rt_config, scope_config);
+        runtime->run_scope(&scope, scope_config);
         return 0;
     }
 }

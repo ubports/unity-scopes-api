@@ -96,7 +96,7 @@ TEST(RuntimeImpl, exceptions)
         TestScope testscope(TestScope::ThrowFromStart);
         auto thread_func = [&rt, &testscope, &rt_ini_file, &scope_ini_file]
         {
-            rt->run_scope(&testscope, rt_ini_file, scope_ini_file);
+            rt->run_scope(&testscope, scope_ini_file);
         };
         auto thread_done = std::async(launch::async, thread_func);
 
@@ -121,7 +121,7 @@ TEST(RuntimeImpl, exceptions)
         TestScope testscope(TestScope::ThrowFromRun);
         auto thread_func = [&rt, &testscope, &rt_ini_file, &scope_ini_file, &promise]
         {
-            rt->run_scope(&testscope, rt_ini_file, scope_ini_file, move(promise));
+            rt->run_scope(&testscope, scope_ini_file, move(promise));
         };
         auto thread_done = std::async(launch::async, thread_func);
 
@@ -150,7 +150,7 @@ TEST(RuntimeImpl, exceptions)
         TestScope testscope(TestScope::ThrowFromStop);
         auto thread_func = [&rt, &testscope, &rt_ini_file, &scope_ini_file, &promise]
         {
-            rt->run_scope(&testscope, rt_ini_file, scope_ini_file, move(promise));
+            rt->run_scope(&testscope, scope_ini_file, move(promise));
         };
         auto thread_done = std::async(launch::async, thread_func);
 
@@ -188,7 +188,7 @@ TEST(RuntimeImpl, directories)
         TestScope testscope;
         auto thread_func = [&rt, &testscope, &rt_ini_file, &scope_ini_file, &promise]
         {
-            rt->run_scope(&testscope, rt_ini_file, scope_ini_file, move(promise));
+            rt->run_scope(&testscope, scope_ini_file, move(promise));
         };
         auto thread_done = std::async(launch::async, thread_func);
 
@@ -224,7 +224,7 @@ TEST(RuntimeImpl, directories)
         TestScope testscope;
         auto thread_func = [&rt, &testscope, &rt_ini_file, &scope_ini_file, &promise]
         {
-            rt->run_scope(&testscope, rt_ini_file, scope_ini_file, move(promise));
+            rt->run_scope(&testscope, scope_ini_file, move(promise));
         };
         auto thread_done = std::async(launch::async, thread_func);
 
