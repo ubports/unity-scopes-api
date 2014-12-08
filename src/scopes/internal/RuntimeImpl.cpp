@@ -74,6 +74,12 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
         // we use a logger that logs to std::clog.
         logger_.reset(new Logger(scope_id_));
 
+logger_->set_channel(Logger::IPC, true);
+BOOST_LOG_SEV(logger(), Logger::Info) << "message 1 ";
+BOOST_LOG_SEV((*logger_)(Logger::IPC), Logger::Info) << "hello";
+BOOST_LOG_SEV(logger(), Logger::Info) << "message 3 ";
+BOOST_LOG_SEV((*logger_)(Logger::IPC), Logger::Info) << "message 4";
+BOOST_LOG_SEV(logger(), Logger::Info) << "message 5 ";
         // Create the middleware factory and get the registry identity and config filename.
         runtime_configfile_ = configfile;
         RuntimeConfig config(configfile);

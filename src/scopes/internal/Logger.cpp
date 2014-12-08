@@ -47,6 +47,11 @@ namespace internal
 namespace
 {
 
+static array<string, Logger::LastChannelEnum_> const channel_names =
+    {
+        "IPC"
+    };
+
 string const& severity(int s)
 {
     static array<string, 5> const severities = { { "TRACE", "INFO", "WARNING", "ERROR", "FATAL" } };
@@ -59,31 +64,13 @@ string const& severity(int s)
     return severities[s];
 }
 
-void formatter(logging::record_view const& rec, logging::formatting_ostream& strm, string const& scope_id)
-{
-    strm << "[" << expr::format_date_time<boost::posix_time::ptime>("TimeStamp", "%Y-%m-%d %H:%M:%S.%f")(rec) << "] "
-         << severity(expr::attr<int>("Severity")(rec).get()) << ": "
-         << scope_id << ": "
-         << rec[expr::smessage];
-}
-
 }
 
 // Instantiate a logger for the scope/client with the given ID.
-//
-// Note: channel is our own address in memory. This gives
-//       us a unique identity. The id passed by the run time
-//       is *not* necessarily unique. (It is normally, but
-//       some of the tests instantiate more than one run time
-//       in a single address space, not always necessarily with
-//       a unique scope id. Using a unique ID guarantees
-//       that a log message writting by one run time isn't
-//       also written a second time by a run time that
-//       happens to have the same ID.
 
 Logger::Logger(string const& scope_id)
     : scope_id_(scope_id)
-    , logger_(keywords::channel = to_string(reinterpret_cast<ptrdiff_t>(this)))
+    , logger_()
     , severity_(Logger::Info)
 {
     namespace ph = std::placeholders;
@@ -92,9 +79,17 @@ Logger::Logger(string const& scope_id)
 
     logger_.add_attribute("TimeStamp", attrs::local_clock());
 
+    // Create a channel logger for each channel.
+    for (auto&& name : channel_names)
+    {
+        auto clogger = boost::log::sources::severity_channel_logger_mt<>(keywords::channel = name);
+        clogger.add_attribute("TimeStamp", attrs::local_clock());
+        channel_loggers_[name] = make_pair(clogger, false);
+    }
+
     // Set up sink that logs to std::clog.
     clog_sink_ = boost::make_shared<ClogSinkT>();
-    clog_sink_->set_formatter(std::bind(formatter, ph::_1, ph::_2, scope_id));
+    clog_sink_->set_formatter(bind(&Logger::formatter, this, ph::_1, ph::_2));
     boost::shared_ptr<std::ostream> console_stream(&std::clog, boost::empty_deleter());
     clog_sink_->locked_backend()->add_stream(console_stream);
     logging::core::get()->add_sink(clog_sink_);
@@ -119,6 +114,19 @@ Logger::operator src::severity_channel_logger_mt<>&()
     return logger_;
 }
 
+src::severity_channel_logger_mt<>& Logger::operator()(Channel c)
+{
+    return channel_loggers_[channel_names[c]].first;
+}
+
+bool Logger::set_channel(Channel c, bool enabled)
+{
+    auto it = channel_loggers_.find(channel_names[c]);
+    assert(it != channel_loggers_.end());
+    bool old_setting = it->second.second.exchange(enabled);
+    return old_setting;
+}
+
 void Logger::set_log_file(string const& path)
 {
     namespace ph = std::placeholders;
@@ -137,7 +145,7 @@ void Logger::set_log_file(string const& path)
     }
     file_sink_ = s;
     set_severity_threshold(severity_);
-    file_sink_->set_formatter(std::bind(formatter, ph::_1, ph::_2, scope_id_));
+    file_sink_->set_formatter(bind(&Logger::formatter, this, ph::_1, ph::_2));
     logging::core::get()->add_sink(s);
 }
 
@@ -145,8 +153,7 @@ Logger::Severity Logger::set_severity_threshold(Logger::Severity s)
 {
     auto old_s = severity_;
     severity_ = s;
-    auto filter = expr::attr<string>("Channel") == to_string(reinterpret_cast<ptrdiff_t>(this))
-                  && expr::attr<int>("Severity") >= static_cast<int>(severity_);
+    auto filter = expr::attr<int>("Severity") >= static_cast<int>(severity_);
     if (clog_sink_)
     {
         clog_sink_->set_filter(filter);
@@ -156,6 +163,30 @@ Logger::Severity Logger::set_severity_threshold(Logger::Severity s)
         file_sink_->set_filter(filter);
     }
     return old_s;
+}
+
+void Logger::formatter(logging::record_view const& rec,
+                       logging::formatting_ostream& strm)
+{
+    string channel = expr::attr<string>("Channel")(rec).get();
+
+    string channel_str;
+
+    if (!channel.empty())
+    {
+        auto it = channel_loggers_.find(channel);
+        if (it != channel_loggers_.end() && !it->second.second)
+        {
+            return;  // Channel is disabled
+        }
+        channel_str = "(" + channel + ") ";
+    }
+
+    strm << "[" << expr::format_date_time<boost::posix_time::ptime>("TimeStamp", "%Y-%m-%d %H:%M:%S.%f")(rec) << "] "
+         << channel_str
+         << severity(expr::attr<int>("Severity")(rec).get()) << ": "
+         << scope_id_ << ": "
+         << rec[expr::smessage];
 }
 
 } // namespace internal
