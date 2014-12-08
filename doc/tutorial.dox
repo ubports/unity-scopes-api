@@ -102,6 +102,14 @@ You must also update the manifest file 'architecture' property to enumerate the 
     "architecture": ["armhf", "amd64"]
 \endcode 
 
+\subsubsection multiarch Multi-arch scope runner
+Similarly to the shared libraries, when a relative path is provided the search path for custom scope runners is as follows:
+
+<ul>
+<li>${SCOPE_DIRECTORY}/${DEB_HOST_MULTIARCH}/${CUSTOM_SCOPERUNNER}
+<li>${SCOPE_DIRECTORY}/${CUSTOM_SCOPERUNNER}
+</ul>
+
 \subsubsection apparmor Apparmor manifest
 
 Scopes that are packaged using click are inherently untrusted and must be confined. At present, there is only a single type of scope that can be defined:
