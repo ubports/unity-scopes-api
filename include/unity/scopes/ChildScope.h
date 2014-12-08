@@ -18,14 +18,32 @@
 
 #pragma once
 
+#include <unity/scopes/ScopeMetadata.h>
+
+#include <vector>
+
 namespace unity
 {
 
 namespace scopes
 {
 
+class ChildScope;
+
+/**
+ \brief An array of child scopes.
+*/
+
+typedef std::vector<ChildScope> ChildScopeArray;
+
+/**
+ \brief A container for details about an aggregator's child scope.
+*/
+
 struct ChildScope
 {
+    ScopeMetadata metadata; ///< Contains the child scope's metadata.
+    bool enabled;           ///< Holds whether this child scope is aggregated.
 };
 
 } // namespace scopes
