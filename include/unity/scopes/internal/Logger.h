@@ -27,6 +27,7 @@
 #include <boost/log/sources/global_logger_storage.hpp>
 #include <boost/log/sources/record_ostream.hpp>
 #include <boost/log/sources/severity_channel_logger.hpp>
+#include <boost/log/utility/value_ref.hpp>
 
 #include <atomic>
 #include <unordered_map>
@@ -39,6 +40,19 @@ namespace scopes
 
 namespace internal
 {
+
+namespace
+{
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmissing-field-initializers"
+
+BOOST_LOG_ATTRIBUTE_KEYWORD(severity, "Severity", int)
+BOOST_LOG_ATTRIBUTE_KEYWORD(channel, "Channel", std::string)
+
+#pragma GCC diagnostic pop
+
+}
 
 class Logger
 {
@@ -69,14 +83,17 @@ public:
     bool set_channel(Channel c, bool enabled);
 
 private:
+    bool filter(boost::log::value_ref<int, tag::severity> const& level,
+                boost::log::value_ref<std::string, tag::channel> const& channel);
+
     void formatter(boost::log::record_view const& rec,
                    boost::log::formatting_ostream& strm);
 
-    std::string scope_id_;
+    std::string scope_id_;  // immutable
 
-    boost::log::sources::severity_channel_logger_mt<> logger_;  // Default logger, no channel
+    boost::log::sources::severity_channel_logger_mt<> logger_;  // Default logger, no channel, immutable
 
-    Severity severity_;
+    std::atomic<Severity> severity_;
 
     typedef boost::log::sinks::synchronous_sink<boost::log::sinks::text_ostream_backend> ClogSinkT;
     typedef boost::shared_ptr<ClogSinkT> ClogSinkPtr;
@@ -88,7 +105,7 @@ private:
 
     typedef std::pair<boost::log::sources::severity_channel_logger_mt<>, std::atomic_bool> ChannelData;
     typedef std::unordered_map<std::string, ChannelData> ChannelMap;
-    ChannelMap channel_loggers_;
+    ChannelMap channel_loggers_;  // immutable
 };
 
 } // namespace internal

@@ -24,6 +24,7 @@
 #include <boost/log/sources/record_ostream.hpp>
 #include <boost/log/support/date_time.hpp>
 #include <boost/log/trivial.hpp>
+#include <boost/phoenix/bind.hpp>
 #include <boost/utility/empty_deleter.hpp>
 
 using namespace std;
@@ -52,7 +53,7 @@ static array<string, Logger::LastChannelEnum_> const channel_names =
         "IPC"
     };
 
-string const& severity(int s)
+string const& to_severity(int s)
 {
     static array<string, 5> const severities = { { "TRACE", "INFO", "WARNING", "ERROR", "FATAL" } };
     static string const unknown = "UNKNOWN";
@@ -151,9 +152,9 @@ void Logger::set_log_file(string const& path)
 
 Logger::Severity Logger::set_severity_threshold(Logger::Severity s)
 {
-    auto old_s = severity_;
-    severity_ = s;
-    auto filter = expr::attr<int>("Severity") >= static_cast<int>(severity_);
+    auto old_s = severity_.exchange(s);
+
+    auto filter = boost::phoenix::bind(&Logger::filter, this, severity.or_none(), channel.or_none());
     if (clog_sink_)
     {
         clog_sink_->set_filter(filter);
@@ -162,7 +163,24 @@ Logger::Severity Logger::set_severity_threshold(Logger::Severity s)
     {
         file_sink_->set_filter(filter);
     }
+
     return old_s;
+}
+
+bool Logger::filter(logging::value_ref<int, tag::severity> const& level,
+                    logging::value_ref<string, tag::channel> const& channel)
+{
+    if (level.get() < static_cast<int>(severity_))
+    {
+        return false;
+    }
+    if (channel.get().empty())
+    {
+        return true;
+    }
+    auto it = channel_loggers_.find(channel.get());
+    assert(it != channel_loggers_.end());
+    return it->second.second;
 }
 
 void Logger::formatter(logging::record_view const& rec,
@@ -171,20 +189,14 @@ void Logger::formatter(logging::record_view const& rec,
     string channel = expr::attr<string>("Channel")(rec).get();
 
     string channel_str;
-
     if (!channel.empty())
     {
-        auto it = channel_loggers_.find(channel);
-        if (it != channel_loggers_.end() && !it->second.second)
-        {
-            return;  // Channel is disabled
-        }
         channel_str = "(" + channel + ") ";
     }
 
     strm << "[" << expr::format_date_time<boost::posix_time::ptime>("TimeStamp", "%Y-%m-%d %H:%M:%S.%f")(rec) << "] "
          << channel_str
-         << severity(expr::attr<int>("Severity")(rec).get()) << ": "
+         << to_severity(expr::attr<int>("Severity")(rec).get()) << ": "
          << scope_id_ << ": "
          << rec[expr::smessage];
 }

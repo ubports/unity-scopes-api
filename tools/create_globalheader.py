@@ -22,8 +22,7 @@ import sys, os
 
 def build_header(outfile, incroots):
     ofile = open(outfile, 'w')
-    ofile.write("#ifndef UNITY_SCOPES_H\n")
-    ofile.write("#define UNITY_SCOPES_H\n")
+    ofile.write("#pragma once\n\n")
     for subdir in ['', 'utility']:
         headers = []
         for r in incroots:
@@ -33,7 +32,6 @@ def build_header(outfile, incroots):
         for f in headers:
             line = '#include<unity/scopes/%s>\n' % os.path.join(subdir, f)
             ofile.write(line)
-    ofile.write("#endif\n")
 
 if __name__ == '__main__':
     if len(sys.argv) <= 3:
