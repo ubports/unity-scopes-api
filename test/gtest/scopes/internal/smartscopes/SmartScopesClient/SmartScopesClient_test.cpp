@@ -23,6 +23,8 @@
 #include <unity/scopes/OptionSelectorFilter.h>
 
 #include <unity/UnityExceptions.h>
+#include <boost/filesystem/operations.hpp>
+#include <fstream>
 
 #include "../RaiiServer.h"
 
@@ -47,10 +49,26 @@ public:
     SmartScopesClientTest()
         : http_client_(new HttpClientQt(20000)),
           json_node_(new JsonCppNode()),
-          server_(FAKE_SSS_PATH)
+          server_(FAKE_SSS_PATH, FAKE_SSS_LOG)
     {
+        boost::filesystem::remove(FAKE_SSS_LOG);
         sss_url_ = "http://127.0.0.1:" + std::to_string(server_.port_);
-        ssc_ = std::make_shared<SmartScopesClient>(http_client_, json_node_, test_logger::get(), sss_url_);
+        ssc_ = std::make_shared<SmartScopesClient>(http_client_, json_node_, test_logger::get(), sss_url_, PARTNER_FILE);
+    }
+
+    bool grep_string(std::string const &s)
+    {
+        std::ifstream str(FAKE_SSS_LOG, std::ifstream::in);
+        while (str)
+        {
+            char tmp[1024];
+            str.getline(tmp, 1024);
+            if (strstr(tmp, s.c_str()))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
 protected:
@@ -68,6 +86,8 @@ TEST_F(SmartScopesClientTest, remote_scopes)
     // first try an invalid locale (should throw)
     EXPECT_THROW(ssc_->get_remote_scopes(scopes, "test_FAIL", false), std::exception);
     ASSERT_EQ(0, scopes.size());
+
+    EXPECT_TRUE(grep_string("/remote-scopes : partner_id=PartnerString"));
 
     // now try an empty locale
     EXPECT_TRUE(ssc_->get_remote_scopes(scopes, "", false));
