@@ -20,7 +20,7 @@
 
 #include <unity/scopes/ScopeMetadata.h>
 
-#include <vector>
+#include <list>
 
 namespace unity
 {
@@ -31,10 +31,10 @@ namespace scopes
 class ChildScope;
 
 /**
- \brief An array of child scopes.
+ \brief A list of child scopes.
 */
 
-typedef std::vector<ChildScope> ChildScopeArray;
+typedef std::list<ChildScope> ChildScopeList;
 
 /**
  \brief A container for details about an aggregator's child scope.
