@@ -167,7 +167,8 @@ public:
     SmartScopesClient(HttpClientInterface::SPtr http_client,
                       JsonNodeInterface::SPtr json_node,
                       boost::log::sources::severity_channel_logger_mt<>& logger_,
-                      std::string const& url = ""); // detect url
+                      std::string const& url = "",
+                      std::string const& partner_id_path = "/custom/partner-id"); // detect url
 
     virtual ~SmartScopesClient();
 
@@ -221,10 +222,10 @@ private:
 
     void write_cache(std::string const& scopes_json);
     std::string read_cache();
+    std::string read_partner_id() const;
 
     std::string stringify_settings(VariantMap const& settings);
 
-private:
     HttpClientInterface::SPtr http_client_;
     JsonNodeInterface::SPtr json_node_;
     boost::log::sources::severity_channel_logger_mt<>& logger_;
@@ -239,6 +240,7 @@ private:
     bool have_latest_cache_;
 
     unsigned int query_counter_;
+    std::string partner_file_;
 };
 
 }  // namespace smartscopes
