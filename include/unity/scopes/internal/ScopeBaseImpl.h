@@ -61,6 +61,8 @@ public:
     void set_settings_db(std::shared_ptr<unity::scopes::internal::SettingsDB> const& db);
     unity::scopes::VariantMap settings() const;
 
+    void set_config_directory(std::string const& path);
+
     ChildScopeList child_scopes() const;
     ChildScopeList child_scopes_ordered(ChildScopeList const& child_scopes) const;
     void set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered);
@@ -85,6 +87,8 @@ private:
     bool settings_db_initialized_;
 
     mutable std::mutex mutex_;
+
+    std::string config_directory_;
 };
 
 } // namespace internal

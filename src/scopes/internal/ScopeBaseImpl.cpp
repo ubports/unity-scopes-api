@@ -170,6 +170,12 @@ VariantMap ScopeBaseImpl::settings() const
     return db_ ? db_->settings() : VariantMap();
 }
 
+void ScopeBaseImpl::set_config_directory(std::string const& path)
+{
+    lock_guard<mutex> lock(mutex_);
+    config_directory_ = path;
+}
+
 ChildScopeList ScopeBaseImpl::child_scopes() const
 {
     ///!
