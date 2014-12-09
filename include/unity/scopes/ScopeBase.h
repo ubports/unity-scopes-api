@@ -347,9 +347,6 @@ public:
     ///! Doc
     virtual ChildScopeList child_scopes_ordered() const final;
 
-    ///! Doc
-    virtual void set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered) final;
-
 protected:
     /// @cond
     ScopeBase();

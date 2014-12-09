@@ -224,7 +224,7 @@ ChildScopeList ScopeObject::child_scopes_ordered() const
 
 void ScopeObject::set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered)
 {
-    scope_base_->set_child_scopes_ordered(child_scopes_ordered);
+    scope_base_->p->set_child_scopes_ordered(child_scopes_ordered);
 }
 
 bool ScopeObject::debug_mode() const

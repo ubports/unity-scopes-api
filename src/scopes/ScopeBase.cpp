@@ -112,11 +112,6 @@ ChildScopeList ScopeBase::child_scopes_ordered() const
     return p->child_scopes_ordered(child_scopes());
 }
 
-void ScopeBase::set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered)
-{
-    p->set_child_scopes_ordered(child_scopes_ordered);
-}
-
 } // namespace scopes
 
 } // namespace unity

@@ -58,7 +58,6 @@ public:
     virtual VariantMap settings() const = 0;
     virtual ChildScopeList child_scopes() const = 0;
     virtual ChildScopeList child_scopes_ordered() const = 0;
-    virtual void set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered) = 0;
 /// @endcond
 };
 
