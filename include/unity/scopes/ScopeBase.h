@@ -72,7 +72,7 @@ class RuntimeImpl;
 namespace testing
 {
 
-struct TypedScopeFixtureHelper;
+class TypedScopeFixtureHelper;
 
 }
 
@@ -338,7 +338,7 @@ private:
 
     friend class internal::RuntimeImpl;
     friend class internal::ScopeObject;
-    friend struct testing::TypedScopeFixtureHelper;
+    friend class testing::TypedScopeFixtureHelper;
     /// @endcond
 };
 

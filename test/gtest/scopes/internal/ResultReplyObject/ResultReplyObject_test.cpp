@@ -34,7 +34,7 @@ public:
     DummyReceiver(std::function<void(Department::SCPtr const&)> departments_push_func)
     {
         departments_push_func_ = departments_push_func;
-    };
+    }
 
     void push(CategorisedResult) override {}
 

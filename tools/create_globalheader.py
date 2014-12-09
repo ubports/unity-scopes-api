@@ -22,17 +22,16 @@ import sys, os
 
 def build_header(outfile, incroots):
     ofile = open(outfile, 'w')
-    headers = []
-    for r in incroots:
-        headers += glob(os.path.join(r, 'unity/scopes', '*.h'))
-    headers = [os.path.split(f)[1] for f in headers]
-    headers.sort()
-    ofile.write("#ifndef UNITY_SCOPES_H\n")
-    ofile.write("#define UNITY_SCOPES_H\n")
-    for f in headers:
-        line = '#include<unity/scopes/%s>\n' % f
-        ofile.write(line)
-    ofile.write("#endif\n")
+    ofile.write("#pragma once\n\n")
+    for subdir in ['', 'utility']:
+        headers = []
+        for r in incroots:
+            headers += glob(os.path.join(r, 'unity/scopes', subdir, '*.h'))
+        headers = [os.path.split(f)[1] for f in headers]
+        headers.sort()
+        for f in headers:
+            line = '#include<unity/scopes/%s>\n' % os.path.join(subdir, f)
+            ofile.write(line)
 
 if __name__ == '__main__':
     if len(sys.argv) <= 3:

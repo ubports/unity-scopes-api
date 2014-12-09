@@ -18,6 +18,7 @@
 
 #include <unity/scopes/internal/zmq_middleware/ObjectAdapter.h>
 
+#include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/zmq_middleware/ServantBase.h>
 #include <unity/scopes/internal/zmq_middleware/StopPublisher.h>
 #include <unity/scopes/internal/zmq_middleware/Util.h>
@@ -31,7 +32,6 @@
 
 #include <cassert>
 #include <sstream>
-#include <iostream>  // TODO: remove this once logging is added
 
 #include <unistd.h>
 #include <sys/socket.h>
@@ -58,6 +58,9 @@ char const* pump_suffix = "-pump";
 
 }  // namespace
 
+// Some tests use a nullptr for the run time, so we use a different logger in that case.
+BOOST_LOG_INLINE_GLOBAL_LOGGER_DEFAULT(object_adapter_test_logger, boost::log::sources::severity_channel_logger_mt<>)
+
 ObjectAdapter::ObjectAdapter(ZmqMiddleware& mw, string const& name, string const& endpoint, RequestMode m,
                              int pool_size, int64_t idle_timeout) :
     mw_(mw),
@@ -66,7 +69,8 @@ ObjectAdapter::ObjectAdapter(ZmqMiddleware& mw, string const& name, string const
     mode_(m),
     pool_size_(pool_size),
     idle_timeout_(idle_timeout != -1 ? idle_timeout : zmqpp::poller::wait_forever),
-    state_(Inactive)
+    state_(Inactive),
+    logger_(mw.runtime() ? mw.runtime()->logger() : object_adapter_test_logger::get())
 {
     assert(!name.empty());
     assert(!endpoint.empty());
@@ -82,14 +86,12 @@ ObjectAdapter::~ObjectAdapter()
     }
     catch (std::exception const& e)
     {
-        // TODO: log error
-        cerr << "~ObjectAdapter(): exception from shutdown(): " << e.what() << endl;
+        BOOST_LOG_SEV(logger_, Logger::Error) << "~ObjectAdapter(): exception from shutdown(): " << e.what();
     }
     // LCOV_EXCL_START
     catch (...)
     {
-        // TODO: log error
-        cerr << "~ObjectAdapter(): unknown exception from shutdown()" << endl;
+        BOOST_LOG_SEV(logger_, Logger::Error) << "~ObjectAdapter(): unknown exception from shutdown()";
     }
     // LCOV_EXCL_STOP
 
@@ -101,14 +103,12 @@ ObjectAdapter::~ObjectAdapter()
     }
     catch (std::exception const& e)
     {
-        // TODO: log error
-        cerr << "~ObjectAdapter(): exception from wait_for_shutdown(): " << e.what() << endl;
+        BOOST_LOG_SEV(logger_, Logger::Error) << "~ObjectAdapter(): exception from wait_for_shutdown(): " << e.what();
     }
     // LCOV_EXCL_START
     catch (...)
     {
-        // TODO: log error
-        cerr << "~ObjectAdapter(): unknown exception from wait_for_shutdown()" << endl;
+        BOOST_LOG_SEV(logger_, Logger::Error) << "~ObjectAdapter(): unknown exception from wait_for_shutdown()";
     }
     // LCOV_EXCL_STOP
 }
@@ -729,9 +729,9 @@ void ObjectAdapter::dispatch(zmqpp::socket& pump, string const& client_address)
             }
             else
             {
-                // TODO: log error
-                cerr << "ObjectAdapter: invalid oneway message header "
-                     << "(id: " << current.id << ", adapter: " << name_ << ", op: " << current.op_name << ")" << endl;
+                BOOST_LOG_SEV(logger_, Logger::Error)
+                    << "ObjectAdapter: invalid oneway message header "
+                     << "(id: " << current.id << ", adapter: " << name_ << ", op: " << current.op_name << ")";
             }
             return;
         }
@@ -751,9 +751,9 @@ void ObjectAdapter::dispatch(zmqpp::socket& pump, string const& client_address)
             }
             else
             {
-                // TODO: log error
-                cerr << "ObjectAdapter: twoway invocation sent to oneway adapter "
-                     << "(id: " << current.id << ", adapter: " << name_ << ", op: " << current.op_name << ")" << endl;
+                BOOST_LOG_SEV(logger_, Logger::Error)
+                    << "ObjectAdapter: twoway invocation sent to oneway adapter "
+                    << "(id: " << current.id << ", adapter: " << name_ << ", op: " << current.op_name << ")";
             }
             return;
         }
@@ -774,8 +774,7 @@ void ObjectAdapter::dispatch(zmqpp::socket& pump, string const& client_address)
         }
         else
         {
-            // TODO: log error
-            cerr << s.str() << endl;
+            BOOST_LOG_SEV(logger_, Logger::Error) << s.str();
         }
         return;
     }

@@ -24,7 +24,6 @@
 #include <unity/scopes/internal/Utils.h>
 
 #include <algorithm>
-#include <iostream>
 #include <sstream>
 #include <string>
 
@@ -58,7 +57,8 @@ namespace
     const string debug_mode_key = "DebugMode";
     const string child_scope_ids_key = "ChildScopes";
     const string version_key = "Version";
-    const string tags_key = "Tags";
+    const string keywords_key = "Keywords";
+    const string is_aggregator_key = "IsAggregator";
 
     const string scope_appearance_group = "Appearance";
     const string fg_color_key = "ForegroundColor";
@@ -224,18 +224,27 @@ ScopeConfig::ScopeConfig(string const& configfile) :
 
     try
     {
-        tags_ = parser()->get_string_array(scope_config_group, tags_key);
+        keywords_ = parser()->get_string_array(scope_config_group, keywords_key);
     }
     catch (LogicException const&)
     {
     }
 
-    for (auto const& tag: tags_)
+    for (auto const& keyword: keywords_)
     {
-        if (tag.empty())
+        if (keyword.empty())
         {
-            throw_ex("Invalid empty tag string found in \"Tags\" list");
+            throw_ex("Invalid empty keyword string found in \"Keywords\" list");
         }
+    }
+
+    try
+    {
+        is_aggregator_ = parser()->get_boolean(scope_config_group, is_aggregator_key);
+    }
+    catch (LogicException const&)
+    {
+        is_aggregator_ = false;
     }
 
     try
@@ -277,7 +286,9 @@ ScopeConfig::ScopeConfig(string const& configfile) :
                results_ttl_key,
                debug_mode_key,
                child_scope_ids_key,
-               version_key
+               version_key,
+               keywords_key,
+               is_aggregator_key
            }
         },
         {  scope_appearance_group,
@@ -461,9 +472,14 @@ int ScopeConfig::version() const
     return version_;
 }
 
-std::vector<std::string> ScopeConfig::tags() const
+std::vector<std::string> ScopeConfig::keywords() const
 {
-    return tags_;
+    return keywords_;
+}
+
+bool ScopeConfig::is_aggregator() const
+{
+    return is_aggregator_;
 }
 
 } // namespace internal

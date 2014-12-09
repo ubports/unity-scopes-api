@@ -63,13 +63,14 @@ interface Registry
 
 */
 
-using namespace std::placeholders;
+using namespace std;
+namespace ph = std::placeholders;
 
 RegistryI::RegistryI(RegistryObjectBase::SPtr const& ro) :
-    ServantBase(ro, { { "get_metadata", bind(&RegistryI::get_metadata_, this, _1, _2, _3) },
-                      { "list", bind(&RegistryI::list_, this, _1, _2, _3) },
-                      { "locate", bind(&RegistryI::locate_, this, _1, _2, _3) },
-                      { "is_scope_running", bind(&RegistryI::is_scope_running_, this, _1, _2, _3) } })
+    ServantBase(ro, { { "get_metadata", bind(&RegistryI::get_metadata_, this, ph::_1, ph::_2, ph::_3) },
+                      { "list", bind(&RegistryI::list_, this, ph::_1, ph::_2, ph::_3) },
+                      { "locate", bind(&RegistryI::locate_, this, ph::_1, ph::_2, ph::_3) },
+                      { "is_scope_running", bind(&RegistryI::is_scope_running_, this, ph::_1, ph::_2, ph::_3) } })
 
 {
 }

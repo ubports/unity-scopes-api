@@ -79,7 +79,7 @@ void DepartmentImpl::add_subdepartment(Department::SCPtr const& department)
     if (department == nullptr)
     {
         std::stringstream str;
-        str << "DepartmentImpl::add_subdepartment(): invalid null department, parent department '", id();
+        str << "DepartmentImpl::add_subdepartment(): invalid null department, parent department '" << id() << "'";
         throw InvalidArgumentException(str.str());
     }
     departments_.push_back(department);

@@ -112,19 +112,29 @@ public:
     \brief Run a scope without going through the scope runner.
 
     This method is intended to run a scope that can not be loaded via the scope runner, such as
-    those written in languages that can not be dynamically loaded.
+    those written in languages that cannot be dynamically loaded.
+
+    \note This method is deprecated. Use
+    `void run_scope(ScopeBase *const scope_base, std::string const& scope_ini_file)` instead.
 
     \param scope_base The scope implementation
-    \param runtime_ini_file The full path of runtime configuration file. Passing an empty string uses
-           a default configuration.
+    \param runtime_ini_file This parameter is ignored.
     \param scope_ini_file The full path of scope configuration file
     */
+    /// @cond
+    // TODO: next ABI incompatible release, strip out this method.
+    __attribute__ ((deprecated))
+    /// @endcond
     void run_scope(ScopeBase *const scope_base, std::string const& runtime_ini_file, std::string const& scope_ini_file);
 
     /**
     \brief Run a scope without going through the scope runner.
 
-    Equivalent to `run_scope(scope_base, "", scope_ini_file);`
+    This method is intended to run a scope that can not be loaded via the scope runner, such as
+    those written in languages that cannot be dynamically loaded.
+
+    \param scope_base The scope implementation
+    \param scope_ini_file The full path of scope configuration file
     */
     void run_scope(ScopeBase *const scope_base, std::string const& scope_ini_file);
 

@@ -72,6 +72,44 @@ In the template, a manifest such as the following is used:
 }
 \endcode
 
+\subsubsection multiarch Multi-arch click packages
+The search path for the shared library inside a click package is as follows:
+
+<ul>
+<li>${SCOPE_DIRECTORY}/${DEB_HOST_MULTIARCH}/lib${SCOPE_NAME}.so
+<li>${SCOPE_DIRECTORY}/${DEB_HOST_MULTIARCH}/${SCOPE_NAME}.so
+<li>${SCOPE_DIRECTORY}/${DEB_HOST_MULTIARCH}/scope.so
+<li>${SCOPE_DIRECTORY}/lib${SCOPE_NAME}.so
+<li>${SCOPE_DIRECTORY}/${SCOPE_NAME}.so
+<li>${SCOPE_DIRECTORY}/scope.so
+</ul>
+
+Therefore click packges can be made multi-arch aware by compiling your targets for multiple architectures, and creating, e.g. the
+following directory structure:
+
+\code
+├── testscopeA.ini
+├── testscopeA-settings.ini
+├── x86_64-linux-gnu
+|   └── libtestscopeA.so
+└── arm-linux-gnueabihf
+    └── libtestscopeA.so
+\endcode
+
+You must also update the manifest file 'architecture' property to enumerate the included architectures, as follows:
+
+\code
+    "architecture": ["armhf", "amd64"]
+\endcode 
+
+\subsubsection multiarch Multi-arch scope runner
+Similarly to the shared libraries, when a relative path is provided the search path for custom scope runners is as follows:
+
+<ul>
+<li>${SCOPE_DIRECTORY}/${DEB_HOST_MULTIARCH}/${CUSTOM_SCOPERUNNER}
+<li>${SCOPE_DIRECTORY}/${CUSTOM_SCOPERUNNER}
+</ul>
+
 \subsubsection apparmor Apparmor manifest
 
 Scopes that are packaged using click are inherently untrusted and must be confined. At present, there is only a single type of scope that can be defined:
@@ -511,7 +549,7 @@ proxy for the scope.
 
 \paragraph subquery Sub-queries
 
-Tsubsearcho send a query to another scope, use one of the `subsearch()` overloads of \link unity::scopes::SearchQueryBase\endlink
+To send a query to another scope, use one of the `subsearch()` overloads of \link unity::scopes::SearchQueryBase\endlink
 inside your implementation of
 \link unity::scopes::SearchQueryBase::run SearchQueryBase::run()\endlink.
 This method requires the proxy to the child scope to query, the query details (\link unity::scopes::CannedQuery CannedQuery\endlink), plus
@@ -599,6 +637,34 @@ private:
     SearchReplyProxy upstream_reply_;
 };
 \endcode
+
+\paragraph aggbuffering Controlling category order
+
+Categories are displayed in the order their results are pushed. This can pose a challenge
+for aggregator scopes because results from child scopes often arrive
+in random order. To control the order in which categories are rendered,
+the aggregator must buffer and potentially re-order results by
+category before pushing them.
+
+\link unity::scopes::utility::BufferedResultForwarder BufferedResultForwarder\endlink makes
+it easier to do this.
+To use the class, you create one instance for each child scope and chain the instances together
+in the desired order of categories. Each forwarder buffers results until its predecessor in
+the chain indicates that it has completed its category ordering, at which point it itself pushes
+any results it has buffered so far and indicates to its follower that it is ready.
+
+By default, a forwarder indicates that it it is ready (has completed ordering) as soon as it has received
+a single result. This is useful if an aggregator has child scopes that produce results
+for a single category each. In this case, the order of the forwarders determines which
+category (the one used by child A or by child B) appears first when the results are rendered.
+
+If an aggregator collates results from children that each produce results for more than
+one category, you can override the default implementation of
+\link unity::scopes::utility::BufferedResultForwarder::push push()\endlink to change
+categories for results from its child, and/or indicate
+that it is ready only once the child has provided results for all expected categories.
+(See \link unity::scopes::utility::BufferedResultForwarder BufferedResultForwarder\endlink
+for more details.)
 
 \paragraph aggactiv Activation and preview
 
@@ -1061,7 +1127,7 @@ following keys:
     HotKey =
     ResultsTtlType = None, Small, Medium, or Large
     ChildScopes =
-    Tags =
+    Keywords =
 
     [Appearance]
     ForegroundColor = default text color (defaults to theme-provided foreground color)
@@ -1109,9 +1175,9 @@ might be aggregated by this scope, for example:
 
 This list of scopes is translated to the names of children scopes when in the scopes overview page of the Unity Dash.
 
-The `Tags` key is optional, but we recommend that you use it. Tags are used by aggregators to collect results from scopes of
-similar type (E.g. The Music scope will aggregate scopes with the tag "music", and so on). The value of `Tags` should specify a
-list of tags your scope falls under. Like `ChildScopes`, this value must be a semicolon separated list (E.g. `Tags = music;video`).
+The `Keywords` key is optional, but we recommend that you use it. Keywords are used by aggregators to collect results from scopes of
+similar type (E.g. The Music scope will aggregate scopes with the keyword "music", and so on). The value of `Keywords` should specify a
+list of keywords your scope falls under. Like `ChildScopes`, this value must be a semicolon separated list (E.g. `Keywords = music;video`).
 
 \subsection scopetool The scope tool
 

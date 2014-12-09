@@ -28,7 +28,6 @@
 using namespace std;
 using namespace unity::scopes;
 using namespace unity::scopes::internal;
-using namespace boost;
 
 namespace
 {
@@ -85,7 +84,7 @@ int run_scope(std::string const& runtime_config, std::string const& scope_config
     ThreadWrapper trap_wrapper(std::move(trap_worker), [trap]{ trap->stop(); });
 
     // Figure out what the scope ID is from the name of the scope config file.
-    auto scope_config_path = filesystem::canonical(scope_config);
+    auto scope_config_path = boost::filesystem::canonical(scope_config);
     string lib_dir = scope_config_path.parent_path().native();
     string scope_id = scope_config_path.stem().native();
 
@@ -94,7 +93,7 @@ int run_scope(std::string const& runtime_config, std::string const& scope_config
         // before loading the scope's .so.
         string scope_ld_lib_path = lib_dir + ":" + lib_dir + "/lib";
         string ld_lib_path = core::posix::this_process::env::get("LD_LIBRARY_PATH", "");
-        if (!starts_with(ld_lib_path, lib_dir))
+        if (!boost::starts_with(ld_lib_path, lib_dir))
         {
             scope_ld_lib_path = scope_ld_lib_path + (ld_lib_path.empty() ? "" : (":" + ld_lib_path));
             try
@@ -115,6 +114,9 @@ int run_scope(std::string const& runtime_config, std::string const& scope_config
     {
         // For a scope_id "Fred", we look for the library as "libFred.so", "Fred.so", and "scope.so".
         vector<string> libs;
+        libs.push_back(lib_dir + "/" + DEB_HOST_MULTIARCH + "/lib" + scope_id + ".so");
+        libs.push_back(lib_dir + "/" + DEB_HOST_MULTIARCH + "/" + scope_id + ".so");
+        libs.push_back(lib_dir + "/" + DEB_HOST_MULTIARCH + "/scope.so");
         libs.push_back(lib_dir + "/lib" + scope_id + ".so");
         libs.push_back(lib_dir + "/" + scope_id + ".so");
         libs.push_back(lib_dir + "/scope.so");
@@ -164,7 +166,7 @@ int run_scope(std::string const& runtime_config, std::string const& scope_config
             rt = RuntimeImpl::create(scope_id, runtime_config);
         }
 
-        rt->run_scope(loader->scope_base(), runtime_config, scope_config);
+        rt->run_scope(loader->scope_base(), scope_config);
 
         exit_status = 0;
     }

@@ -1,0 +1,4 @@
+add_executable(BufferedResultForwarder_test BufferedResultForwarder_test.cpp)
+target_link_libraries(BufferedResultForwarder_test ${TESTLIBS})
+
+add_test(BufferedResultForwarder BufferedResultForwarder_test)

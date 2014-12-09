@@ -2,4 +2,4 @@
 DisplayName = Scope name
 Description = Scope description
 Author = Canonical
-Tags = foo
+Keywords = foo;;

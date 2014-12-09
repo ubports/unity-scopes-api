@@ -24,7 +24,7 @@
 #include <condition_variable>
 #include <mutex>
 
-using namespace std::placeholders;
+using namespace std;
 using namespace unity::scopes;
 using namespace unity::scopes::internal;
 using namespace unity::scopes::internal::zmq_middleware;
@@ -165,16 +165,16 @@ TEST(PubSub, send_receive)
 
     // Create a few subscribers
     auto subscriber1 = mw.create_subscriber("testpublisher", "testtopic1");
-    subscriber1->message_received().connect(std::bind(&SubMsgReceiver::receive1, &message_receiver, _1));
+    subscriber1->message_received().connect(std::bind(&SubMsgReceiver::receive1, &message_receiver, placeholders::_1));
 
     auto subscriber2 = mw.create_subscriber("testpublisher", "testtopic2");
-    subscriber2->message_received().connect(std::bind(&SubMsgReceiver::receive2, &message_receiver, _1));
+    subscriber2->message_received().connect(std::bind(&SubMsgReceiver::receive2, &message_receiver, placeholders::_1));
 
     auto subscriber3 = mw.create_subscriber("testpublisher", "");
-    subscriber3->message_received().connect(std::bind(&SubMsgReceiver::receive3, &message_receiver, _1));
+    subscriber3->message_received().connect(std::bind(&SubMsgReceiver::receive3, &message_receiver, placeholders::_1));
 
     auto subscriber4 = mw.create_subscriber("testpublisher2", "testtopic4");
-    subscriber4->message_received().connect(std::bind(&SubMsgReceiver::receive4, &message_receiver, _1));
+    subscriber4->message_received().connect(std::bind(&SubMsgReceiver::receive4, &message_receiver, placeholders::_1));
 
     // Give the subscribers some time to connect
     std::this_thread::sleep_for(std::chrono::milliseconds(500));

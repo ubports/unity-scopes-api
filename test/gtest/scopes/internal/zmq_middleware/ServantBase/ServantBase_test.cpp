@@ -40,7 +40,7 @@ class MyDelegate : public AbstractObject
 {
 };
 
-using namespace std::placeholders;
+namespace ph = std::placeholders;
 
 class MyServant : public ServantBase
 {
@@ -48,7 +48,7 @@ public:
     enum ThrowType { NoException, UnityException, StdException, OtherException };
 
     MyServant(ThrowType t) :
-        ServantBase(make_shared<MyDelegate>(), { { "op", bind(&MyServant::op, this, _1, _2, _3) } }),
+        ServantBase(make_shared<MyDelegate>(), { { "op", bind(&MyServant::op, this, ph::_1, ph::_2, ph::_3) } }),
         t_(t)
     {
     }

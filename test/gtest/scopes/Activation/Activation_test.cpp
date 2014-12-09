@@ -41,7 +41,7 @@ public:
     DummyReceiver(std::function<void(CategorisedResult)> push_func)
     {
         push_func_ = push_func;
-    };
+    }
 
     void push(CategorisedResult result) override
     {
@@ -516,9 +516,9 @@ struct RaiiScopeThread
     Runtime::UPtr runtime;
     std::thread scope_thread;
 
-    RaiiScopeThread(Runtime::UPtr rt, std::string const& configfile)
+    RaiiScopeThread(Runtime::UPtr rt)
         : runtime(move(rt)),
-          scope_thread([this, configfile]{ runtime->run_scope(&scope, configfile, ""); })
+          scope_thread([this]{ runtime->run_scope(&scope, ""); })
     {
     }
 
@@ -547,7 +547,7 @@ TEST(Activation, scope)
     auto reg_rt = run_test_registry();
 
     auto scope_rt = Runtime::create_scope_runtime("TestScope", TEST_DIR "/Runtime.ini");
-    RaiiScopeThread<TestScope> scope_thread(move(scope_rt), TEST_DIR "/Runtime.ini");
+    RaiiScopeThread<TestScope> scope_thread(move(scope_rt));
 
     // parent: connect to scope and run a query
     auto rt = internal::RuntimeImpl::create("", TEST_DIR "/Runtime.ini");

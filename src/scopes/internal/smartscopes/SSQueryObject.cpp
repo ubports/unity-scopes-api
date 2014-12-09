@@ -29,7 +29,6 @@
 #include <unity/scopes/SearchReply.h>
 
 #include <cassert>
-#include <iostream>
 #include <thread>
 
 using namespace std;
@@ -47,8 +46,8 @@ namespace internal
 namespace smartscopes
 {
 
-SSQueryObject::SSQueryObject()
-    : QueryObjectBase()
+SSQueryObject::SSQueryObject(boost::log::sources::severity_channel_logger_mt<>& logger)
+    : logger_(logger)
 {
 }
 
@@ -95,18 +94,16 @@ void SSQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& /*info*/) n
         std::lock_guard<std::mutex> lock(queries_mutex_);
 
         query_it->second->q_pushable = false;
-        // TODO: log error
+        BOOST_LOG_SEV(logger_, Logger::Error) << "SSQueryObject::run(): " << e.what();
         reply->finished(CompletionDetails(CompletionDetails::Error, e.what()));  // Oneway, can't block
-        cerr << "SSQueryObject::run(): " << e.what() << endl;
     }
     catch (...)
     {
         std::lock_guard<std::mutex> lock(queries_mutex_);
 
         query_it->second->q_pushable = false;
-        // TODO: log error
+        BOOST_LOG_SEV(logger_, Logger::Error) << "SSQueryObject::run(): unknown exception";
         reply->finished(CompletionDetails(CompletionDetails::Error, "unknown exception"));  // Oneway, can't block
-        cerr << "SSQueryObject::run(): unknown exception" << endl;
     }
 
     {
@@ -206,7 +203,11 @@ void SSQueryObject::run_query(SSQuery::SPtr query, MWReplyProxy const& reply)
 
     // Create the reply proxy and keep a weak_ptr, which we will need
     // if cancel() is called later.
-    q_reply_proxy = make_shared<SearchReplyImpl>(reply, shared_from_this(), query->q_cardinality, q_base->department_id());
+    q_reply_proxy = make_shared<SearchReplyImpl>(reply,
+                                                 shared_from_this(),
+                                                 query->q_cardinality,
+                                                 q_base->department_id(),
+                                                 logger_);
     assert(q_reply_proxy);
     query->q_reply_proxy = q_reply_proxy;
 
@@ -228,7 +229,7 @@ void SSQueryObject::run_preview(SSQuery::SPtr query, MWReplyProxy const& reply)
 
     // Create the reply proxy and keep a weak_ptr, which we will need
     // if cancel() is called later.
-    q_reply_proxy = make_shared<PreviewReplyImpl>(reply, shared_from_this());
+    q_reply_proxy = make_shared<PreviewReplyImpl>(reply, shared_from_this(), logger_);
     assert(q_reply_proxy);
     query->q_reply_proxy = q_reply_proxy;
 

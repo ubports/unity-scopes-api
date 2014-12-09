@@ -37,7 +37,9 @@ class ScopeImpl;
 class QueryCtrlImpl : public virtual unity::scopes::QueryCtrl, public virtual ObjectImpl
 {
 public:
-    QueryCtrlImpl(MWQueryCtrlProxy const& ctrl_proxy, MWReplyProxy const& reply_proxy);
+    QueryCtrlImpl(MWQueryCtrlProxy const& ctrl_proxy,
+                  MWReplyProxy const& reply_proxy,
+                  boost::log::sources::severity_channel_logger_mt<>& logger);
     virtual ~QueryCtrlImpl();
 
     virtual void cancel() override;
@@ -48,6 +50,7 @@ private:
     MWQueryCtrlProxy fwd();
 
     MWReplyProxy reply_proxy_;
+
     bool ready_;                // True once ObjectImpl::set_proxy() was called
     bool cancelled_;            // True if cancel() is called before set_proxy() was called
     std::mutex mutex_;          // Protects ready_ and cancelled_

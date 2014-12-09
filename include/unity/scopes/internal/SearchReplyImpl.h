@@ -50,8 +50,11 @@ class QueryObjectBase;
 class SearchReplyImpl : public virtual unity::scopes::SearchReply, public virtual ReplyImpl
 {
 public:
-    SearchReplyImpl(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObjectBase>const & qo, int cardinality,
-            std::string const& current_department_id);
+    SearchReplyImpl(MWReplyProxy const& mw_proxy,
+                    std::shared_ptr<QueryObjectBase>const & qo,
+                    int cardinality,
+                    std::string const& current_department_id,
+                    boost::log::sources::severity_channel_logger_mt<>& logger);
     virtual ~SearchReplyImpl();
 
     virtual void register_departments(Department::SCPtr const& parent) override;
