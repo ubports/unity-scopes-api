@@ -201,9 +201,27 @@ QueryCtrlProxy ZmqScope::preview(VariantMap const& result, VariantMap const& hin
     return make_shared<QueryCtrlImpl>(p, reply_proxy, mw_base()->runtime()->logger());
 }
 
-ChildScopeList ZmqScope::child_scopes_ordered() const
+ChildScopeList ZmqScope::child_scopes_ordered()
 {
-    ///!
+    capnp::MallocMessageBuilder request_builder;
+    make_request_(request_builder, "child_scopes_ordered");
+
+    auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_scope_(request_builder); });
+
+    auto out_params = future.get();
+    auto response = out_params.reader->getRoot<capnproto::Response>();
+    throw_if_runtime_exception(response);
+
+    auto list = response.getPayload().getAs<capnproto::Scope::ChildScopesOrderedResponse>().getReturnValue();
+
+    ChildScopeList child_scope_list;
+    for (size_t i = 0; i < list.size(); ++i)
+    {
+        string id = list[i].getId();
+        bool enabled = list[i].getEnabled();
+        child_scope_list.push_back( ChildScope{id, enabled} );
+    }
+    return child_scope_list;
 }
 
 void ZmqScope::set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered)
