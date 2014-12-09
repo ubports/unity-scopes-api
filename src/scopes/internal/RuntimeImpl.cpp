@@ -64,10 +64,12 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
         destroyed_ = false;
 
         scope_id_ = scope_id;
+        string log_file_basename = scope_id;
         if (scope_id_.empty())
         {
             UniqueID id;
             scope_id_ = "c-" + id.gen();
+            log_file_basename = "client";  // Don't make lots of log files named like c-12345678
         }
 
         // Until we know where the scope's cache directory is,
@@ -86,8 +88,9 @@ BOOST_LOG_SEV(logger(), Logger::Info) << "message 5 ";
         RuntimeConfig config(configfile);
 
         // Now that we have the config, change the logger to log to a file.
-        string log_dir = config.log_directory();
-        logger_->set_log_file(log_dir + "/" + scope_id_);
+        logger_->set_log_file(config.log_directory() + "/" + log_file_basename,
+                              config.max_log_file_size(),
+                              config.max_log_dir_size());
 
         string default_middleware = config.default_middleware();
         string middleware_configfile = config.default_middleware_configfile();

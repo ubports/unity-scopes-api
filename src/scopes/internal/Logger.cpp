@@ -132,13 +132,20 @@ bool Logger::set_channel(Channel c, bool enabled)
     return old_setting;
 }
 
-void Logger::set_log_file(string const& path)
+void Logger::set_log_file(string const& path, int rotation_size, int dir_size)
 {
     namespace ph = std::placeholders;
 
+
     FileSinkPtr s = boost::make_shared<FileSinkT>(
-                        keywords::file_name = path + ".log",
-                        keywords::rotation_size = 512 * 1024);
+                        keywords::file_name = path + "-%N.log",
+                        keywords::rotation_size = rotation_size);
+
+    string parent = boost::filesystem::path(path).parent_path().native();
+    s->locked_backend()->set_file_collector(sinks::file::make_collector(keywords::target = parent,
+                                                                        keywords::max_size = dir_size));
+    s->locked_backend()->scan_for_files();
+
     {
         lock_guard<mutex> lock(mutex_);
 

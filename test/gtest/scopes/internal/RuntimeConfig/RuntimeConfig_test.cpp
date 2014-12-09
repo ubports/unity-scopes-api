@@ -40,6 +40,8 @@ TEST(RuntimeConfig, basic)
     EXPECT_EQ(DFLT_MIDDLEWARE_INI, c.default_middleware_configfile());
     EXPECT_EQ(DFLT_REAP_EXPIRY, c.reap_expiry());
     EXPECT_EQ(DFLT_REAP_INTERVAL, c.reap_interval());
+    EXPECT_EQ(DFLT_MAX_LOG_FILE_SIZE, c.max_log_file_size());
+    EXPECT_EQ(DFLT_MAX_LOG_DIR_SIZE, c.max_log_dir_size());
 }
 
 TEST(RuntimeConfig, _default_cache_dir)
@@ -158,7 +160,6 @@ TEST(RuntimeConfig, exceptions)
 
         RuntimeConfig c(TEST_SRC_DIR "/NoCacheDir.ini");
         FAIL();
-        EXPECT_EQ("cachedir", c.cache_directory());
     }
     catch (ConfigException const& e)
     {
@@ -174,7 +175,6 @@ TEST(RuntimeConfig, exceptions)
 
         RuntimeConfig c(TEST_SRC_DIR "/NoConfigDir.ini");
         FAIL();
-        EXPECT_EQ("cachedir", c.cache_directory());
     }
     catch (ConfigException const& e)
     {
@@ -190,13 +190,36 @@ TEST(RuntimeConfig, exceptions)
 
         RuntimeConfig c(TEST_SRC_DIR "/NoLogDir.ini");
         FAIL();
-        EXPECT_EQ("configdir", c.config_directory());
     }
     catch (ConfigException const& e)
     {
         EXPECT_STREQ("unity::scopes::ConfigException: \"" TEST_SRC_DIR "/NoLogDir.ini\": No LogDir configured and "
                      "failed to get default:\n    unity::ResourceException: RuntimeConfig::default_log_directory(): "
                      "$HOME not set",
+                     e.what());
+    }
+
+    try
+    {
+        RuntimeConfig c(TEST_SRC_DIR "/BadLogFileSize.ini");
+        FAIL();
+    }
+    catch (ConfigException const& e)
+    {
+        EXPECT_STREQ("unity::scopes::ConfigException: \"" TEST_SRC_DIR "/BadLogFileSize.ini\": "
+                     "Illegal value (999) for MaxLogFileSize: value must be > 1024",
+                     e.what());
+    }
+
+    try
+    {
+        RuntimeConfig c(TEST_SRC_DIR "/BadLogDirSize.ini");
+        FAIL();
+    }
+    catch (ConfigException const& e)
+    {
+        EXPECT_STREQ("unity::scopes::ConfigException: \"" TEST_SRC_DIR "/BadLogDirSize.ini\": "
+                     "Illegal value (1024) for MaxLogDirSize: value must be > MaxLogFileSize (2048)",
                      e.what());
     }
 }

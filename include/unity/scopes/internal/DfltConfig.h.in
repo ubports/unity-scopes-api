@@ -46,12 +46,15 @@ static constexpr int DFLT_SCOPE_IDLE_TIMEOUT = 40;           // seconds
 
 static constexpr char const* DFLT_SS_SCOPE_IDENTITY = "SmartScope";
 
-static const int DFLT_REAP_EXPIRY = 45;              // seconds
-static const int DFLT_REAP_INTERVAL = 10;            // seconds
-static const int DFLT_PROCESS_TIMEOUT = 4000;        // milliseconds
-static const int DFLT_ZMQ_TWOWAY_TIMEOUT = 500;      // milliseconds
-static const int DFLT_ZMQ_LOCATE_TIMEOUT = 5000;     // milliseconds
-static const int DFLT_ZMQ_REGISTRY_TIMEOUT = 5000;   // milliseconds
+static constexpr int DFLT_REAP_EXPIRY = 45;              // seconds
+static constexpr int DFLT_REAP_INTERVAL = 10;            // seconds
+static constexpr int DFLT_PROCESS_TIMEOUT = 4000;        // milliseconds
+static constexpr int DFLT_ZMQ_TWOWAY_TIMEOUT = 500;      // milliseconds
+static constexpr int DFLT_ZMQ_LOCATE_TIMEOUT = 5000;     // milliseconds
+static constexpr int DFLT_ZMQ_REGISTRY_TIMEOUT = 5000;   // milliseconds
+
+static constexpr int DFLT_MAX_LOG_FILE_SIZE = 512 * 1024;       // bytes, individual file size
+static constexpr int DFLT_MAX_LOG_DIR_SIZE = 10 * 1024 * 1024;  // bytes, sum of file sizes
 
 } // namespace internal
 

@@ -48,6 +48,8 @@ public:
     std::string app_directory() const;
     std::string config_directory() const;
     std::string log_directory() const;
+    int max_log_file_size() const;
+    int max_log_dir_size() const;
     static std::string default_cache_directory();
     static std::string default_app_directory();
     static std::string default_config_directory();
@@ -66,6 +68,8 @@ private:
     std::string app_directory_;
     std::string config_directory_;
     std::string log_directory_;
+    int max_log_file_size_;
+    int max_log_dir_size_;
 };
 
 } // namespace internal

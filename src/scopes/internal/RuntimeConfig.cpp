@@ -54,6 +54,8 @@ const string cache_dir_key = "CacheDir";
 const string app_dir_key = "AppDir";
 const string config_dir_key = "ConfigDir";
 const string log_dir_key = "LogDir";
+const string max_log_file_size_key = "MaxLogFileSize";
+const string max_log_dir_size_key = "MaxLogDirSize";
 
 }  // namespace
 
@@ -70,15 +72,18 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
         default_middleware_configfile_ = DFLT_ZMQ_MIDDLEWARE_INI;
         reap_expiry_ = DFLT_REAP_EXPIRY;
         reap_interval_ = DFLT_REAP_INTERVAL;
+        max_log_file_size_ = DFLT_MAX_LOG_FILE_SIZE;
+        max_log_dir_size_ = DFLT_MAX_LOG_DIR_SIZE;
         try
         {
             cache_directory_ = default_cache_directory();
             app_directory_ = default_app_directory();
             config_directory_ = default_config_directory();
+            log_directory_ = default_log_directory();
         }
         catch (ResourceException const& e)
         {
-            throw_ex("Failed to get default data directory");
+            throw_ex("Failed to get default directory");
         }
     }
     else
@@ -149,6 +154,18 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
                 throw_ex("No LogDir configured and failed to get default");
             }
         }
+        max_log_file_size_ = get_optional_int(runtime_config_group, max_log_file_size_key, DFLT_MAX_LOG_FILE_SIZE);
+        if (max_log_file_size_ < 1024)
+        {
+            throw_ex("Illegal value (" + to_string(max_log_file_size_) + ") for " + max_log_file_size_key
+                     + ": value must be > 1024");
+        }
+        max_log_dir_size_ = get_optional_int(runtime_config_group, max_log_dir_size_key, DFLT_MAX_LOG_DIR_SIZE);
+        if (max_log_dir_size_ <= max_log_file_size_)
+        {
+            throw_ex("Illegal value (" + to_string(max_log_dir_size_) + ") for " + max_log_dir_size_key
+                     + ": value must be > " + max_log_file_size_key + " (" + to_string(max_log_file_size_) + ")");
+        }
     }
 
     KnownEntries const known_entries = {
@@ -165,7 +182,9 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
                                                 cache_dir_key,
                                                 app_dir_key,
                                                 config_dir_key,
-                                                log_dir_key
+                                                log_dir_key,
+                                                max_log_file_size_key,
+                                                max_log_dir_size_key
                                              }
                                           }
                                        };
@@ -234,6 +253,16 @@ string RuntimeConfig::config_directory() const
 string RuntimeConfig::log_directory() const
 {
     return log_directory_;
+}
+
+int RuntimeConfig::max_log_file_size() const
+{
+    return max_log_file_size_;
+}
+
+int RuntimeConfig::max_log_dir_size() const
+{
+    return max_log_dir_size_;
 }
 
 string RuntimeConfig::default_cache_directory()

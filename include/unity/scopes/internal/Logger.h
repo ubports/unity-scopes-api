@@ -75,7 +75,7 @@ public:
     // Returns logger for specified channel.
     boost::log::sources::severity_channel_logger_mt<>& operator()(Channel c);
 
-    void set_log_file(std::string const& path);
+    void set_log_file(std::string const& path, int rotation_size, int dir_size);
 
     enum Severity { Trace, Info, Warning, Error, Fatal };
     Severity set_severity_threshold(Severity s);

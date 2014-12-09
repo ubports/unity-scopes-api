@@ -138,6 +138,17 @@ The following keys are recognized:
 
   $HOME/.config/unity-scopes/<scope_id>/settings.ini
 
+- MaxLogFileSize
+
+  The maximum size in bytes of an individual log file before it is rolled over.
+  The value must be at least 1024. The default value is 512 kB.
+
+- MaxLogDirSize
+
+  The maximum size in bytes of the sum of sizes of all log files in the log directory
+  before they are deleted. The value must be greater than MaxLogFileSize.
+  The default value is 10 MB.
+
 Zmq.ini
 -------
 
