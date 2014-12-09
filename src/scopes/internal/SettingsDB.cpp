@@ -337,9 +337,9 @@ void SettingsDB::process_all_docs()
                                            | IN_DELETE_SELF));
             if (watch_.get() < 0)
             {
-                throw ResourceException("SettingsDB::add_watch(): failed to add watch for path: \"" +
-                                        db_path_ + "\". inotify_add_watch() failed. (fd = " +
-                                        to_string(fd_.get()) + ", path = " + db_path_ + ")");
+                throw SyscallException("SettingsDB::add_watch(): failed to add watch for path: \"" +
+                                       db_path_ + "\". inotify_add_watch() failed. (fd = " +
+                                       to_string(fd_.get()) + ", path = " + db_path_ + ")", errno);
             }
 
             state_changed_ = true;
