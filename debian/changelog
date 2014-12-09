@@ -7,7 +7,7 @@ unity-scopes-api (0.6.10-0ubuntu1) UNRELEASED; urgency=medium
   [ Pawel Stolowski ]
   * Pass partner-id via UserAgent with remote-scopes call (LP: #1389273).
   * Implemented BufferedResultForwarder API.
-  * Allow multi-arch click packages for scopes (LP: #1398998:).
+  * Allow multi-arch click packages for scopes (LP: #1398998).
 
  -- Pawel Stolowski <pawel.stolowski@canonical.com>  Tue, 09 Dec 2014 16:56:03 +0100
 
