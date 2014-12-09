@@ -203,6 +203,8 @@ void ScopeI::child_scopes_ordered_(Current const&,
                       capnproto::Response::Builder& r)
 {
     auto delegate = dynamic_pointer_cast<ScopeObjectBase>(del());
+    assert(delegate);
+
     auto child_scopes_ordered = delegate->child_scopes_ordered();
 
     r.setStatus(capnproto::ResponseStatus::SUCCESS);
@@ -218,11 +220,24 @@ void ScopeI::child_scopes_ordered_(Current const&,
     }
 }
 
-void ScopeI::set_child_scopes_ordered_(Current const& current,
+void ScopeI::set_child_scopes_ordered_(Current const&,
                       capnp::AnyPointer::Reader& in_params,
-                      capnproto::Response::Builder& r)
+                      capnproto::Response::Builder&)
 {
-    ///!
+    auto delegate = std::dynamic_pointer_cast<ScopeObjectBase>(del());
+    assert(delegate);
+
+    auto list = in_params.getAs<capnproto::Scope::SetChildScopesOrderedRequest>().getChildScopesOrdered();
+
+    ChildScopeList child_scope_list;
+    for (size_t i = 0; i < list.size(); ++i)
+    {
+        string id = list[i].getId();
+        bool enabled = list[i].getEnabled();
+        child_scope_list.push_back( ChildScope{id, enabled} );
+    }
+
+    delegate->set_child_scopes_ordered(child_scope_list);
 }
 
 void ScopeI::debug_mode_(Current const&,
