@@ -6,6 +6,6 @@ add_definitions(-DSCOPE_CONFIG_PATH="${CMAKE_CURRENT_BINARY_DIR}")
 add_library(testscopeA MODULE testscopeA.cpp)
 set_target_properties(testscopeA
   PROPERTIES
-    PREFIX "${DEB_HOST_MULTIARCH}/lib"
+    PREFIX "${CMAKE_LIBRARY_ARCHITECTURE}/lib"
 )
 target_link_libraries(testscopeA ${LIBGTEST})
