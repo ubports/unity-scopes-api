@@ -128,12 +128,12 @@ src::severity_channel_logger_mt<>& Logger::operator()(Channel c)
     return channel_loggers_[channel_names[c]].first;
 }
 
-bool Logger::set_channel(Channel c, bool enabled)
+bool Logger::set_channel(Channel c, bool enable)
 {
     auto it = channel_loggers_.find(channel_names[c]);
     assert(it != channel_loggers_.end());
-    bool old_setting = it->second.second.exchange(enabled);
-    return old_setting;
+    bool was_enabled = it->second.second.exchange(enable);
+    return was_enabled;
 }
 
 void Logger::set_log_file(string const& path, int rotation_size, int dir_size)

@@ -67,7 +67,7 @@ private:
     condition_variable cond_;
 };
 
-void slowsearchscope_thread(RuntimeImpl::SPtr const& rt, string const& runtime_ini_file)
+void slowsearchscope_thread(RuntimeImpl::SPtr const& rt)
 {
     SlowSearchScope scope;
     rt->run_scope(&scope, "SlowSearchScope.ini");
@@ -117,7 +117,7 @@ TEST(IdleTimeout, server_idle_timeout_while_operation_in_progress)
     {
         // Make a run time for the scope and run the scope.
         RuntimeImpl::SPtr srt = RuntimeImpl::create("SlowSearchScope", "Runtime.ini");
-        std::thread slowsearchscope_t(slowsearchscope_thread, srt, "Runtime.ini");
+        std::thread slowsearchscope_t(slowsearchscope_thread, srt);
 
         // Give scope some time to bind to endpoint.
         this_thread::sleep_for(chrono::milliseconds(200));
