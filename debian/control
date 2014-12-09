@@ -93,25 +93,26 @@ Multi-Arch: same
 Pre-Depends: ${misc:Pre-Depends},
 Depends: ${misc:Depends},
          ${shlibs:Depends}
-Description: Qt utilities library for Unity scopes API
- Library that integrates utilites based on Qt for convenience
+Description: Qt utility library for Unity scopes API
+ Library that integrates utilities based on Qt for convenience
 
 Package: libunity-utils-qt-dev
+Section: libdevel
 Architecture: any
 Multi-Arch: same
 Pre-Depends: ${misc:Pre-Depends},
 Depends: libunity-scopes-dev (= ${binary:Version}),
          libunity-utils-qt (= ${binary:Version}),
-         libnet-cpp-dev (>=1.1.0)
+         libnet-cpp-dev (>=1.1.0),
          ${misc:Depends},
          ${shlibs:Depends}
-Description: Header files for Qt utilities library for Unity scopes API
- Library that integrates utilites based on Qt for convenience (dev files)
+Description: Header files for Qt utility library for Unity scopes API
+ Library that integrates utilities based on Qt for convenience (dev files)
 
 Package: libunity-utils-qt-doc
 Section: doc
 Architecture: all
 Multi-Arch: foreign
 Depends: ${misc:Depends},
-Description: Documentation for Unity Qt utilities library
- Library that integrates utilites based on Qt for convenience (documentation)
+Description: Documentation for Unity Qt utility library
+ Library that integrates utilities based on Qt for convenience (documentation)
