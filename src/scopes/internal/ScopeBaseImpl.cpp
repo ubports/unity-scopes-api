@@ -20,6 +20,7 @@
 
 #include <unity/UnityExceptions.h>
 #include <unity/scopes/internal/SettingsDB.h>
+#include <unity/scopes/Registry.h>
 #include <unity/scopes/ScopeExceptions.h>
 
 using namespace unity;
@@ -178,7 +179,17 @@ void ScopeBaseImpl::set_config_directory(std::string const& path)
 
 ChildScopeList ScopeBaseImpl::child_scopes() const
 {
-    ///!
+    // The default behaviour of this method is to simply return all available scopes on the system.
+    // This translates to: Any scope may potentially be aggregated by this scope.
+    lock_guard<mutex> lock(mutex_);
+    ChildScopeList return_list;
+    auto all_scopes = registry_->list();
+    for (auto const& scope : all_scopes)
+    {
+        // New scopes are added disabled by default
+        return_list.push_back( ChildScope{scope.first, false} );
+    }
+    return return_list;
 }
 
 ChildScopeList ScopeBaseImpl::child_scopes_ordered(ChildScopeList const& child_scopes) const
