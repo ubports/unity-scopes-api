@@ -198,11 +198,24 @@ void ScopeI::preview_(Current const& current,
     p.setCategory(ctrl_proxy->target_category().c_str());
 }
 
-void ScopeI::child_scopes_ordered_(Current const& current,
-                      capnp::AnyPointer::Reader& in_params,
+void ScopeI::child_scopes_ordered_(Current const&,
+                      capnp::AnyPointer::Reader&,
                       capnproto::Response::Builder& r)
 {
-    ///!
+    auto delegate = dynamic_pointer_cast<ScopeObjectBase>(del());
+    auto child_scopes_ordered = delegate->child_scopes_ordered();
+
+    r.setStatus(capnproto::ResponseStatus::SUCCESS);
+    auto list_response = r.initPayload().getAs<capnproto::Scope::ChildScopesOrderedResponse>();
+    auto list = list_response.initReturnValue(child_scopes_ordered.size());
+
+    int i = 0;
+    for (auto const& child_scope : child_scopes_ordered)
+    {
+        list[i].setId(child_scope.id);
+        list[i].setEnabled(child_scope.enabled);
+        ++i;
+    }
 }
 
 void ScopeI::set_child_scopes_ordered_(Current const& current,
