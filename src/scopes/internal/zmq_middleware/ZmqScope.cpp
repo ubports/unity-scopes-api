@@ -226,7 +226,22 @@ ChildScopeList ZmqScope::child_scopes_ordered()
 
 void ZmqScope::set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered)
 {
-    ///!
+    capnp::MallocMessageBuilder request_builder;
+    auto request = make_request_(request_builder, "set_child_scopes_ordered");
+
+    auto in_params = request.initInParams().getAs<capnproto::Scope::SetChildScopesOrderedRequest>();
+    auto list = in_params.initChildScopesOrdered(child_scopes_ordered.size());
+
+    int i = 0;
+    for (auto const& child_scope : child_scopes_ordered)
+    {
+        list[i].setId(child_scope.id);
+        list[i].setEnabled(child_scope.enabled);
+        ++i;
+    }
+
+    auto future = mw_base()->oneway_pool()->submit([&] { return this->invoke_oneway_(request_builder); });
+    future.get();
 }
 
 bool ZmqScope::debug_mode()
