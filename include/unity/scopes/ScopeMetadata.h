@@ -213,6 +213,12 @@ public:
     */
     std::vector<std::string> keywords() const;
 
+    /**
+    \brief Check if this scope is an aggregator.
+    \return True if this scope is an aggregator.
+    */
+    bool is_aggregator() const;  // optional (default = false)
+
 private:
     ScopeMetadata(std::unique_ptr<internal::ScopeMetadataImpl>);           // Instantiable only by ScopeMetadataImpl
     std::unique_ptr<internal::ScopeMetadataImpl> p;

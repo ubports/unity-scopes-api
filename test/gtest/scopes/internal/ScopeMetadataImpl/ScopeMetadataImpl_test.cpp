@@ -134,6 +134,9 @@ TEST(ScopeMetadataImpl, basic)
     // when "version" is not set, 0 is returned
     EXPECT_EQ(0, m.version());
 
+    // when "is_aggregator" is not set, false is returned
+    EXPECT_FALSE(m.is_aggregator());
+
     // Check that the copy has the same values as the original
     EXPECT_EQ("scope_id", mi2->scope_id());
     EXPECT_EQ("identity", mi2->proxy()->identity());
@@ -163,6 +166,7 @@ TEST(ScopeMetadataImpl, basic)
     mi2->set_location_data_needed(true);
     mi2->set_child_scope_ids(vector<string>{"abc", "def"});
     mi2->set_keywords(vector<string>{"music", "video", "news"});
+    mi2->set_is_aggregator(true);
 
     // Make another copy, so we get coverage on the entire copy constructor
     unique_ptr<ScopeMetadataImpl> mi3(new ScopeMetadataImpl(*mi2));
@@ -177,6 +181,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_TRUE(m.location_data_needed());
     EXPECT_EQ((vector<string>{"abc", "def"}), m.child_scope_ids());
     EXPECT_EQ((vector<string>{"music", "video", "news"}), m.keywords());
+    EXPECT_TRUE(m.is_aggregator());
 
     // Make another value
     unique_ptr<ScopeMetadataImpl> ti(new ScopeMetadataImpl(&mw));
@@ -201,6 +206,7 @@ TEST(ScopeMetadataImpl, basic)
     ti->set_location_data_needed(true);
     ti->set_child_scope_ids(vector<string>{"tmp abc", "tmp def"});
     ti->set_keywords(vector<string>{"music", "video"});
+    ti->set_is_aggregator(true);
 
     // Check impl assignment operator
     ScopeMetadataImpl ci(&mw);
@@ -224,6 +230,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ((vector<string>{"tmp abc", "tmp def"}), ci.child_scope_ids());
     EXPECT_EQ(99, ci.version());
     EXPECT_EQ((vector<string>{"music", "video"}), ci.keywords());
+    EXPECT_TRUE(ci.is_aggregator());
 
     // Check public assignment operator
     auto tmp = ScopeMetadataImpl::create(move(ti));
@@ -247,6 +254,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_TRUE(m.location_data_needed());
     EXPECT_EQ((vector<string>{"tmp abc", "tmp def"}), m.child_scope_ids());
     EXPECT_EQ((vector<string>{"music", "video"}), m.keywords());
+    EXPECT_TRUE(m.is_aggregator());
 
     // Self-assignment
     tmp = tmp;
@@ -269,6 +277,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_TRUE(tmp.location_data_needed());
     EXPECT_EQ((vector<string>{"tmp abc", "tmp def"}), tmp.child_scope_ids());
     EXPECT_EQ((vector<string>{"music", "video"}), tmp.keywords());
+    EXPECT_TRUE(tmp.is_aggregator());
 
     // Copy constructor
     ScopeMetadata tmp2(tmp);
@@ -291,6 +300,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_TRUE(tmp2.location_data_needed());
     EXPECT_EQ((vector<string>{"tmp abc", "tmp def"}), tmp2.child_scope_ids());
     EXPECT_EQ((vector<string>{"music", "video"}), tmp2.keywords());
+    EXPECT_TRUE(tmp2.is_aggregator());
 }
 
 TEST(ScopeMetadataImpl, serialize)
@@ -323,11 +333,12 @@ TEST(ScopeMetadataImpl, serialize)
     mi->set_location_data_needed(false);
     mi->set_child_scope_ids({"com.foo.bar", "com.foo.baz"});
     mi->set_keywords({"news", "games"});
+    mi->set_is_aggregator(false);
 
     // Check that serialize() sets the map values correctly
     auto m = ScopeMetadataImpl::create(move(mi));
     auto var = m.serialize();
-    EXPECT_EQ(18u, var.size());
+    EXPECT_EQ(19u, var.size());
     EXPECT_EQ("scope_id", var["scope_id"].get_string());
     EXPECT_EQ("display_name", var["display_name"].get_string());
     EXPECT_EQ("description", var["description"].get_string());
@@ -351,6 +362,7 @@ TEST(ScopeMetadataImpl, serialize)
     EXPECT_EQ(2u, var["keywords"].get_array().size());
     EXPECT_EQ("news", var["keywords"].get_array()[0].get_string());
     EXPECT_EQ("games", var["keywords"].get_array()[1].get_string());
+    EXPECT_FALSE(var["is_aggregator"].get_bool());
 
     // Make another instance from the VariantMap and check its fields
     ScopeMetadataImpl c(var, &mw);
@@ -378,6 +390,7 @@ TEST(ScopeMetadataImpl, serialize)
     EXPECT_EQ(2u, c.keywords().size());
     EXPECT_EQ("news", c.keywords()[0]);
     EXPECT_EQ("games", c.keywords()[1]);
+    EXPECT_FALSE(c.is_aggregator());
 }
 
 TEST(ScopeMetadataImpl, serialize_exceptions)
@@ -594,6 +607,7 @@ TEST(ScopeMetadataImpl, deserialize_exceptions)
     m["appearance_attributes"] = appearance;
     m["results_ttl_type"] = 0;
     m["location_data_needed"] = true;
+    m["is_aggregator"] = true;
 
     ScopeMetadataImpl mi(m, &mw);
     mi.deserialize(m);
@@ -612,4 +626,5 @@ TEST(ScopeMetadataImpl, deserialize_exceptions)
     EXPECT_EQ(appearance, mi.appearance_attributes());
     EXPECT_EQ(ScopeMetadata::ResultsTtlType::None, mi.results_ttl_type());
     EXPECT_TRUE(mi.location_data_needed());
+    EXPECT_TRUE(mi.is_aggregator());
 }

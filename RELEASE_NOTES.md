@@ -3,7 +3,8 @@ Release notes
 
 Changes in version 0.6.10
 =========================
-  - Renamed "Tags" scope .ini option to "Keywords"
+  - Renamed "Tags" scope .ini option to "Keywords".
+  - Added support for IsAggregator scope .ini option.
 
 Changes in version 0.6.9
 ========================

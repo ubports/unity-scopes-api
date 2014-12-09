@@ -20,6 +20,7 @@ DebugMode = true
 Version = 1
 ChildScopes = com.foo.bar;com.foo.bar2;com.foo.boo
 Keywords = foo;bar
+IsAggregator = true
 
 [Appearance]
 arbitrary_key = true

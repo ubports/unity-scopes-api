@@ -62,6 +62,8 @@ TEST(ScopeConfig, basic)
         EXPECT_EQ("foo", keywords[0]);
         EXPECT_EQ("bar", keywords[1]);
 
+        EXPECT_TRUE(cfg.is_aggregator());
+
         auto attrs = cfg.appearance_attributes();
         EXPECT_EQ(5, attrs.size());
         EXPECT_TRUE(attrs["arbitrary_key"].get_bool());
@@ -93,6 +95,7 @@ TEST(ScopeConfig, basic)
         EXPECT_FALSE(cfg.location_data_needed());
         EXPECT_FALSE(cfg.debug_mode());
         EXPECT_EQ(0, cfg.version());
+        EXPECT_FALSE(cfg.is_aggregator());
 
         EXPECT_EQ(0, cfg.appearance_attributes().size());
 
