@@ -22,7 +22,7 @@ from wsgiref.simple_server import make_server
 import sys
 
 preview1_complete = False
-outfile = '/tmp/wtf'
+outfile = ''
 
 def response(environ, start_response):
     global preview1_complete, outfile
