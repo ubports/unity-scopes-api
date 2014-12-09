@@ -72,6 +72,44 @@ In the template, a manifest such as the following is used:
 }
 \endcode
 
+\subsubsection multiarch Multi-arch click packages
+The search path for the shared library inside a click package is as follows:
+
+<ul>
+<li>${SCOPE_DIRECTORY}/${DEB_HOST_MULTIARCH}/lib${SCOPE_NAME}.so
+<li>${SCOPE_DIRECTORY}/${DEB_HOST_MULTIARCH}/${SCOPE_NAME}.so
+<li>${SCOPE_DIRECTORY}/${DEB_HOST_MULTIARCH}/scope.so
+<li>${SCOPE_DIRECTORY}/lib${SCOPE_NAME}.so
+<li>${SCOPE_DIRECTORY}/${SCOPE_NAME}.so
+<li>${SCOPE_DIRECTORY}/scope.so
+</ul>
+
+Therefore click packges can be made multi-arch aware by compiling your targets for multiple architectures, and creating, e.g. the
+following directory structure:
+
+\code
+├── testscopeA.ini
+├── testscopeA-settings.ini
+├── x86_64-linux-gnu
+|   └── libtestscopeA.so
+└── arm-linux-gnueabihf
+    └── libtestscopeA.so
+\endcode
+
+You must also update the manifest file 'architecture' property to enumerate the included architectures, as follows:
+
+\code
+    "architecture": ["armhf", "amd64"]
+\endcode 
+
+\subsubsection multiarch Multi-arch scope runner
+Similarly to the shared libraries, when a relative path is provided the search path for custom scope runners is as follows:
+
+<ul>
+<li>${SCOPE_DIRECTORY}/${DEB_HOST_MULTIARCH}/${CUSTOM_SCOPERUNNER}
+<li>${SCOPE_DIRECTORY}/${CUSTOM_SCOPERUNNER}
+</ul>
+
 \subsubsection apparmor Apparmor manifest
 
 Scopes that are packaged using click are inherently untrusted and must be confined. At present, there is only a single type of scope that can be defined:
