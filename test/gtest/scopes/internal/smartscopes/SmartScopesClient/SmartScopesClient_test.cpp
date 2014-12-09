@@ -23,6 +23,7 @@
 #include <unity/scopes/OptionSelectorFilter.h>
 
 #include <unity/UnityExceptions.h>
+#include <unity/util/FileIO.h>
 #include <boost/filesystem/operations.hpp>
 #include <fstream>
 
@@ -58,7 +59,7 @@ public:
 
     bool grep_string(std::string const &s)
     {
-        std::ifstream str(FAKE_SSS_LOG, std::ifstream::in);
+        std::stringstream str(unity::util::read_text_file(FAKE_SSS_LOG));
         while (str)
         {
             char tmp[1024];

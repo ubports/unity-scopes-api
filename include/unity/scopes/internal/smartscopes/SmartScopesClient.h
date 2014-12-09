@@ -222,7 +222,6 @@ private:
 
     void write_cache(std::string const& scopes_json);
     std::string read_cache();
-    std::string read_partner_id() const;
 
     std::string stringify_settings(VariantMap const& settings);
 

@@ -23,6 +23,7 @@
 
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
+#include <unity/util/FileIO.h>
 
 #include <algorithm>
 #include <array>
@@ -151,21 +152,6 @@ std::string SmartScopesClient::url()
     return url_;
 }
 
-std::string SmartScopesClient::read_partner_id() const
-{
-    std::ifstream str(partner_file_, std::ifstream::in);
-    if (str.good())
-    {
-        char buf[255];
-        str.getline(buf, 255);
-        if (str.gcount() > 0)
-        {
-            return std::string(buf);
-        }
-    }
-    return "";
-}
-
 // returns false if cache used
 bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scopes, std::string const& locale, bool caching_enabled)
 {
@@ -187,13 +173,20 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
         BOOST_LOG_SEV(logger_, Logger::Info)
             << "SmartScopesClient.get_remote_scopes(): GET " << remote_scopes_uri.str();
 
-        auto partner_id = read_partner_id();
         HttpHeaders headers;
-        if (!partner_id.empty())
+        try
         {
-            std::string const user_agent_hdr = "partner_id=" + http_client_->to_percent_encoding(partner_id);
-            headers.push_back(std::make_pair("User-Agent", user_agent_hdr));
-            BOOST_LOG_SEV(logger_, Logger::Info) << "User agent: " << user_agent_hdr;
+            auto partner_id = util::read_text_file(partner_file_);
+            if (!partner_id.empty())
+            {
+                std::string const user_agent_hdr = "partner_id=" + http_client_->to_percent_encoding(partner_id);
+                headers.push_back(std::make_pair("User-Agent", user_agent_hdr));
+                BOOST_LOG_SEV(logger_, Logger::Info) << "User agent: " << user_agent_hdr;
+            }
+        }
+        catch (std::exception const& e)
+        {
+            BOOST_LOG_SEV(logger_, Logger::Error) << "SmartScopesClient.get_remote_scopes(): failed to read " << partner_file_ << ": " << e.what();
         }
 
         HttpResponseHandle::SPtr response = http_client_->get(remote_scopes_uri.str(), [&response_str](std::string const& replyLine) {
