@@ -88,9 +88,15 @@ BOOST_LOG_SEV(logger(), Logger::Info) << "message 5 ";
         RuntimeConfig config(configfile);
 
         // Now that we have the config, change the logger to log to a file.
-        logger_->set_log_file(config.log_directory() + "/" + log_file_basename,
-                              config.max_log_file_size(),
-                              config.max_log_dir_size());
+        // If log_dir was explicitly set to the empty string, continue
+        // logging to std::clog.
+        string log_dir = config.log_directory();
+        if (!log_dir.empty())
+        {
+            logger_->set_log_file(config.log_directory() + "/" + log_file_basename,
+                                  config.max_log_file_size(),
+                                  config.max_log_dir_size());
+        }
 
         string default_middleware = config.default_middleware();
         string middleware_configfile = config.default_middleware_configfile();

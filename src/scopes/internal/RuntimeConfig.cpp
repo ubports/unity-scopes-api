@@ -19,6 +19,7 @@
 #include <unity/scopes/internal/RuntimeConfig.h>
 
 #include <unity/scopes/internal/DfltConfig.h>
+#include <unity/scopes/ScopeExceptions.h>
 
 #include <boost/filesystem.hpp>
 #include <unity/UnityExceptions.h>
@@ -142,9 +143,14 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
                 throw_ex("No ConfigDir configured and failed to get default");
             }
         }
-        log_directory_ = get_optional_string(runtime_config_group, log_dir_key);
-        if (log_directory_.empty())
+        try
         {
+            // If explicitly set to the empty string, we succeed here.
+            log_directory_ = parser()->get_string(runtime_config_group, log_dir_key);
+        }
+        catch (LogicException const&)
+        {
+            // Use default value.
             try
             {
                 log_directory_ = default_log_directory();

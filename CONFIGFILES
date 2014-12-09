@@ -130,6 +130,8 @@ The following keys are recognized:
 - LogDir
 
   The parent directory under which the run time writes the scope configration files.
+  Setting this value explicitly to the empty string disables file logging and forces
+  all log entries to go to stderr.
 
   The default value is $HOME/.config/unity-scopes.
 
