@@ -60,6 +60,8 @@ interface Scope
     QueryCtrl* preview(ValueDict result, ValueDict hints, Reply* replyProxy);
     QueryCtrl* perform_action(ValueDict result, ValueDict hints, string action_id, Reply* replyProxy);
     QueryCtrl* activate(ValueDict result, ValueDict hints, Reply* replyProxy);
+    ChildScopeList child_scopes_ordered();
+    void set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered);
     bool debug_mode();
 };
 
@@ -73,6 +75,8 @@ ScopeI::ScopeI(ScopeObjectBase::SPtr const& so) :
                       { "preview", bind(&ScopeI::preview_, this, ph::_1, ph::_2, ph::_3) },
                       { "activate", bind(&ScopeI::activate_, this, ph::_1, ph::_2, ph::_3) },
                       { "perform_action", bind(&ScopeI::perform_action_, this, ph::_1, ph::_2, ph::_3) },
+                      { "child_scopes_ordered", bind(&ScopeI::child_scopes_ordered_, this, ph::_1, ph::_2, ph::_3) },
+                      { "set_child_scopes_ordered", bind(&ScopeI::set_child_scopes_ordered_, this, ph::_1, ph::_2, ph::_3) },
                       { "debug_mode", bind(&ScopeI::debug_mode_, this, ph::_1, ph::_2, ph::_3) }
     })
 {
@@ -192,6 +196,20 @@ void ScopeI::preview_(Current const& current,
     p.setEndpoint(ctrl_proxy->endpoint().c_str());
     p.setIdentity(ctrl_proxy->identity().c_str());
     p.setCategory(ctrl_proxy->target_category().c_str());
+}
+
+void ScopeI::child_scopes_ordered_(Current const& current,
+                      capnp::AnyPointer::Reader& in_params,
+                      capnproto::Response::Builder& r)
+{
+    ///!
+}
+
+void ScopeI::set_child_scopes_ordered_(Current const& current,
+                      capnp::AnyPointer::Reader& in_params,
+                      capnproto::Response::Builder& r)
+{
+    ///!
 }
 
 void ScopeI::debug_mode_(Current const&,

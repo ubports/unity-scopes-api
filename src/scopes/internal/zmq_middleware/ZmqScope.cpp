@@ -201,7 +201,7 @@ QueryCtrlProxy ZmqScope::preview(VariantMap const& result, VariantMap const& hin
     return make_shared<QueryCtrlImpl>(p, reply_proxy, mw_base()->runtime()->logger());
 }
 
-ChildScopeList ZmqScope::child_scopes_ordered()
+ChildScopeList ZmqScope::child_scopes_ordered() const
 {
     ///!
 }

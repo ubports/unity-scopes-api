@@ -453,6 +453,15 @@ public:
         return nullptr;
     }
 
+    virtual ChildScopeList child_scopes_ordered() const override
+    {
+        return ChildScopeList();
+    }
+
+    virtual void set_child_scopes_ordered(ChildScopeList const&) override
+    {
+    }
+
     virtual bool debug_mode() const override
     {
         return false;

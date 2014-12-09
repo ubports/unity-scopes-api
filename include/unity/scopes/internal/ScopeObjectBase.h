@@ -22,6 +22,7 @@
 #include <unity/scopes/internal/InvokeInfo.h>
 #include <unity/scopes/internal/MWQueryCtrlProxyFwd.h>
 #include <unity/scopes/internal/MWReplyProxyFwd.h>
+#include <unity/scopes/ChildScope.h>
 #include <unity/scopes/Result.h>
 #include <unity/scopes/Variant.h>
 
@@ -65,6 +66,9 @@ public:
                                      ActionMetadata const& hints,
                                      MWReplyProxy const& reply,
                                      InvokeInfo const& info) = 0;
+
+    virtual ChildScopeList child_scopes_ordered() const = 0;
+    virtual void set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered) = 0;
 
     virtual bool debug_mode() const = 0;
 };
