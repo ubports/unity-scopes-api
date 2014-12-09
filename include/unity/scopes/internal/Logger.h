@@ -95,11 +95,11 @@ private:
 
     std::atomic<Severity> severity_;
 
-    typedef boost::log::sinks::synchronous_sink<boost::log::sinks::text_ostream_backend> ClogSinkT;
+    typedef boost::log::sinks::asynchronous_sink<boost::log::sinks::text_ostream_backend> ClogSinkT;
     typedef boost::shared_ptr<ClogSinkT> ClogSinkPtr;
     ClogSinkPtr clog_sink_;
 
-    typedef boost::log::sinks::synchronous_sink<boost::log::sinks::text_file_backend> FileSinkT;
+    typedef boost::log::sinks::asynchronous_sink<boost::log::sinks::text_file_backend> FileSinkT;
     typedef boost::shared_ptr<FileSinkT> FileSinkPtr;
     FileSinkPtr file_sink_;
 

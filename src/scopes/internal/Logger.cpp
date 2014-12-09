@@ -106,10 +106,14 @@ Logger::~Logger()
     if (clog_sink_)
     {
         logging::core::get()->remove_sink(clog_sink_);
+        clog_sink_->stop();
+        clog_sink_->flush();
     }
     else
     {
         logging::core::get()->remove_sink(file_sink_);
+        file_sink_->stop();
+        file_sink_->flush();
     }
 }
 

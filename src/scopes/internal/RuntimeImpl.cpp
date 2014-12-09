@@ -59,7 +59,7 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
 {
     try
     {
-        lock_guard<mutex> lock(mutex_);
+        lock_guard<mutex> lock(mutex_);  // TODO: shouldn't be necessary.
 
         destroyed_ = false;
 
@@ -451,7 +451,7 @@ void RuntimeImpl::run_scope(ScopeBase* scope_base,
 
         promise.set_value();
         mw->wait_for_shutdown();
-        cleanup_scope.dealloc();   // Causes ScopeBase::run() to terminate if the scope is properly written
+        cleanup_scope.dealloc();   // Causes ScopeBase::run() to return if the scope is properly written
 
         {
             // mw is now shut down, so we need a separate one to send the state update to the registry.
