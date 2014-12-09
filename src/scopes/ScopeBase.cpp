@@ -102,9 +102,14 @@ unity::scopes::VariantMap ScopeBase::settings() const
     return p->settings();
 }
 
+ChildScopeList ScopeBase::child_scopes() const
+{
+    return p->child_scopes();
+}
+
 ChildScopeList ScopeBase::child_scopes_ordered() const
 {
-    return p->child_scopes_ordered();
+    return p->child_scopes_ordered(child_scopes());
 }
 
 void ScopeBase::set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered)

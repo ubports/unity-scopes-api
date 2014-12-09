@@ -170,7 +170,12 @@ VariantMap ScopeBaseImpl::settings() const
     return db_ ? db_->settings() : VariantMap();
 }
 
-ChildScopeList ScopeBaseImpl::child_scopes_ordered() const
+ChildScopeList ScopeBaseImpl::child_scopes() const
+{
+    ///!
+}
+
+ChildScopeList ScopeBaseImpl::child_scopes_ordered(ChildScopeList const& child_scopes) const
 {
     ///!
 }
