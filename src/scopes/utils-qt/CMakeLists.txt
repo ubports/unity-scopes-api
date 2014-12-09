@@ -11,15 +11,6 @@ set(SRC
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-add_definitions(
-  -fno-permissive
-  -std=c++11
-  -pedantic
-  -Wall
-  -Wextra
-  -fPIC
-)
-
 find_package(PkgConfig REQUIRED)
 find_package(Threads REQUIRED)
 

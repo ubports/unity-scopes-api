@@ -151,6 +151,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wcast-align -Wcast-qual -Wctor-dtor-pri
 # TODO: Once AbstractScopeBase gets its virtual destructor, turn on the line below (bug #1360266).
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wnon-virtual-dtor")
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic -Wall -Wextra") # Can't use -std=c++11 with C compiler
 
 # -fno-permissive causes warnings with clang, so we only enable it for gcc
