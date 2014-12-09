@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <unity/scopes/ChildScope.h>
 #include <unity/scopes/RegistryProxyFwd.h>
 #include <unity/scopes/Variant.h>
 
@@ -59,6 +60,8 @@ public:
     std::shared_ptr<unity::scopes::internal::SettingsDB> settings_db() const;
     void set_settings_db(std::shared_ptr<unity::scopes::internal::SettingsDB> const& db);
     unity::scopes::VariantMap settings() const;
+
+    unity::scopes::ChildScopeList child_scopes_ordered() const;
 
 private:
     std::string scope_directory_;

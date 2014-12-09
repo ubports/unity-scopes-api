@@ -283,6 +283,16 @@ QueryCtrlProxy ScopeImpl::preview(Result const& result,
     return ctrl;
 }
 
+ChildScopeList ScopeImpl::child_scopes_ordered()
+{
+    return fwd()->child_scopes_ordered();
+}
+
+void ScopeImpl::set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered)
+{
+    fwd()->set_child_scopes_ordered(child_scopes_ordered);
+}
+
 ScopeProxy ScopeImpl::create(MWScopeProxy const& mw_proxy, RuntimeImpl* runtime, std::string const& scope_id)
 {
     return make_shared<ScopeImpl>(mw_proxy, runtime, scope_id);

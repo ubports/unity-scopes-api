@@ -102,6 +102,11 @@ unity::scopes::VariantMap ScopeBase::settings() const
     return p->settings();
 }
 
+unity::scopes::ChildScopeList ScopeBase::child_scopes_ordered() const
+{
+    return p->child_scopes_ordered();
+}
+
 } // namespace scopes
 
 } // namespace unity

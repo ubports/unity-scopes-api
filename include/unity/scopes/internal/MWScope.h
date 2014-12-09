@@ -21,8 +21,9 @@
 #include <unity/scopes/internal/MWObjectProxy.h>
 #include <unity/scopes/internal/MWReplyProxyFwd.h>
 #include <unity/scopes/internal/MWScopeProxyFwd.h>
-#include <unity/scopes/QueryCtrlProxyFwd.h>
 #include <unity/scopes/CannedQuery.h>
+#include <unity/scopes/ChildScope.h>
+#include <unity/scopes/QueryCtrlProxyFwd.h>
 #include <unity/scopes/Variant.h>
 
 namespace unity
@@ -43,6 +44,8 @@ public:
     virtual QueryCtrlProxy activate(VariantMap const& result, VariantMap const& hints, MWReplyProxy const& reply) = 0;
     virtual QueryCtrlProxy perform_action(VariantMap const& result, VariantMap const& hints, std::string const& widget_id, std::string const& action_id, MWReplyProxy const& reply) = 0;
     virtual QueryCtrlProxy preview(VariantMap const& result, VariantMap const& hints, MWReplyProxy const& reply) = 0;
+    virtual ChildScopeList child_scopes_ordered() = 0;
+    virtual void set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered) = 0;
     virtual bool debug_mode() = 0;
 
 protected:

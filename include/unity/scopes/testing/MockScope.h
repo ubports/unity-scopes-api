@@ -63,6 +63,10 @@ public:
     MOCK_METHOD3(preview, QueryCtrlProxy(unity::scopes::Result const&,
                                          ActionMetadata const&,
                                          PreviewListenerBase::SPtr const&));
+
+    MOCK_METHOD0(child_scopes_ordered, ChildScopeList());
+
+    MOCK_METHOD1(set_child_scopes_ordered, void(ChildScopeList const&));
 };
 
 /// @endcond

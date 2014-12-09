@@ -18,9 +18,8 @@
 
 #pragma once
 
-#include <unity/scopes/ScopeMetadata.h>
-
 #include <list>
+#include <string>
 
 namespace unity
 {
@@ -42,8 +41,8 @@ typedef std::list<ChildScope> ChildScopeList;
 
 struct ChildScope
 {
-    ScopeMetadata metadata; ///< Contains the child scope's metadata.
-    bool enabled;           ///< Holds whether this child scope is aggregated.
+    std::string id; ///< The scope id of this child scope.
+    bool enabled;   ///< Holds whether this child scope is aggregated.
 };
 
 } // namespace scopes

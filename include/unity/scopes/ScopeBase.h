@@ -20,6 +20,7 @@
 
 #include <unity/scopes/AbstractScopeBase.h>
 #include <unity/scopes/ActionMetadata.h>
+#include <unity/scopes/ChildScope.h>
 #include <unity/scopes/SearchMetadata.h>
 #include <unity/scopes/Version.h>
 
@@ -329,6 +330,19 @@ public:
     \throws LogicException if called from the constructor of this instance.
     */
     virtual VariantMap settings() const final;
+
+    /**
+    \brief Returns a list of child scopes aggregated by this scope.///!
+
+    The scope author must ensure that the list returned by this method contains all scopes
+    that this aggregator may collect results from. This list may contain scopes that are
+    not currently installed and are optional for proper functioning of this scope.
+
+    Note: Only an aggregator scope should implement this method.
+
+    \return The list of child scopes aggregated by this scope.
+    */
+    virtual ChildScopeList child_scopes_ordered() const final;
 
 protected:
     /// @cond

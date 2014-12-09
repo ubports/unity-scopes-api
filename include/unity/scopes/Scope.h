@@ -19,6 +19,7 @@
 #pragma once
 
 #include <unity/scopes/ActivationListenerBase.h>
+#include <unity/scopes/ChildScope.h>
 #include <unity/scopes/Object.h>
 #include <unity/scopes/PreviewListenerBase.h>
 #include <unity/scopes/QueryCtrlProxyFwd.h>
@@ -36,7 +37,6 @@ class Result;
 class FilterState;
 class ActionMetadata;
 class SearchMetadata;
-struct ChildScope;
 
 /**
 \brief Allows queries, preview requests, and activation requests to be sent to a scope.
@@ -134,18 +134,11 @@ public:
                                    ActionMetadata const& metadata,
                                    PreviewListenerBase::SPtr const& reply) = 0;
 
-    /**
-    \brief Returns a list of child scopes aggregated by this scope.
+    ///! Doc
+    virtual ChildScopeList child_scopes_ordered() = 0;
 
-    The scope author must ensure that the list returned by this method contains all scopes
-    that this aggregator may collect results from. This list may contain scopes that are
-    not currently installed and are optional for proper functioning of this scope.
-
-    Note: Only an aggregator scope should implement this method.
-
-    \return The list of child scopes aggregated by this scope.
-    */
-    //virtual std::list<ChildScope> child_scopes_ordered() = 0;
+    ///! Doc
+    virtual void set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered) = 0;
 
     /**
     \brief Destroys a Scope.
