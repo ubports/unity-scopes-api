@@ -52,6 +52,7 @@ static const std::string c_preview_resource = "/preview";
 
 static const std::string c_scopes_cache_dir = homedir() + "/.cache/unity-scopes/";
 static const std::string c_scopes_cache_filename = "remote-scopes.json";
+static const std::string c_partner_id_file = "/custom/partner-id";
 
 using namespace unity::scopes;
 using namespace unity::scopes::internal::smartscopes;
@@ -116,6 +117,11 @@ SmartScopesClient::SmartScopesClient(HttpClientInterface::SPtr http_client,
     , query_counter_(0)
     , partner_file_(partner_id_path)
 {
+    if (partner_file_.size() == 0)
+    {
+        partner_file_ = c_partner_id_file;
+    }
+
     // initialise url_
     reset_url(url);
 

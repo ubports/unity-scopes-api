@@ -167,8 +167,8 @@ public:
     SmartScopesClient(HttpClientInterface::SPtr http_client,
                       JsonNodeInterface::SPtr json_node,
                       boost::log::sources::severity_channel_logger_mt<>& logger_,
-                      std::string const& url = "",
-                      std::string const& partner_id_path = "/custom/partner-id"); // detect url
+                      std::string const& url = "", // detect url
+                      std::string const& partner_id_path = "");
 
     virtual ~SmartScopesClient();
 

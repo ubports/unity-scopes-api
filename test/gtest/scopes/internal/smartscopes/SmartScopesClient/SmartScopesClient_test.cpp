@@ -145,7 +145,7 @@ TEST_F(SmartScopesClientTest, remote_scopes)
     EXPECT_EQ("news", scopes[2].keywords[2]);
     EXPECT_EQ("games", scopes[2].keywords[3]);
 
-    EXPECT_TRUE(grep_string("/remote-scopes : partner_id=PartnerString"));
+    EXPECT_TRUE(grep_string("/remote-scopes : partner_id=Partner%20String"));
 }
 
 TEST_F(SmartScopesClientTest, remote_scopes_no_partner)
