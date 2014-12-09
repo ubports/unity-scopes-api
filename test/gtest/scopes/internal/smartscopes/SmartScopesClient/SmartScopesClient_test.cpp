@@ -88,8 +88,6 @@ TEST_F(SmartScopesClientTest, remote_scopes)
     EXPECT_THROW(ssc_->get_remote_scopes(scopes, "test_FAIL", false), std::exception);
     ASSERT_EQ(0, scopes.size());
 
-    EXPECT_TRUE(grep_string("/remote-scopes : partner_id=PartnerString"));
-
     // now try an empty locale
     EXPECT_TRUE(ssc_->get_remote_scopes(scopes, "", false));
     ASSERT_EQ(4u, scopes.size());
@@ -146,6 +144,16 @@ TEST_F(SmartScopesClientTest, remote_scopes)
     EXPECT_EQ("video", scopes[2].keywords[1]);
     EXPECT_EQ("news", scopes[2].keywords[2]);
     EXPECT_EQ("games", scopes[2].keywords[3]);
+
+    EXPECT_TRUE(grep_string("/remote-scopes : partner_id=PartnerString"));
+}
+
+TEST_F(SmartScopesClientTest, remote_scopes_no_partner)
+{
+    std::vector<RemoteScope> scopes;
+    auto ssc_no_partner_ = std::make_shared<SmartScopesClient>(http_client_, json_node_, test_logger::get(), sss_url_, "/this/file/doesnt/exist");
+    EXPECT_TRUE(ssc_no_partner_->get_remote_scopes(scopes, "", false));
+    EXPECT_FALSE(grep_string("/remote-scopes : partner_id"));
 }
 
 TEST_F(SmartScopesClientTest, search)
