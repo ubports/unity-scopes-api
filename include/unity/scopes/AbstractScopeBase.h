@@ -40,6 +40,7 @@ class AbstractScopeBase
 {
 public:
 /// @cond
+    virtual ~AbstractScopeBase() = default;
     virtual void start(std::string const& scope_id) = 0;
     virtual void stop() = 0;
     virtual void run() = 0;
@@ -55,6 +56,8 @@ public:
     virtual std::string tmp_directory() const = 0;
     virtual unity::scopes::RegistryProxy registry() const = 0;
     virtual VariantMap settings() const = 0;
+    virtual ChildScopeList child_scopes_ordered() const = 0;
+    virtual void set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered) = 0;
 /// @endcond
 };
 

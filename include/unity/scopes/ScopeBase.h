@@ -342,7 +342,7 @@ public:
 
     \return The list of child scopes aggregated by this scope.
     */
-    virtual ChildScopeList child_scopes_ordered() const final;
+    virtual ChildScopeList child_scopes_ordered() const;
 
     ///! Doc
     virtual void set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered) final;
