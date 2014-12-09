@@ -19,7 +19,11 @@
 #include <unity/scopes/internal/RuntimeConfig.h>
 
 #include <unity/scopes/internal/DfltConfig.h>
+
+#include <boost/filesystem.hpp>
 #include <unity/UnityExceptions.h>
+
+#include <sys/stat.h>
 
 #include <stdlib.h>
 
@@ -269,7 +273,12 @@ string RuntimeConfig::default_log_directory()
     {
         throw ResourceException("RuntimeConfig::default_log_directory(): $HOME not set");
     }
-    return string(home) + "/.cache/unity-scopes";
+    string dir = string(home) + "/.cache/unity-scopes/logs";
+
+    boost::system::error_code ec;
+    !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700);
+
+    return dir;
 }
 
 } // namespace internal

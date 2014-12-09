@@ -84,6 +84,11 @@ BOOST_LOG_SEV(logger(), Logger::Info) << "message 5 ";
         // Create the middleware factory and get the registry identity and config filename.
         runtime_configfile_ = configfile;
         RuntimeConfig config(configfile);
+
+        // Now that we have the config, change the logger to log to a file.
+        string log_dir = config.log_directory();
+        logger_->set_log_file(log_dir + "/" + scope_id_);
+
         string default_middleware = config.default_middleware();
         string middleware_configfile = config.default_middleware_configfile();
         middleware_factory_.reset(new MiddlewareFactory(this));

@@ -106,6 +106,8 @@ private:
     typedef std::pair<boost::log::sources::severity_channel_logger_mt<>, std::atomic_bool> ChannelData;
     typedef std::unordered_map<std::string, ChannelData> ChannelMap;
     ChannelMap channel_loggers_;  // immutable
+
+    std::mutex mutex_;  // Protects clog_sink_ and file_sink_
 };
 
 } // namespace internal

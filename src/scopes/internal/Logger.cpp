@@ -93,6 +93,7 @@ Logger::Logger(string const& scope_id)
     clog_sink_->set_formatter(bind(&Logger::formatter, this, ph::_1, ph::_2));
     boost::shared_ptr<std::ostream> console_stream(&std::clog, boost::empty_deleter());
     clog_sink_->locked_backend()->add_stream(console_stream);
+    clog_sink_->locked_backend()->auto_flush(true);
     logging::core::get()->add_sink(clog_sink_);
 
     set_severity_threshold(severity_);
@@ -100,6 +101,8 @@ Logger::Logger(string const& scope_id)
 
 Logger::~Logger()
 {
+    lock_guard<mutex> lock(mutex_);
+
     if (clog_sink_)
     {
         logging::core::get()->remove_sink(clog_sink_);
@@ -112,11 +115,12 @@ Logger::~Logger()
 
 Logger::operator src::severity_channel_logger_mt<>&()
 {
-    return logger_;
+    return logger_;  // No lock needed, immutable
 }
 
 src::severity_channel_logger_mt<>& Logger::operator()(Channel c)
 {
+    // No lock needed: channel_loggers_ is immutable, and the boolean is atomic.
     return channel_loggers_[channel_names[c]].first;
 }
 
@@ -133,26 +137,34 @@ void Logger::set_log_file(string const& path)
     namespace ph = std::placeholders;
 
     FileSinkPtr s = boost::make_shared<FileSinkT>(
-                        keywords::file_name = path + "_%N.log",
-                        keywords::rotation_size = 5 * 1024 * 1024,
-                        keywords::time_based_rotation = sinks::file::rotation_at_time_point(12, 0, 0));
-    if (clog_sink_)
+                        keywords::file_name = path + ".log",
+                        keywords::rotation_size = 512 * 1024);
     {
-        logging::core::get()->remove_sink(clog_sink_);
+        lock_guard<mutex> lock(mutex_);
+
+        if (clog_sink_)
+        {
+            logging::core::get()->remove_sink(clog_sink_);
+            clog_sink_ = nullptr;
+        }
+        else
+        {
+            logging::core::get()->remove_sink(file_sink_);
+        }
+
+        file_sink_ = s;
+        file_sink_->locked_backend()->auto_flush(true);
+        file_sink_->set_formatter(bind(&Logger::formatter, this, ph::_1, ph::_2));
+        logging::core::get()->add_sink(file_sink_);
     }
-    else
-    {
-        logging::core::get()->remove_sink(file_sink_);
-    }
-    file_sink_ = s;
     set_severity_threshold(severity_);
-    file_sink_->set_formatter(bind(&Logger::formatter, this, ph::_1, ph::_2));
-    logging::core::get()->add_sink(s);
 }
 
 Logger::Severity Logger::set_severity_threshold(Logger::Severity s)
 {
     auto old_s = severity_.exchange(s);
+
+    lock_guard<mutex> lock(mutex_);
 
     auto filter = boost::phoenix::bind(&Logger::filter, this, severity.or_none(), channel.or_none());
     if (clog_sink_)
@@ -170,7 +182,7 @@ Logger::Severity Logger::set_severity_threshold(Logger::Severity s)
 bool Logger::filter(logging::value_ref<int, tag::severity> const& level,
                     logging::value_ref<string, tag::channel> const& channel)
 {
-    if (level.get() < static_cast<int>(severity_))
+    if (level.get() < static_cast<int>(severity_))  // atomic
     {
         return false;
     }
@@ -178,6 +190,7 @@ bool Logger::filter(logging::value_ref<int, tag::severity> const& level,
     {
         return true;
     }
+    // No lock needed: channel_loggers_ is immutable, and the boolean is atomic.
     auto it = channel_loggers_.find(channel.get());
     assert(it != channel_loggers_.end());
     return it->second.second;
