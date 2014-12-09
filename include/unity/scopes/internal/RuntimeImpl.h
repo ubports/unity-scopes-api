@@ -54,6 +54,7 @@ public:
     ThreadPool::SPtr async_pool() const;
     ThreadSafeQueue<std::future<void>>::SPtr future_queue() const;
     boost::log::sources::severity_channel_logger_mt<>& logger() const;
+    boost::log::sources::severity_channel_logger_mt<>& logger(Logger::Channel channel) const;
     void run_scope(ScopeBase* scope_base,
                    std::string const& scope_ini_file,
                    std::promise<void> ready_promise = std::promise<void>());

@@ -78,10 +78,10 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
 
 logger_->set_channel(Logger::IPC, true);
 BOOST_LOG_SEV(logger(), Logger::Info) << "message 1 ";
-BOOST_LOG_SEV((*logger_)(Logger::IPC), Logger::Info) << "hello";
+BOOST_LOG_SEV(logger(Logger::IPC), Logger::Info) << "hello";
 BOOST_LOG_SEV(logger(), Logger::Info) << "message 3 ";
 logger_->set_channel(Logger::IPC, false);
-BOOST_LOG_SEV((*logger_)(Logger::IPC), Logger::Info) << "message 4";
+BOOST_LOG_SEV(logger(Logger::IPC), Logger::Info) << "message 4";
 BOOST_LOG_SEV(logger(), Logger::Info) << "message 5 ";
         // Create the middleware factory and get the registry identity and config filename.
         runtime_configfile_ = configfile;
@@ -312,6 +312,11 @@ ThreadSafeQueue<future<void>>::SPtr RuntimeImpl::future_queue() const
 boost::log::sources::severity_channel_logger_mt<>& RuntimeImpl::logger() const
 {
     return *logger_;
+}
+
+boost::log::sources::severity_channel_logger_mt<>& RuntimeImpl::logger(Logger::Channel channel) const
+{
+    return (*logger_)(channel);
 }
 
 namespace
