@@ -252,15 +252,16 @@ class MyDelegate : public AbstractObject
 {
 };
 
-using namespace std::placeholders;
-
 // Mock servant that does nothing but return success.
 
 class MyServant : public ServantBase
 {
 public:
     MyServant() :
-        ServantBase(make_shared<MyDelegate>(), { { "success_op", bind(&MyServant::success_op, this, _1, _2, _3) } })
+        ServantBase(make_shared<MyDelegate>(), { { "success_op", bind(&MyServant::success_op, this,
+                                                                      placeholders::_1,
+                                                                      placeholders::_2,
+                                                                      placeholders::_3) } })
     {
     }
 
@@ -593,7 +594,10 @@ class ThrowONEServant : public ServantBase
 {
 public:
     ThrowONEServant() :
-        ServantBase(make_shared<MyDelegate>(), { { "ONE_op", bind(&ThrowONEServant::ONE_op, this, _1, _2, _3) } })
+        ServantBase(make_shared<MyDelegate>(), { { "ONE_op", bind(&ThrowONEServant::ONE_op, this,
+                                                                  placeholders::_1,
+                                                                  placeholders::_2,
+                                                                  placeholders::_3) } })
     {
     }
 
@@ -704,7 +708,11 @@ class CountingServant : public ServantBase
 {
 public:
     CountingServant(int delay_millisecs) :
-        ServantBase(make_shared<MyDelegate>(), { { "count_op", bind(&CountingServant::count_op, this, _1, _2, _3) } }),
+        ServantBase(make_shared<MyDelegate>(), { { "count_op", bind(&CountingServant::count_op,
+                                                                    this,
+                                                                    placeholders::_1,
+                                                                    placeholders::_2,
+                                                                    placeholders::_3) } }),
         concurrent_(0),
         max_concurrent_(0),
         num_invocations_(0),
@@ -968,7 +976,11 @@ class UpdaterServant : public ServantBase
 {
 public:
     UpdaterServant(function<void()> func) :
-        ServantBase(make_shared<MyDelegate>(), { { "op", bind(&UpdaterServant::op, this, _1, _2, _3) } }),
+        ServantBase(make_shared<MyDelegate>(), { { "op", bind(&UpdaterServant::op,
+                                                              this,
+                                                              placeholders::_1,
+                                                              placeholders::_2,
+                                                              placeholders::_3) } }),
         func(func)
     {
     }

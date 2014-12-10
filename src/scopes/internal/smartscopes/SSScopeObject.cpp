@@ -16,12 +16,13 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#include <unity/scopes/internal/QueryBaseImpl.h>
 #include <unity/scopes/internal/smartscopes/SSScopeObject.h>
-#include <unity/scopes/internal/smartscopes/SmartScope.h>
-#include <unity/scopes/internal/smartscopes/SSQueryObject.h>
 #include <unity/scopes/internal/MWQuery.h>
 #include <unity/scopes/internal/MWReply.h>
+#include <unity/scopes/internal/QueryBaseImpl.h>
+#include <unity/scopes/internal/RuntimeImpl.h>
+#include <unity/scopes/internal/smartscopes/SmartScope.h>
+#include <unity/scopes/internal/smartscopes/SSQueryObject.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/scopes/ActionMetadata.h>
 #include <unity/scopes/SearchMetadata.h>
@@ -44,9 +45,10 @@ SSScopeObject::SSScopeObject(std::string const& ss_scope_id,
                              SSRegistryObject::SPtr ss_registry)
     : ss_scope_id_(ss_scope_id)
     , co_(std::make_shared<SSQueryCtrlObject>())
-    , qo_(std::make_shared<SSQueryObject>())
+    , qo_(std::make_shared<SSQueryObject>(middleware->runtime()->logger()))
     , smartscope_(new SmartScope(ss_registry))
     , ss_registry_(ss_registry)
+    , logger_(middleware->runtime()->logger())
 {
     // Connect the query ctrl to the middleware.
     middleware->add_dflt_query_ctrl_object(co_);
@@ -171,8 +173,7 @@ MWQueryCtrlProxy SSScopeObject::query(InvokeInfo const& info,
         catch (...)
         {
         }
-        std::cerr << "query(): " << e.what() << std::endl;
-        // TODO: log error
+        BOOST_LOG_SEV(logger_, Logger::Error) << "SSScopeObject::query(): " << e.what();
         throw;
     }
     catch (...)
@@ -184,8 +185,7 @@ MWQueryCtrlProxy SSScopeObject::query(InvokeInfo const& info,
         catch (...)
         {
         }
-        std::cerr << "query(): unknown exception" << std::endl;
-        // TODO: log error
+        BOOST_LOG_SEV(logger_, Logger::Error) << "SSScopeObject::query(): unknown exception";
         throw;
     }
 

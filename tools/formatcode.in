@@ -27,6 +27,7 @@
 astyle="@ASTYLE_COMMAND@"
 format="@CLANG_FORMAT_COMMAND@"
 dos2unix="@DOS2UNIX_COMMAND@"
+style="@CMAKE_SOURCE_DIR@/_clang-format"
 
 # Check that the format commands were found.
 [ "$astyle" = "ASTYLE_COMMAND-NOTFOUND" -o \
@@ -40,13 +41,16 @@ dos2unix="@DOS2UNIX_COMMAND@"
 # Recent versions of astyle can't read stdin: http://sourceforge.net/p/astyle/bugs/63/
 # astyle 2.03 writes DOS line endings: https://sourceforge.net/p/astyle/bugs/268/
 [ $# -eq 0 ] && {
-    tmp=`mktemp`
+    tmpdir=`mktemp -d`
+    tmp=`mktemp -p $tmpdir`
+    cp "$style" $tmpdir
     cat >$tmp
+    cd $tmpdir
     "$astyle" -q --options=@CMAKE_SOURCE_DIR@/astyle-config -n $tmp
     "$dos2unix" -q $tmp
     "$format" -i -style=file $tmp
     cat $tmp
-    rm -f $tmp
+    rm -fr $tmpdir
     exit $?
 }
 

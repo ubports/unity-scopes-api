@@ -44,6 +44,7 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"typeinfo for unity::scopes::testing::Result@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo for unity::scopes::testing::Sample@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo for unity::scopes::TimeoutException@Base" 0.4.0+14.04.20140312.1
+ (c++)"typeinfo for unity::scopes::utility::BufferedResultForwarder@Base" 0replaceme
  (c++)"typeinfo for unity::scopes::VariantBuilder@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo name for unity::scopes::AbstractScopeBase@Base" 0.6.0+14.10.20140804.1
  (c++)"typeinfo name for unity::scopes::ActionMetadata@Base" 0.6.0+14.10.20140804.1
@@ -90,6 +91,7 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"typeinfo name for unity::scopes::testing::Result@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo name for unity::scopes::testing::Sample@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo name for unity::scopes::TimeoutException@Base" 0.4.0+14.04.20140312.1
+ (c++)"typeinfo name for unity::scopes::utility::BufferedResultForwarder@Base" 0replaceme
  (c++)"typeinfo name for unity::scopes::VariantBuilder@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ActionMetadata::~ActionMetadata()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ActionMetadata::ActionMetadata(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
@@ -386,8 +388,7 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::on_process_death(int)@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::publish_state_change(unity::scopes::internal::RegistryObject::ScopeProcess::ProcessState)@Base" 0.6.4+14.10.20140828.1
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::~ScopeProcess()@Base" 0.4.2+14.04.20140404.2
- (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::ScopeProcess(unity::scopes::internal::RegistryObject::ScopeExecData, std::weak_ptr<unity::scopes::internal::MWPublisher> const&)@Base" 0.6.5+14.10.20140910.1
- (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::ScopeProcess(unity::scopes::internal::RegistryObject::ScopeProcess const&)@Base" 0.4.2+14.04.20140404.2
+ (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::ScopeProcess(unity::scopes::internal::RegistryObject::ScopeExecData, std::weak_ptr<unity::scopes::internal::MWPublisher> const&, boost::log::v2_mt_posix::sources::severity_channel_logger_mt<int, std::basic_string<char, std::char_traits<char>, std::allocator<char> > >&)@Base" 0replaceme
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::state() const@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::update_state(unity::scopes::internal::RegistryObject::ScopeProcess::ProcessState)@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::internal::RegistryObject::ScopeProcess::update_state_unlocked(unity::scopes::internal::RegistryObject::ScopeProcess::ProcessState)@Base" 0.4.2+14.04.20140404.2
@@ -423,12 +424,12 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::internal::RuntimeImpl::find_cache_dir() const@Base" 0.6.8+15.04.20141119
  (c++)"unity::scopes::internal::RuntimeImpl::find_tmp_dir() const@Base" 0.6.8+15.04.20141119
  (c++)"unity::scopes::internal::RuntimeImpl::future_queue() const@Base" 0.4.3+14.10.20140428
+ (c++)"unity::scopes::internal::RuntimeImpl::logger() const@Base" 0replaceme
  (c++)"unity::scopes::internal::RuntimeImpl::proxy_to_string(std::shared_ptr<unity::scopes::Object> const&) const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RuntimeImpl::registry_configfile() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RuntimeImpl::registry() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RuntimeImpl::registry_identity() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RuntimeImpl::reply_reaper() const@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::internal::RuntimeImpl::run_scope(unity::scopes::ScopeBase*, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::promise<void>)@Base" 0.6.2+rtm+rtm+rtm+14.09.20140818
  (c++)"unity::scopes::internal::RuntimeImpl::run_scope(unity::scopes::ScopeBase*, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::promise<void>)@Base" 0.6.2+rtm+rtm+rtm+14.09.20140818
  (c++)"unity::scopes::internal::RuntimeImpl::~RuntimeImpl()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RuntimeImpl::RuntimeImpl(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
@@ -449,6 +450,8 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::internal::ScopeConfig::icon() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeConfig::idle_timeout() const@Base" 0.4.5+14.10.20140513
  (c++)"unity::scopes::internal::ScopeConfig::invisible() const@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::internal::ScopeConfig::is_aggregator() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeConfig::keywords() const@Base" 0.6.9+15.04.20141129
  (c++)"unity::scopes::internal::ScopeConfig::location_data_needed() const@Base" 0.5.2+14.10.20140709.2
  (c++)"unity::scopes::internal::ScopeConfig::overrideable() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeConfig::parse_appearance_attribute(std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unity::scopes::Variant> > >&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.5.2+14.10.20140709.2
@@ -457,7 +460,6 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::internal::ScopeConfig::ScopeConfig(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeConfig::scope_runner() const@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::internal::ScopeConfig::search_hint() const@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::internal::ScopeConfig::tags() const@Base" 0.6.9+15.04.20141129
  (c++)"unity::scopes::internal::ScopeConfig::version() const@Base" 0.6.9+15.04.20141129
  (c++)"unity::scopes::internal::ScopeImpl::activate(unity::scopes::Result const&, unity::scopes::ActionMetadata const&, std::shared_ptr<unity::scopes::ActivationListenerBase> const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeImpl::create(std::shared_ptr<unity::scopes::internal::MWScope> const&, unity::scopes::internal::RuntimeImpl*, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
@@ -490,6 +492,8 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::internal::ScopeMetadataImpl::hot_key() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeMetadataImpl::icon() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeMetadataImpl::invisible() const@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::internal::ScopeMetadataImpl::is_aggregator() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeMetadataImpl::keywords() const@Base" 0.6.9+15.04.20141129
  (c++)"unity::scopes::internal::ScopeMetadataImpl::location_data_needed() const@Base" 0.5.2+14.10.20140709.2
  (c++)"unity::scopes::internal::ScopeMetadataImpl::operator=(unity::scopes::internal::ScopeMetadataImpl const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeMetadataImpl::proxy() const@Base" 0.4.0+14.04.20140312.1
@@ -510,6 +514,8 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::internal::ScopeMetadataImpl::set_hot_key(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeMetadataImpl::set_icon(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeMetadataImpl::set_invisible(bool)@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::internal::ScopeMetadataImpl::set_is_aggregator(bool)@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeMetadataImpl::set_keywords(std::vector<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&)@Base" 0.6.9+15.04.20141129
  (c++)"unity::scopes::internal::ScopeMetadataImpl::set_location_data_needed(bool)@Base" 0.5.2+14.10.20140709.2
  (c++)"unity::scopes::internal::ScopeMetadataImpl::set_proxy(std::shared_ptr<unity::scopes::Scope> const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeMetadataImpl::set_results_ttl_type(unity::scopes::ScopeMetadata::ResultsTtlType)@Base" 0.4.6+14.10.20140519
@@ -517,10 +523,8 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::internal::ScopeMetadataImpl::set_scope_id(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeMetadataImpl::set_search_hint(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeMetadataImpl::set_settings_definitions(std::vector<unity::scopes::Variant, std::allocator<unity::scopes::Variant> > const&)@Base" 0.5.2+14.10.20140709.2
- (c++)"unity::scopes::internal::ScopeMetadataImpl::set_tags(std::vector<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&)@Base" 0.6.9+15.04.20141129
  (c++)"unity::scopes::internal::ScopeMetadataImpl::settings_definitions() const@Base" 0.5.2+14.10.20140709.2
  (c++)"unity::scopes::internal::ScopeMetadataImpl::set_version(int)@Base" 0.6.9+15.04.20141129
- (c++)"unity::scopes::internal::ScopeMetadataImpl::tags() const@Base" 0.6.9+15.04.20141129
  (c++)"unity::scopes::internal::ScopeMetadataImpl::version() const@Base" 0.6.9+15.04.20141129
  (c++)"unity::scopes::internal::ScopeObject::activate(unity::scopes::Result const&, unity::scopes::ActionMetadata const&, std::shared_ptr<unity::scopes::internal::MWReply> const&, unity::scopes::internal::InvokeInfo const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeObject::debug_mode() const@Base" 0.6.2+rtm+rtm+rtm+14.09.20140818
@@ -776,6 +780,8 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::ScopeMetadata::hot_key() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ScopeMetadata::icon() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ScopeMetadata::invisible() const@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::ScopeMetadata::is_aggregator() const@Base" 0replaceme
+ (c++)"unity::scopes::ScopeMetadata::keywords() const@Base" 0.6.9+15.04.20141129
  (c++)"unity::scopes::ScopeMetadata::location_data_needed() const@Base" 0.5.2+14.10.20140709.2
  (c++)"unity::scopes::ScopeMetadata::operator=(unity::scopes::ScopeMetadata&&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ScopeMetadata::operator=(unity::scopes::ScopeMetadata const&)@Base" 0.4.0+14.04.20140312.1
@@ -790,7 +796,6 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::ScopeMetadata::search_hint() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ScopeMetadata::serialize() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ScopeMetadata::settings_definitions() const@Base" 0.5.2+14.10.20140709.2
- (c++)"unity::scopes::ScopeMetadata::tags() const@Base" 0.6.9+15.04.20141129
  (c++)"unity::scopes::ScopeMetadata::version() const@Base" 0.6.9+15.04.20141129
  (c++)"unity::scopes::Scope::~Scope()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Scope::Scope()@Base" 0.4.0+14.04.20140312.1
@@ -869,6 +874,8 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::testing::ScopeMetadataBuilder::hot_key(unity::scopes::testing::ScopeMetadataBuilder::Optional<std::basic_string<char, std::char_traits<char>, std::allocator<char> > > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::testing::ScopeMetadataBuilder::icon(unity::scopes::testing::ScopeMetadataBuilder::Optional<std::basic_string<char, std::char_traits<char>, std::allocator<char> > > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::testing::ScopeMetadataBuilder::invisible(unity::scopes::testing::ScopeMetadataBuilder::Optional<bool> const&)@Base" 0.5.0+14.10.20140619
+ (c++)"unity::scopes::testing::ScopeMetadataBuilder::is_aggregator(unity::scopes::testing::ScopeMetadataBuilder::Optional<bool> const&)@Base" 0replaceme
+ (c++)"unity::scopes::testing::ScopeMetadataBuilder::keywords(unity::scopes::testing::ScopeMetadataBuilder::Optional<std::vector<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > > const&)@Base" 0.6.9+15.04.20141129
  (c++)"unity::scopes::testing::ScopeMetadataBuilder::location_data_needed(unity::scopes::testing::ScopeMetadataBuilder::Optional<bool> const&)@Base" 0.6.9+15.04.20141129
  (c++)"unity::scopes::testing::ScopeMetadataBuilder::operator()() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::testing::ScopeMetadataBuilder::proxy(std::shared_ptr<unity::scopes::Scope> const&)@Base" 0.4.0+14.04.20140312.1
@@ -879,7 +886,6 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::testing::ScopeMetadataBuilder::ScopeMetadataBuilder()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::testing::ScopeMetadataBuilder::search_hint(unity::scopes::testing::ScopeMetadataBuilder::Optional<std::basic_string<char, std::char_traits<char>, std::allocator<char> > > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::testing::ScopeMetadataBuilder::settings_definitions(unity::scopes::testing::ScopeMetadataBuilder::Optional<std::vector<unity::scopes::Variant, std::allocator<unity::scopes::Variant> > > const&)@Base" 0.6.9+15.04.20141129
- (c++)"unity::scopes::testing::ScopeMetadataBuilder::tags(unity::scopes::testing::ScopeMetadataBuilder::Optional<std::vector<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > > const&)@Base" 0.6.9+15.04.20141129
  (c++)"unity::scopes::testing::ScopeMetadataBuilder::version(unity::scopes::testing::ScopeMetadataBuilder::Optional<int> const&)@Base" 0.6.9+15.04.20141129
  (c++)"unity::scopes::testing::StudentsTTest::one_sample(unity::scopes::testing::Sample const&, double, double)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::testing::StudentsTTest::Result::~Result()@Base" 0.4.2+14.04.20140404.2
@@ -895,6 +901,13 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::TimeoutException::TimeoutException(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::TimeoutException::TimeoutException(unity::scopes::TimeoutException const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::to_string(unity::scopes::CompletionDetails::CompletionStatus)@Base" 0.6.0+14.10.20140804.1
+ (c++)"unity::scopes::utility::BufferedResultForwarder::~BufferedResultForwarder()@Base" 0replaceme
+ (c++)"unity::scopes::utility::BufferedResultForwarder::BufferedResultForwarder(std::shared_ptr<unity::scopes::SearchReply> const&, std::shared_ptr<unity::scopes::utility::BufferedResultForwarder> const&)@Base" 0replaceme
+ (c++)"unity::scopes::utility::BufferedResultForwarder::finished(unity::scopes::CompletionDetails const&)@Base" 0replaceme
+ (c++)"unity::scopes::utility::BufferedResultForwarder::is_ready() const@Base" 0replaceme
+ (c++)"unity::scopes::utility::BufferedResultForwarder::push(unity::scopes::CategorisedResult)@Base" 0replaceme
+ (c++)"unity::scopes::utility::BufferedResultForwarder::set_ready()@Base" 0replaceme
+ (c++)"unity::scopes::utility::BufferedResultForwarder::upstream() const@Base" 0replaceme
  (c++)"unity::scopes::VariantBuilder::add_tuple(std::initializer_list<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::VariantBuilder::add_tuple(std::vector<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant>, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant> > > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::VariantBuilder::end()@Base" 0.4.0+14.04.20140312.1
@@ -1000,6 +1013,7 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"vtable for unity::scopes::testing::Result@Base" 0.4.0+14.04.20140312.1
  (c++)"vtable for unity::scopes::testing::Sample@Base" 0.4.0+14.04.20140312.1
  (c++)"vtable for unity::scopes::TimeoutException@Base" 0.4.0+14.04.20140312.1
+ (c++)"vtable for unity::scopes::utility::BufferedResultForwarder@Base" 0replaceme
  (c++)"vtable for unity::scopes::VariantBuilder@Base" 0.4.0+14.04.20140312.1
  (c++)"VTT for unity::scopes::ConfigException@Base" 0.4.0+14.04.20140312.1
  (c++)"VTT for unity::scopes::MiddlewareException@Base" 0.4.0+14.04.20140312.1

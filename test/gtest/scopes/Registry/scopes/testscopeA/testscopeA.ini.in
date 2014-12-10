@@ -9,7 +9,8 @@ HotKey = scope-A.HotKey
 LocationDataNeeded = true
 ChildScopes = com.foo.bar;com.foo.baz
 Version = 1
-Tags = music;news;foo
+Keywords = music;news;foo
+IsAggregator = false
 
 [Appearance]
 ForegroundColor = fg_color

@@ -39,9 +39,6 @@ class CannedQuery;
 namespace internal
 {
 
-class MiddlewareBase;
-class RuntimeImpl;
-
 class ScopeObjectBase : public AbstractObject
 {
 public:

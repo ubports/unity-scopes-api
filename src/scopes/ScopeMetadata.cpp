@@ -157,9 +157,14 @@ int ScopeMetadata::version() const
     return p->version();
 }
 
-std::vector<std::string> ScopeMetadata::tags() const
+std::vector<std::string> ScopeMetadata::keywords() const
 {
-    return p->tags();
+    return p->keywords();
+}
+
+bool ScopeMetadata::is_aggregator() const
+{
+    return p->is_aggregator();
 }
 
 //! @endcond

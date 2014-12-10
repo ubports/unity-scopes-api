@@ -1,3 +1,18 @@
+unity-scopes-api (0.6.10-0ubuntu1) UNRELEASED; urgency=medium
+
+  [ Marcus Tomlinson ]
+  * Renamed "Tags" scope .ini option to "Keywords".
+  * Added support for IsAggregator scope .ini option.
+
+  [ Pawel Stolowski ]
+  * Pass partner-id via UserAgent with remote-scopes call (LP: #1389273).
+  * Implemented BufferedResultForwarder API.
+  * Allow multi-arch click packages for scopes (LP: #1398998).
+  * Use SIGNON_POLICY_NO_USER_INTERACTION by default unless UNITY_SCOPES_OA_UI_POLICY
+    is set (LP: #1380914).
+
+ -- Pawel Stolowski <pawel.stolowski@canonical.com>  Tue, 09 Dec 2014 16:56:03 +0100
+
 unity-scopes-api (0.6.9+15.04.20141129-0ubuntu1) vivid; urgency=medium
 
   [ Pawel Stolowski ]

@@ -35,9 +35,10 @@ namespace scopes
 namespace internal
 {
 
-ObjectImpl::ObjectImpl(MWProxy const& mw_proxy)
+ObjectImpl::ObjectImpl(MWProxy const& mw_proxy, boost::log::sources::severity_channel_logger_mt<>& logger)
+    : logger_(logger)
 {
-    lock_guard<mutex> lock(proxy_mutex_);
+    lock_guard<mutex> lock(proxy_mutex_); // TODO: Why this lock?
     mw_proxy_ = mw_proxy;
 }
 

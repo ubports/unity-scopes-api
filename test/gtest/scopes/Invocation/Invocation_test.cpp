@@ -199,22 +199,22 @@ TEST(Invocation, shutdown_with_outstanding_async)
     }
 }
 
-void testscope_thread(Runtime::SPtr const& rt, string const& runtime_ini_file)
+void testscope_thread(Runtime::SPtr const& rt)
 {
     TestScope scope;
-    rt->run_scope(&scope, runtime_ini_file, "");
+    rt->run_scope(&scope, "");
 }
 
-void nullscope_thread(Runtime::SPtr const& rt, string const& runtime_ini_file)
+void nullscope_thread(Runtime::SPtr const& rt)
 {
     EmptyScope scope;
-    rt->run_scope(&scope, runtime_ini_file, "");
+    rt->run_scope(&scope, "");
 }
 
-void debugtestscope_thread(Runtime::SPtr const& rt, string const& runtime_ini_file)
+void debugtestscope_thread(Runtime::SPtr const& rt)
 {
     DebugTestScope scope;
-    rt->run_scope(&scope, runtime_ini_file, "DebugTestScope.ini");
+    rt->run_scope(&scope, "DebugTestScope.ini");
 }
 
 int main(int argc, char **argv)
@@ -222,13 +222,13 @@ int main(int argc, char **argv)
     ::testing::InitGoogleTest(&argc, argv);
 
     Runtime::SPtr tsrt = move(Runtime::create_scope_runtime("TestScope", "Runtime.ini"));
-    std::thread testscope_t(testscope_thread, tsrt, "Runtime.ini");
+    std::thread testscope_t(testscope_thread, tsrt);
 
     Runtime::SPtr esrt = move(Runtime::create_scope_runtime("EmptyScope", "Runtime.ini"));
-    std::thread emptyscope_t(nullscope_thread, esrt, "Runtime.ini");
+    std::thread emptyscope_t(nullscope_thread, esrt);
 
     Runtime::SPtr dsrt = move(Runtime::create_scope_runtime("DebugTestScope", "Runtime.ini"));
-    std::thread debugtestscope_t(debugtestscope_thread, dsrt, "Runtime.ini");
+    std::thread debugtestscope_t(debugtestscope_thread, dsrt);
 
     // Give threads some time to bind to endpoints, to avoid getting a TimeoutException
     // from a synchronous remote call.

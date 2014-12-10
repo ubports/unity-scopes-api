@@ -19,7 +19,6 @@
 #include <unity/scopes/internal/ScopeLoader.h>
 
 #include <unity/scopes/internal/ScopeBaseImpl.h>
-#include <unity/scopes/internal/SettingsDB.h>
 #include <unity/scopes/Version.h>
 #include <unity/UnityExceptions.h>
 

@@ -38,7 +38,7 @@ namespace internal
 namespace zmq_middleware
 {
 
-using namespace std::placeholders;
+using namespace std;
 
 ServantBase::ServantBase(shared_ptr<AbstractObject> const& delegate, DispatchTable funcs) :
     delegate_(delegate),
