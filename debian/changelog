@@ -1,4 +1,4 @@
-unity-scopes-api (0.6.10-0ubuntu1) UNRELEASED; urgency=medium
+unity-scopes-api (0.6.10+15.04.20141210.2-0ubuntu1) vivid; urgency=medium
 
   [ Marcus Tomlinson ]
   * Renamed "Tags" scope .ini option to "Keywords".
@@ -14,7 +14,7 @@ unity-scopes-api (0.6.10-0ubuntu1) UNRELEASED; urgency=medium
   [ Ubuntu daily release ]
   * debian/libunity-scopes3.symbols: auto-update to released version
 
- -- Pawel Stolowski <pawel.stolowski@canonical.com>  Tue, 09 Dec 2014 16:56:03 +0100
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Wed, 10 Dec 2014 12:59:48 +0000
 
 unity-scopes-api (0.6.9+15.04.20141129-0ubuntu1) vivid; urgency=medium
 
