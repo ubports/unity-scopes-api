@@ -19,6 +19,7 @@
 #pragma once
 
 #include <unity/util/DefinesPtrs.h>
+#include <unity/util/NonCopyable.h>
 #include <unity/util/ResourcePtr.h>
 
 #define BOOST_LOG_DYN_LINK
@@ -57,6 +58,7 @@ BOOST_LOG_ATTRIBUTE_KEYWORD(channel, "Channel", std::string)
 class Logger
 {
 public:
+    NONCOPYABLE(Logger);
     UNITY_DEFINES_PTRS(Logger);
 
     // Instantiate a logger that logs to std::clog.
