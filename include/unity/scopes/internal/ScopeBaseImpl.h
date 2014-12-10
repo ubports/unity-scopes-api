@@ -34,6 +34,7 @@ namespace scopes
 namespace internal
 {
 
+class ChildScopesRepository;
 class SettingsDB;
 
 class ScopeBaseImpl final
@@ -64,7 +65,7 @@ public:
     void set_config_directory(std::string const& path);
 
     ChildScopeList child_scopes() const;
-    ChildScopeList child_scopes_ordered(ChildScopeList const& child_scopes) const;
+    ChildScopeList child_scopes_ordered(ChildScopeList const& unordered_child_scopes) const;
     void set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered);
 
 private:
@@ -88,7 +89,7 @@ private:
 
     mutable std::mutex mutex_;
 
-    std::string config_directory_;
+    std::shared_ptr<ChildScopesRepository> child_scopes_repo_;
 };
 
 } // namespace internal

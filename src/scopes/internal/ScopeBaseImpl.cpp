@@ -19,9 +19,12 @@
 #include <unity/scopes/internal/ScopeBaseImpl.h>
 
 #include <unity/UnityExceptions.h>
+#include <unity/scopes/internal/ChildScopesRepository.h>
 #include <unity/scopes/internal/SettingsDB.h>
 #include <unity/scopes/Registry.h>
 #include <unity/scopes/ScopeExceptions.h>
+
+static const std::string c_child_scopes_repo_filename = "child-scopes.json";
 
 using namespace unity;
 using namespace unity::scopes;
@@ -174,7 +177,7 @@ VariantMap ScopeBaseImpl::settings() const
 void ScopeBaseImpl::set_config_directory(std::string const& path)
 {
     lock_guard<mutex> lock(mutex_);
-    config_directory_ = path;
+    child_scopes_repo_ = make_shared<ChildScopesRepository>(path + "/" + c_child_scopes_repo_filename);
 }
 
 ChildScopeList ScopeBaseImpl::child_scopes() const
@@ -192,14 +195,14 @@ ChildScopeList ScopeBaseImpl::child_scopes() const
     return return_list;
 }
 
-ChildScopeList ScopeBaseImpl::child_scopes_ordered(ChildScopeList const& child_scopes) const
+ChildScopeList ScopeBaseImpl::child_scopes_ordered(ChildScopeList const& child_scopes_unordered) const
 {
-    ///!
+    return child_scopes_repo_->child_scopes_ordered(child_scopes_unordered);
 }
 
 void ScopeBaseImpl::set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered)
 {
-    ///!
+    return child_scopes_repo_->set_child_scopes_ordered(child_scopes_ordered);
 }
 
 } // namespace internal
