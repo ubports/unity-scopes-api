@@ -6,6 +6,10 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/XmlReader.cpp
 )
 
+# add -fPIC specifically to Qt content files
+# we need the flag in order to compile with Qt
+set_source_files_properties(${SRC} PROPERTIES COMPILE_FLAGS -fPIC)
+
 # -- libunity-utils-qt --
 
 set(CMAKE_AUTOMOC ON)
