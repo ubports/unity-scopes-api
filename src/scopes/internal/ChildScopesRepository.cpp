@@ -20,6 +20,7 @@
 #include <unity/scopes/internal/JsonCppNode.h>
 
 #include <fstream>
+#include <set>
 #include <sstream>
 
 using namespace unity::scopes;
@@ -31,14 +32,64 @@ ChildScopesRepository::ChildScopesRepository(std::string const& repo_file_path)
 {
 }
 
-ChildScopeList ChildScopesRepository::child_scopes_ordered(ChildScopeList const& child_scopes_unordered) const
+ChildScopeList ChildScopesRepository::child_scopes_ordered(ChildScopeList const& child_scopes_unordered)
 {
-    ///!
+    std::lock_guard<std::mutex> lock(mutex_);
+
+    // use sets to determine duplicates between lists more efficiently
+    std::set<std::string> unordered_set;
+    std::set<std::string> ordered_set;
+
+    // fill unordered_set
+    for (auto const& child : child_scopes_unordered)
+    {
+        unordered_set.insert(child.id);
+    }
+
+    // fill ordered_set
+    ChildScopeList child_scopes_ordered = read_repo();
+    for (auto const& child : child_scopes_ordered)
+    {
+        // only the scopes from the repo that appear in the unordered_set should be added to ordered_set
+        // (scope was problaby uninstalled from the system since the repo was last writen)
+        if (unordered_set.find(child.id) != unordered_set.end())
+        {
+            ordered_set.insert(child.id);
+        }
+    }
+
+    // scopes in unordered_set that are also in ordered_set should be removed from unordered_set
+    for (auto const& child : ordered_set)
+    {
+        unordered_set.erase(child);
+    }
+
+    // now create a new list by first adding child_scopes_ordered then child_scopes_unordered,
+    // using the sets to determine whether or not the scope should be included.
+    ChildScopeList new_child_scopes_ordered;
+    for (auto const& child : child_scopes_ordered)
+    {
+        if (ordered_set.find(child.id) != ordered_set.end())
+        {
+            new_child_scopes_ordered.push_back(child);
+        }
+    }
+    for (auto const& child : child_scopes_unordered)
+    {
+        if (unordered_set.find(child.id) != unordered_set.end())
+        {
+            new_child_scopes_ordered.push_back(child);
+        }
+    }
+
+    write_repo(list_to_json(new_child_scopes_ordered));
+    return new_child_scopes_ordered;
 }
 
 void ChildScopesRepository::set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered)
 {
     // simply write child_scopes_ordered to file
+    std::lock_guard<std::mutex> lock(mutex_);
     write_repo(list_to_json(child_scopes_ordered));
 }
 
@@ -98,30 +149,32 @@ std::string ChildScopesRepository::list_to_json(ChildScopeList const& child_scop
 
 ChildScopeList ChildScopesRepository::json_to_list(std::string const& child_scopes_json)
 {
-    ChildScopeList return_list;
-
     JsonCppNode json_node(child_scopes_json);
     if (json_node.type() != JsonCppNode::Array)
     {
         throw;
     }
 
+    ChildScopeList return_list;
     for (int i = 0; i < json_node.size(); ++i)
     {
         auto child_node = json_node.get_node(i);
 
-        if (!child_node->has_node("id") || !child_node->has_node("enabled"))
+        if (!child_node->has_node("id") ||
+            !child_node->has_node("enabled"))
         {
-            continue;
+            continue;///!
         }
         auto id_node = json_node.get_node("id");
         auto enabled_node = json_node.get_node("enabled");
 
-        if (id_node->type() != JsonCppNode::String || enabled_node->type() != JsonCppNode::Bool)
+        if (id_node->type() != JsonCppNode::String ||
+            enabled_node->type() != JsonCppNode::Bool)
         {
-            continue;
+            continue;///!
         }
-        return_list.push_back( ChildScope{id_node->as_string(), enabled_node->as_bool()} );
+        return_list.push_back( ChildScope{id_node->as_string(),
+                                          enabled_node->as_bool()} );
     }
     return return_list;
 }

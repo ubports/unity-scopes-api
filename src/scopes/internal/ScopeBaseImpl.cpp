@@ -197,13 +197,11 @@ ChildScopeList ScopeBaseImpl::child_scopes() const
 
 ChildScopeList ScopeBaseImpl::child_scopes_ordered(ChildScopeList const& child_scopes_unordered) const
 {
-    lock_guard<mutex> lock(mutex_);
     return child_scopes_repo_->child_scopes_ordered(child_scopes_unordered);
 }
 
 void ScopeBaseImpl::set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered)
 {
-    lock_guard<mutex> lock(mutex_);
     return child_scopes_repo_->set_child_scopes_ordered(child_scopes_ordered);
 }
 

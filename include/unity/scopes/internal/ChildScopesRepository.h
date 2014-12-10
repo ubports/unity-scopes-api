@@ -21,6 +21,7 @@
 #include <unity/scopes/ChildScope.h>
 
 #include <list>
+#include <mutex>
 #include <string>
 
 namespace unity
@@ -37,7 +38,7 @@ class ChildScopesRepository
 public:
     ChildScopesRepository(std::string const& repo_file_path);
 
-    ChildScopeList child_scopes_ordered(ChildScopeList const& child_scopes_unordered) const;
+    ChildScopeList child_scopes_ordered(ChildScopeList const& child_scopes_unordered);
     void set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered);
 
 private:
@@ -47,7 +48,8 @@ private:
     std::string list_to_json(ChildScopeList const& child_scopes_list);
     ChildScopeList json_to_list(std::string const& child_scopes_json);
 
-    std::string repo_file_path_;
+    mutable std::mutex mutex_;
+    std::string const repo_file_path_;
     ChildScopeList cached_repo_;
     bool have_latest_cache_;
 };
