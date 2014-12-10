@@ -19,7 +19,6 @@
 #pragma once
 
 #include <unity/scopes/ChildScope.h>
-#include <unity/scopes/internal/JsonCppNode.h>
 
 #include <list>
 #include <string>
@@ -43,10 +42,13 @@ public:
 
 private:
     void write_repo(std::string const& child_scopes_json);
-    JsonCppNode::SPtr read_repo();
+    ChildScopeList read_repo();
+
+    std::string list_to_json(ChildScopeList const& child_scopes_list);
+    ChildScopeList json_to_list(std::string const& child_scopes_json);
 
     std::string repo_file_path_;
-    JsonCppNode::SPtr cached_repo_;
+    ChildScopeList cached_repo_;
     bool have_latest_cache_;
 };
 
