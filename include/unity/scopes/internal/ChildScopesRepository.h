@@ -19,6 +19,7 @@
 #pragma once
 
 #include <unity/scopes/ChildScope.h>
+#include <unity/scopes/internal/JsonCppNode.h>
 
 #include <list>
 #include <string>
@@ -39,6 +40,14 @@ public:
 
     ChildScopeList child_scopes_ordered(ChildScopeList const& child_scopes_unordered) const;
     void set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered);
+
+private:
+    void write_repo(std::string const& child_scopes_json);
+    JsonCppNode::SPtr read_repo();
+
+    std::string repo_file_path_;
+    JsonCppNode::SPtr cached_repo_;
+    bool have_latest_cache_;
 };
 
 } // namespace internal
