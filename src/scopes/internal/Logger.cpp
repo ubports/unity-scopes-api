@@ -26,6 +26,7 @@
 #include <boost/log/trivial.hpp>
 #include <boost/phoenix/bind.hpp>
 #include <boost/utility/empty_deleter.hpp>
+#include <unity/UnityExceptions.h>
 
 using namespace std;
 
@@ -133,6 +134,17 @@ bool Logger::set_channel(Channel c, bool enable)
 {
     auto it = channel_loggers_.find(channel_names[c]);
     assert(it != channel_loggers_.end());
+    bool was_enabled = it->second.second.exchange(enable);
+    return was_enabled;
+}
+
+bool Logger::set_channel(string channel_name, bool enable)
+{
+    auto it = channel_loggers_.find(channel_name);
+    if (it == channel_loggers_.end())
+    {
+        throw InvalidArgumentException("Logger::set_channel(): invalid channel name: " + channel_name);
+    }
     bool was_enabled = it->second.second.exchange(enable);
     return was_enabled;
 }

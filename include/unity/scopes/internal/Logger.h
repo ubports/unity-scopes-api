@@ -81,6 +81,7 @@ public:
     Severity set_severity_threshold(Severity s);
 
     bool set_channel(Channel c, bool enable);
+    bool set_channel(std::string channel_name, bool enable);
 
 private:
     bool filter(boost::log::value_ref<int, tag::severity> const& level,

@@ -42,6 +42,27 @@ TEST(RuntimeConfig, basic)
     EXPECT_EQ(DFLT_REAP_INTERVAL, c.reap_interval());
     EXPECT_EQ(DFLT_MAX_LOG_FILE_SIZE, c.max_log_file_size());
     EXPECT_EQ(DFLT_MAX_LOG_DIR_SIZE, c.max_log_dir_size());
+    EXPECT_TRUE(c.trace_channels().empty());
+}
+
+TEST(RuntimeConfig, complete)
+{
+    RuntimeConfig c(TEST_SRC_DIR "/Complete.ini");
+    EXPECT_EQ("R.Id", c.registry_identity());
+    EXPECT_EQ("R.Config", c.registry_configfile());
+    EXPECT_EQ("SS.R.Id", c.ss_registry_identity());
+    EXPECT_EQ("SS.Config", c.ss_configfile());
+    EXPECT_EQ("Zmq", c.default_middleware());
+    EXPECT_EQ("Z.Config", c.default_middleware_configfile());
+    EXPECT_EQ(500, c.reap_expiry());
+    EXPECT_EQ(100, c.reap_interval());
+    EXPECT_EQ("CacheD", c.cache_directory());
+    EXPECT_EQ("AppD", c.app_directory());
+    EXPECT_EQ("ConfigD", c.config_directory());
+    EXPECT_EQ("LogD", c.log_directory());
+    EXPECT_EQ(10000, c.max_log_file_size());
+    EXPECT_EQ(20000, c.max_log_dir_size());
+    EXPECT_EQ(vector<string>{ "IPC" }, c.trace_channels());
 }
 
 TEST(RuntimeConfig, _default_cache_dir)
@@ -209,7 +230,7 @@ TEST(RuntimeConfig, exceptions)
     catch (ConfigException const& e)
     {
         EXPECT_STREQ("unity::scopes::ConfigException: \"" TEST_SRC_DIR "/BadLogFileSize.ini\": "
-                     "Illegal value (999) for MaxLogFileSize: value must be > 1024",
+                     "Illegal value (999) for Log.MaxFileSize: value must be > 1024",
                      e.what());
     }
 
@@ -221,7 +242,7 @@ TEST(RuntimeConfig, exceptions)
     catch (ConfigException const& e)
     {
         EXPECT_STREQ("unity::scopes::ConfigException: \"" TEST_SRC_DIR "/BadLogDirSize.ini\": "
-                     "Illegal value (1024) for MaxLogDirSize: value must be > MaxLogFileSize (2048)",
+                     "Illegal value (1024) for Log.MaxDirSize: value must be > Log.MaxFileSize (2048)",
                      e.what());
     }
 }

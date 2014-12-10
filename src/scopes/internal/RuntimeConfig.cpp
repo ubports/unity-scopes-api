@@ -55,8 +55,9 @@ const string cache_dir_key = "CacheDir";
 const string app_dir_key = "AppDir";
 const string config_dir_key = "ConfigDir";
 const string log_dir_key = "LogDir";
-const string max_log_file_size_key = "MaxLogFileSize";
-const string max_log_dir_size_key = "MaxLogDirSize";
+const string max_log_file_size_key = "Log.MaxFileSize";
+const string max_log_dir_size_key = "Log.MaxDirSize";
+const string trace_channels_key = "Log.TraceChannels";
 
 }  // namespace
 
@@ -116,7 +117,7 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
             }
             catch (ResourceException const& e)
             {
-                throw_ex("No CacheDir configured and failed to get default");
+                throw_ex("No " + cache_dir_key + " configured and failed to get default");
             }
         }
         app_directory_ = get_optional_string(runtime_config_group, app_dir_key);
@@ -128,7 +129,7 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
             }
             catch (ResourceException const& e)
             {
-                throw_ex("No AppDir configured and failed to get default");
+                throw_ex("No " + app_dir_key + " configured and failed to get default");
             }
         }
         config_directory_ = get_optional_string(runtime_config_group, config_dir_key);
@@ -140,7 +141,7 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
             }
             catch (ResourceException const& e)
             {
-                throw_ex("No ConfigDir configured and failed to get default");
+                throw_ex("No " + config_dir_key + " configured and failed to get default");
             }
         }
         try
@@ -157,7 +158,7 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
             }
             catch (ResourceException const& e)
             {
-                throw_ex("No LogDir configured and failed to get default");
+                throw_ex("No " + log_dir_key + " configured and failed to get default");
             }
         }
         max_log_file_size_ = get_optional_int(runtime_config_group, max_log_file_size_key, DFLT_MAX_LOG_FILE_SIZE);
@@ -172,6 +173,16 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
             throw_ex("Illegal value (" + to_string(max_log_dir_size_) + ") for " + max_log_dir_size_key
                      + ": value must be > " + max_log_file_size_key + " (" + to_string(max_log_file_size_) + ")");
         }
+
+        try
+        {
+            trace_channels_ = parser()->get_string_array(runtime_config_group, trace_channels_key);
+        }
+        catch (LogicException const&)
+        {
+            // No TraceChannels configured.
+        }
+
     }
 
     KnownEntries const known_entries = {
@@ -190,7 +201,8 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
                                                 config_dir_key,
                                                 log_dir_key,
                                                 max_log_file_size_key,
-                                                max_log_dir_size_key
+                                                max_log_dir_size_key,
+                                                trace_channels_key
                                              }
                                           }
                                        };
@@ -269,6 +281,11 @@ int RuntimeConfig::max_log_file_size() const
 int RuntimeConfig::max_log_dir_size() const
 {
     return max_log_dir_size_;
+}
+
+vector<string> RuntimeConfig::trace_channels() const
+{
+    return trace_channels_;
 }
 
 string RuntimeConfig::default_cache_directory()

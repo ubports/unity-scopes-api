@@ -50,6 +50,8 @@ public:
     std::string log_directory() const;
     int max_log_file_size() const;
     int max_log_dir_size() const;
+    std::vector<std::string> trace_channels() const;
+
     static std::string default_cache_directory();
     static std::string default_app_directory();
     static std::string default_config_directory();
@@ -70,6 +72,7 @@ private:
     std::string log_directory_;
     int max_log_file_size_;
     int max_log_dir_size_;
+    std::vector<std::string> trace_channels_;
 };
 
 } // namespace internal

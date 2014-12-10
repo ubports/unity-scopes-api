@@ -87,6 +87,32 @@ BOOST_LOG_SEV(logger(), Logger::Info) << "message 5 ";
         runtime_configfile_ = configfile;
         RuntimeConfig config(configfile);
 
+        // Configure trace channels.
+        auto cnames = config.trace_channels();
+        exception_ptr ep;
+        for (auto&& name : cnames)
+        {
+            try
+            {
+                logger_->set_channel(name, true);
+            }
+            catch (InvalidArgumentException& e)
+            {
+                ep = ep ? make_exception_ptr(current_exception()) : e.remember(ep);
+            }
+        }
+        if (ep)
+        {
+            try
+            {
+                rethrow_exception(ep);
+            }
+            catch (...)
+            {
+                throw ConfigException("Runtime(): invalid trace channel name(s)");
+            }
+        }
+
         // Now that we have the config, change the logger to log to a file.
         // If log_dir was explicitly set to the empty string, continue
         // logging to std::clog.
