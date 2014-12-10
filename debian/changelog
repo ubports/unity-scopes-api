@@ -11,6 +11,9 @@ unity-scopes-api (0.6.10-0ubuntu1) UNRELEASED; urgency=medium
   * Use SIGNON_POLICY_NO_USER_INTERACTION by default unless UNITY_SCOPES_OA_UI_POLICY
     is set (LP: #1380914).
 
+  [ Ubuntu daily release ]
+  * debian/libunity-scopes3.symbols: auto-update to released version
+
  -- Pawel Stolowski <pawel.stolowski@canonical.com>  Tue, 09 Dec 2014 16:56:03 +0100
 
 unity-scopes-api (0.6.9+15.04.20141129-0ubuntu1) vivid; urgency=medium
