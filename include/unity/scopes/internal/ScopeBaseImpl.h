@@ -62,7 +62,7 @@ public:
     void set_settings_db(std::shared_ptr<unity::scopes::internal::SettingsDB> const& db);
     unity::scopes::VariantMap settings() const;
 
-    void set_config_directory(std::string const& path);
+    void set_child_scopes_repo(std::shared_ptr<ChildScopesRepository> const& child_scopes_repo);
 
     ChildScopeList child_scopes() const;
     ChildScopeList child_scopes_ordered(ChildScopeList const& unordered_child_scopes) const;

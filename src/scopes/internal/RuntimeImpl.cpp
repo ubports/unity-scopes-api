@@ -18,6 +18,7 @@
 
 #include <unity/scopes/internal/RuntimeImpl.h>
 
+#include <unity/scopes/internal/ChildScopesRepository.h>
 #include <unity/scopes/internal/DfltConfig.h>
 #include <unity/scopes/internal/Logger.h>
 #include <unity/scopes/internal/MWStateReceiver.h>
@@ -342,9 +343,9 @@ void RuntimeImpl::run_scope(ScopeBase* scope_base,
     boost::filesystem::path scope_dir = boost::filesystem::canonical(scope_ini_file).parent_path();
     scope_base->p->set_scope_directory(scope_dir.native());
 
-    string config_dir = config_dir_ + "/" + scope_id_;
     {
         // Try to open the scope settings database, if any.
+        string config_dir = config_dir_ + "/" + scope_id_;
         string settings_db = config_dir + "/settings.ini";
 
         string settings_schema = scope_dir.native() + "/" + scope_id_ + "-settings.ini";
@@ -359,13 +360,18 @@ void RuntimeImpl::run_scope(ScopeBase* scope_base,
         {
             scope_base->p->set_settings_db(nullptr);
         }
+
+        // Configure the child scopes repository
+        string child_scopes_repo = config_dir + "/child-scopes.json";
+
+        auto repo = make_shared<ChildScopesRepository>(child_scopes_repo, logger());
+        scope_base->p->set_child_scopes_repo(repo);
     }
 
     scope_base->p->set_registry(registry_);
     scope_base->p->set_cache_directory(find_cache_dir());
     scope_base->p->set_app_directory(find_app_dir());
     scope_base->p->set_tmp_directory(find_tmp_dir());
-    scope_base->p->set_config_directory(config_dir);
 
     // TODO: redirect log messages to scope-specific file.
 

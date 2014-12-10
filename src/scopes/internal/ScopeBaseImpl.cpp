@@ -174,10 +174,10 @@ VariantMap ScopeBaseImpl::settings() const
     return db_ ? db_->settings() : VariantMap();
 }
 
-void ScopeBaseImpl::set_config_directory(std::string const& path)
+void ScopeBaseImpl::set_child_scopes_repo(std::shared_ptr<ChildScopesRepository> const& child_scopes_repo)
 {
     lock_guard<mutex> lock(mutex_);
-    child_scopes_repo_ = make_shared<ChildScopesRepository>(path + "/" + c_child_scopes_repo_filename);
+    child_scopes_repo_ = child_scopes_repo;
 }
 
 ChildScopeList ScopeBaseImpl::child_scopes() const

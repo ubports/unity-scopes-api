@@ -26,8 +26,10 @@
 using namespace unity::scopes;
 using namespace unity::scopes::internal;
 
-ChildScopesRepository::ChildScopesRepository(std::string const& repo_file_path)
+ChildScopesRepository::ChildScopesRepository(std::string const& repo_file_path,
+                                             boost::log::sources::severity_channel_logger_mt<>& logger)
     : repo_file_path_(repo_file_path)
+    , logger_(logger)
     , have_latest_cache_(false)
 {
 }
@@ -36,7 +38,7 @@ ChildScopeList ChildScopesRepository::child_scopes_ordered(ChildScopeList const&
 {
     std::lock_guard<std::mutex> lock(mutex_);
 
-    // use sets to determine duplicates between lists more efficiently
+    // use sets to compare lists more efficiently
     std::set<std::string> unordered_set;
     std::set<std::string> ordered_set;
 
@@ -65,7 +67,7 @@ ChildScopeList ChildScopesRepository::child_scopes_ordered(ChildScopeList const&
     }
 
     // now create a new list by first adding child_scopes_ordered then child_scopes_unordered,
-    // using the sets to determine whether or not the scope should be included.
+    // using the sets as a mask to determine whether or not a scope should be included.
     ChildScopeList new_child_scopes_ordered;
     for (auto const& child : child_scopes_ordered)
     {
@@ -98,15 +100,16 @@ void ChildScopesRepository::write_repo(std::string const& child_scopes_json)
 {
     // open repository for output
     std::ofstream repo_file(repo_file_path_);
-
-    if (!repo_file.fail())
+    if (repo_file.fail())
     {
-        repo_file << child_scopes_json;
-        repo_file.close();
-
-        cached_repo_ = json_to_list(child_scopes_json);
-        have_latest_cache_ = true;
+        throw; ///!
     }
+
+    repo_file << child_scopes_json;
+    repo_file.close();
+
+    cached_repo_ = json_to_list(child_scopes_json);
+    have_latest_cache_ = true;
 }
 
 ChildScopeList ChildScopesRepository::read_repo()
@@ -119,16 +122,16 @@ ChildScopeList ChildScopesRepository::read_repo()
 
     // open repository for input
     std::ifstream repo_file(repo_file_path_);
-
-    if (!repo_file.fail())
+    if (repo_file.fail())
     {
-        cached_repo_ = json_to_list(std::string((std::istreambuf_iterator<char>(repo_file)),
-                                                std::istreambuf_iterator<char>()));
-        repo_file.close();
-
-        have_latest_cache_ = true;
+        throw; ///!
     }
 
+    cached_repo_ = json_to_list(std::string((std::istreambuf_iterator<char>(repo_file)),
+                                            std::istreambuf_iterator<char>()));
+    repo_file.close();
+
+    have_latest_cache_ = true;
     return cached_repo_;
 }
 
@@ -153,7 +156,7 @@ ChildScopeList ChildScopesRepository::json_to_list(std::string const& child_scop
     JsonCppNode json_node(child_scopes_json);
     if (json_node.type() != JsonCppNode::Array)
     {
-        throw;
+        throw; ///!
     }
 
     ChildScopeList return_list;
@@ -164,7 +167,7 @@ ChildScopeList ChildScopesRepository::json_to_list(std::string const& child_scop
         if (!child_node->has_node("id") ||
             !child_node->has_node("enabled"))
         {
-            continue;///!
+            continue; ///!
         }
         auto id_node = json_node.get_node("id");
         auto enabled_node = json_node.get_node("enabled");
@@ -172,7 +175,7 @@ ChildScopeList ChildScopesRepository::json_to_list(std::string const& child_scop
         if (id_node->type() != JsonCppNode::String ||
             enabled_node->type() != JsonCppNode::Bool)
         {
-            continue;///!
+            continue; ///!
         }
         return_list.push_back( ChildScope{id_node->as_string(),
                                           enabled_node->as_bool()} );
