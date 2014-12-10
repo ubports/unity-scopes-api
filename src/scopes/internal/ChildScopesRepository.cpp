@@ -18,31 +18,22 @@
 
 #pragma once
 
-#include <unity/scopes/ChildScope.h>
+#include <unity/scopes/internal/ChildScopesRepository.h>
 
-#include <list>
-#include <string>
+using namespace unity::scopes;
+using namespace unity::scopes::internal;
 
-namespace unity
+ChildScopesRepository::ChildScopesRepository(std::string const& repo_file_path)
 {
 
-namespace scopes
+}
+
+ChildScopeList ChildScopesRepository::child_scopes_ordered(ChildScopeList const& child_scopes_unordered) const
 {
 
-namespace internal
+}
+
+void ChildScopesRepository::set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered)
 {
 
-class ChildScopesRepository
-{
-public:
-    ChildScopesRepository(std::string const& repo_file_path);
-
-    ChildScopeList child_scopes_ordered(ChildScopeList const& child_scopes_unordered) const;
-    void set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered);
-};
-
-} // namespace internal
-
-} // namespace scopes
-
-} // namespace unity
+}
