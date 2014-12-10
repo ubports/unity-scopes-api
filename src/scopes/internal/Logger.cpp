@@ -149,10 +149,29 @@ bool Logger::set_channel(string channel_name, bool enable)
     return was_enabled;
 }
 
+void Logger::enable_channels(vector<string> const& names)
+{
+    exception_ptr ep;
+    for (auto&& name : names)
+    {
+        try
+        {
+            set_channel(name, true);
+        }
+        catch (InvalidArgumentException& e)
+        {
+            ep = ep ? make_exception_ptr(current_exception()) : e.remember(ep);
+        }
+    }
+    if (ep)
+    {
+        rethrow_exception(ep);
+    }
+}
+
 void Logger::set_log_file(string const& path, int rotation_size, int dir_size)
 {
     namespace ph = std::placeholders;
-
 
     FileSinkPtr s = boost::make_shared<FileSinkT>(
                         keywords::file_name = path + "-%N.log",

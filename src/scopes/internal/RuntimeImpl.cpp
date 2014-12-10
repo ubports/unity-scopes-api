@@ -76,41 +76,18 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
         // we use a logger that logs to std::clog.
         logger_.reset(new Logger(scope_id_));
 
-logger_->set_channel(Logger::IPC, true);
-BOOST_LOG_SEV(logger(), Logger::Info) << "message 1 ";
-BOOST_LOG(logger(Logger::IPC)) << "hello";
-BOOST_LOG_SEV(logger(), Logger::Info) << "message 3 ";
-logger_->set_channel(Logger::IPC, false);
-BOOST_LOG(logger(Logger::IPC)) << "message 4";
-BOOST_LOG_SEV(logger(), Logger::Info) << "message 5 ";
         // Create the middleware factory and get the registry identity and config filename.
         runtime_configfile_ = configfile;
         RuntimeConfig config(configfile);
 
         // Configure trace channels.
-        auto cnames = config.trace_channels();
-        exception_ptr ep;
-        for (auto&& name : cnames)
+        try
         {
-            try
-            {
-                logger_->set_channel(name, true);
-            }
-            catch (InvalidArgumentException& e)
-            {
-                ep = ep ? make_exception_ptr(current_exception()) : e.remember(ep);
-            }
+            logger_->enable_channels(config.trace_channels());
         }
-        if (ep)
+        catch (...)
         {
-            try
-            {
-                rethrow_exception(ep);
-            }
-            catch (...)
-            {
-                throw ConfigException("Runtime(): invalid trace channel name(s)");
-            }
+            throw InvalidArgumentException("Runtime(): invalid trace channel name(s)");
         }
 
         // Now that we have the config, change the logger to log to a file.
@@ -123,6 +100,12 @@ BOOST_LOG_SEV(logger(), Logger::Info) << "message 5 ";
                                   config.max_log_file_size(),
                                   config.max_log_dir_size());
         }
+
+BOOST_LOG_SEV(logger(), Logger::Info) << "message 1 ";
+BOOST_LOG(logger(Logger::IPC)) << "hello";
+BOOST_LOG_SEV(logger(), Logger::Info) << "message 3 ";
+BOOST_LOG(logger(Logger::IPC)) << "message 4";
+BOOST_LOG_SEV(logger(), Logger::Info) << "message 5 ";
 
         string default_middleware = config.default_middleware();
         string middleware_configfile = config.default_middleware_configfile();
