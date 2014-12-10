@@ -137,12 +137,11 @@ void DirWatcher::cleanup()
             }
             catch (std::exception const& e)
             {
-                BOOST_LOG_SEV(logger_, Logger::Error) << "~DirWatcher(): " << e.what();
+                BOOST_LOG(logger_) << "~DirWatcher(): " << e.what();
             }
             catch (...)
             {
-                BOOST_LOG_SEV(logger_, Logger::Error)
-                    << "~DirWatcher(): watch_thread was aborted due to an unknown exception";
+                BOOST_LOG(logger_) << "~DirWatcher(): watch_thread was aborted due to an unknown exception";
             }
         }
         else
@@ -281,14 +280,14 @@ void DirWatcher::watch_thread()
     }
     catch (std::exception const& e)
     {
-        BOOST_LOG_SEV(logger_, Logger::Error) << e.what();
+        BOOST_LOG(logger_) << "DirWatcher::watch_thread(): " << e.what();
         std::lock_guard<std::mutex> lock(mutex_);
         thread_state_ = Failed;
         thread_exception_ = std::current_exception();
     }
     catch (...)
     {
-        BOOST_LOG_SEV(logger_, Logger::Error) << "DirWatcher::watch_thread(): Thread aborted: unknown exception";
+        BOOST_LOG(logger_) << "DirWatcher::watch_thread(): Thread aborted: unknown exception";
         std::lock_guard<std::mutex> lock(mutex_);
         thread_state_ = Failed;
         thread_exception_ = std::current_exception();

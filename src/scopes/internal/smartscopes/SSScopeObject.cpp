@@ -173,7 +173,7 @@ MWQueryCtrlProxy SSScopeObject::query(InvokeInfo const& info,
         catch (...)
         {
         }
-        BOOST_LOG_SEV(logger_, Logger::Error) << "SSScopeObject::query(): " << e.what();
+        BOOST_LOG(logger_) << "SSScopeObject::query(): " << e.what();
         throw;
     }
     catch (...)
@@ -185,7 +185,7 @@ MWQueryCtrlProxy SSScopeObject::query(InvokeInfo const& info,
         catch (...)
         {
         }
-        BOOST_LOG_SEV(logger_, Logger::Error) << "SSScopeObject::query(): unknown exception";
+        BOOST_LOG(logger_) << "SSScopeObject::query(): unknown exception";
         throw;
     }
 

@@ -82,7 +82,7 @@ void QueryCtrlImpl::cancel()
     }
     catch (std::exception const& e)
     {
-        BOOST_LOG_SEV(logger_, Logger::Error) << e.what();
+        BOOST_LOG(logger_) << e.what();
     }
 }
 

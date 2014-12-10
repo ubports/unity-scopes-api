@@ -82,8 +82,7 @@ SSRegistryObject::SSRegistryObject(MiddlewareBase::SPtr middleware,
     catch (std::exception const& e)
     {
 
-        BOOST_LOG_SEV(middleware_->runtime()->logger(), Logger::Error)
-            << "SSRegistryObject: get_remote_scopes() failed: " << e.what();
+        BOOST_LOG(middleware_->runtime()->logger()) << "SSRegistryObject: get_remote_scopes() failed: " << e.what();
     }
 
     refresh_thread_ = std::thread(&SSRegistryObject::refresh_thread, this);
@@ -96,7 +95,7 @@ SSRegistryObject::SSRegistryObject(MiddlewareBase::SPtr middleware,
         }
         catch (std::exception const& e)
         {
-            BOOST_LOG_SEV(middleware_->runtime()->logger(), Logger::Error)
+            BOOST_LOG(middleware_->runtime()->logger())
                 << "SSRegistryObject(): failed to create registry publisher: " << e.what();
         }
     }
@@ -210,7 +209,7 @@ void SSRegistryObject::refresh_thread()
             }
             catch (std::exception const& e)
             {
-                BOOST_LOG_SEV(middleware_->runtime()->logger(), Logger::Error)
+                BOOST_LOG(middleware_->runtime()->logger())
                     << "SSRegistryObject: get_remote_scopes() failed: " << e.what();
             }
         }
@@ -284,7 +283,7 @@ void SSRegistryObject::get_remote_scopes()
                 }
                 catch (ResourceException const& e)
                 {
-                    BOOST_LOG_SEV(middleware_->runtime()->logger(), Logger::Error)
+                    BOOST_LOG(middleware_->runtime()->logger())
                         << "SSRegistryObject: ignoring invalid settings JSON for scope \"" << scope.id << "\": "
                         << e.what();
                 }
@@ -333,7 +332,7 @@ void SSRegistryObject::get_remote_scopes()
                 }
                 catch (ResourceException const& e)
                 {
-                    BOOST_LOG_SEV(middleware_->runtime()->logger(), Logger::Error)
+                    BOOST_LOG(middleware_->runtime()->logger())
                         << "SSRegistryObject: ignoring invalid settings JSON for scope \"" << scope.id << "\": "
                         << e.what();
                 }
@@ -360,7 +359,7 @@ void SSRegistryObject::get_remote_scopes()
         }
         catch (std::exception const& e)
         {
-            BOOST_LOG_SEV(middleware_->runtime()->logger(), Logger::Error)
+            BOOST_LOG(middleware_->runtime()->logger())
                 << "SSRegistryObject: skipping scope \"" << scope.id << "\": " << e.what();
         }
     }

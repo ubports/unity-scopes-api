@@ -86,12 +86,12 @@ ObjectAdapter::~ObjectAdapter()
     }
     catch (std::exception const& e)
     {
-        BOOST_LOG_SEV(logger_, Logger::Error) << "~ObjectAdapter(): exception from shutdown(): " << e.what();
+        BOOST_LOG(logger_) << "~ObjectAdapter(): exception from shutdown(): " << e.what();
     }
     // LCOV_EXCL_START
     catch (...)
     {
-        BOOST_LOG_SEV(logger_, Logger::Error) << "~ObjectAdapter(): unknown exception from shutdown()";
+        BOOST_LOG(logger_) << "~ObjectAdapter(): unknown exception from shutdown()";
     }
     // LCOV_EXCL_STOP
 
@@ -103,12 +103,12 @@ ObjectAdapter::~ObjectAdapter()
     }
     catch (std::exception const& e)
     {
-        BOOST_LOG_SEV(logger_, Logger::Error) << "~ObjectAdapter(): exception from wait_for_shutdown(): " << e.what();
+        BOOST_LOG(logger_) << "~ObjectAdapter(): exception from wait_for_shutdown(): " << e.what();
     }
     // LCOV_EXCL_START
     catch (...)
     {
-        BOOST_LOG_SEV(logger_, Logger::Error) << "~ObjectAdapter(): unknown exception from wait_for_shutdown()";
+        BOOST_LOG(logger_) << "~ObjectAdapter(): unknown exception from wait_for_shutdown()";
     }
     // LCOV_EXCL_STOP
 }
@@ -729,7 +729,7 @@ void ObjectAdapter::dispatch(zmqpp::socket& pump, string const& client_address)
             }
             else
             {
-                BOOST_LOG_SEV(logger_, Logger::Error)
+                BOOST_LOG(logger_)
                     << "ObjectAdapter: invalid oneway message header "
                      << "(id: " << current.id << ", adapter: " << name_ << ", op: " << current.op_name << ")";
             }
@@ -751,7 +751,7 @@ void ObjectAdapter::dispatch(zmqpp::socket& pump, string const& client_address)
             }
             else
             {
-                BOOST_LOG_SEV(logger_, Logger::Error)
+                BOOST_LOG(logger_)
                     << "ObjectAdapter: twoway invocation sent to oneway adapter "
                     << "(id: " << current.id << ", adapter: " << name_ << ", op: " << current.op_name << ")";
             }
@@ -774,7 +774,7 @@ void ObjectAdapter::dispatch(zmqpp::socket& pump, string const& client_address)
         }
         else
         {
-            BOOST_LOG_SEV(logger_, Logger::Error) << s.str();
+            BOOST_LOG(logger_) << s.str();
         }
         return;
     }

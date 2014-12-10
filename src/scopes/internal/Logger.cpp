@@ -55,7 +55,7 @@ static array<string, Logger::LastChannelEnum_> const channel_names =
 
 string const& to_severity(int s)
 {
-    static array<string, 5> const severities = { { "TRACE", "INFO", "WARNING", "ERROR", "FATAL" } };
+    static array<string, 5> const severities = { { "INFO", "WARNING", "ERROR", "FATAL", "TRACE" } };
     static string const unknown = "UNKNOWN";
 
     if (s < 0 || s >= static_cast<int>(severities.size()))
@@ -71,7 +71,7 @@ string const& to_severity(int s)
 
 Logger::Logger(string const& scope_id)
     : scope_id_(scope_id)
-    , logger_()
+    , logger_(keywords::severity = Logger::Error)
     , severity_(Logger::Info)
 {
     namespace ph = std::placeholders;
@@ -83,7 +83,8 @@ Logger::Logger(string const& scope_id)
     // Create a channel logger for each channel.
     for (auto&& name : channel_names)
     {
-        auto clogger = boost::log::sources::severity_channel_logger_mt<>(keywords::channel = name);
+        auto clogger = boost::log::sources::severity_channel_logger_mt<>(keywords::severity = Logger::Trace,
+                                                                         keywords::channel = name);
         clogger.add_attribute("TimeStamp", attrs::local_clock());
         channel_loggers_[name] = make_pair(clogger, false);
     }
@@ -212,15 +213,10 @@ void Logger::formatter(logging::record_view const& rec,
 {
     string channel = expr::attr<string>("Channel")(rec).get();
 
-    string channel_str;
-    if (!channel.empty())
-    {
-        channel_str = "(" + channel + ") ";
-    }
+    string prefix = channel.empty() ? to_severity(expr::attr<int>("Severity")(rec).get()) : channel;
 
     strm << "[" << expr::format_date_time<boost::posix_time::ptime>("TimeStamp", "%Y-%m-%d %H:%M:%S.%f")(rec) << "] "
-         << channel_str
-         << to_severity(expr::attr<int>("Severity")(rec).get()) << ": "
+         << prefix << ": "
          << scope_id_ << ": "
          << rec[expr::smessage];
 }

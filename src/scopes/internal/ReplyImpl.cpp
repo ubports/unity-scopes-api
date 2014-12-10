@@ -123,7 +123,7 @@ void ReplyImpl::error(exception_ptr ex)
     {
         error_message = "unknown exception";
     }
-    BOOST_LOG_SEV(logger_, Logger::Error) << "ReplyImpl::error(): " << error_message;
+    BOOST_LOG(logger_) << "ReplyImpl::error(): " << error_message;
 
     try
     {
@@ -131,7 +131,7 @@ void ReplyImpl::error(exception_ptr ex)
     }
     catch (std::exception const& e)
     {
-        BOOST_LOG_SEV(logger_, Logger::Error) << "ReplyImpl::error(): excpetion from finished(): " << error_message;
+        BOOST_LOG(logger_) << "ReplyImpl::error(): excpetion from finished(): " << error_message;
     }
 }
 
@@ -148,7 +148,7 @@ void ReplyImpl::info(OperationInfo const& op_info)
     }
     catch (std::exception const& e)
     {
-        BOOST_LOG_SEV(logger_, Logger::Error) << "ReplyImpl::error(): excpetion from info(): " << e.what();
+        BOOST_LOG(logger_) << "ReplyImpl::error(): excpetion from info(): " << e.what();
     }
 }
 

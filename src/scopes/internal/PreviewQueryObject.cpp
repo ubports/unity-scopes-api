@@ -78,12 +78,12 @@ void PreviewQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& /* inf
     catch (std::exception const& e)
     {
         pushable_ = false;
-        BOOST_LOG_SEV(logger_, Logger::Error) << "PreviewQueryObject::run(): " << e.what();
+        BOOST_LOG(logger_) << "PreviewQueryObject::run(): " << e.what();
         reply_->finished(CompletionDetails(CompletionDetails::Error, e.what()));  // Oneway, can't block
     }
     catch (...)
     {
-        BOOST_LOG_SEV(logger_, Logger::Error) << "PreviewQueryObject::run(): unknown exception";
+        BOOST_LOG(logger_) << "PreviewQueryObject::run(): unknown exception";
         reply_->finished(CompletionDetails(CompletionDetails::Error, "unknown exception"));  // Oneway, can't block
     }
 }

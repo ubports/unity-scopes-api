@@ -77,7 +77,7 @@ public:
 
     void set_log_file(std::string const& path, int rotation_size, int dir_size);
 
-    enum Severity { Trace, Info, Warning, Error, Fatal };
+    enum Severity { Info, Warning, Error, Fatal, Trace };
     Severity set_severity_threshold(Severity s);
 
     bool set_channel(Channel c, bool enable);

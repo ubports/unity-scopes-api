@@ -262,13 +262,13 @@ void SettingsDB::watch_thread()
     }
     catch (exception const& e)
     {
-        BOOST_LOG_SEV(logger_, Logger::Error) << "SettingsDB::watch_thread(): Thread aborted: " << e.what();
+        BOOST_LOG(logger_) << "SettingsDB::watch_thread(): Thread aborted: " << e.what();
         lock_guard<mutex> lock(mutex_);
         thread_state_ = Failed;
     }
     catch (...)
     {
-        BOOST_LOG_SEV(logger_, Logger::Error) << "SettingsDB::watch_thread(): Thread aborted: unknown exception";
+        BOOST_LOG(logger_) << "SettingsDB::watch_thread(): Thread aborted: unknown exception";
         lock_guard<mutex> lock(mutex_);
         thread_state_ = Failed;
     }

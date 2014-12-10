@@ -78,10 +78,10 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
 
 logger_->set_channel(Logger::IPC, true);
 BOOST_LOG_SEV(logger(), Logger::Info) << "message 1 ";
-BOOST_LOG_SEV(logger(Logger::IPC), Logger::Info) << "hello";
+BOOST_LOG(logger(Logger::IPC)) << "hello";
 BOOST_LOG_SEV(logger(), Logger::Info) << "message 3 ";
 logger_->set_channel(Logger::IPC, false);
-BOOST_LOG_SEV(logger(Logger::IPC), Logger::Info) << "message 4";
+BOOST_LOG(logger(Logger::IPC)) << "message 4";
 BOOST_LOG_SEV(logger(), Logger::Info) << "message 5 ";
         // Create the middleware factory and get the registry identity and config filename.
         runtime_configfile_ = configfile;
@@ -138,7 +138,7 @@ BOOST_LOG_SEV(logger(), Logger::Info) << "message 5 ";
         string msg = "Cannot instantiate run time for " + (scope_id.empty() ? "client" : scope_id) +
                      ", config file: " + configfile;
         ConfigException ex(msg);
-        BOOST_LOG_SEV(logger(), Logger::Error) << ex.what();
+        BOOST_LOG(logger()) << ex.what();
         throw ex;
     }
 }
@@ -151,11 +151,11 @@ RuntimeImpl::~RuntimeImpl()
     }
     catch (std::exception const& e) // LCOV_EXCL_LINE
     {
-        BOOST_LOG_SEV(logger(), Logger::Error) << "~RuntimeImpl(): " << e.what();
+        BOOST_LOG(logger()) << "~RuntimeImpl(): " << e.what();
     }
     catch (...) // LCOV_EXCL_LINE
     {
-        BOOST_LOG_SEV(logger(), Logger::Error) << "~RuntimeImpl(): unknown exception";
+        BOOST_LOG(logger()) << "~RuntimeImpl(): unknown exception";
     }
 }
 
