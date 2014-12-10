@@ -10,7 +10,7 @@ set(SRC
 # we need the flag in order to compile with Qt
 set_source_files_properties(${SRC} PROPERTIES COMPILE_FLAGS -fPIC)
 
-# -- libunity-utils-qt --
+# -- libunity-scopes-qt --
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -33,34 +33,41 @@ include_directories(
 )
 
 add_library(
-    unity-utils-qt SHARED
+    unity-scopes-qt SHARED
     ${SRC}
 )
 
 add_library(
-  unity-utils-qt-static OBJECT
+  unity-scopes-qt-static OBJECT
   ${SRC}
 )
 
 qt5_use_modules(
-    unity-utils-qt
+    unity-scopes-qt
 
     Core
 )
 
-set(LIBS unity-utils-qt)
+set(LIBS unity-scopes-qt)
 
 target_link_libraries(
-    unity-utils-qt
+    unity-scopes-qt
     ${UNITY_API_LDFLAGS}
     net-cpp
 )
-set_target_properties(unity-utils-qt PROPERTIES
-    VERSION "${UNITY_SCOPES_MAJOR}.${UNITY_SCOPES_MINOR}.${UNITY_SCOPES_MICRO}"
-    SOVERSION ${UNITY_SCOPES_SOVERSION})
+
+# API version
+set(UNITY_SCOPES_QT_MAJOR 0)
+set(UNITY_SCOPES_QT_MINOR 1)
+set(UNITY_SCOPES_QT_MICRO 0)
+set(UNITY_SCOPES_QT_SOVERSION ${UNITY_SCOPES_QT_MAJOR}${UNITY_SCOPES_QT_MINOR})
+
+set_target_properties(unity-scopes-qt PROPERTIES
+    VERSION "${UNITY_SCOPES_QT_MAJOR}.${UNITY_SCOPES_QT_MINOR}.${UNITY_SCOPES_QT_MICRO}"
+    SOVERSION ${UNITY_SCOPES_QT_SOVERSION})
 
 set(LIB_INSTALL_PREFIX lib/${CMAKE_LIBRARY_ARCHITECTURE})
-install(TARGETS unity-utils-qt LIBRARY DESTINATION ${LIB_INSTALL_PREFIX})
+install(TARGETS unity-scopes-qt LIBRARY DESTINATION ${LIB_INSTALL_PREFIX})
 
 
 #
@@ -82,6 +89,6 @@ else()
                        DEPENDS ${PROJECT_BINARY_DIR}/doc/Doxyfile-utils-qt
                                ${CMAKE_BINARY_DIR}/include/unity/scopes/utils-qt)
     add_custom_target(doc-utils-qt ALL DEPENDS ${PROJECT_BINARY_DIR}/doc-utils-qt/index.html)
-    install(DIRECTORY ${PROJECT_BINARY_DIR}/doc-utils-qt/unity-utils-qt
+    install(DIRECTORY ${PROJECT_BINARY_DIR}/doc-utils-qt/unity-scopes-qt
             DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/doc)
 endif()

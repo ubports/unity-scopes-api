@@ -1,7 +1,7 @@
 add_executable(
   XmlAsyncReader_test
   XmlAsyncReader_test.cpp
-  $<TARGET_OBJECTS:unity-utils-qt-static>)
+  $<TARGET_OBJECTS:unity-scopes-qt-static>)
 
 target_link_libraries(
   XmlAsyncReader_test
