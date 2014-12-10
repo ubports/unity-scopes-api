@@ -50,8 +50,8 @@ ChildScopeList ChildScopesRepository::child_scopes_ordered(ChildScopeList const&
     ChildScopeList child_scopes_ordered = read_repo();
     for (auto const& child : child_scopes_ordered)
     {
-        // only the scopes from the repo that appear in the unordered_set should be added to ordered_set
-        // (scope was problaby uninstalled from the system since the repo was last writen)
+        // only the scopes from the repo that appear in unordered_set should be added to ordered_set
+        // (the scope was problaby uninstalled since the repo was last writen)
         if (unordered_set.find(child.id) != unordered_set.end())
         {
             ordered_set.insert(child.id);
@@ -82,6 +82,7 @@ ChildScopeList ChildScopesRepository::child_scopes_ordered(ChildScopeList const&
         }
     }
 
+    // write the new ordered list to file
     write_repo(list_to_json(new_child_scopes_ordered));
     return new_child_scopes_ordered;
 }
