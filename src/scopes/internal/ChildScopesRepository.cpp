@@ -25,15 +25,15 @@ using namespace unity::scopes::internal;
 
 ChildScopesRepository::ChildScopesRepository(std::string const& repo_file_path)
 {
-
+    ///!
 }
 
 ChildScopeList ChildScopesRepository::child_scopes_ordered(ChildScopeList const& child_scopes_unordered) const
 {
-
+    ///!
 }
 
 void ChildScopesRepository::set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered)
 {
-
+    ///!
 }
