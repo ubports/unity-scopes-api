@@ -20,7 +20,6 @@
 
 #include <unity/scopes/AbstractScopeBase.h>
 #include <unity/scopes/ActionMetadata.h>
-#include <unity/scopes/ChildScope.h>
 #include <unity/scopes/SearchMetadata.h>
 #include <unity/scopes/Version.h>
 

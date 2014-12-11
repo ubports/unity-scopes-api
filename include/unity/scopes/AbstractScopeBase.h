@@ -19,6 +19,7 @@
 #pragma once
 
 #include <unity/scopes/ActivationQueryBase.h>
+#include <unity/scopes/ChildScope.h>
 #include <unity/scopes/PreviewQueryBase.h>
 #include <unity/scopes/Registry.h>
 #include <unity/scopes/SearchQueryBase.h>

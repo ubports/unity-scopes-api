@@ -56,7 +56,7 @@ private:
     std::string const repo_file_path_;
     boost::log::sources::severity_channel_logger_mt<>& logger_;
 
-    mutable std::mutex mutex_;
+    std::mutex mutex_;
     ChildScopeList cached_repo_;
     bool have_latest_cache_;
 };

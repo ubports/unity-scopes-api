@@ -24,8 +24,6 @@
 #include <unity/scopes/Registry.h>
 #include <unity/scopes/ScopeExceptions.h>
 
-static const std::string c_child_scopes_repo_filename = "child-scopes.json";
-
 using namespace unity;
 using namespace unity::scopes;
 using namespace std;
