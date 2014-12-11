@@ -1,3 +1,14 @@
+unity-scopes-api (0.6.10+15.04.20141211-0ubuntu1) vivid; urgency=low
+
+  [ Pawel Stolowski ]
+  * Use 'partner' in UserAgent instead of partner_id for consistency
+    with shell plugin
+
+  [ Michi Henning ]
+  * Replace old references to Ice with zmq.
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Thu, 11 Dec 2014 11:37:01 +0000
+
 unity-scopes-api (0.6.10+15.04.20141210.2-0ubuntu1) vivid; urgency=medium
 
   [ Marcus Tomlinson ]
