@@ -5,6 +5,7 @@ Changes in version 0.6.10
 =========================
   - Renamed "Tags" scope .ini option to "Keywords".
   - Added support for IsAggregator scope .ini option.
+  - Implemented BufferedResultForwarder API in utility namespace.
 
 Changes in version 0.6.9
 ========================
