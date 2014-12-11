@@ -185,7 +185,7 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
             auto partner_id = util::read_text_file(partner_file_);
             if (!partner_id.empty())
             {
-                std::string const user_agent_hdr = "partner_id=" + http_client_->to_percent_encoding(partner_id);
+                std::string const user_agent_hdr = "partner=" + http_client_->to_percent_encoding(partner_id);
                 headers.push_back(std::make_pair("User-Agent", user_agent_hdr));
                 BOOST_LOG_SEV(logger_, Logger::Info) << "User agent: " << user_agent_hdr;
             }
