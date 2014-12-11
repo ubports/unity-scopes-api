@@ -181,7 +181,6 @@ void ScopeBaseImpl::set_child_scopes_repo(std::shared_ptr<ChildScopesRepository>
 ChildScopeList ScopeBaseImpl::child_scopes() const
 {
     // The default behaviour of this method is to simply return all available scopes on the system.
-    // This translates to: Any scope may potentially be aggregated by this scope.
     lock_guard<mutex> lock(mutex_);
     ChildScopeList return_list;
     auto all_scopes = registry_->list();

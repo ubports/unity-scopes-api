@@ -134,10 +134,16 @@ public:
                                    ActionMetadata const& metadata,
                                    PreviewListenerBase::SPtr const& reply) = 0;
 
-    ///! Doc
+    /**
+    \brief Returns a list of child scopes aggregated by this scope in user-defined order.
+    \return The list of child scopes aggregated by this scope in user-defined order.
+    */
     virtual ChildScopeList child_scopes_ordered() = 0;
 
-    ///! Doc
+    /**
+    \brief Sets the ordered list of child scopes aggregated by this scope.
+    \param child_scopes_ordered The ordered list of child scopes aggregated by this scope.
+    */
     virtual void set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered) = 0;
 
     /**
