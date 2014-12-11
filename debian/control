@@ -87,32 +87,32 @@ Depends: ${misc:Depends},
 Description: Documentation for Unity scopes API
  Library to integrate scopes with the Unity shell (documentation)
 
-Package: libunity-utils-qt
+Package: libunity-scopes-qt
 Architecture: any
 Multi-Arch: same
 Pre-Depends: ${misc:Pre-Depends},
 Depends: ${misc:Depends},
          ${shlibs:Depends}
-Description: Qt utility library for Unity scopes API
- Library that integrates utilities based on Qt for convenience
+Description: Qt library for Unity scopes API
+ Library that integrates classes based on Qt for convenience
 
-Package: libunity-utils-qt-dev
+Package: libunity-scopes-qt-dev
 Section: libdevel
 Architecture: any
 Multi-Arch: same
 Pre-Depends: ${misc:Pre-Depends},
 Depends: libunity-scopes-dev (= ${binary:Version}),
-         libunity-utils-qt (= ${binary:Version}),
+         libunity-scopes-qt (= ${binary:Version}),
          libnet-cpp-dev (>=1.1.0),
          ${misc:Depends},
          ${shlibs:Depends}
-Description: Header files for Qt utility library for Unity scopes API
- Library that integrates utilities based on Qt for convenience (dev files)
+Description: Header files for Qt library for Unity scopes API
+ Library that integrates classes based on Qt for convenience (dev files)
 
-Package: libunity-utils-qt-doc
+Package: libunity-scopes-qt-doc
 Section: doc
 Architecture: all
 Multi-Arch: foreign
 Depends: ${misc:Depends},
-Description: Documentation for Unity Qt utility library
- Library that integrates utilities based on Qt for convenience (documentation)
+Description: Documentation for Unity Qt library
+ Library that integrates classes based on Qt for convenience (documentation)
