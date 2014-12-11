@@ -1,7 +1,7 @@
 add_subdirectory(internal)
 add_subdirectory(testing)
 add_subdirectory(utility)
-add_subdirectory(utils-qt)
+add_subdirectory(scopes-qt)
 
 file(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
 

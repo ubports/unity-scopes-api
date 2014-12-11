@@ -15,7 +15,7 @@
 *
 * Author: Xavi Garcia <xavi.garcia.mena@canonical.com>
 */
-#include <unity/scopes/utils-qt/JsonAsyncReader.h>
+#include "../../../include/unity/scopes/scopes-qt/JsonAsyncReader.h"
 
 using namespace std;
 using namespace unity::scopes::utils::qt;

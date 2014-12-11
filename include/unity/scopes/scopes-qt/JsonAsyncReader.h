@@ -27,7 +27,8 @@
 
 #include <memory>
 #include <future>
-#include "HttpAsyncReader.h"
+
+#include "../scopes-qt/HttpAsyncReader.h"
 
 namespace unity
 {

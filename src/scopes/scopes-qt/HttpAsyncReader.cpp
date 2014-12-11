@@ -15,8 +15,7 @@
 *
 * Author: Xavi Garcia <xavi.garcia.mena@canonical.com>
 */
-#include <unity/scopes/utils-qt/HttpAsyncReader.h>
-
+#include "../../../include/unity/scopes/scopes-qt/HttpAsyncReader.h"
 #include <core/net/uri.h>
 
 namespace http = core::net::http;

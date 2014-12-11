@@ -16,9 +16,7 @@
  * Authored by: Xavi Garcia <xavi.garcia.mena@canonical.com>
  */
 
-#include <unity/scopes/utils-qt/XmlAsyncReader.h>
-#include <unity/scopes/utils-qt/XmlReader.h>
-
+#include "../../../../../include/unity/scopes/scopes-qt/XmlAsyncReader.h"
 #include <unity/scopes/ScopeExceptions.h>
 
 #include <QtCore/QXmlStreamReader>
@@ -27,6 +25,7 @@
 #include <gtest/gtest.h>
 
 #include <core/posix/exec.h>
+#include "../../../../../include/unity/scopes/scopes-qt/XmlReader.h"
 
 namespace posix = core::posix;
 

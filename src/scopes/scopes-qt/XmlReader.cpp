@@ -15,8 +15,9 @@
  *
  * Author: Xavi Garcia <xavi.garcia.mena@canonical.com>
  */
-#include <unity/scopes/utils-qt/XmlAsyncReader.h>
-#include <unity/scopes/utils-qt/XmlReader.h>
+#include "../../../include/unity/scopes/scopes-qt/XmlReader.h"
+
+#include "../../../include/unity/scopes/scopes-qt/XmlAsyncReader.h"
 
 using namespace unity::scopes::utils::qt;
 

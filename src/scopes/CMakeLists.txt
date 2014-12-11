@@ -1,7 +1,7 @@
 add_subdirectory(utility)
 add_subdirectory(internal)
 add_subdirectory(testing)
-add_subdirectory(utils-qt)
+add_subdirectory(scopes-qt)
 
 set(CAPNPROTO_FILES ${CAPNPROTO_FILES} PARENT_SCOPE)
 
