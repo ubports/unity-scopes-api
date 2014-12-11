@@ -38,7 +38,8 @@ ChildScopeList ChildScopesRepository::child_scopes_ordered(ChildScopeList const&
 {
     std::lock_guard<std::mutex> lock(mutex_);
 
-    // use sets to compare lists more efficiently
+    // unordered_set and ordered_set will act as masks for child_scopes_unordered and
+    // child_scopes_ordered respectively when creating our resultant child scope list
     std::set<std::string> unordered_set;
     std::set<std::string> ordered_set;
 
@@ -52,22 +53,19 @@ ChildScopeList ChildScopesRepository::child_scopes_ordered(ChildScopeList const&
     ChildScopeList child_scopes_ordered = read_repo();
     for (auto const& child : child_scopes_ordered)
     {
-        // only the scopes from the repo that appear in unordered_set should be added to ordered_set
-        // (the scope was problaby uninstalled since the repo was last writen)
-        if (unordered_set.find(child.id) != unordered_set.end())
+        // scopes in child_scopes_ordered that are also in child_scopes_unordered should be removed
+        // from unordered_set (to avoid duplicates in our resultant child scope list)
+        if (unordered_set.erase(child.id) > 0)
         {
+            // only the scopes from child_scopes_ordered that appear in child_scopes_unordered
+            // should be added to ordered_set (a scope not found in child_scopes_unordered was
+            // probably uninstalled since the repo was last writen)
             ordered_set.insert(child.id);
         }
     }
 
-    // scopes in unordered_set that are also in ordered_set should be removed from unordered_set
-    for (auto const& child : ordered_set)
-    {
-        unordered_set.erase(child);
-    }
-
     // now create a new list by first adding child_scopes_ordered then child_scopes_unordered,
-    // using the sets as a mask to determine whether or not a scope should be included.
+    // using each set as a mask to determine whether or not a scope should be included
     ChildScopeList new_child_scopes_ordered;
     for (auto const& child : child_scopes_ordered)
     {
