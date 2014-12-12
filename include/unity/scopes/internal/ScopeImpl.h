@@ -48,6 +48,8 @@ public:
     ScopeImpl(MWScopeProxy const& mw_proxy, RuntimeImpl* runtime, std::string const& scope_id);
     virtual ~ScopeImpl();
 
+    RuntimeImpl* runtime() const;
+
     virtual QueryCtrlProxy search(std::string const& q,
                                   SearchMetadata const& metadata,
                                   SearchListenerBase::SPtr const& reply) override;

@@ -26,7 +26,6 @@
 #include <unity/UnityExceptions.h>
 
 #include <cassert>
-#include <iostream> // TODO: remove this once logging is added
 
 using namespace std;
 
@@ -39,10 +38,12 @@ namespace scopes
 namespace internal
 {
 
-ReplyImpl::ReplyImpl(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObjectBase> const& qo) :
-    ObjectImpl(mw_proxy),
-    qo_(qo),
-    finished_(false)
+ReplyImpl::ReplyImpl(MWReplyProxy const& mw_proxy,
+                     std::shared_ptr<QueryObjectBase> const& qo,
+                     boost::log::sources::severity_channel_logger_mt<>& logger)
+    : ObjectImpl(mw_proxy, logger)
+    , qo_(qo)
+    , finished_(false)
 {
     assert(mw_proxy);
 }
@@ -55,7 +56,6 @@ ReplyImpl::~ReplyImpl()
     }
     catch (...)
     {
-        // TODO: log error
     }
 }
 
@@ -96,8 +96,7 @@ void ReplyImpl::finished()
         }
         catch (std::exception const& e)
         {
-            // TODO: log error
-            cerr << e.what() << endl;
+            // No logging here because this may happen after the run time is destroyed.
         }
     }
 }
@@ -124,8 +123,7 @@ void ReplyImpl::error(exception_ptr ex)
     {
         error_message = "unknown exception";
     }
-    // TODO: log error
-    cerr << error_message << endl;
+    BOOST_LOG_SEV(logger_, Logger::Error) << "ReplyImpl::error(): " << error_message;
 
     try
     {
@@ -133,8 +131,7 @@ void ReplyImpl::error(exception_ptr ex)
     }
     catch (std::exception const& e)
     {
-        // TODO: log error
-        cerr << e.what() << endl;
+        BOOST_LOG_SEV(logger_, Logger::Error) << "ReplyImpl::error(): excpetion from finished(): " << error_message;
     }
 }
 
@@ -151,8 +148,7 @@ void ReplyImpl::info(OperationInfo const& op_info)
     }
     catch (std::exception const& e)
     {
-        // TODO: log error
-        cerr << e.what() << endl;
+        BOOST_LOG_SEV(logger_, Logger::Error) << "ReplyImpl::error(): excpetion from info(): " << e.what();
     }
 }
 

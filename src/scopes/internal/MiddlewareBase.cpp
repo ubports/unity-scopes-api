@@ -44,12 +44,6 @@ MiddlewareBase::~MiddlewareBase()
 
 RuntimeImpl* MiddlewareBase::runtime() const noexcept
 {
-    if (!runtime_)
-    {
-        // This is the case only for some of the tests, because it impossible to
-        // fake RuntimeImpl.
-        throw LogicException("MiddlewareBase::runtime(): MiddlewareBase was instantianted with nullptr runtime");
-    }
     return runtime_;
 }
 

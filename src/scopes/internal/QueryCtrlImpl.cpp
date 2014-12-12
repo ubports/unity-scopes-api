@@ -26,7 +26,6 @@
 #include <unity/scopes/ScopeExceptions.h>
 
 #include <cassert>
-#include <iostream> // TODO: remove this once logging is added
 
 using namespace std;
 
@@ -39,9 +38,11 @@ namespace scopes
 namespace internal
 {
 
-QueryCtrlImpl::QueryCtrlImpl(MWQueryCtrlProxy const& ctrl_proxy, MWReplyProxy const& reply_proxy) :
-    ObjectImpl(ctrl_proxy),
-    reply_proxy_(reply_proxy)
+QueryCtrlImpl::QueryCtrlImpl(MWQueryCtrlProxy const& ctrl_proxy,
+                             MWReplyProxy const& reply_proxy,
+                             boost::log::sources::severity_channel_logger_mt<>& logger)
+    : ObjectImpl(ctrl_proxy, logger)
+    , reply_proxy_(reply_proxy)
 {
     // We remember the reply proxy so, when the query is cancelled, we can
     // inform the reply object belonging to this query that the query is finished.
@@ -78,8 +79,7 @@ void QueryCtrlImpl::cancel()
     }
     catch (std::exception const& e)
     {
-        cerr << e.what() << endl;
-        // TODO: log error
+        BOOST_LOG_SEV(logger_, Logger::Error) << e.what();
     }
 }
 

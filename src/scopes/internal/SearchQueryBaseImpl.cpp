@@ -20,15 +20,15 @@
 #include <unity/scopes/internal/SearchQueryBaseImpl.h>
 
 #include <unity/scopes/internal/QueryCtrlImpl.h>
+#include <unity/scopes/internal/RuntimeImpl.h>
+#include <unity/scopes/internal/ScopeImpl.h>
 #include <unity/scopes/internal/SearchMetadataImpl.h>
-#include <unity/scopes/Scope.h>
 #include <unity/scopes/ScopeExceptions.h>
 
 #include <unity/UnityExceptions.h>
 
 #include <algorithm>
 #include <cassert>
-#include <iostream>  // TODO: remove this
 
 namespace unity
 {
@@ -173,17 +173,18 @@ QueryCtrlProxy SearchQueryBaseImpl::check_for_query_loop(ScopeProxy const& scope
     shared_ptr<QueryCtrlImpl> ctrl_proxy;
 
     SearchMetadataImpl::SendRecvPair pair = make_pair(canned_query_.scope_id(), scope->identity());
-    cerr << "pair: " << pair.first << ", " << pair.second << endl;
     auto meta = dynamic_cast<SearchMetadataImpl*>(search_metadata_.p.get());
     if (!meta->add_to_history(pair))
     {
-        cerr << "query loop for " << pair.first << ", " << pair.second << endl;
-        // Query has been here before.
+        // Query has been here before with the same child scope as the target.
         reply->finished(CompletionDetails(CompletionDetails::OK,
                                           "empty result set due to aggregator loop on scope " + pair.first));
-        cerr << pair.first << ": RETURNING DUMMY" << endl;
-        // TODO: logging a warning would be nice here.
-        ctrl_proxy = make_shared<QueryCtrlImpl>(nullptr, nullptr);
+        auto scope_impl = dynamic_pointer_cast<ScopeImpl>(scope);
+        auto logger = scope_impl->runtime()->logger();
+        ctrl_proxy = make_shared<QueryCtrlImpl>(nullptr, nullptr, logger);  // Dummy proxy in already-cancelled state
+        BOOST_LOG_SEV(logger, Logger::Warning)
+            << "query loop for query \"" << canned_query_.query_string()
+            << "\", sender: " << pair.first << ", receiver: " << pair.second << endl;
     }
 
     return ctrl_proxy;  // null proxy if there was no loop

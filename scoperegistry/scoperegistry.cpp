@@ -33,6 +33,7 @@
 #include <boost/filesystem/operations.hpp>
 
 #include <sys/stat.h>  // TODO: remove this once hack for creating data root dir is removed
+#include <wordexp.h>
 
 using namespace scoperegistry;
 using namespace std;
@@ -258,6 +259,30 @@ void convert_relative_attribute(VariantMap& inner_map, const string& id, const f
     }
 }
 
+string get_first_component(string const& id, string const& custom_exec)
+{
+    if (custom_exec.empty())
+    {
+        throw unity::InvalidArgumentException("Invalid scope runner executable for scope: " + id);
+    }
+
+    wordexp_t exp;
+    string result;
+
+    // Split command into program and args
+    if (wordexp(custom_exec.c_str(), &exp, WRDE_NOCMD) == 0)
+    {
+        util::ResourcePtr<wordexp_t*, decltype(&wordfree)> free_guard(&exp, wordfree);
+        result = exp.we_wordv[0];
+    }
+    else
+    {
+        throw unity::InvalidArgumentException("Invalid scope runner executable for scope: " + id);
+    }
+
+    return result;
+}
+
 // For each scope, open the config file for the scope, create the metadata info from the config,
 // and add an entry to the RegistryObject.
 // If the scope uses settings, also parse the settings file and add the settings to the metadata.
@@ -319,7 +344,8 @@ void add_local_scope(RegistryObject::SPtr const& registry,
     mi->set_appearance_attributes(sc.appearance_attributes());
     mi->set_child_scope_ids(sc.child_scope_ids());
     mi->set_version(sc.version());
-    mi->set_tags(sc.tags());
+    mi->set_keywords(sc.keywords());
+    mi->set_is_aggregator(sc.is_aggregator());
 
     // Prepend scope_dir to pageheader logo path if logo path is relative.
     // TODO: Once we have type-safe parsing in the config files, remove
@@ -384,7 +410,7 @@ void add_local_scope(RegistryObject::SPtr const& registry,
 
     ScopeProxy proxy = ScopeImpl::create(mw->create_scope_proxy(scope.first), mw->runtime(), scope.first);
     mi->set_proxy(proxy);
-    auto meta = ScopeMetadataImpl::create(move(mi));
+    auto meta = ScopeMetadataImpl::create(std::move(mi));
 
     RegistryObject::ScopeExecData exec_data;
     exec_data.scope_id = scope.first;
@@ -410,11 +436,32 @@ void add_local_scope(RegistryObject::SPtr const& registry,
     try
     {
         auto custom_exec = sc.scope_runner();
-        if (custom_exec.empty())
+        filesystem::path program(get_first_component( scope.first, custom_exec));
+        if (program.is_relative())
         {
-            throw unity::InvalidArgumentException("Invalid scope runner executable for scope: " + scope.first);
+            // First look inside the arch-specific directory
+            if (filesystem::exists(scope_dir / DEB_HOST_MULTIARCH / program))
+            {
+                // Join the full command, not just the program path
+                exec_data.custom_exec = (scope_dir / DEB_HOST_MULTIARCH / custom_exec).native();
+            }
+            // Next try in the non arch-aware directory
+            else if (filesystem::exists(scope_dir / program))
+            {
+                // Join the full command, not just the program path
+                exec_data.custom_exec = (scope_dir / custom_exec).native();
+            }
+            else
+            {
+                throw unity::InvalidArgumentException(
+                        "Nonexistent scope runner '" + custom_exec
+                                + "' executable for scope: " + scope.first);
+            }
         }
-        exec_data.custom_exec = relative_scope_path_to_abs_path(custom_exec, scope_dir).native();
+        else
+        {
+            exec_data.custom_exec = custom_exec;
+        }
     }
     catch (NotFoundException const&)
     {
@@ -423,7 +470,7 @@ void add_local_scope(RegistryObject::SPtr const& registry,
     exec_data.scope_config = scope.second;
     exec_data.debug_mode = sc.debug_mode();
 
-    registry->add_local_scope(scope.first, move(meta), exec_data);
+    registry->add_local_scope(scope.first, std::move(meta), exec_data);
 }
 
 void add_local_scopes(RegistryObject::SPtr const& registry,
@@ -548,7 +595,7 @@ int main(int argc, char* argv[])
         });
 
         // The registry object stores the local and remote scopes
-        Executor::SPtr executor = make_shared<Executor>();
+        Executor::SPtr executor = std::make_shared<Executor>();
         RegistryObject::SPtr registry(new RegistryObject(*signal_handler_wrapper.death_observer, executor, middleware, true));
 
         // Add the metadata for each scope to the lookup table.
@@ -592,7 +639,7 @@ int main(int argc, char* argv[])
                 error("ignoring installed scope \"" + scope.first + "\": cannot create metadata: " + e.what());
             }
         };
-        ScopesWatcher local_scopes_watcher(registry, local_watch_lambda);
+        ScopesWatcher local_scopes_watcher(registry, local_watch_lambda, runtime->logger());
         local_scopes_watcher.add_install_dir(scope_installdir);
         local_scopes_watcher.add_install_dir(oem_installdir);
 
@@ -608,7 +655,7 @@ int main(int argc, char* argv[])
                 error("ignoring installed scope \"" + scope.first + "\": cannot create metadata: " + e.what());
             }
         };
-        ScopesWatcher click_scopes_watcher(registry, click_watch_lambda);
+        ScopesWatcher click_scopes_watcher(registry, click_watch_lambda, runtime->logger());
         click_scopes_watcher.add_install_dir(click_installdir);
 
         // Let's add the registry's state receiver to the middleware so that scopes can inform

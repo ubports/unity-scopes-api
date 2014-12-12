@@ -22,8 +22,6 @@
 #include <unity/scopes/PreviewReply.h>
 #include <unity/scopes/SearchReply.h>
 
-#include <iostream>
-
 using namespace unity::scopes;
 using namespace unity::scopes::internal::smartscopes;
 
@@ -57,7 +55,8 @@ void SmartQuery::run(SearchReplyProxy const& reply)
         auto var = hints_[no_net_hint];
         if (var.which() == Variant::Type::Bool && var.get_bool())
         {
-            std::cout << "SmartQuery(): networking disabled for remote scope " << scope_id_ << ", skipping" << std::endl;
+            BOOST_LOG_SEV(ss_client_->logger(), Logger::Info)
+                << "SmartQuery(): networking disabled for remote scope " << scope_id_ << ", skipping";
             return;
         }
     }
@@ -72,16 +71,9 @@ void SmartQuery::run(SearchReplyProxy const& reply)
         {}
 
         void push() {
-            if (has_filters && has_state) {
-                try
-                {
-                    reply->push(filters, state);
-                }
-                catch (std::exception const& e)
-                {
-                    std::cerr << "SmartScope::run(): Failed to register filters for scope '" << scope_id << "': "
-                        << e.what() << std::endl;
-                }
+            if (has_filters && has_state)
+            {
+                reply->push(filters, state);
             }
         }
 
@@ -106,11 +98,29 @@ void SmartQuery::run(SearchReplyProxy const& reply)
     } filters_data(reply, scope_id_);
 
     SearchReplyHandler handler;
-    handler.filters_handler = [&filters_data](Filters const &filters) {
-        filters_data.set(filters);
+    handler.filters_handler = [this, &filters_data](Filters const &filters) {
+        try
+        {
+            filters_data.set(filters);
+        }
+        catch (std::exception const& e)
+        {
+            BOOST_LOG_SEV(ss_client_->logger(), Logger::Error)
+                << "SmartScope::run(): Failed to register filters for scope '" << filters_data.scope_id
+                << "': " << e.what();
+        }
     };
-    handler.filter_state_handler = [&filters_data](FilterState const& state) {
-        filters_data.set(state);
+    handler.filter_state_handler = [this, &filters_data](FilterState const& state) {
+        try
+        {
+            filters_data.set(state);
+        }
+        catch (std::exception const& e)
+        {
+            BOOST_LOG_SEV(ss_client_->logger(), Logger::Error)
+                << "SmartScope::run(): Failed to set filter state for scope '" << filters_data.scope_id
+                << "': " << e.what();
+        }
     };
     handler.category_handler = [this, reply](std::shared_ptr<SearchCategory> const& category) {
         const CategoryRenderer rdr(category->renderer_template);
@@ -120,9 +130,9 @@ void SmartQuery::run(SearchReplyProxy const& reply)
         }
         catch (std::exception const& e)
         {
-            std::cerr << "SmartScope: failed to register category: \"" << category->id
-                << "\" for scope \"" << scope_id_ << "\" and query: \""
-                << query_.query_string() << std::endl;
+            BOOST_LOG_SEV(this->ss_client_->logger(), Logger::Error)
+                << "SmartScope: failed to register category: \"" << category->id
+                << "\" for scope \"" << scope_id_ << "\" and query: \"" << query_.query_string() << "\"";
         }
     };
     handler.result_handler = [this, reply](SearchResult const& result) {
@@ -143,8 +153,9 @@ void SmartQuery::run(SearchReplyProxy const& reply)
         }
         else
         {
-            std::cerr << "SmartScope: result for query: \"" << scope_id_ << "\": \"" << query_.query_string()
-                      << "\" returned an invalid cat_id. Skipping result." << std::endl;
+            BOOST_LOG_SEV(this->ss_client_->logger(), Logger::Error)
+                << "SmartScope: result for query: \"" << scope_id_ << "\": \"" << query_.query_string()
+                << "\" returned an invalid cat_id. Skipping result.";
         }
     };
     handler.departments_handler = [this, reply](std::shared_ptr<DepartmentInfo> const& deptinfo) {
@@ -155,8 +166,8 @@ void SmartQuery::run(SearchReplyProxy const& reply)
         }
         catch (std::exception const& e)
         {
-            std::cerr << "SmartScope::run(): Failed to register departments for scope '" << scope_id_ << "': "
-                      << e.what() << std::endl;
+            BOOST_LOG_SEV(this->ss_client_->logger(), Logger::Error)
+                << "SmartScope::run(): Failed to register departments for scope '" << scope_id_ << "': " << e.what();
         }
     };
 
@@ -173,7 +184,9 @@ void SmartQuery::run(SearchReplyProxy const& reply)
     else
     {
         session_id = "session_id_missing";
-        std::cout << "SmartScope: missing or invalid session id for \"" << scope_id_ << "\": \"" << query_.query_string() << "\"" << std::endl;
+        BOOST_LOG_SEV(this->ss_client_->logger(), Logger::Info)
+            << "SmartScope: missing or invalid session id for \"" << scope_id_ << "\": \""
+            << query_.query_string() << "\"";
     }
     if (metadata.contains_hint("query-id") && metadata["query-id"].which() == Variant::Int)
     {
@@ -181,7 +194,9 @@ void SmartQuery::run(SearchReplyProxy const& reply)
     }
     else
     {
-        std::cout << "SmartScope: missing or invalid query id for \"" << scope_id_ << "\": \"" << query_.query_string() << "\"" << std::endl;
+        BOOST_LOG_SEV(this->ss_client_->logger(), Logger::Info)
+            << "SmartScope: missing or invalid query id for \"" << scope_id_ << "\": \""
+            << query_.query_string() << "\"";
     }
     if (metadata.contains_hint("user-agent") && metadata["user-agent"].which() == Variant::String)
     {
@@ -205,7 +220,8 @@ void SmartQuery::run(SearchReplyProxy const& reply)
             settings(), query_.filter_state().serialize(), hints_.locale(), loc, agent, hints_.cardinality());
     search_handle_->wait();
 
-    std::cout << "SmartScope: query for \"" << scope_id_ << "\": \"" << query_.query_string() << "\" complete" << std::endl;
+    BOOST_LOG_SEV(this->ss_client_->logger(), Logger::Info)
+        << "SmartScope: query for \"" << scope_id_ << "\": \"" << query_.query_string() << "\" complete";
 }
 
 Department::SCPtr SmartQuery::create_department(std::shared_ptr<DepartmentInfo const> const& deptinfo)
@@ -281,7 +297,9 @@ void SmartPreview::run(PreviewReplyProxy const& reply)
     else
     {
         session_id = "session_id_missing";
-        std::cout << "SmartScope: missing or invalid session id for \"" << scope_id_ << "\" preview: \"" << result().uri() << "\"" << std::endl;
+        BOOST_LOG_SEV(this->ss_client_->logger(), Logger::Info)
+            << "SmartScope: missing or invalid session id for \"" << scope_id_ << "\" preview: \""
+            << result().uri() << "\"";
     }
 
     if (metadata.contains_hint("user-agent") && metadata["user-agent"].which() == Variant::String)
@@ -294,7 +312,8 @@ void SmartPreview::run(PreviewReplyProxy const& reply)
 
     preview_handle_->wait();
 
-    std::cout << "SmartScope: preview for \"" << scope_id_ << "\": \"" << result().uri() << "\" complete" << std::endl;
+    BOOST_LOG_SEV(this->ss_client_->logger(), Logger::Info)
+        << "SmartScope: preview for \"" << scope_id_ << "\": \"" << result().uri() << "\" complete";
 }
 
 SmartActivation::SmartActivation(Result const& result, ActionMetadata const& metadata, std::string const& widget_id, std::string const& action_id)
@@ -320,20 +339,23 @@ ActivationResponse NullActivation::activate()
 
 SmartScope::SmartScope(SSRegistryObject::SPtr reg)
     : reg_(reg)
+    , ss_client_(reg->get_ssclient())
 {
 }
 
 SearchQueryBase::UPtr SmartScope::search(std::string const& scope_id, CannedQuery const& q, SearchMetadata const& hints)
 {
     SearchQueryBase::UPtr query(new SmartQuery(scope_id, reg_, q, hints));
-    std::cout << "SmartScope: created query for \"" << scope_id << "\": \"" << q.query_string() << "\"" << std::endl;
+    BOOST_LOG_SEV(ss_client_->logger(), Logger::Info)
+        << "SmartScope: created query for \"" << scope_id << "\": \"" << q.query_string() << "\"";
     return query;
 }
 
 QueryBase::UPtr SmartScope::preview(std::string const& scope_id, Result const& result, ActionMetadata const& hints)
 {
     QueryBase::UPtr preview(new SmartPreview(scope_id, reg_, result, hints));
-    std::cout << "SmartScope: created preview for \"" << scope_id << "\": \"" << result.uri() << "\"" << std::endl;
+    BOOST_LOG_SEV(ss_client_->logger(), Logger::Info)
+        << "SmartScope: created preview for \"" << scope_id << "\": \"" << result.uri() << "\"";
     return preview;
 }
 
@@ -346,6 +368,7 @@ ActivationQueryBase::UPtr SmartScope::activate(std::string const&, Result const&
 ActivationQueryBase::UPtr SmartScope::perform_action(std::string const& scope_id, Result const& result, ActionMetadata const& metadata, std::string const& widget_id, std::string const& action_id)
 {
     ActivationQueryBase::UPtr activation(new SmartActivation(result, metadata, widget_id, action_id));
-    std::cout << "SmartScope: created activation for \"" << scope_id << "\": \"" << result.uri() << "\"" << std::endl;
+    BOOST_LOG_SEV(ss_client_->logger(), Logger::Info)
+        << "SmartScope: created activation for \"" << scope_id << "\": \"" << result.uri() << "\"";
     return activation;
 }

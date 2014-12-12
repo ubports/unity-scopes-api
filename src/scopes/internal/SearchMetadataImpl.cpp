@@ -147,7 +147,8 @@ void SearchMetadataImpl::serialize(VariantMap& var) const
         var["location"] = location_->serialize();
     }
 
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);  // history_ is mutable
+
     VariantArray hist;
     for (auto const& pair : history_)
     {

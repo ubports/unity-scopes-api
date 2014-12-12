@@ -78,10 +78,10 @@ RuntimeImpl::SPtr run_test_registry()
     return runtime;
 }
 
-void scope_thread(Runtime::SPtr const& rt, string const& runtime_ini_file)
+void scope_thread(Runtime::SPtr const& rt)
 {
     NoReplyScope scope;
-    rt->run_scope(&scope, runtime_ini_file, "");
+    rt->run_scope(&scope, "");
 }
 
 TEST(ReplyReaper, reap)
@@ -89,7 +89,7 @@ TEST(ReplyReaper, reap)
     auto reg_rt = run_test_registry();
 
     Runtime::SPtr no_reply_rt = move(Runtime::create_scope_runtime("NoReplyScope", TEST_DIR "/Runtime.ini"));
-    std::thread scope_t(scope_thread, no_reply_rt, TEST_DIR "/Runtime.ini");
+    std::thread scope_t(scope_thread, no_reply_rt);
 
     try
     {
@@ -150,10 +150,10 @@ private:
     condition_variable cond_;
 };
 
-void scope_thread_debug_mode(Runtime::SPtr const& rt, string const& runtime_ini_file)
+void scope_thread_debug_mode(Runtime::SPtr const& rt)
 {
     NoReplyScope scope;
-    rt->run_scope(&scope, runtime_ini_file, TEST_DIR "/DebugScope.ini");
+    rt->run_scope(&scope, TEST_DIR "/DebugScope.ini");
 }
 
 TEST(ReplyReaper, no_reap_in_debug_mode)
@@ -161,7 +161,7 @@ TEST(ReplyReaper, no_reap_in_debug_mode)
     auto reg_rt = run_test_registry();
 
     Runtime::SPtr no_reply_rt = move(Runtime::create_scope_runtime("NoReplyScope", TEST_DIR "/Runtime.ini"));
-    std::thread scope_t(scope_thread_debug_mode, no_reply_rt, TEST_DIR "/Runtime.ini");
+    std::thread scope_t(scope_thread_debug_mode, no_reply_rt);
 
     try
     {

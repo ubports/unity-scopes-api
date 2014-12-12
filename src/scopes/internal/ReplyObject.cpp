@@ -27,7 +27,6 @@
 #include <unity/scopes/internal/CategorisedResultImpl.h>
 
 #include <cassert>
-#include <iostream> // TODO: remove this once logging is added
 
 using namespace std;
 using namespace unity::scopes::internal;
@@ -43,6 +42,7 @@ namespace internal
 
 ReplyObject::ReplyObject(ListenerBase::SPtr const& receiver_base, RuntimeImpl const* runtime,
                          std::string const& scope_proxy, bool dont_reap) :
+    runtime_(runtime),
     listener_base_(receiver_base),
     finished_(false),
     origin_proxy_(scope_proxy),
@@ -183,13 +183,11 @@ void ReplyObject::finished(CompletionDetails const& details) noexcept
     }
     catch (std::exception const& e)
     {
-        cerr << "ReplyObject::finished(): " << e.what() << endl;
-        // TODO: log error
+        BOOST_LOG_SEV(runtime_->logger(), Logger::Error) << "ReplyObject::finished(): " << e.what();
     }
     catch (...)
     {
-        cerr << "ReplyObject::finished(): unknown exception" << endl;
-        // TODO: log error
+        BOOST_LOG_SEV(runtime_->logger(), Logger::Error) << "ReplyObject::finished(): unknown exception";
     }
 
     // Disconnect self from middleware, if this hasn't happened yet.
@@ -219,13 +217,11 @@ void ReplyObject::info(OperationInfo const& op_info) noexcept
     }
     catch (std::exception const& e)
     {
-        cerr << "ReplyObject::info(): " << e.what() << endl;
-        // TODO: log error
+        BOOST_LOG_SEV(runtime_->logger(), Logger::Error) << "ReplyObject::info(): " << e.what();
     }
     catch (...)
     {
-        cerr << "ReplyObject::info(): unknown exception" << endl;
-        // TODO: log error
+        BOOST_LOG_SEV(runtime_->logger(), Logger::Error) << "ReplyObject::info(): unknown exception";
     }
 }
 

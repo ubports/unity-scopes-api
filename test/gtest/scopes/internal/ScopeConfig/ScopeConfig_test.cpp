@@ -57,10 +57,12 @@ TEST(ScopeConfig, basic)
         EXPECT_EQ("com.foo.bar2", children[1]);
         EXPECT_EQ("com.foo.boo", children[2]);
 
-        auto tags = cfg.tags();
-        EXPECT_EQ(2u, tags.size());
-        EXPECT_EQ("foo", tags[0]);
-        EXPECT_EQ("bar", tags[1]);
+        auto keywords = cfg.keywords();
+        EXPECT_EQ(2u, keywords.size());
+        EXPECT_EQ("foo", keywords[0]);
+        EXPECT_EQ("bar", keywords[1]);
+
+        EXPECT_TRUE(cfg.is_aggregator());
 
         auto attrs = cfg.appearance_attributes();
         EXPECT_EQ(5, attrs.size());
@@ -93,6 +95,7 @@ TEST(ScopeConfig, basic)
         EXPECT_FALSE(cfg.location_data_needed());
         EXPECT_FALSE(cfg.debug_mode());
         EXPECT_EQ(0, cfg.version());
+        EXPECT_FALSE(cfg.is_aggregator());
 
         EXPECT_EQ(0, cfg.appearance_attributes().size());
 
@@ -185,29 +188,29 @@ TEST(ScopeConfig, bad_version)
     }
 }
 
-TEST(ScopeConfig, bad_tags)
+TEST(ScopeConfig, bad_keywords)
 {
     try
     {
-        ScopeConfig cfg(BAD_TAGS);
+        ScopeConfig cfg(BAD_KEYWORDS);
     }
     catch(ConfigException const& e)
     {
-        boost::regex r("unity::scopes::ConfigException: \".*\": Invalid empty tag string found in \"Tags\" list");
+        boost::regex r("unity::scopes::ConfigException: \".*\": Invalid empty keyword string found in \"Keywords\" list");
         EXPECT_TRUE(boost::regex_match(e.what(), r));
     }
 }
 
-TEST(ScopeConfig, empty_tags)
+TEST(ScopeConfig, empty_keywords)
 {
-    ScopeConfig cfg(EMPTY_TAGS);
-    EXPECT_EQ(cfg.tags().size(), 0);
+    ScopeConfig cfg(EMPTY_KEYWORDS);
+    EXPECT_EQ(cfg.keywords().size(), 0);
 }
 
-TEST(ScopeConfig, single_tag)
+TEST(ScopeConfig, single_keyword)
 {
-    ScopeConfig cfg(SINGLE_TAG);
-    EXPECT_EQ(cfg.tags().size(), 1);
+    ScopeConfig cfg(SINGLE_KEYWORD);
+    EXPECT_EQ(cfg.keywords().size(), 1);
 }
 
 class ScopeConfigWithIntl: public ::testing::Test
