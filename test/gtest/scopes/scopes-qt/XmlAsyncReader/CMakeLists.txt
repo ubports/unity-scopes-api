@@ -1,11 +1,11 @@
 add_executable(
   XmlAsyncReader_test
-  XmlAsyncReader_test.cpp
-  ${SCOPES_QT_SRC})
+  XmlAsyncReader_test.cpp)
 
 target_link_libraries(
   XmlAsyncReader_test
-  ${TESTLIBS})
+  ${TESTLIBS}
+  ${TESTLIBS_QT})
 
 target_link_libraries(
   XmlAsyncReader_test
