@@ -198,7 +198,7 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
         HttpResponseHandle::SPtr response = http_client_->get(remote_scopes_uri.str(), [&response_str](std::string const& replyLine) {
                 response_str += replyLine; // accumulate all reply lines
         }, headers);
-        response->wait();
+        response->get();
 
         BOOST_LOG_SEV(logger_, Logger::Info)
             << "SmartScopesClient.get_remote_scopes(): Remote scopes:\n" << response_str;
