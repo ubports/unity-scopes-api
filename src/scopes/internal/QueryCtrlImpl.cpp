@@ -45,9 +45,6 @@ QueryCtrlImpl::QueryCtrlImpl(MWQueryCtrlProxy const& ctrl_proxy, MWReplyProxy co
 {
     // We remember the reply proxy so, when the query is cancelled, we can
     // inform the reply object belonging to this query that the query is finished.
-    assert(reply_proxy);
-
-    lock_guard<mutex> lock(mutex_);
     ready_ = ctrl_proxy != nullptr;
     cancelled_ = false;
 }
@@ -89,12 +86,16 @@ void QueryCtrlImpl::cancel()
 void QueryCtrlImpl::set_proxy(MWQueryCtrlProxy const& p)
 {
     assert(proxy() == nullptr);
-    ObjectImpl::set_proxy(p);
 
-    bool need_cancel;
-
+    bool need_cancel = false;
     {
         lock_guard<mutex> lock(mutex_);
+
+        if (!reply_proxy_)
+        {
+            return;
+        }
+        ObjectImpl::set_proxy(p);
         ready_ = true;
         need_cancel = cancelled_;
     } // Unlock

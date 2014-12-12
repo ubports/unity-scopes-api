@@ -70,9 +70,16 @@ private:
     bool valid_;
     mutable std::mutex mutex_;
     const CannedQuery canned_query_;
-    const SearchMetadata search_metadata_;
+    SearchMetadata search_metadata_;
     std::string department_id_;
     std::vector<QueryCtrlProxy> subqueries_;
+
+    void check_subsearch_params(ScopeProxy const& scope, SearchListenerBase::SPtr const& reply);
+    QueryCtrlProxy check_for_query_loop(ScopeProxy const& scope, SearchListenerBase::SPtr const& reply);
+    void remember_subsearch(QueryCtrlProxy const& qcp);
+    QueryCtrlProxy do_subsearch(ScopeProxy const& scope,
+                                SearchListenerBase::SPtr const& reply,
+                                std::function<QueryCtrlProxy()> search_func);
 };
 
 } // namespace internal
