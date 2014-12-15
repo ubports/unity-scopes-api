@@ -1,0 +1,4 @@
+add_executable(ChildScopesRepository_test ChildScopesRepository_test.cpp)
+target_link_libraries(ChildScopesRepository_test ${TESTLIBS})
+
+add_test(ChildScopesRepository ChildScopesRepository_test)
