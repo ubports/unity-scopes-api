@@ -29,18 +29,17 @@ using namespace testing;
 using namespace unity::scopes;
 using namespace unity::scopes::internal;
 
-std::shared_ptr<core::posix::SignalTrap> trap(core::posix::trap_signals_for_all_subsequent_threads({core::posix::Signal::sig_chld}));
-std::unique_ptr<core::posix::ChildProcess::DeathObserver> death_observer(core::posix::ChildProcess::DeathObserver::create_once_with_signal_trap(trap));
-
 class ChildScopesTest : public Test
 {
 public:
     ChildScopesTest()
     {
         // Run a test registry
+        trap_ = core::posix::trap_signals_for_all_subsequent_threads({core::posix::Signal::sig_chld});
+        death_observer_ = core::posix::ChildProcess::DeathObserver::create_once_with_signal_trap(trap_);
         reg_rt_ = RuntimeImpl::create("TestRegistry", "Runtime.ini");
         auto reg_mw = reg_rt_->factory()->create("TestRegistry", "Zmq", "Zmq.ini");
-        auto reg_obj(std::make_shared<RegistryObject>(*death_observer, std::make_shared<Executor>(), reg_mw));
+        auto reg_obj(std::make_shared<RegistryObject>(*death_observer_, std::make_shared<Executor>(), reg_mw));
         reg_mw->add_registry_object("TestRegistry", reg_obj);
 
         // Create a proxy to TestScope
@@ -48,13 +47,17 @@ public:
         auto scope_mw = scope_rt_->factory()->create("TestScope", "Zmq", "Zmq.ini");
         scope_mw->start();
         auto proxy = scope_mw->create_scope_proxy("TestScope");
-        scope_proxy_ = ScopeImpl::create(proxy, scope_rt_.get(), "TestScope");
+        test_scope = ScopeImpl::create(proxy, scope_rt_.get(), "TestScope");
     }
 
 protected:
+    ScopeProxy test_scope;
+
+private:
+    std::shared_ptr<core::posix::SignalTrap> trap_;
+    std::unique_ptr<core::posix::ChildProcess::DeathObserver> death_observer_;
     RuntimeImpl::UPtr reg_rt_;
     RuntimeImpl::UPtr scope_rt_;
-    ScopeProxy scope_proxy_;
 };
 
 TEST_F(ChildScopesTest, basic)
