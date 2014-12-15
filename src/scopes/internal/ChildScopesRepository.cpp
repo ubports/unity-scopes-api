@@ -180,8 +180,8 @@ ChildScopeList ChildScopesRepository::json_to_list(std::string const& child_scop
                                                   << child_node->to_json_string();
             continue;
         }
-        auto id_node = json_node.get_node("id");
-        auto enabled_node = json_node.get_node("enabled");
+        auto id_node = child_node->get_node("id");
+        auto enabled_node = child_node->get_node("enabled");
 
         if (id_node->type() != JsonCppNode::String ||
             enabled_node->type() != JsonCppNode::Bool)

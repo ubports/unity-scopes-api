@@ -62,6 +62,16 @@ private:
 
 TEST_F(ChildScopesTest, basic)
 {
+    ChildScopeList list;
+    list.push_back({"ScopeA", true});
+    list.push_back({"ScopeB", false});
+    list.push_back({"ScopeC", false});
+
+    test_scope->set_child_scopes_ordered(list);
+
+    ChildScopeList return_list = test_scope->child_scopes_ordered();
+    EXPECT_EQ(3, return_list.size());
+    EXPECT_EQ("ScopeA", return_list.front().id);
 }
 
 int main(int argc, char **argv)

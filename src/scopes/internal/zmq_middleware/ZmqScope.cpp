@@ -57,6 +57,8 @@ interface Scope
     QueryCtrl* activate(string query, ValueDict hints, Reply* replyProxy);
     QueryCtrl* perform_action(string query, ValueDict hints, string action_id, Reply* replyProxy);
     QueryCtrl* preview(string query, ValueDict hints, Reply* replyProxy);
+    ChildScopeList child_scopes_ordered();
+    void set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered);
     bool debug_mode();
 };
 
@@ -240,7 +242,7 @@ void ZmqScope::set_child_scopes_ordered(ChildScopeList const& child_scopes_order
         ++i;
     }
 
-    auto future = mw_base()->oneway_pool()->submit([&] { return this->invoke_oneway_(request_builder); });
+    auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_scope_(request_builder); });
     future.get();
 }
 
