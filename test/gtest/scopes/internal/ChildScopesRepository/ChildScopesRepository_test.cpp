@@ -15,3 +15,12 @@
  *
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
+
+#include <unity/scopes/internal/ChildScopesRepository.h>
+
+#include <gtest/gtest.h>
+
+TEST(ChildScopesRepository, basic)
+{
+
+}

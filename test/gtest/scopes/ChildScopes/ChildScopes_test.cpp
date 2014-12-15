@@ -16,6 +16,8 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
+#include <unity/scopes/ChildScope.h>
+
 #include <unity/scopes/internal/RegistryObject.h>
 #include <unity/scopes/internal/ScopeImpl.h>
 
@@ -37,22 +39,26 @@ public:
     {
         // Run a test registry
         reg_rt_ = RuntimeImpl::create("TestRegistry", "Runtime.ini");
-        auto mw = reg_rt_->factory()->create("TestRegistry", "Zmq", "Zmq.ini");
-        auto reg_obj(std::make_shared<RegistryObject>(*death_observer, std::make_shared<Executor>(), mw));
-        mw->add_registry_object("TestRegistry", reg_obj);
+        auto reg_mw = reg_rt_->factory()->create("TestRegistry", "Zmq", "Zmq.ini");
+        auto reg_obj(std::make_shared<RegistryObject>(*death_observer, std::make_shared<Executor>(), reg_mw));
+        reg_mw->add_registry_object("TestRegistry", reg_obj);
+
+        // Create a proxy to TestScope
+        scope_rt_ = RuntimeImpl::create("", "Runtime.ini");
+        auto scope_mw = scope_rt_->factory()->create("TestScope", "Zmq", "Zmq.ini");
+        scope_mw->start();
+        auto proxy = scope_mw->create_scope_proxy("TestScope");
+        scope_proxy_ = ScopeImpl::create(proxy, scope_rt_.get(), "TestScope");
     }
 
-private:
-    RuntimeImpl::SPtr reg_rt_;
+protected:
+    RuntimeImpl::UPtr reg_rt_;
+    RuntimeImpl::UPtr scope_rt_;
+    ScopeProxy scope_proxy_;
 };
 
 TEST_F(ChildScopesTest, basic)
 {
-    auto rt = RuntimeImpl::create("", "Runtime.ini");
-    auto mw = rt->factory()->create("TestScope", "Zmq", "Zmq.ini");
-    mw->start();
-    auto proxy = mw->create_scope_proxy("TestScope");
-    auto scope = ScopeImpl::create(proxy, rt.get(), "TestScope");
 }
 
 int main(int argc, char **argv)
