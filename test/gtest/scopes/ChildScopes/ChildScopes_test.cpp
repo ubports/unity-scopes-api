@@ -57,7 +57,7 @@ TEST_F(ChildScopesTest, basic)
 
 int main(int argc, char **argv)
 {
-    ::testing::InitGoogleTest(&argc, argv);
+    InitGoogleTest(&argc, argv);
 
     // Run TestScope in a separate thread
     auto rt = Runtime::create_scope_runtime("TestScope", "Runtime.ini");
@@ -67,7 +67,7 @@ int main(int argc, char **argv)
         rt->run_scope(&scope, "");
     });
 
-    // Give threads some time to bind to their endpoints
+    // Give the scope some time to bind to its endpoint
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
     // Run tests

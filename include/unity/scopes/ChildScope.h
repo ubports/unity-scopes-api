@@ -27,7 +27,7 @@ namespace unity
 namespace scopes
 {
 
-class ChildScope;
+struct ChildScope;
 
 /**
  \brief A list of child scopes.
