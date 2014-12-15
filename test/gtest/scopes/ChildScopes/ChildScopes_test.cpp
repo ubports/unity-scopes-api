@@ -23,25 +23,31 @@
 
 #include <gtest/gtest.h>
 
+using namespace testing;
 using namespace unity::scopes;
 using namespace unity::scopes::internal;
 
 std::shared_ptr<core::posix::SignalTrap> trap(core::posix::trap_signals_for_all_subsequent_threads({core::posix::Signal::sig_chld}));
 std::unique_ptr<core::posix::ChildProcess::DeathObserver> death_observer(core::posix::ChildProcess::DeathObserver::create_once_with_signal_trap(trap));
 
-RuntimeImpl::SPtr run_test_registry()
+class ChildScopesTest : public Test
 {
-    RuntimeImpl::SPtr runtime = RuntimeImpl::create("TestRegistry", "Runtime.ini");
-    MiddlewareBase::SPtr middleware = runtime->factory()->create("TestRegistry", "Zmq", "Zmq.ini");
-    RegistryObject::SPtr reg_obj(std::make_shared<RegistryObject>(*death_observer, std::make_shared<Executor>(), middleware));
-    middleware->add_registry_object("TestRegistry", reg_obj);
-    return runtime;
-}
+public:
+    ChildScopesTest()
+    {
+        // Run a test registry
+        reg_rt_ = RuntimeImpl::create("TestRegistry", "Runtime.ini");
+        auto mw = reg_rt_->factory()->create("TestRegistry", "Zmq", "Zmq.ini");
+        auto reg_obj(std::make_shared<RegistryObject>(*death_observer, std::make_shared<Executor>(), mw));
+        mw->add_registry_object("TestRegistry", reg_obj);
+    }
 
-TEST(ChildScopes, basic)
+private:
+    RuntimeImpl::SPtr reg_rt_;
+};
+
+TEST_F(ChildScopesTest, basic)
 {
-    auto reg_rt = run_test_registry();
-
     auto rt = RuntimeImpl::create("", "Runtime.ini");
     auto mw = rt->factory()->create("TestScope", "Zmq", "Zmq.ini");
     mw->start();
