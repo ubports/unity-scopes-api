@@ -15,7 +15,10 @@
 *
 * Author: Xavi Garcia <xavi.garcia.mena@canonical.com>
 */
-#include "../../../include/unity/scopes/scopes-qt/HttpAsyncReader.h"
+// allow experimental headers
+#define _ENABLE_QT_EXPERIMENTAL_
+
+#include <unity/scopes/scopes-qt/HttpAsyncReader.h>
 #include <core/net/uri.h>
 
 namespace http = core::net::http;

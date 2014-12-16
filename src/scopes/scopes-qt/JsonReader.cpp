@@ -15,9 +15,13 @@
  *
  * Author: Xavi Garcia <xavi.garcia.mena@canonical.com>
  */
-#include "../../../include/unity/scopes/scopes-qt/JsonReader.h"
+
+// allow experimental headers
+#define _ENABLE_QT_EXPERIMENTAL_
+
+#include <unity/scopes/scopes-qt/JsonReader.h>
 #include <QtCore/QVector>
-#include "../../../include/unity/scopes/scopes-qt/JsonAsyncReader.h"
+#include <unity/scopes/scopes-qt/JsonAsyncReader.h>
 
 using namespace unity::scopes::qt;
 

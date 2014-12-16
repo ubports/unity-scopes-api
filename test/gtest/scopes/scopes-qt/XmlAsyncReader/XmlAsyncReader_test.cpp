@@ -16,7 +16,11 @@
  * Authored by: Xavi Garcia <xavi.garcia.mena@canonical.com>
  */
 
-#include "../../../../../include/unity/scopes/scopes-qt/XmlAsyncReader.h"
+// allow experimental headers
+#define _ENABLE_QT_EXPERIMENTAL_
+
+#include <unity/scopes/scopes-qt/XmlAsyncReader.h>
+#include <unity/scopes/scopes-qt/XmlReader.h>
 #include <unity/scopes/ScopeExceptions.h>
 
 #include <QtCore/QXmlStreamReader>
@@ -25,7 +29,6 @@
 #include <gtest/gtest.h>
 
 #include <core/posix/exec.h>
-#include "../../../../../include/unity/scopes/scopes-qt/XmlReader.h"
 
 namespace posix = core::posix;
 
