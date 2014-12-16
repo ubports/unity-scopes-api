@@ -8,6 +8,29 @@ libunity-scopes-qt.so.01 libunity-scopes-qt #MINVER#
  (c++)"core::net::Error::~Error()@Base" 0.6.10+15.04.20141211
  (c++)"core::net::Error::~Error()@Base" 0.6.10+15.04.20141211
  (c++)"core::net::Error::~Error()@Base" 0.6.10+15.04.20141211
+ (c++)"unity::scopes::qt::JsonReader::JsonReader()@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::JsonReader::JsonReader()@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::XmlAsyncReader::create_parser_with_data(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::XmlAsyncReader::XmlAsyncReader()@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::XmlAsyncReader::XmlAsyncReader()@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::XmlAsyncReader::~XmlAsyncReader()@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::XmlAsyncReader::~XmlAsyncReader()@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::XmlAsyncReader::~XmlAsyncReader()@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::HttpAsyncReader::Priv::~Priv()@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::HttpAsyncReader::Priv::~Priv()@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::HttpAsyncReader::HttpAsyncReader()@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::HttpAsyncReader::HttpAsyncReader()@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::HttpAsyncReader::~HttpAsyncReader()@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::HttpAsyncReader::~HttpAsyncReader()@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::HttpAsyncReader::~HttpAsyncReader()@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::JsonAsyncReader::create_parser_with_data(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::JsonAsyncReader::JsonAsyncReader()@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::JsonAsyncReader::JsonAsyncReader()@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::JsonAsyncReader::~JsonAsyncReader()@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::JsonAsyncReader::~JsonAsyncReader()@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::JsonAsyncReader::~JsonAsyncReader()@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::XmlReader::XmlReader()@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::XmlReader::XmlReader()@Base" 0.6.10-0ubuntu1
  (c++)"unity::scopes::utils::qt::JsonReader::JsonReader()@Base" 0.6.10+15.04.20141211
  (c++)"unity::scopes::utils::qt::JsonReader::JsonReader()@Base" 0.6.10+15.04.20141211
  (c++)"unity::scopes::utils::qt::XmlAsyncReader::create_parser_with_data(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)@Base" 0.6.10+15.04.20141211
@@ -36,6 +59,17 @@ libunity-scopes-qt.so.01 libunity-scopes-qt #MINVER#
  (c++)"QString::~QString()@Base" 0.6.10+15.04.20141211
  (c++)"QString::~QString()@Base" 0.6.10+15.04.20141211
  (c++)"std::basic_string<char, std::char_traits<char>, std::allocator<char> > __gnu_cxx::__to_xstring<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, char>(int (*)(char*, unsigned long, char const*, __va_list_tag*), unsigned long, char const*, ...)@Base" 0.6.10+15.04.20141211
+ (c++)"unity::scopes::qt::JsonReader::read(QUrl const&) const@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::JsonReader::read(QString const&, QVector<QPair<QString, QString> > const&) const@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::XmlAsyncReader::async_get_parser(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::XmlAsyncReader::async_get_parser(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::vector<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > > const&) const@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::HttpAsyncReader::async_execute(core::net::http::Request::Handler const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::HttpAsyncReader::progress_report(core::net::http::Request::Progress const&) const@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::HttpAsyncReader::get_uri(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::vector<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > > const&) const@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::JsonAsyncReader::async_get_parser(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::JsonAsyncReader::async_get_parser(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::vector<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > > const&) const@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::XmlReader::read(QUrl const&) const@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::XmlReader::read(QString const&, QVector<QPair<QString, QString> > const&) const@Base" 0.6.10-0ubuntu1
  (c++)"unity::scopes::utils::qt::JsonReader::read(QUrl const&) const@Base" 0.6.10+15.04.20141211
  (c++)"unity::scopes::utils::qt::JsonReader::read(QString const&, QVector<QPair<QString, QString> > const&) const@Base" 0.6.10+15.04.20141211
  (c++)"unity::scopes::utils::qt::XmlAsyncReader::async_get_parser(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0.6.10+15.04.20141211
@@ -180,6 +214,9 @@ libunity-scopes-qt.so.01 libunity-scopes-qt #MINVER#
  (c++)"typeinfo for std::shared_ptr<QJsonDocument> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)@Base" 0.6.10+15.04.20141211
  (c++)"typeinfo for std::shared_ptr<QXmlStreamReader> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)@Base" 0.6.10+15.04.20141211
  (c++)"typeinfo for core::net::Error@Base" 0.6.10+15.04.20141211
+ (c++)"typeinfo for unity::scopes::qt::XmlAsyncReader@Base" 0.6.10-0ubuntu1
+ (c++)"typeinfo for unity::scopes::qt::HttpAsyncReader@Base" 0.6.10-0ubuntu1
+ (c++)"typeinfo for unity::scopes::qt::JsonAsyncReader@Base" 0.6.10-0ubuntu1
  (c++)"typeinfo for unity::scopes::utils::qt::XmlAsyncReader@Base" 0.6.10+15.04.20141211
  (c++)"typeinfo for unity::scopes::utils::qt::HttpAsyncReader@Base" 0.6.10+15.04.20141211
  (c++)"typeinfo for unity::scopes::utils::qt::JsonAsyncReader@Base" 0.6.10+15.04.20141211
@@ -218,6 +255,9 @@ libunity-scopes-qt.so.01 libunity-scopes-qt #MINVER#
  (c++)"typeinfo name for std::shared_ptr<QJsonDocument> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)@Base" 0.6.10+15.04.20141211
  (c++)"typeinfo name for std::shared_ptr<QXmlStreamReader> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)@Base" 0.6.10+15.04.20141211
  (c++)"typeinfo name for core::net::Error@Base" 0.6.10+15.04.20141211
+ (c++)"typeinfo name for unity::scopes::qt::XmlAsyncReader@Base" 0.6.10-0ubuntu1
+ (c++)"typeinfo name for unity::scopes::qt::HttpAsyncReader@Base" 0.6.10-0ubuntu1
+ (c++)"typeinfo name for unity::scopes::qt::JsonAsyncReader@Base" 0.6.10-0ubuntu1
  (c++)"typeinfo name for unity::scopes::utils::qt::XmlAsyncReader@Base" 0.6.10+15.04.20141211
  (c++)"typeinfo name for unity::scopes::utils::qt::HttpAsyncReader@Base" 0.6.10+15.04.20141211
  (c++)"typeinfo name for unity::scopes::utils::qt::JsonAsyncReader@Base" 0.6.10+15.04.20141211
@@ -254,6 +294,9 @@ libunity-scopes-qt.so.01 libunity-scopes-qt #MINVER#
  (c++)"typeinfo name for std::future<std::shared_ptr<QXmlStreamReader> > unity::scopes::utils::qt::HttpAsyncReader::async_get_parser<QXmlStreamReader>(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::function<std::shared_ptr<QXmlStreamReader> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)> const&) const::{lambda(core::net::http::Response const&)#2}@Base" 0.6.10+15.04.20141211
  (c++)"typeinfo name for std::future<std::shared_ptr<QXmlStreamReader> > unity::scopes::utils::qt::HttpAsyncReader::async_get_parser<QXmlStreamReader>(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::function<std::shared_ptr<QXmlStreamReader> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)> const&) const::{lambda(core::net::Error const&)#1}@Base" 0.6.10+15.04.20141211
  (c++)"vtable for core::net::Error@Base" 0.6.10+15.04.20141211
+ (c++)"vtable for unity::scopes::qt::XmlAsyncReader@Base" 0.6.10-0ubuntu1
+ (c++)"vtable for unity::scopes::qt::HttpAsyncReader@Base" 0.6.10-0ubuntu1
+ (c++)"vtable for unity::scopes::qt::JsonAsyncReader@Base" 0.6.10-0ubuntu1
  (c++)"vtable for unity::scopes::utils::qt::XmlAsyncReader@Base" 0.6.10+15.04.20141211
  (c++)"vtable for unity::scopes::utils::qt::HttpAsyncReader@Base" 0.6.10+15.04.20141211
  (c++)"vtable for unity::scopes::utils::qt::JsonAsyncReader@Base" 0.6.10+15.04.20141211
