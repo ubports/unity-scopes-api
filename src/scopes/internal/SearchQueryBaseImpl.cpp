@@ -64,8 +64,19 @@ QueryCtrlProxy SearchQueryBaseImpl::subsearch(ScopeProxy const& scope,
                                               string const& query_string,
                                               SearchListenerBase::SPtr const& reply)
 {
+    function<QueryCtrlProxy()> search;
     auto scope_impl = dynamic_pointer_cast<ScopeImpl>(scope);
-    auto search = [&]{ return scope_impl->search(query_string, "", FilterState(), search_metadata_, history_, reply); };
+    if (scope_impl)
+    {
+        search = [&]{ return scope_impl->search(query_string, "", FilterState(), search_metadata_, history_, reply); };
+    }
+    else
+    {
+        // scope_impl can be nullptr if we use a mock scope: TypedScopeFixture<testing::Scope>
+        // If so, we call the normal search without passing the history through, because
+        // we don't need loop detection for mock scopes.
+        search = [&]{ return scope->search(query_string, "", FilterState(), search_metadata_, reply); };
+    }
     return do_subsearch(scope, reply, search);
 }
 
@@ -74,8 +85,16 @@ QueryCtrlProxy SearchQueryBaseImpl::subsearch(ScopeProxy const& scope,
                                               FilterState const& filter_state,
                                               SearchListenerBase::SPtr const& reply)
 {
+    function<QueryCtrlProxy()> search;
     auto scope_impl = dynamic_pointer_cast<ScopeImpl>(scope);
-    auto search = [&]{ return scope_impl->search(query_string, "", filter_state, search_metadata_, history_, reply); };
+    if (scope_impl)
+    {
+        search = [&]{ return scope_impl->search(query_string, "", filter_state, search_metadata_, history_, reply); };
+    }
+    else
+    {
+        search = [&]{ return scope->search(query_string, "", filter_state, search_metadata_, reply); };
+    }
     return do_subsearch(scope, reply, search);
 }
 
@@ -85,8 +104,16 @@ QueryCtrlProxy SearchQueryBaseImpl::subsearch(ScopeProxy const& scope,
                                    FilterState const& filter_state,
                                    SearchListenerBase::SPtr const& reply)
 {
+    function<QueryCtrlProxy()> search;
     auto scope_impl = dynamic_pointer_cast<ScopeImpl>(scope);
-    auto search = [&]{ return scope_impl->search(query_string, department_id, filter_state, search_metadata_, history_, reply); };
+    if (scope_impl)
+    {
+        search = [&]{ return scope_impl->search(query_string, department_id, filter_state, search_metadata_, history_, reply); };
+    }
+    else
+    {
+        search = [&]{ return scope->search(query_string, department_id, filter_state, search_metadata_, reply); };
+    }
     return do_subsearch(scope, reply, search);
 }
 
@@ -97,9 +124,16 @@ QueryCtrlProxy SearchQueryBaseImpl::subsearch(ScopeProxy const& scope,
                                               SearchMetadata const& metadata,
                                               SearchListenerBase::SPtr const& reply)
 {
-    abort();
+    function<QueryCtrlProxy()> search;
     auto scope_impl = dynamic_pointer_cast<ScopeImpl>(scope);
-    auto search = [&]{ return scope_impl->search(query_string, department_id, filter_state, metadata, history_, reply); };
+    if (scope_impl)
+    {
+        search = [&]{ return scope_impl->search(query_string, department_id, filter_state, metadata, history_, reply); };
+    }
+    else
+    {
+        search = [&]{ return scope->search(query_string, department_id, filter_state, metadata, reply); };
+    }
     return do_subsearch(scope, reply, search);
 }
 
@@ -192,7 +226,8 @@ QueryCtrlProxy SearchQueryBaseImpl::check_for_query_loop(ScopeProxy const& scope
     {
         // Query has been here before from the same client and with the same child scope as the target.
         reply->finished(CompletionDetails(CompletionDetails::OK,
-                                          "empty result set due to aggregator loop or repeated query on scope " + get<1>(tuple)));
+                                          "empty result set due to aggregator loop or repeated query on aggregating scope "
+                                          + get<1>(tuple)));
         auto scope_impl = dynamic_pointer_cast<ScopeImpl>(scope);
         auto logger = scope_impl->runtime()->logger();
         ctrl_proxy = make_shared<QueryCtrlImpl>(nullptr, nullptr, logger);  // Dummy proxy in already-cancelled state
