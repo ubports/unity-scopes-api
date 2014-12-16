@@ -53,6 +53,7 @@ public:
     // Remote operation implementations
     MWQueryCtrlProxy search(CannedQuery const& q,
                                   SearchMetadata const& hints,
+                                  VariantMap const& details,
                                   MWReplyProxy const& reply,
                                   InvokeInfo const& info) override;
 

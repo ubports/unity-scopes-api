@@ -31,8 +31,6 @@ namespace scopes
 namespace internal
 {
 
-std::mutex SearchMetadataImpl::mutex_;
-
 SearchMetadataImpl::SearchMetadataImpl(std::string const& locale, std::string const& form_factor)
     : QueryMetadataImpl(locale, form_factor),
       cardinality_(0)
@@ -57,21 +55,6 @@ SearchMetadataImpl::SearchMetadataImpl(VariantMap const& var)
     {
         it = find_or_throw("SearchMetadataImpl()", var, "location");
         location_ = Location(it->second.get_dict());
-    }
-    catch (std::exception &e)
-    {
-    }
-
-    // History of sender/receiver scope ID pairs this query has visited
-    try
-    {
-        it = find_or_throw("SearchMetadataImpl()", var, "history");
-        for (auto const& v : it->second.get_array())
-        {
-            auto sender = v.get_dict()["s"].get_string();
-            auto receiver = v.get_dict()["r"].get_string();
-            history_.push_back(make_pair(sender, receiver));
-        }
     }
     catch (std::exception &e)
     {
@@ -108,30 +91,6 @@ bool SearchMetadataImpl::has_location() const
     return location_;
 }
 
-bool SearchMetadataImpl::add_to_history(SendRecvPair const& pair)
-{
-    std::lock_guard<std::mutex> lock(mutex_);
-
-    if (std::find(history_.begin(), history_.end(), pair) != history_.end())
-    {
-        return false;
-    }
-    history_.push_back(pair);
-    return true;
-}
-
-SearchMetadataImpl::History SearchMetadataImpl::history() const
-{
-    std::lock_guard<std::mutex> lock(mutex_);
-    return history_;
-}
-
-void SearchMetadataImpl::set_history(History const& h)
-{
-    std::lock_guard<std::mutex> lock(mutex_);
-    history_ = h;
-}
-
 std::string SearchMetadataImpl::metadata_type() const
 {
     static const std::string t("search_metadata");
@@ -146,18 +105,6 @@ void SearchMetadataImpl::serialize(VariantMap& var) const
     {
         var["location"] = location_->serialize();
     }
-
-    std::lock_guard<std::mutex> lock(mutex_);  // history_ is mutable
-
-    VariantArray hist;
-    for (auto const& pair : history_)
-    {
-        VariantMap vm;
-        vm["s"] = pair.first;         // Sender scope ID
-        vm["r"] = pair.first;         // Receiver scope ID
-        hist.push_back(Variant(vm));
-    }
-    var["history"] = hist;
 }
 
 VariantMap SearchMetadataImpl::serialize() const

@@ -41,8 +41,16 @@ public:
     SearchQueryBaseImpl(CannedQuery const& query, SearchMetadata const& metadata);
     CannedQuery query() const;
     SearchMetadata search_metadata() const;
+
     void set_department_id(std::string const& department_id);
     std::string department_id() const;
+
+    void set_client_id(const std::string& id);
+
+    typedef std::tuple<std::string, std::string, std::string> HistoryData;
+    typedef std::vector<HistoryData> History;
+
+    void set_history(History const& h);
 
     QueryCtrlProxy subsearch(ScopeProxy const& scope,
                                    std::string const& query_string,
@@ -72,6 +80,8 @@ private:
     const CannedQuery canned_query_;
     SearchMetadata search_metadata_;
     std::string department_id_;
+    std::string client_id_;
+    History history_;
     std::vector<QueryCtrlProxy> subqueries_;
 
     void check_subsearch_params(ScopeProxy const& scope, SearchListenerBase::SPtr const& reply);

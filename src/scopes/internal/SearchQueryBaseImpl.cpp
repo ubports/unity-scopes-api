@@ -64,7 +64,8 @@ QueryCtrlProxy SearchQueryBaseImpl::subsearch(ScopeProxy const& scope,
                                               string const& query_string,
                                               SearchListenerBase::SPtr const& reply)
 {
-    auto search = [&]{ return scope->search(query_string, search_metadata_, reply); };
+    auto scope_impl = dynamic_pointer_cast<ScopeImpl>(scope);
+    auto search = [&]{ return scope_impl->search(query_string, "", FilterState(), search_metadata_, history_, reply); };
     return do_subsearch(scope, reply, search);
 }
 
@@ -73,7 +74,8 @@ QueryCtrlProxy SearchQueryBaseImpl::subsearch(ScopeProxy const& scope,
                                               FilterState const& filter_state,
                                               SearchListenerBase::SPtr const& reply)
 {
-    auto search = [&]{ return scope->search(query_string, filter_state, search_metadata_, reply); };
+    auto scope_impl = dynamic_pointer_cast<ScopeImpl>(scope);
+    auto search = [&]{ return scope_impl->search(query_string, "", filter_state, search_metadata_, history_, reply); };
     return do_subsearch(scope, reply, search);
 }
 
@@ -83,7 +85,8 @@ QueryCtrlProxy SearchQueryBaseImpl::subsearch(ScopeProxy const& scope,
                                    FilterState const& filter_state,
                                    SearchListenerBase::SPtr const& reply)
 {
-    auto search = [&]{ return scope->search(query_string, department_id, filter_state, search_metadata_, reply); };
+    auto scope_impl = dynamic_pointer_cast<ScopeImpl>(scope);
+    auto search = [&]{ return scope_impl->search(query_string, department_id, filter_state, search_metadata_, history_, reply); };
     return do_subsearch(scope, reply, search);
 }
 
@@ -94,12 +97,9 @@ QueryCtrlProxy SearchQueryBaseImpl::subsearch(ScopeProxy const& scope,
                                               SearchMetadata const& metadata,
                                               SearchListenerBase::SPtr const& reply)
 {
-    // The caller supplied the metadata. We need to add the current search history to the caller's metadata,
-    // so the search history is marshaled to the receiver.
-    auto new_meta = dynamic_cast<SearchMetadataImpl*>(metadata.p.get());
-    auto this_meta = dynamic_cast<SearchMetadataImpl const*>(search_metadata_.p.get());
-    new_meta->set_history(this_meta->history());
-    auto search = [&]{ return scope->search(query_string, department_id, filter_state, metadata, reply); };
+    abort();
+    auto scope_impl = dynamic_pointer_cast<ScopeImpl>(scope);
+    auto search = [&]{ return scope_impl->search(query_string, department_id, filter_state, metadata, history_, reply); };
     return do_subsearch(scope, reply, search);
 }
 
@@ -134,6 +134,18 @@ std::string SearchQueryBaseImpl::department_id() const
     return department_id_;
 }
 
+void SearchQueryBaseImpl::set_client_id(std::string const& id)
+{
+    lock_guard<mutex> lock(mutex_);
+    client_id_ = id;
+}
+
+void SearchQueryBaseImpl::set_history(History const& h)
+{
+    lock_guard<mutex> lock(mutex_);
+    history_ = h;
+}
+
 bool SearchQueryBaseImpl::valid() const
 {
     lock_guard<mutex> lock(mutex_);
@@ -153,16 +165,16 @@ void SearchQueryBaseImpl::check_subsearch_params(ScopeProxy const& scope, Search
 }
 
 // Check if this query has been through this aggregator before by checking the
-// history of the search metadata. The history is a list of <sender, receiver> scope IDs.
-// If a query loops around to this aggregator, and has been sent to the same child previously,
-// we immediately return an empty result set in order to break loops. If a loop is detected,
-// we return a dummy QueryCtrl. Otherwise, we add the <sender, receiver> pair to the
-// metadata before forwarding the search.
+// history. The history is a list of <client, aggregator, receiver> scope ID tuples.
+// If a query loops around to this aggregator, and has been sent to the same child
+// previously on behalf of the same client, we immediately call finished to indicate
+// an empty result set. If a loop is detected, we return a dummy QueryCtrl. Otherwise,
+// we add the current <client, aggregator, receiver> tuple to the history before forwarding the search.
 //
 // Note that we do this unconditionally, whether the receiver is a leaf or an aggregator.
-// In practice, this means that an aggregator can ask the same leaf scope more than
-// once for data. This works because normal searches do not check the query history.
-// But it also means that an aggregator cannot ask another aggregator more than
+// This means that an aggregator can ask a *leaf scope* more than once for data.
+// This works because normal searches do not check the query history (only
+// subsearches do). But an aggregator cannot ask another *aggregator* more
 // than once for data, even if that would not create a loop.
 //
 // It is possible for an aggregator to send a query to itself, but only once.
@@ -172,19 +184,25 @@ QueryCtrlProxy SearchQueryBaseImpl::check_for_query_loop(ScopeProxy const& scope
 {
     shared_ptr<QueryCtrlImpl> ctrl_proxy;
 
-    SearchMetadataImpl::SendRecvPair pair = make_pair(canned_query_.scope_id(), scope->identity());
-    auto meta = dynamic_cast<SearchMetadataImpl*>(search_metadata_.p.get());
-    if (!meta->add_to_history(pair))
+    assert(!mutex_.try_lock());
+
+    HistoryData tuple = make_tuple(client_id_, canned_query_.scope_id(), scope->identity());
+    auto it = find(history_.begin(), history_.end(), tuple);
+    if (it != history_.end())
     {
-        // Query has been here before with the same child scope as the target.
+        // Query has been here before from the same client and with the same child scope as the target.
         reply->finished(CompletionDetails(CompletionDetails::OK,
-                                          "empty result set due to aggregator loop on scope " + pair.first));
+                                          "empty result set due to aggregator loop or repeated query on scope " + get<1>(tuple)));
         auto scope_impl = dynamic_pointer_cast<ScopeImpl>(scope);
         auto logger = scope_impl->runtime()->logger();
         ctrl_proxy = make_shared<QueryCtrlImpl>(nullptr, nullptr, logger);  // Dummy proxy in already-cancelled state
         BOOST_LOG_SEV(logger, Logger::Warning)
             << "query loop for query \"" << canned_query_.query_string()
-            << "\", sender: " << pair.first << ", receiver: " << pair.second << endl;
+            << "\", client: " << get<0>(tuple) << ", aggregator: " << get<1>(tuple) << ", receiver: " << get<2>(tuple) << endl;
+    }
+    else
+    {
+        history_.push_back(tuple);
     }
 
     return ctrl_proxy;  // null proxy if there was no loop
@@ -195,7 +213,8 @@ QueryCtrlProxy SearchQueryBaseImpl::check_for_query_loop(ScopeProxy const& scope
 
 void SearchQueryBaseImpl::remember_subsearch(QueryCtrlProxy const& qcp)
 {
-    lock_guard<mutex> lock(mutex_);
+    assert(!mutex_.try_lock());
+
     subqueries_.push_back(qcp);
 }
 
@@ -204,6 +223,9 @@ QueryCtrlProxy SearchQueryBaseImpl::do_subsearch(ScopeProxy const& scope,
                                                  function<QueryCtrlProxy()> search_func)
 {
     check_subsearch_params(scope, reply);
+
+    lock_guard<mutex> lock(mutex_);
+
     auto query_ctrl = check_for_query_loop(scope, reply);
     if (query_ctrl)
     {

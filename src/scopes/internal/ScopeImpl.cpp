@@ -68,7 +68,7 @@ QueryCtrlProxy ScopeImpl::search(std::string const& query_string,
 {
     CannedQuery query(scope_id_, query_string, department_id);
     query.set_filter_state(filter_state);
-    return search(query, metadata, reply);
+    return search(query, metadata, SearchQueryBaseImpl::History(), reply);
 }
 
 QueryCtrlProxy ScopeImpl::search(std::string const& query_string,
@@ -76,23 +76,34 @@ QueryCtrlProxy ScopeImpl::search(std::string const& query_string,
                                  SearchMetadata const& metadata,
                                  SearchListenerBase::SPtr const& reply)
 {
-    CannedQuery query(scope_id_);
-    query.set_query_string(query_string);
+    CannedQuery query(scope_id_, query_string, "");
     query.set_filter_state(filter_state);
-    return search(query, metadata, reply);
+    return search(query, metadata, SearchQueryBaseImpl::History(), reply);
 }
 
 QueryCtrlProxy ScopeImpl::search(string const& query_string,
                                  SearchMetadata const& metadata,
                                  SearchListenerBase::SPtr const& reply)
 {
-    CannedQuery query(scope_id_);
-    query.set_query_string(query_string);
-    return search(query, metadata, reply);
+    CannedQuery query(scope_id_, query_string, "");
+    return search(query, metadata, SearchQueryBaseImpl::History(), reply);
+}
+
+QueryCtrlProxy ScopeImpl::search(std::string const& query_string,
+                                 std::string const& department_id,
+                                 FilterState const& filter_state,
+                                 SearchMetadata const& metadata,
+                                 SearchQueryBaseImpl::History const& history,
+                                 SearchListenerBase::SPtr const& reply)
+{
+    CannedQuery query(scope_id_, query_string, department_id);
+    query.set_filter_state(filter_state);
+    return search(query, metadata, history, reply);
 }
 
 QueryCtrlProxy ScopeImpl::search(CannedQuery const& query,
                                  SearchMetadata const& metadata,
+                                 SearchQueryBaseImpl::History const& history,
                                  SearchListenerBase::SPtr const& reply)
 {
     if (reply == nullptr)
@@ -112,12 +123,29 @@ QueryCtrlProxy ScopeImpl::search(CannedQuery const& query,
     // sent in the new thread, the lambda will call into this by-now-destroyed instance.
     auto impl = dynamic_pointer_cast<ScopeImpl>(shared_from_this());
 
-    auto send_search = [impl, query, metadata, rp, ro, ctrl]() -> void
+    string const my_id = runtime_->scope_id();
+    auto send_search = [my_id, impl, query, metadata, history, rp, ro, ctrl]() -> void
     {
         try
         {
+            // Create query details with our own ID and the query history for loop detection.
+            VariantMap details;
+            details["client_id"] = my_id;
+
+            VariantArray hist;
+            for (auto const& tuple : history)
+            {
+                VariantMap d;
+                d["c"] = get<0>(tuple);  // Client
+                d["a"] = get<1>(tuple);  // Aggregator
+                d["r"] = get<2>(tuple);  // Receiver
+                hist.push_back(Variant(d));
+            }
+            details["history"] = Variant(hist);
+
             // Forward the (synchronous) search() method across the bus.
-            auto real_ctrl = dynamic_pointer_cast<QueryCtrlImpl>(impl->fwd()->search(query, metadata.serialize(), rp));
+            auto real_ctrl = dynamic_pointer_cast<QueryCtrlImpl>(impl->fwd()->search(query, metadata.serialize(), details, rp));
+
             assert(real_ctrl);
 
             // Call has completed now, so we update the MWQueryCtrlProxy for the fake proxy

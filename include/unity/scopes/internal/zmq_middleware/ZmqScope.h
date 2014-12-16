@@ -46,6 +46,7 @@ public:
 
     virtual QueryCtrlProxy search(CannedQuery const& query,
                                         VariantMap const& hints,
+                                        VariantMap const& details,
                                         MWReplyProxy const& reply) override;
 
     virtual QueryCtrlProxy activate(VariantMap const& result,

@@ -94,10 +94,12 @@ void ScopeI::search_(Current const& current,
                               proxy.getEndpoint().cStr(),
                               proxy.getIdentity().cStr(),
                               proxy.getCategory().cStr()));
+    auto details = to_variant_map(req.getDetails());
     auto delegate = dynamic_pointer_cast<ScopeObjectBase>(del());
     assert(delegate);
     auto ctrl_proxy = dynamic_pointer_cast<ZmqQueryCtrl>(delegate->search(query,
                                                                           metadata,
+                                                                          details,
                                                                           reply_proxy,
                                                                           to_info(current)));
     assert(ctrl_proxy);

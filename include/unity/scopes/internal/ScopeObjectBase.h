@@ -46,6 +46,7 @@ public:
 
     virtual MWQueryCtrlProxy search(CannedQuery const& query,
                                           SearchMetadata const& hints,
+                                          VariantMap const& details,
                                           MWReplyProxy const& reply,
                                           InvokeInfo const& info) = 0;
 

@@ -56,13 +56,6 @@ public:
     Location location() const;
     bool has_location() const;
 
-    typedef std::pair<std::string, std::string> SendRecvPair;
-    bool add_to_history(SendRecvPair const& pair);             // Returns true if pair was added, false otherwise
-
-    typedef std::vector<SendRecvPair> History;
-    History history() const;
-    void set_history(History const&);
-
     virtual VariantMap serialize() const override;
 
     static SearchMetadata create(VariantMap const& var);
@@ -76,8 +69,6 @@ protected:
 private:
     int cardinality_;                           // immutable
     boost::optional<Location> location_;        // immutable
-    History history_;                           // List of sender/receiver pairs the query has visited
-    static std::mutex mutex_;                   // Protects history_. static, so we remain copyable
 };
 
 } // namespace internal
