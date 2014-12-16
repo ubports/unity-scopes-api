@@ -172,8 +172,6 @@ SearchMetadata (returned by serialize())
   all QueryMetadata attributes
   'cardinality' : int
   'location'    : dict
-  'history'     : array of pairs <sender, receiver> scope IDs as a dictionary.
-                  Records where the query has been so far
 
 ActionMetadata (returned by serialize())
 ========================================
