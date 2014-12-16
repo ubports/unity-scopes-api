@@ -18,7 +18,7 @@
 #include "../../../include/unity/scopes/scopes-qt/JsonAsyncReader.h"
 
 using namespace std;
-using namespace unity::scopes::utils::qt;
+using namespace unity::scopes::qt;
 
 JsonAsyncReader::JsonAsyncReader()
     : p_(new HttpAsyncReader)

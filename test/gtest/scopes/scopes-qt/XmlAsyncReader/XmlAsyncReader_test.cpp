@@ -30,7 +30,7 @@
 namespace posix = core::posix;
 
 using namespace std;
-using namespace unity::scopes::utils::qt;
+using namespace unity::scopes::qt;
 
 class ExceptionsTest : public ::testing::Test
 {

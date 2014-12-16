@@ -19,7 +19,7 @@
 #include <QtCore/QVector>
 #include "../../../include/unity/scopes/scopes-qt/JsonAsyncReader.h"
 
-using namespace unity::scopes::utils::qt;
+using namespace unity::scopes::qt;
 
 const static int64_t SECONDS_TIMEOUT = 10;
 

@@ -33,9 +33,6 @@ namespace unity
 namespace scopes
 {
 
-namespace utils
-{
-
 namespace qt
 {
 
@@ -304,8 +301,6 @@ static bool get_results(QXmlStreamReader& xml,
 }
 
 }  // namespace qt
-
-}  // namespace utils
 
 }  // namespace scopes
 

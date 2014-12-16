@@ -18,7 +18,7 @@
 #include "../../../include/unity/scopes/scopes-qt/XmlAsyncReader.h"
 
 using namespace std;
-using namespace unity::scopes::utils::qt;
+using namespace unity::scopes::qt;
 
 XmlAsyncReader::XmlAsyncReader()
     : p_(new HttpAsyncReader)

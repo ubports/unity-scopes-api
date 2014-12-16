@@ -1,0 +1,15 @@
+{
+global:
+    extern "C++" {
+        unity::scopes::qt::[!i]*;
+        typeinfo?for?unity::scopes::qt::[!i]*;
+        typeinfo?name?for?unity::scopes::qt::[!i]*;
+        vtable?for?unity::scopes::qt::[!i]*;
+        VTT?for?unity::scopes::qt::[!i]*;
+        virtual?thunk?to?unity::scopes::utility::[!i]*;
+    };
+local:
+    extern "C++" {
+        *;
+    };
+};

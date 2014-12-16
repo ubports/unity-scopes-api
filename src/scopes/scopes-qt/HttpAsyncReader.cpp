@@ -19,7 +19,7 @@
 #include <core/net/uri.h>
 
 namespace http = core::net::http;
-using namespace unity::scopes::utils::qt;
+using namespace unity::scopes::qt;
 
 // Private class that holds the httpclient and the worker thread
 class HttpAsyncReader::Priv

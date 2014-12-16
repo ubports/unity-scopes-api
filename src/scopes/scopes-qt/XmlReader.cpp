@@ -19,7 +19,7 @@
 
 #include "../../../include/unity/scopes/scopes-qt/XmlAsyncReader.h"
 
-using namespace unity::scopes::utils::qt;
+using namespace unity::scopes::qt;
 
 const static int64_t SECONDS_TIMEOUT = 10;
 

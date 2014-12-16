@@ -29,9 +29,6 @@ namespace unity
 namespace scopes
 {
 
-namespace utils
-{
-
 namespace qt
 {
 
@@ -79,8 +76,6 @@ private:
 };
 
 }  // namespace qt
-
-}  // namespace utils
 
 }  // namespace scopes
 

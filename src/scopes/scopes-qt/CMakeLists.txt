@@ -62,13 +62,13 @@ qt5_use_modules(
 
 target_link_libraries(
     ${UNITY_SCOPES_QT}
-    ${UNITY_API_LDFLAGS}
+    ${UNITY_SCOPES_LIB}
     net-cpp
 )
 
 target_link_libraries(
     ${UNITY_SCOPES_QT_TEST}
-    ${UNITY_SCOPES_TEST_LIB}
+    ${UNITY_SCOPES_LIB}
     net-cpp
 )
 
@@ -97,6 +97,13 @@ set_target_properties(${UNITY_SCOPES_QT_TEST} PROPERTIES LINK_FLAGS "${ldflags}"
 
 # export the library name so the unit test can access
 set(TESTLIBS_QT ${UNITY_SCOPES_QT_TEST} CACHE STRING "Qt test library with internal symbols visible" FORCE)
+
+
+# We compile with all symbols visible by default.
+set(symbol_map "${CMAKE_SOURCE_DIR}/src/scopes/scopes-qt/${UNITY_SCOPES_QT}.map")
+set_target_properties(${UNITY_SCOPES_QT} PROPERTIES
+                      LINK_FLAGS "${ldflags} -Wl,--version-script,${symbol_map}")
+set_target_properties(${UNITY_SCOPES_QT} PROPERTIES LINK_DEPENDS ${symbol_map})
 
 install(TARGETS ${UNITY_SCOPES_QT} LIBRARY DESTINATION ${LIB_INSTALL_PREFIX})
 

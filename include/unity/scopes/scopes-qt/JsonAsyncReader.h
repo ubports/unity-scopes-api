@@ -36,9 +36,6 @@ namespace unity
 namespace scopes
 {
 
-namespace utils
-{
-
 namespace qt
 {
 
@@ -335,8 +332,6 @@ static bool get_results_json(QJsonDocument& doc,
 }
 
 }  // namespace qt
-
-}  // namespace utils
 
 }  // namespace scopes
 

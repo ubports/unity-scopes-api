@@ -38,9 +38,6 @@ namespace unity
 namespace scopes
 {
 
-namespace utils
-{
-
 namespace qt
 {
 
@@ -299,8 +296,6 @@ T HttpAsyncReader::get_or_throw(std::future<T>& f, int64_t seconds)
 }
 
 }  // namespace qt
-
-}  // namespace utils
 
 }  // namespace scopes
 
