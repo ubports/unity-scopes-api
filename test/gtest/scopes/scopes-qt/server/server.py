@@ -47,6 +47,9 @@ class Query(ErrorHandler):
     def get(self):
 #         validate_argument(self, 'part', 'snippet,statistics')
         file = 'queries/%s.txt' % self.get_argument('method', None );
+        if "not_found" in file:
+            file = 'queries/not_found.txt'
+            self.set_status(404)
         self.write(read_file(file))
         self.finish()
 

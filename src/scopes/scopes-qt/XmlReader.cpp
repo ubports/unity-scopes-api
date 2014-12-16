@@ -19,8 +19,8 @@
 // allow experimental headers
 #define _ENABLE_QT_EXPERIMENTAL_
 
-#include <unity/scopes/scopes-qt/XmlReader.h>
 #include <unity/scopes/scopes-qt/XmlAsyncReader.h>
+#include <unity/scopes/scopes-qt/XmlReader.h>
 
 using namespace unity::scopes::qt;
 

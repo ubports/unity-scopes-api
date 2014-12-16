@@ -18,7 +18,7 @@
 #pragma once
 
 #ifndef _ENABLE_QT_EXPERIMENTAL_
-    #error You should define _ENABLE_QT_EXPERIMENTAL_ in order to use this experimental header file.
+#error You should define _ENABLE_QT_EXPERIMENTAL_ in order to use this experimental header file.
 #endif
 
 #include <QtCore/QUrl>

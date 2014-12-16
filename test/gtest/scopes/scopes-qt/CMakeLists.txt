@@ -4,3 +4,4 @@ add_definitions(
 )
 
 add_subdirectory(XmlAsyncReader)
+add_subdirectory(JsonAsyncReader)

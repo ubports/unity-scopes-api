@@ -18,9 +18,10 @@
 #pragma once
 
 #ifndef _ENABLE_QT_EXPERIMENTAL_
-    #error You should define _ENABLE_QT_EXPERIMENTAL_ in order to use this experimental header file.
+#error You should define _ENABLE_QT_EXPERIMENTAL_ in order to use this experimental header file.
 #endif
 
+#include <unity/scopes/scopes-qt/HttpAsyncReader.h>
 #include <unity/util/DefinesPtrs.h>
 #include <unity/util/NonCopyable.h>
 
@@ -28,11 +29,10 @@
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
 #include <QtCore/QStringList>
+#include <QtCore/QVector>
 
 #include <memory>
 #include <future>
-
-#include "../scopes-qt/HttpAsyncReader.h"
 
 namespace unity
 {

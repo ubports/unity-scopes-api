@@ -18,7 +18,7 @@
 #pragma once
 
 #ifndef _ENABLE_QT_EXPERIMENTAL_
-    #error You should define _ENABLE_QT_EXPERIMENTAL_ in order to use this experimental header file.
+#error You should define _ENABLE_QT_EXPERIMENTAL_ in order to use this experimental header file.
 #endif
 
 #include <unity/util/DefinesPtrs.h>
@@ -193,9 +193,11 @@ HttpAsyncReader::ResultsFuture<BASE> HttpAsyncReader::async_get(std::string cons
 
     handler.on_progress(bind(&HttpAsyncReader::progress_report, this, std::placeholders::_1));
 
-    handler.on_error([prom](core::net::Error const& e)
+    handler.on_error([prom, uri](core::net::Error const& e)
                      {
-                         prom->set_exception(make_exception_ptr(e));
+                         unity::LogicException logic_exception("AsyncReader::async_get: " + std::string(e.what()) +
+                                                               "( uri = " + uri + " )");
+                         prom->set_exception(logic_exception.self());
                      });
 
     handler.on_response(
@@ -254,9 +256,11 @@ HttpAsyncReader::ParserFuture<PARSER> HttpAsyncReader::async_get_parser(std::str
     core::net::http::Request::Handler handler;
     handler.on_progress(bind(&HttpAsyncReader::progress_report, this, std::placeholders::_1));
 
-    handler.on_error([prom](core::net::Error const& e)
+    handler.on_error([prom, uri](core::net::Error const& e)
                      {
-                         prom->set_exception(make_exception_ptr(e));
+                         unity::LogicException logic_exception("AsyncReader::async_get: " + std::string(e.what()) +
+                                                               "( uri = " + uri + " )");
+                         prom->set_exception(logic_exception.self());
                      });
 
     handler.on_response(
