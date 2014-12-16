@@ -1,3 +1,11 @@
+unity-scopes-api (0.6.10+15.04.20141212-0ubuntu1) vivid; urgency=low
+
+  [ Pawel Stolowski ]
+  * Use get() on future of the http request to get exceptions reported
+    when error occur (std::future::wait() doesn't throw). (LP: #1401560)
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Fri, 12 Dec 2014 11:48:25 +0000
+
 unity-scopes-api (0.6.10+15.04.20141211-0ubuntu1) vivid; urgency=low
 
   [ Pawel Stolowski ]
