@@ -73,9 +73,9 @@ target_link_libraries(
 )
 
 # API version
-set(UNITY_SCOPES_QT_MAJOR 0)
-set(UNITY_SCOPES_QT_MINOR 1)
-set(UNITY_SCOPES_QT_MICRO 0)
+set(UNITY_SCOPES_QT_MAJOR 0 CACHE STRING "Qt library major version" FORCE)
+set(UNITY_SCOPES_QT_MINOR 1 CACHE STRING "Qt library minor version" FORCE)
+set(UNITY_SCOPES_QT_MICRO 0 CACHE STRING "Qt library micro version" FORCE)
 set(UNITY_SCOPES_QT_SOVERSION ${UNITY_SCOPES_QT_MAJOR}${UNITY_SCOPES_QT_MINOR})
 
 set_target_properties(${UNITY_SCOPES_QT} PROPERTIES
@@ -97,6 +97,7 @@ set_target_properties(${UNITY_SCOPES_QT_TEST} PROPERTIES LINK_FLAGS "${ldflags}"
 
 # export the library name so the unit test can access
 set(TESTLIBS_QT ${UNITY_SCOPES_QT_TEST} CACHE STRING "Qt test library with internal symbols visible" FORCE)
+set(LIB_QT ${UNITY_SCOPES_QT} CACHE STRING "Qt library" FORCE)
 
 
 # We compile with all symbols visible by default.
