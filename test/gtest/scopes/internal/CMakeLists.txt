@@ -1,5 +1,4 @@
 add_subdirectory(CategoryRegistry)
-add_subdirectory(ChildScopesRepository)
 add_subdirectory(ConfigBase)
 add_subdirectory(DynamicLoader)
 add_subdirectory(IniSettingsSchema)

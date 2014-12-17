@@ -174,7 +174,7 @@ TEST_F(ChildScopesTest, get_set_ordered_list)
     list.push_back({"ScopeB", false});
     list.push_back({"ScopeD", true});
     list.push_back({"ScopeX", true});
-    list.push_back({"ScopeA", true});
+    list.push_back({"ScopeA", false});
     EXPECT_TRUE(test_scope->set_child_scopes_ordered(list));
 
     // 3rd+ TestScope::child_scopes() returns: "D,A,B"
@@ -188,7 +188,7 @@ TEST_F(ChildScopesTest, get_set_ordered_list)
     EXPECT_TRUE(return_list.front().enabled);
     return_list.pop_front();
     EXPECT_EQ("ScopeA", return_list.front().id);
-    EXPECT_TRUE(return_list.front().enabled);
+    EXPECT_FALSE(return_list.front().enabled);
 }
 
 TEST_F(ChildScopesTest, existing_config)
@@ -205,7 +205,7 @@ TEST_F(ChildScopesTest, existing_config)
     EXPECT_FALSE(return_list.front().enabled);
     return_list.pop_front();
     EXPECT_EQ("ScopeA", return_list.front().id);
-    EXPECT_TRUE(return_list.front().enabled);
+    EXPECT_FALSE(return_list.front().enabled);
     return_list.pop_front();
     EXPECT_EQ("ScopeC", return_list.front().id);
     EXPECT_TRUE(return_list.front().enabled);
@@ -238,4 +238,8 @@ TEST_F(ChildScopesTest, no_config_dir)
     return_list.pop_front();
     EXPECT_EQ("ScopeC", return_list.front().id);
     EXPECT_TRUE(return_list.front().enabled);
+}
+
+TEST_F(ChildScopesTest, corrupted_config)
+{
 }
