@@ -1,6 +1,11 @@
 Release notes
 =============
 
+Changes in version 0.6.11
+=========================
+  - Prevent query from looping indefinitely if a query is forwarded
+    among aggregators and loops back to an earlier aggregator.
+
 Changes in version 0.6.10
 =========================
   - Renamed "Tags" scope .ini option to "Keywords".

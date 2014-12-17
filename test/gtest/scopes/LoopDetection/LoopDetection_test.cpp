@@ -114,6 +114,11 @@ private:
     ScopeProxy scope_;
 };
 
+// Stop warnings about unused return value from system()
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-result"
+
 // The command file for each scope is called A.cmd, B.cmd, etc. It contains scope IDs, one per
 // line. For each scope ID in its command file, the scope sends a subsearch to that scope.
 // Once a scope's subsearch completes, it pushes a single result with the scope's ID as the
@@ -216,6 +221,8 @@ TEST_F(LoopDetectionTest, repeated_search_on_aggregator)
     EXPECT_EQ(1, r.find("B")->second.size());
     EXPECT_EQ(1, r.find("C")->second.size());
 }
+
+#pragma GCC diagnostic pop
 
 int main(int argc, char **argv)
 {
