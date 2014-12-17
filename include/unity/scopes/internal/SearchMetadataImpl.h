@@ -23,8 +23,6 @@
 
 #include <boost/optional.hpp>
 
-#include <mutex>
-
 namespace unity
 {
 
