@@ -41,13 +41,29 @@ public:
 
     ChildScopeList child_scopes() const override
     {
-        ChildScopeList list;
-        list.push_back({"ScopeA", true});
-        list.push_back({"ScopeB", false});
-        list.push_back({"ScopeC", false});
-
-        return list;
+        if (i == 0)
+        {
+            ChildScopeList list;
+            list.push_back({"ScopeA", true});
+            list.push_back({"ScopeB", false});
+            list.push_back({"ScopeC", false});
+            ++i;
+            return list;
+        }
+        else
+        {
+            ChildScopeList list;
+            list.push_back({"ScopeA", true});
+            list.push_back({"ScopeB", false});
+            list.push_back({"ScopeC", false});
+            list.push_back({"ScopeD", false});
+            list.push_back({"ScopeE", true});
+            return list;
+        }
     }
+
+private:
+    mutable int i = 0;
 };
 
 } // namespace scopes

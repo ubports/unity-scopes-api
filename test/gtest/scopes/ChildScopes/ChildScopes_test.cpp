@@ -21,7 +21,7 @@
 #include <unity/scopes/internal/RegistryObject.h>
 #include <unity/scopes/internal/ScopeImpl.h>
 
-#include <TestScope.h>
+#include "TestScope.h"
 
 #include <boost/filesystem/operations.hpp>
 #include <gtest/gtest.h>
@@ -70,14 +70,18 @@ TEST_F(ChildScopesTest, basic)
 
     ChildScopeList list;
     list.push_back({"ScopeC", false});
-    list.push_back({"ScopeA", true});
-    list.push_back({"ScopeB", false});
+    list.push_back({"ScopeA", false});
     list.push_back({"ScopeD", true});
+    list.push_back({"ScopeB", true});
 
     test_scope->set_child_scopes_ordered(list);
 
     return_list = test_scope->child_scopes_ordered();
-    EXPECT_EQ(3, return_list.size());
+    EXPECT_EQ(5, return_list.size());
+    EXPECT_EQ("ScopeC", return_list.front().id);
+
+    return_list = test_scope->child_scopes_ordered();
+    EXPECT_EQ(5, return_list.size());
     EXPECT_EQ("ScopeC", return_list.front().id);
 }
 

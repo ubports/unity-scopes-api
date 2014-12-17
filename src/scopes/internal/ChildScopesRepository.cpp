@@ -59,26 +59,56 @@ ChildScopeList ChildScopesRepository::child_scopes_ordered(ChildScopeList const&
         {
             // only the scopes from child_scopes_ordered that appear in child_scopes_unordered
             // should be added to ordered_set (a scope not found in child_scopes_unordered was
-            // probably uninstalled since the repo was last writen)
+            // probably uninstalled since the repo was last written)
             ordered_set.insert(child.id);
         }
+    }
+
+    // has anything changed since the repo was last written?
+    if (child_scopes_ordered.size() == ordered_set.size() && // if no scopes have been removed
+        unordered_set.size() == 0)                           // and no scopes have been added
+    {
+        return child_scopes_ordered; // return the repo list as is
     }
 
     // now create a new list by first adding child_scopes_ordered then child_scopes_unordered,
     // using each set as a mask to determine whether or not a scope should be included
     ChildScopeList new_child_scopes_ordered;
-    for (auto const& child : child_scopes_ordered)
     {
-        if (ordered_set.find(child.id) != ordered_set.end())
+        // add child_scopes_ordered to new_child_scopes_ordered
+        if (child_scopes_ordered.size() == ordered_set.size())
         {
-            new_child_scopes_ordered.push_back(child);
+            new_child_scopes_ordered = child_scopes_ordered;
         }
-    }
-    for (auto const& child : child_scopes_unordered)
-    {
-        if (unordered_set.find(child.id) != unordered_set.end())
+        else if (!ordered_set.empty())
         {
-            new_child_scopes_ordered.push_back(child);
+            // use ordered_set as a mask
+            for (auto const& child : child_scopes_ordered)
+            {
+                if (ordered_set.find(child.id) != ordered_set.end())
+                {
+                    new_child_scopes_ordered.push_back(child);
+                }
+            }
+        }
+
+        // add child_scopes_unordered to new_child_scopes_ordered
+        if (child_scopes_unordered.size() == unordered_set.size())
+        {
+            new_child_scopes_ordered.insert(new_child_scopes_ordered.end(),
+                                            child_scopes_unordered.begin(),
+                                            child_scopes_unordered.end());
+        }
+        else if (!unordered_set.empty())
+        {
+            // use unordered_set as a mask
+            for (auto const& child : child_scopes_unordered)
+            {
+                if (unordered_set.find(child.id) != unordered_set.end())
+                {
+                    new_child_scopes_ordered.push_back(child);
+                }
+            }
         }
     }
 
