@@ -188,7 +188,13 @@ std::string ChildScopesRepository::list_to_json(ChildScopeList const& child_scop
 
 ChildScopeList ChildScopesRepository::json_to_list(std::string const& child_scopes_json)
 {
-    JsonCppNode json_node(child_scopes_json);
+    JsonCppNode json_node;
+    try
+    {
+        json_node.read_json(child_scopes_json);
+    }
+    catch (...){}
+
     if (json_node.type() != JsonCppNode::Array)
     {
         BOOST_LOG_SEV(logger_, Logger::Error) << "ChildScopesRepository::json_to_list(): "

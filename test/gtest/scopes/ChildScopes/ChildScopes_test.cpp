@@ -24,6 +24,7 @@
 #include "TestScope.h"
 
 #include <boost/filesystem/operations.hpp>
+#include <fstream>
 #include <gtest/gtest.h>
 
 using namespace boost;
@@ -70,6 +71,30 @@ public:
         // Remove the config directory for TestScope
         system::error_code ec;
         filesystem::remove_all(TEST_BIN_DIR "/TestScope", ec);
+    }
+
+    void write_empty_config()
+    {
+        // open repository for output
+        std::ofstream repo_file(TEST_BIN_DIR "/TestScope/child-scopes.json");
+        repo_file << "";
+        repo_file.close();
+    }
+
+    void write_corrupt_config()
+    {
+        // open repository for output
+        std::ofstream repo_file(TEST_BIN_DIR "/TestScope/child-scopes.json");
+        repo_file << "ag;hasd;glasd;glkasdhg;klasdf;k;";
+        repo_file.close();
+    }
+
+    void write_partially_corrupt_config()
+    {
+        // open repository for output
+        std::ofstream repo_file(TEST_BIN_DIR "/TestScope/child-scopes.json");
+        repo_file << R"([{"id":"ScopeB","enabled":true},{"id":"ScopeB"},{"id":"ScopeC","enabled":"false"}])";
+        repo_file.close();
     }
 
     void start_test_scope()
@@ -180,6 +205,7 @@ TEST_F(ChildScopesTest, get_set_ordered_list)
     // 3rd+ TestScope::child_scopes() returns: "D,A,B"
     // with order: "B,D,X,A", we should get: "B,D,A"
     return_list = test_scope->child_scopes_ordered();
+    return_list = test_scope->child_scopes_ordered();
     EXPECT_EQ(3, return_list.size());
     EXPECT_EQ("ScopeB", return_list.front().id);
     EXPECT_FALSE(return_list.front().enabled);
@@ -242,4 +268,58 @@ TEST_F(ChildScopesTest, no_config_dir)
 
 TEST_F(ChildScopesTest, corrupted_config)
 {
+    // Create an empty config directory for TestScope
+    remove_config_dir();
+    create_config_dir();
+
+    // Partially corrupt config (Sets order to: "B")
+    write_partially_corrupt_config();
+    start_test_scope();
+
+    // 1st TestScope::child_scopes() returns: "A,B,C"
+    // with partial order: "B", we should get: "B,A,C"
+    ChildScopeList return_list = test_scope->child_scopes_ordered();
+    EXPECT_EQ(3, return_list.size());
+    EXPECT_EQ("ScopeB", return_list.front().id);
+    EXPECT_TRUE(return_list.front().enabled);
+    return_list.pop_front();
+    EXPECT_EQ("ScopeA", return_list.front().id);
+    EXPECT_FALSE(return_list.front().enabled);
+    return_list.pop_front();
+    EXPECT_EQ("ScopeC", return_list.front().id);
+    EXPECT_TRUE(return_list.front().enabled);
+
+    // Empty config
+    write_empty_config();
+    stop_test_scope();
+    start_test_scope();
+
+    // Check that nothing crashes and we simply get the list from the scope as is
+    return_list = test_scope->child_scopes_ordered();
+    EXPECT_EQ(3, return_list.size());
+    EXPECT_EQ("ScopeA", return_list.front().id);
+    EXPECT_FALSE(return_list.front().enabled);
+    return_list.pop_front();
+    EXPECT_EQ("ScopeB", return_list.front().id);
+    EXPECT_FALSE(return_list.front().enabled);
+    return_list.pop_front();
+    EXPECT_EQ("ScopeC", return_list.front().id);
+    EXPECT_TRUE(return_list.front().enabled);
+
+    // Corrupt config
+    write_corrupt_config();
+    stop_test_scope();
+    start_test_scope();
+
+    // Check that nothing crashes and we simply get the list from the scope as is
+    return_list = test_scope->child_scopes_ordered();
+    EXPECT_EQ(3, return_list.size());
+    EXPECT_EQ("ScopeA", return_list.front().id);
+    EXPECT_FALSE(return_list.front().enabled);
+    return_list.pop_front();
+    EXPECT_EQ("ScopeB", return_list.front().id);
+    EXPECT_FALSE(return_list.front().enabled);
+    return_list.pop_front();
+    EXPECT_EQ("ScopeC", return_list.front().id);
+    EXPECT_TRUE(return_list.front().enabled);
 }
