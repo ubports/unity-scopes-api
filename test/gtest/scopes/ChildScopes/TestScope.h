@@ -41,23 +41,35 @@ public:
 
     ChildScopeList child_scopes() const override
     {
+        // 1st TestScope::child_scopes() returns: "A,B,C"
         if (i == 0)
         {
             ChildScopeList list;
-            list.push_back({"ScopeA", true});
+            list.push_back({"ScopeA", false});
             list.push_back({"ScopeB", false});
-            list.push_back({"ScopeC", false});
+            list.push_back({"ScopeC", true});
             ++i;
             return list;
         }
+        // 2nd TestScope::child_scopes() returns: "D,A,B,C,E"
+        else if (i == 1)
+        {
+            ChildScopeList list;
+            list.push_back({"ScopeD", false});
+            list.push_back({"ScopeA", false});
+            list.push_back({"ScopeB", false});
+            list.push_back({"ScopeC", true});
+            list.push_back({"ScopeE", true});
+            ++i;
+            return list;
+        }
+        // 3rd+ TestScope::child_scopes() returns: D,A,B
         else
         {
             ChildScopeList list;
-            list.push_back({"ScopeA", true});
+            list.push_back({"ScopeD", true});
+            list.push_back({"ScopeA", false});
             list.push_back({"ScopeB", false});
-            list.push_back({"ScopeC", false});
-            list.push_back({"ScopeD", false});
-            list.push_back({"ScopeE", true});
             return list;
         }
     }

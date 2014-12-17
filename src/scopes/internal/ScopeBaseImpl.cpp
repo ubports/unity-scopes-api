@@ -197,7 +197,7 @@ ChildScopeList ScopeBaseImpl::child_scopes_ordered(ChildScopeList const& child_s
     return child_scopes_repo_->child_scopes_ordered(child_scopes_unordered);
 }
 
-void ScopeBaseImpl::set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered)
+bool ScopeBaseImpl::set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered)
 {
     return child_scopes_repo_->set_child_scopes_ordered(child_scopes_ordered);
 }

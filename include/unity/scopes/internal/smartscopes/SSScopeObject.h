@@ -74,7 +74,7 @@ public:
                              InvokeInfo const& info) override;
 
     ChildScopeList child_scopes_ordered() const override;
-    void set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered) override;
+    bool set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered) override;
 
     bool debug_mode() const override;
 

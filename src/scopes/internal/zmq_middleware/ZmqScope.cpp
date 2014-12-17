@@ -58,7 +58,7 @@ interface Scope
     QueryCtrl* perform_action(string query, ValueDict hints, string action_id, Reply* replyProxy);
     QueryCtrl* preview(string query, ValueDict hints, Reply* replyProxy);
     ChildScopeList child_scopes_ordered();
-    void set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered);
+    bool set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered);
     bool debug_mode();
 };
 
@@ -226,7 +226,7 @@ ChildScopeList ZmqScope::child_scopes_ordered()
     return child_scope_list;
 }
 
-void ZmqScope::set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered)
+bool ZmqScope::set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered)
 {
     capnp::MallocMessageBuilder request_builder;
     auto request = make_request_(request_builder, "set_child_scopes_ordered");
@@ -243,7 +243,12 @@ void ZmqScope::set_child_scopes_ordered(ChildScopeList const& child_scopes_order
     }
 
     auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_scope_(request_builder); });
-    future.get();
+    auto out_params = future.get();
+    auto r = out_params.reader->getRoot<capnproto::Response>();
+    throw_if_runtime_exception(r);
+
+    auto response = r.getPayload().getAs<capnproto::Scope::SetChildScopesOrderedResponse>();
+    return response.getReturnValue();
 }
 
 bool ZmqScope::debug_mode()

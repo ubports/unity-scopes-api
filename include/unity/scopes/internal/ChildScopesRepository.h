@@ -44,10 +44,10 @@ public:
                           boost::log::sources::severity_channel_logger_mt<>& logger);
 
     ChildScopeList child_scopes_ordered(ChildScopeList const& child_scopes_unordered);
-    void set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered);
+    bool set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered);
 
 private:
-    void write_repo(std::string const& child_scopes_json);
+    bool write_repo(std::string const& child_scopes_json);
     ChildScopeList read_repo();
 
     std::string list_to_json(ChildScopeList const& child_scopes_list);

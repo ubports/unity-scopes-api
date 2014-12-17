@@ -92,6 +92,11 @@ struct SetChildScopesOrderedRequest
     childScopesOrdered @0 : List(ChildScope);
 }
 
+struct SetChildScopesOrderedResponse
+{
+    returnValue @0 : Bool;
+}
+
 struct DebugModeResponse
 {
     returnValue @0 : Bool;

@@ -117,14 +117,14 @@ ChildScopeList ChildScopesRepository::child_scopes_ordered(ChildScopeList const&
     return new_child_scopes_ordered;
 }
 
-void ChildScopesRepository::set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered)
+bool ChildScopesRepository::set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered)
 {
     // simply write child_scopes_ordered to file
     std::lock_guard<std::mutex> lock(mutex_);
-    write_repo(list_to_json(child_scopes_ordered));
+    return write_repo(list_to_json(child_scopes_ordered));
 }
 
-void ChildScopesRepository::write_repo(std::string const& child_scopes_json)
+bool ChildScopesRepository::write_repo(std::string const& child_scopes_json)
 {
     // open repository for output
     std::ofstream repo_file(repo_file_path_);
@@ -133,7 +133,7 @@ void ChildScopesRepository::write_repo(std::string const& child_scopes_json)
         BOOST_LOG_SEV(logger_, Logger::Error) << "ChildScopesRepository::write_repo(): "
                                               << "Failed to open file: \"" << repo_file_path_
                                               << "\"";
-        return;
+        return false;
     }
 
     repo_file << child_scopes_json;
@@ -141,6 +141,7 @@ void ChildScopesRepository::write_repo(std::string const& child_scopes_json)
 
     cached_repo_ = json_to_list(child_scopes_json);
     have_latest_cache_ = true;
+    return true;
 }
 
 ChildScopeList ChildScopesRepository::read_repo()

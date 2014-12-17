@@ -66,7 +66,7 @@ public:
 
     MOCK_METHOD0(child_scopes_ordered, ChildScopeList());
 
-    MOCK_METHOD1(set_child_scopes_ordered, void(ChildScopeList const&));
+    MOCK_METHOD1(set_child_scopes_ordered, bool(ChildScopeList const&));
 };
 
 /// @endcond

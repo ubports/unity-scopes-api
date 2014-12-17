@@ -288,9 +288,9 @@ ChildScopeList ScopeImpl::child_scopes_ordered()
     return fwd()->child_scopes_ordered();
 }
 
-void ScopeImpl::set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered)
+bool ScopeImpl::set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered)
 {
-    fwd()->set_child_scopes_ordered(child_scopes_ordered);
+    return fwd()->set_child_scopes_ordered(child_scopes_ordered);
 }
 
 ScopeProxy ScopeImpl::create(MWScopeProxy const& mw_proxy, RuntimeImpl* runtime, std::string const& scope_id)

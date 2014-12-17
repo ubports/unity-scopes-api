@@ -31,86 +31,211 @@ using namespace testing;
 using namespace unity::scopes;
 using namespace unity::scopes::internal;
 
+std::shared_ptr<core::posix::SignalTrap> trap(core::posix::trap_signals_for_all_subsequent_threads({core::posix::Signal::sig_chld}));
+std::unique_ptr<core::posix::ChildProcess::DeathObserver> death_observer(core::posix::ChildProcess::DeathObserver::create_once_with_signal_trap(trap));
+
 class ChildScopesTest : public Test
 {
 public:
     ChildScopesTest()
     {
         // Run a test registry
-        trap_ = core::posix::trap_signals_for_all_subsequent_threads({core::posix::Signal::sig_chld});
-        death_observer_ = core::posix::ChildProcess::DeathObserver::create_once_with_signal_trap(trap_);
         reg_rt_ = RuntimeImpl::create("TestRegistry", "Runtime.ini");
         auto reg_mw = reg_rt_->factory()->create("TestRegistry", "Zmq", "Zmq.ini");
-        auto reg_obj(std::make_shared<RegistryObject>(*death_observer_, std::make_shared<Executor>(), reg_mw));
+        auto reg_obj(std::make_shared<RegistryObject>(*death_observer, std::make_shared<Executor>(), reg_mw));
         reg_mw->add_registry_object("TestRegistry", reg_obj);
 
         // Create a proxy to TestScope
-        scope_rt_ = RuntimeImpl::create("", "Runtime.ini");
-        auto scope_mw = scope_rt_->factory()->create("TestScope", "Zmq", "Zmq.ini");
+        proxy_rt_ = RuntimeImpl::create("", "Runtime.ini");
+        auto scope_mw = proxy_rt_->factory()->create("TestScope", "Zmq", "Zmq.ini");
         scope_mw->start();
         auto proxy = scope_mw->create_scope_proxy("TestScope");
-        test_scope = ScopeImpl::create(proxy, scope_rt_.get(), "TestScope");
+        test_scope = ScopeImpl::create(proxy, proxy_rt_.get(), "TestScope");
+    }
+
+    ~ChildScopesTest()
+    {
+        stop_test_scope();
+    }
+
+    void create_config_dir()
+    {
+        // Create an empty config directory for TestScope
+        system::error_code ec;
+        filesystem::create_directory(TEST_BIN_DIR "/TestScope", ec);
+    }
+
+    void remove_config_dir()
+    {
+        // Remove the config directory for TestScope
+        system::error_code ec;
+        filesystem::remove_all(TEST_BIN_DIR "/TestScope", ec);
+    }
+
+    void start_test_scope()
+    {
+        // Run TestScope in a separate thread
+        scope_rt_ = Runtime::create_scope_runtime("TestScope", "Runtime.ini");
+        scope_t_ = std::thread([this]
+        {
+            TestScope scope;
+            scope_rt_->run_scope(&scope, "");
+        });
+
+        // Give the scope some time to bind to its endpoint
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    }
+
+    void stop_test_scope()
+    {
+        if (scope_rt_)
+        {
+            scope_rt_->destroy();
+        }
+        if (scope_t_.joinable())
+        {
+            scope_t_.join();
+        }
     }
 
 protected:
     ScopeProxy test_scope;
 
 private:
-    std::shared_ptr<core::posix::SignalTrap> trap_;
-    std::unique_ptr<core::posix::ChildProcess::DeathObserver> death_observer_;
     RuntimeImpl::UPtr reg_rt_;
-    RuntimeImpl::UPtr scope_rt_;
+    RuntimeImpl::UPtr proxy_rt_;
+    Runtime::UPtr scope_rt_;
+    std::thread scope_t_;
 };
 
-TEST_F(ChildScopesTest, basic)
+TEST_F(ChildScopesTest, get_set_ordered_list)
 {
+    // Create an empty config directory for TestScope
+    remove_config_dir();
+    create_config_dir();
+
+    // Start TestScope
+    start_test_scope();
+
+    // 1st TestScope::child_scopes() returns: "A,B,C"
+    // No order has been set yet, so we should just get: "A,B,C"
     ChildScopeList return_list = test_scope->child_scopes_ordered();
     EXPECT_EQ(3, return_list.size());
     EXPECT_EQ("ScopeA", return_list.front().id);
+    EXPECT_FALSE(return_list.front().enabled);
+    return_list.pop_front();
+    EXPECT_EQ("ScopeB", return_list.front().id);
+    EXPECT_FALSE(return_list.front().enabled);
+    return_list.pop_front();
+    EXPECT_EQ("ScopeC", return_list.front().id);
+    EXPECT_TRUE(return_list.front().enabled);
 
+    // Set order to: "B,E,A"
     ChildScopeList list;
-    list.push_back({"ScopeC", false});
-    list.push_back({"ScopeA", false});
+    list.push_back({"ScopeB", false});
+    list.push_back({"ScopeE", false});
+    list.push_back({"ScopeA", true});
+    EXPECT_TRUE(test_scope->set_child_scopes_ordered(list));
+
+    // 2nd TestScope::child_scopes() returns: "D,A,B,C,E"
+    // with order: "B,E,A", we should get: "B,E,A,D,C"
+    return_list = test_scope->child_scopes_ordered();
+    EXPECT_EQ(5, return_list.size());
+    EXPECT_EQ("ScopeB", return_list.front().id);
+    EXPECT_FALSE(return_list.front().enabled);
+    return_list.pop_front();
+    EXPECT_EQ("ScopeE", return_list.front().id);
+    EXPECT_FALSE(return_list.front().enabled);
+    return_list.pop_front();
+    EXPECT_EQ("ScopeA", return_list.front().id);
+    EXPECT_TRUE(return_list.front().enabled);
+    return_list.pop_front();
+    EXPECT_EQ("ScopeD", return_list.front().id);
+    EXPECT_FALSE(return_list.front().enabled);
+    return_list.pop_front();
+    EXPECT_EQ("ScopeC", return_list.front().id);
+    EXPECT_TRUE(return_list.front().enabled);
+
+    // 3rd+ TestScope::child_scopes() returns: "D,A,B"
+    // with order: "B,E,A,D,C", we should get: "B,A,D"
+    return_list = test_scope->child_scopes_ordered();
+    EXPECT_EQ(3, return_list.size());
+    EXPECT_EQ("ScopeB", return_list.front().id);
+    EXPECT_FALSE(return_list.front().enabled);
+    return_list.pop_front();
+    EXPECT_EQ("ScopeA", return_list.front().id);
+    EXPECT_TRUE(return_list.front().enabled);
+    return_list.pop_front();
+    EXPECT_EQ("ScopeD", return_list.front().id);
+    EXPECT_FALSE(return_list.front().enabled);
+
+    // Set order to: "A,D,X,B"
+    list.clear();
+    list.push_back({"ScopeB", false});
     list.push_back({"ScopeD", true});
-    list.push_back({"ScopeB", true});
+    list.push_back({"ScopeX", true});
+    list.push_back({"ScopeA", true});
+    EXPECT_TRUE(test_scope->set_child_scopes_ordered(list));
 
-    test_scope->set_child_scopes_ordered(list);
-
+    // 3rd+ TestScope::child_scopes() returns: "D,A,B"
+    // with order: "B,D,X,A", we should get: "B,D,A"
     return_list = test_scope->child_scopes_ordered();
-    EXPECT_EQ(5, return_list.size());
-    EXPECT_EQ("ScopeC", return_list.front().id);
-
-    return_list = test_scope->child_scopes_ordered();
-    EXPECT_EQ(5, return_list.size());
-    EXPECT_EQ("ScopeC", return_list.front().id);
+    EXPECT_EQ(3, return_list.size());
+    EXPECT_EQ("ScopeB", return_list.front().id);
+    EXPECT_FALSE(return_list.front().enabled);
+    return_list.pop_front();
+    EXPECT_EQ("ScopeD", return_list.front().id);
+    EXPECT_TRUE(return_list.front().enabled);
+    return_list.pop_front();
+    EXPECT_EQ("ScopeA", return_list.front().id);
+    EXPECT_TRUE(return_list.front().enabled);
 }
 
-int main(int argc, char **argv)
+TEST_F(ChildScopesTest, existing_config)
 {
-    InitGoogleTest(&argc, argv);
+    // Use config from previous test
+    // Start TestScope
+    start_test_scope();
 
-    // Create an empty config directory for TestScope
-    system::error_code ec;
-    filesystem::remove_all(TEST_BIN_DIR "/TestScope", ec);
-    filesystem::create_directory(TEST_BIN_DIR "/TestScope", ec);
+    // 1st TestScope::child_scopes() returns: "A,B,C"
+    // with order: "B,D,A" (from previous test), we should get: "B,A,C"
+    ChildScopeList return_list = test_scope->child_scopes_ordered();
+    EXPECT_EQ(3, return_list.size());
+    EXPECT_EQ("ScopeB", return_list.front().id);
+    EXPECT_FALSE(return_list.front().enabled);
+    return_list.pop_front();
+    EXPECT_EQ("ScopeA", return_list.front().id);
+    EXPECT_TRUE(return_list.front().enabled);
+    return_list.pop_front();
+    EXPECT_EQ("ScopeC", return_list.front().id);
+    EXPECT_TRUE(return_list.front().enabled);
+}
 
-    // Run TestScope in a separate thread
-    auto rt = Runtime::create_scope_runtime("TestScope", "Runtime.ini");
-    std::thread scope_t([&rt]
-    {
-        TestScope scope;
-        rt->run_scope(&scope, "");
-    });
+TEST_F(ChildScopesTest, no_config_dir)
+{
+    // Remove the config directory for TestScope
+    remove_config_dir();
 
-    // Give the scope some time to bind to its endpoint
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    // Start TestScope
+    start_test_scope();
 
-    // Run tests
-    int rc = RUN_ALL_TESTS();
+    // Set order to: "B,A,C" (should fail)
+    ChildScopeList list;
+    list.push_back({"ScopeB", false});
+    list.push_back({"ScopeA", false});
+    list.push_back({"ScopeC", true});
+    EXPECT_FALSE(test_scope->set_child_scopes_ordered(list));
 
-    // Clean up
-    rt->destroy();
-    scope_t.join();
-
-    return rc;
+    // 1st TestScope::child_scopes() returns: "A,B,C"
+    // No order was set, so we should just get: "A,B,C"
+    ChildScopeList return_list = test_scope->child_scopes_ordered();
+    EXPECT_EQ(3, return_list.size());
+    EXPECT_EQ("ScopeA", return_list.front().id);
+    EXPECT_FALSE(return_list.front().enabled);
+    return_list.pop_front();
+    EXPECT_EQ("ScopeB", return_list.front().id);
+    EXPECT_FALSE(return_list.front().enabled);
+    return_list.pop_front();
+    EXPECT_EQ("ScopeC", return_list.front().id);
+    EXPECT_TRUE(return_list.front().enabled);
 }

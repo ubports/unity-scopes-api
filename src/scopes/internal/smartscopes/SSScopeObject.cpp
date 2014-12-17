@@ -197,8 +197,9 @@ ChildScopeList SSScopeObject::child_scopes_ordered() const
     return ChildScopeList();
 }
 
-void SSScopeObject::set_child_scopes_ordered(ChildScopeList const&)
+bool SSScopeObject::set_child_scopes_ordered(ChildScopeList const&)
 {
+    return false;
 }
 
 bool SSScopeObject::debug_mode() const

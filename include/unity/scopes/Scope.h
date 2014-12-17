@@ -142,9 +142,12 @@ public:
 
     /**
     \brief Sets the ordered list of child scopes aggregated by this scope.
+    \note The only time this call will return false is if the scope cannot write to its config directory.
+    This should not happen in real-world usage, but if it does, check the log for more detail.
     \param child_scopes_ordered The ordered list of child scopes aggregated by this scope.
+    \return True if the list was successfully set.
     */
-    virtual void set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered) = 0;
+    virtual bool set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered) = 0;
 
     /**
     \brief Destroys a Scope.

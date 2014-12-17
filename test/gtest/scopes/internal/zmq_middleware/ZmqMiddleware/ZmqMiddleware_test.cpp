@@ -458,8 +458,9 @@ public:
         return ChildScopeList();
     }
 
-    virtual void set_child_scopes_ordered(ChildScopeList const&) override
+    virtual bool set_child_scopes_ordered(ChildScopeList const&) override
     {
+        return false;
     }
 
     virtual bool debug_mode() const override

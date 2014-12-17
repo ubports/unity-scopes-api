@@ -61,7 +61,7 @@ interface Scope
     QueryCtrl* perform_action(ValueDict result, ValueDict hints, string action_id, Reply* replyProxy);
     QueryCtrl* activate(ValueDict result, ValueDict hints, Reply* replyProxy);
     ChildScopeList child_scopes_ordered();
-    void set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered);
+    bool set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered);
     bool debug_mode();
 };
 
@@ -222,7 +222,7 @@ void ScopeI::child_scopes_ordered_(Current const&,
 
 void ScopeI::set_child_scopes_ordered_(Current const&,
                       capnp::AnyPointer::Reader& in_params,
-                      capnproto::Response::Builder&)
+                      capnproto::Response::Builder& r)
 {
     auto delegate = std::dynamic_pointer_cast<ScopeObjectBase>(del());
     assert(delegate);
@@ -237,7 +237,10 @@ void ScopeI::set_child_scopes_ordered_(Current const&,
         child_scope_list.push_back( ChildScope{id, enabled} );
     }
 
-    delegate->set_child_scopes_ordered(child_scope_list);
+    bool result = delegate->set_child_scopes_ordered(child_scope_list);
+    r.setStatus(capnproto::ResponseStatus::SUCCESS);
+    auto response = r.initPayload().getAs<capnproto::Scope::SetChildScopesOrderedResponse>();
+    response.setReturnValue(result);
 }
 
 void ScopeI::debug_mode_(Current const&,

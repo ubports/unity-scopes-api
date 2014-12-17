@@ -66,7 +66,7 @@ public:
 
     ChildScopeList child_scopes() const;
     ChildScopeList child_scopes_ordered(ChildScopeList const& unordered_child_scopes) const;
-    void set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered);
+    bool set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered);
 
 private:
     std::string scope_directory_;
