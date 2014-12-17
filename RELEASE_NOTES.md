@@ -5,6 +5,9 @@ Changes in version 0.7.0
 ========================
   - Introduced child_scopes() methods for aggregators to return their
     list of child scopes at runtime.
+  - Added missing virtual destructor to AbstractScopeBase. (LP: #1360266)
+  - Removed deprecated Runtime::run_scope() method.
+  - Bumped .so version due to public vtable changes.
 
 Changes in version 0.6.10
 =========================
