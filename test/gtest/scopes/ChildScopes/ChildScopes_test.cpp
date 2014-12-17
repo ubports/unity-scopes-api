@@ -21,10 +21,12 @@
 #include <unity/scopes/internal/RegistryObject.h>
 #include <unity/scopes/internal/ScopeImpl.h>
 
-#include "TestScope.h"
+#include <TestScope.h>
 
+#include <boost/filesystem/operations.hpp>
 #include <gtest/gtest.h>
 
+using namespace boost;
 using namespace testing;
 using namespace unity::scopes;
 using namespace unity::scopes::internal;
@@ -62,21 +64,31 @@ private:
 
 TEST_F(ChildScopesTest, basic)
 {
-    ChildScopeList list;
-    list.push_back({"ScopeA", true});
-    list.push_back({"ScopeB", false});
-    list.push_back({"ScopeC", false});
-
-    test_scope->set_child_scopes_ordered(list);
-
     ChildScopeList return_list = test_scope->child_scopes_ordered();
     EXPECT_EQ(3, return_list.size());
     EXPECT_EQ("ScopeA", return_list.front().id);
+
+    ChildScopeList list;
+    list.push_back({"ScopeC", false});
+    list.push_back({"ScopeA", true});
+    list.push_back({"ScopeB", false});
+    list.push_back({"ScopeD", true});
+
+    test_scope->set_child_scopes_ordered(list);
+
+    return_list = test_scope->child_scopes_ordered();
+    EXPECT_EQ(3, return_list.size());
+    EXPECT_EQ("ScopeC", return_list.front().id);
 }
 
 int main(int argc, char **argv)
 {
     InitGoogleTest(&argc, argv);
+
+    // Create an empty config directory for TestScope
+    system::error_code ec;
+    filesystem::remove_all(TEST_BIN_DIR "/TestScope", ec);
+    filesystem::create_directory(TEST_BIN_DIR "/TestScope", ec);
 
     // Run TestScope in a separate thread
     auto rt = Runtime::create_scope_runtime("TestScope", "Runtime.ini");

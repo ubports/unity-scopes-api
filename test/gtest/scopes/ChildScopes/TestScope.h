@@ -29,14 +29,24 @@ namespace scopes
 class TestScope : public ScopeBase
 {
 public:
-    virtual SearchQueryBase::UPtr search(CannedQuery const&, SearchMetadata const&) override
+    SearchQueryBase::UPtr search(CannedQuery const&, SearchMetadata const&) override
     {
         return nullptr;
     }
 
-    virtual PreviewQueryBase::UPtr preview(Result const&, ActionMetadata const&) override
+    PreviewQueryBase::UPtr preview(Result const&, ActionMetadata const&) override
     {
         return nullptr;
+    }
+
+    ChildScopeList child_scopes() const override
+    {
+        ChildScopeList list;
+        list.push_back({"ScopeA", true});
+        list.push_back({"ScopeB", false});
+        list.push_back({"ScopeC", false});
+
+        return list;
     }
 };
 

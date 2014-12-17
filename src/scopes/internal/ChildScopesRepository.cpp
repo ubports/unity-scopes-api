@@ -125,9 +125,9 @@ ChildScopeList ChildScopesRepository::read_repo()
     std::ifstream repo_file(repo_file_path_);
     if (repo_file.fail())
     {
-        BOOST_LOG_SEV(logger_, Logger::Error) << "ChildScopesRepository::read_repo(): "
-                                              << "Failed to open file: \"" << repo_file_path_
-                                              << "\"";
+        BOOST_LOG_SEV(logger_, Logger::Info) << "ChildScopesRepository::read_repo(): "
+                                             << "Failed to open file: \"" << repo_file_path_
+                                             << "\"";
         return ChildScopeList();
     }
 

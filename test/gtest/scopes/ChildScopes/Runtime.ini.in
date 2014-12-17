@@ -3,3 +3,4 @@ Registry.Identity = TestRegistry
 Registry.ConfigFile = Registry.ini
 Default.Middleware = Zmq
 Zmq.ConfigFile = Zmq.ini
+ConfigDir = @CMAKE_CURRENT_BINARY_DIR@
