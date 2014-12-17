@@ -35,7 +35,7 @@ struct CreateQueryRequest
     query @0      : ValueDict.ValueDict;
     hints @1      : ValueDict.ValueDict;
     replyProxy @2 : Proxy.Proxy;
-    details @3    : ValueDict.ValueDict;  # Additional details for the request, such as client ID and history.
+    context @3    : ValueDict.ValueDict;  # Additional context for the request, such as client ID and history.
 }
 
 struct CreateQueryResponse

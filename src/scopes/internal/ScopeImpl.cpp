@@ -128,9 +128,9 @@ QueryCtrlProxy ScopeImpl::search(CannedQuery const& query,
     {
         try
         {
-            // Create query details with our own ID and the query history for loop detection.
-            VariantMap details;
-            details["client_id"] = my_id;
+            // Create query context with our own ID and the query history for loop detection.
+            VariantMap context;
+            context["client_id"] = my_id;
 
             VariantArray hist;
             for (auto const& tuple : history)
@@ -141,10 +141,13 @@ QueryCtrlProxy ScopeImpl::search(CannedQuery const& query,
                 d["r"] = get<2>(tuple);  // Receiver
                 hist.push_back(Variant(d));
             }
-            details["history"] = Variant(hist);
+            context["history"] = Variant(hist);
 
             // Forward the (synchronous) search() method across the bus.
-            auto real_ctrl = dynamic_pointer_cast<QueryCtrlImpl>(impl->fwd()->search(query, metadata.serialize(), details, rp));
+            auto real_ctrl = dynamic_pointer_cast<QueryCtrlImpl>(impl->fwd()->search(query,
+                                                                                     metadata.serialize(),
+                                                                                     context,
+                                                                                     rp));
 
             assert(real_ctrl);
 

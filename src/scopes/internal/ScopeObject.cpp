@@ -151,12 +151,12 @@ MWQueryCtrlProxy ScopeObject::query(MWReplyProxy const& reply, MiddlewareBase* m
 
 MWQueryCtrlProxy ScopeObject::search(CannedQuery const& q,
                                      SearchMetadata const& hints,
-                                     VariantMap const& details,
+                                     VariantMap const& context,
                                      MWReplyProxy const& reply,
                                      InvokeInfo const& info)
 {
     return query(reply, info.mw,
-            [&q, &hints, &details, this]() -> SearchQueryBase::UPtr {
+            [&q, &hints, &context, this]() -> SearchQueryBase::UPtr {
                  auto search_query = this->scope_base_->search(q, hints);
                  search_query->set_department_id(q.department_id());
 
@@ -165,16 +165,16 @@ MWQueryCtrlProxy ScopeObject::search(CannedQuery const& q,
 
                  // Set client ID and history that we received in the SearchQueryBase
                  // for loop detection.
-                 auto const c_it = details.find("client_id");
-                 if (c_it != details.end())
+                 auto const c_it = context.find("client_id");
+                 if (c_it != context.end())
                  {
                      string client_id;
                      client_id = c_it->second.get_string();
                      sqb->set_client_id(client_id);
                  }
 
-                 auto const h_it = details.find("history");
-                 if (h_it != details.end())
+                 auto const h_it = context.find("history");
+                 if (h_it != context.end())
                  {
                     auto const hlist = h_it->second.get_array();
                     SearchQueryBaseImpl::History history;
