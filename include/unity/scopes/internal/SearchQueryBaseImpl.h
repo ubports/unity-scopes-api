@@ -75,10 +75,11 @@ public:
     bool valid() const override;
 
 private:
-    bool valid_;
+    CannedQuery const canned_query_;
+    SearchMetadata const search_metadata_;
+
     mutable std::mutex mutex_;
-    const CannedQuery canned_query_;
-    SearchMetadata search_metadata_;
+    bool valid_;
     std::string department_id_;
     std::string client_id_;
     History history_;

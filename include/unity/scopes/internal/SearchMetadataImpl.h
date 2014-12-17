@@ -65,8 +65,8 @@ protected:
     void check_cardinality(std::string const& func_name, int cardinality);
 
 private:
-    int cardinality_;                           // immutable
-    boost::optional<Location> location_;        // immutable
+    int cardinality_;
+    boost::optional<Location> location_;
 };
 
 } // namespace internal

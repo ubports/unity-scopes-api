@@ -43,9 +43,9 @@ using namespace std;
 
 SearchQueryBaseImpl::SearchQueryBaseImpl(CannedQuery const& query, SearchMetadata const& metadata)
     : QueryBaseImpl(),
-      valid_(true),
       canned_query_(query),
-      search_metadata_(metadata)
+      search_metadata_(metadata),
+      valid_(true)
 {
 }
 
@@ -56,7 +56,6 @@ CannedQuery SearchQueryBaseImpl::query() const
 
 SearchMetadata SearchQueryBaseImpl::search_metadata() const
 {
-    lock_guard<mutex> lock(mutex_);
     return search_metadata_;
 }
 
