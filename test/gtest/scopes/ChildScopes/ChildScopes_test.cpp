@@ -169,7 +169,7 @@ TEST_F(ChildScopesTest, get_set_ordered_list)
     EXPECT_EQ("ScopeD", return_list.front().id);
     EXPECT_FALSE(return_list.front().enabled);
 
-    // Set order to: "A,D,X,B"
+    // Set order to: "B,D,X,A"
     list.clear();
     list.push_back({"ScopeB", false});
     list.push_back({"ScopeD", true});
