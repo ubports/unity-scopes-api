@@ -1,6 +1,11 @@
 Release notes
 =============
 
+Changes in version 0.7.0
+========================
+  - Introduced child_scopes() methods for aggregators to return their
+    list of child scopes at runtime.
+
 Changes in version 0.6.10
 =========================
   - Renamed "Tags" scope .ini option to "Keywords".
