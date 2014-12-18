@@ -41,8 +41,10 @@ ScopeBaseImpl::ScopeBaseImpl()
     : scope_dir_initialized_(false)
     , cache_dir_initialized_(false)
     , app_dir_initialized_(false)
+    , tmp_dir_initialized_(false)
     , registry_initialized_(false)
     , settings_db_initialized_(false)
+    , child_scopes_repo_initialized_(false)
 {
 }
 
@@ -176,14 +178,21 @@ void ScopeBaseImpl::set_child_scopes_repo(std::shared_ptr<ChildScopesRepository>
 {
     lock_guard<mutex> lock(mutex_);
     child_scopes_repo_ = child_scopes_repo;
+    child_scopes_repo_initialized_ = true;
 }
 
 ChildScopeList ScopeBaseImpl::child_scopes() const
 {
+    // Get a copy of the registry proxy
+    RegistryProxy reg = registry();
+    if (!reg)
+    {
+        return ChildScopeList();
+    }
+
     // The default behaviour of this method is to simply return all available scopes on the system.
-    lock_guard<mutex> lock(mutex_);
     ChildScopeList return_list;
-    auto all_scopes = registry_->list();
+    auto all_scopes = reg->list();
     for (auto const& scope : all_scopes)
     {
         // New scopes are added disabled by default
@@ -194,12 +203,22 @@ ChildScopeList ScopeBaseImpl::child_scopes() const
 
 ChildScopeList ScopeBaseImpl::child_scopes_ordered(ChildScopeList const& child_scopes_unordered) const
 {
-    return child_scopes_repo_->child_scopes_ordered(child_scopes_unordered);
+    lock_guard<mutex> lock(mutex_);
+    if (!child_scopes_repo_initialized_)
+    {
+        throw LogicException("ScopeBase::child_scopes_ordered() cannot be called from constructor");
+    }
+    return child_scopes_repo_ ? child_scopes_repo_->child_scopes_ordered(child_scopes_unordered) : ChildScopeList();
 }
 
 bool ScopeBaseImpl::set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered)
 {
-    return child_scopes_repo_->set_child_scopes_ordered(child_scopes_ordered);
+    lock_guard<mutex> lock(mutex_);
+    if (!child_scopes_repo_initialized_)
+    {
+        throw LogicException("ScopeBase::set_child_scopes_ordered() cannot be called from constructor");
+    }
+    return child_scopes_repo_ ? child_scopes_repo_->set_child_scopes_ordered(child_scopes_ordered) : false;
 }
 
 } // namespace internal

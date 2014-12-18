@@ -87,9 +87,10 @@ private:
     std::shared_ptr<unity::scopes::internal::SettingsDB> db_;
     bool settings_db_initialized_;
 
-    mutable std::mutex mutex_;
-
     std::shared_ptr<ChildScopesRepository> child_scopes_repo_;
+    bool child_scopes_repo_initialized_;
+
+    mutable std::mutex mutex_;
 };
 
 } // namespace internal
