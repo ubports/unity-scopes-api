@@ -113,7 +113,7 @@ ChildScopeList ChildScopesRepository::child_scopes_ordered(ChildScopeList const&
     }
 
     // write the new ordered list to file
-    write_repo(list_to_json(new_child_scopes_ordered));
+    write_repo(new_child_scopes_ordered);
     return new_child_scopes_ordered;
 }
 
@@ -121,11 +121,13 @@ bool ChildScopesRepository::set_child_scopes_ordered(ChildScopeList const& child
 {
     // simply write child_scopes_ordered to file
     std::lock_guard<std::mutex> lock(mutex_);
-    return write_repo(list_to_json(child_scopes_ordered));
+    return write_repo(child_scopes_ordered);
 }
 
-bool ChildScopesRepository::write_repo(std::string const& child_scopes_json)
+bool ChildScopesRepository::write_repo(ChildScopeList const& child_scopes_list)
 {
+    assert(!mutex_.try_lock());
+
     // open repository for output
     std::ofstream repo_file(repo_file_path_);
     if (repo_file.fail())
@@ -136,10 +138,10 @@ bool ChildScopesRepository::write_repo(std::string const& child_scopes_json)
         return false;
     }
 
-    repo_file << child_scopes_json;
+    repo_file << list_to_json(child_scopes_list);
     repo_file.close();
 
-    cached_repo_ = json_to_list(child_scopes_json);
+    cached_repo_ = child_scopes_list;
     have_latest_cache_ = true;
     return true;
 }
@@ -193,8 +195,13 @@ ChildScopeList ChildScopesRepository::json_to_list(std::string const& child_scop
     {
         json_node.read_json(child_scopes_json);
     }
-    catch (...){}
-
+    catch (std::exception const& e)
+    {
+        BOOST_LOG_SEV(logger_, Logger::Error) << "ChildScopesRepository::json_to_list(): "
+                                              << "Exception thrown while reading json string: "
+                                              << e.what();
+        return ChildScopeList();
+    }
     if (json_node.type() != JsonCppNode::Array)
     {
         BOOST_LOG_SEV(logger_, Logger::Error) << "ChildScopesRepository::json_to_list(): "

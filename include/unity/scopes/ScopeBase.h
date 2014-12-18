@@ -340,7 +340,7 @@ public:
     The default behaviour of this method is to simply return all available scopes on the
     system. This translates to: "Any scope may potentially be aggregated by this scope".
 
-    \note Only an aggregator scope should implement this method.
+    \note Only aggregator scopes should implement this method.
 
     \return The list of child scopes aggregated by this scope.
     */

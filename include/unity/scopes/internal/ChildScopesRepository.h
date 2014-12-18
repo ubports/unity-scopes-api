@@ -47,7 +47,7 @@ public:
     bool set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered);
 
 private:
-    bool write_repo(std::string const& child_scopes_json);
+    bool write_repo(ChildScopeList const& child_scopes_list);
     ChildScopeList read_repo();
 
     std::string list_to_json(ChildScopeList const& child_scopes_list);
