@@ -24,6 +24,7 @@
 namespace http = core::net::http;
 using namespace unity::scopes::qt;
 
+/// @cond
 // Private class that holds the httpclient and the worker thread
 class HttpAsyncReader::Priv
 {
@@ -65,6 +66,8 @@ HttpAsyncReader::~HttpAsyncReader()
 {
 }
 
+
+
 core::net::http::Request::Progress::Next HttpAsyncReader::progress_report(
     core::net::http::Request::Progress const&) const
 {
@@ -81,6 +84,7 @@ void HttpAsyncReader::async_execute(core::net::http::Request::Handler const& han
     auto request = p_->client_->head(configuration);
     request->async_execute(handler);
 }
+/// @endcond
 
 std::string HttpAsyncReader::get_uri(std::string const& host,
                                      std::vector<std::pair<std::string, std::string>> const& parameters) const

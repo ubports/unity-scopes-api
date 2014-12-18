@@ -43,6 +43,7 @@ namespace scopes
 namespace qt
 {
 
+/// @cond
 template <typename TYPE>
 using ResultsList = std::deque<std::shared_ptr<TYPE>>;
 
@@ -51,6 +52,7 @@ static bool get_results_json(QJsonDocument& json,
                              std::string const& object_name,
                              ResultsList<B>& results,
                              std::string&);
+/// @endcond
 
 /**
 \brief Class that downloads http JSON files asynchronously.
@@ -68,26 +70,43 @@ public:
     NONCOPYABLE(JsonAsyncReader);
     UNITY_DEFINES_PTRS(JsonAsyncReader);
 
+    /**
+     * \brief Parse function alias
+     */
     template <typename B>
     using ParseFunc =
         std::function<bool(QJsonDocument& root, const std::string&, std::deque<std::shared_ptr<B>>&, std::string&)>;
 
+    /**
+     * \brief Results future alias
+     */
     template <typename T>
     using ResultsFuture = std::future<std::deque<std::shared_ptr<T>>>;
 
+    /**
+     * \brief Results list alias
+     */
     template <typename TYPE>
     using ResultsList = std::deque<std::shared_ptr<TYPE>>;
 
+    /**
+     * \brief Future of QJsonDocument
+     */
     typedef std::future<std::shared_ptr<QJsonDocument>> JsonDocumentFuture;
 
+    /**
+     * \brief Shared pointer of QJsonDocument
+     */
     typedef std::shared_ptr<QJsonDocument> QJsonDocumentSptr;
 
+    /**
+     * \brief Vector of pair of parameters
+     */
     typedef std::vector<std::pair<std::string, std::string>> JsonParameters;
 
     JsonAsyncReader();
-
     virtual ~JsonAsyncReader() = default;
-    /// @endcond
+    /// @encond
 
     /**
      * \brief Downloads a HTTP JSON remote file asynchronously and returns a future to a list of results
@@ -235,6 +254,7 @@ protected:
     /// @endcond
 };
 
+/// @cond
 template <typename BASE, typename TYPE>
 JsonAsyncReader::ResultsFuture<BASE> JsonAsyncReader::async_get(std::string const& uri,
                                                                 std::string const& object_name,
@@ -270,6 +290,7 @@ JsonAsyncReader::ResultsFuture<T> JsonAsyncReader::async_get(std::string const& 
     std::string uri = p_->get_uri(host, params);
     return p_->async_get<T, T, QJsonDocument>(uri, object_name, JsonAsyncReader::create_parser_with_data, parse);
 }
+
 
 template <typename B, typename T>
 static bool get_results_json_object(QJsonObject& root,
@@ -334,6 +355,7 @@ static bool get_results_json(QJsonDocument& doc,
     }
     return true;
 }
+/// @endcond
 
 }  // namespace qt
 

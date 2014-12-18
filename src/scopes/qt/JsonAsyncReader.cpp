@@ -22,10 +22,12 @@
 using namespace std;
 using namespace unity::scopes::qt;
 
+/// @cond
 JsonAsyncReader::JsonAsyncReader()
     : p_(new HttpAsyncReader)
 {
 }
+/// @endcond
 
 JsonAsyncReader::QJsonDocumentSptr JsonAsyncReader::create_parser_with_data(std::string const& data, std::string& error)
 {

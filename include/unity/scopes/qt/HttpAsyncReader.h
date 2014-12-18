@@ -170,7 +170,7 @@ public:
 
 protected:
     /// @cond
-    core::net::http::Request::Progress::Next progress_report(core::net::http::Request::Progress const&) const;
+    core::net::http::Request::Progress::Next progress_report(core::net::http::Request::Progress const& progress) const;
 
     void async_execute(core::net::http::Request::Handler const& handler, std::string const& uri) const;
 
