@@ -19,10 +19,10 @@
 // allow experimental headers
 #define _ENABLE_QT_EXPERIMENTAL_
 
-#include <unity/scopes/scopes-qt/JsonAsyncReader.h>
-#include <unity/scopes/scopes-qt/JsonReader.h>
+#include <unity/scopes/qt/JsonAsyncReader.h>
+#include <unity/scopes/qt/JsonReader.h>
 
-#include <unity/scopes/scopes-qt/HttpAsyncReader.h>
+#include <unity/scopes/qt/HttpAsyncReader.h>
 
 using namespace unity::scopes::qt;
 

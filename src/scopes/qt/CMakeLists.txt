@@ -101,7 +101,7 @@ set(LIB_QT ${UNITY_SCOPES_QT} CACHE STRING "Qt library" FORCE)
 
 
 # We compile with all symbols visible by default.
-set(symbol_map "${CMAKE_SOURCE_DIR}/src/scopes/scopes-qt/${UNITY_SCOPES_QT}.map")
+set(symbol_map "${CMAKE_SOURCE_DIR}/src/scopes/qt/${UNITY_SCOPES_QT}.map")
 set_target_properties(${UNITY_SCOPES_QT} PROPERTIES
                       LINK_FLAGS "${ldflags} -Wl,--version-script,${symbol_map}")
 set_target_properties(${UNITY_SCOPES_QT} PROPERTIES LINK_DEPENDS ${symbol_map})
@@ -125,7 +125,7 @@ else()
     add_custom_command(OUTPUT ${PROJECT_BINARY_DIR}/doc-scopes-qt/index.html
                        COMMAND ${DOXYGEN_EXECUTABLE} ${PROJECT_BINARY_DIR}/doc/Doxyfile-scopes-qt
                        DEPENDS ${PROJECT_BINARY_DIR}/doc/Doxyfile-scopes-qt
-                               ${CMAKE_BINARY_DIR}/include/unity/scopes/scopes-qt)
+                               ${CMAKE_BINARY_DIR}/include/unity/scopes/qt)
     add_custom_target(doc-scopes-qt ALL DEPENDS ${PROJECT_BINARY_DIR}/doc-scopes-qt/index.html)
     install(DIRECTORY ${PROJECT_BINARY_DIR}/doc-scopes-qt/unity-scopes-qt
             DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/doc)

@@ -21,7 +21,7 @@
 #error You should define _ENABLE_QT_EXPERIMENTAL_ in order to use this experimental header file.
 #endif
 
-#include <unity/scopes/scopes-qt/HttpAsyncReader.h>
+#include <unity/scopes/qt/HttpAsyncReader.h>
 #include <unity/util/DefinesPtrs.h>
 #include <unity/util/NonCopyable.h>
 
