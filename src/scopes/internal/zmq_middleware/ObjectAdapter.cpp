@@ -800,6 +800,12 @@ void ObjectAdapter::dispatch(zmqpp::socket& pump, string const& client_address)
             auto exr = create_object_not_exist_response(b, current);
             sender.send(exr);
         }
+        else
+        {
+            BOOST_LOG_SEV(logger_, Logger::Warning)
+                << "ObjectAdapter: no servant for oneway request "
+                << "(id: " << current.id << ", adapter: " << name_ << ", op: " << current.op_name << ")";
+        }
         return;
     }
 
