@@ -101,11 +101,7 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
                                   config.max_log_dir_size());
         }
 
-BOOST_LOG_SEV(logger(), Logger::Info) << "message 1 ";
-BOOST_LOG(logger(Logger::IPC)) << "hello";
-BOOST_LOG_SEV(logger(), Logger::Info) << "message 3 ";
-BOOST_LOG(logger(Logger::IPC)) << "message 4";
-BOOST_LOG_SEV(logger(), Logger::Info) << "message 5 ";
+logger_->set_channel(Logger::IPC, true);
 
         string default_middleware = config.default_middleware();
         string middleware_configfile = config.default_middleware_configfile();

@@ -182,7 +182,7 @@ void register_monitor_socket(ConnectionPool& pool, zmqpp::context_t const& conte
 
 // Get a socket to the endpoint for this proxy and write the request on the wire.
 
-void ZmqObjectProxy::invoke_oneway_(capnp::MessageBuilder& in_params)
+void ZmqObjectProxy::invoke_oneway_(capnp::MessageBuilder& request)
 {
     // Each calling thread gets its own pool because zmq sockets are not thread-safe.
     thread_local static ConnectionPool pool(*mw_base()->context());
@@ -192,7 +192,8 @@ void ZmqObjectProxy::invoke_oneway_(capnp::MessageBuilder& in_params)
     assert(mode_ == RequestMode::Oneway);
     shared_ptr<zmqpp::socket> s = pool.find(endpoint_);
     ZmqSender sender(*s);
-    auto segments = in_params.getSegmentsForOutput();
+    auto segments = request.getSegmentsForOutput();
+    trace_request_(request);
     if (!sender.send(segments, ZmqSender::DontWait))
     {
         // If there is nothing at the other end, discard the message and trash the socket.
@@ -210,12 +211,12 @@ void ZmqObjectProxy::invoke_oneway_(capnp::MessageBuilder& in_params)
 #endif
 }
 
-ZmqObjectProxy::TwowayOutParams ZmqObjectProxy::invoke_twoway_(capnp::MessageBuilder& in_params)
+ZmqObjectProxy::TwowayOutParams ZmqObjectProxy::invoke_twoway_(capnp::MessageBuilder& request)
 {
-    return invoke_twoway_(in_params, timeout_);
+    return invoke_twoway_(request, timeout_);
 }
 
-ZmqObjectProxy::TwowayOutParams ZmqObjectProxy::invoke_twoway_(capnp::MessageBuilder& in_params,
+ZmqObjectProxy::TwowayOutParams ZmqObjectProxy::invoke_twoway_(capnp::MessageBuilder& request,
                                                                int64_t twoway_timeout,
                                                                int64_t locate_timeout)
 {
@@ -263,14 +264,14 @@ ZmqObjectProxy::TwowayOutParams ZmqObjectProxy::invoke_twoway_(capnp::MessageBui
     }
 
     // Try the invocation
-    return invoke_twoway__(in_params, twoway_timeout);
+    return invoke_twoway__(request, twoway_timeout);
 }
 
 // Get a socket to the endpoint for this proxy and write the request on the wire.
 // Poll for the reply with the given timeout.
 // Return a reader for the response or throw if the timeout expires.
 
-ZmqObjectProxy::TwowayOutParams ZmqObjectProxy::invoke_twoway__(capnp::MessageBuilder& in_params, int64_t timeout)
+ZmqObjectProxy::TwowayOutParams ZmqObjectProxy::invoke_twoway__(capnp::MessageBuilder& request, int64_t timeout)
 {
     RequestMode mode;
     std::string endpoint;
@@ -295,7 +296,8 @@ ZmqObjectProxy::TwowayOutParams ZmqObjectProxy::invoke_twoway__(capnp::MessageBu
     s.set(zmqpp::socket_option::reconnect_interval_max, reconnect_max);
     s.connect(endpoint);
     ZmqSender sender(s);
-    auto segments = in_params.getSegmentsForOutput();
+    auto segments = request.getSegmentsForOutput();
+    trace_request_(request);
     sender.send(segments);
 
 #ifdef ENABLE_IPC_MONITOR
@@ -324,7 +326,7 @@ ZmqObjectProxy::TwowayOutParams ZmqObjectProxy::invoke_twoway__(capnp::MessageBu
 
     if (!p.has_input(s))
     {
-        string op_name = in_params.getRoot<capnproto::Request>().getOpName().cStr();
+        string op_name = request.getRoot<capnproto::Request>().getOpName().cStr();
         throw TimeoutException("Request timed out after " + std::to_string(timeout) + " milliseconds (endpoint = " +
                                endpoint + ", op = " + op_name + ")");
     }
@@ -335,8 +337,70 @@ ZmqObjectProxy::TwowayOutParams ZmqObjectProxy::invoke_twoway__(capnp::MessageBu
     out_params.receiver.reset(new ZmqReceiver(s));
     auto params = out_params.receiver->receive();
     out_params.reader.reset(new capnp::SegmentArrayMessageReader(params));
+    trace_reply_(request, *out_params.reader);
     return out_params;
     // Outgoing twoway socket closed here.
+}
+
+string ZmqObjectProxy::decode_request_(capnp::MessageBuilder& request)
+{
+    auto r = request.getRoot<capnproto::Request>();
+    auto mode = r.getMode();
+    auto op_name = r.getOpName().cStr();
+    auto identity = r.getId().cStr();
+    auto cat = r.getCat().cStr();
+    stringstream s;
+    s << "op = " << op_name
+      << ", id = " << identity
+      << ", cat = " << cat
+      << ", mode = " << (mode == capnproto::RequestMode::ONEWAY ? "oneway" : "twoway");
+    return s.str();
+}
+
+void ZmqObjectProxy::trace_request_(capnp::MessageBuilder& request)
+{
+    BOOST_LOG(mw_base()->runtime()->logger(Logger::IPC))
+        << "sending request: "
+        << decode_request_(request);
+}
+
+string ZmqObjectProxy::decode_reply_(capnp::MessageBuilder& request, capnp::MessageReader& reply)
+{
+    stringstream s;
+    s << decode_request_(request) << ", ";
+    auto response = reply.getRoot<capnproto::Response>();
+    switch (response.getStatus())
+    {
+        case capnproto::ResponseStatus::SUCCESS:
+        {
+            s << "status = Success";
+            break;
+        }
+        case capnproto::ResponseStatus::USER_EXCEPTION:
+        {
+            s << "status = User exception";
+            break;
+        }
+        case capnproto::ResponseStatus::RUNTIME_EXCEPTION:
+        {
+            s << decode_runtime_exception(response);
+            break;
+        }
+        // LCOV_EXCL_START
+        default:
+        {
+            assert(false);
+        }
+        // LCOV_EXCL_STOP
+    }
+    return s.str();
+}
+
+void ZmqObjectProxy::trace_reply_(capnp::MessageBuilder& request, capnp::MessageReader& reply)
+{
+    BOOST_LOG(mw_base()->runtime()->logger(Logger::IPC))
+        << "received reply: "
+        << decode_reply_(request, reply);
 }
 
 } // namespace zmq_middleware

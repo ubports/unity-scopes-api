@@ -123,8 +123,26 @@ void throw_if_runtime_exception(capnproto::Response::Reader const& response)
         {
             throw MiddlewareException(payload.getUnknown().cStr());
         }
+        // LCOV_EXCL_START
         default:
-            break;
+        {
+            assert(false);
+        }
+        // LCOV_EXCL_STOP
+    }
+}
+
+string decode_runtime_exception(capnproto::Response::Reader const& response)
+{
+    assert(response.getStatus() == capnproto::ResponseStatus::RUNTIME_EXCEPTION);
+
+    try
+    {
+        throw_if_runtime_exception(response);
+    }
+    catch (MiddlewareException const& e)
+    {
+        return e.what();
     }
 }
 
