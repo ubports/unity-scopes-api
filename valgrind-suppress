@@ -1,8 +1,3 @@
-# Leak suppressions for Ice below are all for bogus "possibly lost" reports.
-# In all cases, we ultimately end up in the std::string library, which does
-# weird things with pointers that point somewhere into the middle of an allocated
-# block to avoid copies. In turn, that causes bogus reports from valgrind.
-
 # Bogus "possibly leaked" reports for pthreads
 
 {

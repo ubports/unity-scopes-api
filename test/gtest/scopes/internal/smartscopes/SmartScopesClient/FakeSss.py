@@ -22,12 +22,17 @@ from wsgiref.simple_server import make_server
 import sys
 
 preview1_complete = False
+outfile = ''
 
 def response(environ, start_response):
-    global preview1_complete
+    global preview1_complete, outfile
     status = '200 OK'
     response_headers = [('Content-Type', 'application/json')]
     start_response(status, response_headers)
+
+    if outfile != '':
+        f = open(outfile, 'a')
+        f.writelines(["%s : %s\n" % (environ['PATH_INFO'], environ['HTTP_USER_AGENT'])])
 
     if environ['PATH_INFO'] == '/remote-scopes' and (environ['QUERY_STRING'] == '' or environ['QUERY_STRING'] == 'locale=test_TEST'):
         return [remote_scopes_response]
@@ -59,6 +64,9 @@ def response(environ, start_response):
 
     return ''
 
+
+if len(sys.argv) > 1:
+    outfile = sys.argv[1]
 serving = False
 port = 1024
 while serving == False:

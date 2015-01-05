@@ -23,6 +23,7 @@
 
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
+#include <unity/util/FileIO.h>
 
 #include <algorithm>
 #include <array>
@@ -51,6 +52,7 @@ static const std::string c_preview_resource = "/preview";
 
 static const std::string c_scopes_cache_dir = homedir() + "/.cache/unity-scopes/";
 static const std::string c_scopes_cache_filename = "remote-scopes.json";
+static const std::string c_partner_id_file = "/custom/partner-id";
 
 using namespace unity::scopes;
 using namespace unity::scopes::internal::smartscopes;
@@ -106,13 +108,20 @@ void PreviewHandle::cancel_preview()
 SmartScopesClient::SmartScopesClient(HttpClientInterface::SPtr http_client,
                                      JsonNodeInterface::SPtr json_node,
                                      boost::log::sources::severity_channel_logger_mt<>& logger,
-                                     std::string const& url)
+                                     std::string const& url,
+                                     std::string const& partner_id_path)
     : http_client_(http_client)
     , json_node_(json_node)
     , logger_(logger)
     , have_latest_cache_(false)
     , query_counter_(0)
+    , partner_file_(partner_id_path)
 {
+    if (partner_file_.size() == 0)
+    {
+        partner_file_ = c_partner_id_file;
+    }
+
     // initialise url_
     reset_url(url);
 
@@ -170,10 +179,26 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
         BOOST_LOG_SEV(logger_, Logger::Info)
             << "SmartScopesClient.get_remote_scopes(): GET " << remote_scopes_uri.str();
 
+        HttpHeaders headers;
+        try
+        {
+            auto partner_id = util::read_text_file(partner_file_);
+            if (!partner_id.empty())
+            {
+                std::string const user_agent_hdr = "partner=" + http_client_->to_percent_encoding(partner_id);
+                headers.push_back(std::make_pair("User-Agent", user_agent_hdr));
+                BOOST_LOG_SEV(logger_, Logger::Info) << "User agent: " << user_agent_hdr;
+            }
+        }
+        catch (std::exception const& e)
+        {
+            BOOST_LOG_SEV(logger_, Logger::Error) << "SmartScopesClient.get_remote_scopes(): failed to read " << partner_file_ << ": " << e.what();
+        }
+
         HttpResponseHandle::SPtr response = http_client_->get(remote_scopes_uri.str(), [&response_str](std::string const& replyLine) {
                 response_str += replyLine; // accumulate all reply lines
-        });
-        response->wait();
+        }, headers);
+        response->get();
 
         BOOST_LOG_SEV(logger_, Logger::Info)
             << "SmartScopesClient.get_remote_scopes(): Remote scopes:\n" << response_str;

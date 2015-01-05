@@ -23,6 +23,9 @@
 #include <unity/scopes/OptionSelectorFilter.h>
 
 #include <unity/UnityExceptions.h>
+#include <unity/util/FileIO.h>
+#include <boost/filesystem/operations.hpp>
+#include <fstream>
 
 #include "../RaiiServer.h"
 
@@ -47,10 +50,26 @@ public:
     SmartScopesClientTest()
         : http_client_(new HttpClientQt(20000)),
           json_node_(new JsonCppNode()),
-          server_(FAKE_SSS_PATH)
+          server_(FAKE_SSS_PATH, FAKE_SSS_LOG)
     {
+        boost::filesystem::remove(FAKE_SSS_LOG);
         sss_url_ = "http://127.0.0.1:" + std::to_string(server_.port_);
-        ssc_ = std::make_shared<SmartScopesClient>(http_client_, json_node_, test_logger::get(), sss_url_);
+        ssc_ = std::make_shared<SmartScopesClient>(http_client_, json_node_, test_logger::get(), sss_url_, PARTNER_FILE);
+    }
+
+    bool grep_string(std::string const &s)
+    {
+        std::stringstream str(unity::util::read_text_file(FAKE_SSS_LOG));
+        while (str)
+        {
+            char tmp[1024];
+            str.getline(tmp, 1024);
+            if (strstr(tmp, s.c_str()))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
 protected:
@@ -125,6 +144,16 @@ TEST_F(SmartScopesClientTest, remote_scopes)
     EXPECT_EQ("video", scopes[2].keywords[1]);
     EXPECT_EQ("news", scopes[2].keywords[2]);
     EXPECT_EQ("games", scopes[2].keywords[3]);
+
+    EXPECT_TRUE(grep_string("/remote-scopes : partner=Partner%20String"));
+}
+
+TEST_F(SmartScopesClientTest, remote_scopes_no_partner)
+{
+    std::vector<RemoteScope> scopes;
+    auto ssc_no_partner_ = std::make_shared<SmartScopesClient>(http_client_, json_node_, test_logger::get(), sss_url_, "/this/file/doesnt/exist");
+    EXPECT_TRUE(ssc_no_partner_->get_remote_scopes(scopes, "", false));
+    EXPECT_FALSE(grep_string("/remote-scopes : partner"));
 }
 
 TEST_F(SmartScopesClientTest, search)
