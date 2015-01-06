@@ -79,7 +79,10 @@ When using <tt>{"schema-version": 1}</tt>, the following keys are understood:
 
 \section example Example
 
-In the following example a category named "Recommended" containing three components is created (title, art and subtitle), and a result providing values for these components is pushed.
+In the following example a category named "Recommended" containing four components is created (title,
+art, art-fallback, and subtitle), and a result providing values for these components is pushed.
+The art-fallback URI is a fallback hint to the shell, to be used in case the shall cannot retrieve
+the artwork for a result.
 
 Note that the scope is free to set any other extra result fields even if they are not used by the renderer (and therefore not specified in the \c "components" dictionary), such fields will be preserved and available to the scope when handling result-specific methods (for example unity::scopes::ScopeBase::preview()).
 
@@ -98,6 +101,7 @@ std::string CATEGORY_DEFINITION = R"(
       "field": "art",
       "aspect-ratio": 1.3
     },
+    "art-fallback": "file:///path_to_fallback_image",
     "subtitle": "publisher"
   }
 }

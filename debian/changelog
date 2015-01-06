@@ -1,3 +1,11 @@
+unity-scopes-api (0.6.11+15.04.20141212-0ubuntu2) UNRELEASED; urgency=medium
+
+  * Added "art-fallback" entry to "components" dictionary of the category renderer
+    to allow a fallback image to be specified in case the art URI of a result
+    cannot be retrieved.
+
+ -- Michi Henning <michi.henning@canonical.com>  Tue, 06 Jan 2015 14:03:54 +1000
+
 unity-scopes-api (0.6.10+15.04.20141212-0ubuntu1) vivid; urgency=low
 
   [ Pawel Stolowski ]
