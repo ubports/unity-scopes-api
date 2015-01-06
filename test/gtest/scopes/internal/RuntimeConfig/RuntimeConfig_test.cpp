@@ -21,6 +21,8 @@
 #include <unity/scopes/internal/DfltConfig.h>
 #include <unity/scopes/ScopeExceptions.h>
 
+#include <unity/UnityExceptions.h>
+
 #include <gtest/gtest.h>
 
 using namespace std;
@@ -131,10 +133,24 @@ TEST(RuntimeConfig, overridden_log_dir)
 
 TEST(RuntimeConfig, overridden_log_dir_with_home_dir)
 {
-    setenv("HOME", TEST_SRC_DIR, 1);
-
     RuntimeConfig c(TEST_SRC_DIR "/LogDir.ini");
     EXPECT_EQ("logdir", c.log_directory());
+}
+
+TEST(RuntimeConfig, log_dir_env_var_override)
+{
+    setenv("UNITY_SCOPES_LOGDIR", "otherdir", 1);
+
+    RuntimeConfig c(TEST_SRC_DIR "/LogDir.ini");
+    EXPECT_EQ("otherdir", c.log_directory());
+}
+
+TEST(RuntimeConfig, trace_channels_env_var_override)
+{
+    setenv("UNITY_SCOPES_LOG_TRACECHANNELS", "ABC;XYZ;;DEF", 1);
+
+    RuntimeConfig c(TEST_SRC_DIR "/Complete.ini");
+    EXPECT_EQ((vector<string>{ "ABC", "XYZ", "DEF"}), c.trace_channels());
 }
 
 TEST(RuntimeConfig, exceptions)
@@ -219,6 +235,21 @@ TEST(RuntimeConfig, exceptions)
                       "    unity::ResourceException: RuntimeConfig::default_log_directory(): $HOME not set:\n"
                       "        unity::LogicException: Could not get string value (" TEST_SRC_DIR "/NoLogDir.ini, "
                       "group: Runtime): Key file does not have key 'LogDir' in group 'Runtime'",
+                     e.what());
+    }
+
+    try
+    {
+        unsetenv("HOME");
+
+        RuntimeConfig c(TEST_SRC_DIR "/NoAppDir.ini");
+        FAIL();
+    }
+    catch (ConfigException const& e)
+    {
+        EXPECT_STREQ( "unity::scopes::ConfigException: \"" TEST_SRC_DIR "/NoAppDir.ini\": "
+                      "No AppDir configured and failed to get default:\n"
+                      "    unity::ResourceException: RuntimeConfig::default_app_directory(): $HOME not set",
                      e.what());
     }
 

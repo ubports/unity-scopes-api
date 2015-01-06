@@ -63,7 +63,7 @@ BOOST_LOG_INLINE_GLOBAL_LOGGER_DEFAULT(oa_test_logger, boost::log::sources::seve
 BOOST_LOG_INLINE_GLOBAL_LOGGER_CTOR_ARGS(
     oa_test_ipc_logger,
     boost::log::sources::severity_channel_logger_mt<>,
-    ((boost::log::keywords::severity = Logger::Trace, boost::log::keywords::channel = "IPC")));
+    ((boost::log::keywords::severity = Logger::Trace, boost::log::keywords::channel = "IPC")))
 
 }  // namespace
 

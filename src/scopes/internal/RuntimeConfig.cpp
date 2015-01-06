@@ -79,17 +79,10 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
         reap_interval_ = DFLT_REAP_INTERVAL;
         max_log_file_size_ = DFLT_MAX_LOG_FILE_SIZE;
         max_log_dir_size_ = DFLT_MAX_LOG_DIR_SIZE;
-        try
-        {
-            cache_directory_ = default_cache_directory();
-            app_directory_ = default_app_directory();
-            config_directory_ = default_config_directory();
-            log_directory_ = default_log_directory();
-        }
-        catch (ResourceException const& e)
-        {
-            throw_ex("Failed to get default directory");
-        }
+        cache_directory_ = default_cache_directory();
+        app_directory_ = default_app_directory();
+        config_directory_ = default_config_directory();
+        log_directory_ = default_log_directory();
     }
     else
     {
