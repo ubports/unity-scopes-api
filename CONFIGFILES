@@ -140,6 +140,10 @@ The following keys are recognized:
 
   $HOME/.config/unity-scopes/<scope_id>/settings.ini
 
+  The environment variable UNITY_SCOPES_LOGDIR overrides this key.
+  Setting this variable explicitly to the empty string disables file logging and forces
+  all log entries to go to stderr.
+
 - Log.MaxFileSize
 
   The maximum size in bytes of an individual log file before it is rolled over.
@@ -160,6 +164,9 @@ The following keys are recognized:
   - IPC
 
     Trace inter-process messages activity.
+
+  The environment variable UNITY_SCOPES_LOG_TRACECHANNELS overrides this key.
+  The value must be a semicolon-separate list of channel names.
 
 
 Zmq.ini

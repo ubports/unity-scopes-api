@@ -21,6 +21,9 @@
 #include <unity/scopes/internal/DfltConfig.h>
 #include <unity/scopes/ScopeExceptions.h>
 
+#include <boost/algorithm/string/classification.hpp>
+#include <boost/algorithm/string/constants.hpp>
+#include <boost/algorithm/string/split.hpp>
 #include <boost/filesystem.hpp>
 #include <unity/UnityExceptions.h>
 
@@ -108,6 +111,7 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
         {
             throw_ex("Illegal value (" + to_string(reap_interval_) + ") for " + reap_interval_key + ": value must be > 0");
         }
+
         cache_directory_ = get_optional_string(runtime_config_group, cache_dir_key);
         if (cache_directory_.empty())
         {
@@ -120,6 +124,7 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
                 throw_ex("No " + cache_dir_key + " configured and failed to get default");
             }
         }
+
         app_directory_ = get_optional_string(runtime_config_group, app_dir_key);
         if (app_directory_.empty())
         {
@@ -132,6 +137,7 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
                 throw_ex("No " + app_dir_key + " configured and failed to get default");
             }
         }
+
         config_directory_ = get_optional_string(runtime_config_group, config_dir_key);
         if (config_directory_.empty())
         {
@@ -144,6 +150,7 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
                 throw_ex("No " + config_dir_key + " configured and failed to get default");
             }
         }
+
         try
         {
             // If explicitly set to the empty string, we succeed here.
@@ -161,12 +168,21 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
                 throw_ex("No " + log_dir_key + " configured and failed to get default");
             }
         }
+
+        // Check if we have an override for the log directory.
+        char const* logdir = getenv("UNITY_SCOPES_LOGDIR");
+        if (logdir)
+        {
+            log_directory_ = logdir;
+        }
+
         max_log_file_size_ = get_optional_int(runtime_config_group, max_log_file_size_key, DFLT_MAX_LOG_FILE_SIZE);
         if (max_log_file_size_ < 1024)
         {
             throw_ex("Illegal value (" + to_string(max_log_file_size_) + ") for " + max_log_file_size_key
                      + ": value must be > 1024");
         }
+
         max_log_dir_size_ = get_optional_int(runtime_config_group, max_log_dir_size_key, DFLT_MAX_LOG_DIR_SIZE);
         if (max_log_dir_size_ <= max_log_file_size_)
         {
@@ -183,6 +199,14 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
             // No TraceChannels configured.
         }
 
+        // Check if we have an override for the trace channels.
+        char const* tc = getenv("UNITY_SCOPES_LOG_TRACECHANNELS");
+        if (tc && *tc != '\0')
+        {
+            vector<string> channels;
+            split(channels, tc, boost::is_any_of(";"), boost::token_compress_on);
+            trace_channels_ = channels;
+        }
     }
 
     KnownEntries const known_entries = {
