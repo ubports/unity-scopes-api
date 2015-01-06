@@ -312,7 +312,7 @@ string RuntimeConfig::default_cache_directory()
     {
         throw ResourceException("RuntimeConfig::default_cache_directory(): $HOME not set");
     }
-    return string(home) + "/.local/share/unity-scopes";
+    return string(home) + "/" + DFLT_HOME_CACHE_SUBDIR;
 }
 
 string RuntimeConfig::default_app_directory()
@@ -322,7 +322,7 @@ string RuntimeConfig::default_app_directory()
     {
         throw ResourceException("RuntimeConfig::default_app_directory(): $HOME not set");
     }
-    return string(home) + "/.local/share";
+    return string(home) + "/" + DFLT_HOME_APP_SUBDIR;
 }
 
 string RuntimeConfig::default_config_directory()
@@ -332,7 +332,7 @@ string RuntimeConfig::default_config_directory()
     {
         throw ResourceException("RuntimeConfig::default_config_directory(): $HOME not set");
     }
-    return string(home) + "/.config/unity-scopes";
+    return string(home) + "/" + DFLT_HOME_CONFIG_SUBDIR;
 }
 
 string RuntimeConfig::default_log_directory()
@@ -342,7 +342,7 @@ string RuntimeConfig::default_log_directory()
     {
         throw ResourceException("RuntimeConfig::default_log_directory(): $HOME not set");
     }
-    string dir = string(home) + "/.cache/unity-scopes/logs";
+    string dir = string(home) + "/" + DFLT_HOME_LOG_SUBDIR;
 
     boost::system::error_code ec;
     !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700);
