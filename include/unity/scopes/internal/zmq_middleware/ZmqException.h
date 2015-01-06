@@ -51,6 +51,7 @@ kj::ArrayPtr<kj::ArrayPtr<capnp::word const> const> create_object_not_exist_resp
 void throw_if_runtime_exception(capnproto::Response::Reader const& response);
 
 std::string decode_runtime_exception(capnproto::Response::Reader const& response);
+std::string decode_status(capnproto::Response::Reader const& response);
 
 } // namespace zmq_middleware
 

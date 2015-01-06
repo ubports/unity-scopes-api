@@ -101,8 +101,6 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
                                   config.max_log_dir_size());
         }
 
-logger_->set_channel(Logger::IPC, true);
-
         string default_middleware = config.default_middleware();
         string middleware_configfile = config.default_middleware_configfile();
         middleware_factory_.reset(new MiddlewareFactory(this));

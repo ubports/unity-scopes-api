@@ -366,34 +366,8 @@ void ZmqObjectProxy::trace_request_(capnp::MessageBuilder& request)
 
 string ZmqObjectProxy::decode_reply_(capnp::MessageBuilder& request, capnp::MessageReader& reply)
 {
-    stringstream s;
-    s << decode_request_(request) << ", ";
     auto response = reply.getRoot<capnproto::Response>();
-    switch (response.getStatus())
-    {
-        case capnproto::ResponseStatus::SUCCESS:
-        {
-            s << "status = Success";
-            break;
-        }
-        case capnproto::ResponseStatus::USER_EXCEPTION:
-        {
-            s << "status = User exception";
-            break;
-        }
-        case capnproto::ResponseStatus::RUNTIME_EXCEPTION:
-        {
-            s << decode_runtime_exception(response);
-            break;
-        }
-        // LCOV_EXCL_START
-        default:
-        {
-            assert(false);
-        }
-        // LCOV_EXCL_STOP
-    }
-    return s.str();
+    return decode_request_(request) + ", " + decode_status(response);
 }
 
 void ZmqObjectProxy::trace_reply_(capnp::MessageBuilder& request, capnp::MessageReader& reply)
