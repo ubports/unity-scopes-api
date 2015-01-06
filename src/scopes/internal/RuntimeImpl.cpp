@@ -69,7 +69,7 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
         {
             UniqueID id;
             scope_id_ = "c-" + id.gen();
-            log_file_basename = "client";  // Don't make lots of log files named like c-12345678
+            log_file_basename = "client";  // Don't make lots of log files named like c-c4c758b100000000.
         }
 
         // Until we know where the scope's cache directory is,

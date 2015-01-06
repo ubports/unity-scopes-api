@@ -166,20 +166,6 @@ capnproto::Request::Builder ZmqObjectProxy::make_request_(capnp::MessageBuilder&
     return request;
 }
 
-#ifdef ENABLE_IPC_MONITOR
-void register_monitor_socket(ConnectionPool& pool, zmqpp::context_t const& context)
-{
-    thread_local static bool monitor_initialized = false;
-    if (!monitor_initialized) {
-        monitor_initialized = true;
-        auto monitor_socket = make_shared<zmqpp::socket>(context, zmqpp::socket_type::publish);
-        monitor_socket->set(zmqpp::socket_option::linger, 0);
-        monitor_socket->connect(MONITOR_ENDPOINT);
-        pool.register_socket(MONITOR_ENDPOINT, monitor_socket, false);
-    }
-}
-#endif
-
 // Get a socket to the endpoint for this proxy and write the request on the wire.
 
 void ZmqObjectProxy::invoke_oneway_(capnp::MessageBuilder& request)
@@ -200,15 +186,6 @@ void ZmqObjectProxy::invoke_oneway_(capnp::MessageBuilder& request)
         pool.remove(endpoint_);
         return;
     }
-
-#ifdef ENABLE_IPC_MONITOR
-    if (true) {
-        register_monitor_socket(pool, *mw_base()->context());
-        auto monitor = pool.find(MONITOR_ENDPOINT);
-        auto word_arr = capnp::messageToFlatArray(segments);
-        monitor->send_raw(reinterpret_cast<char*>(&word_arr[0]), word_arr.size() * sizeof(capnp::word));
-    }
-#endif
 }
 
 ZmqObjectProxy::TwowayOutParams ZmqObjectProxy::invoke_twoway_(capnp::MessageBuilder& request)
@@ -299,18 +276,6 @@ ZmqObjectProxy::TwowayOutParams ZmqObjectProxy::invoke_twoway__(capnp::MessageBu
     auto segments = request.getSegmentsForOutput();
     trace_request_(request);
     sender.send(segments);
-
-#ifdef ENABLE_IPC_MONITOR
-    // Each calling thread gets its own pool because zmq sockets are not thread-safe.
-    thread_local static ConnectionPool pool(*mw_base()->context());
-
-    if (true) {
-        register_monitor_socket(pool, *mw_base()->context());
-        auto monitor = pool.find(MONITOR_ENDPOINT);
-        auto word_arr = capnp::messageToFlatArray(segments);
-        monitor->send_raw(reinterpret_cast<char*>(&word_arr[0]), word_arr.size() * sizeof(capnp::word));
-    }
-#endif
 
     zmqpp::poller p;
     p.add(s);
