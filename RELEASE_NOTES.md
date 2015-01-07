@@ -8,6 +8,11 @@ Changes in version 0.6.11
     This allows a scope to specify a category-specific
     fallback image in case the artwork for a result cannot be retrieved.
 
+  - PreviewWidget now supports a "fallback" field for the "image",
+    "gallery", and "header" widget types. This allows the scope
+    to specify a fallback image in case the artwork for a widget
+    cannot be retrieved.
+
 Changes in version 0.6.10
 =========================
   - Renamed "Tags" scope .ini option to "Keywords".
