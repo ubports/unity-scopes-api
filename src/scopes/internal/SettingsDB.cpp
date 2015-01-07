@@ -230,7 +230,6 @@ void SettingsDB::watch_thread()
             {
                 static_assert(std::alignment_of<char*>::value >= std::alignment_of<struct inotify_event>::value,
                               "cannot use std::string as buffer for inotify events");
-                              "cannot use std::string as buffer for inotify events");
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wcast-align"
                 auto event = reinterpret_cast<inotify_event const*>(&buffer[i]);
