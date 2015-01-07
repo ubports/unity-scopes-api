@@ -177,8 +177,6 @@ void DirWatcher::watch_thread()
 #pragma GCC diagnostic pop
 
         int bytes_avail = 0;
-        static_assert(std::alignment_of<char*>::value >= std::alignment_of<struct inotify_event>::value,
-                      "cannot use std::string as buffer for inotify events");
         std::string buffer;
         std::string event_path;
 
@@ -222,7 +220,12 @@ void DirWatcher::watch_thread()
             int i = 0;
             while (i < bytes_read)
             {
+                static_assert(std::alignment_of<char*>::value >= std::alignment_of<struct inotify_event>::value,
+                              "cannot use std::string as buffer for inotify events");
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-align"
                 auto event = reinterpret_cast<inotify_event const*>(&buffer[i]);
+#pragma GCC diagnostic pop
                 {
                     event_path = "";
                     std::lock_guard<std::mutex> lock(mutex_);
