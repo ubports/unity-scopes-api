@@ -68,10 +68,19 @@ When using <tt>{"schema-version": 1}</tt>, the following keys are understood:
 \subsection components1 components keys
 
 \arg \c title String specifying card's title
-\arg \c art URI specifying card's art (primary graphics), can contain subkeys: \c "aspect-ratio" (double specifying the aspect ratio of the graphics, default: 1.0)
 \arg \c subtitle String specifying subtitle of a card
+\arg \c art URI specifying card's art (primary graphics), can contain subkeys: \c "aspect-ratio" (double specifying the aspect ratio of the graphics, default: 1.0) and "field" (specifying the result's field name that contains the URI).
+\arg \c art-fallback Fallback image to be used if the URI for a result's artwork cannot be retrieved. Subkeys are: \c
+"aspect-ratio" (double specifying the aspect ratio of the graphics (default: 1.0) and \c "URI"
+(specifying the URI of the fallback image).
 \arg \c mascot URI specifying card's mascot (secondary graphics)
+\arg \c mascot-fallback Fallback image to be used if the URI for a result's mascot cannot be retrieved. Subkeys are:
+\c "aspect-ratio" (double specifying the aspect ratio of the graphics (default: 1.0) and \c "URI"
+(specifying the URI of the mascot image).
 \arg \c emblem URI specifying card's emblem
+\arg \c emblem-fallback Fallback image to be used if the URI for a result's emblem cannot be retrieved. Subkeys are:
+\c "aspect-ratio" (double specifying the aspect ratio of the graphics (default: 1.0) and \c "URI"
+(specifying the URI of the emblem image).
 \arg \c summary String specifying text summary
 \arg \c background Card background URI, can override the default specified in the card-background field of the template section (same format as for card-background)
 \arg \c attributes Array of dictionaries specifying text and an optional icon (keys: "value", "icon")
@@ -93,16 +102,19 @@ std::string CATEGORY_DEFINITION = R"(
   "schema-version" : 1,
   "template" : {
     "category-layout" : "carousel",
-    "card-size": "small"
+    "card-size" : "small"
   },
   "components" : {
     "title" : "title",
     "art" : {
-      "field": "art",
-      "aspect-ratio": 1.3
+      "field" : "art",
+      "aspect-ratio" : 1.3
     },
-    "art-fallback": "file:///path_to_fallback_image",
-    "subtitle": "publisher"
+    "art-fallback" : {
+      "URI" : "file:///path_to_fallback_image",
+      "aspect-ratio" : 1.2
+    },
+    "subtitle" : "publisher"
   }
 }
 )";
