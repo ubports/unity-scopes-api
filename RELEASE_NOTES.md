@@ -3,8 +3,9 @@ Release notes
 
 Changes in version 0.6.11
 =========================
-  - The JSON for a CategoryRenderer now supports an "art-fallback" field in the
-    "components" dictionary. This allows a scope to specify a category-specific
+  - The JSON for a CategoryRenderer now supports a "fallback" field in the
+    "art" and "mascot" entries of the "components" dictionary.
+    This allows a scope to specify a category-specific
     fallback image in case the artwork for a result cannot be retrieved.
 
 Changes in version 0.6.10
