@@ -318,6 +318,7 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::FilterOption::FilterOption(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::FilterOption::id() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::FilterOption::label() const@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::FilterState::deserialize(std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unity::scopes::Variant> > > const&)@Base" 0replaceme
  (c++)"unity::scopes::FilterState::~FilterState()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::FilterState::FilterState()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::FilterState::FilterState(unity::scopes::FilterState&&)@Base" 0.4.0+14.04.20140312.1
