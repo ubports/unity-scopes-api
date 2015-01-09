@@ -19,6 +19,7 @@
 
 #include <unity/scopes/internal/FilterBaseImpl.h>
 #include <unity/scopes/internal/FilterStateImpl.h>
+#include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/smartscopes/SmartScopesClient.h>
 
 #include <unity/scopes/ScopeExceptions.h>
@@ -53,6 +54,9 @@ static const std::string c_preview_resource = "/preview";
 static const std::string c_scopes_cache_dir = homedir() + "/.cache/unity-scopes/";
 static const std::string c_scopes_cache_filename = "remote-scopes.json";
 static const std::string c_partner_id_file = "/custom/partner-id";
+
+// Some of the tests don't have a runtime, so we use a separate logger in that case.
+BOOST_LOG_INLINE_GLOBAL_LOGGER_DEFAULT(test_logger, boost::log::sources::severity_channel_logger_mt<>)
 
 using namespace unity::scopes;
 using namespace unity::scopes::internal::smartscopes;
@@ -107,12 +111,13 @@ void PreviewHandle::cancel_preview()
 
 SmartScopesClient::SmartScopesClient(HttpClientInterface::SPtr http_client,
                                      JsonNodeInterface::SPtr json_node,
-                                     boost::log::sources::severity_channel_logger_mt<>& logger,
+                                     RuntimeImpl* runtime,
                                      std::string const& url,
                                      std::string const& partner_id_path)
     : http_client_(http_client)
     , json_node_(json_node)
-    , logger_(logger)
+    , runtime_(runtime)
+    , logger_(runtime ? runtime->logger() : test_logger::get())
     , have_latest_cache_(false)
     , query_counter_(0)
     , partner_file_(partner_id_path)
@@ -542,11 +547,6 @@ PreviewHandle::UPtr SmartScopesClient::preview(PreviewReplyHandler const& handle
     return PreviewHandle::UPtr(new PreviewHandle(preview_id, shared_from_this()));
 }
 
-boost::log::sources::severity_channel_logger_mt<>& SmartScopesClient::logger() const
-{
-    return logger_;
-}
-
 void SmartScopesClient::parse_line(std::string const& json, PreviewReplyHandler const& handler)
 {
     JsonNodeInterface::SPtr root_node;
@@ -939,4 +939,9 @@ std::string SmartScopesClient::stringify_settings(VariantMap const& settings)
         return std::string();
     }
     return result_str.str();
+}
+
+boost::log::sources::severity_channel_logger_mt<>& SmartScopesClient::logger() const
+{
+    return logger_;
 }

@@ -22,6 +22,7 @@
 #include <unity/scopes/internal/InvokeInfo.h>
 #include <unity/scopes/internal/MWReply.h>
 #include <unity/scopes/internal/PreviewReplyImpl.h>
+#include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/SearchReplyImpl.h>
 #include <unity/scopes/PreviewQueryBase.h>
 #include <unity/scopes/PreviewReply.h>
@@ -47,8 +48,7 @@ namespace internal
 namespace smartscopes
 {
 
-SSQueryObject::SSQueryObject(boost::log::sources::severity_channel_logger_mt<>& logger)
-    : logger_(logger)
+SSQueryObject::SSQueryObject()
 {
 }
 
@@ -56,7 +56,7 @@ SSQueryObject::~SSQueryObject()
 {
 }
 
-void SSQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& /*info*/) noexcept
+void SSQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& info) noexcept
 {
     decltype(queries_.begin()) query_it;
 
@@ -95,7 +95,7 @@ void SSQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& /*info*/) n
         std::lock_guard<std::mutex> lock(queries_mutex_);
 
         query_it->second->q_pushable = false;
-        BOOST_LOG(logger_) << "SSQueryObject::run(): " << e.what();
+        BOOST_LOG(info.mw->runtime()->logger()) << "SSQueryObject::run(): " << e.what();
         reply->finished(CompletionDetails(CompletionDetails::Error, e.what()));  // Oneway, can't block
     }
     catch (...)
@@ -103,7 +103,7 @@ void SSQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& /*info*/) n
         std::lock_guard<std::mutex> lock(queries_mutex_);
 
         query_it->second->q_pushable = false;
-        BOOST_LOG(logger_) << "SSQueryObject::run(): unknown exception";
+        BOOST_LOG(info.mw->runtime()->logger()) << "SSQueryObject::run(): unknown exception";
         reply->finished(CompletionDetails(CompletionDetails::Error, "unknown exception"));  // Oneway, can't block
     }
 
@@ -207,8 +207,7 @@ void SSQueryObject::run_query(SSQuery::SPtr query, MWReplyProxy const& reply)
     q_reply_proxy = make_shared<SearchReplyImpl>(reply,
                                                  shared_from_this(),
                                                  query->q_cardinality,
-                                                 q_base->department_id(),
-                                                 logger_);
+                                                 q_base->department_id());
     assert(q_reply_proxy);
     query->q_reply_proxy = q_reply_proxy;
 
@@ -230,7 +229,7 @@ void SSQueryObject::run_preview(SSQuery::SPtr query, MWReplyProxy const& reply)
 
     // Create the reply proxy and keep a weak_ptr, which we will need
     // if cancel() is called later.
-    q_reply_proxy = make_shared<PreviewReplyImpl>(reply, shared_from_this(), logger_);
+    q_reply_proxy = make_shared<PreviewReplyImpl>(reply, shared_from_this());
     assert(q_reply_proxy);
     query->q_reply_proxy = q_reply_proxy;
 

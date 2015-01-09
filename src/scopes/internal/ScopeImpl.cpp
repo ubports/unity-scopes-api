@@ -43,12 +43,12 @@ namespace scopes
 namespace internal
 {
 
-ScopeImpl::ScopeImpl(MWScopeProxy const& mw_proxy, RuntimeImpl* runtime, std::string const& scope_id) :
-    ObjectImpl(mw_proxy, runtime->logger()),
-    runtime_(runtime),
+ScopeImpl::ScopeImpl(MWScopeProxy const& mw_proxy, std::string const& scope_id) :
+    ObjectImpl(mw_proxy),
+    runtime_(mw_proxy->mw_base()->runtime()),
     scope_id_(scope_id)
 {
-    assert(runtime);
+    assert(runtime_);
 }
 
 ScopeImpl::~ScopeImpl()
@@ -99,7 +99,7 @@ QueryCtrlProxy ScopeImpl::search(CannedQuery const& query,
     MWReplyProxy rp = fwd()->mw_base()->add_reply_object(ro);
 
     // "Fake" QueryCtrlProxy that doesn't have a real MWQueryCtrlProxy yet.
-    shared_ptr<QueryCtrlImpl> ctrl = make_shared<QueryCtrlImpl>(nullptr, rp, runtime_->logger());
+    shared_ptr<QueryCtrlImpl> ctrl = make_shared<QueryCtrlImpl>(nullptr, rp);
 
     // We pass a shared pointer to the lambda (instead of the this pointer)
     // to keep ourselves alive until after the lambda fires.
@@ -152,7 +152,7 @@ QueryCtrlProxy ScopeImpl::activate(Result const& result,
     ReplyObject::SPtr ro(make_shared<ActivationReplyObject>(reply, runtime_, to_string(), fwd()->debug_mode()));
     MWReplyProxy rp = fwd()->mw_base()->add_reply_object(ro);
 
-    shared_ptr<QueryCtrlImpl> ctrl = make_shared<QueryCtrlImpl>(nullptr, rp, runtime_->logger());
+    shared_ptr<QueryCtrlImpl> ctrl = make_shared<QueryCtrlImpl>(nullptr, rp);
 
     auto impl = dynamic_pointer_cast<ScopeImpl>(shared_from_this());
 
@@ -200,7 +200,7 @@ QueryCtrlProxy ScopeImpl::perform_action(Result const& result,
     ReplyObject::SPtr ro(make_shared<ActivationReplyObject>(reply, runtime_, to_string(), fwd()->debug_mode()));
     MWReplyProxy rp = fwd()->mw_base()->add_reply_object(ro);
 
-    shared_ptr<QueryCtrlImpl> ctrl = make_shared<QueryCtrlImpl>(nullptr, rp, runtime_->logger());
+    shared_ptr<QueryCtrlImpl> ctrl = make_shared<QueryCtrlImpl>(nullptr, rp);
 
     auto impl = dynamic_pointer_cast<ScopeImpl>(shared_from_this());
 
@@ -249,7 +249,7 @@ QueryCtrlProxy ScopeImpl::preview(Result const& result,
     ReplyObject::SPtr ro(make_shared<PreviewReplyObject>(reply, runtime_, to_string(), fwd()->debug_mode()));
     MWReplyProxy rp = fwd()->mw_base()->add_reply_object(ro);
 
-    shared_ptr<QueryCtrlImpl> ctrl = make_shared<QueryCtrlImpl>(nullptr, rp, runtime_->logger());
+    shared_ptr<QueryCtrlImpl> ctrl = make_shared<QueryCtrlImpl>(nullptr, rp);
 
     auto impl = dynamic_pointer_cast<ScopeImpl>(shared_from_this());
 
@@ -283,9 +283,9 @@ QueryCtrlProxy ScopeImpl::preview(Result const& result,
     return ctrl;
 }
 
-ScopeProxy ScopeImpl::create(MWScopeProxy const& mw_proxy, RuntimeImpl* runtime, std::string const& scope_id)
+ScopeProxy ScopeImpl::create(MWScopeProxy const& mw_proxy, std::string const& scope_id)
 {
-    return make_shared<ScopeImpl>(mw_proxy, runtime, scope_id);
+    return make_shared<ScopeImpl>(mw_proxy, scope_id);
 }
 
 MWScopeProxy ScopeImpl::fwd()

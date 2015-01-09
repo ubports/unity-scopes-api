@@ -17,7 +17,6 @@
  */
 
 #include <unity/scopes/internal/JsonCppNode.h>
-#include <unity/scopes/internal/Logger.h>
 #include <unity/scopes/internal/smartscopes/HttpClientQt.h>
 #include <unity/scopes/internal/smartscopes/SmartScopesClient.h>
 #include <unity/scopes/OptionSelectorFilter.h>
@@ -39,8 +38,6 @@ using namespace unity::scopes::internal;
 using namespace unity::scopes::internal::smartscopes;
 using namespace unity::test::scopes::internal::smartscopes;
 
-BOOST_LOG_INLINE_GLOBAL_LOGGER_DEFAULT(test_logger, boost::log::sources::severity_channel_logger_mt<>)
-
 namespace
 {
 
@@ -54,7 +51,7 @@ public:
     {
         boost::filesystem::remove(FAKE_SSS_LOG);
         sss_url_ = "http://127.0.0.1:" + std::to_string(server_.port_);
-        ssc_ = std::make_shared<SmartScopesClient>(http_client_, json_node_, test_logger::get(), sss_url_, PARTNER_FILE);
+        ssc_ = std::make_shared<SmartScopesClient>(http_client_, json_node_, nullptr, sss_url_, PARTNER_FILE);
     }
 
     bool grep_string(std::string const &s)
@@ -151,7 +148,7 @@ TEST_F(SmartScopesClientTest, remote_scopes)
 TEST_F(SmartScopesClientTest, remote_scopes_no_partner)
 {
     std::vector<RemoteScope> scopes;
-    auto ssc_no_partner_ = std::make_shared<SmartScopesClient>(http_client_, json_node_, test_logger::get(), sss_url_, "/this/file/doesnt/exist");
+    auto ssc_no_partner_ = std::make_shared<SmartScopesClient>(http_client_, json_node_, nullptr, sss_url_, "/this/file/doesnt/exist");
     EXPECT_TRUE(ssc_no_partner_->get_remote_scopes(scopes, "", false));
     EXPECT_FALSE(grep_string("/remote-scopes : partner"));
 }

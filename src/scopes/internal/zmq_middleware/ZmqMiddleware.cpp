@@ -826,12 +826,12 @@ ObjectProxy ZmqMiddleware::make_typed_proxy(string const& endpoint,
     if (category == scope_category)
     {
         auto p = make_shared<ZmqScope>(this, endpoint, identity, category, timeout);
-        return ScopeImpl::create(p, runtime(), identity);
+        return ScopeImpl::create(p, identity);
     }
     else if (category == registry_category)
     {
         auto p = make_shared<ZmqRegistry>(this, endpoint, identity, category, timeout);
-        return make_shared<RegistryImpl>(p, runtime());
+        return make_shared<RegistryImpl>(p);
     }
     else
     {

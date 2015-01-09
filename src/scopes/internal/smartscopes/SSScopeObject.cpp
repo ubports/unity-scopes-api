@@ -45,10 +45,9 @@ SSScopeObject::SSScopeObject(std::string const& ss_scope_id,
                              SSRegistryObject::SPtr ss_registry)
     : ss_scope_id_(ss_scope_id)
     , co_(std::make_shared<SSQueryCtrlObject>())
-    , qo_(std::make_shared<SSQueryObject>(middleware->runtime()->logger()))
+    , qo_(std::make_shared<SSQueryObject>())
     , smartscope_(new SmartScope(ss_registry))
     , ss_registry_(ss_registry)
-    , logger_(middleware->runtime()->logger())
 {
     // Connect the query ctrl to the middleware.
     middleware->add_dflt_query_ctrl_object(co_);
@@ -173,7 +172,7 @@ MWQueryCtrlProxy SSScopeObject::query(InvokeInfo const& info,
         catch (...)
         {
         }
-        BOOST_LOG(logger_) << "SSScopeObject::query(): " << e.what();
+        BOOST_LOG(info.mw->runtime()->logger()) << "SSScopeObject::query(): " << e.what();
         throw;
     }
     catch (...)
@@ -185,7 +184,7 @@ MWQueryCtrlProxy SSScopeObject::query(InvokeInfo const& info,
         catch (...)
         {
         }
-        BOOST_LOG(logger_) << "SSScopeObject::query(): unknown exception";
+        BOOST_LOG(info.mw->runtime()->logger()) << "SSScopeObject::query(): unknown exception";
         throw;
     }
 

@@ -128,7 +128,7 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
             // Create the registry proxy
             RegistryConfig reg_config(registry_identity_, registry_configfile_);
             auto registry_mw_proxy = middleware_->registry_proxy();
-            registry_ = make_shared<RegistryImpl>(registry_mw_proxy, this);
+            registry_ = make_shared<RegistryImpl>(registry_mw_proxy);
         }
 
         cache_dir_ = config.cache_directory();

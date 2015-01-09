@@ -19,6 +19,7 @@
 
 #include <unity/scopes/internal/smartscopes/SmartScope.h>
 
+#include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/PreviewReply.h>
 #include <unity/scopes/SearchReply.h>
 

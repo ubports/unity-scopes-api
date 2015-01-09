@@ -104,8 +104,7 @@ void QueryObject::run(MWReplyProxy const& reply, InvokeInfo const& info) noexcep
     auto reply_proxy = make_shared<SearchReplyImpl>(reply,
                                                     self_,
                                                     cardinality_,
-                                                    search_query->department_id(),
-                                                    info.mw->runtime()->logger());
+                                                    search_query->department_id());
     assert(reply_proxy);
     reply_proxy_ = reply_proxy;
 

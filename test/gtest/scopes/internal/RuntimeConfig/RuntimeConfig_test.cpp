@@ -234,7 +234,7 @@ TEST(RuntimeConfig, exceptions)
                       "No LogDir configured and failed to get default:\n"
                       "    unity::ResourceException: RuntimeConfig::default_log_directory(): $HOME not set:\n"
                       "        unity::LogicException: Could not get string value (" TEST_SRC_DIR "/NoLogDir.ini, "
-                      "group: Runtime): Key file does not have key 'LogDir'",
+                      "group: Runtime): Key file does not have key 'LogDir' in group 'Runtime'",
                      e.what());
     }
 

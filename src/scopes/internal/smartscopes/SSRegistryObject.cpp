@@ -50,7 +50,7 @@ SSRegistryObject::SSRegistryObject(MiddlewareBase::SPtr middleware,
     : ssclient_(std::make_shared<SmartScopesClient>(
                     std::make_shared<HttpClientQt>(ss_config.http_reply_timeout() * 1000),  // need millisecs
                     std::make_shared<JsonCppNode>(),
-                    middleware->runtime()->logger(),
+                    middleware->runtime(),
                     sss_url))
     , refresh_stopped_(false)
     , middleware_(middleware)
@@ -347,7 +347,6 @@ void SSRegistryObject::get_remote_scopes()
             metadata->set_keywords(scope.keywords);
 
             ScopeProxy proxy = ScopeImpl::create(middleware_->create_scope_proxy(scope.id, ss_scope_endpoint_),
-                                                 middleware_->runtime(),
                                                  scope.id);
 
             metadata->set_proxy(proxy);
