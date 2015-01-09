@@ -46,12 +46,10 @@ namespace scopes
 namespace internal
 {
 
-ScopeObject::ScopeObject(RuntimeImpl* runtime, ScopeBase* scope_base, bool debug_mode) :
-    runtime_(runtime),
+ScopeObject::ScopeObject(ScopeBase* scope_base, bool debug_mode) :
     scope_base_(scope_base),
     debug_mode_(debug_mode)
 {
-    assert(runtime);
     assert(scope_base);
 }
 
