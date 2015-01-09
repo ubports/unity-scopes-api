@@ -19,6 +19,7 @@
 #include <unity/scopes/internal/smartscopes/SSQueryObject.h>
 
 #include <unity/scopes/ActivationQueryBase.h>
+#include <unity/scopes/internal/InvokeInfo.h>
 #include <unity/scopes/internal/MWReply.h>
 #include <unity/scopes/internal/PreviewReplyImpl.h>
 #include <unity/scopes/internal/SearchReplyImpl.h>
