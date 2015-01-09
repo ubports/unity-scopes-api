@@ -1,4 +1,4 @@
-unity-scopes-api (0.6.11+15.04.20141212-0ubuntu1) UNRELEASED; urgency=medium
+unity-scopes-api (0.6.11-0ubuntu1) UNRELEASED; urgency=medium
 
   * Improved logging internals.
 
