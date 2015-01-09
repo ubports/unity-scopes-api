@@ -71,7 +71,8 @@ public:
 
 private:
     mutable std::mutex mutex_;
-    std::map<std::string, Category::SCPtr> categories_;
+    typedef std::pair<std::string, Category::SCPtr> CatPair;
+    std::vector<CatPair> categories_;                         // vector instead of map, so we preserve order
 };
 
 } // namespace internal

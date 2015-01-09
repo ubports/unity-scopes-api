@@ -22,10 +22,14 @@
 #include <unity/scopes/Annotation.h>
 #include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/internal/DepartmentImpl.h>
-#include <unity/scopes/internal/MWReply.h>
 #include <unity/scopes/internal/FilterBaseImpl.h>
+#include <unity/scopes/internal/MWReply.h>
 #include <unity/scopes/internal/QueryObjectBase.h>
+#include <unity/scopes/internal/RuntimeImpl.h>
+#include <unity/util/FileIO.h>
 #include <unity/UnityExceptions.h>
+
+#include <stdlib.h>
 
 using namespace std;
 
@@ -39,20 +43,24 @@ namespace internal
 {
 
 SearchReplyImpl::SearchReplyImpl(MWReplyProxy const& mw_proxy,
-                                 std::shared_ptr<QueryObjectBase> const& qo,
+                                 shared_ptr<QueryObjectBase> const& qo,
                                  int cardinality,
-                                 std::string const& current_department_id)
+                                 string const& query_string,
+                                 string const& current_department_id)
     : ObjectImpl(mw_proxy)
     , ReplyImpl(mw_proxy, qo)
     , cat_registry_(new CategoryRegistry())
     , cardinality_(cardinality)
     , num_pushes_(0)
+    , finished_(false)
+    , query_string_(query_string)
     , current_department_(current_department_id)
 {
 }
 
 SearchReplyImpl::~SearchReplyImpl()
 {
+    finished();
 }
 
 void SearchReplyImpl::register_departments(Department::SCPtr const& parent)
@@ -67,6 +75,12 @@ void SearchReplyImpl::register_departments(Department::SCPtr const& parent)
         throw unity::LogicException("SearchReplyImpl::register_departments(): Failed to validate departments");
     }
 
+    if (query_string_.empty())
+    {
+        lock_guard<mutex> lock(mutex_);
+        cached_departments_ = parent;
+    }
+
     ReplyImpl::push(internal::DepartmentImpl::serialize_departments(parent)); // ignore return value?
 }
 
@@ -76,10 +90,10 @@ void SearchReplyImpl::register_category(Category::SCPtr category)
     push(category);
 }
 
-Category::SCPtr SearchReplyImpl::register_category(std::string const& id,
-                                             std::string const& title,
-                                             std::string const &icon,
-                                             CategoryRenderer const& renderer_template)
+Category::SCPtr SearchReplyImpl::register_category(string const& id,
+                                                   string const& title,
+                                                   string const &icon,
+                                                   CategoryRenderer const& renderer_template)
 {
     // will throw if adding same category again
     auto cat = cat_registry_->register_category(id, title, icon, nullptr, renderer_template);
@@ -87,11 +101,11 @@ Category::SCPtr SearchReplyImpl::register_category(std::string const& id,
     return cat;
 }
 
-Category::SCPtr SearchReplyImpl::register_category(std::string const& id,
-                                             std::string const& title,
-                                             std::string const& icon,
-                                             CannedQuery const& query,
-                                             CategoryRenderer const& renderer_template)
+Category::SCPtr SearchReplyImpl::register_category(string const& id,
+                                                   string const& title,
+                                                   string const& icon,
+                                                   CannedQuery const& query,
+                                                   CategoryRenderer const& renderer_template)
 {
     // will throw if adding same category again
     auto cat = cat_registry_->register_category(id, title, icon, make_shared<CannedQuery>(query), renderer_template);
@@ -99,7 +113,7 @@ Category::SCPtr SearchReplyImpl::register_category(std::string const& id,
     return cat;
 }
 
-Category::SCPtr SearchReplyImpl::lookup_category(std::string const& id)
+Category::SCPtr SearchReplyImpl::lookup_category(string const& id)
 {
     return cat_registry_->lookup_category(id);
 }
@@ -125,6 +139,14 @@ bool SearchReplyImpl::push(unity::scopes::CategorisedResult const& result)
     if (!ReplyImpl::push(var))
     {
         return false;
+    }
+
+    // We cache the results of surfacing queries so, if a scope has not connectivity,
+    // we can replay the results of the last successful surfacing query.
+    if (query_string_.empty())
+    {
+        lock_guard<mutex> lock(mutex_);
+        cached_results_.push_back(result);
     }
 
     // Enforce cardinality limit (0 means no limit). If the scope pushes more results
@@ -164,6 +186,120 @@ bool SearchReplyImpl::push(Category::SCPtr category)
     VariantMap var;
     var["category"] = category->serialize();
     return ReplyImpl::push(var);
+}
+
+void SearchReplyImpl::finished()
+{
+    if (finished_.exchange(true))
+    {
+        return;
+    }
+    write_cached_results();
+    ReplyImpl::finished();  // Upcall to deal with the normal case
+}
+
+namespace
+{
+    static constexpr char const* cache_file_name = ".surfacing_cache";
+}
+
+void SearchReplyImpl::write_cached_results() noexcept
+{
+    try
+    {
+        assert(finished_);
+
+        if (!query_string_.empty())
+        {
+            return;  // Caching applies only to surfacing queries
+        }
+
+        // Open a temporary file for writing.
+        string tmp_path = mw_proxy_->mw_base()->runtime()->tmp_directory() + "/cached_resultsXXXXXX";
+        int tmp_fd = mkstemp(const_cast<char*>(tmp_path.c_str()));
+        if (tmp_fd == -1)
+        {
+            throw SyscallException("SearchReply::write_cached_results(): cannot open tmp file " + tmp_path, errno);
+        }
+        auto closer = [tmp_path](int fd) {
+            if (close(fd) == -1)
+            {
+                ::unlink(tmp_path.c_str());
+                throw SyscallException("cannot close tmp file " + tmp_path, errno);
+            }
+        };
+        unity::util::ResourcePtr<int, decltype(closer)> tmp_file(tmp_fd, closer);
+
+        for (auto&& r : cached_results_)
+        {
+            // TODO: Write cached results to disk here.
+        }
+
+        tmp_file.dealloc();  // Close tmp file.
+
+        // Atomically replace the old cache with the new one.
+        string cache_path = mw_proxy_->mw_base()->runtime()->cache_directory() + "/" + cache_file_name;
+        if (rename(tmp_path.c_str(), cache_path.c_str()) == -1)
+        {
+            ::unlink(tmp_path.c_str());
+            throw SyscallException("SearchReply::write_cached_results(): cannot rename tmp file "
+                                   + tmp_path + " to " + cache_path,
+                                   errno);
+        }
+    }
+    catch (std::exception const& e)
+    {
+        BOOST_LOG(mw_proxy_->mw_base()->runtime()->logger()) << e.what();
+    }
+    catch (...)
+    {
+        BOOST_LOG(mw_proxy_->mw_base()->runtime()->logger())
+            << "SearchReply::write_cached_results(): unknown exception";
+    }
+}
+
+void SearchReplyImpl::push_surfacing_results_from_cache() noexcept
+{
+    if (!query_string_.empty())
+    {
+        return;  // Caching applies only to surfacing queries
+    }
+
+    if (finished_.exchange(true))
+    {
+        return;
+    }
+
+    try
+    {
+        string cache_path = mw_proxy_->mw_base()->runtime()->cache_directory() + "/" + cache_file_name;
+        try
+        {
+            string cache_str = unity::util::read_text_file(cache_path);
+        }
+        catch (unity::FileException const& e)
+        {
+            if (e.error() == ENOENT)
+            {
+                return;  // No cache has been written yet.
+            }
+            throw;
+        }
+
+        // TODO: Open cache file (if one exists), deserialize, and push.
+
+        ReplyImpl::finished();  // Sends finished() message to client
+    }
+    catch (std::exception const& e)
+    {
+        BOOST_LOG(mw_proxy_->mw_base()->runtime()->logger())
+            << "SearchReply::push_surfacing_results_from_cache(): " << e.what();
+    }
+    catch (...)
+    {
+        BOOST_LOG(mw_proxy_->mw_base()->runtime()->logger())
+            << "SearchReply::push_surfacing_results_from_cache(): unknown exception";
+    }
 }
 
 } // namespace internal

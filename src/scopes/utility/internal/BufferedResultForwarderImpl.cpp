@@ -72,7 +72,7 @@ void BufferedResultForwarderImpl::set_ready()
     // scope author tells us that results for this forwarder are now ready
     // to be displayed (or the query has finished); set the 'ready' flag
     // and if previous forwarder is also ready, then push and disable
-    // futher buffering.
+    // further buffering.
     if (!ready_.exchange(true))
     {
         if (previous_ready_ || !has_previous_)
