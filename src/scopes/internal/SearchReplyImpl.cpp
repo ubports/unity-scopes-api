@@ -20,14 +20,15 @@
 #include <unity/scopes/internal/SearchReplyImpl.h>
 
 #include <unity/scopes/Annotation.h>
-#include <unity/scopes/CategorisedResult.h>
+#include <unity/scopes/internal/CategorisedResultImpl.h>
 #include <unity/scopes/internal/DepartmentImpl.h>
 #include <unity/scopes/internal/FilterBaseImpl.h>
 #include <unity/scopes/internal/MWReply.h>
 #include <unity/scopes/internal/QueryObjectBase.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
-#include <unity/util/FileIO.h>
+#include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
+#include <unity/util/FileIO.h>
 
 #include <stdlib.h>
 
@@ -198,61 +199,81 @@ void SearchReplyImpl::finished()
     ReplyImpl::finished();  // Upcall to deal with the normal case
 }
 
-namespace
-{
-    static constexpr char const* cache_file_name = ".surfacing_cache";
-}
+static constexpr char const* cache_file_name = ".surfacing_cache";
 
 void SearchReplyImpl::write_cached_results() noexcept
 {
+    assert(finished_);
+
+    if (!query_string_.empty())
+    {
+        return;  // Caching applies only to surfacing queries
+    }
+
+    string tmp_path;
     try
     {
-        assert(finished_);
-
-        if (!query_string_.empty())
-        {
-            return;  // Caching applies only to surfacing queries
-        }
-
         // Open a temporary file for writing.
-        string tmp_path = mw_proxy_->mw_base()->runtime()->tmp_directory() + "/cached_resultsXXXXXX";
-        int tmp_fd = mkstemp(const_cast<char*>(tmp_path.c_str()));
-        if (tmp_fd == -1)
+        tmp_path = mw_proxy_->mw_base()->runtime()->cache_directory() + "/" + cache_file_name + "XXXXXX";
+        auto opener = [tmp_path]()
         {
-            throw SyscallException("SearchReply::write_cached_results(): cannot open tmp file " + tmp_path, errno);
-        }
-        auto closer = [tmp_path](int fd) {
-            if (close(fd) == -1)
+            int tmp_fd = mkstemp(const_cast<char*>(tmp_path.c_str()));
+            if (tmp_fd == -1)
             {
-                ::unlink(tmp_path.c_str());
-                throw SyscallException("cannot close tmp file " + tmp_path, errno);
+                throw FileException("cannot open tmp file " + tmp_path, errno);
+            }
+            return tmp_fd;
+        };
+        auto closer = [tmp_path](int fd)
+        {
+            if (::close(fd) == -1)
+            {
+                throw FileException("cannot close tmp file " + tmp_path, errno);
             }
         };
-        unity::util::ResourcePtr<int, decltype(closer)> tmp_file(tmp_fd, closer);
+        unity::util::ResourcePtr<int, decltype(closer)> tmp_file(opener(), closer);
 
+        // Turn departments, categories, and results into a JSON string.
+        VariantMap departments;
+        if (cached_departments_)
+        {
+            departments = cached_departments_->serialize();
+        }
+        VariantArray categories = cat_registry_->serialize();
+        VariantArray results;
         for (auto&& r : cached_results_)
         {
-            // TODO: Write cached results to disk here.
+            results.push_back(Variant(r.serialize()));
         }
+        VariantMap vm;
+        vm["departments"] = move(departments);
+        vm["categories"] = move(categories);
+        vm["results"] = move(results);
+        string json = Variant(move(vm)).serialize_json();
 
+        // Write tmp file.
+        if (::write(tmp_file.get(), json.c_str(), json.size()) != static_cast<int>(json.size()))
+        {
+            throw FileException("cannot write tmp file " + tmp_path, errno);
+        }
         tmp_file.dealloc();  // Close tmp file.
 
         // Atomically replace the old cache with the new one.
         string cache_path = mw_proxy_->mw_base()->runtime()->cache_directory() + "/" + cache_file_name;
         if (rename(tmp_path.c_str(), cache_path.c_str()) == -1)
         {
-            ::unlink(tmp_path.c_str());
-            throw SyscallException("SearchReply::write_cached_results(): cannot rename tmp file "
-                                   + tmp_path + " to " + cache_path,
-                                   errno);
+            throw FileException("cannot rename tmp file " + tmp_path + " to " + cache_path, errno);
         }
     }
     catch (std::exception const& e)
     {
-        BOOST_LOG(mw_proxy_->mw_base()->runtime()->logger()) << e.what();
+        ::unlink(tmp_path.c_str());
+        BOOST_LOG(mw_proxy_->mw_base()->runtime()->logger())
+            << "SearchReply::write_cached_results(): " << e.what();
     }
     catch (...)
     {
+        ::unlink(tmp_path.c_str());
         BOOST_LOG(mw_proxy_->mw_base()->runtime()->logger())
             << "SearchReply::write_cached_results(): unknown exception";
     }
@@ -270,12 +291,14 @@ void SearchReplyImpl::push_surfacing_results_from_cache() noexcept
         return;
     }
 
+    string cache_path = mw_proxy_->mw_base()->runtime()->cache_directory() + "/" + cache_file_name;
     try
     {
-        string cache_path = mw_proxy_->mw_base()->runtime()->cache_directory() + "/" + cache_file_name;
+        // Read cache file.
+        string json;
         try
         {
-            string cache_str = unity::util::read_text_file(cache_path);
+            json = unity::util::read_text_file(cache_path);
         }
         catch (unity::FileException const& e)
         {
@@ -286,19 +309,65 @@ void SearchReplyImpl::push_surfacing_results_from_cache() noexcept
             throw;
         }
 
-        // TODO: Open cache file (if one exists), deserialize, and push.
+        // Re-construct cached contents from JSON.
+        Variant v(Variant::deserialize_json(json));
+        VariantMap vm = v.get_dict();
 
-        ReplyImpl::finished();  // Sends finished() message to client
+        auto it = vm.find("departments");
+        if (it == vm.end())
+        {
+            throw unity::scopes::NotFoundException("malformed cache file", "departments");
+        }
+        auto department_dict = it->second.get_dict();
+
+        it = vm.find("categories");
+        if (it == vm.end())
+        {
+            throw unity::scopes::NotFoundException("malformed cache file", "categories");
+        }
+        auto category_array = it->second.get_array();
+
+        it = vm.find("results");
+        if (it == vm.end())
+        {
+            throw unity::scopes::NotFoundException("malformed cache file", "results");
+        }
+        auto result_array = it->second.get_array();
+
+        // We have the JSON strings as Variants, re-create the native representations
+        // and re-instate them.
+        auto departments = DepartmentImpl::create(it->second.get_dict());
+        register_departments(move(departments));
+
+        for (auto const& c : category_array)
+        {
+            // Can't use make_shared here because that isn't a friend of Category.
+            auto cp = Category::SCPtr(new Category(c.get_dict()));
+            register_category(cp);
+        }
+
+        for (auto&& r : result_array)
+        {
+            VariantMap dict = r.get_dict();
+            string const cat_id = dict.at("internal").get_dict().at("cat_id").get_string();
+            auto cat = lookup_category(cat_id);
+            auto crip = new CategorisedResultImpl(move(cat), move(dict));
+            auto cr = CategorisedResult(crip);
+            push(cr);
+        }
+
+        // Query is complete.
+        ReplyImpl::finished();
     }
     catch (std::exception const& e)
     {
         BOOST_LOG(mw_proxy_->mw_base()->runtime()->logger())
-            << "SearchReply::push_surfacing_results_from_cache(): " << e.what();
+            << "SearchReply::push_surfacing_results_from_cache() (file = " + cache_path + "): " << e.what();
     }
     catch (...)
     {
         BOOST_LOG(mw_proxy_->mw_base()->runtime()->logger())
-            << "SearchReply::push_surfacing_results_from_cache(): unknown exception";
+            << "SearchReply::push_surfacing_results_from_cache() (file = " + cache_path + "): unknown exception";
     }
 }
 

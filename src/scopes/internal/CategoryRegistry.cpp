@@ -68,6 +68,17 @@ Category::SCPtr CategoryRegistry::lookup_category(std::string const& id) const
     return nullptr;
 }
 
+VariantArray CategoryRegistry::serialize() const
+{
+    std::lock_guard<decltype(mutex_)> lock(mutex_);
+    VariantArray va;
+    for (auto&& p : categories_)
+    {
+        va.push_back(Variant(p.second->serialize()));
+    }
+    return va;
+}
+
 } // namespace internal
 
 } // namespace scopes

@@ -36,6 +36,7 @@ namespace internal
 {
     class CategoryImpl;
     class CategoryRegistry;
+    class SearchReplyImpl;
 }
 
 /**
@@ -100,6 +101,7 @@ protected:
     /// @endcond
 
     friend class internal::CategoryRegistry;
+    friend class internal::SearchReplyImpl;
 
 private:
     std::unique_ptr<internal::CategoryImpl> p;
