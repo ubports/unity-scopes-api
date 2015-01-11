@@ -228,7 +228,7 @@ void SearchReplyImpl::write_cached_results() noexcept
         {
             if (::close(fd) == -1)
             {
-                throw FileException("cannot close tmp file " + tmp_path, errno);
+                throw FileException("cannot close tmp file " + tmp_path + " (fd = " + std::to_string(fd) + ")", errno);
             }
         };
         unity::util::ResourcePtr<int, decltype(closer)> tmp_file(opener(), closer);
@@ -254,7 +254,8 @@ void SearchReplyImpl::write_cached_results() noexcept
         // Write tmp file.
         if (::write(tmp_file.get(), json.c_str(), json.size()) != static_cast<int>(json.size()))
         {
-            throw FileException("cannot write tmp file " + tmp_path, errno);
+            throw FileException("cannot write tmp file " + tmp_path + " (fd = " + std::to_string(tmp_file.get()) + ")",
+                                errno);
         }
         tmp_file.dealloc();  // Close tmp file.
 
@@ -309,7 +310,7 @@ void SearchReplyImpl::push_surfacing_results_from_cache() noexcept
             throw;
         }
 
-        // Re-construct cached contents from JSON.
+        // Decode JSON for the three sections.
         Variant v(Variant::deserialize_json(json));
         VariantMap vm = v.get_dict();
 
