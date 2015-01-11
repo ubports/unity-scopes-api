@@ -241,7 +241,7 @@ void SearchReplyImpl::write_cached_results() noexcept
         }
         VariantArray categories = cat_registry_->serialize();
         VariantArray results;
-        for (auto&& r : cached_results_)
+        for (auto const& r : cached_results_)
         {
             results.push_back(Variant(r.serialize()));
         }
@@ -249,7 +249,7 @@ void SearchReplyImpl::write_cached_results() noexcept
         vm["departments"] = move(departments);
         vm["categories"] = move(categories);
         vm["results"] = move(results);
-        string json = Variant(move(vm)).serialize_json();
+        string const json = Variant(move(vm)).serialize_json();
 
         // Write tmp file.
         if (::write(tmp_file.get(), json.c_str(), json.size()) != static_cast<int>(json.size()))
@@ -337,8 +337,11 @@ void SearchReplyImpl::push_surfacing_results_from_cache() noexcept
 
         // We have the JSON strings as Variants, re-create the native representations
         // and re-instate them.
-        auto departments = DepartmentImpl::create(it->second.get_dict());
-        register_departments(move(departments));
+        if (!department_dict.empty())
+        {
+            auto departments = DepartmentImpl::create(department_dict);
+            register_departments(move(departments));
+        }
 
         for (auto const& c : category_array)
         {
@@ -347,7 +350,7 @@ void SearchReplyImpl::push_surfacing_results_from_cache() noexcept
             register_category(cp);
         }
 
-        for (auto&& r : result_array)
+        for (auto const& r : result_array)
         {
             VariantMap dict = r.get_dict();
             string const cat_id = dict.at("internal").get_dict().at("cat_id").get_string();
