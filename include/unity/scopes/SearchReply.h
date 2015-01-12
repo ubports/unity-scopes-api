@@ -157,7 +157,7 @@ public:
     nothing.
 
     You must call this method before calling finished(), otherwise no cached results
-    will be pushed.
+    will be pushed (push_surfacing_results_from_cache() implicitly calls finished()).
     */
     virtual void push_surfacing_results_from_cache() = 0;
 

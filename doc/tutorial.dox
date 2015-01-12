@@ -240,7 +240,7 @@ being presented with an empty screen if he/she swipes to the scope while the dev
 `push_surfacing_results_from_cache()` has an effect only if called for a surfacing query (that is, a query with an empty query string). If called for a non-empty query, it does nothing.
 
 You must call this method before calling \link unity::scopes::Reply::finished finished()\endlink,
-otherwise no cached results will be pushed. 
+otherwise no cached results will be pushed. (`push_surfacing_results_from_cache() implicitly calls `finished()`);
 
 \paragraph querybase Implementing QueryBase
 
