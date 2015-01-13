@@ -228,7 +228,9 @@ void SearchReplyImpl::write_cached_results() noexcept
         {
             if (::close(fd) == -1)
             {
+                // LCOV_EXCL_START
                 throw FileException("cannot close tmp file " + tmp_path + " (fd = " + std::to_string(fd) + ")", errno);
+                // LCOV_EXCL_STOP
             }
         };
         unity::util::ResourcePtr<int, decltype(closer)> tmp_file(opener(), closer);
@@ -254,8 +256,10 @@ void SearchReplyImpl::write_cached_results() noexcept
         // Write tmp file.
         if (::write(tmp_file.get(), json.c_str(), json.size()) != static_cast<int>(json.size()))
         {
+            // LCOV_EXCL_START
             throw FileException("cannot write tmp file " + tmp_path + " (fd = " + std::to_string(tmp_file.get()) + ")",
                                 errno);
+            // LCOV_EXCL_STOP
         }
         tmp_file.dealloc();  // Close tmp file.
 
@@ -263,7 +267,7 @@ void SearchReplyImpl::write_cached_results() noexcept
         string cache_path = mw_proxy_->mw_base()->runtime()->cache_directory() + "/" + cache_file_name;
         if (rename(tmp_path.c_str(), cache_path.c_str()) == -1)
         {
-            throw FileException("cannot rename tmp file " + tmp_path + " to " + cache_path, errno);
+            throw FileException("cannot rename tmp file " + tmp_path + " to " + cache_path, errno);  // LCOV_EXCL_LINE
         }
     }
     catch (std::exception const& e)
@@ -272,12 +276,14 @@ void SearchReplyImpl::write_cached_results() noexcept
         BOOST_LOG(mw_proxy_->mw_base()->runtime()->logger())
             << "SearchReply::write_cached_results(): " << e.what();
     }
+    // LCOV_EXCL_START
     catch (...)
     {
         ::unlink(tmp_path.c_str());
         BOOST_LOG(mw_proxy_->mw_base()->runtime()->logger())
             << "SearchReply::write_cached_results(): unknown exception";
     }
+    // LCOV_EXCL_STOP
 }
 
 void SearchReplyImpl::push_surfacing_results_from_cache() noexcept
@@ -366,11 +372,13 @@ void SearchReplyImpl::push_surfacing_results_from_cache() noexcept
         BOOST_LOG(mw_proxy_->mw_base()->runtime()->logger())
             << "SearchReply::push_surfacing_results_from_cache() (file = " + cache_path + "): " << e.what();
     }
+    // LCOV_EXCL_START
     catch (...)
     {
         BOOST_LOG(mw_proxy_->mw_base()->runtime()->logger())
             << "SearchReply::push_surfacing_results_from_cache() (file = " + cache_path + "): unknown exception";
     }
+    // LCOV_EXCL_STOP
 
     // Query is complete.
     ReplyImpl::finished();
