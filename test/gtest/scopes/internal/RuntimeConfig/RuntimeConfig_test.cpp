@@ -23,6 +23,7 @@
 
 #include <unity/UnityExceptions.h>
 
+#include <boost/regex.hpp>  // Use Boost implementation until http://gcc.gnu.org/bugzilla/show_bug.cgi?id=53631 is fixed.
 #include <gtest/gtest.h>
 
 using namespace std;
@@ -230,12 +231,14 @@ TEST(RuntimeConfig, exceptions)
     }
     catch (ConfigException const& e)
     {
-        EXPECT_STREQ( "unity::scopes::ConfigException: \"" TEST_SRC_DIR "/NoLogDir.ini\": "
-                      "No LogDir configured and failed to get default:\n"
-                      "    unity::ResourceException: RuntimeConfig::default_log_directory(): $HOME not set:\n"
-                      "        unity::LogicException: Could not get string value (" TEST_SRC_DIR "/NoLogDir.ini, "
-                      "group: Runtime): Key file does not have key 'LogDir' in group 'Runtime'",
-                     e.what());
+        // Using regex here because error message returned by glib changed from Utopic to Vivid.
+        // The final .* takes care of the difference.
+        boost::regex r("unity::scopes::ConfigException: \"" TEST_SRC_DIR "/NoLogDir.ini\": "
+                       "No LogDir configured and failed to get default:\\n"
+                       "    unity::ResourceException: RuntimeConfig::default_log_directory\\(\\): \\$HOME not set:\\n"
+                       "        unity::LogicException: Could not get string value \\(" TEST_SRC_DIR "/NoLogDir.ini, "
+                       "group: Runtime\\): Key file does not have key 'LogDir'.*");
+        EXPECT_TRUE(boost::regex_match(e.what(), r)) << e.what();
     }
 
     try
@@ -247,9 +250,9 @@ TEST(RuntimeConfig, exceptions)
     }
     catch (ConfigException const& e)
     {
-        EXPECT_STREQ( "unity::scopes::ConfigException: \"" TEST_SRC_DIR "/NoAppDir.ini\": "
-                      "No AppDir configured and failed to get default:\n"
-                      "    unity::ResourceException: RuntimeConfig::default_app_directory(): $HOME not set",
+        EXPECT_STREQ("unity::scopes::ConfigException: \"" TEST_SRC_DIR "/NoAppDir.ini\": "
+                     "No AppDir configured and failed to get default:\n"
+                     "    unity::ResourceException: RuntimeConfig::default_app_directory(): $HOME not set",
                      e.what());
     }
 

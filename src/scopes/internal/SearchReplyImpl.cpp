@@ -305,6 +305,7 @@ void SearchReplyImpl::push_surfacing_results_from_cache() noexcept
         {
             if (e.error() == ENOENT)
             {
+                ReplyImpl::finished();
                 return;  // No cache has been written yet.
             }
             throw;
@@ -359,9 +360,6 @@ void SearchReplyImpl::push_surfacing_results_from_cache() noexcept
             auto cr = CategorisedResult(crip);
             push(cr);
         }
-
-        // Query is complete.
-        ReplyImpl::finished();
     }
     catch (std::exception const& e)
     {
@@ -373,6 +371,9 @@ void SearchReplyImpl::push_surfacing_results_from_cache() noexcept
         BOOST_LOG(mw_proxy_->mw_base()->runtime()->logger())
             << "SearchReply::push_surfacing_results_from_cache() (file = " + cache_path + "): unknown exception";
     }
+
+    // Query is complete.
+    ReplyImpl::finished();
 }
 
 } // namespace internal
