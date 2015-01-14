@@ -36,6 +36,11 @@ This class allows a scope to be replaced by a mock implementation.
 See unity::scopes::ScopeBase for documentation of the member functions.
 */
 
+// TODO: Once we can make an ABI-breaking change, add a virtual destructor and remove the pragma.
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wnon-virtual-dtor"
+
 class AbstractScopeBase
 {
 public:
@@ -57,6 +62,8 @@ public:
     virtual VariantMap settings() const = 0;
 /// @endcond
 };
+
+#pragma GCC diagnostic pop
 
 } // namespace scopes
 

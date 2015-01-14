@@ -220,7 +220,7 @@ Then you can run a subscriber that will display content of the messages:
 Autopkg test suite
 ------------------
 
-Scopes comes with an autopkg smoke test.
+Scopes come with an autopkg smoke test.
 
 http://packaging.ubuntu.com/html/auto-pkg-test.html
 

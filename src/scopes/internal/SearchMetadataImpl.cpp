@@ -19,8 +19,8 @@
 #include <unity/scopes/internal/SearchMetadataImpl.h>
 #include <unity/scopes/internal/Utils.h>
 #include <unity/scopes/ScopeExceptions.h>
+
 #include <unity/UnityExceptions.h>
-#include <sstream>
 
 namespace unity
 {

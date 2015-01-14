@@ -94,7 +94,7 @@ void ReplyImpl::finished()
         {
             fwd()->finished(CompletionDetails(CompletionDetails::OK));  // Oneway, can't block
         }
-        catch (std::exception const& e)
+        catch (std::exception const&)
         {
             // No logging here because this may happen after the run time is destroyed.
         }

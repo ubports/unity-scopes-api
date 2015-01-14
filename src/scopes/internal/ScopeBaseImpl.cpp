@@ -39,6 +39,7 @@ ScopeBaseImpl::ScopeBaseImpl()
     : scope_dir_initialized_(false)
     , cache_dir_initialized_(false)
     , app_dir_initialized_(false)
+    , tmp_dir_initialized_(false)
     , registry_initialized_(false)
     , settings_db_initialized_(false)
 {
