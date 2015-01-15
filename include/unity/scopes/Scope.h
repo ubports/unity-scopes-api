@@ -135,6 +135,13 @@ public:
                                    PreviewListenerBase::SPtr const& reply) = 0;
 
     /**
+    \brief Destroys a Scope.
+
+    Destroying a Scope has no effect on any query that might still be in progress.
+    */
+    virtual ~Scope();
+
+    /**
     \brief Returns a list of child scopes aggregated by this scope in user-defined order.
     \return The list of child scopes aggregated by this scope in user-defined order.
     */
@@ -148,13 +155,6 @@ public:
     \return True if the list was successfully set.
     */
     virtual bool set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered) = 0;
-
-    /**
-    \brief Destroys a Scope.
-
-    Destroying a Scope has no effect on any query that might still be in progress.
-    */
-    virtual ~Scope();
 
 protected:
     /// @cond
