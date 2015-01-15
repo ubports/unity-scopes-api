@@ -93,6 +93,8 @@ libunity-scopes.so.3 libunity-scopes4 #MINVER#
  (c++)"typeinfo name for unity::scopes::TimeoutException@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo name for unity::scopes::utility::BufferedResultForwarder@Base" 0.6.10+15.04.20141210.2
  (c++)"typeinfo name for unity::scopes::VariantBuilder@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::AbstractScopeBase::~AbstractScopeBase()@Base" 0replaceme
+ (c++)"unity::scopes::AbstractScopeBase::AbstractScopeBase()@Base" 0replaceme
  (c++)"unity::scopes::ActionMetadata::~ActionMetadata()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ActionMetadata::ActionMetadata(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ActionMetadata::ActionMetadata(unity::scopes::ActionMetadata&&)@Base" 0.4.0+14.04.20140312.1
