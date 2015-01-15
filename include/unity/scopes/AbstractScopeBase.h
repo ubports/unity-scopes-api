@@ -57,9 +57,13 @@ public:
     virtual unity::scopes::RegistryProxy registry() const = 0;
     virtual VariantMap settings() const = 0;
 
-    virtual ~AbstractScopeBase() = default;
+    virtual ~AbstractScopeBase();
+
     virtual ChildScopeList child_scopes() const = 0;
     virtual ChildScopeList child_scopes_ordered() const = 0;
+
+protected:
+    AbstractScopeBase();
 /// @endcond
 };
 
