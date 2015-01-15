@@ -1,3 +1,17 @@
+unity-scopes-api (0.6.11+15.04) UNRELEASED; urgency=medium
+
+  [ Michi Henning ]
+  * Added push_surfacing_results_from_cache() to Reply proxy. This allows a scope
+    to reply the results of the last succesful surfacing query from an on-disk cache.
+    This is useful to prevent the user being presented with an empty screen when
+    swiping to the scope while the device has no network access, or the scope's
+    data source is off-line.
+
+    Note: This is change is ABI compatible with gcc and clang despite the addition 
+          a new virtual function.
+
+ -- Michi Henning <michi.henning@canonical.com>  Thu, 15 Jan 2015 14:22:17 +1000
+
 unity-scopes-api (0.6.10+15.04.20141212-0ubuntu1) vivid; urgency=low
 
   [ Pawel Stolowski ]
