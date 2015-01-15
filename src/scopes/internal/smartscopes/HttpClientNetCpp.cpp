@@ -26,6 +26,7 @@
 #include <core/net/http/status.h>
 
 #include <iostream>
+#include <strstream>
 #include <unordered_map>
 
 namespace net = core::net;
@@ -115,14 +116,23 @@ HttpClientNetCpp::~HttpClientNetCpp()
         worker.join();
 }
 
-HttpResponseHandle::SPtr HttpClientNetCpp::get(std::string const& request_url)
+HttpResponseHandle::SPtr HttpClientNetCpp::get(std::string const& request_url,
+                                               std::function<void(std::string const&)> const& lineData,
+                                               HttpHeaders const& headers)
 {
-    auto request = client->get(http::Request::Configuration::from_uri_as_string(request_url));
+    auto http_config = http::Request::Configuration::from_uri_as_string(request_url);
+    http::Header http_header;
+    for (auto const& hdr: headers)
+    {
+        http_header.add(hdr.first, hdr.second);
+    }
+    http_config.header = http_header;
 
+    auto request = client->get(http_config);
     request->set_timeout(std::chrono::milliseconds{no_reply_timeout});
 
-    auto promise = std::make_shared<std::promise<std::string>>();
-    std::shared_future<std::string> future(promise->get_future());
+    auto promise = std::make_shared<std::promise<void>>();
+    std::shared_future<void> future(promise->get_future());
 
     auto id_and_cancelable = CancellationRegistry::instance().add();
 
@@ -134,7 +144,7 @@ HttpResponseHandle::SPtr HttpClientNetCpp::get(std::string const& request_url)
                                     http::Request::Progress::Next::abort_operation :
                                     http::Request::Progress::Next::continue_operation;
                     })
-                    .on_response([promise](const http::Response& response)
+                    .on_response([lineData, promise](const http::Response& response)
                     {
                         if (response.status != http::Status::ok)
                         {
@@ -145,7 +155,13 @@ HttpResponseHandle::SPtr HttpClientNetCpp::get(std::string const& request_url)
                             promise->set_exception(std::make_exception_ptr(e));
                         } else
                         {
-                            promise->set_value(response.body);
+                            std::istrstream in(response.body.c_str());
+                            std::string line;
+                            while (std::getline(in, line))
+                            {
+                                lineData(line);
+                            }
+                            promise->set_value();
                         }
                     })
                     .on_error([promise](const net::Error& e)

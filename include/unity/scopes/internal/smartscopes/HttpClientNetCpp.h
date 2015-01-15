@@ -53,7 +53,9 @@ public:
     explicit HttpClientNetCpp(uint no_reply_timeout);
     ~HttpClientNetCpp();
 
-    HttpResponseHandle::SPtr get(std::string const& request_url) override;
+    HttpResponseHandle::SPtr get(std::string const& request_url,
+                                 std::function<void(std::string const&)> const& lineData = [](std::string const&) {},
+                                 HttpHeaders const& headers = HttpHeaders()) override;
 
     std::string to_percent_encoding(std::string const& string) override;
 
