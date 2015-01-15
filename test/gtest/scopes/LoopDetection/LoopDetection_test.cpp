@@ -59,7 +59,6 @@ public:
     {
         EXPECT_EQ(CompletionDetails::OK, details.status());
         lock_guard<mutex> lock(mutex_);
-        completion_msg_ = details.message();
         query_complete_ = true;
         cond_.notify_one();
     }
@@ -69,13 +68,6 @@ public:
         unique_lock<mutex> lock(mutex_);
         cond_.wait(lock, [this] { return this->query_complete_; });
         query_complete_ = false;
-    }
-
-    string completion_msg() const
-    {
-        lock_guard<mutex> lock(mutex_);
-
-        return completion_msg_;
     }
 
     map<string, vector<string>> results() const
@@ -88,7 +80,6 @@ public:
 private:
     map<string, vector<string>> results_;
     bool query_complete_;
-    string completion_msg_;
     mutable mutex mutex_;
     condition_variable cond_;
 };
