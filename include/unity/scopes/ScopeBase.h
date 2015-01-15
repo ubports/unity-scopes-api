@@ -136,11 +136,6 @@ The scope implementation, if it does not return from run(), is expected to retur
 call to stop() in a timely manner.
 */
 
-// TODO: Once we can make an ABI-breaking change, remove the pragma.
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wnon-virtual-dtor"
-
 class ScopeBase : public AbstractScopeBase
 {
 public:
@@ -346,8 +341,6 @@ private:
     friend class testing::TypedScopeFixtureHelper;
     /// @endcond
 };
-
-#pragma GCC diagnostic pop
 
 } // namespace scopes
 
