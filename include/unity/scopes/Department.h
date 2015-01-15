@@ -16,8 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_DEPARTMENT_H
-#define UNITY_SCOPES_DEPARTMENT_H
+#pragma once
 
 #include <unity/scopes/Variant.h>
 #include <unity/util/DefinesPtrs.h>
@@ -31,18 +30,18 @@ namespace unity
 namespace scopes
 {
 
-class CannedQuery;
 class Department;
-
-/*! \typedef DepartmentList
-\brief List of departments (see unity::scopes::Department)
-*/
-typedef std::list<Department> DepartmentList;
+class CannedQuery;
 
 namespace internal
 {
 class DepartmentImpl;
 }
+
+/*! \typedef DepartmentList
+\brief List of departments (see unity::scopes::Department)
+*/
+typedef std::list<std::shared_ptr<Department const>> DepartmentList;
 
 /**
 \brief A department with optional sub-departments.
@@ -62,7 +61,7 @@ public:
     selects this department.
     \param label The display name of this department.
     */
-    Department(CannedQuery const& query, std::string const& label);
+    static Department::UPtr create(CannedQuery const& query, std::string const& label);
 
     /**
     \brief Create a department with the given department identifier, canned query, and name.
@@ -75,21 +74,7 @@ public:
     selects this department.
     \param label The display name of this department.
     */
-    Department(std::string const& department_id, CannedQuery const& query, std::string const& label);
-
-    /**
-    \brief Create a department with the given department identifier, canned query, name, and sub-departments.
-
-    The canned query's target department identifier is updated with department_id.
-    This constructor is convenient for creating multiple departments that use the same query and only
-    need a different department identifier.
-    \param department_id The department identifier.
-    \param query The canned query (and associated parameters, such as filter state) to be executed when the user
-    selects this department.
-    \param label The display name of this department.
-    \param subdepartments The sub-departments of this department.
-     */
-    Department(std::string const& department_id, CannedQuery const& query, std::string const& label, DepartmentList const& subdepartments);
+    static Department::UPtr create(std::string const& department_id, CannedQuery const& query, std::string const& label);
 
     /**@name Copy and assignment
     Copy and assignment operators (move and non-move versions) have the usual value semantics.
@@ -112,6 +97,34 @@ public:
     void set_subdepartments(DepartmentList const& departments);
 
     /**
+    \brief Add sub-department to this department.
+    \param department The subdepartment instance.
+    */
+    void add_subdepartment(Department::SCPtr const& department);
+
+    /**
+     \brief Set the alternate label (plural of the normal label) of this department.
+
+     The alternate label should express the plural "all" form of the normal label. For example,
+     if the normal label is "Books", then the alternate label should be "All Books". The alternate label
+     needs to be provided for the current department only.
+     \param label The alternate label to display when showing plural form of this department's name.
+    */
+    void set_alternate_label(std::string const& label);
+
+    /**
+     \brief Sets has_subdepartments flag of this department.
+
+     This flag is a display hint for the Shell that indicates if this department has sub-departments and as such should be displayed
+     in a way that suggests further navigation to the user.
+     Setting this flag is not needed when sub-departments have been added with set_subdepartments() method.
+     Setting this flag to false after adding sub-departments with set_subdepartments() throws unity::LogicException.
+
+     \throws unity::LogicException if called with false after adding sub-departments with unity::scopes::Department::set_subdepartments()
+     */
+    void set_has_subdepartments(bool subdepartments = true);
+
+    /**
     \brief Get the identifier of this department.
     \return The department identifier.
     */
@@ -122,6 +135,17 @@ public:
     \return The department label.
     */
     std::string label() const;
+
+    /**
+    \brief Get the alternate label of this department.
+
+    Return the alternate label of this department. The alternate label expresses the plural "all" form of the normal label.
+    For example, if the normal label is "Books", then the alternate label is "All Books". Note that alternate label
+    and can be empty - in that case the normal label should be displayed instead.
+
+    \return The alternate label.
+     */
+    std::string alternate_label() const;
 
     /**
     \brief Get the canned query associated with this department.
@@ -135,16 +159,22 @@ public:
     */
     DepartmentList subdepartments() const;
 
+    /**
+     \brief Check if this department has subdepartments or has_subdepartments flag is set
+     \return true if this deparment has subdepartments or has_subdepartments flag is set
+     */
+    bool has_subdepartments() const;
+
     /// @cond
     VariantMap serialize() const;
     /// @endcond
 
 private:
+    Department(internal::DepartmentImpl *impl);
     std::unique_ptr<internal::DepartmentImpl> p;
+    friend class internal::DepartmentImpl;
 };
 
 } // namespace scopes
 
 } // namespace unity
-
-#endif

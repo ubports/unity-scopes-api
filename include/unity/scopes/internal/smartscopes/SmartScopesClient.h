@@ -16,11 +16,13 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_SMARTSCOPES_SMARTSCOPESCLIENT_H
-#define UNITY_SCOPES_INTERNAL_SMARTSCOPES_SMARTSCOPESCLIENT_H
+#pragma once
 
+#include <unity/scopes/FilterBase.h>
+#include <unity/scopes/FilterState.h>
 #include <unity/scopes/internal/smartscopes/HttpClientInterface.h>
 #include <unity/scopes/internal/JsonNodeInterface.h>
+#include <unity/scopes/internal/Logger.h>
 #include <unity/scopes/internal/UniqueID.h>
 
 #include <unity/util/NonCopyable.h>
@@ -30,6 +32,7 @@
 #include <map>
 #include <memory>
 #include <mutex>
+#include <tuple>
 
 namespace unity
 {
@@ -52,9 +55,14 @@ struct RemoteScope
     std::string description;
     std::string author;
     std::string base_url;
-    std::shared_ptr<std::string> icon;  // optional
-    std::shared_ptr<std::string> art;  // optional
+    std::shared_ptr<std::string> icon;          // optional
+    std::shared_ptr<std::string> art;           // optional
+    std::shared_ptr<VariantMap> appearance;     // optional
+    std::shared_ptr<std::string> settings;      // optional
+    std::shared_ptr<bool> needs_location_data;  // optional
     bool invisible = false;
+    int version;
+    std::vector<std::string> keywords;          // optional
 };
 
 struct SearchCategory
@@ -70,7 +78,26 @@ struct SearchResult
     std::string json;
     std::string uri;
     std::map<std::string, JsonNodeInterface::SPtr > other_params;
-    std::shared_ptr<SearchCategory> category;
+    std::string category_id;
+};
+
+struct DepartmentInfo
+{
+    std::string label;
+    std::string alternate_label;
+    std::string canned_query;
+    bool has_subdepartments = false;
+    std::vector<std::shared_ptr<DepartmentInfo>> subdepartments;
+};
+
+struct LocationInfo
+{
+    bool has_location;
+    std::string country_code;
+    double latitude;
+    double longitude;
+
+    LocationInfo(): has_location(false) {}
 };
 
 class SearchHandle
@@ -81,15 +108,15 @@ public:
 
     ~SearchHandle();
 
-    std::vector<SearchResult> get_search_results();
+    void wait();
     void cancel_search();
 
 private:
     friend class SmartScopesClient;
-    SearchHandle(uint search_id, std::shared_ptr<SmartScopesClient> ssc);
+    SearchHandle(unsigned int search_id, std::shared_ptr<SmartScopesClient> ssc);
 
 private:
-    uint search_id_;
+    unsigned int search_id_;
     std::shared_ptr<SmartScopesClient> ssc_;
 };
 
@@ -104,16 +131,31 @@ public:
     using Columns = std::vector<std::vector<std::vector<std::string>>>;
     using Widgets = std::vector<std::string>;
 
-    std::pair<Columns, Widgets> get_preview_results();
+    void wait();
     void cancel_preview();
 
 private:
     friend class SmartScopesClient;
-    PreviewHandle(uint preview_id, std::shared_ptr<SmartScopesClient> ssc);
+    PreviewHandle(unsigned int preview_id, std::shared_ptr<SmartScopesClient> ssc);
 
 private:
-    uint preview_id_;
+    unsigned int preview_id_;
     std::shared_ptr<SmartScopesClient> ssc_;
+};
+
+struct SearchReplyHandler
+{
+    std::function<void(SearchResult const&)> result_handler;
+    std::function<void(std::shared_ptr<SearchCategory> const&)> category_handler;
+    std::function<void(std::shared_ptr<DepartmentInfo> const&)> departments_handler;
+    std::function<void(Filters const&)> filters_handler;
+    std::function<void(FilterState const&)> filter_state_handler;
+};
+
+struct PreviewReplyHandler
+{
+    std::function<void(std::string const&)> widget_handler;
+    std::function<void(PreviewHandle::Columns const&)> columns_handler;
 };
 
 class SmartScopesClient : public std::enable_shared_from_this<SmartScopesClient>
@@ -124,7 +166,9 @@ public:
 
     SmartScopesClient(HttpClientInterface::SPtr http_client,
                       JsonNodeInterface::SPtr json_node,
-                      std::string const& url = ""); // detect url
+                      boost::log::sources::severity_channel_logger_mt<>& logger_,
+                      std::string const& url = "", // detect url
+                      std::string const& partner_id_path = "");
 
     virtual ~SmartScopesClient();
 
@@ -133,44 +177,60 @@ public:
 
     bool get_remote_scopes(std::vector<RemoteScope>& scopes, std::string const& locale = "", bool caching_enabled = true);
 
-    SearchHandle::UPtr search(std::string const& base_url,
+    SearchHandle::UPtr search(SearchReplyHandler const& handler,
+                              std::string const& base_url,
                               std::string const& query,
+                              std::string const& department_id,
                               std::string const& session_id,
-                              uint query_id,
+                              int query_id,
                               std::string const& platform,
+                              VariantMap const& settings = VariantMap(),
+                              VariantMap const& filter_state = VariantMap(),
                               std::string const& locale = "",
-                              std::string const& country = "",
-                              const uint limit = 0);
+                              LocationInfo const& location = LocationInfo(),
+                              std::string const& user_agent_hdr = "",
+                              const unsigned int limit = 0);
 
-    PreviewHandle::UPtr preview(std::string const& base_url,
+    PreviewHandle::UPtr preview(PreviewReplyHandler const& handler,
+                                std::string const& base_url,
                                 std::string const& result,
                                 std::string const& session_id,
                                 std::string const& platform,
-                                const uint widgets_api_version,
+                                const unsigned int widgets_api_version,
+                                VariantMap const& settings = VariantMap(),
                                 std::string const& locale = "",
-                                std::string const& country = "");
+                                std::string const& country = "",
+                                std::string const& user_agent_hdr = "");
+
+    boost::log::sources::severity_channel_logger_mt<>& logger() const;
 
 private:
     friend class SearchHandle;
     friend class PreviewHandle;
 
-    std::vector<SearchResult> get_search_results(uint search_id);
-    std::pair<PreviewHandle::Columns, PreviewHandle::Widgets> get_preview_results(uint preview_id);
+    void wait_for_search(unsigned int search_id);
+    void wait_for_preview(unsigned int preview_id);
+    std::shared_ptr<DepartmentInfo> parse_departments(JsonNodeInterface::SPtr node);
+    Filters parse_filters(JsonNodeInterface::SPtr node);
+    FilterState parse_filter_state(JsonNodeInterface::SPtr node);
+    void parse_line(std::string const& json, SearchReplyHandler const& handler);
+    void parse_line(std::string const& json, PreviewReplyHandler const& handler);
 
     std::vector<std::string> extract_json_stream(std::string const& json_stream);
 
-    void cancel_query(uint query_id);
+    void cancel_query(unsigned int query_id);
 
     void write_cache(std::string const& scopes_json);
     std::string read_cache();
 
-private:
+    std::string stringify_settings(VariantMap const& settings);
+
     HttpClientInterface::SPtr http_client_;
     JsonNodeInterface::SPtr json_node_;
-
+    boost::log::sources::severity_channel_logger_mt<>& logger_;
     std::string url_;
 
-    std::map<uint, HttpResponseHandle::SPtr> query_results_;
+    std::map<unsigned int, HttpResponseHandle::SPtr> query_results_;
 
     std::mutex json_node_mutex_;
     std::mutex query_results_mutex_;
@@ -178,7 +238,8 @@ private:
     std::string cached_scopes_;
     bool have_latest_cache_;
 
-    uint query_counter_;
+    unsigned int query_counter_;
+    std::string partner_file_;
 };
 
 }  // namespace smartscopes
@@ -188,5 +249,3 @@ private:
 }  // namespace scopes
 
 }  // namespace unity
-
-#endif  // UNITY_SCOPES_INTERNAL_SMARTSCOPES_SMARTSCOPESCLIENT_H

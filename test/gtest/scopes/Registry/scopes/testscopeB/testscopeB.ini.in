@@ -1,0 +1,10 @@
+[ScopeConfig]
+DisplayName = scope-B.DisplayName
+Description = scope-B.Description
+Art = data/scope-B.Art
+Author = Canonical Ltd.
+Icon = data/scope-B.Icon
+SearchHint = scope-B.SearchHint
+HotKey = scope-B.HotKey
+ScopeRunner = testscopeB "unused arg 1" %S %R unused' 'arg' '2
+IdleTimeout = 2

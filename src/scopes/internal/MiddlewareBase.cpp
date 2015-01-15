@@ -18,6 +18,8 @@
 
 #include <unity/scopes/internal/MiddlewareBase.h>
 
+#include <unity/UnityExceptions.h>
+
 #include <cassert>
 
 using namespace std;
@@ -34,7 +36,6 @@ namespace internal
 MiddlewareBase::MiddlewareBase(RuntimeImpl* runtime) :
     runtime_(runtime)
 {
-    assert(runtime);
 }
 
 MiddlewareBase::~MiddlewareBase()

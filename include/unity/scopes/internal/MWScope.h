@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_MWSCOPE_H
-#define UNITY_SCOPES_INTERNAL_MWSCOPE_H
+#pragma once
 
 #include <unity/scopes/internal/MWObjectProxy.h>
 #include <unity/scopes/internal/MWReplyProxyFwd.h>
@@ -44,6 +43,7 @@ public:
     virtual QueryCtrlProxy activate(VariantMap const& result, VariantMap const& hints, MWReplyProxy const& reply) = 0;
     virtual QueryCtrlProxy perform_action(VariantMap const& result, VariantMap const& hints, std::string const& widget_id, std::string const& action_id, MWReplyProxy const& reply) = 0;
     virtual QueryCtrlProxy preview(VariantMap const& result, VariantMap const& hints, MWReplyProxy const& reply) = 0;
+    virtual bool debug_mode() = 0;
 
 protected:
     MWScope(MiddlewareBase* mw_base);
@@ -54,5 +54,3 @@ protected:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

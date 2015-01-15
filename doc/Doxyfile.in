@@ -648,8 +648,7 @@ WARN_FORMAT            = "$file:$line: $text"
 # documented source files. You may enter file names like "myfile.cpp" or
 # directories like "/usr/src/myproject". Separate the files or directories
 # with spaces.
-
-INPUT                  = @PROJECT_SOURCE_DIR@/doc/tutorial.dox @PROJECT_BINARY_DIR@/include @PROJECT_SOURCE_DIR@/include @PROJECT_SOURCE_DIR@/src
+INPUT                  = @PROJECT_SOURCE_DIR@/doc/tutorial.dox @PROJECT_SOURCE_DIR@/RELEASE_NOTES.md @PROJECT_BINARY_DIR@/include @PROJECT_SOURCE_DIR@/include @PROJECT_SOURCE_DIR@/src
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is
@@ -736,7 +735,7 @@ EXCLUDE_PATTERNS       =  */internal/*
 # wildcard * is used, a substring. Examples: ANamespace, AClass,
 # AClass::ANamespace, ANamespace::*Test
 
-EXCLUDE_SYMBOLS        = *::internal::*
+EXCLUDE_SYMBOLS        = *::internal::* *::experimental::*
 
 # The EXAMPLE_PATH tag can be used to specify one or more files or
 # directories that contain example code fragments that are included (see
@@ -888,7 +887,7 @@ GENERATE_HTML          = YES
 # If a relative path is entered the value of OUTPUT_DIRECTORY will be
 # put in front of it. If left blank `html' will be used as the default path.
 
-HTML_OUTPUT            = @PROJECT@
+HTML_OUTPUT            = @UNITY_SCOPES_LIB@
 
 # The HTML_FILE_EXTENSION tag can be used to specify the file extension for
 # each generated HTML page (for example: .htm,.php,.asp). If it is left blank
@@ -1415,18 +1414,6 @@ GENERATE_XML           = NO
 # put in front of it. If left blank `xml' will be used as the default path.
 
 XML_OUTPUT             = xml
-
-# The XML_SCHEMA tag can be used to specify an XML schema,
-# which can be used by a validating XML parser to check the
-# syntax of the XML files.
-
-XML_SCHEMA             =
-
-# The XML_DTD tag can be used to specify an XML DTD,
-# which can be used by a validating XML parser to check the
-# syntax of the XML files.
-
-XML_DTD                =
 
 # If the XML_PROGRAMLISTING tag is set to YES Doxygen will
 # dump the program listings (including syntax highlighting

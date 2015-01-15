@@ -34,12 +34,22 @@ struct testing::ScopeMetadataBuilder::Private
     ScopeProxy proxy;
     std::string display_name;
     std::string description;
+    std::string author;
 
     Optional<std::string> art;
     Optional<std::string> icon;
     Optional<std::string> search_hint;
     Optional<std::string> hot_key;
     Optional<bool> invisible;
+    Optional<VariantMap> appearance_attributes;
+    Optional<std::string> scope_directory;
+    Optional<ScopeMetadata::ResultsTtlType> results_ttl_type;
+    Optional<VariantArray> settings_definitions;
+    Optional<bool> location_data_needed;
+    Optional<std::vector<std::string>> child_scope_ids;
+    Optional<int> version;
+    Optional<std::vector<std::string>> keywords;
+    Optional<bool> is_aggregator;
 };
 
 testing::ScopeMetadataBuilder::ScopeMetadataBuilder() : p(new Private())
@@ -74,6 +84,12 @@ testing::ScopeMetadataBuilder& testing::ScopeMetadataBuilder::description(std::s
     return *this;
 }
 
+testing::ScopeMetadataBuilder& testing::ScopeMetadataBuilder::author(std::string const& value)
+{
+    p->author = value;
+    return *this;
+}
+
 testing::ScopeMetadataBuilder& testing::ScopeMetadataBuilder::art(Optional<std::string> const& value)
 {
     p->art = value;
@@ -98,9 +114,63 @@ testing::ScopeMetadataBuilder& testing::ScopeMetadataBuilder::hot_key(Optional<s
     return *this;
 }
 
-testing::ScopeMetadataBuilder& testing::ScopeMetadataBuilder::invisible(Optional<bool> value)
+testing::ScopeMetadataBuilder& testing::ScopeMetadataBuilder::invisible(Optional<bool> const& value)
 {
     p->invisible = value;
+    return *this;
+}
+
+testing::ScopeMetadataBuilder& testing::ScopeMetadataBuilder::appearance_attributes(Optional<VariantMap> const& value)
+{
+    p->appearance_attributes = value;
+    return *this;
+}
+
+testing::ScopeMetadataBuilder& testing::ScopeMetadataBuilder::scope_directory(Optional<std::string> const& value)
+{
+    p->scope_directory = value;
+    return *this;
+}
+
+testing::ScopeMetadataBuilder& testing::ScopeMetadataBuilder::results_ttl_type(Optional<ScopeMetadata::ResultsTtlType> const& value)
+{
+    p->results_ttl_type = value;
+    return *this;
+}
+
+testing::ScopeMetadataBuilder& testing::ScopeMetadataBuilder::settings_definitions(Optional<VariantArray> const& value)
+{
+    p->settings_definitions = value;
+    return *this;
+}
+
+testing::ScopeMetadataBuilder& testing::ScopeMetadataBuilder::location_data_needed(Optional<bool> const& value)
+{
+    p->location_data_needed = value;
+    return *this;
+}
+
+testing::ScopeMetadataBuilder& testing::ScopeMetadataBuilder::child_scope_ids(Optional<std::vector<std::string>> const& value)
+{
+    p->child_scope_ids = value;
+    return *this;
+}
+
+testing::ScopeMetadataBuilder& testing::ScopeMetadataBuilder::version(Optional<int> const& value)
+{
+    p->version = value;
+    return *this;
+}
+
+testing::ScopeMetadataBuilder& testing::ScopeMetadataBuilder::keywords(Optional<std::vector<std::string>> const& value)
+{
+    p->keywords = value;
+    return *this;
+}
+
+testing::ScopeMetadataBuilder& testing::ScopeMetadataBuilder::is_aggregator(Optional<bool> const& value)
+{
+    p->is_aggregator = value;
     return *this;
 }
 
@@ -111,6 +181,7 @@ unity::scopes::ScopeMetadata testing::ScopeMetadataBuilder::operator()() const
     impl->set_proxy(p->proxy);
     impl->set_display_name(p->display_name);
     impl->set_description(p->description);
+    impl->set_author(p->author);
 
     if (p->art)
         impl->set_art(*p->art);
@@ -122,6 +193,24 @@ unity::scopes::ScopeMetadata testing::ScopeMetadataBuilder::operator()() const
         impl->set_hot_key(*p->hot_key);
     if (p->invisible)
         impl->set_invisible(*p->invisible);
+    if (p->appearance_attributes)
+        impl->set_appearance_attributes(*p->appearance_attributes);
+    if (p->scope_directory)
+        impl->set_scope_directory(*p->scope_directory);
+    if (p->results_ttl_type)
+        impl->set_results_ttl_type(*p->results_ttl_type);
+    if (p->settings_definitions)
+        impl->set_settings_definitions(*p->settings_definitions);
+    if (p->location_data_needed)
+        impl->set_location_data_needed(*p->location_data_needed);
+    if (p->child_scope_ids)
+        impl->set_child_scope_ids(*p->child_scope_ids);
+    if (p->version)
+        impl->set_version(*p->version);
+    if (p->keywords)
+        impl->set_keywords(*p->keywords);
+    if (p->is_aggregator)
+        impl->set_is_aggregator(*p->is_aggregator);
 
     return unity::scopes::internal::ScopeMetadataImpl::create(
                 std::move(

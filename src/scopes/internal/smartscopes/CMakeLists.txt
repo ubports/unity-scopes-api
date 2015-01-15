@@ -1,4 +1,6 @@
 set(SRC
+    ${CMAKE_CURRENT_SOURCE_DIR}/SmartScope.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/SSConfig.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/SSQueryCtrlObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/SSQueryObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/SSRegistryObject.cpp

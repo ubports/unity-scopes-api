@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_OBJECT_H
-#define UNITY_SCOPES_OBJECT_H
+#pragma once
 
 #include <unity/scopes/ObjectProxyFwd.h>
 #include <unity/util/NonCopyable.h>
@@ -54,6 +53,12 @@ public:
     virtual std::string identity() = 0;
 
     /**
+    \brief Returns the category of the target object of this proxy.
+    \return The category of the target of the proxy.
+    */
+    virtual std::string target_category() = 0;
+
+    /**
     \brief Returns the timeout in milliseconds if this proxy is a twoway proxy.
 
     For oneway proxies and twoway proxies without a timeout, the return value is -1.
@@ -62,7 +67,7 @@ public:
     virtual int64_t timeout() = 0;      // Timeout in milliseconds, -1 == no timeout
 
     /**
-    \brief converts a proxy into its string representation.
+    \brief Converts a proxy into its string representation.
 
     A proxy string can be converted back into a proxy by calling Runtime::string_to_proxy().
     \return The string representation of the proxy.
@@ -78,5 +83,3 @@ protected:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

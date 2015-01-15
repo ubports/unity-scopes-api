@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_TASKWRAPPER_H
-#define UNITY_SCOPES_INTERNAL_TASKWRAPPER_H
+#pragma once
 
 #include <memory>
 
@@ -31,7 +30,7 @@ namespace internal
 {
 
 // Simple wrapper for tasks. Allows us to use a std::packaged_task as the functor
-// for a task in a thread pool, without having to know the task's return type in advance.
+// for a task in a thread pool without having to know the task's return type in advance.
 
 class TaskWrapper final
 {
@@ -54,7 +53,6 @@ public:
 
     void operator()()
     {
-
         task_->call();
     }
 
@@ -68,7 +66,7 @@ private:
     {
         virtual void call() = 0;
         virtual bool valid() const = 0;
-        virtual ~WrapperBase() {};
+        virtual ~WrapperBase() {}
     };
 
     template<typename F>
@@ -81,7 +79,7 @@ private:
         {
         }
 
-        virtual ~WrapperType() {};
+        virtual ~WrapperType() {}
 
         void call()
         {
@@ -102,5 +100,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

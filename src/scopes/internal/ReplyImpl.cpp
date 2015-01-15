@@ -26,7 +26,6 @@
 #include <unity/UnityExceptions.h>
 
 #include <cassert>
-#include <iostream> // TODO: remove this once logging is added
 
 using namespace std;
 
@@ -39,10 +38,12 @@ namespace scopes
 namespace internal
 {
 
-ReplyImpl::ReplyImpl(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObjectBase> const& qo) :
-    ObjectImpl(mw_proxy),
-    qo_(qo),
-    finished_(false)
+ReplyImpl::ReplyImpl(MWReplyProxy const& mw_proxy,
+                     std::shared_ptr<QueryObjectBase> const& qo,
+                     boost::log::sources::severity_channel_logger_mt<>& logger)
+    : ObjectImpl(mw_proxy, logger)
+    , qo_(qo)
+    , finished_(false)
 {
     assert(mw_proxy);
 }
@@ -55,7 +56,6 @@ ReplyImpl::~ReplyImpl()
     }
     catch (...)
     {
-        // TODO: log error
     }
 }
 
@@ -63,7 +63,7 @@ bool ReplyImpl::push(VariantMap const& variant_map)
 {
     auto qo = dynamic_pointer_cast<QueryObjectBase>(qo_);
     assert(qo);
-    if (!qo->pushable({ fwd()->identity(), fwd()->mw_base() }))
+    if (!qo->pushable(InvokeInfo{ fwd()->identity(), fwd()->mw_base() }))
     {
         return false; // Query was cancelled or had an error.
     }
@@ -88,21 +88,15 @@ bool ReplyImpl::push(VariantMap const& variant_map)
 
 void ReplyImpl::finished()
 {
-    finished(ListenerBase::Finished);
-}
-
-void ReplyImpl::finished(ListenerBase::Reason reason)
-{
     if (!finished_.exchange(true))
     {
         try
         {
-            fwd()->finished(reason, "");
+            fwd()->finished(CompletionDetails(CompletionDetails::OK));  // Oneway, can't block
         }
         catch (std::exception const& e)
         {
-            // TODO: log error
-            cerr << e.what() << endl;
+            // No logging here because this may happen after the run time is destroyed.
         }
     }
 }
@@ -129,21 +123,36 @@ void ReplyImpl::error(exception_ptr ex)
     {
         error_message = "unknown exception";
     }
-    // TODO: log error
-    cerr << error_message << endl;
+    BOOST_LOG_SEV(logger_, Logger::Error) << "ReplyImpl::error(): " << error_message;
 
     try
     {
-        fwd()->finished(ListenerBase::Error, error_message);
+        fwd()->finished(CompletionDetails(CompletionDetails::Error, error_message));  // Oneway, can't block
     }
     catch (std::exception const& e)
     {
-        // TODO: log error
-        cerr << e.what() << endl;
+        BOOST_LOG_SEV(logger_, Logger::Error) << "ReplyImpl::error(): excpetion from finished(): " << error_message;
     }
 }
 
-MWReplyProxy ReplyImpl::fwd() const
+void ReplyImpl::info(OperationInfo const& op_info)
+{
+    if (finished_.load())
+    {
+        return; // Ignore info messages that arrive after finished().
+    }
+
+    try
+    {
+        fwd()->info(op_info);
+    }
+    catch (std::exception const& e)
+    {
+        BOOST_LOG_SEV(logger_, Logger::Error) << "ReplyImpl::error(): excpetion from info(): " << e.what();
+    }
+}
+
+MWReplyProxy ReplyImpl::fwd()
 {
     return dynamic_pointer_cast<MWReply>(proxy());
 }

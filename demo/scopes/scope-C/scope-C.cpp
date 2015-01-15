@@ -129,16 +129,17 @@ private:
 class MyQuery : public SearchQueryBase
 {
 public:
-    MyQuery(CannedQuery const& query, Queue& queue) :
-        query_(query),
+    MyQuery(string const& scope_id, CannedQuery const& query, SearchMetadata const& metadata, Queue& queue) :
+        SearchQueryBase(query, metadata),
+        scope_id_(scope_id),
         queue_(queue)
     {
-        cerr << "My Query created" << endl;
+        cerr << scope_id_ << ": query instance for \"" << query.query_string() << "\" created" << endl;
     }
 
     ~MyQuery()
     {
-        cerr << "My Query destroyed" << endl;
+        cerr << scope_id_ << ": query instance for \"" << query().query_string() << "\" destroyed" << endl;
     }
 
     virtual void cancelled() override
@@ -148,22 +149,32 @@ public:
         // query, the worker thread's next call to push() will return false,
         // causing the worker thread to stop working on this query.
         queue_.remove(this);
-        cerr << "scope-C: \"" + query_.to_string() + "\" cancelled" << endl;
+        cerr << scope_id_ << ": \"" + query().to_uri() + "\" cancelled" << endl;
     }
 
     virtual void run(SearchReplyProxy const& reply) override
     {
-        queue_.put(this, query_.query_string(), reply);
-        cerr << "scope-C: run() returning" << endl;
+        if (!valid())
+        {
+            return;  // Query was cancelled
+        }
+
+        queue_.put(this, query().query_string(), reply);
     }
 
 private:
-    CannedQuery query_;
+    string scope_id_;
     Queue& queue_;
 };
 
 class MyActivation : public ActivationQueryBase
 {
+public:
+    MyActivation(Result const& result, ActionMetadata const& metadata)
+        : ActivationQueryBase(result, metadata)
+    {
+    }
+
     ActivationResponse activate() override
     {
         return ActivationResponse(ActivationResponse::Status::ShowDash);
@@ -173,10 +184,9 @@ class MyActivation : public ActivationQueryBase
 class MyScope : public ScopeBase
 {
 public:
-    virtual int start(string const& scope_name, RegistryProxy const&) override
+    virtual void start(string const& scope_id) override
     {
-        scope_name_ = scope_name;
-        return VERSION;
+        scope_id_ = scope_id;
     }
 
     virtual void stop() override
@@ -205,7 +215,7 @@ public:
             {
                 CategorisedResult result(cat);
                 result.set_uri("uri");
-                result.set_title("scope-C: result " + to_string(i) + " for query \"" + query + "\"");
+                result.set_title(scope_id_ + ": result " + to_string(i) + " for query \"" + query + "\"");
                 result.set_art("icon");
                 result.set_dnd_uri("dnd_uri");
                 result.set_intercept_activation();
@@ -215,29 +225,29 @@ public:
                 }
                 sleep(1);
             }
+            cerr << scope_id_ << ": query \"" << query << "\" complete" << endl;
         }
     }
 
-    virtual SearchQueryBase::UPtr search(CannedQuery const& q, SearchMetadata const&) override
+    virtual SearchQueryBase::UPtr search(CannedQuery const& q, SearchMetadata const& metadata) override
     {
-        cout << scope_name_ << ": created query: \"" << q.query_string() << "\"" << endl;
-        return SearchQueryBase::UPtr(new MyQuery(q, queue));
+        return SearchQueryBase::UPtr(new MyQuery(scope_id_, q, metadata, queue));
     }
 
-    virtual ActivationQueryBase::UPtr activate(Result const& result, ActionMetadata const& /* hints */) override
+    virtual ActivationQueryBase::UPtr activate(Result const& result, ActionMetadata const& metadata) override
     {
-        cout << scope_name_ << ": activate: \"" << result.uri() << "\"" << endl;
-        return ActivationQueryBase::UPtr(new MyActivation());
+        cerr << scope_id_ << ": activate: \"" << result.uri() << "\"" << endl;
+        return ActivationQueryBase::UPtr(new MyActivation(result, metadata));
     }
 
     virtual PreviewQueryBase::UPtr preview(Result const& result, ActionMetadata const&) override
     {
-        cout << "scope-C: preview: \"" << result.uri() << "\"" << endl;
+        cerr << scope_id_ << ": preview: \"" << result.uri() << "\"" << endl;
         return nullptr;
     }
 
 private:
-    string scope_name_;
+    string scope_id_;
     Queue queue;
 };
 

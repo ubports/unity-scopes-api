@@ -17,6 +17,7 @@
  */
 
 #include <unity/scopes/Variant.h>
+#include <unity/scopes/internal/JsonCppNode.h>
 
 #include <unity/UnityExceptions.h>
 
@@ -266,6 +267,18 @@ void Variant::swap(Variant& other) noexcept
 void swap(Variant& lhs, Variant& rhs) noexcept
 {
     lhs.swap(rhs);
+}
+
+std::string Variant::serialize_json() const
+{
+    internal::JsonCppNode node(*this);
+    return node.to_json_string();
+}
+
+Variant Variant::deserialize_json(std::string const& json_string)
+{
+    internal::JsonCppNode node(json_string);
+    return node.to_variant();
 }
 
 } // namespace scopes

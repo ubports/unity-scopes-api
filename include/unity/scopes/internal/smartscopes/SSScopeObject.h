@@ -16,8 +16,7 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_SMARTSCOPES_SSSCOPEOBJECT_H
-#define UNITY_SCOPES_INTERNAL_SMARTSCOPES_SSSCOPEOBJECT_H
+#pragma once
 
 #include <unity/scopes/internal/ScopeObjectBase.h>
 #include <unity/scopes/internal/smartscopes/SSQueryCtrlObject.h>
@@ -49,7 +48,7 @@ public:
     UNITY_DEFINES_PTRS(SSScopeObject);
 
     SSScopeObject(std::string const& ss_scope_id, MiddlewareBase::SPtr middleware, SSRegistryObject::SPtr ss_registry);
-    virtual ~SSScopeObject() noexcept;
+    virtual ~SSScopeObject();
 
     // Remote operation implementations
     MWQueryCtrlProxy search(CannedQuery const& q,
@@ -74,13 +73,14 @@ public:
                              MWReplyProxy const& reply,
                              InvokeInfo const& info) override;
 
+    bool debug_mode() const override;
+
 private:
     MWQueryCtrlProxy query(InvokeInfo const& info,
                            MWReplyProxy const& reply,
                            std::function<QueryBase::SPtr(void)> const& query_factory_fun,
                            std::function<void(QueryBase::SPtr)> const& query_object_fun);
 
-private:
     std::string ss_scope_id_;
 
     SSQueryCtrlObject::SPtr co_;
@@ -88,6 +88,8 @@ private:
 
     std::unique_ptr<SmartScope> const smartscope_;
     SSRegistryObject::SPtr ss_registry_;
+
+    boost::log::sources::severity_channel_logger_mt<>& logger_;
 };
 
 }  // namespace smartscopes
@@ -97,5 +99,3 @@ private:
 }  // namespace scopes
 
 }  // namespace unity
-
-#endif  // UNITY_SCOPES_INTERNAL_SMARTSCOPES_SSSCOPEOBJECT_H

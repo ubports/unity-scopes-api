@@ -18,6 +18,7 @@
 
 #include <unity/scopes/internal/OptionSelectorFilterImpl.h>
 #include <unity/scopes/FilterState.h>
+#include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 #include <unordered_set>
 #include <sstream>
@@ -37,6 +38,15 @@ OptionSelectorFilterImpl::OptionSelectorFilterImpl(std::string const& id, std::s
     label_(label),
     multi_select_(multi_select)
 {
+    if (label.empty())
+    {
+        throw InvalidArgumentException("OptionSelectorFilter(): Invalid empty label string");
+    }
+}
+
+OptionSelectorFilter::SPtr OptionSelectorFilterImpl::create(VariantMap const& var)
+{
+    return std::shared_ptr<OptionSelectorFilter>(new OptionSelectorFilter(new OptionSelectorFilterImpl(var)));
 }
 
 OptionSelectorFilterImpl::OptionSelectorFilterImpl(VariantMap const& var)
@@ -74,7 +84,7 @@ void OptionSelectorFilterImpl::throw_on_missing(VariantMap::const_iterator const
 {
     if (it == endit)
     {
-        throw LogicException("OptionSelectorFilter: missing " + name);
+        throw NotFoundException("OptionSelectorFilter: missing ", name);
     }
 }
 
@@ -110,9 +120,21 @@ std::string OptionSelectorFilterImpl::filter_type() const
 
 FilterOption::SCPtr OptionSelectorFilterImpl::add_option(std::string const& id, std::string const& label)
 {
-    auto opt = std::shared_ptr<FilterOption>(new FilterOption(id, label));
-    options_.push_back(opt);
-    return opt;
+    try
+    {
+        auto opt = std::shared_ptr<FilterOption>(new FilterOption(id, label));
+        options_.push_back(opt);
+        return opt;
+    }
+    catch (...)
+    {
+        throw ResourceException("OptionSelectorFilter(): cannot create FilterOption");
+    }
+}
+
+int OptionSelectorFilterImpl::num_of_options() const
+{
+    return options_.size();
 }
 
 std::list<FilterOption::SCPtr> OptionSelectorFilterImpl::options() const
@@ -154,6 +176,33 @@ std::set<FilterOption::SCPtr> OptionSelectorFilterImpl::active_options(FilterSta
     return opts;
 }
 
+bool OptionSelectorFilterImpl::has_active_option(FilterState const& filter_state) const
+{
+    if (filter_state.has_filter(id()))
+    {
+        try
+        {
+            auto const var = FilterBaseImpl::get(filter_state, id()).get_array(); // this can throw if of different type
+
+            for (auto const& idvar: var)
+            {
+                auto const opt_id = idvar.get_string();
+                for (auto const& opt: options_)
+                {
+                    if (opt_id == opt->id())
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+        catch (...)
+        {
+        }
+    }
+    return false;
+}
+
 void OptionSelectorFilterImpl::update_state(FilterState& filter_state, FilterOption::SCPtr option, bool active) const
 {
     auto const oid(option->id());
@@ -178,8 +227,20 @@ void OptionSelectorFilterImpl::update_state(FilterState& filter_state, FilterOpt
 
 void OptionSelectorFilterImpl::update_state(FilterState& filter_state, std::string const& filter_id, std::string const& option_id, bool value)
 {
+    if (filter_id.empty())
+    {
+        throw InvalidArgumentException("OptionSelectorFilter::update_state(): Invalid empty filter_id string");
+    }
+    if (option_id.empty())
+    {
+        throw InvalidArgumentException("OptionSelectorFilter::update_state(): Invalid empty option_id string");
+    }
+
     VariantMap& state = FilterBaseImpl::get(filter_state);
     auto it = state.find(filter_id);
+
+    VariantMap filter_info;
+
     // do we have this filter already?
     if (it == state.end())
     {

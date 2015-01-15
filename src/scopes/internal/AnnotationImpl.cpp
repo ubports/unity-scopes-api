@@ -18,7 +18,6 @@
 #include <unity/scopes/internal/AnnotationImpl.h>
 #include <unity/UnityExceptions.h>
 #include <sstream>
-#include <iostream>
 #include <cassert>
 
 namespace unity
@@ -36,6 +35,7 @@ AnnotationImpl::AnnotationImpl(Annotation::Type annotation_type)
 }
 
 AnnotationImpl::AnnotationImpl(const VariantMap &variant_map)
+    : annotation_type_(static_cast<Annotation::Type>(0xefff))    // Impossible value
 {
     auto it = variant_map.find("type");
     if (it == variant_map.end())
@@ -85,7 +85,11 @@ void AnnotationImpl::set_label(std::string const& label)
 {
     if (annotation_type_ != Annotation::Type::GroupedLink)
     {
-        std::cerr << "Annotation::set_label(): label is allowed in GroupedLink only" << std::endl;
+        throw LogicException("Annotation::set_label(): label is allowed in GroupedLink only");
+    }
+    if (label.empty())
+    {
+        throw InvalidArgumentException("Annotation::set_label(): Invalid empty label string");
     }
     label_ = label;
 }
@@ -94,7 +98,11 @@ void AnnotationImpl::set_icon(std::string const& icon)
 {
     if (annotation_type_ != Annotation::Type::Link)
     {
-        std::cerr << "Annotation::set_icon(): icon is allowed in Link annotations only" << std::endl;
+        throw LogicException("Annotation::set_icon(): icon is allowed in Link annotations only");
+    }
+    if (icon.empty())
+    {
+        throw InvalidArgumentException("Annotation::set_icon(): Invalid empty icon string");
     }
     icon_ = icon;
 }
@@ -105,14 +113,21 @@ void AnnotationImpl::add_link(std::string const& label, CannedQuery const& query
     {
         throw InvalidArgumentException("Annotation::add_link(): multiple links are supported by GroupedLink only");
     }
-    links_.push_back(std::shared_ptr<Link>(new Link(label, query)));
+    try
+    {
+        links_.push_back(std::shared_ptr<Link>(new Link(label, query)));
+    }
+    catch (...)
+    {
+        throw ResourceException("Annotation::add_link(): cannot create link");
+    }
 }
 
 std::string AnnotationImpl::label() const
 {
     if (annotation_type_ != Annotation::Type::GroupedLink)
     {
-        std::cerr << "Annotation::label(): label is allowed in GroupedLink only" << std::endl;
+        throw LogicException("Annotation::label(): label is allowed in GroupedLink only");
     }
     return label_;
 }
@@ -121,7 +136,7 @@ std::string AnnotationImpl::icon() const
 {
     if (annotation_type_ != Annotation::Type::Link)
     {
-        std::cerr << "Annotation::icon(): icon is allowed in Link annotations only" << std::endl;
+        throw LogicException("Annotation::icon(): icon is allowed in Link annotations only");
     }
     return icon_;
 }

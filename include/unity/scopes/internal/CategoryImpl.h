@@ -16,12 +16,12 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_CATEGORYIMPL_H
-#define UNITY_SCOPES_INTERNAL_CATEGORYIMPL_H
+#pragma once
 
 #include <unity/util/NonCopyable.h>
-#include <unity/scopes/Variant.h>
+#include <unity/scopes/CannedQuery.h>
 #include <unity/scopes/CategoryRenderer.h>
+#include <unity/scopes/Variant.h>
 #include <string>
 #include <memory>
 
@@ -40,10 +40,13 @@ public:
     NONCOPYABLE(CategoryImpl);
 
     CategoryImpl(VariantMap const& variant_map);
-    CategoryImpl(std::string const& id, std::string const& title, std::string const &icon, CategoryRenderer const& renderer_template);
+    CategoryImpl(std::string const& id, std::string const& title,
+                 std::string const &icon, CannedQuery::SCPtr const& query,
+                 CategoryRenderer const& renderer_template);
     std::string const& id() const;
     std::string const& title() const;
     std::string const& icon() const;
+    CannedQuery::SCPtr const& query() const;
     CategoryRenderer const& renderer_template() const;
     VariantMap serialize() const;
 
@@ -53,6 +56,7 @@ private:
     std::string id_;
     std::string title_;
     std::string icon_;
+    CannedQuery::SCPtr query_;
     CategoryRenderer renderer_template_;
 };
 
@@ -61,5 +65,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

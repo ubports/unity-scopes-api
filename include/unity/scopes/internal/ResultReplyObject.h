@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_RESULTREPLYOBJECT_H
-#define UNITY_SCOPES_INTERNAL_RESULTREPLYOBJECT_H
+#pragma once
 
 #include <unity/scopes/internal/ReplyObject.h>
 #include <unity/scopes/internal/CategoryRegistry.h>
@@ -37,10 +36,8 @@ class RuntimeImpl;
 class ResultReplyObject : public ReplyObject
 {
 public:
-    ResultReplyObject(SearchListenerBase::SPtr const& receiver,
-                      RuntimeImpl const* runtime,
-                      std::string const& scope_id,
-                      int cardinality);
+    ResultReplyObject(SearchListenerBase::SPtr const& receiver, RuntimeImpl const* runtime,
+                      std::string const& scope_id, int cardinality, bool dont_reap = false);
     virtual ~ResultReplyObject();
 
     virtual bool process_data(VariantMap const& data) override;
@@ -58,5 +55,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

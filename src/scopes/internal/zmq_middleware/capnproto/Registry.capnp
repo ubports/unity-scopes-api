@@ -29,13 +29,13 @@ using Proxy = import "Proxy.capnp";
 #
 # Operations:
 #
-# ValueDict get_metadata(string name) throws NotFoundException;
+# ValueDict get_metadata(string scope_id) throws NotFoundException;
 # map<string, ScopeMetadata> list();
-# ScopeProxy locate(string name) throws NotFoundException, RegistryException;
+# ObjectProxy locate(string identity) throws NotFoundException, RegistryException;
 
 struct NotFoundException
 {
-    name @0 : Text;
+    identity @0 : Text;
 }
 
 struct RegistryException
@@ -45,7 +45,7 @@ struct RegistryException
 
 struct GetMetadataRequest
 {
-    name @0 : Text;
+    identity @0 : Text;
 }
 
 struct GetMetadataResponse
@@ -68,7 +68,7 @@ struct ListResponse
 
 struct LocateRequest
 {
-    name @0 : Text;
+    identity @0 : Text;
 }
 
 struct LocateResponse
@@ -78,5 +78,19 @@ struct LocateResponse
         returnValue         @0 : Proxy.Proxy;
         notFoundException   @1 : NotFoundException;
         registryException   @2 : RegistryException;
+    }
+}
+
+struct IsScopeRunningRequest
+{
+    identity @0 : Text;
+}
+
+struct IsScopeRunningResponse
+{
+    response : union
+    {
+        returnValue         @0 : Bool;
+        notFoundException   @1 : NotFoundException;
     }
 }

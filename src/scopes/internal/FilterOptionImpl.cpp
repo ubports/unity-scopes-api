@@ -18,6 +18,8 @@
 
 #include <unity/scopes/internal/FilterOptionImpl.h>
 
+#include <unity/UnityExceptions.h>
+
 namespace unity
 {
 
@@ -31,6 +33,14 @@ FilterOptionImpl::FilterOptionImpl(std::string const& id, std::string const& lab
     : id_(id),
       label_(label)
 {
+    if (id_.empty())
+    {
+        throw InvalidArgumentException("FilterOption(): invalid empty id string");
+    }
+    if (label_.empty())
+    {
+        throw InvalidArgumentException("FilterOption(): invalid empty label string");
+    }
 }
 
 std::string FilterOptionImpl::id() const

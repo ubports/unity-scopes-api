@@ -16,9 +16,10 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_SEARCHMETADATA_H
-#define UNITY_SCOPES_SEARCHMETADATA_H
+#pragma once
 
+#include <unity/scopes/QueryMetadata.h>
+#include <unity/scopes/Location.h>
 #include <unity/scopes/Variant.h>
 #include <unity/util/DefinesPtrs.h>
 
@@ -38,7 +39,7 @@ class ScopeObject;
 \brief Metadata passed with search requests.
 */
 
-class SearchMetadata final
+class SearchMetadata : public QueryMetadata
 {
 public:
     /// @cond
@@ -46,14 +47,14 @@ public:
     /// @endcond
 
     /**
-    \brief Create SearchMetadata with given locale and form factor.
+    \brief Create SearchMetadata with the given locale and form factor.
     \param locale locale string, eg. en_EN
     \param form_factor form factor name, e.g. phone, desktop, phone-version etc.
     */
     SearchMetadata(std::string const& locale, std::string const& form_factor);
 
     /**
-    \brief Create SearchMetadata with given cardinality, locale and form factor.
+    \brief Create SearchMetadata with the given cardinality, locale, and form factor.
     \param cardinality maximum number of search results
     \param locale locale string, eg. en_EN
     \param form_factor form factor name, e.g. phone, desktop, phone-version etc.
@@ -67,25 +68,13 @@ public:
     SearchMetadata(SearchMetadata const& other);
     SearchMetadata(SearchMetadata&&);
 
-    SearchMetadata& operator=(SearchMetadata const &other);
+    SearchMetadata& operator=(SearchMetadata const& other);
     SearchMetadata& operator=(SearchMetadata&&);
     //@}
 
     /// @cond
     ~SearchMetadata();
     /// @endcond
-
-    /**
-    \brief Get the locale string.
-    \return The locale string
-    */
-    std::string locale() const;
-
-    /**
-    \brief Get the form factor string.
-    \return The form factor string
-    */
-    std::string form_factor() const;
 
     /**
     \brief Set cardinality.
@@ -100,6 +89,25 @@ public:
     int cardinality() const;
 
     /**
+    \brief Set location.
+    \param location Location data.
+    */
+    void set_location(Location const& location);
+
+    /**
+    \brief Get location.
+    \return Location data representing the current location, including attributes such as city and country.
+    \throws unity::NotFoundException if no location data is available.
+    */
+    Location location() const;
+
+    /**
+    \brief Does the SearchMetadata have a location.
+    \return True if there is a location property.
+    */
+    bool has_location() const;
+
+    /**
     \brief Sets a hint.
 
     \param key The name of the hint.
@@ -111,6 +119,7 @@ public:
     \brief Get all hints.
 
     \return Hints dictionary.
+    \throws unity::NotFoundException if no hints are available.
     */
     VariantMap hints() const;
 
@@ -139,23 +148,15 @@ public:
     Referencing a non-existing hint throws unity::InvalidArgumentException.
     \param key The name of the hint.
     \return A const reference to the hint.
-    \throws unity::LogicException if no hint with the given name exists.
+    \throws unity::NotFoundException if no hint with the given name exists.
     */
     Variant const& operator[](std::string const& key) const;
 
-    /// @cond
-    VariantMap serialize() const;
-    /// @endcond
-
 private:
-    std::unique_ptr<internal::SearchMetadataImpl> p;
-
-    SearchMetadata(internal::SearchMetadataImpl *impl);
+    SearchMetadata(internal::SearchMetadataImpl* impl);
     friend class internal::SearchMetadataImpl;
 };
 
 } // namespace scopes
 
 } // namespace unity
-
-#endif

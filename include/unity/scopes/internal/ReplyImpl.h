@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_REPLYIMPL_H
-#define UNITY_SCOPES_INTERNAL_REPLYIMPL_H
+#pragma once
 
 #include <unity/scopes/internal/MWReplyProxyFwd.h>
 #include <unity/scopes/internal/ObjectImpl.h>
@@ -42,19 +41,21 @@ class QueryObjectBase;
 class ReplyImpl : public virtual unity::scopes::Reply, public virtual ObjectImpl
 {
 public:
-    ReplyImpl(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObjectBase>const & qo);
+    ReplyImpl(MWReplyProxy const& mw_proxy,
+              std::shared_ptr<QueryObjectBase>const & qo,
+              boost::log::sources::severity_channel_logger_mt<>& logger);
     virtual ~ReplyImpl();
 
     virtual void finished() override;
-    void finished(unity::scopes::ListenerBase::Reason reason);
     virtual void error(std::exception_ptr ex) override;
+    virtual void info(OperationInfo const& op_info) override;
 
     typedef std::function<void()> CleanupFunc;
 
 protected:
     bool push(VariantMap const& variant_map);
 
-    MWReplyProxy fwd() const;
+    MWReplyProxy fwd();
 
 private:
     std::shared_ptr<QueryObjectBase> qo_;
@@ -66,5 +67,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

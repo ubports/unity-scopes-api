@@ -16,12 +16,12 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_CATEGORY_H
-#define UNITY_SCOPES_CATEGORY_H
+#pragma once
 
 #include <unity/util/NonCopyable.h>
 #include <unity/util/DefinesPtrs.h>
 #include <unity/scopes/Variant.h>
+#include <unity/scopes/CannedQuery.h>
 #include <string>
 #include <memory>
 
@@ -74,6 +74,12 @@ public:
     std::string icon() const;
 
     /**
+     \brief Query to perform when this category is expanded
+     \return The expansion query or nullptr.
+    */
+    CannedQuery::SCPtr query() const;
+
+    /**
      \brief Get renderer template of this Category
      \return The category renderer template.
      */
@@ -85,7 +91,11 @@ public:
 
 protected:
     /// @cond
-    Category(std::string const& id, std::string const& title, std::string const &icon, CategoryRenderer const& renderer_template);
+    Category(std::string const& id, std::string const& title,
+             std::string const &icon, CategoryRenderer const& renderer_template);
+    Category(std::string const& id, std::string const& title,
+             std::string const &icon, CannedQuery::SCPtr const& query,
+             CategoryRenderer const& renderer_template);
     Category(VariantMap const& variant_map);
     /// @endcond
 
@@ -98,5 +108,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

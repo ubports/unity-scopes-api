@@ -16,22 +16,17 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_SCOPEBASE_H
-#define UNITY_SCOPES_SCOPEBASE_H
+#pragma once
 
-#include <unity/scopes/SearchQueryBase.h>
-#include <unity/scopes/PreviewQueryBase.h>
-#include <unity/scopes/RegistryProxyFwd.h>
-#include <unity/scopes/ActivationQueryBase.h>
-#include <unity/scopes/Version.h>
-#include <unity/scopes/Result.h>
+#include <unity/scopes/AbstractScopeBase.h>
 #include <unity/scopes/ActionMetadata.h>
 #include <unity/scopes/SearchMetadata.h>
+#include <unity/scopes/Version.h>
 
 /**
 \brief Expands to the identifier of the scope create function. @hideinitializer
 */
-#define UNITY_SCOPE_CREATE_FUNCTION unity_scope_create
+#define UNITY_SCOPE_CREATE_FUNCTION UNITY_SCOPES_VERSIONED_CREATE_SYM
 
 /**
 \brief Expands to the identifier of the scope destroy function. @hideinitializer
@@ -66,6 +61,21 @@ namespace scopes
 
 class CannedQuery;
 
+namespace internal
+{
+
+class ScopeBaseImpl;
+class RuntimeImpl;
+
+}
+
+namespace testing
+{
+
+class TypedScopeFixtureHelper;
+
+}
+
 /**
 \file ScopeBase.h
 \class ScopeBase
@@ -83,14 +93,14 @@ public:
     MyScope();
     virtual ~MyScope();
 
-    virtual int start();    // Mandatory
-    virtual void stop();    // Mandatory
-    virtual void run();     // Optional
+    virtual void start(std::string const& scope_id);   // Optional
+    virtual void stop();                               // Optional
+    virtual void run();                                // Optional
+    // ...
 };
 ~~~
 
-The derived class must provide implementations of the pure virtual methods start()
-and stop(). In addition, the library must provide two functions with "C" linkage:
+In addition, the library must provide two functions with "C" linkage:
  - a create function that must return a pointer to the derived instance
  - a destroy function that is passed the pointer returned by the create function
 
@@ -117,7 +127,7 @@ UNITY_SCOPE_DESTROY_FUNCTION(unity::scopes::ScopeBase* scope)
 ~~~
 
 After the scopes run time has obtained a pointer to the class instance from the create function, it calls start(),
-which allows the scope to intialize itself. This is followed by call to run(). The call to run() is made by
+which allows the scope to intialize itself. This is followed by a call to run(). The call to run() is made by
 a separate thread; its only purpose is to pass a thread of control to the scope, for example, to run an event loop.
 When the scope should complete its activities, the run time calls stop(). The calls to the create function, start(),
 stop(), and the destroy function) are made by the same thread.
@@ -126,18 +136,13 @@ The scope implementation, if it does not return from run(), is expected to retur
 call to stop() in a timely manner.
 */
 
-class ScopeBase
+class ScopeBase : public AbstractScopeBase
 {
 public:
     /// @cond
     NONCOPYABLE(ScopeBase);
     virtual ~ScopeBase();
     /// @endcond
-
-    /**
-    \brief This value must be returned from the start() method.
-    */
-    static constexpr int VERSION = UNITY_SCOPES_VERSION_MAJOR;
 
     /**
     \brief Called by the scopes run time after the create function completes.
@@ -147,15 +152,8 @@ public:
     The call to start() is made by the same thread that calls the create function.
 
     \param scope_id The name of the scope as defined by the scope's configuration file.
-
-    \param registry A proxy to the scope registry. This parameter is provided for aggregating
-    scopes that need to retrieve proxies to their child scopes.
-
-    \return Any return value other than ScopeBase::VERSION will cause the scopes run time
-    to refuse to load the scope. The return value is used to ensure that the shared library
-    containing the scope is ABI compatible with the scopes run time.
     */
-    virtual int start(std::string const& scope_id, RegistryProxy const& registry) = 0;
+    virtual void start(std::string const& scope_id);
 
     /**
     \brief Called by the scopes run time when the scope should shut down.
@@ -168,7 +166,7 @@ public:
 
     The call to stop() is made by the same thread that calls the create function and start().
     */
-    virtual void stop() = 0;
+    virtual void stop();
 
     /**
     \brief Called by the scopes run time after it has called start() to hand a thread of control to the scope.
@@ -176,7 +174,7 @@ public:
     run() passes a thread of control to the scope to do with as it sees fit, for example, to run an event loop.
     During finalization, the scopes run time joins with the thread that called run(). This means that, if
     the scope implementation does not return from run(), it is expected to arrange for run() to complete
-    in timely manner in response to a call to stop(). Failure to do so will cause deadlock during finalization.
+    in a timely manner in response to a call to stop(). Failure to do so will cause deadlock during finalization.
 
     If run() throws an exception, the run time handles the exception and calls stop() in response.
     */
@@ -185,7 +183,7 @@ public:
     /**
     \brief Called by the scopes run time when a scope needs to instantiate a query.
 
-    This method must return an instance that is derived from QueryBase. The implementation
+    This method must return an instance that is derived from `QueryBase`. The implementation
     of this method must return in a timely manner, that is, it should perform only minimal
     initialization that is guaranteed to complete quickly. The call to search() is made
     by an arbitrary thread.
@@ -198,7 +196,7 @@ public:
     /**
     \brief Called by the scopes run time when a scope needs to respond to a result activation request.
 
-    This method must return an instance that is derived from ActivationQueryBase. The implementation
+    This method must return an instance that is derived from `ActivationQueryBase`. The implementation
     of this method must return in a timely manner, that is, it should perform only minimal
     initialization that is guaranteed to complete quickly. The call to activate() is made
     by an arbitrary thread.
@@ -207,13 +205,13 @@ public:
     \param result The result that should be activated.
     \param metadata additional data sent by the client.
     \return The activation instance.
-     */
+    */
     virtual ActivationQueryBase::UPtr activate(Result const& result, ActionMetadata const& metadata);
 
     /**
     \brief Invoked when a scope is requested to handle a preview action.
 
-    This method must return an instance that is derived from ActivationQueryBase. The implementation
+    This method must return an instance that is derived from `ActivationQueryBase`. The implementation
     of this method must return in a timely manner, that is, it should perform only minimal
     initialization that is guaranteed to complete quickly. The call to activate() is made
     by an arbitrary thread.
@@ -224,20 +222,23 @@ public:
     \param widget_id The identifier of the 'actions' widget of the activated action.
     \param action_id The identifier of the action that was activated.
     \return The activation instance.
-     */
-    virtual ActivationQueryBase::UPtr perform_action(Result const& result, ActionMetadata const& metadata, std::string const& widget_id, std::string const& action_id);
+    */
+    virtual ActivationQueryBase::UPtr perform_action(Result const& result,
+                                                     ActionMetadata const& metadata,
+                                                     std::string const& widget_id,
+                                                     std::string const& action_id);
 
     /**
     \brief Invoked when a scope is requested to create a preview for a particular result.
 
-    This method must return an instance that is derived from PreviewQueryBase. The implementation
+    This method must return an instance that is derived from `PreviewQueryBase`. The implementation
     of this method must return in a timely manner, that is, it should perform only minimal
     initialization that is guaranteed to complete quickly. The call to activate() is made
     by an arbitrary thread.
     \param result The result that should be previewed.
     \param metadata Additional data sent by the client.
     \return The preview instance.
-     */
+    */
     virtual PreviewQueryBase::UPtr preview(Result const& result, ActionMetadata const& metadata) = 0;
 
     /**
@@ -245,9 +246,99 @@ public:
     */
     static void runtime_version(int& v_major, int& v_minor, int& v_micro) noexcept;
 
+    /**
+    \brief Returns the directory that stores the scope's configuration files and shared library.
+
+    \note The scope directory is available only after this ScopeBase is instantiated; do not
+    call this method from the constructor!
+
+    \return The scope's configuration directory.
+    \throws LogicException if called from the constructor of this instance.
+    */
+    virtual std::string scope_directory() const final;
+
+    /**
+    \brief Returns a directory that is (exclusively) writable for the scope.
+
+    This directory allows scopes to store persistent information, such
+    as cached content or similar.
+
+    \note The cache directory is available only after this ScopeBase is instantiated; do not
+    call this method from the constructor!
+
+    \return The root directory of a filesystem sub-tree that is writable for the scope.
+    \throws LogicException if called from the constructor of this instance.
+    */
+    virtual std::string cache_directory() const final;
+
+    /**
+    \brief Returns a directory that is shared with an app in the same click package.
+
+    If a scope and an app share a single click package, this directory and the
+    files in it are writable by the app, and read-only to the scope. This allows
+    the app to write information into the filesystem that can be read by the scope
+    (but not vice versa).
+
+    \note The app directory is available only after this ScopeBase is instantiated; do not
+    call this method from the constructor!
+
+    \return The root directory of a filesystem sub-tree that the scope shares with
+    an application installed from the same click-package.
+    \throws LogicException if called from the constructor of this instance.
+    */
+    virtual std::string app_directory() const final;
+
+    /**
+    \brief Returns a tmp directory that is (exclusively) writable for the scope.
+
+    This directory is periodically cleaned of unused files. The exact amount of time
+    may vary, but is on the order of a few hours. The directory is also cleaned
+    during reboot.
+
+    \note The tmp directory is available only after this ScopeBase is instantiated; do not
+    call this method from the constructor!
+
+    \return A directory for temporary files.
+    \throws LogicException if called from the constructor of this instance.
+    */
+    virtual std::string tmp_directory() const final;
+
+    /**
+    \brief Returns the proxy to the registry.
+
+    \note The registry proxy is available only after this ScopeBase is instantiated; do not
+    call this method from the constructor!
+
+    \return The proxy to the registry.
+    \throws LogicException if called from the constructor of this instance.
+    */
+    virtual unity::scopes::RegistryProxy registry() const final;
+
+    /**
+    \brief Returns a dictionary with the scope's current settings.
+
+    Instead of storing the return value, it is preferable to call settings()
+    each time your implementation requires a settings value. This ensures
+    that, if a user changes settings while the scope is running, the new settings
+    take effect with the next query.
+
+    \note The settings are available only after this ScopeBase is instantiated; do not
+    call this method from the constructor!
+
+    \return The scope's current settings.
+    \throws LogicException if called from the constructor of this instance.
+    */
+    virtual VariantMap settings() const final;
+
 protected:
     /// @cond
     ScopeBase();
+private:
+    std::unique_ptr<internal::ScopeBaseImpl> p;
+
+    friend class internal::RuntimeImpl;
+    friend class internal::ScopeObject;
+    friend class testing::TypedScopeFixtureHelper;
     /// @endcond
 };
 
@@ -257,12 +348,16 @@ protected:
 
 /**
 \brief The function called by the scopes run time to initialize the scope.
-It must return a pointer to an instance derived from ScopeBase. The returned
+It must return a pointer to an instance derived from `ScopeBase`. The returned
 instance need not be heap-allocated, but must remain in scope until the
 destroy function is called by the scopes run time.
 
 If this function throws an exception, the destroy function will _not_ be called. If this function returns NULL,
 the destroy function _will_ be called with NULL as its argument.
+
+\note The only purpose of the create function is to return the an instance.
+Do not do anything in the implementation that might block, and do
+not attempt to call any methods on `ScopeBase` from the constructor.
 
 \return The pointer to the ScopeBase instance.
 */
@@ -297,5 +392,3 @@ typedef decltype(&UNITY_SCOPE_DESTROY_FUNCTION) DestroyFunction;
 } // namespace scopes
 
 } // namespace unity
-
-#endif

@@ -16,10 +16,10 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_OPTIONSELECTORFILTERIMPL_H
-#define UNITY_SCOPES_INTERNAL_OPTIONSELECTORFILTERIMPL_H
+#pragma once
 
 #include <unity/scopes/internal/FilterBaseImpl.h>
+#include <unity/scopes/OptionSelectorFilter.h>
 #include <unity/scopes/FilterOption.h>
 #include <string>
 #include <list>
@@ -42,11 +42,14 @@ public:
     OptionSelectorFilterImpl(VariantMap const& var);
     std::string label() const;
     bool multi_select() const;
-    FilterOption::SCPtr add_option(std::string const& id, std::string const& label);
+    virtual FilterOption::SCPtr add_option(std::string const& id, std::string const& label);
     std::list<FilterOption::SCPtr> options() const;
+    int num_of_options() const;
     std::set<FilterOption::SCPtr> active_options(FilterState const& filter_state) const;
+    bool has_active_option(FilterState const& filter_state) const;
     void update_state(FilterState& filter_state, FilterOption::SCPtr option, bool active) const;
     static void update_state(FilterState& filter_state, std::string const& filter_id, std::string const& option_id, bool value);
+    static OptionSelectorFilter::SPtr create(VariantMap const& var);
 
 protected:
     void serialize(VariantMap& var) const override;
@@ -65,5 +68,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

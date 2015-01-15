@@ -16,9 +16,9 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_INTERNAL_QUERYMETADATAIMPL_H
-#define UNITY_INTERNAL_QUERYMETADATAIMPL_H
+#pragma once
 
+#include <unity/scopes/QueryMetadata.h>
 #include <unity/scopes/Variant.h>
 #include <string>
 
@@ -48,14 +48,26 @@ public:
     std::string locale() const;
     std::string form_factor() const;
 
-protected:
+    void set_internet_connectivity(QueryMetadata::ConnectivityStatus connectivity_status);
+    QueryMetadata::ConnectivityStatus internet_connectivity() const;
+
+    bool contains_hint(std::string const& key) const;
+    void set_hint(std::string const& key, Variant const& value);
+    VariantMap hints() const;
+    Variant& hint(std::string const& key);
+    Variant const& hint(std::string const& key) const;
+
     virtual VariantMap serialize() const = 0;
-    virtual void serialize(VariantMap &var) const = 0;
+
+protected:
+    virtual void serialize(VariantMap& var) const = 0;
     virtual std::string metadata_type() const = 0;
 
 private:
     std::string locale_;
     std::string form_factor_;
+    VariantMap hints_;
+    QueryMetadata::ConnectivityStatus internet_connectivity_;
 };
 
 } // namespace internal
@@ -63,5 +75,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

@@ -18,8 +18,14 @@
 
 #include "FindFiles.h"
 
+#include <unity/scopes/internal/safe_strerror.h>
 #include <unity/UnityExceptions.h>
 #include <unity/util/ResourcePtr.h>
+
+#include <boost/algorithm/string.hpp>
+#include <boost/filesystem/path.hpp>
+
+#include <map>
 
 #include <dirent.h>
 #include <string.h>
@@ -27,35 +33,22 @@
 
 using namespace std;
 using namespace unity;
+using namespace boost;
 
 namespace scoperegistry
 {
 
-namespace
-{
-
-bool has_suffix(string const& s, string const& suffix)
-{
-    auto s_len = s.length();
-    auto suffix_len = suffix.length();
-    if (s_len >= suffix_len)
-    {
-        return s.compare(s_len - suffix_len, suffix_len, suffix) == 0;
-    }
-    return false;
-}
-
 // Return all paths underneath the given dir that are of the given type
 // or are a symbolic link.
-
-enum EntryType { File, Directory };
 
 vector<string> find_entries(string const& install_dir, EntryType type)
 {
     DIR* d = opendir(install_dir.c_str());
     if (d == NULL)
     {
-        throw ResourceException("cannot open scope installation directory \"" + install_dir + "\": " + strerror(errno));
+        throw FileException("cannot open scope installation directory \"" + install_dir + "\": "
+                                + scopes::internal::safe_strerror(errno),
+                            errno);
     }
     util::ResourcePtr<DIR*, decltype(&closedir)> dir_ptr(d, closedir);  // Clean up automatically
 
@@ -89,46 +82,68 @@ vector<string> find_entries(string const& install_dir, EntryType type)
     return entries;
 }
 
-} // namespace
-
-// Return all files of the form dir/<somescope>/<scomescope>.ini that are regular files or
-// symbolic links and have the specified suffix.
+// Return all files of the form dir/<somescope>.ini (but not <somescope>-setttings.ini)
+// that are regular files or symbolic links and have the specified suffix.
 // The empty suffix is legal and causes all regular files and symlinks to be returned.
 
-vector<string> find_scope_config_files(string const& install_dir, string const& suffix)
+map<string, string> find_scope_dir_configs(string const& scope_dir, string const& suffix)
 {
-    vector<string> files;
+    map<string, string> files;
 
-    auto subdirs = find_entries(install_dir, Directory);
-    for (auto subdir : subdirs)
+    auto paths = find_entries(scope_dir, File);
+    for (auto path : paths)
     {
-        string scope_name = basename(const_cast<char*>(subdir.c_str()));    // basename() modifies its argument
-        auto candidates = find_entries(subdir, File);
-        for (auto c : candidates)
+        filesystem::path fs_path(path);
+        if (fs_path.extension() != suffix)
         {
-            string config_name = basename(const_cast<char*>(c.c_str()));    // basename() modifies its argument
-            if (config_name == scope_name + suffix)
-            {
-                files.emplace_back(c);
-            }
+            continue;
         }
+        if (boost::ends_with(path, "-settings.ini"))
+        {
+            continue;
+        }
+        auto scope_id = fs_path.stem().native();
+        files.insert(make_pair(scope_id, path));
     }
 
     return files;
 }
 
-// Return all files with the given suffix in dir.
+// Return all files of the form dir/*/<somescope>.ini (but not <somescope>-settings.ini)
+// that are regular files or symbolic links and have the specified suffix.
+// The empty suffix is legal and causes all regular files and symlinks to be returned.
+// Print error message for any scopes with an id that was seen previously.
 
-vector<string> find_files(string const& dir, string const& suffix)
+map<string, string> find_install_dir_configs(string const& install_dir,
+                                             string const& suffix,
+                                             std::function<void(string const&)> error)
 {
-    vector<string> files;
+    map<string, string> files;
+    map<string, string> scopes_seen;
 
-    auto candidates = find_entries(dir, File);
-    for (auto c : candidates)
+    auto scope_dirs = find_entries(install_dir, Directory);
+    for (auto scope_dir : scope_dirs)
     {
-        if (has_suffix(c, suffix))
+        try
         {
-            files.emplace_back(c);
+            auto configs = find_scope_dir_configs(scope_dir, suffix);
+            for (auto config : configs)
+            {
+                auto const it = scopes_seen.find(config.first);
+                if (it != scopes_seen.end())
+                {
+                    error("ignoring second instance of non-unique scope: " + config.second + "\n"
+                            "previous instance: " + it->second);
+                    continue;
+                }
+                scopes_seen[config.first] = config.second;
+                files.insert(config);
+            }
+        }
+        catch (FileException const& e)
+        {
+            error(e.what());
+            error("could not open scope directory: " + scope_dir);
         }
     }
 

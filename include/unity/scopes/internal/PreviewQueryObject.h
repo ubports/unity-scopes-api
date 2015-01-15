@@ -16,8 +16,7 @@
  * Authored by: Michal Hruby <michal.hruby@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_PREVIEWQUERYOBJECT_H
-#define UNITY_SCOPES_INTERNAL_PREVIEWQUERYOBJECT_H
+#pragma once
 
 #include <unity/scopes/internal/QueryObject.h>
 #include <unity/scopes/PreviewQueryBase.h>
@@ -38,7 +37,10 @@ class PreviewQueryObject final : public QueryObject
 public:
     UNITY_DEFINES_PTRS(PreviewQueryObject);
 
-    PreviewQueryObject(std::shared_ptr<PreviewQueryBase> const& preview_base, MWReplyProxy const& reply, MWQueryCtrlProxy const& ctrl);
+    PreviewQueryObject(std::shared_ptr<PreviewQueryBase> const& preview_base,
+                       MWReplyProxy const& reply,
+                       MWQueryCtrlProxy const& ctrl,
+                       boost::log::sources::severity_channel_logger_mt<>& logger);
     virtual ~PreviewQueryObject();
     void run(MWReplyProxy const& reply, InvokeInfo const& info) noexcept override;
 
@@ -51,5 +53,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

@@ -16,9 +16,9 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_ACTIONMETADATA_H
-#define UNITY_SCOPES_ACTIONMETADATA_H
+#pragma once
 
+#include <unity/scopes/QueryMetadata.h>
 #include <unity/scopes/Variant.h>
 #include <unity/util/DefinesPtrs.h>
 
@@ -38,7 +38,7 @@ class ActionMetadataImpl;
 \see unity::scopes::ScopeBase::preview, unity::scopes::ScopeBase::activate, unity::scopes::ScopeBase::perform_action
 */
 
-class ActionMetadata final
+class ActionMetadata : public QueryMetadata
 {
 public:
     /// @cond
@@ -48,23 +48,11 @@ public:
     /// @endcond
 
     /**
-    \brief Create ActionMetadata with given locale and form factor
+    \brief Create ActionMetadata with the given locale and form factor.
     \param locale locale string, eg. en_EN
     \param form_factor form factor name, e.g. phone, desktop, phone-version etc.
     */
     ActionMetadata(std::string const& locale, std::string const& form_factor);
-
-    /**
-    \brief Get the locale string.
-    \return The locale string
-    */
-    std::string locale() const;
-
-    /**
-    \brief Get the form factor string.
-    \return The form factor string
-    */
-    std::string form_factor() const;
 
     /**
      \brief Attach arbitrary data to this ActionMetadata.
@@ -85,23 +73,60 @@ public:
     ActionMetadata(ActionMetadata const& other);
     ActionMetadata(ActionMetadata&&);
 
-    ActionMetadata& operator=(ActionMetadata const &other);
+    ActionMetadata& operator=(ActionMetadata const& other);
     ActionMetadata& operator=(ActionMetadata&&);
     //@}
 
-    /// @cond
-    VariantMap serialize() const;
-    /// @endcond
+    /**
+    \brief Sets a hint.
+
+    \param key The name of the hint.
+    \param value Hint value
+    */
+    void set_hint(std::string const& key, Variant const& value);
+
+    /**
+    \brief Get all hints.
+
+    \return Hints dictionary.
+    \throws unity::NotFoundException if no hints are available.
+    */
+    VariantMap hints() const;
+
+    /**
+    \brief Check if this SearchMetadata has a hint.
+    \param key The hint name.
+    \return True if the hint is set.
+    */
+    bool contains_hint(std::string const& key) const;
+
+    /**
+    \brief Returns a reference to a hint.
+
+    This method can be used to read or set hints. Setting a value of an existing hint overwrites
+    its previous value.
+    Referencing a non-existing hint automatically creates it with a default value of Variant::Type::Null.
+    \param key The name of the hint.
+    \return A reference to the hint.
+    */
+    Variant& operator[](std::string const& key);
+
+    /**
+    \brief Returns a const reference to a hint.
+
+    This method can be used for read-only access to hints.
+    Referencing a non-existing hint throws unity::InvalidArgumentException.
+    \param key The name of the hint.
+    \return A const reference to the hint.
+    \throws unity::NotFoundException if no hint with the given name exists.
+    */
+    Variant const& operator[](std::string const& key) const;
 
 private:
-    std::unique_ptr<internal::ActionMetadataImpl> p;
-
-    ActionMetadata(internal::ActionMetadataImpl *impl);
+    ActionMetadata(internal::ActionMetadataImpl* impl);
     friend class internal::ActionMetadataImpl;
 };
 
 } // namespace scopes
 
 } // namespace unity
-
-#endif

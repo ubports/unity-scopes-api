@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_MWQUERYCTRL_H
-#define UNITY_SCOPES_INTERNAL_MWQUERYCTRL_H
+#pragma once
 
 #include <unity/scopes/internal/MWObjectProxy.h>
 #include <unity/scopes/internal/MWQueryCtrlProxyFwd.h>
@@ -48,5 +47,3 @@ protected:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

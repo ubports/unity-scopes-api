@@ -25,10 +25,11 @@ See the stand-alone directory for details.
 
 To send a query to a scope, run
 
-$ ./client <scope-letter> <query-string>
+$ ./scopes-client <scope-id> <query-string>
 
 For example:
 
-$ ./client B testquery
+$ ./scopes-client scope-B testquery
 
-TODO: The client currently looks for Runtime.ini in the current directory, so you need to run it from here.
+The client currently looks for Runtime.ini in the current directory and if not present, uses the system-wide Runtime.ini
+shipped with libunity-scopes (/usr/lib/<arch>/unity-scopes/Runtime.ini by default)

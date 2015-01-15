@@ -107,11 +107,19 @@ void ResultImpl::set_runtime(RuntimeImpl const* runtime)
 
 void ResultImpl::set_origin(std::string const& scope_id)
 {
+    if (scope_id.empty())
+    {
+        throw InvalidArgumentException("Result::set_origin(): Invalid empty scope_id string");
+    }
     origin_ = scope_id;
 }
 
 void ResultImpl::set_uri(std::string const& uri)
 {
+    if (uri.empty())
+    {
+        throw InvalidArgumentException("Result::set_uri(): Invalid empty uri string");
+    }
     attrs_["uri"] = uri;
 }
 
@@ -134,7 +142,7 @@ void ResultImpl::set_intercept_activation()
 {
     flags_ |= Flags::InterceptActivation;
 
-    // clear the origin scope name, ReplyObject with set it anew with correct scope name (i.e. this scope);
+    // clear the origin scope ID, ReplyObject with set it anew with correct scope ID (i.e. this scope);
     // this is needed to support the case where aggregator scope just passes the original result
     // upstream - in that case we want the original scope to receive activation.
     origin_.clear();
@@ -278,12 +286,23 @@ int ResultImpl::flags() const
 
 Variant& ResultImpl::operator[](std::string const& key)
 {
+    if (key.empty())
+    {
+        throw InvalidArgumentException("Result::operator[]: Invalid empty key string");
+    }
     return attrs_[key];
 }
 
 Variant const& ResultImpl::operator[](std::string const& key) const
 {
-    return value(key);
+    try
+    {
+        return value(key);
+    }
+    catch (...)
+    {
+        throw ResourceException("Result::operator[]: Cannot locate value for key");
+    }
 }
 
 std::string ResultImpl::uri() const noexcept
@@ -333,11 +352,19 @@ std::string ResultImpl::origin() const noexcept
 
 bool ResultImpl::contains(std::string const& key) const
 {
+    if (key.empty())
+    {
+        throw InvalidArgumentException("Result::contains(): Invalid empty key string");
+    }
     return attrs_.find(key) != attrs_.end();
 }
 
 Variant const& ResultImpl::value(std::string const& key) const
 {
+    if (key.empty())
+    {
+        throw InvalidArgumentException("Result::value(): invalid empty key string");
+    }
     auto const& it = attrs_.find(key);
     if (it != attrs_.end())
     {

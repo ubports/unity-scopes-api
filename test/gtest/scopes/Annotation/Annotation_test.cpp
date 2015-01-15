@@ -24,6 +24,7 @@
 #include <unity/UnityExceptions.h>
 
 using namespace unity::scopes;
+using namespace unity::scopes::experimental;
 using namespace unity::scopes::internal;
 
 TEST(Annotation, link)
@@ -72,9 +73,8 @@ TEST(Annotation, link_exceptions)
         annotation.add_link("Link1", query);
         EXPECT_THROW(annotation.add_link("Link2", query), unity::InvalidArgumentException); // only one link allowed
         EXPECT_EQ(1u, annotation.links().size());
-        EXPECT_NO_THROW(annotation.set_label("label"));
-        // no design case for link with a label (makes sense for a group only), but we shouldn't throw
-        EXPECT_NO_THROW(annotation.label());
+        EXPECT_THROW(annotation.set_label("label"), unity::LogicException);
+        EXPECT_THROW(annotation.label(), unity::LogicException);
     }
 }
 
@@ -114,9 +114,8 @@ TEST(Annotation, groupedLink_exceptions)
         annotation.set_label("Group");
         annotation.add_link("Link1", query1);
         annotation.add_link("Link2", query2);
-        // no design case for link group with an icon, but we shouldn't throw
-        EXPECT_NO_THROW(annotation.set_icon("icon"));
-        EXPECT_NO_THROW(annotation.icon());
+        EXPECT_THROW(annotation.set_icon("icon"), unity::LogicException);
+        EXPECT_THROW(annotation.icon(), unity::LogicException);
     }
 }
 
@@ -154,7 +153,6 @@ TEST(Annotation, deserialize)
     }
     {
         Annotation annotation(Annotation::Type::Link);
-        annotation.set_icon("Icon");
         annotation.add_link("Link1", query);
         auto var = annotation.serialize();
         AnnotationImpl impl(var);
@@ -217,7 +215,6 @@ TEST(Annotation, deserialize_exceptions)
         {
             VariantMap var;
             var["type"] = "card";
-            var["icon"] = "Icon";
             var["cat_id"] = "unknowncat";
             try
             {

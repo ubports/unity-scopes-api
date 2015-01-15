@@ -21,7 +21,7 @@
 #include <unity/scopes/ActivationQueryBase.h>
 #include <unity/scopes/internal/MWReply.h>
 #include <unity/scopes/internal/MWQueryCtrl.h>
-#include <iostream>
+
 #include <cassert>
 
 using namespace std;
@@ -36,9 +36,12 @@ namespace scopes
 namespace internal
 {
 
-ActivationQueryObject::ActivationQueryObject(std::shared_ptr<ActivationQueryBase> const& act_base, MWReplyProxy const& reply, MWQueryCtrlProxy const& ctrl)
-    : QueryObject(act_base, reply, ctrl),
-    act_base_(act_base)
+ActivationQueryObject::ActivationQueryObject(std::shared_ptr<ActivationQueryBase> const& act_base,
+                                             MWReplyProxy const& reply,
+                                             MWQueryCtrlProxy const& ctrl,
+                                             boost::log::sources::severity_channel_logger_mt<>& logger)
+    : QueryObject(act_base, reply, ctrl, logger)
+    , act_base_(act_base)
 {
 }
 
@@ -63,19 +66,17 @@ void ActivationQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& /* 
         // and just push it ourseleves
         auto res = act_base_->activate();
         reply->push(res.serialize());
-        reply_->finished(ListenerBase::Finished, "");
+        reply_->finished(CompletionDetails(CompletionDetails::OK));  // Oneway, can't block
     }
     catch (std::exception const& e)
     {
-        // TODO: log error
-        reply_->finished(ListenerBase::Error, e.what());     // Oneway, can't block
-        cerr << "ActivationQueryObject::run(): " << e.what() << endl;
+        BOOST_LOG_SEV(logger_, Logger::Error) << "ActivationQueryObject::run(): " << e.what();
+        reply_->finished(CompletionDetails(CompletionDetails::Error, e.what()));  // Oneway, can't block
     }
     catch (...)
     {
-        // TODO: log error
-        reply_->finished(ListenerBase::Error, "unknown exception");     // Oneway, can't block
-        cerr << "ActivationQueryObject::run(): unknown exception" << endl;
+        BOOST_LOG_SEV(logger_, Logger::Error) << "ActivationQueryObject::run(): unknown exception";
+        reply_->finished(CompletionDetails(CompletionDetails::Error, "unknown exception"));  // Oneway, can't block
     }
 }
 

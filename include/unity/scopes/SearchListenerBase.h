@@ -16,16 +16,16 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_SEARCHLISTENERBASE_H
-#define UNITY_SCOPES_SEARCHLISTENERBASE_H
+#pragma once
 
+#include <unity/scopes/Annotation.h>
+#include <unity/scopes/CategorisedResult.h>
+#include <unity/scopes/Category.h>
+#include <unity/scopes/Department.h>
+#include <unity/scopes/FilterBase.h>
 #include <unity/scopes/ListenerBase.h>
 #include <unity/util/DefinesPtrs.h>
 #include <unity/util/NonCopyable.h>
-#include <unity/scopes/Category.h>
-#include <unity/scopes/Annotation.h>
-#include <unity/scopes/Department.h>
-#include <unity/scopes/FilterBase.h>
 
 #include <string>
 
@@ -35,19 +35,22 @@ namespace unity
 namespace scopes
 {
 
-class CategorisedResult;
-class FilterState;
+namespace experimental
+{
+class Annotation;
+}
 
 /**
-\brief Abstract base interface that a scope specializes to
-receive the results of a query.
+\brief Abstract base interface for a client to receive the results of a query.
 
-An instance of this interface must be passed to Scope::create_query().
-Results for the query are delivered to the instance by the scopes run
+An instance of this interface must be passed to Scope::search().
+Results for the query are delivered to the client by the scopes run
 time by invoking the appropriate push method.
 
-If a scope throw an exception from one of the push() methods, the scopes
-run time calls ListenerBase::finished() with an 'Error' reason.
+If the implementation of a push method throws an exception, the scopes
+run time calls ListenerBase::finished() with an 'Error' status.
+
+\see ListenerBase
 */
 
 class SearchListenerBase : public ListenerBase
@@ -61,11 +64,11 @@ public:
     /// @endcond
 
     /**
-    \brief Called at most once by the scopes run time for a list of departments returned by a query.
+    \brief Called at most once by the scopes run time for a tree of departments returned by a query.
 
     The default implementation does nothing.
     */
-    virtual void push(DepartmentList const& departments, std::string const& current_department_id);
+    virtual void push(Department::SCPtr const& parent);
 
     /**
     \brief Called once by the scopes run time for each result that is returned by a query().
@@ -77,16 +80,18 @@ public:
 
     The default implementation does nothing.
     */
-    virtual void push(Annotation annotation);
+    virtual void push(experimental::Annotation annotation);
 
     /**
     \brief Called once by the scopes run time for each category that is returned by a query().
 
-    The default implementation does nothing. Receipt of categories may be interleaved with
+    Receipt of categories may be interleaved with
     the receipt of results, that is, there is no guarantee that the complete set of categories
     will be provided before the first query result.
+
+    The default implementation does nothing.
     */
-    virtual void push(Category::SCPtr category);
+    virtual void push(Category::SCPtr const& category);
 
     /**
     \brief Called once by the scopes to send all the filters and their state.
@@ -104,5 +109,3 @@ protected:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

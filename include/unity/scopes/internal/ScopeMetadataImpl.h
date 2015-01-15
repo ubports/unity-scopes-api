@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_SCOPEMETADATAIMPL_H
-#define UNITY_SCOPES_INTERNAL_SCOPEMETADATAIMPL_H
+#pragma once
 
 #include <unity/scopes/internal/MWScope.h>
 #include <unity/scopes/ScopeMetadata.h>
@@ -45,14 +44,23 @@ public:
 
     std::string scope_id() const;
     ScopeProxy proxy() const;
-    std::string display_name() const;   // localized
-    std::string description() const;    // localized
-    std::string author() const;
-    std::string art() const;            // optional
-    std::string icon() const;           // optional
-    std::string search_hint() const;    // localized, optional
-    std::string hot_key() const;        // localized, optional
-    bool invisible() const;             // optional (default = false)
+    std::string display_name() const;                            // mandatory, localized
+    std::string description() const;                             // mandatory, localized
+    std::string author() const;                                  // mandatory
+    std::string art() const;                                     // optional
+    std::string icon() const;                                    // optional
+    std::string search_hint() const;                             // optional, localized
+    std::string hot_key() const;                                 // optional
+    bool invisible() const;                                      // optional (default: false)
+    VariantMap appearance_attributes() const;                    // optional (default: empty map)
+    std::string scope_directory() const;                         // optional
+    ScopeMetadata::ResultsTtlType results_ttl_type() const;      // optional (default: none)
+    VariantArray settings_definitions() const;                   // optional (default: empty array)
+    bool location_data_needed() const;                           // optional (default: false)
+    std::vector<std::string> child_scope_ids() const;            // optional (default: empty array)
+    int version() const;                                         // optional (default: 0)
+    std::vector<std::string> keywords() const;                   // optional (default: empty array)
+    bool is_aggregator() const;                                  // optional (default: false)
 
     void set_scope_id(std::string const& scope_id);
     void set_proxy(ScopeProxy const& proxy);
@@ -64,6 +72,15 @@ public:
     void set_search_hint(std::string const& search_hint);
     void set_hot_key(std::string const& hot_key);
     void set_invisible(bool invisible);
+    void set_appearance_attributes(VariantMap const& appearance_attributes);
+    void set_scope_directory(std::string const& path);
+    void set_results_ttl_type(ScopeMetadata::ResultsTtlType results_ttl);
+    void set_settings_definitions(VariantArray const& settings_definitions);
+    void set_location_data_needed(bool location_data_needed);
+    void set_child_scope_ids(std::vector<std::string> const& ids);
+    void set_version(int v);
+    void set_keywords(std::vector<std::string> const& keywords);
+    void set_is_aggregator(bool is_aggregator);
 
     VariantMap serialize() const;
     void deserialize(VariantMap const& var);
@@ -78,11 +95,20 @@ private:
     std::string display_name_;
     std::string description_;
     std::string author_;
-    std::unique_ptr<std::string> art_;          // Optional, hence a pointer
-    std::unique_ptr<std::string> icon_;         // Optional, hence a pointer
-    std::unique_ptr<std::string> search_hint_;  // Optional, hence a pointer
-    std::unique_ptr<std::string> hot_key_;      // Optional, hence a pointer
-    std::unique_ptr<bool> invisible_;           // Optional, hence a pointer
+    std::unique_ptr<std::string> art_;                    // Optional, hence a pointer
+    std::unique_ptr<std::string> icon_;                   // Optional, hence a pointer
+    std::unique_ptr<std::string> search_hint_;            // Optional, hence a pointer
+    std::unique_ptr<std::string> hot_key_;                // Optional, hence a pointer
+    std::unique_ptr<bool> invisible_;                     // Optional, hence a pointer
+    std::unique_ptr<std::string> scope_directory_;        // Optional, hence a pointer
+    VariantMap appearance_attributes_;
+    ScopeMetadata::ResultsTtlType results_ttl_type_;
+    std::unique_ptr<VariantArray> settings_definitions_;  // Optional, hence a pointer
+    std::unique_ptr<bool> location_data_needed_;          // Optional, hence a pointer
+    std::vector<std::string> child_scope_ids_;
+    int version_;
+    std::vector<std::string> keywords_;
+    std::unique_ptr<bool> is_aggregator_;                 // Optional, hence a pointer
 };
 
 } // namespace internal
@@ -90,6 +116,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-
-#endif

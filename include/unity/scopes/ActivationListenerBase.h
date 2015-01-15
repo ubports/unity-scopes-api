@@ -16,8 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_ACTIVATIONLISTENERBASE_H
-#define UNITY_SCOPES_ACTIVATIONLISTENERBASE_H
+#pragma once
 
 #include <unity/scopes/ListenerBase.h>
 #include <unity/util/NonCopyable.h>
@@ -52,18 +51,15 @@ public:
     virtual void activated(ActivationResponse const& response);
 
     /**
-    \brief Called once by the scopes run time after receiving an activation response.
-
-    Default implementation does nothing.
+    \brief Called once by the scopes run time after the final result for a request was sent.
 
     Calls to finished() are made by an arbitrary thread.
 
     Exceptions thrown from finished() are ignored.
-    \param r Indicates the cause for the call to finished().
-    \param error_message If r is set to Reason::Error, error_message contains further details.
-           Otherwise, error_message is the empty string.
+    \param details Contains details about the completion status of a query as well as any additional
+    information regarding the operation of the request.
     */
-    virtual void finished(Reason r, std::string const& error_message) override;
+    virtual void finished(CompletionDetails const& details) override;
 
 protected:
     /// @cond
@@ -74,5 +70,3 @@ protected:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

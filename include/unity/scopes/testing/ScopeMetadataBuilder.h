@@ -16,8 +16,7 @@
  * Authored by: Thomas Voß <thomas.voss@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_TESTING_SCOPEMETADATA_BUILDER_H
-#define UNITY_SCOPES_TESTING_SCOPEMETADATA_BUILDER_H
+#pragma once
 
 #include <unity/scopes/ScopeMetadata.h>
 
@@ -85,11 +84,21 @@ public:
     ScopeMetadataBuilder& proxy(ScopeProxy const& value);
     ScopeMetadataBuilder& display_name(std::string const& value);
     ScopeMetadataBuilder& description(std::string const& value);
+    ScopeMetadataBuilder& author(std::string const& value);
     ScopeMetadataBuilder& art(Optional<std::string> const& value);
     ScopeMetadataBuilder& icon(Optional<std::string> const& value);
     ScopeMetadataBuilder& search_hint(Optional<std::string> const& value);
     ScopeMetadataBuilder& hot_key(Optional<std::string> const& value);
-    ScopeMetadataBuilder& invisible(Optional<bool> value);
+    ScopeMetadataBuilder& invisible(Optional<bool> const& value);
+    ScopeMetadataBuilder& appearance_attributes(Optional<VariantMap> const& value);
+    ScopeMetadataBuilder& scope_directory(Optional<std::string> const& value);
+    ScopeMetadataBuilder& results_ttl_type(Optional<ScopeMetadata::ResultsTtlType> const& value);
+    ScopeMetadataBuilder& settings_definitions(Optional<VariantArray> const& value);
+    ScopeMetadataBuilder& location_data_needed(Optional<bool> const& value);
+    ScopeMetadataBuilder& child_scope_ids(Optional<std::vector<std::string>> const& value);
+    ScopeMetadataBuilder& version(Optional<int> const& value);
+    ScopeMetadataBuilder& keywords(Optional<std::vector<std::string>> const& value);
+    ScopeMetadataBuilder& is_aggregator(Optional<bool> const& value);
 
     ScopeMetadata operator()() const;
 
@@ -105,6 +114,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-
-#endif

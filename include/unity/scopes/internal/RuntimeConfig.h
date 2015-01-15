@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_RUNTIMECONFIG_H
-#define UNITY_SCOPES_INTERNAL_RUNTIMECONFIG_H
+#pragma once
 
 #include <unity/scopes/internal/ConfigBase.h>
 #include <unity/scopes/Runtime.h>
@@ -34,21 +33,36 @@ namespace internal
 class RuntimeConfig : public ConfigBase
 {
 public:
-    static const char* RUNTIME_CONFIG_GROUP;
-
     RuntimeConfig(std::string const& configfile);
     ~RuntimeConfig();
 
     std::string registry_identity() const;
     std::string registry_configfile() const;
+    std::string ss_registry_identity() const;
+    std::string ss_configfile() const;
     std::string default_middleware() const;
     std::string default_middleware_configfile() const;
+    int reap_expiry() const;
+    int reap_interval() const;
+    std::string cache_directory() const;
+    std::string app_directory() const;
+    std::string config_directory() const;
+    static std::string default_cache_directory();
+    static std::string default_app_directory();
+    static std::string default_config_directory();
 
 private:
     std::string registry_identity_;
     std::string registry_configfile_;
+    std::string ss_registry_identity_;
+    std::string ss_configfile_;
     std::string default_middleware_;
     std::string default_middleware_configfile_;
+    int reap_expiry_;
+    int reap_interval_;
+    std::string cache_directory_;
+    std::string app_directory_;
+    std::string config_directory_;
 };
 
 } // namespace internal
@@ -56,5 +70,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

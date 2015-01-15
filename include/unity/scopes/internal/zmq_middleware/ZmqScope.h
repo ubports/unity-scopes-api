@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQSCOPE_H
-#define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQSCOPE_H
+#pragma once
 
 #include <unity/scopes/internal/zmq_middleware/ZmqObjectProxy.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqScopeProxyFwd.h>
@@ -62,6 +61,13 @@ public:
     virtual QueryCtrlProxy preview(VariantMap const& result,
                                    VariantMap const& hints,
                                    MWReplyProxy const& reply) override;
+
+    virtual bool debug_mode() override;
+
+private:
+    ZmqObjectProxy::TwowayOutParams invoke_scope_(capnp::MessageBuilder& in_params);
+    std::mutex debug_mode_mutex_;
+    std::unique_ptr<bool> debug_mode_;
 };
 
 } // namespace zmq_middleware
@@ -71,5 +77,3 @@ public:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

@@ -5,8 +5,12 @@
 #export DH_VERBOSE=1
 export DPKG_GENSYMBOLS_CHECK_LEVEL=4
 
+# We require a specific gcc version to avoid ABI breakage.
+export CC=$(DEB_HOST_GNU_TYPE)-gcc-4.9
+export CXX=$(DEB_HOST_GNU_TYPE)-g++-4.9
+
 %:
-	dh $@ --parallel --fail-missing
+	dh $@ --parallel --fail-missing --with click
 
 override_dh_auto_configure:
 	dh_auto_configure -- -DLIBDIR=/usr/lib/$(DEB_HOST_MULTIARCH)
@@ -14,3 +18,6 @@ override_dh_auto_configure:
 # Tests are not written to be run in parallel.
 override_dh_auto_test:
 	dh_auto_test --max-parallel=1 -- ARGS="--verbose"
+
+override_dh_click:
+	dh_click --name scope

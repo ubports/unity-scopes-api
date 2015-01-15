@@ -1,3 +1,492 @@
+unity-scopes-api (0.6.10+15.04.20141212-0ubuntu1) vivid; urgency=low
+
+  [ Pawel Stolowski ]
+  * Use get() on future of the http request to get exceptions reported
+    when error occur (std::future::wait() doesn't throw). (LP: #1401560)
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Fri, 12 Dec 2014 11:48:25 +0000
+
+unity-scopes-api (0.6.10+15.04.20141211-0ubuntu1) vivid; urgency=low
+
+  [ Pawel Stolowski ]
+  * Use 'partner' in UserAgent instead of partner_id for consistency
+    with shell plugin
+
+  [ Michi Henning ]
+  * Replace old references to Ice with zmq.
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Thu, 11 Dec 2014 11:37:01 +0000
+
+unity-scopes-api (0.6.10+15.04.20141210.2-0ubuntu1) vivid; urgency=medium
+
+  [ Marcus Tomlinson ]
+  * Renamed "Tags" scope .ini option to "Keywords".
+  * Added support for IsAggregator scope .ini option.
+
+  [ Pawel Stolowski ]
+  * Pass partner-id via UserAgent with remote-scopes call (LP: #1389273).
+  * Implemented BufferedResultForwarder API.
+  * Allow multi-arch click packages for scopes (LP: #1398998).
+  * Use SIGNON_POLICY_NO_USER_INTERACTION by default unless UNITY_SCOPES_OA_UI_POLICY
+    is set (LP: #1380914).
+
+  [ Ubuntu daily release ]
+  * debian/libunity-scopes3.symbols: auto-update to released version
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Wed, 10 Dec 2014 12:59:48 +0000
+
+unity-scopes-api (0.6.9+15.04.20141129-0ubuntu1) vivid; urgency=medium
+
+  [ Pawel Stolowski ]
+  * Added support for ChildScopes scope .ini option.
+
+  [ Michi Henning ]
+  * Added app_directory() method to ScopeBase.
+  * Added support for Version attribute in scope.ini file, and added
+    version() accessor to ScopeMetadata.
+  * Added missing methods for settings_definitions(), location_data_needed(),
+    and child_scope_ids() to testing::ScopeMetadataBuilder.
+
+  [ Marcus Tomlinson ]
+  * Added support for Tags scope .ini option.
+
+  [ Ubuntu daily release ]
+  * debian/libunity-scopes3.symbols: auto-update to released version
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Sat, 29 Nov 2014 09:50:16 +0000
+
+unity-scopes-api (0.6.8+15.04.20141119-0ubuntu1) vivid; urgency=medium
+
+  [ Marcus Tomlinson ]
+  * Replaced dbus-send with "list updated" pub/sub to invalidate smart scopes.
+
+  [ Ubuntu daily release ]
+  * debian/libunity-scopes3.symbols: auto-update to released version
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Wed, 19 Nov 2014 08:16:38 +0000
+
+unity-scopes-api (0.6.7+14.10.20141014-0ubuntu1) 14.09; urgency=low
+
+  [ Marcus Tomlinson ]
+  * Merge staging ( (LP: #1380588)
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Tue, 14 Oct 2014 12:06:24 +0000
+
+unity-scopes-api (0.6.7+14.10.20141010.1-0ubuntu1) utopic; urgency=medium
+
+  [ Marcus Tomlinson ]
+  * OnlineAccountClient fixes: run the internal event loop within its own context to avoid
+    clashing with external main loop (LP: #1377147).
+  * Introduced new dependencies on dbus-test-runner and libdbustest1-dev.
+  * Fix for Zmq infinite reconnection problem (LP: #1374206)
+
+  [ Ubuntu daily release ]
+  * New rebuild forced
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Fri, 10 Oct 2014 19:24:20 +0000
+
+unity-scopes-api (0.6.6+14.10.20141006-0ubuntu1) utopic; urgency=medium
+
+  [ Pawel Stolowski ]
+  * Removed duplicates from symbols file. Symbols file now maintained
+    in sorted order. Created script to maintain file in sorted order,
+    so we should no longer see the stuff-ups in the symbols file.
+  * Added valgrind to build deps.
+  * Load-balancing message pump.
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Mon, 06 Oct 2014 12:03:20 +0000
+
+unity-scopes-api (0.6.6+14.10.20140916-0ubuntu1) utopic; urgency=medium
+
+  [ Marcus Tomlinson ]
+  * Added support for online accounts (via new OnlineAccountClient class).
+  * Introduced new dependencies on libaccounts-glib and libsignon-glib.
+
+  [ Ubuntu daily release ]
+  * debian/libunity-scopes3.symbols: auto-update to released version
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Tue, 16 Sep 2014 09:40:03 +0000
+
+unity-scopes-api (0.6.5+14.10.20140910.1-0ubuntu1) utopic; urgency=medium
+
+  [ Pawel Stolowski ]
+  * Added support for expandable widgets.
+  * Enhanced ActionMetadata with hints, similar to SearchMetadata. (LP: #1308585)
+  * Push smart scopes online results immediately as they become available. (LP: #1359177)
+
+  [ Michi Henning ]
+  * Various fixes for race conditions and test stability.
+    - This results in *safe* internal symbol changes.
+  * Updates to scope tutorial and documentation.
+
+  [ Ubuntu daily release ]
+  * debian/libunity-scopes3.symbols: auto-update to released version
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Wed, 10 Sep 2014 08:49:56 +0000
+
+unity-scopes-api (0.6.4+14.10.20140828.1-0ubuntu1) utopic; urgency=medium
+
+  [ Pawel Stolowski ]
+  * Execute SDK DBus callback on scope start and stop in debug mode.
+
+  [ Ubuntu daily release ]
+  * debian/libunity-scopes3.symbols: auto-update to released version
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Thu, 28 Aug 2014 14:01:50 +0000
+
+unity-scopes-api (0.6.3+14.10.20140826-0ubuntu1) utopic; urgency=medium
+
+  [ Pawel Stolowski ]
+  * Fix two-way invoke thread pool - fixes lp:1359582.
+  * Fix ABI break caused by introduction of explicit destructor.
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Tue, 26 Aug 2014 13:44:05 +0000
+
+unity-scopes-api (0.6.3+14.10.20140820.is.0.6.1+14.10.20140809-0ubuntu1) utopic; urgency=medium
+
+  * Do a quick emergency revert of the last landing as it is causing a
+    regression in local music search.
+
+ -- Åukasz 'sil2100' Zemczak <lukasz.zemczak@canonical.com>  Thu, 21 Aug 2014 10:16:44 +0200
+
+unity-scopes-api (0.6.3+14.10.20140820-0ubuntu1) utopic; urgency=medium
+
+  [ Pete Woods ]
+  * Move scope configuration to ~/.config/unity-scopes/
+  * New setting to enable/disable location data being fed to scopes.
+  * Switch from u1db to QSettings and drop u1db and related dependencies.
+  * There are internal symbols changes that do not break the public ABI.
+    - Apologies for the symbol sorting. The previous release caused this.
+
+  [ Marcus Tomlinson ]
+  * Add scope debug mode parameter.
+
+  [ Michi Henning ]
+  * Fix several race conditions.
+  * Make tests more robust.
+  * Fix cache directory paths for confined scopes.
+
+  [ Ubuntu daily release ]
+  * debian/libunity-scopes3.symbols: auto-update to released version
+  * New rebuild forced
+  * New rebuild forced
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Wed, 20 Aug 2014 14:25:35 +0000
+
+unity-scopes-api (0.6.1+14.10.20140809-0ubuntu1) utopic; urgency=medium
+
+  [ Marcus Tomlinson ]
+  * Clear any signal masks inherited from the parent process when forking.
+  * Allow timeout value of -1 to disable the scope idle timeout, reaper timeouts, and two-way invocation timeout.
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Sat, 09 Aug 2014 07:58:15 +0000
+
+unity-scopes-api (0.6.0+14.10.20140806-0ubuntu1) utopic; urgency=low
+
+  [ Michal Hruby ]
+  * Sync with devel.
+
+  [ Pete Woods ]
+  * Sync with devel.
+
+  [ Marcus Tomlinson ]
+  * Sync with devel.
+
+  [ thomas-voss ]
+  * Sync with devel.
+
+  [ CI bot ]
+  * Sync with devel.
+
+  [ Michi Henning ]
+  * Sync with devel.
+
+  [ Łukasz 'sil2100' Zemczak ]
+  * Sync with devel.
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Wed, 06 Aug 2014 15:49:25 +0000
+
+unity-scopes-api (0.6.0+14.10.20140804.1-0ubuntu1) utopic; urgency=medium
+
+  [ Michi Henning ]
+  * Added cache_directory() method and refactored scoperunner and RuntimeImpl.
+
+  [ Marcus Tomlinson ]
+  * Introduced QueryMetadata base for shared functionality of *Metadata classes.
+  * Added set_internet_connectivity() and internet_connectivity() to QueryMetadata.
+  * Added support for additional query reply info.
+  * Upgraded finished() callback to be more flexible and expandable.
+
+  [ Ubuntu daily release ]
+  * debian/libunity-scopes3.symbols: auto-update to released version
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Mon, 04 Aug 2014 20:27:02 +0000
+
+unity-scopes-api (0.5.3+14.10.20140728-0ubuntu1) utopic; urgency=medium
+
+  [ Pete Woods ]
+  * Add location property to SearchMetadata
+
+  [ Ubuntu daily release ]
+  * debian/libunity-scopes2.symbols: auto-update to released version
+
+  [ Marcus Tomlinson ]
+  * Fixed invoke_twoway_() to not call locate() when targeting the
+    registry or the SS registry
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Mon, 28 Jul 2014 14:05:36 +0000
+
+unity-scopes-api (0.5.2+14.10.20140723-0ubuntu1) utopic; urgency=low
+
+  [ Pete Woods ]
+  * Normalize relative paths (LP: #1340135)
+
+  [ Marcus Tomlinson ]
+  * Call locate() before every two-way request. Increased two-way
+    invocation timeouts.
+
+  [ Michi Henning ]
+  * Normalize relative paths (LP: #1340135)
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Wed, 23 Jul 2014 22:06:06 +0000
+
+unity-scopes-api (0.5.2+14.10.20140722-0ubuntu1) utopic; urgency=low
+
+  [ thomas-voss ]
+  * Force building with g++ 4.9
+
+  [ Michi Henning ]
+  * Force building with g++ 4.9
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Tue, 22 Jul 2014 09:52:30 +0000
+
+unity-scopes-api (0.5.2+14.10.20140715-0ubuntu1) utopic; urgency=low
+
+  [ Michal Hruby ]
+  * Sync with devel.
+
+  [ Pete Woods ]
+  * Sync with devel.
+
+  [ Marcus Tomlinson ]
+  * Sync with devel.
+
+  [ Tarmac ]
+  * Sync with devel.
+
+  [ CI bot ]
+  * Sync with devel.
+
+  [ Michi Henning ]
+  * Sync with devel.
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Tue, 15 Jul 2014 18:47:01 +0000
+
+unity-scopes-api (0.5.2+14.10.20140709.2-0ubuntu1) utopic; urgency=medium
+
+  [ Michal Hruby ]
+  * Added CannedQuery parameter to Category
+
+  [ Michi Henning ]
+  * Added support for scope settings.
+
+  [ Ubuntu daily release ]
+  * debian/*symbols: auto-update new symbols to released version
+  * New rebuild forced
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Wed, 09 Jul 2014 14:26:31 +0000
+
+unity-scopes-api (0.5.1+14.10.20140626-0ubuntu1) utopic; urgency=medium
+
+  [ Pawel Stolowski ]
+  * Added support for nested dictionaries in appearance attributes.
+
+  [ Ubuntu daily release ]
+  * debian/*symbols: auto-update new symbols to released version
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Thu, 26 Jun 2014 11:02:11 +0000
+
+unity-scopes-api (0.5.0+14.10.20140619-0ubuntu1) utopic; urgency=medium
+
+  [ Pawel Stolowski ]
+  * Implemented ValueSliderFilter.
+  * Changes to departments API.
+
+  [ Ubuntu daily release ]
+  * debian/*symbols: auto-update new symbols to released version
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Thu, 19 Jun 2014 10:47:15 +0000
+
+unity-scopes-api (0.4.8+14.10.20140604.1-0ubuntu1) utopic; urgency=medium
+
+  [ Marcus Tomlinson ]
+  * Introduced Dir/ScopesWatcher classes to watch for updates to the scope install directories.
+  * Updated all relevant registry classes to propagate an update pub/sub message via middleware.
+  * Added is_scope_running(), set_scope_state_callback() and set_update_callback() to Registry.
+  * Watch parent directories of install directories in order to be
+    notified when entire install directories are added / removed. (LP:
+    #1326068)
+
+  [ Ubuntu daily release ]
+  * debian/*symbols: auto-update new symbols to released version
+
+  [ Pete Woods ]
+  * Watch parent directories of install directories in order to be
+    notified when entire install directories are added / removed. (LP:
+    #1326068)
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Wed, 04 Jun 2014 13:03:56 +0000
+
+unity-scopes-api (0.4.7+14.10.20140522-0ubuntu1) utopic; urgency=low
+
+  [ Ubuntu daily release ]
+  * debian/*symbols: auto-update new symbols to released version
+  * New rebuild forced
+
+  [ Pete Woods ]
+  * Switch to use libapparmor instead of aa-exec
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Thu, 22 May 2014 09:58:34 +0000
+
+unity-scopes-api (0.4.7+14.10.20140521-0ubuntu1) utopic; urgency=medium
+
+  [ Pawel Stolowski ]
+  * Implemented RatingFilter and RadioButtonFilter.
+  * Fixed lp:1319712: Appearance attributes not supported for remote scopes.
+  * Changed create() methods of OptionSelectorFilter and RangeInputFilter to return unique ptr.
+
+  [ Ubuntu daily release ]
+  * debian/*symbols: auto-update new symbols to released version
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Wed, 21 May 2014 14:01:03 +0000
+
+unity-scopes-api (0.4.6+14.10.20140519-0ubuntu1) utopic; urgency=medium
+
+  [ Pete Woods ]
+  * Add results TTL option to configuration files.
+
+  [ Pawel Stolowski ]
+  * Added method to get and set display hints for filters.
+  * Added has_subdepartments flag and alternate label to the Department class.
+
+  [ Ubuntu daily release ]
+  * debian/*symbols: auto-update new symbols to released version
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Mon, 19 May 2014 10:10:28 +0000
+
+unity-scopes-api (0.4.6+14.10.20140508-0ubuntu1) UNRELEASED; urgency=medium
+
+  [ Pawel Stolowski ]
+  * Implemented RangeInputFilter.
+
+  [ Michi Henning ]
+  * Changed parameter type for pushing categories to Category::SCPtr const&
+
+ -- Michi Henning <michi.henning@canonical.com>  Thu, 15 May 2014 13:54:38 +1000
+
+unity-scopes-api (0.4.5+14.10.20140513-0ubuntu1) utopic; urgency=low
+
+  [ Pawel Stolowski ]
+  * Implemented RangeInputFilter.
+
+  [ Ubuntu daily release ]
+  * debian/*symbols: auto-update new symbols to released version
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Tue, 13 May 2014 18:24:18 +0000
+
+unity-scopes-api (0.4.4+14.10.20140508-0ubuntu1) utopic; urgency=low
+
+  [ Michi Henning ]
+  * Simplified configuration files.
+  * Removed SS.Registry.Endpoint from Runtime.ini.
+  * Replaced SS.Registry.Identity with Smartscopes.Registry.Identity
+  * Added documentation for configuration parameters (see CONFIGFILES in
+    the root of the source tree)
+  * Runtime::run_scope() now has an overload to accept a path to Runtime.ini.
+    If no file name is passed, the system-wide Runtime.ini is used.
+  * UNIX domain sockets for Zmq are now placed under $XDG_RUNTIME_DIR/zmq.
+  * Install location for things under /usr/share is now unity-scopes instead
+    of unity-scopes-api.
+
+  [ Pawel Stolowski ]
+  * Renamed SearchReply::register_annotation() to push().
+
+  [ Ubuntu daily release ]
+  * debian/*symbols: auto-update new symbols to released version
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Thu, 08 May 2014 17:23:03 +0000
+
+unity-scopes-api (0.4.3+14.10.20140502.1-0ubuntu1) utopic; urgency=low
+
+  [ Tarmac ]
+  * Sync with devel branch.
+
+  [ Ubuntu daily release ]
+  * New rebuild forced
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Fri, 02 May 2014 14:44:05 +0000
+
+unity-scopes-api (0.4.3+14.10.20140428-0ubuntu1) utopic; urgency=low
+
+  [ Pawel Stolowski ]
+  * Implemented to_uri() and from_uri() conversions for CannedQuery.
+  * Ship scopes-client in libunity-scopes-cli package.
+
+  [ Ubuntu daily release ]
+  * debian/*symbols: auto-update new symbols to released version
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Mon, 28 Apr 2014 17:24:08 +0000
+
+unity-scopes-api (0.4.2+14.04.20140408-0ubuntu1) trusty; urgency=low
+
+  [ Michal Hruby ]
+  * Merge r298 from devel branch.
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Tue, 08 Apr 2014 13:41:30 +0000
+
+unity-scopes-api (0.4.2+14.04.20140404.2-0ubuntu1) trusty; urgency=low
+
+  [ Pawel Stolowski ]
+  * Added ability for defining custom scope runner path, relative
+    to scope's directories.
+  * Added support for customization attributes to ScopeMetadata and scope
+    config files.
+  * Expose scope_directory in ScopeMetadata.
+
+  [ Ubuntu daily release ]
+  * debian/*symbols: auto-update new symbols to released version
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Fri, 04 Apr 2014 17:36:39 +0000
+
+unity-scopes-api (0.4.1+14.04.20140326.1-0ubuntu1) trusty; urgency=low
+
+  * New rebuild forced
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Wed, 26 Mar 2014 17:57:37 +0000
+
+unity-scopes-api (0.4.0+14.04.20140324-0ubuntu1) trusty; urgency=low
+
+  [ Michal Hruby ]
+  * Backport invalidation raciness fix.
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Mon, 24 Mar 2014 13:06:04 +0000
+
+unity-scopes-api (0.4.0+14.04.20140319-0ubuntu1) trusty; urgency=low
+
+  [ Michal Hruby ]
+  * Backport the invalidation fix.
+
+  [ Ubuntu daily release ]
+  * debian/*symbols: auto-update new symbols to released version
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Mon, 24 Mar 2014 13:06:02 +0000
+
+unity-scopes-api (0.4.0+14.04.20140312.2-0ubuntu1) trusty; urgency=low
+
+  * New rebuild forced
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Wed, 12 Mar 2014 20:26:50 +0000
+
 unity-scopes-api (0.4.0+14.04.20140312.1-0ubuntu1) trusty; urgency=medium
 
   [ Michi Henning ]

@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_SEARCHQUERYBASE_H
-#define UNITY_SCOPES_SEARCHQUERYBASE_H
+#pragma once
 
 #include <unity/scopes/QueryBase.h>
 #include <unity/scopes/QueryCtrlProxyFwd.h>
@@ -40,8 +39,15 @@ class SearchMetadata;
 namespace internal
 {
 
-class QueryBaseImpl;
-class QueryObject;
+class SearchQueryBaseImpl;
+
+namespace smartscopes
+{
+
+class SSScopeObject;
+class SSQueryObject;
+
+}
 
 } // namespace internal
 
@@ -113,18 +119,42 @@ public:
                                    SearchListenerBase::SPtr const& reply);
     //@}
 
+    /**
+     \brief Get a canned query for this search request.
+
+     \return The canned query.
+     \throws unity::LogicException if the canned query was not initialized (was default-constructed).
+     */
+    CannedQuery query() const;
+
+    /**
+     \brief Get metadata for this search request.
+     \return The search metadata.
+     \throws unity::LogicException if search metadata was not initialized (was default-constructed).
+    */
+    SearchMetadata search_metadata() const;
+
     /// @cond
     virtual ~SearchQueryBase();
     /// @endcond
 
 protected:
     /// @cond
-    SearchQueryBase();
+    SearchQueryBase(CannedQuery const& query, SearchMetadata const& metadata);
     /// @endcond
+
+private:
+    internal::SearchQueryBaseImpl* fwd() const;
+
+    void set_department_id(std::string const& department_id);
+    std::string department_id() const;
+
+    friend class internal::QueryObject;                    // So QueryObject can call cancel() and set_department_id()
+    friend class internal::ScopeObject;                    // So ScopeObject can call set_metadata() and set_department_id()
+    friend class internal::smartscopes::SSQueryObject;     // So SSQueryObject can call cancel()
+    friend class internal::smartscopes::SSScopeObject;     // So SSQueryObject can call set_department_id()
 };
 
 } // namespace scopes
 
 } // namespace unity
-
-#endif

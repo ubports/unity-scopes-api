@@ -16,15 +16,15 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQOBJECTPROXY_H
-#define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQOBJECTPROXY_H
+#pragma once
 
 #include <unity/scopes/internal/MWObjectProxy.h>
 #include <scopes/internal/zmq_middleware/capnproto/Message.capnp.h>
+#include <unity/scopes/internal/zmq_middleware/ConnectionPool.h>
 #include <unity/scopes/internal/zmq_middleware/RequestMode.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqMiddleware.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqObjectProxyFwd.h>
-#include <unity/scopes/internal/zmq_middleware/ZmqReceiver.h>
+#include <unity/scopes/internal/zmq_middleware/ZmqRegistryProxyFwd.h>
 
 #include <capnp/message.h>
 
@@ -60,7 +60,7 @@ public:
 
     virtual std::string endpoint() const override;
     virtual std::string identity() const override;
-    std::string category() const;
+    std::string target_category() const;
     RequestMode mode() const;
     virtual int64_t timeout() const noexcept override;
 
@@ -71,10 +71,32 @@ public:
 
 protected:
     capnproto::Request::Builder make_request_(capnp::MessageBuilder& b, std::string const& operation_name) const;
-    ZmqReceiver invoke_(capnp::MessageBuilder& out_params);
-    ZmqReceiver invoke_(capnp::MessageBuilder& out_params, int64_t timeout);
+
+    void invoke_oneway_(capnp::MessageBuilder& out_params);
+
+    // Holds both the receiver for the unmarshaling buffer (which allocates memory)
+    // and the reader that decodes the memory from the unmarshaling buffer.
+    // We use unique_ptr because capnp Builder and Reader types are not movable.
+    struct TwowayOutParams
+    {
+        NONCOPYABLE(TwowayOutParams);
+
+        TwowayOutParams() = default;
+        TwowayOutParams(TwowayOutParams&&) = default;
+        TwowayOutParams& operator=(TwowayOutParams&&) = default;
+
+        std::unique_ptr<ZmqReceiver> receiver;
+        std::unique_ptr<capnp::SegmentArrayMessageReader> reader;
+    };
+
+    TwowayOutParams invoke_twoway_(capnp::MessageBuilder& in_params);
+    TwowayOutParams invoke_twoway_(capnp::MessageBuilder& in_params,
+                                   int64_t twoway_timeout,
+                                   int64_t locate_timeout = -1);
 
 private:
+    TwowayOutParams invoke_twoway__(capnp::MessageBuilder& in_params, int64_t timeout);
+
     std::string endpoint_;
     std::string identity_;
     std::string category_;
@@ -89,5 +111,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

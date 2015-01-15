@@ -125,7 +125,7 @@ To re-format all source and header files in the tree:
     $ make formatcode
 
 Thread and address sanitizer
-----------------
+----------------------------
 
 Set SANITIZER to "thread" or "address" to build with the
 corresponding sanitizer enabled.
@@ -143,18 +143,52 @@ Updating symbols file
 ---------------------
 
 To easily spot new/removed/changed symbols in the library, the debian
-package is maintaining a .symbols file which lists all exported symbols
+package maintains a .symbols file that lists all exported symbols
 present in the library .so. If you add new public symbols to the library,
 it's necessary to refresh the symbols file, otherwise the package will
 fail to build. The easiest way to do that is using bzr-builddeb:
 
-    $ bzr bd
+    $ bzr bd -- -us -uc -j8  # Don't sign source package or changes file, 8 compiles in parallel
     $ # this will exit with an error if symbols file isn't up-to-date
     $ cd ../build-area/unity-scopes-api-[version]
-    $ cat ./debian/libunity-scopes0/DEBIAN/symbols | c++filt | sed 's/^ \(.*@Base\)/ (c++)"\1"/' | uniq | diff -u debian/libunity-scopes0.symbols - | sed 's/^+ \(.*@Base"\)\( .*\)/+ \1 0replaceme/' > /tmp/symbols.diff
+    $ ./obj-[arch]/tools/symbol_diff
+
+This creates a diff of the symbols in /tmp/symbols.diff.
+(The demangled symbols from the debian build are in ./new_symbols.)
+
+Review any changes in /tmp/symbols.diff. If they are OK:
+
     $ cd -
-    $ # review the symbol differences and if everything is ok, apply the diff
     $ patch -p0 < /tmp/symbols.diff
+
+ABI compliance test
+-------------------
+To use this, install abi-compliance-checker package from the archives.
+
+You can use abi-compliance-checker to test whether a particular build
+is ABI compatible with another build. The tool does some source-level
+analysis in addition to checking library symbols, so it catches things
+that are potentially dangerous, but won't be picked up by just looking
+at the symbol table.
+
+Assume you have built devel in src/devel, and you have a later build
+in src/mybranch and want to check that mybranch is still compatible.
+To run the compliance test:
+
+$ cd src
+$ abi-compliance-checker -lib libunity-scopes.so -old devel/build/test/abi-compliance/abi.xml -new mybranch/build/test/abi-compliance/abi.xml
+
+The script will take about two minutes to run.
+
+You will get a message about compilation errors. These are caused by a Qt macro and
+can be ignored. (The log file in src/logs/libunity-scopes.so/[version]/log.txt
+contains the details.)
+
+Now point your browser at 
+
+src/compat_reports/libunity-scopes.so/[version]_to_[version]/compat_report.html
+
+The report provides a nicely layed-out page with all the details.
 
 Debugging IPC
 -------------
@@ -182,3 +216,28 @@ to all subscribers.
 Then you can run a subscriber that will display content of the messages:
 
     $ ./zmq-parser.py
+
+Autopkg test suite
+------------------
+
+Scopes comes with an autopkg smoke test.
+
+http://packaging.ubuntu.com/html/auto-pkg-test.html
+
+Running the test manually is simple. After building and installing the
+new packages, just run 'sh debian/tests/scopebuild'.
+
+To run the autopkg tests the same way Jenkins does, without installing
+the packages, follow the instructions here:
+
+http://packaging.ubuntu.com/html/auto-pkg-test.html
+
+When adding new tests to debian/tests, be sure that the new tests
+are built and run by adding them to tests/autopkg. Doing this doesn't
+run the tests exactly the same way as on Jenkins because they will
+be built and run against the headers and library in the build area,
+rather than against the installed packages. But it provides a basic
+sanity check for them. Without this, it's very easy to make a breaking
+change to the API and forgetting to update the autopkg tests too,
+meaning that the failure will show up only in Jenkins, but not
+when running the tests locally.

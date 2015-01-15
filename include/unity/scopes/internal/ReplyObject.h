@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_REPLYOBJECT_H
-#define UNITY_SCOPES_INTERNAL_REPLYOBJECT_H
+#pragma once
 
 #include <unity/scopes/internal/ReplyObjectBase.h>
 #include <unity/scopes/internal/Reaper.h>
@@ -47,7 +46,8 @@ class ReplyObject : public ReplyObjectBase
 public:
     UNITY_DEFINES_PTRS(ReplyObject);
 
-    ReplyObject(ListenerBase::SPtr const& receiver_base, RuntimeImpl const* runtime, std::string const& scope_proxy);
+    ReplyObject(ListenerBase::SPtr const& receiver_base, RuntimeImpl const* runtime,
+                std::string const& scope_proxy, bool dont_reap);
     virtual ~ReplyObject();
 
     virtual bool process_data(VariantMap const& data) = 0;
@@ -56,16 +56,20 @@ public:
 
     // Remote operation implementations
     void push(VariantMap const& result) noexcept override;
-    void finished(ListenerBase::Reason reason, std::string const& error_message) noexcept override;
+    void finished(CompletionDetails const& details) noexcept override;
+    void info(OperationInfo const& op_info) noexcept override;
 
 private:
-    ListenerBase::SPtr const listener_base_;
+    RuntimeImpl const* runtime_;
+    ListenerBase::SPtr listener_base_;
     ReapItem::SPtr reap_item_;
     std::atomic_bool finished_;
     std::mutex mutex_;
     std::condition_variable idle_;
     std::string origin_proxy_;
     int num_push_;
+    std::atomic_bool info_occurred_;
+    std::vector<OperationInfo> info_list_;
 };
 
 } // namespace internal
@@ -73,5 +77,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

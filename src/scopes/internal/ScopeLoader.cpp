@@ -18,6 +18,7 @@
 
 #include <unity/scopes/internal/ScopeLoader.h>
 
+#include <unity/scopes/internal/ScopeBaseImpl.h>
 #include <unity/scopes/Version.h>
 #include <unity/UnityExceptions.h>
 
@@ -36,10 +37,9 @@ namespace scopes
 namespace internal
 {
 
-ScopeLoader::ScopeLoader(string const& name, string const& libpath, RegistryProxy const& registry) :
-    scope_id_(name),
+ScopeLoader::ScopeLoader(string const& scope_id, string const& libpath) :
+    scope_id_(scope_id),
     dyn_loader_(DynamicLoader::create(libpath, DynamicLoader::Binding::now, DynamicLoader::Unload::noclose)),
-    registry_(registry),
     scope_base_(nullptr, reinterpret_cast<DestroyFunction>(dyn_loader_->find_function(UNITY_SCOPE_DESTROY_SYMSTR))),
     scope_state_(ScopeState::Stopped)
 {
@@ -66,9 +66,9 @@ ScopeLoader::~ScopeLoader()
     }
 }
 
-ScopeLoader::UPtr ScopeLoader::load(string const& name, string const& libpath, RegistryProxy const& registry)
+ScopeLoader::UPtr ScopeLoader::load(string const& scope_id, string const& libpath)
 {
-    return UPtr(new ScopeLoader(name, libpath, registry));
+    return UPtr(new ScopeLoader(scope_id, libpath));
 }
 
 void ScopeLoader::unload()
@@ -110,28 +110,12 @@ void ScopeLoader::start()
 
     try
     {
-        const int s_version = scope_base_->start(scope_id_, registry_);
-        const int maj_version = major_version();
-        if (s_version != maj_version)
-        {
-
-            try
-            {
-                scope_base_->stop(); // Make sure to tell the scope to stop again before reporting version mismatch.
-            }
-            catch (...)
-            {
-            }
-            throw unity::ResourceException("Scope " + scope_id_ + " was compiled with major version " +
-                                           std::to_string(s_version) + " of the Unity scopes run time. This " +
-                                           "version is incompatible with the current major " +
-                                           "version (" + std::to_string(maj_version) + ").");
-        }
+        scope_base_->start(scope_id_);
     }
     catch (...)
     {
         scope_state_ = ScopeState::Failed;
-        throw unity::ResourceException("Scope " + scope_id_ +": terminated due to exception in start()");
+        throw unity::ResourceException("Scope " + scope_id_ +": exception from start()");
     }
     scope_state_ = ScopeState::Started;
 }
@@ -163,11 +147,11 @@ void ScopeLoader::stop()
     catch (...)
     {
         scope_state_ = ScopeState::Failed;
-        throw unity::ResourceException("Scope " + scope_id_ +": terminated due to exception in stop()");
+        throw unity::ResourceException("Scope " + scope_id_ +": exception from stop()");
     }
 }
 
-string ScopeLoader::name() const noexcept
+string ScopeLoader::scope_id() const noexcept
 {
     return scope_id_;
 }

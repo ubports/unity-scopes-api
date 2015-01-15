@@ -33,7 +33,6 @@
 
 #include <memory>
 #include <gtest/gtest.h>
-#include <scope-api-testconfig.h>
 
 using namespace testing;
 using namespace unity::scopes;
@@ -51,37 +50,44 @@ public:
         : server_(FAKE_SSS_PATH)
         , reg_id_("SSRegistryTest")
         , scope_id_("SmartScopeTest")
+        , ss_config_("")
     {
-        // Instantiate SS registry and scopes runtimes
-        reg_rt_ = RuntimeImpl::create(reg_id_, SS_RUNTIME_PATH);
-        scope_rt_ = RuntimeImpl::create(scope_id_, SS_RUNTIME_PATH);
+        // set the LANGUAGE env var
+        std::string locale_env = "LANGUAGE=test_TEST";
+        ::putenv(const_cast<char*>(locale_env.c_str()));
+
+        // Instantiate runtime
+        rt_ = RuntimeImpl::create(reg_id_, SS_RUNTIME_PATH);
 
         // Get registry config
-        RegistryConfig reg_conf(reg_id_, reg_rt_->registry_configfile());
+        RegistryConfig reg_conf(reg_id_, rt_->registry_configfile());
         std::string mw_kind = reg_conf.mw_kind();
         std::string mw_configfile = reg_conf.mw_configfile();
 
+        ss_config_ = SSConfig(rt_->ss_configfile());
+
         // Get middleware handles from runtimes
-        reg_mw_ = reg_rt_->factory()->find(reg_id_, mw_kind);
-        scope_mw_ = scope_rt_->factory()->create(scope_id_, mw_kind, mw_configfile);
+        mw_ = rt_->factory()->find(reg_id_, mw_kind);
 
         // Instantiate a SS registry and scope objects
-        reg_ = SSRegistryObject::SPtr(new SSRegistryObject(reg_mw_, scope_mw_->get_scope_endpoint(), 20000, 60,
+        reg_ = SSRegistryObject::SPtr(new SSRegistryObject(mw_, ss_config_, mw_->get_scope_endpoint(),
                                                            "http://127.0.0.1:" + std::to_string(server_.port_), false));
-        scope_ = SSScopeObject::UPtr(new SSScopeObject(scope_id_, scope_mw_, reg_));
+        scope_ = SSScopeObject::UPtr(new SSScopeObject(scope_id_, mw_, reg_));
 
         // Add objects to the middlewares
-        reg_mw_->add_registry_object(reg_rt_->registry_identity(), reg_);
-        scope_mw_->add_dflt_scope_object(std::move(scope_));
+        mw_->add_registry_object(rt_->registry_identity(), reg_);
+        mw_->add_dflt_scope_object(std::move(scope_));
+    }
+
+    void reset_reg()
+    {
+        reg_.reset(new SSRegistryObject(mw_, ss_config_, mw_->get_scope_endpoint(),
+                                        "http://127.0.0.1:" + std::to_string(server_.port_), false));
     }
 
     ~smartscopesproxytest()
     {
-        scope_mw_->stop();
-        scope_mw_->wait_for_shutdown();
-
-        reg_mw_->stop();
-        reg_mw_->wait_for_shutdown();
+        rt_->destroy();
     }
 
 protected:
@@ -90,11 +96,11 @@ protected:
     std::string reg_id_;
     std::string scope_id_;
 
-    RuntimeImpl::UPtr reg_rt_;
-    RuntimeImpl::UPtr scope_rt_;
+    RuntimeImpl::UPtr rt_;
 
-    MiddlewareBase::SPtr reg_mw_;
-    MiddlewareBase::SPtr scope_mw_;
+    SSConfig ss_config_;
+
+    MiddlewareBase::SPtr mw_;
 
     SSRegistryObject::SPtr reg_;
     SSScopeObject::UPtr scope_;
@@ -102,44 +108,118 @@ protected:
 
 TEST_F(smartscopesproxytest, ss_registry)
 {
-    // locate should throw (direct)
-    EXPECT_THROW(reg_->locate("dummy.scope"), RegistryException);
+    // non-existent scope (direct)
+    EXPECT_THROW(reg_->get_metadata("dummy.scope.5"), NotFoundException);
+    EXPECT_THROW(reg_->locate("dummy.scope.5"), NotFoundException);
 
-    // list scopes (direct)
-    MetadataMap scopes = reg_->list();
-    EXPECT_EQ(2u, scopes.size());
+    {
+        // list scopes (direct)
+        MetadataMap scopes = reg_->list();
+        EXPECT_EQ(4u, scopes.size());
 
-    // visible scope (direct)
-    ScopeMetadata meta = reg_->get_metadata("dummy.scope");
-    EXPECT_EQ("dummy.scope", meta.scope_id());
-    EXPECT_EQ("Dummy Demo Scope", meta.display_name());
-    EXPECT_EQ("Dummy demo scope.", meta.description());
-    EXPECT_EQ("Mr.Fake", meta.author());
-    EXPECT_EQ("icon", meta.icon());
-    EXPECT_FALSE(meta.invisible());
+        // visible scope (direct)
+        ScopeMetadata meta = reg_->get_metadata("dummy.scope");
+        EXPECT_EQ("dummy.scope", meta.scope_id());
+        EXPECT_EQ("Dummy Demo Scope", meta.display_name());
+        EXPECT_EQ("Dummy demo scope.", meta.description());
+        EXPECT_EQ("Mr.Fake", meta.author());
+        EXPECT_EQ("icon", meta.icon());
+        EXPECT_FALSE(meta.invisible());
 
-    // non-existant scope (direct)
-    EXPECT_THROW(reg_->get_metadata("dummy.scope.3"), NotFoundException);
+        meta = reg_->get_metadata("dummy.scope.3");
+        EXPECT_EQ("dummy.scope.3", meta.scope_id());
+        EXPECT_EQ("Dummy Demo Scope 3", meta.display_name());
+        EXPECT_EQ("Dummy demo scope 3.", meta.description());
+        EXPECT_EQ("Mr.Fake", meta.author());
+        EXPECT_FALSE(meta.invisible());
+        EXPECT_EQ(4, meta.settings_definitions().size());
+        EXPECT_EQ("unitTemp", meta.settings_definitions()[1].get_dict()["id"].get_string());
+        EXPECT_EQ("Temperature Units", meta.settings_definitions()[1].get_dict()["displayName"].get_string());
+        EXPECT_EQ("list", meta.settings_definitions()[1].get_dict()["type"].get_string());
+        EXPECT_EQ(1, meta.settings_definitions()[1].get_dict()["defaultValue"].get_int());
+        EXPECT_EQ(2, meta.settings_definitions()[1].get_dict()["displayValues"].get_array().size());
+        EXPECT_EQ("Celsius", meta.settings_definitions()[1].get_dict()["displayValues"].get_array()[0].get_string());
+        EXPECT_EQ("Fahrenheit", meta.settings_definitions()[1].get_dict()["displayValues"].get_array()[1].get_string());
+        ASSERT_EQ(4, meta.keywords().size());
+        EXPECT_EQ("music", meta.keywords()[0]);
+        EXPECT_EQ("video", meta.keywords()[1]);
+        EXPECT_EQ("news", meta.keywords()[2]);
+        EXPECT_EQ("games", meta.keywords()[3]);
+    }
 
-    // locate should throw (via mw)
-    MWRegistryProxy mw_reg = reg_mw_->create_registry_proxy(reg_id_, reg_mw_->get_scope_endpoint());
-    EXPECT_THROW(mw_reg->locate("Dummy Demo Scope"), RegistryException);
+    // non-existent scope (via mw)
+    MWRegistryProxy mw_reg = mw_->registry_proxy();
+    EXPECT_THROW(mw_reg->get_metadata("dummy.scope.5"), NotFoundException);
+    EXPECT_THROW(mw_reg->locate("dummy.scope.5"), NotFoundException);
 
-    // list scopes (via mw)
-    scopes = mw_reg->list();
-    EXPECT_EQ(2u, scopes.size());
+    {
+        // list scopes (via mw)
+        MetadataMap scopes = mw_reg->list();
+        EXPECT_EQ(4u, scopes.size());
 
-    // visible scope (via mw)
-    meta = mw_reg->get_metadata("dummy.scope");
-    EXPECT_EQ("dummy.scope", meta.scope_id());
-    EXPECT_EQ("Dummy Demo Scope", meta.display_name());
-    EXPECT_EQ("Dummy demo scope.", meta.description());
-    EXPECT_EQ("Mr.Fake", meta.author());
-    EXPECT_EQ("icon", meta.icon());
-    EXPECT_FALSE(meta.invisible());
+        // visible scope (via mw)
+        ScopeMetadata meta = mw_reg->get_metadata("dummy.scope");
+        EXPECT_EQ("dummy.scope", meta.scope_id());
+        EXPECT_EQ("Dummy Demo Scope", meta.display_name());
+        EXPECT_EQ("Dummy demo scope.", meta.description());
+        EXPECT_EQ("Mr.Fake", meta.author());
+        EXPECT_EQ("icon", meta.icon());
+        EXPECT_FALSE(meta.invisible());
 
-    // non-existant scope (via mw)
-    EXPECT_THROW(mw_reg->get_metadata("dummy.scope.3"), NotFoundException);
+        meta = mw_reg->get_metadata("dummy.scope.3");
+        EXPECT_EQ("dummy.scope.3", meta.scope_id());
+        EXPECT_EQ("Dummy Demo Scope 3", meta.display_name());
+        EXPECT_EQ("Dummy demo scope 3.", meta.description());
+        EXPECT_EQ("Mr.Fake", meta.author());
+        EXPECT_FALSE(meta.invisible());
+        EXPECT_EQ(4, meta.settings_definitions().size());
+        EXPECT_EQ("unitTemp", meta.settings_definitions()[1].get_dict()["id"].get_string());
+        EXPECT_EQ("Temperature Units", meta.settings_definitions()[1].get_dict()["displayName"].get_string());
+        EXPECT_EQ("list", meta.settings_definitions()[1].get_dict()["type"].get_string());
+        EXPECT_EQ(1, meta.settings_definitions()[1].get_dict()["defaultValue"].get_int());
+        EXPECT_EQ(2, meta.settings_definitions()[1].get_dict()["displayValues"].get_array().size());
+        EXPECT_EQ("Celsius", meta.settings_definitions()[1].get_dict()["displayValues"].get_array()[0].get_string());
+        EXPECT_EQ("Fahrenheit", meta.settings_definitions()[1].get_dict()["displayValues"].get_array()[1].get_string());
+    }
+}
+
+TEST_F(smartscopesproxytest, ss_registry_locale)
+{
+    // set an invalid LANGUAGE env var (should return 0 scopes)
+    std::string locale_env = "LANGUAGE=test_FAIL";
+    ::putenv(const_cast<char*>(locale_env.c_str()));
+    reset_reg();
+    EXPECT_EQ(0, reg_->list().size());
+
+    // set an empty LANGUAGE env var (should return 2 scopes)
+    locale_env = "LANGUAGE=";
+    ::putenv(const_cast<char*>(locale_env.c_str()));
+    reset_reg();
+    EXPECT_EQ(4u, reg_->list().size());
+
+    // set a valid LANGUAGE env var (should return 2 scopes)
+    locale_env = "LANGUAGE=test_TEST";
+    ::putenv(const_cast<char*>(locale_env.c_str()));
+    reset_reg();
+    EXPECT_EQ(4u, reg_->list().size());
+
+    // set a colon only LANGUAGE env var (should return 2 scopes)
+    locale_env = "LANGUAGE=:";
+    ::putenv(const_cast<char*>(locale_env.c_str()));
+    reset_reg();
+    EXPECT_EQ(4u, reg_->list().size());
+
+    // set a colon seperated LANGUAGE env var (first valid - should return 2 scopes)
+    locale_env = "LANGUAGE=test_TEST:test_FAIL";
+    ::putenv(const_cast<char*>(locale_env.c_str()));
+    reset_reg();
+    EXPECT_EQ(4u, reg_->list().size());
+
+    // set a colon seperated LANGUAGE env var (first invalid - should return 0 scopes)
+    locale_env = "LANGUAGE=test_FAIL:test_TEST";
+    ::putenv(const_cast<char*>(locale_env.c_str()));
+    reset_reg();
+    EXPECT_EQ(0, reg_->list().size());
 }
 
 class Receiver : public SearchListenerBase
@@ -151,7 +231,7 @@ public:
         {
             EXPECT_EQ("URI", result.uri());
             EXPECT_EQ("Stuff", result.title());
-            EXPECT_EQ("https://productsearch.ubuntu.com/imgs/amazon.png", result.art());
+            EXPECT_EQ("https://dash.ubuntu.com/imgs/amazon.png", result.art());
             EXPECT_EQ("", result.dnd_uri());
             EXPECT_EQ("cat1", result.category()->id());
             EXPECT_EQ("Category 1", result.category()->title());
@@ -174,10 +254,10 @@ public:
         last_result_ = std::make_shared<Result>(result);
     }
 
-    virtual void finished(ListenerBase::Reason reason, std::string const& error_message) override
+    virtual void finished(CompletionDetails const& details) override
     {
-        EXPECT_EQ(Finished, reason);
-        EXPECT_EQ("", error_message);
+        EXPECT_EQ(CompletionDetails::OK, details.status());
+        EXPECT_EQ("", details.message());
         EXPECT_EQ(2, count_);
 
         // signal wait_until_finished
@@ -213,6 +293,22 @@ TEST_F(smartscopesproxytest, search)
 
     meta.proxy()->search("search_string", SearchMetadata("en", "phone"), reply);
     reply->wait_until_finished();
+
+    // If the following search URIs are built incorrectly we will not get any results back
+    reply = std::make_shared<Receiver>();
+
+    meta = reg_->get_metadata("dummy.scope.3");
+
+    meta.proxy()->search("search_string", SearchMetadata("en", "phone"), reply);
+    reply->wait_until_finished();
+
+    // Now try a different remote scope
+    reply = std::make_shared<Receiver>();
+
+    meta = reg_->get_metadata("dummy.scope.4");
+
+    meta.proxy()->search("search_string", SearchMetadata("en", "phone"), reply);
+    reply->wait_until_finished();
 }
 
 TEST_F(smartscopesproxytest, consecutive_queries)
@@ -220,13 +316,15 @@ TEST_F(smartscopesproxytest, consecutive_queries)
     ScopeMetadata meta = reg_->get_metadata("dummy.scope");
     std::vector<std::shared_ptr<Receiver>> replies;
 
-    for (int i = 0; i < 10; ++i)
+    const int iterations = 100;
+
+    for (int i = 0; i < iterations; ++i)
     {
         replies.push_back(std::make_shared<Receiver>());
         meta.proxy()->search("search_string", SearchMetadata("en", "phone"), replies.back());
     }
 
-    for (int i = 0; i < 10; ++i)
+    for (int i = 0; i < iterations; ++i)
     {
         replies[i]->wait_until_finished();
     }
@@ -237,29 +335,7 @@ class PreviewerWithCols : public PreviewListenerBase
 public:
     virtual void push(PreviewWidgetList const& widget_list) override
     {
-        EXPECT_EQ(3u, widget_list.size());
-
-        // widget 1
-        auto it = widget_list.begin();
-        EXPECT_EQ("widget_id_A", it->id());
-        EXPECT_EQ("text", it->widget_type());
-        EXPECT_EQ("Widget A", it->attribute_values()["title"].get_string());
-        EXPECT_EQ("First widget.", it->attribute_values()["text"].get_string());
-
-        // widget 2
-        std::advance(it, 1);
-        EXPECT_EQ("widget_id_B", it->id());
-        EXPECT_EQ("text", it->widget_type());
-        EXPECT_EQ("Widget B", it->attribute_values()["title"].get_string());
-        EXPECT_EQ("Second widget.", it->attribute_values()["text"].get_string());
-
-        // widget 3
-        std::advance(it, 1);
-        EXPECT_EQ("widget_id_C", it->id());
-        EXPECT_EQ("text", it->widget_type());
-        EXPECT_EQ("Widget C", it->attribute_values()["title"].get_string());
-        EXPECT_EQ("Third widget.", it->attribute_values()["text"].get_string());
-
+        widget_list_.insert(widget_list_.end(), widget_list.begin(), widget_list.end());
         widget_pushes_++;
     }
 
@@ -305,11 +381,35 @@ public:
         col_pushes_++;
     }
 
-    virtual void finished(ListenerBase::Reason reason, std::string const& error_message) override
+    virtual void finished(CompletionDetails const& details) override
     {
-        EXPECT_EQ(Finished, reason);
-        EXPECT_EQ("", error_message);
-        EXPECT_EQ(1, widget_pushes_);
+        EXPECT_EQ(3u, widget_list_.size());
+
+        // widget 1
+        auto it = widget_list_.begin();
+        EXPECT_EQ("widget_id_A", it->id());
+        EXPECT_EQ("text", it->widget_type());
+        EXPECT_EQ("Widget A", it->attribute_values()["title"].get_string());
+        EXPECT_EQ("First widget.", it->attribute_values()["text"].get_string());
+
+        // widget 2
+        std::advance(it, 1);
+        EXPECT_EQ("widget_id_B", it->id());
+        EXPECT_EQ("text", it->widget_type());
+        EXPECT_EQ("Widget B", it->attribute_values()["title"].get_string());
+        EXPECT_EQ("Second widget.", it->attribute_values()["text"].get_string());
+
+        // widget 3
+        std::advance(it, 1);
+        EXPECT_EQ("widget_id_C", it->id());
+        EXPECT_EQ("text", it->widget_type());
+        EXPECT_EQ("Widget C", it->attribute_values()["title"].get_string());
+        EXPECT_EQ("Third widget.", it->attribute_values()["text"].get_string());
+
+
+        EXPECT_EQ(CompletionDetails::OK, details.status());
+        EXPECT_EQ("", details.message());
+        EXPECT_EQ(3, widget_pushes_);
         EXPECT_EQ(1, col_pushes_);
 
         // Signal wait_until_finished
@@ -328,6 +428,7 @@ private:
     int widget_pushes_ = 0;
     int col_pushes_ = 0;
     bool query_complete_ = false;
+    PreviewWidgetList widget_list_;
     std::mutex mutex_;
     std::condition_variable cond_;
 };
@@ -337,22 +438,7 @@ class PreviewerNoCols : public PreviewListenerBase
 public:
     virtual void push(PreviewWidgetList const& widget_list) override
     {
-        EXPECT_EQ(2u, widget_list.size());
-
-        // widget 1
-        auto it = widget_list.begin();
-        EXPECT_EQ("widget_id_A", it->id());
-        EXPECT_EQ("text", it->widget_type());
-        EXPECT_EQ("Widget A", it->attribute_values()["title"].get_string());
-        EXPECT_EQ("First widget.", it->attribute_values()["text"].get_string());
-
-        // widget 2
-        std::advance(it, 1);
-        EXPECT_EQ("widget_id_B", it->id());
-        EXPECT_EQ("text", it->widget_type());
-        EXPECT_EQ("Widget B", it->attribute_values()["title"].get_string());
-        EXPECT_EQ("Second widget.", it->attribute_values()["text"].get_string());
-
+        widget_list_.insert(widget_list_.end(), widget_list.begin(), widget_list.end());
         widget_pushes_++;
     }
 
@@ -366,12 +452,28 @@ public:
         col_pushes_++;
     }
 
-    virtual void finished(ListenerBase::Reason reason, std::string const& error_message) override
+    virtual void finished(CompletionDetails const& details) override
     {
-        EXPECT_EQ(Finished, reason);
-        EXPECT_EQ("", error_message);
-        EXPECT_EQ(1, widget_pushes_);
+        EXPECT_EQ(CompletionDetails::OK, details.status());
+        EXPECT_EQ("", details.message());
+        EXPECT_EQ(2, widget_pushes_);
         EXPECT_EQ(0, col_pushes_);
+
+        EXPECT_EQ(2u, widget_list_.size());
+
+        // widget 1
+        auto it = widget_list_.begin();
+        EXPECT_EQ("widget_id_A", it->id());
+        EXPECT_EQ("text", it->widget_type());
+        EXPECT_EQ("Widget A", it->attribute_values()["title"].get_string());
+        EXPECT_EQ("First widget.", it->attribute_values()["text"].get_string());
+
+        // widget 2
+        std::advance(it, 1);
+        EXPECT_EQ("widget_id_B", it->id());
+        EXPECT_EQ("text", it->widget_type());
+        EXPECT_EQ("Widget B", it->attribute_values()["title"].get_string());
+        EXPECT_EQ("Second widget.", it->attribute_values()["text"].get_string());
 
         // Signal wait_until_finished
         std::unique_lock<std::mutex> lock(mutex_);
@@ -391,6 +493,7 @@ private:
     bool query_complete_ = false;
     std::mutex mutex_;
     std::condition_variable cond_;
+    PreviewWidgetList widget_list_;
 };
 
 TEST_F(smartscopesproxytest, preview)
@@ -416,6 +519,38 @@ TEST_F(smartscopesproxytest, preview)
 
     meta.proxy()->preview(*(result.get()), ActionMetadata("en", "phone"), previewer_no_cols);
     previewer_no_cols->wait_until_finished();
+
+    // If the following preview URIs are built incorrectly we will not get any results back
+    reply = std::make_shared<Receiver>();
+
+    meta = reg_->get_metadata("dummy.scope.3");
+
+    meta.proxy()->search("search_string", SearchMetadata("en", "phone"), reply);
+    reply->wait_until_finished();
+
+    result = reply->last_result();
+    EXPECT_TRUE(result.get() != nullptr);
+
+    previewer_with_cols = std::make_shared<PreviewerWithCols>();
+
+    meta.proxy()->preview(*(result.get()), ActionMetadata("en", "phone"), previewer_with_cols);
+    previewer_with_cols->wait_until_finished();
+
+    // Now try a different remote scope
+    reply = std::make_shared<Receiver>();
+
+    meta = reg_->get_metadata("dummy.scope.4");
+
+    meta.proxy()->search("search_string", SearchMetadata("en", "phone"), reply);
+    reply->wait_until_finished();
+
+    result = reply->last_result();
+    EXPECT_TRUE(result.get() != nullptr);
+
+    previewer_with_cols = std::make_shared<PreviewerWithCols>();
+
+    meta.proxy()->preview(*(result.get()), ActionMetadata("en", "phone"), previewer_with_cols);
+    previewer_with_cols->wait_until_finished();
 }
 
 } // namespace

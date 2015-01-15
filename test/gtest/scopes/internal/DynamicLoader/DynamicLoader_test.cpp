@@ -20,16 +20,15 @@
 #include <unity/UnityExceptions.h>
 
 #include <gtest/gtest.h>
-#include <boost/regex.hpp>  // Use Boost implementation until http://gcc.gnu.org/bugzilla/show_bug.cgi?id=53631 is fixed.
-#include <scope-api-testconfig.h>
 
+#include <boost/regex.hpp>  // Use Boost implementation until http://gcc.gnu.org/bugzilla/show_bug.cgi?id=53631 is fixed.
 using namespace std;
 using namespace unity::scopes::internal;
 
 namespace
 {
-char const* goodlib = TEST_BUILD_ROOT "/gtest/scopes/internal/DynamicLoader/libtestlib.so";
-char const* badlib = TEST_BUILD_ROOT "/gtest/scopes/internal/DynamicLoader/libbadtestlib.so";
+char const* goodlib = TEST_DIR "/libtestlib.so";
+char const* badlib = TEST_DIR "/libbadtestlib.so";
 }
 
 // Basic test.
@@ -61,15 +60,15 @@ TEST(DynamicLoader, basic)
 TEST(DynamicLoader, flags)
 {
     {
-        DynamicLoader::UPtr dl = DynamicLoader::create(badlib);
-        DynamicLoader::VoidFunc f = dl->find_function("test_function");   // Must work despite unreslved().
+        DynamicLoader::UPtr dl = DynamicLoader::create(badlib, DynamicLoader::Binding::lazy);
+        DynamicLoader::VoidFunc f = dl->find_function("test_function");   // Must work despite unresolved().
         EXPECT_NE(nullptr, f);
     }
 
     try
     {
         // Must fail because of unresolved symbol.
-        DynamicLoader::UPtr dl = DynamicLoader::create(badlib, DynamicLoader::Binding::now);
+        DynamicLoader::UPtr dl = DynamicLoader::create(badlib);
     }
     catch (unity::ResourceException const& e)
     {

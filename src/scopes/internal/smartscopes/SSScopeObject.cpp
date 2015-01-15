@@ -17,10 +17,12 @@
  */
 
 #include <unity/scopes/internal/smartscopes/SSScopeObject.h>
-#include <unity/scopes/internal/smartscopes/SmartScope.h>
-#include <unity/scopes/internal/smartscopes/SSQueryObject.h>
 #include <unity/scopes/internal/MWQuery.h>
 #include <unity/scopes/internal/MWReply.h>
+#include <unity/scopes/internal/QueryBaseImpl.h>
+#include <unity/scopes/internal/RuntimeImpl.h>
+#include <unity/scopes/internal/smartscopes/SmartScope.h>
+#include <unity/scopes/internal/smartscopes/SSQueryObject.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/scopes/ActionMetadata.h>
 #include <unity/scopes/SearchMetadata.h>
@@ -43,9 +45,10 @@ SSScopeObject::SSScopeObject(std::string const& ss_scope_id,
                              SSRegistryObject::SPtr ss_registry)
     : ss_scope_id_(ss_scope_id)
     , co_(std::make_shared<SSQueryCtrlObject>())
-    , qo_(std::make_shared<SSQueryObject>())
+    , qo_(std::make_shared<SSQueryObject>(middleware->runtime()->logger()))
     , smartscope_(new SmartScope(ss_registry))
     , ss_registry_(ss_registry)
+    , logger_(middleware->runtime()->logger())
 {
     // Connect the query ctrl to the middleware.
     middleware->add_dflt_query_ctrl_object(co_);
@@ -57,7 +60,7 @@ SSScopeObject::SSScopeObject(std::string const& ss_scope_id,
     co_->set_query(qo_);
 }
 
-SSScopeObject::~SSScopeObject() noexcept
+SSScopeObject::~SSScopeObject()
 {
 }
 
@@ -68,8 +71,12 @@ MWQueryCtrlProxy SSScopeObject::search(CannedQuery const& q,
 {
     return query(info,
                  reply,
-                 [&q, &hints, &info, this ]()->QueryBase::SPtr
-                     { return this->smartscope_->search(info.id, q, hints); },
+                 [&q, &hints, &info, this ]()->SearchQueryBase::SPtr
+                     {
+                        SearchQueryBase::SPtr search_query = this->smartscope_->search(info.id, q, hints);
+                        search_query->set_department_id(q.department_id());
+                        return search_query;
+                     },
                  [&reply, &hints, this](QueryBase::SPtr query_base)
                      { qo_->add_query(SSQuery::Query, query_base, hints.cardinality(), reply); });
 }
@@ -141,6 +148,7 @@ MWQueryCtrlProxy SSScopeObject::query(InvokeInfo const& info,
             // TODO: log error, scope returned null pointer.
             throw ResourceException("SmartScope returned nullptr from query_factory_fun()");
         }
+        query_base->p->set_settings_db(ss_registry_->get_settings_db(info.id));
     }
     catch (...)
     {
@@ -160,30 +168,33 @@ MWQueryCtrlProxy SSScopeObject::query(InvokeInfo const& info,
     {
         try
         {
-            reply->finished(ListenerBase::Error, e.what());
+            reply->finished(CompletionDetails(CompletionDetails::Error, e.what()));  // Oneway, can't block
         }
         catch (...)
         {
         }
-        std::cerr << "query(): " << e.what() << std::endl;
-        // TODO: log error
+        BOOST_LOG_SEV(logger_, Logger::Error) << "SSScopeObject::query(): " << e.what();
         throw;
     }
     catch (...)
     {
         try
         {
-            reply->finished(ListenerBase::Error, "unknown exception");
+            reply->finished(CompletionDetails(CompletionDetails::Error, "unknown exception"));  // Oneway, can't block
         }
         catch (...)
         {
         }
-        std::cerr << "query(): unknown exception" << std::endl;
-        // TODO: log error
+        BOOST_LOG_SEV(logger_, Logger::Error) << "SSScopeObject::query(): unknown exception";
         throw;
     }
 
     return info.mw->create_query_ctrl_proxy(reply->identity() + ".c", info.mw->get_query_ctrl_endpoint());
+}
+
+bool SSScopeObject::debug_mode() const
+{
+    return false;
 }
 
 }  // namespace smartscopes

@@ -16,13 +16,13 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_OBJECTADAPTER_H
-#define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_OBJECTADAPTER_H
+#pragma once
 
+#include <unity/scopes/internal/Logger.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqObjectProxy.h>
-
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/util/NonCopyable.h>
+
 #include <zmqpp/socket.hpp>
 
 #include <future>
@@ -46,6 +46,7 @@ namespace zmq_middleware
 {
 
 class ServantBase;
+class StopPublisher;
 class ZmqMiddleware;
 
 class ObjectAdapter final
@@ -57,7 +58,8 @@ public:
                   std::string const& name,
                   std::string const& endpoint,
                   RequestMode m,
-                  int pool_size);
+                  int pool_size,
+                  int64_t idle_timeout = -1);
     ~ObjectAdapter();
 
     ZmqMiddleware* mw() const;
@@ -89,20 +91,17 @@ private:
     // The Failed state is reachable from any of the other states and indicates
     // a fatal error condition.
     enum AdapterState { Inactive, Activating, Active, Deactivating, Destroyed, Failed };
-    void throw_bad_state(AdapterState state) const;
+    void throw_bad_state(std::string const& label, AdapterState state) const;
 
     void run_workers();
-    void init_ctrl_socket();
-    zmqpp::socket subscribe_to_ctrl_socket();
-    void stop_workers() noexcept;
-
-    void safe_bind(zmqpp::socket& s, std::string const& endpoint);
 
     std::shared_ptr<ServantBase> find_servant(std::string const& id, std::string const& category);
 
     // Thread start functions
-    void broker_thread();
-    void worker_thread();
+    void pump(std::promise<void> ready);
+    void worker();
+
+    void dispatch(zmqpp::socket& s, std::string const& client_address);
 
     void cleanup();
     void join_with_all_threads();
@@ -114,19 +113,18 @@ private:
     std::string endpoint_;
     RequestMode mode_;
     int pool_size_;
-    std::unique_ptr<zmqpp::socket> ctrl_;       // PUB socket to signal when to deactivate
-    std::mutex ctrl_mutex_;                     // Synchronizes access to ctrl_ when sending
-    std::thread broker_;                        // Connects router with dealer
+    int64_t idle_timeout_;
+    std::unique_ptr<StopPublisher> stopper_;    // Used to signal threads when it's time to terminate
+    std::thread pump_;                          // Load-balancing pump: router-router or pull-router
     std::vector<std::thread> workers_;          // Threads for incoming invocations
-    std::atomic_int num_workers_;               // For handshake with parent
-    std::promise<void> ready_;                  // For handshake with child threads
-    std::mutex ready_mutex_;                    // Protects ready_
-    std::once_flag once_;
     std::exception_ptr exception_;              // Failed threads deposit their exception here
+    std::once_flag once_;
 
     AdapterState state_;
     std::condition_variable state_changed_;
     mutable std::mutex state_mutex_;
+
+    boost::log::sources::severity_channel_logger_mt<>& logger_;
 
     // Map of object identity and servant pairs
     typedef std::unordered_map<std::string, std::shared_ptr<ServantBase>> ServantMap;
@@ -142,5 +140,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

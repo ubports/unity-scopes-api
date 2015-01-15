@@ -16,8 +16,7 @@
  * Authored by: Thomas Voß <thomas.voss@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_TESTING_CATEGORY_H
-#define UNITY_SCOPES_TESTING_CATEGORY_H
+#pragma once
 
 #include <unity/scopes/Category.h>
 
@@ -49,7 +48,7 @@ public:
      \param renderer_template The renderer template
      */
     inline Category(std::string const& id, std::string const& title, std::string const &icon, CategoryRenderer const& renderer_template) :
-        unity::scopes::Category(id, title, icon, renderer_template)
+        unity::scopes::Category(id, title, icon, nullptr, renderer_template)
     {
     }
 
@@ -69,5 +68,3 @@ public:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

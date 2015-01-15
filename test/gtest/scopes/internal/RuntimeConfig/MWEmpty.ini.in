@@ -1,4 +1,0 @@
-[Runtime]
-Registry.Identity = Registry
-Registry.ConfigFile = Registry.ini
-Default.Middleware =

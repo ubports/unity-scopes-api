@@ -5,21 +5,22 @@
 
 \subsection intro Introduction
 
-One of Unity’s core features on the desktop is the Dash. The Dash allows users to search for and discover virtually anything
-from local files and applications, to web content and other online data. The Dash achieves this by interfacing with one or more
-search plug-ins called “scopes” (e.g. “Apps”, “Music”, “Videos”, or “Amazon”, “Wikipedia”, “Youtube”).
+One of Unity’s core features on the desktop is the Dash. The Dash allows users to search for and discover virtually anything,
+from local files and applications to web content and other online data. The Dash achieves this by interfacing with one or more
+search plug-ins called “scopes”, such as “Apps”, “Music”, “Videos”, “Amazon”, “Wikipedia”, and “Youtube”.
 
 On the phone and tablet, scopes make up the central user interface, as they provide everything a user needs from an operating
 system. Scopes enable users to locate and launch applications, access local files, play music and videos, search the web,
 manage their favourite social network, keep up with the latest news, and much more.
 
-Each scope is a dedicated search engine for the category / data source it represents. The data source could be a local database,
-a web service, or even an aggregation of other scopes (e.g. the “Music” scope aggregates “Local Music” and “Online Music”
-scopes). A scope is primarily responsible for performing the actual search logic and returning the best possible results for each
+Each scope is a dedicated search engine for the category of data it represents. The data source could be a local database,
+a web service, or even an aggregation of other scopes. (For example, the “Music” scope aggregates “Local Music” and “Online Music”
+scopes). A scope is responsible for performing the actual search and returning the best possible results for each
 query it receives.
 
-This document describes how to implement, test and package your own scope using the Unity Scopes C++ API (unity-scopes-api).
+This document describes how to implement, test, and package your own scope using the Unity Scopes C++ API (unity-scopes-api).
 
+\if RemoteScopes
 \subsection LvsR Local vs remote scopes
 
 Local scopes are scopes that are located and run on the user’s device, while remote scopes (or “Smart Scopes”) are scopes that
@@ -33,134 +34,258 @@ perform searches). It is only in these situations that a scope should be written
 be written with the intention of running remotely on the Smart Scopes Server.</b>
 
 (For more information on how to deploy your scope to the Smart Scopes Server, or how to implement a native remote scope using
-the SSS REST API see: <link_not_yet_available>)
+the SSS REST API see: <i>link_not_yet_available</i>)
+\endif
 
 \section develop Developing scopes
 
 \subsection starting Getting started
 
-A simple C++ scope template with cmake build system is currently available
-on Launchpad, to use it install the packages required for scope development:
+A simple C++ scope template with a cmake build system is currently available as part of the Ubuntu SDK IDE. To use it, install the
+packages required for scope development:
 
 \verbatim
 sudo apt-get install libunity-scopes-dev
 \endverbatim
 
-Clone the bazaar branch with the scope template and build the scope:
+Now you are ready to explore and modify the sample code in the src/ directory.
 
-\verbatim
-bzr branch lp:~jpakkane/+junk/scopetemplate
-cd scopetemplate
-mkdir build
-cd build
-cmake ..
-make
-\endverbatim
+\subsection click Click packaging
 
-Now you're ready to explore and modify the sample code in the src/ directory.
+To register your scope, you must use the "scope" click hook, and point it to a directory containing your .ini file and .so file.
+In the template, a manifest such as the following is used:
 
-\subsection impl Implementing scope
+\code
+{
+  "description": "Net scope description",
+  "framework": "ubuntu-sdk-14.10-dev1",
+  "hooks": {
+    "myscope": {
+      "scope": "myscope", <-- Point to directory in build tree with .ini and .so
+      "apparmor": "scope-security.json" <-- Point to AppArmor manifest in build tree
+    }
+  }
+  "maintainer": "Some Guy <some.guy@ubuntu.com>",
+  "name": "com.ubuntu.developer.username.net-scope",
+  "title": "Some scope",
+  "version": "0.1"
+}
+\endcode
 
-This short tutorial covers the basic steps and building blocks needed for implementing your own scope with unity-scopes-api, using C++.
-For complete examples of various scopes see demo/scopes subdirectory of the unity-scopes-api source project.
+\subsubsection multiarch Multi-arch click packages
+The search path for the shared library inside a click package is as follows:
+
+<ul>
+<li>${SCOPE_DIRECTORY}/${DEB_HOST_MULTIARCH}/lib${SCOPE_NAME}.so
+<li>${SCOPE_DIRECTORY}/${DEB_HOST_MULTIARCH}/${SCOPE_NAME}.so
+<li>${SCOPE_DIRECTORY}/${DEB_HOST_MULTIARCH}/scope.so
+<li>${SCOPE_DIRECTORY}/lib${SCOPE_NAME}.so
+<li>${SCOPE_DIRECTORY}/${SCOPE_NAME}.so
+<li>${SCOPE_DIRECTORY}/scope.so
+</ul>
+
+Therefore click packges can be made multi-arch aware by compiling your targets for multiple architectures, and creating, e.g. the
+following directory structure:
+
+\code
+├── testscopeA.ini
+├── testscopeA-settings.ini
+├── x86_64-linux-gnu
+|   └── libtestscopeA.so
+└── arm-linux-gnueabihf
+    └── libtestscopeA.so
+\endcode
+
+You must also update the manifest file 'architecture' property to enumerate the included architectures, as follows:
+
+\code
+    "architecture": ["armhf", "amd64"]
+\endcode 
+
+\subsubsection multiarch-scoperunner Multi-arch scope runner
+Similarly to the shared libraries, when a relative path is provided the search path for custom scope runners is as follows:
+
+<ul>
+<li>${SCOPE_DIRECTORY}/${DEB_HOST_MULTIARCH}/${CUSTOM_SCOPERUNNER}
+<li>${SCOPE_DIRECTORY}/${CUSTOM_SCOPERUNNER}
+</ul>
+
+\subsubsection apparmor Apparmor manifest
+
+Scopes that are packaged using click are inherently untrusted and must be confined. At present, there is only a single type of scope that can be defined:
+<ul>
+<li>Network scope - can access the network / internet, but is not allowed to use APIs that provide access to the user's data.
+</ul>
+
+The security manifest for this type of scope should be as follows:
+
+\code
+{
+    "template": "ubuntu-scope-network",
+    "policy_groups": [],
+    "policy_version": 1.2
+}
+\endcode
+
+\subsection impl Implementing a scope
+
+This short tutorial covers the basic steps and building blocks needed to implement a scope in C++ with unity-scopes-api.
+For complete examples of various scopes, see the `demo/scopes` subdirectory of the unity-scopes-api source project.
 
 A typical scope implementation needs to implement interfaces of the following classes from the Scopes API:
 <ul>
-<li>unity::scopes::ScopeBase - the main scope class and an entry point for all incoming requests.
-<li>unity::scopes::SearchQueryBase - the handler of search request.
-<li>unity::scopes::PreviewQueryBase - the handler of preview requests (only if handling previews).
-<li>unity::scopes::ActivationQueryBase - the handler of activation and preview action requests (only if handling previews and activation)
-<li>unity::scopes::SearchListenerBase - the handler of search replies (only in aggreagator scopes, to pull results from other scopes)
+<li>unity::scopes::ScopeBase - the main scope class and entry point for all incoming requests
+<li>unity::scopes::SearchQueryBase - the handler for search requests
+<li>unity::scopes::PreviewQueryBase - the handler for preview requests (only if handling previews)
+<li>unity::scopes::ActivationQueryBase - the handler for activation and preview action requests (only if handling previews and activation)
+<li>unity::scopes::SearchListenerBase - the handler for search replies (only in aggreagator scopes, to pull results from other scopes)
 </ul>
 
-The following sections show them in more detail.
+The following sections show explaing these in more detail.
 
-\subsubsection simplescope Case 1: A simple scope which doesn't query other scopes.
+\subsubsection simplescope Case 1: A simple (non-aggregating) scope
 
-This is the typical case: a scope that connects to a remote or local backend, database etc. and provides results in response to search queries coming from a
-client (i.e. Unity Dash or another scope).
+This is the typical case: a scope that connects to a remote or local backend, such as a database,
+and provides results in response to search queries coming from a
+client (that is, the Unity Dash or another scope).
 
-\paragraph scopebase Create a scope class that implements ScopeBase inteface.
+\paragraph scopebase Implementing ScopeBase
 
-There are a few pure virtual methods that need to be implemented; at the very minimum you need to provide a non-empty implementation of
-\link unity::scopes::ScopeBase::start() start\endlink and unity::scopes::ScopeBase::search()  and
-unity::scopes::ScopeBase::preview() methods. 
+You must create a class that derives from \link unity::scopes::ScopeBase ScopeBase\endlink and
+implement a few methods. As a minimum, you must provide implementations of the
+\link unity::scopes::ScopeBase::search search()\endlink and \link unity::scopes::ScopeBase::preview preview()\endlink methods. 
 
 \code{.cpp}
-class MyScope: public unity::scopes::ScopeBase
+using unity::scopes;
+
+class MyScope : public ScopeBase
 {
 public:
-    virtual int start(std::string const&, unity::scopes::RegistryProxy const&) override;
-    virtual void stop() override;
-    virtual void run() override;
-    virtual unity::scopes::SearchQueryBase::UPtr search(CannedQuery const& query, SearchMetadata const& metadata) override;
-    virtual unity::scopes::PreviewQueryBase::UPtr preview(unity::scopes::Result const& result, unity::scopes::ActionMetadata const& metadata) override;
+    virtual void start(std::string const& scope_id) override;  // optional, dflt impl does nothing
+    virtual void stop() override;                              // optional, dflt impl does nothing
+    virtual void run() override;                               // optional, dflt impl does nothing
+    virtual SearchQueryBase::UPtr search(CannedQuery const& query,
+                                         SearchMetadata const& metadata) override;
+    virtual PreviewQueryBase::UPtr preview(Result const& result,
+                                           ActionMetadata const& metadata) override;
 }
 \endcode
 
-The \link unity::scopes::ScopeBase::start() start\endlink method must, at the very least return unity::scopes::ScopeBase::VERSION, e.g.
+The scopes run time calls \link unity::scopes::ScopeBase::start() start()\endlink once prior to
+sending any queries. You can use it to perform one-time initialization for your scope. Note that you should
+not perform any lengthy operations in `start()`. Your implementation must return as quickly as possible
+(in a fraction of the second), so do not, for example, make synchronous network requests as part of `start()`.
 
-\code{.cpp}
-int MyScope::start(string const&, unity::scopes::RegistryProxy const&)
-{
-    return ScopeBase::VERSION;
-}
-\endcode
+The scope ID passed to `start()` is taken from the name your scope's `.ini` configuration file.
 
-The \link unity::scopes::ScopeBase::stop() stop\endlink method should release any resources, such as network connections where applicable. See the
-documentation of \link unity::scopes::ScopeBase ScopeBase\endlink for an explanation of when \link unity::scopes::ScopeBase::run() ScopeBase::run\endlink;
-is useful; for typical and simple cases the implementation of run can be an empty function.
+The scopes run time calls \link unity::scopes::ScopeBase::stop() stop()\endlink to inform your scope
+that it should shut down. You can use this method to perform any one-time clean-up.
+
+Prior to sending any queries, the scopes run time calls \link unity::scopes::ScopeBase::run() run()\endlink if your `stop()` method
+completed successfully (did not throw an exception). The `run()` method
+is called by a separate thread that you can use for your own purposes, for example, to run an event loop.
+The scopes run time has no further interest in this thread, but you must ensure that, if you do not return
+from `run()`, you must return from `run()` in response to a call to `stop()`.
+
+For typical and simple cases, you can ignore `run()`.
 
 \paragraph handlingsearch Handling search
 
-The unity::scopes::ScopeBase::search() method of scope implementation is the entry point of every search - it receives
-search queries from the Dash or other scopes. This method must return an instance of an object that implements
-unity::scopes::SearchQueryBase interface, e.g:
+The unity::scopes::ScopeBase::search() method is called once for each query. Its purpose is to instantiante
+and return a new C++ instance that encapsulates the query, that is, `search()` is a factory method.
+(Do not start execution of the query as part of `search()`; the query object has a separate method for this.)
+
+`search()` must return an instance of an object that implements the unity::scopes::SearchQueryBase interface, for example:
 
 \code{.cpp}
+
+class MyQuery : public SearchQueryBase { ... };
+
 SearchQueryBase::UPtr MyScope::search(CannedQuery const& query, SearchMetadata const& metadata)
 {
-    SearchQueryBase::UPtr q(new MyQuery(query));
+    SearchQueryBase::UPtr q(new MyQuery(query, metadata));
     return q;
 }
 \endcode
 
-The search() method receives two arguments: a unity::scopes::CannedQuery query object that carries actual query string (among other information) and
-additional parameters of the search request, stored in unity::scopes::SearchMetadata - such as locale string, form factor string and cardinality.
-Cardinality is the maximum number of results expected from the scope (the value of 0 should be treated as if no limit was set). For optimal performance scopes
-should provide no more results than requested; if they however fail to handle cardinality constraint, any excessive results will be ignored by scopes API.
+The search() method receives two arguments: a unity::scopes::CannedQuery query object that (among other information) carries the actual
+query string, and
+additional parameters for the search request, passed as unity::scopes::SearchMetadata. The metadata includes information such as
+the current locale string, the form factor, and the query cardinality.
 
+Cardinality is the maximum number of results expected from a query (a value of 0 indicates no limit). For optimal performance,
+do not return more results than indicated by the cardinality. If you more than the requested number of results, you are
+wasting resources. (The scopes run time ignores the additional results.)
 
-\paragraph querybase Create a query class that implements SearchQueryBase interface.
+\paragraph surfacingmode Surfacing mode
 
-The central and most important method that needs to be implemented in this interface is unity::scopes::SearchQueryBase::run().
-This is where actual processing of current search query takes place, and this is the spot where you may want to query local or remote data source for results
-matching the query.
+The query string may be the empty string. If so, the UI is asking your scope to produce default results
+that are shown in what is known as _surfacing mode_. These are the results the UI displays if the user
+navigates to your scope, but has not entered a query yet. What results to show here depends on how your
+scope works. For example, for a music scope, the default results could be something like "Most Popular"
+and "Recently Played"; similarly, for a weather scope, the default results could be for the weather
+report for the current location. As the scope author, you need to decide what is most appropriate
+to show in surfacing mode. In the interests of a good user experience, it is important to show _something_
+here (if at all possible), so the user gets to see at least some results (instead of being confronted with
+a blank screen).
 
-The unity::scopes::SearchQueryBase::run() method gets passed an instance of SearchReplyProxy, which represents a receiver of query results. Please note
-that SearchReplyProxy is just a shared pointer for \link unity::scopes::SearchReply SearchReply\endlink object. The two most important
-methods of SearchReply object that every scope have to use are \link unity::scopes::SearchReply::register_category register_category\endlink
-and \link unity::scopes::SearchReply::push push\endlink.
+\paragraph querybase Implementing QueryBase
 
-The \link unity::scopes::SearchReply::register_category register_category\endlink method is a factory method for creating new categories (see
-\link unity::scopes::Category\endlink). Categories can be created at any point during query processing inside run method, but it's recommended to create
-them as soon as possible (ideally as soon as they are known to the scope).
+You must implement a class that derives from \link unity::scopes::SearchQueryBase SearchQueryBase\endlink and return
+an instance of this class from `search()`.
+Your class must implement a \link unity::scopes::SearchQueryBase::run run()\endlink method. The scopes run time calls
+`run()` to execute the query.
 
-When creating a category, one of its parameters is a \link unity::scopes::CategoryRenderer \endlink instance,
-which specifies how will a particular category be rendered. See the unity::scopes::CategoryRenderer documentation for more on that subject.
+The \link unity::scopes::SearchReplyProxy SearchReplyProxy\endlink that is passed to `run()` is an invocation
+handle that allows you push results for the query back towards the client. (`SearchReplyProxy` is a `shared_ptr`
+to a \link unity::scopes::SearchReply SearchReply\endlink object.)
 
-The actual search results have to be wrapped inside \link unity::scopes::CategorisedResult CategorisedResult\endlink objects and
-passed to \link unity::scopes::SearchReply::push push\endlink.
+Two important methods of `SerchReply` are \link unity::scopes::SearchReply::register_category register_category()\endlink
+and \link unity::scopes::SearchReply::push push()\endlink.
 
-A typical implementation of run may look like this:
+`register_category()` is a factory method that registers new categories for the results of this query (see
+\link unity::scopes::Category\endlink). You can create new categories at any point during query processing. 
+Categories serve to visually group query results in some way;
+when you push results for a query, you indicate which
+category each particular result belongs to, and the UI renders that result in the corresponding
+visual group. Categories are rendered in the order in which they are encountered by the UI
+as you push your results. If you want to control the order in which categories are rendered
+(for examples, such that a "Breaking News" category always appears first), you may need to
+buffer the results you receive from your back-end data source until you get a result for that
+category, and then push that result, plus any other buffered results.
+
+Pre-registering categories is the preferred approach because it allows the UI to reserve space
+and perform layout chores before any query results arrive. (In turn, this permits the UI to
+optimize its operation.) However, for some data sources, it may not be possible to determine
+all of the possible categories in advance, in which case you have no choice but to create
+new categories as they arrive in the data from your scope's data source.
+
+Do _not_ wait for all results for a query to arrive in an attempt to buffer them and order
+them by category. If you do, this prevents incremental rendering, and the user sees nothing
+until your scope has processed _all_ results. To create a positive user experience,
+your scope should push results as soon as possible.
+
+When you create a category, you can provide a \link unity::scopes::CategoryRenderer \endlink instance.
+The category renderer determines the visual appearance of the results in that category (such as
+display in a grid or in a carousel layout).
+
+You must wrap each actual search result inside a \link unity::scopes::CategorisedResult CategorisedResult\endlink object and
+pass the result instance to \link unity::scopes::SearchReply::push push\endlink.
+
+A typical implementation of `run()` might look like this:
 
 \code{.cpp}
 void MyQuery::run(SearchReplyProxy const& reply)
 {
+    if (!valid())
+    {
+        return;  // Query was cancelled
+    }
+
     auto category = reply->register_category("recommended", "Recommended", icon);
     //... query a local or remote backend
 
-    for (auto res: backend.get_results(search_query)) // for every result returned by a backend
+    for (auto res : backend.get_results(query().query_string())) // for every result returned by a backend
     {
         ...
         CategorisedResult result(category); // create a result item in "recommended" category
@@ -172,264 +297,407 @@ void MyQuery::run(SearchReplyProxy const& reply)
 
         if (!reply->push(result)) // send result to the client
         {
-            break; // false from push() means search was cancelled
+            break; // false from push() means that the search was cancelled
         }
     }
 }
 \endcode
 
+As far as the UI is concerned, the query is complete when `run()` returns. (While the query can potentially
+return more results, the UI shows a spinner or similar, to indicate that the query is not complete yet.)
+
+It is possible for you to return from `run()` _without_ having the query complete automatically. The life time
+of the query is controlled not only by `run()`, but also by the life time of the `SearchReplyProxy` that is passed
+to `run()`. The scopes run time monitors the reply proxy and informs the UI that the query is complete when
+_either_ `run()` returns _or_ the last reply proxy for the query goes out of scope. This allows you to, for example,
+pass the reply proxy to a different thread that pushes results (as you might want to do if you need to run a
+separate event loop). That thread can then also react to query cancellation. The important point is that, if
+you keep copies of the reply proxy, the query will remain alive until you destroy all copies of the reply proxy
+for that query (or explicitly call `finished()` on the reply proxy yourself, which explicitly ends the query).
+
+\paragraph cancellation Query cancellation
+
+It is possible for the UI to cancel a query before the query has completed and is still running in your scope, potentially
+producing additional results.
+Typically, this happens because the user has typed a few characters as the search term (which creates a query for
+the string up to that point); shortly after this, the user might type another character or two, extending the search string.
+After a short idle period, the UI cancels the original query and creates a new query for the extended search string.
+However, the second query will not start until _after_ the previous query has completed.
+
+\note _Query cancellation happens frequently, and it is important for your scope to react quickly to cancellation!_
+
+The scopes run time provides several ways for your implementation to react to cancellation:
+
+<ul>
+<li>A `false` return value from `SearchReply::push`. If `push` returns `false`, there is no point in continuing to
+provide more results.
+<li>You can poll for cancellation by calling \link unity::scopes::QueryBase::valid QueryBase::valid()\endlink. `valid()`
+returns `false` once a query is cancelled or has exceeded its cardinality limit.
+<li>Your query implementation class must override the \link unity::scopes::QueryBase::cancelled QueryBase::cancelled()\endlink
+method. The scopes run time calls `cancelled()` if the UI has cancelled the query. (Note that calls to `cancelled()` are
+made by a separate thread.)
+</ul>
+
+Testing the return value from `push()` is reasonable only if you know that results for your scope will
+arrive quickly (no more than 0.1 seconds apart). Otherwise, you should push results asynchronously from
+a separate thread and arrange for the query to complete (return from `run()`) in response to the scopes
+run time calling `cancelled()`.
+
+Note that it is possible for a call to `cancelled()` to arrive before the scopes run time has called `run()`
+(because `cancelled()` and `run()` are called by different threads and, therefore, can be dispatched out of order).
+
+
 \paragraph handlingpreview Handling previews
 
-Scopes are responsible for handling preview requests for results they created; this needs to be implemented by overriding unity::scopes::ScopeBase::preview()
-method:
+Your scope is responsible for handling preview requests for results it has returned; you implement this by overriding
+the unity::scopes::ScopeBase::preview() method:
 
 \code{.cpp}
-class MyScope: public unity::scopes::ScopeBase
+class MyScope : public unity::scopes::ScopeBase
 {
 public:
     ...
-    virtual unity::scopes::PreviewQueryBase::UPtr preview(unitu::scopes::Result const& result, unity::scopes::ActionMetadata const& metadata) override;
+    virtual PreviewQueryBase::UPtr preview(Result const& result, ActionMetadata const& metadata) override;
     ...
 }
 \endcode
 
-This method must return an instance derived from unity::scopes::PreviewQueryBase. The implementation of unity::scopes::PreviewQueryBase interface is similar to
-unity::scopes::SearchQueryBase in that its central method is unity::scopes::PreviewQueryBase::run(). This method is responsible for gathering preview data (from
-local or remote sources) and passing it along with the definition of preview look to unity::scopes::PreviewReplyProxy (this is a pointer to
-unity::scopes::PreviewReplyBasel; the run() method receives a pointer to an instance of unity::scopes::PreviewReply).
+This method must return an instance derived from unity::scopes::PreviewQueryBase. Like `search()`, `preview()` is a factory method;
+the scopes run time initiates the actual preview by calling \link unity::scopes::PreviewQueryBase::run run()\endlink on the instance you
+return. Your `run()` method is responsible for gathering preview data (from
+local or remote sources) and passing it to the UI along with the definition of the visual appearance of the preview by calling
+\link unity::scopes::PreviewReply::push push()\endlink on the reply proxy that is passed to `run()`. (This is analogous to returning
+results from `search()`.)
 
-A preview consists of one or more preview widgets - these are the basic building blocks for previews, such as a header with a title and subtitle, an image, a
-gallery with multiple images, a list of audio tracks etc.; see unity::scopes::PreviewWidget for a detailed documentation and a list of supported widget types.
-So, the implementation of unity::scopes::PreviewQueryBase::run() needs to create and populate one or more instances of unity::scopes::PreviewWidget and push them to the
-client with unity::scopes::PreviewReply::push().
+A preview consists of one or more preview widgets. Preview widgets are the basic building blocks for previews, such as a header with a title and subtitle, an image, a
+gallery with multiple images, a list of audio tracks, and so on.(See unity::scopes::PreviewWidget for a list of supported widget types.)
+Your implementation of \link unity::scopes::PreviewQueryBase::run run()\endlink must create and populate one or more preview widgets
+and push them to the UI.
 
-Every unity::scopes::PreviewWidget has a unique identifier, a type name and a set of attributes determined by its type. For example, a widget of "image" type expects
-two attributes: "source", which should point to an image (an uri) and "zoomable" boolean flag, which determines if the image should be zoomable. Values of such
-attributes can either be specified directly, or they can reference values present already in the unity::scopes::Result instance, or pushed spearately during the
-execution of unity::scopes::PreviewQueryBase::run().
+Each preview widget has a unique identifier, a type name, and a set of attributes determined by the widget's type.
+For example, a widget of "image" type expects two attributes: "source" (a URI that should point at an image),
+and a "zoomable" flag that determines if the image should be zoomable.
+You can specify the values of these attributes explicitly, or you can arrange for the values to be taken from a result
+that the corresponding query returned earlier, by referencing the corresponding \link unity::scopes::Result Result\endlink instance.
+You can also push the value for a referenced attribute separately as part of your implementation of `run()`.
 
-Attributes can be specified directly with unity::scopes::PreviewWidget::add_attribute_value() method, e.g:
+You provide attributes explicitly by calling
+\link unity::scopes::PreviewWidget::add_attribute_value PreviewWidget::add_attribute_value()\endlink:
 
 \code{.cpp}
-    PreviewWidget image_widget("myimage", "image");
+PreviewWidget image_widget("myimage", "image");
 
-    image_widget.add_attribute_value("source", Variant("file:///tmp/image.jpg"));
-    image_widget.add_attribute_value("zoomable", Variant(false));
+image_widget.add_attribute_value("source", Variant("file:///tmp/image.jpg"));
+image_widget.add_attribute_value("zoomable", Variant(false));
 \endcode
 
-To reference values from results or arbitrary values pushed separately, use unity::scopes::PreviewWidget::add_attribute_mapping() method:
+To reference values from results or arbitrary values that you push separately, use
+\link unity::scopes::PreviewWidget::add_attribute_mapping PreviewWidget::add_attribute_mapping()\endlink:
 
 \code{.cpp}
-    PreviewWidget image_widget("myimage", "image");
-    image_widget.add_attribute_mapping("source", "art"); // use 'art' attribute from the result
-    image_widget.add_attribute_mapping("zoomable", "myzoomable"); // 'myzoomable' not specified, but pushed below
-    reply->push("myzoomable", Variant(true));
+PreviewWidget image_widget("myimage", "image");
+image_widget.add_attribute_mapping("source", "art"); // use 'art' attribute from the result
+image_widget.add_attribute_mapping("zoomable", "myzoomable"); // 'myzoomable' not specified, but pushed below
+reply->push("myzoomable", Variant(true));
 \endcode
 
-To push preview widgets to the client, use unity::scopes::PreviewReply::push():
+To push preview widgets to the client, use \link unity::scopes::PreviewReply::push PreviewReply::push()\endlink:
 
 \code{.cpp}
-    PreviewWidget image_widget("myimage", "image");
-    PreviewWidget header_widget("myheader", "header");
-    // fill in widget attributes
-    ...
-    PreviewWidgetList widgets { image_widget, header_widget };
-    reply->push(widgets);
+PreviewWidget image_widget("myimage", "image");
+PreviewWidget header_widget("myheader", "header");
+// fill in widget attributes
+...
+PreviewWidgetList widgets { image_widget, header_widget };
+reply->push(widgets);
 \endcode
 
 \paragraph previewactions Preview actions
 
-Previews can have actions (i.e. buttons) that user can activate - they are supported by unity::scopes::PreviewWidget of "actions" type. This type of widget
-takes one or more action button definitions, where every button is constituted by an unique identifier, a label and an optional icon. For example, a widget with
-two buttons: "Open" and "Download" can be defined as follows (using unity::scopes::VariantBuilder helper class):
+Previews can have actions, such as buttons that the user can press. Actions are supported by a preview widget of type "actions".
+An actions widget holds one or more action button definitions, where each definition has a unique identifier, a label,
+and an optional icon. For example, a widget with two buttons, "Open" and "Download", can be defined as follows
+(using the \link unity::scopes::VariantBuilder VariantBuilder\endlink helper class):
 
 \code{.cpp}
-    PreviewWidget buttons("mybuttons", "actions");
 
-    VariantBuilder builder;
-    builder.add_tuple({
-        {"id", Variant("open")},
-        {"label", Variant("Open")}
-    });
-    builder.add_tuple({
-        {"id", Variant("download")},
-        {"label", Variant("Download")}
-    });
+PreviewWidget buttons("mybuttons", "actions");
 
-    buttons.add_attribute_value("actions", builder.end());
+VariantBuilder builder;
+builder.add_tuple({
+    {"id", Variant("open")},
+    {"label", Variant("Open")}
+});
+builder.add_tuple({
+    {"id", Variant("download")},
+    {"label", Variant("Download")}
+});
+
+buttons.add_attribute_value("actions", builder.end());
 \endcode
 
-To handle activation of preview actions, scope needs to implement the following method of unity::scopes::ScopeBase:
-
-\code{.cpp}
-class MyScope: public unity::scopes::ScopeBase
-{
-    virtual ActivationQueryBase::UPtr perform_action(Result const& result, ActionMetadata const& metadata, std::string const& widget_id, std::string const& action_id) override
-    ...
-}
-\endcode
-
-This method receives a widget identifier and action identifier that was activated. 
-This method needs to return an instance derived from unity::scopes::ActivationQueryBase. The derived class needs to reimplement
-unity::scopes::ActivationQueryBase::activate() method and put any activation logic in there. This method needs to respond with an instance of
-unity::scopes::ActivationResponse, which informs the shell about status of activation and the expected behaviour of the UI. For example, activate() may request
-a new search query to be executed as follows:
-
-\code{.cpp}
-class MyActivation : public unity::scopes::ActivationQueryBase
-{
-    virtual unity::scopes::ActivationResponse activate() override
-    {
-        ...
-        if (action_id == "search-grooveshark")
-        {
-            CannedQuery query("com.canonical.scopes.grooveshark");
-            query.set_query_string("metal");
-            return unity::scopes::ActivationResponse(query);
-        }
-        ...
-    }
-}
-\endcode
-
-\paragraph handlingactivation Handling result activation
-
-In most cases search results can be activated (i.e. when user taps or clicks them) directly by the shell - as long as a desktop schema used by that result's uri is
-known to the shell. In some cases however scope may want to intercept and handle activation request. To do that, it has to reimplement
-unity::scopes::ScopeBase::activate() method:
+To respond to activation of preview actions, your scope must implement
+\link unity::scopes::ScopeBase::perform_action ScopeBase::perform_action\endlink:
 
 \code{.cpp}
 class MyScope : public ScopeBase
 {
-    virtual ActivationQueryBase::UPtr activate(Result const& result, ActionMetadata const& metadata) override;
+    ...
+    virtual ActivationQueryBase::UPtr perform_action(Result const& result,
+                                                     ActionMetadata const& metadata,
+                                                     std::string const& widget_id,
+                                                     std::string const& action_id) override
     ...
 }
 \endcode
 
-and also call Result::set_intercept_activation() for all results that should trigger unity::scopes::ScopeBase::activate() on activation. The implementation of
-unity::scopes::ScopeBase::activate() should follow the same guidelines as unity::scopes::ScopeBase::perform_action(), the only difference with result activation
-being the lack of widget or action identifiers, as those are specific to preview widgets.
-
-\paragraph export Exporting the scope
-
-The scope needs to be compiled into a .so shared library and to be succesfully
-loaded at runtime it must provide two C functions to create and destroy it - a
-typical code snippet to do this looks as follows:
+Like `search()` and `preview()`, `perform_action()` is a factory method. It must return an
+instance that derives from \link unity::scopes::ActivationQueryBase ActivationQueryBase\endlink.
+Your derived class must implement the \link unity::scopes::ActivationQueryBase::activate activate()\endlink method,
+whose job it is to respond to the activation (that is, the user pressing a button). `activate` must return
+an \link unity::scopes::ActivationResponse ActivationResponse\endlink, which tells the UI how it should
+behave in response to the activation. For example, your `activate()` could direct the UI to
+run a new search as follows:
 
 \code{.cpp}
-extern "C" {
-    EXPORT unity::scopes::ScopeBase* UNITY_SCOPE_CREATE_FUNCTION()
+class MyActivation : public ActivationQueryBase
+{
+    MyActivation(Result const& result, unity::scopes::ActionMetadata const& metadata) :
+        ActivationQueryBase(result, metadata)
+    {
+    }
+
+    virtual ActivationResponse activate() override
+    {
+        ...
+        if (action_id() == "search-grooveshark")
+        {
+            CannedQuery query("com.canonical.scopes.grooveshark");
+            query.set_query_string("metal");
+            return ActivationResponse(query);
+        }
+        ...
+    }
+};
+\endcode
+
+\paragraph handlingactivation Handling result activation
+
+In many cases, the user can activate search results directly, by tapping on them, provided the result's schema (such as "http://")
+has a handler in the system. If this is the case, you need not do anything for activation. However, if your scope uses
+schemas without a handler, the shell will ignore the activation. (Nothing happens in response to a tap by the user.)
+
+If you want to intercept such activations (either for schemas without a handler, or to generally intercept result activation),
+you must implement the \link unity::scopes::ScopeBase::activate ScopeBase::activate()\endlink method:
+
+\code{.cpp}
+class MyScope : public ScopeBase
+{
+    virtual ActivationQueryBase::UPtr activate(Result const& result,
+                                               ActionMetadata const& metadata) override;
+    ...
+}
+\endcode
+
+In addition, you must call \link unity::scopes::Result::set_intercept_activation Result::set_intercept_activation()\endlink
+for all results that should trigger a
+call to your `activate()` method. Your implementation of `activate()` should follow the same guidelines as for
+`perform_action()` (except that widget and action identifiers do not apply to result activation).
+
+\paragraph export Exporting a scope
+
+Your scope must be compiled into a `.so` shared library and, to be successfully
+loaded at runtime, it must provide two C functions to create and destroy it.
+A typical code snippet to do this looks as follows:
+
+\code{.cpp}
+extern "C"
+{
+    unity::scopes::ScopeBase* UNITY_SCOPE_CREATE_FUNCTION()
     {
         return new MyScope();
     }
 
-    EXPORT void UNITY_SCOPE_DESTROY_FUNCTION(unity::scopes::ScopeBase* scope_base)
+    void UNITY_SCOPE_DESTROY_FUNCTION(unity::scopes::ScopeBase* scope_base)
     {
         delete scope_base;
     }
 }
 \endcode
 
-\subsubsection aggscope Case 2: A simple aggregator scope.
+\subsubsection aggscope Case 2: An aggregating scope
 
-Aggregator scope is not much different from regular scopes, except for its data sources can include any other scope(s). The main difference is in the
-implementation of run method of unity::scopes::SearchQueryBase and in the new class that has to implement
-\link unity::scopes::SearchListenerBase SearchListenerBase\endlink interface, which receives result from other scope(s).
+Aggregating scopes are scopes that collect results from other scopes and possibly consolidate, modify, or re-categorise
+the results in some way. In other words, for an aggregating scope, the data source(s) are other scopes rather than,
+say, a remote web service.
 
-\paragraph subquery Query another scopes via SearchQueryBase::subsearch()
+To receive results from its child scopes, your scope must implement a class that derives from
+\link unity::scopes::SearchListenerBase SearchListenerBase\endlink. You provide an instance
+of this class to each sub-query; the scopes run time invokes callback methods on this class
+to let you know when a new result or status update arrives, and when a query completes.
 
-To send search query to another scope, use one of the `subsearch()` overloads of unity::scopes::SearchQueryBase inside your implementation of unity::scopes::SearchQueryBase.
-This method requires - among search query string - an instance of \link unity::scopes::ScopeProxy ScopeProxy\endlink that points to the target scope and an instance of class that implements
-\link unity::scopes::SearchListenerBase SearchListenerBase\endlink interface. ScopeProxy can be obtained from unity::scopes::RegistryProxy and the right place to
-do this is in the implementation of \link unity::scopes::ScopeBase::start() start()\endlink method of \link unity::scopes::ScopeBase ScopeBase\endlink interface.
+\paragraph childscopes Locating child scopes
+
+To send queries to its child scopes, your scope must obtain a proxy for each child scope. The scopes run time
+runs a registry process. The job of the registry (among other things) is to provide information about available
+scopes (whether they are local scopes or remote scopes in the Smartscopes server).
+
+You can obtain the proxy for a child scope by calling  \link unity::scopes::Registry::get_metadata get_metadata()\endlink
+on the registry, supplying the ID of the child scope. The return value is an instance of type
+\link unity::scopes::ScopeMetadata ScopeMetadata\endlink that describes the scope and also provides access to the
+proxy for the scope.
+
+\paragraph subquery Sub-queries
+
+To send a query to another scope, use one of the `subsearch()` overloads of \link unity::scopes::SearchQueryBase\endlink
+inside your implementation of
+\link unity::scopes::SearchQueryBase::run SearchQueryBase::run()\endlink.
+This method requires the proxy to the child scope to query, the query details (\link unity::scopes::CannedQuery CannedQuery\endlink), plus
+an instance of your `SearchListenerBase` implementation that will receive the query results.
+
+\note `subsearch()` is identical to
+\link unity::scopes::ScopeBase::search search()\endlink but, for `subsearch()`, the scopes run time transparently
+forwards query cancellation to child scopes, so your implementation of \link unity::scopes::QueryBase::cancelled QueryBase::cancelled()\endlink
+does not need to forward cancellation to its children.
+(However, your query class still needs to react to cancellation and should terminate the current query
+is quickly as possible in response to a cancelled message.)
+
+Here is how you could implement an aggregating scope that passes a query to a single child scope "scope-A":
 
 \code{.cpp}
 
-int MyScope::start(std::string const&, unity::scopes::RegistryProxy const& registry)
+void MyScope::start(std::string const& scope_id) override
 {
+    auto reg = registry();  // Up-call into base class
+    if (!reg)
+    {
+        throw ConfigException(scope_id + ": No registry available, cannot locate child scopes");
+    }
+
     try
     {
-        auto meta = registry->get_metadata("scope-A");
+        auto meta = reg->get_metadata("scope-A");
         scope_to_query_ = meta.proxy(); // store the proxy for passing it further in search 
     }
     catch (NotFoundException const& e)
     {
         ...
     }
-    return VERSION;
 }
 
-unity::scopes::QueryBase::UPtr MyScope::search(CannedQuery const& query, unity::scopes::SearchMetadata const&)
+QueryBase::UPtr MyScope::search(CannedQuery const& query,
+                                SearchMetadata const& metadata)
 {
-    SearchQueryBase::UPtr q(new MyQuery(query, scope_to_query_));
+    SearchQueryBase::UPtr q(new MyQuery(query, metadata, scope_to_query_));
     return q;
 }
 
 ...
 
-void MyQuery::run(unity::scopes::SearchReplyProxy const& upstream_reply) 
+void MyQuery::run(SearchReplyProxy const& upstream_reply) 
 {
     auto category = reply->register_category("recommended", "Recommended", icon, "");
     SearchListenerBase::SPtr reply(new MyReceiver(upstream_reply, category));
     subsearch(scope_to_query_, query_, reply);
-    ...
 }
 \endcode
 
-\paragraph receiver Create a class that implements SearchListenerBase interface
+Note that the `subsearch()` call is asynchronous and returns immediately. Despite this, your `MyQuery` instance is kept alive
+because the scopes run time does not delete it until the child query has completed. (The run time tracks the `reply` proxy
+for the query and holds the query alive until it receives a finished message from the child scope.)
 
-The \link unity::scopes::SearchListenerBase SearchListenerBase\endlink is an abstract class to receive the results of a query sent to a scope. Its virtual push methods let the
-implementation receive \link unity::scopes::SearchListenerBase::push result items and categories\endlink returned by that query. A simple implementation of
-an aggregator scope may just register all categories it receives and push all received results upstream to the query originator, e.g.
+\paragraph receiver Receiving sub-query results
+
+Here is a simple implementation of a receiver that passes all child categories and results through to
+its parent without change. Of course, a more realistic aggregating scope will typically aggregate from
+more than one child and probably de-duplicate, collate, or otherwise modify child results before passing
+them upstream.
 
 \code{.cpp}
 
-void push(Category::SCPtr category)
+class MyReceiver: public SearchListenerBase
 {
-    upstream_->register_category(category);
-}
+public:
+    virtual void push(Category::SCPtr const& category) override
+    {
+        upstream_reply_->register_category(category);
+    }
 
-void MyReceiver::push(CategorisedResult result)
-{
-    upstream_->push(std::move(result));
-}
+    virtual void push(CategorisedResult result) override
+    {
+        upstream_reply_->push(std::move(result));
+    }
+
+    MyReceiver(SearchReplyProxy const& upstream_reply) :
+        upstream_reply_(upstream_reply)
+    {
+    }
+
+private:
+    SearchReplyProxy upstream_reply_;
+};
 \endcode
 
-A more sophisticated aggregator scope can rearrange results it receives into a different set of categories, alter or enrich the results before pushing them
-upstream etc.
+\paragraph aggbuffering Controlling category order
 
-\paragraph aggactiv Activation and previews of results processed by aggregator scopes
+Categories are displayed in the order their results are pushed. This can pose a challenge
+for aggregator scopes because results from child scopes often arrive
+in random order. To control the order in which categories are rendered,
+the aggregator must buffer and potentially re-order results by
+category before pushing them.
 
-If an aggregator scope just forwards results it receives from other scopes, possibly only changing their category assignment, then there is nothing
-to do in terms of handling previews, preview actions and result activation: preview and perform_action requests will trigger respective methods of
-unity::scopes::ScopeBase for the scope that created results. Result activation will trigger unity::scopes::ScopeBase::activate() method for the scope that
-produced the result as long as it set interception flag for it. In other words, when aggreagor scope just forwards results (and makes only minor
-adjustements to them, such as category assignment), it is not involved in preview or activation handling at all.
+\link unity::scopes::utility::BufferedResultForwarder BufferedResultForwarder\endlink makes
+it easier to do this.
+To use the class, you create one instance for each child scope and chain the instances together
+in the desired order of categories. Each forwarder buffers results until its predecessor in
+the chain indicates that it has completed its category ordering, at which point it itself pushes
+any results it has buffered so far and indicates to its follower that it is ready.
 
-If, however, aggregator scope changes attributes of results (or creates completely new results that "replace" received results), then some extra care needs to
-be taken:
+By default, a forwarder indicates that it it is ready (has completed ordering) as soon as it has received
+a single result. This is useful if an aggregator has child scopes that produce results
+for a single category each. In this case, the order of the forwarders determines which
+category (the one used by child A or by child B) appears first when the results are rendered.
+
+If an aggregator collates results from children that each produce results for more than
+one category, you can override the default implementation of
+\link unity::scopes::utility::BufferedResultForwarder::push push()\endlink to change
+categories for results from its child, and/or indicate
+that it is ready only once the child has provided results for all expected categories.
+(See \link unity::scopes::utility::BufferedResultForwarder BufferedResultForwarder\endlink
+for more details.)
+
+\paragraph aggactiv Activation and preview
+
+If an aggregator scope simply forwards the results it receives from other scopes (possibly changing their category),
+the aggregator need not do anything special for previews, preview actions, or result activation. In this case,
+previews, preview actions, and result activation are sent to the scope that produced the corresponding result.
+
+If, however, an aggregator scope changes attributes of results (or creates completely new results that "replace"
+received results), you must take extra care:
 <ul>
-<li>if original scope should still handle preview (and activation) requests, then <b>aggregator has to store a copy of original result</b> in the modified (or brand
-new) result. This can be done with unity::scopes::Result::store method. Preview request for such result will automatically trigger a scope that created the most
-inner stored result, and that scope will receive the stored result. It will also do the same for activation as long as the original scope set interception flag
-on that result.
+<li>If the original original scope should still handle preview (and activation) requests for a modified result, you must store
+a copy of the original result in the modified (or new) result by calling \link unity::scopes::Result::store Result::store()\endlink.
+Preview requests for such a result will automatically trigger the scope that created the innermost stored result.
 
-\note Making substantial changes to received results and failing to store original results with them may result in unexpected behavior: a scope will
-suddenly receive a modified version of it and depending on the level of changes, it may or may not be able to correctly handle it.
+\note Making changes to a receive result but failing to store the original result with the change can cause
+in unexpected behavior: a scope could receive a modified result and, depending the exact changes, may
+not be able to correctly deal with the result.
 
-<li>if aggregator scope creates a completly new result that replaces original one, but doesn't store a copy of the original result, it is expected to handle
-preview (and potentially activation requests - if interception activation flag is set) - this is no different than for normal scopes, see \ref handlingpreview and \ref handlingactivation .
+<li>If an aggregator creates a completely new result that replaces the original result but does not also store a copy of
+the original result, the aggregator _must_ handle preview and activation requests (if the intercept flag is set).
+The actions to take are the same as for a non-aggregating scope (see \ref handlingpreview and \ref handlingactivation).
 </ul>
 
-Consider the following example of implementation of unity::scopes::SearchListenerBase interface that modifies results and stores their copies, so that original
-scope can handle previews and activation for them:
+Here is an example `push()` implementation that modifies a result and stores a copy, so the original scope
+can handle preview and activation:
 
 \code{.cpp}
 void MyReceiver::push(CategorisedResult original_result)
 {
-    CategorisedResult result(agg_category); // agg_category is a category that aggregates all results from other scopes
+    // agg_category is a category that aggregates all results from other scopes
+    CategorisedResult result(agg_category);
     result.set_uri(original_result.uri());
-    result.set_title(original_result.title() + "(aggregated)");
+    result.set_title(original_result.title() + " (aggregated)");
     result.set_art(original_result.art());
     result.store(original_result);
 
@@ -437,33 +705,336 @@ void MyReceiver::push(CategorisedResult original_result)
 }
 \endcode
 
-\subsection scopetesting Testing
+\subsection scopesettings Settings
 
-Unity Scopes API provides testing helpers based on well-known and established testing frameworks:
-<a href="https://code.google.com/p/googletest/">googletest</a> and <a href="https://code.google.com/p/googlemock/">googlemock</a>.
-Please see respective documentation of those projects for general information about how to use Google C++ Testing Framework.
+A scope can provide for simple customizations, such as allowing the user to configure an email address or
+select a distance unit as metric or imperial.
 
-All the helper classes provided by Scopes API are located in unity::scopes::testing namespace. The most important ones are:
+\subsubsection settings_definitions Defining settings
+
+You can define such settings in a configuration file.
+The file must be placed into the same directory as the scope's normal
+configuration file, with the name `<scope-name>-settings.ini`. For example, for a scope with ID `com.acme.myscope`,
+the normal configuration file is `com.acme.myscope.ini`, and the settings definition file is
+`com.acme.myscope-settings.ini`. Both files must be installed in the same directory (together with the scope's `.so` file).
+
+The shell constructs a user interface from the settings definitions. The user can change settings via that UI.
+The scope can retrieve the actual setting values at run time (see \ref read_settings).
+
+The following types are supported for settings:
+
 <ul>
-<li>unity::scopes::testing::TypedScopeFixture - template class that takes your scope class name as a template argument and creates a test fixture that can be
-used in tests.
-<li>unity::scopes::testing::MockSearchReply - a mock of unity::scopes::SearchReply that makes it possible to intercept responses to search request sent from
-the scope to a client, making it easy to test if your scope returns all expected data.
-<li>unity::scopes::testing::MockPreviewReply - a mock of unity::scopes::PreviewReply that makes is possible to intercept and test responses to preview request
-sent from the scope to a client.
-<li>unity::scopes::testing::Result - a simple class defined on top of unity::scopes::Result that provides a default constructor, making it possible to create
-dummy results (with no attributes) for testing purposes.
-<li>unity::scopes::testing::category - a simple class defined on top of unity::scopes::Category that makes it possible to create dummy categories (which would
-otherwise require an instance of unity::scopes::SearchReply and a call to unity::scopes::SearchReply::register_category()).
+<li>`string` - a string value
+<li>`number` - a numeric value (integer or floating point)
+<li>`boolean` - `true` or `false`
+<li>`list` - a list of alternatives to choose from (single-choice)
 </ul>
 
-With the above classes a test case that checks if MyScope calls appropriate methods of unity::scopes::SearchReply may look like this (note that it just checks
-if proper methods get called and uses _ matchers that match any values; put actual values in there for stricts checks):
+It is possible to optionally define a default value for each setting.
+
+Here are the contents of an example definition file:
+~~~
+[location]
+type = string
+defaultValue = London
+displayName = Location
+
+[distanceUnit]
+type = list
+defaultValue = 1
+displayName = Distance Unit
+displayName[de] = Entfernungseinheit
+displayValues = Kilometers;Miles
+displayValues[de] = Kilometer;Meilen
+
+[age]
+type = number
+defaultValue = 23
+displayName = Age
+
+[enabled]
+type = boolean
+defaultValue = true
+displayName = Enabled
+
+# Setting without a default value
+[color]
+type = string
+displayName = Color
+~~~
+
+The file must contain a group for each setting.
+The order of the groups determines the display order for the user interface
+that is constructed by the shell. The group name is the ID of the corresponding setting.
+
+Each setting definition must contain at least the following mandatory definitions:
+<ul>
+<li> `type` - Defines the type of the setting (`string`, `number`, `boolean`, or `list`).
+<li> `displayName` - Defines a display name that is shown for this setting by the shell.
+</ul>
+
+The defaultValue field is optional. If present, it defines
+a default value that is provided to the scope if the user has not changed anything (or has never used the settings UI
+before using the scope).
+It is possible to test for settings that do not have a default value and
+were never set by the user (see \ref read_settings).
+
+For settings of type `list`, the `displayValues` field is mandatory. It must contain an array
+that lists the available choices. If you provide a default value,
+it must be in the range `0..max-1` (where `max` is the number of choices).
+
+The `displayName` and `displayValues` fields can be localized by appending a locale identifier
+in square brackets. If no entry can be found that matches the current locale, the non-localized value
+is used.
+
+\subsubsection read_settings Accessing settings
+
+The settings that are currently in effect are available to a scope via the unity::scopes::ScopeBase::settings()
+and unity::scopes::QueryBase::settings() methods.
+These methods return a unity::scopes::VariantMap with one entry per setting. The map contains an entry for
+each setting (using the group name as the key). The lookup value is a unity::scopes::Variant that holds
+the current value of the setting.
+
+If a setting has a value, the corresponding entry in the map contains a string (for settings of type `string`,
+a boolean (for settings of type `boolean`), or an integer (for settings of type `number` and `list`). (If the user
+did not provide a particular value, but the settings definition provided a default value, the `Variant` contains the
+default value.
+
+If a setting does not have a default value, and the user did not establish a value for the setting, the corresponding
+entry is absent from the map.
+
+When you use settings in your scope implementation, do not cache the values and re-use them
+for a different query. If you do, any setting changes made by the user will not take effect until
+your scope is re-started by the run time. (Because the user cannot know when that happens, this
+can be highly confusing.) Instead, call `settings()` each time you need to use the value
+of a setting. That way, your scope will react to any change made by the user as soon as it receives another
+query.
+
+Here is an example of how to read the current settings values for the definition in \ref settings_definitions :
+
+~~~
+// In your `ScopeBase` or `QueryBase` implementation:
+
+unity::scopes::VariantMap s = settings();  // The settings method is provided by the base class
+
+cout << s["location"].get_string();        // Prints "London" unless the user changed the value
+
+auto it = s.find("color");
+if (it != s.end())                         // Setting does not have a default value, need to test
+{
+    cout << it->second.get_string();       // Prints the user-established value
+}
+~~~
+
+\subsection directories File system access
+
+Scopes that are installed from click packages are subject to confinement and are not allowed
+to access most parts of the file system. However, a few locations are available to a scope.
+You can access these paths by calling methods on \link unity::scopes::ScopeBase ScopeBase\endlink.
+
+\note Do not call these methods from the constructor of your `ScopeBase` implementation. If you
+do, these methods throw `LogicException`. Instead, call them from
+\link unity::scopes::ScopeBase::start() start()\endlink or any time thereafter.
+
+\link unity::scopes::ScopeBase::scope_directory() scope_directory()\endlink returns the path of the installation
+directory of the scope. This directory contains the scope's `.so` and `.ini` files, plus whatever other
+files you decide to package with your scope. The scope has read-only permission for this directory.
+
+\link unity::scopes::ScopeBase::cache_directory() cache_directory()\endlink returns the path of a
+directory that is (exclusively) writable for the scope. You can use this directory to store
+persistent information, such as a cache of results.
+
+\link unity::scopes::ScopeBase::app_directory() app_directory()\endlink returns the path of a
+read-only directory. If the scope is packaged together with an app, the app has permission to write
+files in this location, that is, this directory can be used make information provided by the app
+available to the scope (but not vice versa).
+
+\link unity::scopes::ScopeBase::tmp_directory() tmp_directory()\endlink returns the path of a
+read-only directory that is (exclusively) writable for the scope. This directory is periodically
+cleaned of unused files. The exact amount of time may vary, but is on the order of a few hours.
+The directory is also cleaned during reboot.
+
+\subsection online_accounts Online Accounts
+
+A scope may require access to an online account in order to evaluate particular results, perform certain actions, or
+perhaps even operate at all. The following section describes how to use online account services from your scope.
+
+\subsubsection oa_step1 Step 1: Update Apparmor manifest.
+
+Firstly, in order for your scope to be granted access to the online accounts backend, the "accounts" policy group needs
+to be added to your Apparmor manifest file, as follows:
+
+\paragraph oa_apparmor Example Apparmor manifest file:
+\code
+{
+    "template": "ubuntu-scope-network",
+    "policy_groups": [
+        "accounts"
+    ],
+    "policy_version": 1.2
+}
+\endcode
+
+\subsubsection oa_step2 Step 2: Account service configuration.
+
+Scopes access accounts at a service level (E.g. YouTube service under a Google account, Ubuntu Store service under an
+Ubuntu One account, etc.), therefore each scope must provide some config to specify its account service requirements.
+
+There are 2 additional files that a scope must supply:
+1. A .service file to specify a method of accessing its particular account provider.
+2. A .application file to link one or more services to your scope.
+
+\paragraph oa_service Example .service file:
+\code
+<?xml version="1.0" encoding="UTF-8"?>
+<service id="com.ubuntu.scopes.youtube_youtube">
+  <type>sharing</type>
+  <icon>youtube</icon>
+  <name>YouTube</name>
+  <provider>google</provider>
+  <translations>unity-scope-youtube</translations>
+  <template>
+    <group name="auth">
+      <setting name="method">oauth2</setting>
+      <setting name="mechanism">web_server</setting>
+      <group name="oauth2">
+        <group name="web_server">
+          <setting name="Host">accounts.google.com</setting>
+          <setting name="AuthPath">o/oauth2/auth?access_type=offline</setting>
+          <setting name="TokenPath">o/oauth2/token</setting>
+          <setting name="RedirectUri">https://wiki.ubuntu.com/</setting>
+          <setting name="ResponseType">code</setting>
+          <setting type="as" name="Scope">['https://www.googleapis.com/auth/youtube.readonly']</setting>
+          <setting name="ClientId">xxxx</setting>
+          <setting name="ClientSecret">xxxx</setting>
+          <setting type="as" name="AllowedSchemes">['https','http']</setting>
+        </group>
+      </group>
+    </group>
+  </template>
+</service>
+\endcode
+
+\paragraph oa_application Example .application file:
+\code
+<?xml version="1.0" encoding="UTF-8"?>
+<application id="com.ubuntu.scopes.youtube_youtube">
+  <description>YouTube</description>
+  <desktop-entry>com.ubuntu.scopes.youtube_youtube.desktop</desktop-entry>
+  <services>
+    <service id="com.ubuntu.scopes.youtube_youtube">
+      <description>Watch your favorite YouTube videos</description>
+    </service>
+  </services>
+</application>
+\endcode
+
+\subsubsection oa_step3 Step 3: Update Click manifest.
+
+Now that we have added the new files from the previous step to our project, we need to update our click manifest file to include
+them:
+
+\paragraph oa_click Example Click manifest file:
+\code
+{
+    "description": "YouTube scope",
+    "framework": "ubuntu-sdk-14.10-dev2",
+    "architecture": "armhf",
+    "hooks": {
+        "youtube": {
+            "scope": "youtube",
+            "apparmor": "apparmor.json",
+            "account-application": "youtube.application",
+            "account-service": "youtube.service"
+        }
+    },
+    "icon": "youtube/icon.png",
+    "maintainer": "Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>",
+    "name": "com.ubuntu.scopes.youtube",
+    "title": "YouTube scope",
+    "version": "1.0.12"
+}
+\endcode
+
+\subsubsection oa_step4 Step 4: Utilize the OnlineAccountClient class.
+
+Finally, we can access online account services from within our scope implementation.
+
+The first thing we need to do is instantiate a unity::scopes::OnlineAccountClient object. On construction we must
+specify our account service name, service type, and provider name (These correspond to the values of the "service_id",
+"type", and "provider" entries in your .service file).
+
+Via this object we can get the statuses of all account services, set a callback for status updates, and register
+results and widgets that require authorization (See: unity::scopes::OnlineAccountClient class documentation for more
+detail).
+
+Here's a simple example of how one could return a "Log-in" result to the dash (Selecting this result from the dash will
+trigger an authorization request to the user before executing one of the 2 post-login actions):
+
+\paragraph oa_usage Example OnlineAccountClient usage:
+\code
+void Query::run(unity::scopes::SearchReplyProxy const& reply)
+{
+    // Instantiate a unity::scopes::OnlineAccountClient object
+    unity::scopes::OnlineAccountClient oa_client("com.ubuntu.scopes.youtube_youtube", "sharing", "google");
+
+    // Check if our service is authenticated under at least one account
+    bool service_authenticated = false;
+    for (auto const& status : oa_client.get_service_statuses())
+    {
+        if (status.service_authenticated)
+        {
+            service_authenticated = true;
+            break;
+        }
+    }
+
+    // If our service is not authenticated, return a "Log-in" result
+    if (!service_authenticated)
+    {
+        auto cat = reply->register_category("youtube_login", "", "");
+        unity::scopes::CategorisedResult res(cat);
+        res.set_title("Log-in to YouTube");
+
+        oa_client.register_account_login_item(res,
+                                              query(),
+                                              unity::scopes::OnlineAccountClient::InvalidateResults,
+                                              unity::scopes::OnlineAccountClient::DoNothing);
+        reply->push(res);
+    }
+}
+\endcode
+
+\subsection scopetesting Testing
+
+The Unity Scopes API provides testing helpers based on the well-known and established testing frameworks,
+<a href="https://code.google.com/p/googletest/">googletest</a> and <a href="https://code.google.com/p/googlemock/">googlemock</a>.
+Please see the respective documentation of these framework for general information on how to use them.
+
+The testing helper classes are in the unity::scopes::testing namespace. The most important ones are:
+<ul>
+<li>unity::scopes::testing::TypedScopeFixture - A template class that takes your scope class name as a template argument
+and creates a test fixture that can be used in tests.
+<li>unity::scopes::testing::MockSearchReply - A mock of unity::scopes::SearchReply that makes it possible to intercept
+responses to search request sent from the scope to a client, so you can test if your scope returns the expected data.
+<li>unity::scopes::testing::MockPreviewReply - A mock of unity::scopes::PreviewReply that makes it possible to
+intercept and test responses to preview request sent from the scope to a client.
+<li>unity::scopes::testing::Result - A simple Result class derived from unity::scopes::Result that provides a default constructor,
+so you can create dummy results (without attributes) for testing purposes.
+<li>unity::scopes::testing::category - A simple class derived from unity::scopes::Category that makes it possible to create
+dummy categories (which otherwise would require an instance of \link unity::scopes::SearchReply SearchReply\endlink and a call to
+\link unity::scopes::SearchReply::register_category register_category()\endlink).
+</ul>
+
+Here is a test that checks if `MyScope` calls appropriate methods of unity::scopes::SearchReply. Note
+that the test only checks that the correct methods are called and uses `_` matchers that match any value.
+For a proper test, you will need to substitute values appropriate for your scope.
+
 \code{.cpp}
-typedef unity::scopes::testing::TypedScopeFixture<MyScope> TestScopeFixutre;
+typedef unity::scopes::testing::TypedScopeFixture<MyScope> TestScopeFixture;
 using namespace ::testing;
 
-TEST_F(TestScopeFixutre, search_results)
+TEST_F(TestScopeFixture, search_results)
 {
     const unity::scopes::CategoryRenderer renderer;
 
@@ -476,14 +1047,15 @@ TEST_F(TestScopeFixutre, search_results)
                     unity::scopes::Category::SCPtr(new unity::scopes::testing::Category("id", "title", "icon", renderer))
                 )
             );
-    EXPECT_CALL(reply, register_annotation(_))
+    EXPECT_CALL(reply, push(Matcher<unity::scopes::Annotation const&>(_)))
             .Times(1)
             .WillOnce(Return(true));
-    EXPECT_CALL(reply, push(_))
+    EXPECT_CALL(reply, push(Matcher<unity::scopes::CategorisedResult const&>(_)))
             .Times(1)
             .WillOnce(Return(true));
 
-    unity::scopes::SearchReplyProxy reply_proxy(&reply, [](unity::scopes::SearchReplyBase*) {}); // note: this is a std::shared_ptr with empty deleter
+    // note: this is a std::shared_ptr with empty deleter
+    unity::scopes::SearchReplyProxy reply_proxy(&reply, [](unity::scopes::SearchReplyBase*) {});
 
     unity::scopes::CannedQuery query(scope_id, "", "");
     unity::scopes::SearchMetadata meta_data("en_EN", "phone");
@@ -498,31 +1070,136 @@ TEST_F(TestScopeFixutre, search_results)
 
 Installing a scope is as simple as running `make install` when using the scope
 template. You might need to restart the global scope registry when a new scope
-is installed by running: `restart scope-registry`.
+is installed by running:
 
-In the future it will be possible to create click packages with scopes.
+\verbatim
+restart scope-registry
+\endverbatim
 
-\subsection scopetool Previewing scope
+Scopes are installed under one of the "scopes directories"
+scanned by the scope registry.  Currently these default to:
 
-To help with the development of a scope and to be able to see how will the dash
-render the dynamically-specified categories (see unity::scopes::CategoryRenderer),
-a specialized tool to preview a scope is provided - the "Unity Scope Tool".
+<ul>
+<li>/usr/lib/${arch}/unity-scopes</li>
+<li>/custom/lib/${arch}/unity-scopes</li>
+<li>$HOME/.local/share/unity-scopes</li>
+</ul>
 
-You can install it from the Ubuntu archive using:
+The `/usr/lib` directory is for scopes that are pre-installed by Canonical.
+The `/custom/lib` directory is for scopes that pre-installed by OEMs.
+The `$HOME/.local` directory is for scopes that are installed from click packages.
+
+Individual scopes are installed into subdirectories of these
+installation directories. The name of the subdirectory containing
+a scope's `.ini` and `.so` files can be anything but, to avoid name clashes,
+we strongly suggest something that is unique, such as `com.canonical.scopes.scopename`.
+At a minimum, the directory structure must contain the following:
+
+    -+- ${scopesdir}
+     `-+- subdirectory
+       |--- scopename.ini
+       `--- <library>.so
+
+That is, each subdirectory must contain a scope `.ini` file and a shared library containing the
+scope code. You are free to ship additional data in this
+directory, such as a settings definition file (if your scope uses settings) or icon files
+and screenshots.
+
+The name of the scope's `.ini` file _must_ be a unique ID for the scope. We _strongly_
+suggest to use a unique identifier, such as `com.canonical.scopes.scopename`, to avoid
+clashes with scopes created by other developers.
+
+The name of of the scope's `.so` file can be `libscopename.so`, `scopename.so`, or simply `scope.so`. For example,
+for a scope named `Fred`, the names `libFred.so`, `Fred.so`, and `scope.so` are acceptable. (No other library
+names are valid.)
+
+The scope `.ini` file uses the standard `.ini` file format, with the
+following keys:
+
+    [ScopeConfig]
+    DisplayName = human readable name of scope
+    Description = description of scope
+    Author = Author
+    Version = 1
+    Icon = path to icon representing the scope
+    Art = path to screenshot of the scope
+    SearchHint = hint text displayed to user when viewing scope
+    HotKey =
+    ResultsTtlType = None, Small, Medium, or Large
+    ChildScopes =
+    Keywords =
+
+    [Appearance]
+    ForegroundColor = default text color (defaults to theme-provided foreground color)
+    BackgroundColor = color of scope background (default is transparent)
+    ShapeImages = whether to use Ubuntu-shape for all cards and artwork (defaults to true)
+    CategoryHeaderBackground = background scheme of the results categories
+    PreviewButtonColor = color of preview buttons (defaults to theme-provided color)
+    LogoOverlayColor = color for the overlay in scopes overview (defaults to semi-transparent black)
+    PageHeader.Logo = image containing scope's logo
+    PageHeader.ForegroundColor = default header text color (defaults to the overall foreground color)
+    PageHeader.Background = background scheme of the header
+    PageHeader.DividerColor = color of the header divider
+    PageHeader.NavigationBackground = background scheme of the navigation bar
+
+The `ScopeConfig` group is mandatory and must contain settings for at least `DisplayName`, `Description`, and `Author`.
+`DisplayName` and `Description` can (and should) be localized. For example:
+
+`Description[de_DE] = Fu&szlig;ballergebnisse`
+
+The `Version` key is optional, but we strongly recommend that you set it.
+If the behavior of your scope changes in any way that is visible to the query source
+(such having added or removed a result attribute), you should increment the version number.
+This allows an aggregating scope to adjust its behavior according to which version of
+your scope is installed.
+If not set, the default value is 0. You can set the value to any integer >= 1.
+
+In addition to allowing the registry to make the scope available, this information controls how the scope appears
+in the "Scopes" scope.
+
+The group `Appearance` and all keys within are optional and can be used to customize the look of the scope.
+Some of the `Appearance` keys (like `PageHeader.Background`) require background scheme uris. Valid uris for these keys include:
+
+<ul>
+<li>color:///\#aarrggbb</li>
+<li>color:///black</li>
+<li>gradient:///\#aarrggbb/\#aarrggbb</li>
+<li>/absolute/path/to/image</li>
+<li>http://remote-server.com/path/to/image</li>
+</ul>
+
+The value of `ChildScopes` key is to be used by aggregator scopes. It must be a semicolon separated list of scope identifiers that
+might be aggregated by this scope, for example:
+
+`ChildScopes = com.foo.bar;com.foo.bar2`
+
+This list of scopes is translated to the names of children scopes when in the scopes overview page of the Unity Dash.
+
+The `Keywords` key is optional, but we recommend that you use it. Keywords are used by aggregators to collect results from scopes of
+similar type (E.g. The Music scope will aggregate scopes with the keyword "music", and so on). The value of `Keywords` should specify a
+list of keywords your scope falls under. Like `ChildScopes`, this value must be a semicolon separated list (E.g. `Keywords = music;video`).
+
+\subsection scopetool The scope tool
+
+The Unity Scope Tool is a stand-alone redering tool that allows you
+to see how the dash will render your scope.
+
+You can install the tool from the Ubuntu archive using:
 \verbatim
 sudo apt-get install unity-scope-tool
 \endverbatim
 
-After installation, you can run the scope-tool with a parameter specifying
-path to your scope configuration file (for example `unity-scope-tool ~/dev/myscope/build/myscope.ini`). If a binary for your scope can be found in the same
-directory (ie there's `~/dev/myscope/build/libmyscope.so`), the scope-tool will
-display surfacing and search results provided by your scope, and allow you to
-perform searches, invoke previews and actions within previews.
+After installation, you can run the scope-tool with a parameter specifying the
+path to your scope configuration file (for example `unity-scope-tool ~/dev/myscope/build/myscope.ini`).
+If a binary for your scope can be found in the same
+directory, the scope-tool
+displays surfacing and search results provided by your scope, and it allows you to
+perform searches, invoke previews, and perform actions within previews.
 
-Note that the scope-tool is using the same rendering mechanism as Unity
-itself, and therefore what you see in the scope-tool is what you get in Unity.
-It can also be used to fine-tune the category definitions, as it allows you
-to manipulate the definitions on the fly, and once you're happy with the result
+Note that the scope-tool uses the same rendering mechanism as Unity
+itself and, therefore, what you see in the scope-tool is what you get in Unity.
+The tool can also be used to fine-tune category definitions, as it allows you
+to manipulate the definitions on the fly. Once you are satisfied with the result,
 you can just copy the JSON definition back into your scope
 (see unity::scopes::CategoryRenderer::CategoryRenderer()).
 

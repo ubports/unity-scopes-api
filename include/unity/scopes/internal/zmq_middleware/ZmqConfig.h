@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_ZMQCONFIG_H
-#define UNITY_SCOPES_INTERNAL_ZMQCONFIG_H
+#pragma once
 
 #include <unity/scopes/internal/ConfigBase.h>
 
@@ -33,17 +32,23 @@ namespace internal
 class ZmqConfig : public ConfigBase
 {
 public:
-    static const char* ZMQ_CONFIG_GROUP;
-
     ZmqConfig(std::string const& configfile);
     ~ZmqConfig();
 
-    std::string public_dir() const;
-    std::string private_dir() const;
+    std::string endpoint_dir() const;
+    int twoway_timeout() const;
+    int locate_timeout() const;
+    int registry_timeout() const;
+    std::string registry_endpoint_dir() const;
+    std::string ss_registry_endpoint_dir() const;
 
 private:
-    std::string public_dir_;
-    std::string private_dir_;
+    std::string endpoint_dir_;
+    int twoway_timeout_;
+    int locate_timeout_;
+    int registry_timeout_;
+    std::string registry_endpoint_dir_;
+    std::string ss_registry_endpoint_dir_;
 };
 
 } // namespace internal
@@ -51,5 +56,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

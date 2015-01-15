@@ -57,26 +57,25 @@ When using <tt>{"schema-version": 1}</tt>, the following keys are understood:
 
 \subsection template1 template keys
 
-\arg \c category-layout Specifies renderer type; possible values: \c "grid" (default), \c "carousel", \c "organic-grid", \c "journal", \c "vertical-journal"
+\arg \c category-layout Specifies renderer type; possible values: \c "grid" (default), \c "carousel", \c "vertical-journal", \c "horizontal-list"
 \arg \c card-layout Specifies layout of the individual result cards; possible values: \c "vertical" (default), \c "horizontal"
 \arg \c card-size Size of the result cards; possible values: \c "small", \c "medium" (default), \c "large"; when using <tt>"category-layout": "vertical-journal"</tt> any integer between 12 and 38
 \arg \c overlay Overlay text data on top of the art; boolean, default false
-\arg \c collapsed-rows Number of result rows displayed while the category is collapsed; possible values: 1 or 2 (only affects grid and journal)
+\arg \c collapsed-rows Number of result rows displayed while the category is collapsed; possible values: any non-negative integer, where 0 fully expands the category (only affects grid and vertical journal)
 \arg \c card-background Background color for the cards; string; URI in the format \verbatim color:///#rrggbb \endverbatim or \verbatim color:///color_name
 \endverbatim or \verbatim gradient:///#rrggbb/#rrggbb \endverbatim or an image URI (will be stretched)
 
 \subsection components1 components keys
 
-\arg \c title Card title, string
-\arg \c art Card art (primary graphics), uri; can contain subkeys: \c "aspect-ratio" (double specifying the aspect ratio of the graphics, default: 1.0) and \c "fill-mode" (\c "crop" (default), or \c "fit")
-\arg \c subtitle Subtitle of a card, string
-\arg \c mascot Mascot (secondary graphics), uri
-\arg \c emblem Emblem, uri
-\arg \c summary Text summary, string
-\arg \c background Card background, can override the default specified in the card-background field of the template section, string (same URI format as for card-background)
-\arg \c attribute-1 string
-\arg \c attribute-2 string
-\arg \c attribute-3 string
+\arg \c title String specifying card's title
+\arg \c art URI specifying card's art (primary graphics), can contain subkeys: \c "aspect-ratio" (double specifying the aspect ratio of the graphics, default: 1.0)
+\arg \c subtitle String specifying subtitle of a card
+\arg \c mascot URI specifying card's mascot (secondary graphics)
+\arg \c emblem URI specifying card's emblem
+\arg \c summary String specifying text summary
+\arg \c background Card background URI, can override the default specified in the card-background field of the template section (same format as for card-background)
+\arg \c attributes Array of dictionaries specifying text and an optional icon (keys: "value", "icon")
+\arg \c overlay-color Color of overlay for templates with overlay
 
 \section example Example
 

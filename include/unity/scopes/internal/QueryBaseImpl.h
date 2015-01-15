@@ -16,16 +16,11 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_QUERYBASEIMPL_H
-#define UNITY_SCOPES_INTERNAL_QUERYBASEIMPL_H
+#pragma once
 
-#include <unity/scopes/internal/QueryCtrlImpl.h>
-#include <unity/scopes/ScopeProxyFwd.h>
 #include <unity/scopes/Variant.h>
-#include <unity/scopes/SearchListenerBase.h>
-#include <unity/scopes/SearchMetadata.h>
 
-#include <vector>
+#include <mutex>
 
 namespace unity
 {
@@ -36,37 +31,23 @@ namespace scopes
 namespace internal
 {
 
-class QueryBaseImpl final
+class SettingsDB;
+
+class QueryBaseImpl
 {
 public:
     QueryBaseImpl();
-    ~QueryBaseImpl();
+    virtual ~QueryBaseImpl();
 
-    QueryCtrlProxy subsearch(ScopeProxy const& scope,
-                                   std::string const& query_string,
-                                   SearchListenerBase::SPtr const& reply);
-    QueryCtrlProxy subsearch(ScopeProxy const& scope,
-                                   std::string const& query_string,
-                                   FilterState const& filter_state,
-                                   SearchListenerBase::SPtr const& reply);
-    QueryCtrlProxy subsearch(ScopeProxy const& scope,
-                                   std::string const& query_string,
-                                   std::string const& department_id,
-                                   FilterState const& filter_state,
-                                   SearchListenerBase::SPtr const& reply);
-    QueryCtrlProxy subsearch(ScopeProxy const& scope,
-                                   std::string const& query_string,
-                                   std::string const& department_id,
-                                   FilterState const& filter_state,
-                                   SearchMetadata const& metadata,
-                                   SearchListenerBase::SPtr const& reply);
+    virtual void cancel() = 0;
+    virtual bool valid() const = 0;
 
-    void cancel();
-    void set_metadata(SearchMetadata const& metadata);
+    unity::scopes::VariantMap settings() const;
+    void set_settings_db(std::shared_ptr<unity::scopes::internal::SettingsDB> const& db);
 
 private:
-    SearchMetadata::UPtr search_metadata_;
-    std::vector<QueryCtrlProxy> subqueries_;
+    std::shared_ptr<unity::scopes::internal::SettingsDB> db_;
+    mutable std::mutex mutex_;
 };
 
 } // namespace internal
@@ -74,5 +55,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

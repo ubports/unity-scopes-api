@@ -22,14 +22,15 @@
 #include <unity/scopes/internal/MWQuery.h>
 #include <unity/scopes/internal/MWReply.h>
 #include <unity/scopes/internal/PreviewQueryObject.h>
+#include <unity/scopes/internal/QueryBaseImpl.h>
 #include <unity/scopes/internal/QueryCtrlObject.h>
 #include <unity/scopes/internal/QueryObject.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
+#include <unity/scopes/internal/ScopeBaseImpl.h>
 #include <unity/scopes/ScopeBase.h>
 #include <unity/UnityExceptions.h>
 
 #include <cassert>
-#include <iostream> // TODO: remove this once logging is added
 #include <sstream>
 
 using namespace std;
@@ -45,9 +46,10 @@ namespace scopes
 namespace internal
 {
 
-ScopeObject::ScopeObject(RuntimeImpl* runtime, ScopeBase* scope_base) :
+ScopeObject::ScopeObject(RuntimeImpl* runtime, ScopeBase* scope_base, bool debug_mode) :
     runtime_(runtime),
-    scope_base_(scope_base)
+    scope_base_(scope_base),
+    debug_mode_(debug_mode)
 {
     assert(runtime);
     assert(scope_base);
@@ -68,7 +70,6 @@ MWQueryCtrlProxy ScopeObject::query(MWReplyProxy const& reply, MiddlewareBase* m
         // to be safe, we don't assert, in case someone is running a broken client.
 
         // TODO: log error about incoming request containing an invalid reply proxy.
-
         throw LogicException("Scope \"" + runtime_->scope_id() + "\": query() called with null reply proxy");
     }
 
@@ -79,13 +80,17 @@ MWQueryCtrlProxy ScopeObject::query(MWReplyProxy const& reply, MiddlewareBase* m
         query_base = query_factory_fun();
         if (!query_base)
         {
-            // TODO: log error, scope returned null pointer.
-            throw ResourceException("Scope \"" + runtime_->scope_id() + "\" returned nullptr from query_factory_fun()");
+            string msg = "Scope \"" + runtime_->scope_id() + "\" returned nullptr from query_factory_fun()";
+            BOOST_LOG_SEV(runtime_->logger(), Logger::Error) << msg;
+            throw ResourceException(msg);
         }
+        query_base->p->set_settings_db(scope_base_->p->settings_db());
     }
     catch (...)
     {
-        throw ResourceException("Scope \"" + runtime_->scope_id() + "\" threw an exception from query_factory_fun()");
+        string msg = "Scope \"" + runtime_->scope_id() + "\" threw an exception from query_factory_fun()";
+        BOOST_LOG_SEV(runtime_->logger(), Logger::Error) << msg;
+        throw ResourceException(msg);
     }
 
     MWQueryCtrlProxy ctrl_proxy;
@@ -117,26 +122,26 @@ MWQueryCtrlProxy ScopeObject::query(MWReplyProxy const& reply, MiddlewareBase* m
     {
         try
         {
-            reply->finished(ListenerBase::Error, e.what());
+            reply->finished(CompletionDetails(CompletionDetails::Error, e.what()));  // Oneway, can't block
         }
         catch (...)
         {
         }
-        cerr << "query(): " << e.what() << endl;
-        // TODO: log error
+        BOOST_LOG_SEV(runtime_->logger(), Logger::Error)
+            << "ScopeObject::query(): " << e.what();
         throw;
     }
     catch (...)
     {
         try
         {
-            reply->finished(ListenerBase::Error, "unknown exception");
+            reply->finished(CompletionDetails(CompletionDetails::Error, "unknown exception"));  // Oneway, can't block
         }
         catch (...)
         {
         }
-        cerr << "query(): unknown exception" << endl;
-        // TODO: log error
+        BOOST_LOG_SEV(runtime_->logger(), Logger::Error)
+            << "ScopeObject::query(): unknown exception";
         throw;
     }
     return ctrl_proxy;
@@ -150,11 +155,11 @@ MWQueryCtrlProxy ScopeObject::search(CannedQuery const& q,
     return query(reply, info.mw,
             [&q, &hints, this]() -> SearchQueryBase::UPtr {
                  auto search_query = this->scope_base_->search(q, hints);
-                 search_query->set_metadata(hints);
+                 search_query->set_department_id(q.department_id());
                  return search_query;
             },
-            [&reply, &hints](QueryBase::SPtr query_base, MWQueryCtrlProxy ctrl_proxy) -> QueryObjectBase::SPtr {
-                return make_shared<QueryObject>(query_base, hints.cardinality(), reply, ctrl_proxy);
+            [&reply, &hints, this](QueryBase::SPtr query_base, MWQueryCtrlProxy ctrl_proxy) -> QueryObjectBase::SPtr {
+                return make_shared<QueryObject>(query_base, hints.cardinality(), reply, ctrl_proxy, runtime_->logger());
             }
     );
 }
@@ -168,10 +173,10 @@ MWQueryCtrlProxy ScopeObject::activate(Result const& result,
             [&result, &hints, this]() -> QueryBase::SPtr {
                 return this->scope_base_->activate(result, hints);
             },
-            [&reply](QueryBase::SPtr query_base, MWQueryCtrlProxy ctrl_proxy) -> QueryObjectBase::SPtr {
+            [&reply, this](QueryBase::SPtr query_base, MWQueryCtrlProxy ctrl_proxy) -> QueryObjectBase::SPtr {
                 auto activation_base = dynamic_pointer_cast<ActivationQueryBase>(query_base);
                 assert(activation_base);
-                return make_shared<ActivationQueryObject>(activation_base, reply, ctrl_proxy);
+                return make_shared<ActivationQueryObject>(activation_base, reply, ctrl_proxy, runtime_->logger());
             }
     );
 }
@@ -187,10 +192,10 @@ MWQueryCtrlProxy ScopeObject::perform_action(Result const& result,
             [&result, &hints, &widget_id, &action_id, this]() -> QueryBase::SPtr {
                 return this->scope_base_->perform_action(result, hints, widget_id, action_id);
             },
-            [&reply](QueryBase::SPtr query_base, MWQueryCtrlProxy ctrl_proxy) -> QueryObjectBase::SPtr {
+            [&reply, this](QueryBase::SPtr query_base, MWQueryCtrlProxy ctrl_proxy) -> QueryObjectBase::SPtr {
                 auto activation_base = dynamic_pointer_cast<ActivationQueryBase>(query_base);
                 assert(activation_base);
-                return make_shared<ActivationQueryObject>(activation_base, reply, ctrl_proxy);
+                return make_shared<ActivationQueryObject>(activation_base, reply, ctrl_proxy, runtime_->logger());
             }
     );
 }
@@ -204,12 +209,17 @@ MWQueryCtrlProxy ScopeObject::preview(Result const& result,
             [&result, &hints, this]() -> QueryBase::SPtr {
                 return this->scope_base_->preview(result, hints);
             },
-            [&reply](QueryBase::SPtr query_base, MWQueryCtrlProxy ctrl_proxy) -> QueryObjectBase::SPtr {
+            [&reply, this](QueryBase::SPtr query_base, MWQueryCtrlProxy ctrl_proxy) -> QueryObjectBase::SPtr {
                 auto preview_query = dynamic_pointer_cast<PreviewQueryBase>(query_base);
                 assert(preview_query);
-                return make_shared<PreviewQueryObject>(preview_query, reply, ctrl_proxy);
+                return make_shared<PreviewQueryObject>(preview_query, reply, ctrl_proxy, runtime_->logger());
             }
     );
+}
+
+bool ScopeObject::debug_mode() const
+{
+    return debug_mode_;
 }
 
 } // namespace internal

@@ -30,10 +30,9 @@ using namespace std;
 class ScopeA : public MyScope
 {
 public:
-    virtual int start(std::string const&, unity::scopes::RegistryProxy const&) override
+    virtual void start(std::string const&) override
     {
         inc_start();
-        return VERSION;
     }
 
     virtual void stop() override

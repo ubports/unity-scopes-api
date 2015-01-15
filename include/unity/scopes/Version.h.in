@@ -20,8 +20,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_VERSION_H
-#define UNITY_SCOPES_VERSION_H
+#pragma once
 
 #ifndef UNITY_SCOPES_VERSION_MAJOR
 #    define UNITY_SCOPES_VERSION_MAJOR @UNITY_SCOPES_MAJOR@
@@ -41,6 +40,8 @@
 #define UNITY_SCOPES_VERSION_STRING UNITY_SCOPES_VERSION_XSTR(UNITY_SCOPES_VERSION_MAJOR) "." \
                                     UNITY_SCOPES_VERSION_XSTR(UNITY_SCOPES_VERSION_MINOR) "." \
                                     UNITY_SCOPES_VERSION_XSTR(UNITY_SCOPES_VERSION_MICRO)
+
+#define UNITY_SCOPES_VERSIONED_CREATE_SYM unity_scope_create_v ## @UNITY_SCOPES_SOVERSION@
 
 /**
 \brief Top-level namespace for all things Unity-related.
@@ -105,5 +106,3 @@ const char* version_string();    // Returns "major.minor.micro"
 } // namespace scopes
 
 } // namespace unity
-
-#endif

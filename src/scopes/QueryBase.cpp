@@ -20,6 +20,8 @@
 
 #include <unity/scopes/internal/QueryBaseImpl.h>
 
+#include <iostream>
+
 using namespace std;
 
 namespace unity
@@ -29,8 +31,8 @@ namespace scopes
 {
 
 /// @cond
-QueryBase::QueryBase() :
-    p(new internal::QueryBaseImpl)
+QueryBase::QueryBase(internal::QueryBaseImpl* impl)
+    : p(impl)
 {
 }
 
@@ -41,13 +43,31 @@ QueryBase::~QueryBase()
 void QueryBase::cancel()
 {
     p->cancel();    // Forward cancel to subqueries
-    cancelled();    // Inform this query that it was cancelled
+    try
+    {
+        cancelled();    // Inform this query that it was cancelled
+    }
+    catch (std::exception const& e)
+    {
+        cerr << "QueryBase::cancel(): exception from cancelled(): " << e.what() << endl;
+        // TODO: log error
+    }
+    catch (...)
+    {
+        cerr << "QueryBase::cancel(): unknown exception from cancelled()" << endl;
+        // TODO: log error
+    }
 }
 /// @endcond
 
-void QueryBase::set_metadata(SearchMetadata const& metadata)
+bool QueryBase::valid() const
 {
-    p->set_metadata(metadata);
+    return p->valid();
+}
+
+VariantMap QueryBase::settings() const
+{
+    return p->settings();
 }
 
 } // namespace scopes

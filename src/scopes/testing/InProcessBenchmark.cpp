@@ -18,13 +18,11 @@
 
 #include <unity/scopes/testing/InProcessBenchmark.h>
 
+#include <unity/scopes/internal/CategoryRegistry.h>
+#include <unity/scopes/PreviewReply.h>
 #include <unity/scopes/ReplyProxyFwd.h>
 #include <unity/scopes/ScopeBase.h>
 #include <unity/scopes/SearchReply.h>
-
-#include <unity/scopes/internal/CategoryRegistry.h>
-#include <unity/scopes/PreviewReply.h>
-
 #include <unity/scopes/testing/Category.h>
 
 #include <core/posix/fork.h>
@@ -63,6 +61,11 @@ struct ObjectImpl : public virtual unity::scopes::Object
     }
 
     std::string identity() override
+    {
+        return "";
+    }
+
+    std::string target_category() override
     {
         return "";
     }
@@ -130,6 +133,10 @@ struct WaitableReply : public virtual unity::scopes::Reply, public ObjectImpl
         state.store(State::finished_with_error);
         wait_condition.notify_all();
     }
+
+    void info(unity::scopes::OperationInfo const&) override
+    {
+    }
 };
 
 struct DevNullPreviewReply : public unity::scopes::PreviewReply, public WaitableReply
@@ -154,7 +161,7 @@ struct DevNullSearchReply : public unity::scopes::SearchReply, public WaitableRe
 {
     unity::scopes::internal::CategoryRegistry category_registry;
 
-    void register_departments(unity::scopes::DepartmentList const&, std::string) override
+    void register_departments(unity::scopes::Department::SCPtr const&) override
     {
     }
 
@@ -164,7 +171,17 @@ struct DevNullSearchReply : public unity::scopes::SearchReply, public WaitableRe
             std::string const& icon,
             unity::scopes::CategoryRenderer const& renderer) override
     {
-        return category_registry.register_category(id, title, icon, renderer);
+        return category_registry.register_category(id, title, icon, nullptr, renderer);
+    }
+
+    unity::scopes::Category::SCPtr register_category(
+            std::string const& id,
+            std::string const& title,
+            std::string const& icon,
+            unity::scopes::CannedQuery const& query,
+            unity::scopes::CategoryRenderer const& renderer) override
+    {
+        return category_registry.register_category(id, title, icon, std::make_shared<unity::scopes::CannedQuery>(query), renderer);
     }
 
     void register_category(unity::scopes::Category::SCPtr category) override
@@ -187,7 +204,7 @@ struct DevNullSearchReply : public unity::scopes::SearchReply, public WaitableRe
         return true;
     }
 
-    bool register_annotation(unity::scopes::Annotation const&) override
+    bool push(unity::scopes::experimental::Annotation const&) override
     {
         return true;
     }

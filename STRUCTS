@@ -55,20 +55,32 @@ Department (returned by serialize()):
 =====================================
   'query'       : dictionary (serialized Query)
   'label'       : string
+  'alt_label'   : string, optional
   'departments' : array of dictionaries (serialized Departments), optional
+  'has_subdepartments' : bool (optional)
 
 ScopeMetadata (returned by serialize()):
 =====================================
- 'scope_id'     : string
- 'proxy'        : dictionary
-    'identity'  : string
-    'endpoint'  : string
- 'display_name' : string
- 'description'  : string
- 'art'          : string, optional
- 'icon'         : string, optional
- 'search_hint'  : string, optional
- 'hot_key'      : string, optional
+ 'scope_id'              : string
+ 'proxy'                 : dictionary
+    'identity'           : string
+    'endpoint'           : string
+ 'display_name'          : string
+ 'description'           : string
+ 'scope_dir'             : string, optional
+ 'art'                   : string, optional
+ 'icon'                  : string, optional
+ 'search_hint'           : string, optional
+ 'hot_key'               : string, optional
+ 'invisible'             : bool, optional
+ 'appearance_attributes' : dictionary, optional
+ 'results_ttl_type'      : int, optional
+ 'settings_definitions'  : dictionary, optional
+ 'location_data_needed'  : bool, optional
+ 'child_scopes'          : array of strings, optional
+ 'version'               : int, optional
+ 'keywords'              : array of strings, optional
+ 'is_aggregator'         : bool, optional
 
 Query (returned by serialize())
 ===============================
@@ -101,10 +113,23 @@ FilterOption
 OptionSelectorFilter
 ====================
  'id'           : string
+ 'filter_type'  : string
+ 'display_hints': int, optional
+
+OptionSelectorFilter (FilterBase)
+=================================
+ 'id'           : string
  'filter_type'  : "option_selector"
  'label'        : string
  'multi_select' : bool
  'options'      : array of FilterOption
+
+RangeInputFilter
+================
+ 'id'           : string
+ 'start_label'  : string
+ 'end_label'    : string
+ 'unit_label'   : string
 
 Filters + FilterState
 =====================
@@ -133,3 +158,22 @@ ActivationResponse (returned by serialize())
 ============================================
  'status'      : int (corresponds to ActivationResponse::Status enum)
  'scope_data'  : variant
+
+QueryMetadata (returned by serialize())
+=======================================
+ 'type'        : string (metadata type)
+ 'locale'      : string
+ 'form_factor' : string
+ 'hints'       : dict
+ 'internet_connectivity' : bool (optional)
+
+SearchMetadata (returned by serialize())
+========================================
+  all QueryMetadata attributes
+  'cardinality' : int
+  'location'    : dict
+
+ActionMetadata (returned by serialize())
+========================================
+  all QueryMetadata attributes
+  'scope_data'  : variant

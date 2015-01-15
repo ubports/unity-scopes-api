@@ -40,22 +40,18 @@ namespace internal
 
 namespace zmq_middleware
 {
+
 void marshal_unknown_exception(capnproto::Response::Builder& r, string const& s)
 {
-    capnp::MallocMessageBuilder ex;
-    auto payload = ex.initRoot<capnproto::RuntimeException>();
+    auto payload = r.initPayload().initAs<capnproto::RuntimeException>();
 
-    capnp::Text::Reader text(s.c_str());
-    payload.setUnknown(text);
-
+    payload.setUnknown(s);
     r.setStatus(capnproto::ResponseStatus::RUNTIME_EXCEPTION);
-    r.getPayload().setAs<capnproto::RuntimeException>(ex.getRoot<capnproto::RuntimeException>());
 }
 
 void marshal_object_not_exist_exception(capnproto::Response::Builder& r, Current const& c)
 {
-    capnp::MallocMessageBuilder ex;
-    auto payload = ex.initRoot<capnproto::RuntimeException>();
+    auto payload = r.initPayload().initAs<capnproto::RuntimeException>();
 
     auto one = payload.initObjectNotExist();
     auto proxy = one.initProxy();
@@ -65,13 +61,11 @@ void marshal_object_not_exist_exception(capnproto::Response::Builder& r, Current
     one.setAdapter(c.adapter->name().c_str());
 
     r.setStatus(capnproto::ResponseStatus::RUNTIME_EXCEPTION);
-    r.getPayload().setAs<capnproto::ObjectNotExistException>(ex.getRoot<capnproto::ObjectNotExistException>());
 }
 
 void marshal_operation_not_exist_exception(capnproto::Response::Builder& r, Current const& c)
 {
-    capnp::MallocMessageBuilder ex;
-    auto payload = ex.initRoot<capnproto::RuntimeException>();
+    auto payload = r.initPayload().initAs<capnproto::RuntimeException>();
 
     auto opne = payload.initOperationNotExist();
     auto proxy = opne.initProxy();
@@ -82,7 +76,6 @@ void marshal_operation_not_exist_exception(capnproto::Response::Builder& r, Curr
     opne.setOpName(c.op_name.c_str());
 
     r.setStatus(capnproto::ResponseStatus::RUNTIME_EXCEPTION);
-    r.getPayload().setAs<capnproto::OperationNotExistException>(ex.getRoot<capnproto::OperationNotExistException>());
 }
 
 kj::ArrayPtr<kj::ArrayPtr<capnp::word const> const> create_unknown_response(capnp::MessageBuilder& b, string const& s)
@@ -130,6 +123,8 @@ void throw_if_runtime_exception(capnproto::Response::Reader const& response)
         {
             throw MiddlewareException(payload.getUnknown().cStr());
         }
+        default:
+            break;
     }
 }
 

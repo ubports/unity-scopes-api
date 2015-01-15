@@ -5,7 +5,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 add_library(SharedState SHARED Counters.cpp PerScopeVariables.cpp)
 
-add_library(BadVersion MODULE BadVersion.cpp)
 add_library(NoDestroy MODULE NoDestroy.cpp)
 add_library(NullReturn MODULE NullReturn.cpp)
 add_library(ScopeA MODULE ScopeA.cpp)
@@ -17,4 +16,5 @@ add_library(ThrowStdExFromStop MODULE ThrowStdExFromStop.cpp)
 add_library(ThrowUnknownExFromStart MODULE ThrowUnknownExFromStart.cpp)
 add_library(ThrowUnknownExFromStop MODULE ThrowUnknownExFromStop.cpp)
 
+add_definitions(-DTEST_DIR="${CMAKE_CURRENT_BINARY_DIR}")
 add_test(ScopeLoader ScopeLoader_test)

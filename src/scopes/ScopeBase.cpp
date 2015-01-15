@@ -18,6 +18,8 @@
 
 #include <unity/scopes/ScopeBase.h>
 #include <unity/scopes/ActivationQueryBase.h>
+#include <unity/scopes/Registry.h>
+#include <unity/scopes/internal/ScopeBaseImpl.h>
 
 namespace unity
 {
@@ -28,6 +30,7 @@ namespace scopes
 //! @cond
 
 ScopeBase::ScopeBase()
+    : p(new internal::ScopeBaseImpl())
 {
 }
 
@@ -37,19 +40,29 @@ ScopeBase::~ScopeBase()
 
 //! @endcond
 
+void ScopeBase::start(std::string const&)
+{
+    // Intentionally empty: default "do nothing" implementation.
+}
+
+void ScopeBase::stop()
+{
+    // Intentionally empty: default "do nothing" implementation.
+}
+
 void ScopeBase::run()
 {
     // Intentionally empty: default "do nothing" implementation.
 }
 
-ActivationQueryBase::UPtr ScopeBase::activate(Result const& /* result */, ActionMetadata const& /* metadata */)
+ActivationQueryBase::UPtr ScopeBase::activate(Result const& result, ActionMetadata const& metadata)
 {
-    return ActivationQueryBase::UPtr(new ActivationQueryBase()); // default impl returns NotHandled
+    return ActivationQueryBase::UPtr(new ActivationQueryBase(result, metadata)); // default impl returns NotHandled
 }
 
-ActivationQueryBase::UPtr ScopeBase::perform_action(Result const& /* result */, ActionMetadata const& /* metadata */, std::string const& /* widget_id */, std::string const& /* action_id */)
+ActivationQueryBase::UPtr ScopeBase::perform_action(Result const& result, ActionMetadata const& metadata, std::string const& widget_id, std::string const& action_id)
 {
-    return ActivationQueryBase::UPtr(new ActivationQueryBase()); // default impl returns NotHandled
+    return ActivationQueryBase::UPtr(new ActivationQueryBase(result, metadata, widget_id, action_id)); // default impl returns NotHandled
 }
 
 void ScopeBase::runtime_version(int& v_major, int& v_minor, int& v_micro) noexcept
@@ -57,6 +70,36 @@ void ScopeBase::runtime_version(int& v_major, int& v_minor, int& v_micro) noexce
     v_major = unity::scopes::major_version();
     v_minor = unity::scopes::minor_version();
     v_micro = unity::scopes::micro_version();
+}
+
+std::string ScopeBase::scope_directory() const
+{
+    return p->scope_directory();
+}
+
+std::string ScopeBase::cache_directory() const
+{
+    return p->cache_directory();
+}
+
+std::string ScopeBase::app_directory() const
+{
+    return p->app_directory();
+}
+
+std::string ScopeBase::tmp_directory() const
+{
+    return p->tmp_directory();
+}
+
+RegistryProxy ScopeBase::registry() const
+{
+    return p->registry();
+}
+
+unity::scopes::VariantMap ScopeBase::settings() const
+{
+    return p->settings();
 }
 
 } // namespace scopes

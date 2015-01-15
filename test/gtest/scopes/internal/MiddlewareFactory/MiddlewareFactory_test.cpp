@@ -27,7 +27,7 @@ using namespace unity::scopes::internal;
 
 TEST(MiddlewareFactory, basic)
 {
-    MiddlewareFactory f((RuntimeImpl*)0x1);
+    MiddlewareFactory f(reinterpret_cast<RuntimeImpl*>(0x1));
     EXPECT_EQ(nullptr, f.find("nosuchscope", "Zmq"));
     MiddlewareBase::SPtr not_found;
     MiddlewareBase::SPtr mw = f.find("testscope", "Zmq");
@@ -40,7 +40,7 @@ TEST(MiddlewareFactory, BadKind)
 {
     try
     {
-        MiddlewareFactory f((RuntimeImpl*)0x1);
+        MiddlewareFactory f(reinterpret_cast<RuntimeImpl*>(0x1));
         f.create("somescope", "NoSuchMiddleware", "Zmq.ini");
         FAIL();
     }

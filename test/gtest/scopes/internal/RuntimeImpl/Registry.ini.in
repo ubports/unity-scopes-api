@@ -1,8 +1,7 @@
 [Registry]
 Middleware = Zmq
-Zmq.Endpoint = ipc:///tmp/socket_for_registry
-Zmq.EndpointDir = /tmp
-Zmq.ConfigFile = Zmq.ini
+Zmq.ConfigFile = @CMAKE_CURRENT_BINARY_DIR@/Zmq.ini
 Scoperunner.Path = /SomePath
-Scope.ConfigDir = /tmp
 Scope.InstallDir = /tmp
+Scope.InstallDir = /tmp
+Click.InstallDir = /unused

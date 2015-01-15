@@ -1,0 +1,26 @@
+[ScopeConfig]
+DisplayName = scope-A.DisplayName
+Description = scope-A.Description
+Art = /foo/scope-A.Art
+Author = Canonical Ltd.
+Icon = file://scope-A.Icon
+SearchHint = scope-A.SearchHint
+HotKey = scope-A.HotKey
+LocationDataNeeded = true
+ChildScopes = com.foo.bar;com.foo.baz
+Version = 1
+Keywords = music;news;foo
+IsAggregator = false
+
+[Appearance]
+ForegroundColor = fg_color
+BackgroundColor = bg_color
+ShapeImages = true
+CategoryHeaderBackground = cat_header_bg_scheme
+PreviewButtonColor = preview_button_color
+LogoOverlayColor = overlay_color
+PageHeader.Logo = some_url
+PageHeader.ForegroundColor = fg_color
+PageHeader.Background = bg_scheme
+PageHeader.DividerColor = div_color
+PageHeader.NavigationBackground = http://nav_background

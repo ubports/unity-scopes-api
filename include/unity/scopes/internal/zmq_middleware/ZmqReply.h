@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQREPLY_H
-#define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQREPLY_H
+#pragma once
 
 #include <unity/scopes/internal/zmq_middleware/ZmqObjectProxy.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqReplyProxyFwd.h>
@@ -45,7 +44,8 @@ public:
     virtual ~ZmqReply();
 
     virtual void push(VariantMap const& result) override;
-    virtual void finished(ListenerBase::Reason reason, std::string const& error_message) override;
+    virtual void finished(CompletionDetails const& details) override;
+    virtual void info(OperationInfo const& op_info) override;
 };
 
 } // namespace zmq_middleware
@@ -55,5 +55,3 @@ public:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

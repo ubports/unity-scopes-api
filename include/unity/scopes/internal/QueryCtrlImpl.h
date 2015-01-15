@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_QUERYCTRLIMPL_H
-#define UNITY_SCOPES_INTERNAL_QUERYCTRLIMPL_H
+#pragma once
 
 #include <unity/scopes/internal/MWQueryCtrlProxyFwd.h>
 #include <unity/scopes/internal/MWReplyProxyFwd.h>
@@ -33,24 +32,30 @@ namespace scopes
 namespace internal
 {
 
-// Proxy used by a scope to push results for a query.
-// To indicate that it has sent the last result, the scope must call finished().
-// Subsequent calls to finished() are ignored.
-// Calls to push() after finished() was called are ignored.
-// If the proxy goes out of scope before finished was called, it implicitly calls finished().
+class ScopeImpl;
 
 class QueryCtrlImpl : public virtual unity::scopes::QueryCtrl, public virtual ObjectImpl
 {
 public:
-    QueryCtrlImpl(MWQueryCtrlProxy const& ctrl_proxy, MWReplyProxy const& reply_proxy);
+    QueryCtrlImpl(MWQueryCtrlProxy const& ctrl_proxy,
+                  MWReplyProxy const& reply_proxy,
+                  boost::log::sources::severity_channel_logger_mt<>& logger);
     virtual ~QueryCtrlImpl();
 
     virtual void cancel() override;
 
+    void set_proxy(MWQueryCtrlProxy const& p);
+
 private:
-    MWQueryCtrlProxy fwd() const;
+    MWQueryCtrlProxy fwd();
 
     MWReplyProxy reply_proxy_;
+
+    bool ready_;                // True once ObjectImpl::set_proxy() was called
+    bool cancelled_;            // True if cancel() is called before set_proxy() was called
+    std::mutex mutex_;          // Protects ready_ and cancelled_
+
+    friend class ScopeImpl;     // Allows ScopeImpl to call set_proxy()
 };
 
 } // namespace internal
@@ -58,5 +63,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

@@ -1,0 +1,421 @@
+This document outlines how the scopes run time is configured.
+In general, if a recognized key is not set in a configuration
+file, a default value applies as detailed below.
+
+The following configuration files are used by the scopes run time:
+
+
+Runtime.ini
+-----------
+
+If no specific file is provided to the scopes run time, the default path is
+"/usr/lib/<arch>/unity-scopes/Runtime.ini".
+
+If that file does not exist, the default values apply.
+
+The only recognized group in this file is [Runtime].
+
+The following keys are recognized:
+
+- Registry.Identity (string)
+
+  The identity of the local registry. If not set, the default value is "Registry".
+  To run a scope without a registry, for example, using the scoperunner for testing, the identity
+  can be the empty string.
+
+- Registry.ConfigFile (string)
+
+  The path to the registry configuration file. The default value is
+  "/usr/lib/<arch>/unity-scopes/Registry.ini".
+
+- Smartscopes.Registry.Identity (string)
+
+  The identity of the remote registry. If not set, the default value is "SSRegistry".
+  Setting this value explicitly to the empty string disables use of the remote registry.
+
+- Smartscopes.ConfigFile (string)
+
+  The path to the smartscopes configuration file. The default value is
+  "/usr/lib/<arch>/unity-scopes/Smartscopes.ini".
+
+- Default.Middleware (string)
+
+  The middleware to be used by default. The default value is "Zmq".
+
+- <middleware>.ConfigFile
+
+  The path to the configuration file for the middleware, with the value of
+  Default.Middleware substituted for <middleware>, For example,
+
+  Zmq.ConfigFile = <path>
+
+  The default value is "/usr/lib/<arch>/unity-scopes/Zmq.ini".
+
+- Reap.Expiry
+
+  A ReplyBase instance receives push() invocations from a scope in
+  response to a query.
+  If a scope becomes non-responsive and stops pushing, eventually,
+  the scopes run time calls the finished() method with an error indicating
+  that there was no activity for some time and then deallocates the
+  ReplyBase instance.
+
+  Reap.Expiry sets the inactivity time (in seconds) for a query to be
+  considered "dead". If no push() or finished() message arrives for
+  this amount of time, the scopes run time reaps the ReplyBase.
+
+  The default value is 45 seconds.
+
+- Reap.Interval
+
+  The run time maintains a reaper thread that checks for "dead"
+  queries (at most) every Reap.Interval seconds. For a Reap.Expiry
+  time of 45 seconds and a Reap.Interval of 10 seconds, the actual
+  time for a dead query to be reaped is at least 45 seconds and
+  at most 55 seconds.
+
+  The default value is 10 seconds.
+
+- Process.Timeout
+
+  This parameter determines how the registry will wait for a scope
+  to start and stop. The registry waits for at most Process.Timeout
+  milliseconds before it concludes that a scope failed to initialize
+  or terminate correctly. If a scope does not respond
+  within the allotted time, it is killed with SIGKILL.
+
+  Only values in the range 10 to 15000 milliseconds are accepted.
+
+  The default value is 4000 milliseconds.
+
+  Note that this value must be less than Locate.Timeout in the [<Middleware>]
+  config group, otherwise the middleware can prematurely conclude that
+  a locate() request failed to start a scope.
+
+- CacheDir
+
+  The parent directory under which a scope can write scope-specific data files
+  (such as caches).
+
+  The default value is $HOME/.local/share/unity-scopes.
+
+  Note that the actual files are written into subdirectories of
+  this directory, for example:
+
+  $HOME/.local/share/unity-scopes/leaf-net/<scope_id>/some_file (for confined scopes)
+  and $HOME/.local/share/unity-scopes/unconfined/<scope_id>/some_file (for unconfined scopes).
+
+- AppDir
+
+  The parent directory under which a scope can read data provided by an
+  app that was installed from the same click package.
+
+  The default value is $HOME/.local/share.
+
+  Note that the actual directory is a subdirectory of
+  this directory, for example:
+
+  $HOME/.local/share/<app-pkgname>
+
+  The app has read/write permission for this directory and the files in it,
+  the scope has read-only permission, so communication is from the app to
+  the scope, not vice versa.
+
+- ConfigDir
+
+  The parent directory under which the runtime writes the scope configration files.
+
+  The default value is $HOME/.config/unity-scopes.
+
+  Note that the actual configuration is written into subdirectories of this
+  directory. Specifically:
+
+  $HOME/.config/unity-scopes/<scope_id>/settings.ini
+
+
+Zmq.ini
+-------
+
+If no specific file is provided to the scopes run time, the default path is
+"/usr/lib/<arch>/unity-scopes/Zmq.ini".
+
+If that file does not exist, the default values for keys apply.
+
+The only recognized group in this file is [Zmq].
+
+The following keys are recognized:
+
+- EndpointDir (string)
+
+  The directory in which the public endpoint of a scope (or the registry) is created.
+  This endpoint must be accessible to any process.
+
+  The default value is "$XDG_RUNTIME_DIR/zmq". If XDG_RUNTIME_DIR is not
+  set, or $XDG_RUNTIME_DIR does not exist or is not writable, initialization fails.
+
+  Otherwise, the public directory is created if it does not exist, with mode rwxr-xr-xt.
+
+  Private endpoints are created in "<EndpointDir>/priv". The priv
+  directory is created if it does not exist, with mode rwx------t.
+
+- Registry.EndpointDir
+
+  The directory in which the public endpoints of the registry are created.
+  If set to a non-empty string, this directory overrides the setting
+  of EndpointDir for the registry only. (This is provided for testing,
+  so a separate registry can run beside the system-wide registry.)
+
+  The directory is created if it does not exist, with mode rwxr-xr-xt.
+
+- Default.Twoway.Timeout
+
+  The default timeout value to be used for twoway invocations in milliseconds.
+  If a twoway invocation (such as list() or search()) does not complete
+  within the specified time, the invocation throws a TimeoutException, possibly
+  after asking the registry to start the target process first (see Locate.Timeout).
+
+  The default value is 500 milliseconds.
+
+- Smartscopes.Registry.EndpointDir
+
+  The directory in which the public endpoints of the registry are created.
+  If set to a non-empty string, this directory overrides the setting
+  of EndpointDir for the registry only. (This is provided for testing,
+  so a separate registry can run beside the system-wide registry,
+  while still using the system-wide smartscopes registry.)
+
+- Locate.Timeout
+
+  The timeout to be used when asking the registry to start a scope. If the registry
+  does not respond within the specified amount of time, the scope is assumed
+  to be unavailable, and twoway invocations fail with a TimeoutException.
+
+  Note that this value must be somewhat larger than the value of Process.Timeout
+  in Registry.ini, otherwise invocations on a scope that needs to be activated
+  first can fail, even though the activation succeeded.
+
+  Only values in the range 10 to 15000 milliseconds are accepted. (Values outside
+  this range would either cause locate() to falsely conclude that a scope
+  could not be started, or cause an unacceptably long wait time.)
+
+  Only values in the range 10 to 15000 milliseconds are accepted.
+
+  The default value is 5000 milliseconds.
+
+- Registry.Timeout
+
+  The timeout to be used when invoking a twoway operation on the registry other
+  than locate().
+
+  Only values in the range 10 to 15000 milliseconds are accepted.
+
+  The default value is 5000 milliseconds.
+
+
+Registry.ini
+------------
+
+If no specific file is provided to the scopes run time, the default path is
+"/usr/lib/<arch>/unity-scopes/Registry.ini".
+
+If that file does not exist, the default values for keys apply.
+
+The only recognized group in this file is [Registry].
+
+The following keys are recognized:
+
+- Middleware
+
+  The middleware used by the registry, such as "Zmq". The default value is "Zmq".
+
+- <Middleware>.ConfigFile
+
+  <Middleware> must match the value of the Middleware key, for example:
+
+      Zmq.Middleware = path/to/SomeFile.ini
+
+- Scoperunner.Path
+
+  The path to the scoperunner executable. The path must be an absolute path.
+  The default value is "/usr/lib/<arch>/unity-scopes/scoperunner".
+
+- Scope.InstallDir
+
+  The directory in which to look for subdirectories containing scope .so and .ini files.
+
+  The default value is "/usr/lib/<arch>/unity-scopes".
+
+- OEM.InstallDir
+
+  The directory in which to look for subdirectories containing scope .so and .ini files added
+  by OEMs. The default value is "/custom/usr/lib/<arch>/unity-scopes".
+
+- Click.InstallDir
+
+  The directory in which to look for subdirectories containing scopes installed from click packages.
+
+  The default value is "$HOME/.local/share/unity-scopes".
+
+
+Smartscopes.ini
+--------------
+
+If no specific file is provided to the scopes run time, the default path is
+"/usr/lib/<arch>/unity-scopes/Smartscopes.ini".
+
+If that file does not exist, the default values for keys apply.
+
+The only recognized group in this file is [Smartscopes].
+
+The following keys are recognized:
+
+- Http.Reply.Timeout
+
+  The amount of time (in seconds) to wait for a reply from the smartscopes server.
+  The value must be in the range 1 - 60.
+
+  The default value is 20 seconds.
+
+- Registry.Refresh.Rate
+
+  The amount of time (in seconds) between metadata refreshes from the smartscopes server.
+  The value must be >= 60.
+
+  The default value is 24 hours.
+
+- Registry.Refresh.Fail.Timeout
+
+  The amount of time (in seconds) in between retry attempts if a metadata refresh from
+  the smartscopes server fails.
+  The value must be >= 1.
+
+  The default value is 10 seconds.
+
+- Scope.Identity
+
+  The identity for proxy scope provided by smartscopesproxy.
+
+  The default value is "SmartScope".
+
+
+<scope_id>.ini
+--------------
+
+The recognized groups in this file are:
+
+- ScopeConfig
+- Appearance
+
+The following keys are recognized in the ScopeConfig group:
+
+- Override
+
+  Determines whether an OEM scope is allowed to override a Canonical scope. This key is used only by Canonical
+  scopes. If true, the Canonical scope can be replaced by an OEM scope with the same ID. The default value
+  is false.
+
+  For OEM scopes and click scopes, the setting of this key is ignored.
+
+- DisplayName
+
+  The display name of a scope (mandatory, localizable).
+
+- Description
+
+  The description of a scope (mandatory, localizable).
+
+- Author
+
+  The author of the scope (mandatory).
+
+- Version
+
+  A integer describing the scope version. The setting is optional, but we strongly
+  recommend to set it. If the behavior of your scope changes in any way that is
+  visible to the query source (such having added or removed a result attribute),
+  you should increment the version number. This allows an aggregating scope to
+  adjust its behavior according to which version of your scope is installed.
+  If not set, the default value is 0. You can set the value to any integer >= 1.
+
+- Art
+
+  Artwork to be shown for the scope. The default value is the empty string.
+
+- Icon
+
+  The icon to be shown for the scope. The default value is the empty string.
+
+- SearchHint
+
+  A search hint for on-screen display (localizable). The default value is the empty string.
+
+- HotKey
+
+  The hot key for the scope. The default value is the empty string.
+
+- ChildScopes
+
+  The list of ids of scopes aggregated by this scope (if any). The values in this list
+  must be separated by semicolons. This list is translated to the names of
+  children scopes when in the scopes overview page of the Unity Dash.
+
+  Note: make sure there are no trailing spaces following
+  the ids, as they will be preserved.
+
+- Invisible
+
+  Whether the scope is hidden in the UI. The default value is false.
+
+- ScopeRunner
+
+  A custom scoperunner command-line to be executed when the scope is invoked.
+  The following placeholders can be used to substitute config paths where required:
+
+  - %R - absolute path to the runtime .ini config file
+  - %S - absolute path to the scope's .ini config file
+
+  E.g. "ScopeRunner = /usr/bin/gdb --ex run --args /usr/lib/x86_64-linux-gnu/unity-scopes/scoperunner %R %S"
+  
+  If not set, the default scoperunner is used.
+
+- IdleTimeout
+
+  The amount of time (in seconds) a running scope can be inactive before it will automatically shut down.
+  If not set, a default value of 40 is used.
+
+- ResultsTtlType
+
+  If set, the results for this scope will be set to expire, and be refreshed. Valid values are:
+
+  - None
+
+  - Small - in the order of a minute
+
+  - Medium - in the order of a few minutes
+
+  - Large - in the order of an hour
+
+- LocationDataNeeded
+
+  Whether the scope wants to have location data delivered to it. Note that this does not mean that the scope
+  will actually receive location data at run time. (The user may deny access, or may only provide approximate
+  location data.)
+
+  If not set, the default value is false.
+
+- Keywords
+
+  A list of keywords this scope falls under (if any). The values in this list must be separated by semicolons.
+
+  E.g. "Keywords = music;video"
+
+  Note: make sure there are no trailing spaces following the keywords, as they will be preserved.
+
+- IsAggregator
+
+  Whether the scope is an aggregator. The default value is false.
+
+
+The following keys are recognized in the Appearance group:
+
+- TODO: document this

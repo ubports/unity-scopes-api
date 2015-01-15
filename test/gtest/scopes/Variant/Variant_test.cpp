@@ -19,8 +19,9 @@
 #include <unity/scopes/Variant.h>
 #include <unity/UnityExceptions.h>
 
-#include <gtest/gtest.h>
 #include <boost/variant.hpp>
+
+#include <gtest/gtest.h>
 
 using namespace std;
 using namespace unity;
@@ -49,7 +50,7 @@ TEST(Variant, basic)
     {
         Variant v(true);
         EXPECT_EQ(Variant::Type::Bool, v.which());
-        EXPECT_EQ(true, v.get_bool());
+        EXPECT_TRUE(v.get_bool());
     }
 
     {
@@ -222,4 +223,73 @@ TEST(Variant, exceptions)
                      e.what());
     }
 
+}
+
+TEST(Variant, serialize_json)
+{
+    {
+        Variant v;
+        EXPECT_EQ("null\n", v.serialize_json());
+    }
+    {
+        Variant v(42);
+        EXPECT_EQ("42\n", v.serialize_json());
+    }
+
+    {
+        Variant v(10.5f);
+        EXPECT_EQ("10.50\n", v.serialize_json());
+    }
+
+    {
+        Variant v(true);
+        EXPECT_EQ("true\n", v.serialize_json());
+    }
+
+    {
+        Variant v("hello");
+        EXPECT_EQ("\"hello\"\n", v.serialize_json());
+    }
+
+    {
+        VariantMap m;
+        m["foo"] = Variant("bar");
+        Variant v(m);
+        EXPECT_EQ("{\"foo\":\"bar\"}\n", v.serialize_json());
+    }
+
+    {
+        VariantArray varr {Variant(1), Variant("foo")};
+        Variant v(varr);
+        EXPECT_EQ("[1,\"foo\"]\n", v.serialize_json());
+    }
+}
+
+TEST(Variant, deserialize_json)
+{
+    Variant v = Variant::deserialize_json("null");
+    EXPECT_TRUE(v.is_null());
+
+    v = Variant::deserialize_json("42");
+    EXPECT_EQ(42, v.get_int());
+
+    v = Variant::deserialize_json("10.5");
+    EXPECT_EQ(10.5f, v.get_double());
+
+    v = Variant::deserialize_json("false");
+    EXPECT_FALSE(v.get_bool());
+
+    v = Variant::deserialize_json("\"hello\"");
+    EXPECT_EQ("hello", v.get_string());
+
+    v = Variant::deserialize_json("{\"foo\": \"bar\"}");
+    VariantMap vm = v.get_dict();
+    EXPECT_EQ(1, vm.size());
+    EXPECT_EQ("bar", vm.at("foo").get_string());
+
+    v = Variant::deserialize_json("[1, \"two\"]");
+    VariantArray va = v.get_array();
+    EXPECT_EQ(2, va.size());
+    EXPECT_EQ(1, va[0].get_int());
+    EXPECT_EQ("two", va[1].get_string());
 }

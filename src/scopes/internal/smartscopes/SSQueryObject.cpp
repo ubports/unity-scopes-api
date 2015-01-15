@@ -29,7 +29,6 @@
 #include <unity/scopes/SearchReply.h>
 
 #include <cassert>
-#include <iostream>
 #include <thread>
 
 using namespace std;
@@ -47,12 +46,12 @@ namespace internal
 namespace smartscopes
 {
 
-SSQueryObject::SSQueryObject()
-    : QueryObjectBase()
+SSQueryObject::SSQueryObject(boost::log::sources::severity_channel_logger_mt<>& logger)
+    : logger_(logger)
 {
 }
 
-SSQueryObject::~SSQueryObject() noexcept
+SSQueryObject::~SSQueryObject()
 {
 }
 
@@ -95,18 +94,16 @@ void SSQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& /*info*/) n
         std::lock_guard<std::mutex> lock(queries_mutex_);
 
         query_it->second->q_pushable = false;
-        // TODO: log error
-        reply->finished(ListenerBase::Error, e.what());  // Oneway, can't block
-        cerr << "SSQueryObject::run(): " << e.what() << endl;
+        BOOST_LOG_SEV(logger_, Logger::Error) << "SSQueryObject::run(): " << e.what();
+        reply->finished(CompletionDetails(CompletionDetails::Error, e.what()));  // Oneway, can't block
     }
     catch (...)
     {
         std::lock_guard<std::mutex> lock(queries_mutex_);
 
         query_it->second->q_pushable = false;
-        // TODO: log error
-        reply->finished(ListenerBase::Error, "unknown exception");  // Oneway, can't block
-        cerr << "SSQueryObject::run(): unknown exception" << endl;
+        BOOST_LOG_SEV(logger_, Logger::Error) << "SSQueryObject::run(): unknown exception";
+        reply->finished(CompletionDetails(CompletionDetails::Error, "unknown exception"));  // Oneway, can't block
     }
 
     {
@@ -142,8 +139,8 @@ void SSQueryObject::cancel(InvokeInfo const& info)
     {
         // Send finished() to up-stream client to tell him the query is done.
         // We send via the MWReplyProxy here because that allows passing
-        // a ListenerBase::Reason (whereas the public ReplyProxy does not).
-        q_reply->finished(ListenerBase::Cancelled, "");  // Oneway, can't block
+        // a CompletionDetails::CompletionStatus (whereas the public ReplyProxy does not).
+        q_reply->finished(CompletionDetails(CompletionDetails::Cancelled));  // Oneway, can't block
     }
 
     // Forward the cancellation to the query base (which in turn will forward it to any subqueries).
@@ -198,15 +195,19 @@ void SSQueryObject::add_query(SSQuery::QueryType query_type,
 
 void SSQueryObject::run_query(SSQuery::SPtr query, MWReplyProxy const& reply)
 {
-    QueryBase::SPtr q_base;
+    SearchQueryBase::SPtr q_base;
     SearchReplyProxy q_reply_proxy;
     SearchQueryBase::SPtr search_query;
 
-    q_base = query->q_base;
+    q_base = std::dynamic_pointer_cast<SearchQueryBase>(query->q_base);
 
     // Create the reply proxy and keep a weak_ptr, which we will need
     // if cancel() is called later.
-    q_reply_proxy = make_shared<SearchReplyImpl>(reply, shared_from_this());
+    q_reply_proxy = make_shared<SearchReplyImpl>(reply,
+                                                 shared_from_this(),
+                                                 query->q_cardinality,
+                                                 q_base->department_id(),
+                                                 logger_);
     assert(q_reply_proxy);
     query->q_reply_proxy = q_reply_proxy;
 
@@ -228,7 +229,7 @@ void SSQueryObject::run_preview(SSQuery::SPtr query, MWReplyProxy const& reply)
 
     // Create the reply proxy and keep a weak_ptr, which we will need
     // if cancel() is called later.
-    q_reply_proxy = make_shared<PreviewReplyImpl>(reply, shared_from_this());
+    q_reply_proxy = make_shared<PreviewReplyImpl>(reply, shared_from_this(), logger_);
     assert(q_reply_proxy);
     query->q_reply_proxy = q_reply_proxy;
 
@@ -255,7 +256,7 @@ void SSQueryObject::run_activation(SSQuery::SPtr query, MWReplyProxy const& repl
     // and just push it ourseleves
     auto res = activation_query->activate();
     reply->push(res.serialize());
-    reply->finished(ListenerBase::Finished, "");
+    reply->finished(CompletionDetails(CompletionDetails::OK));  // Oneway, can't block
 }
 
 }  // namespace smartscopes

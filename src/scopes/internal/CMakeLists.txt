@@ -17,25 +17,37 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/CategoryRegistry.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/CategoryRendererImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ColumnLayoutImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/CompletionDetailsImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ConfigBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/DepartmentImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/DynamicLoader.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Executor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/FilterBaseImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/FilterOptionImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/FilterStateImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/IniSettingsSchema.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/JsonCppNode.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/JsonSettingsSchema.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/LinkImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/LocationImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Logger.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MiddlewareBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MiddlewareFactory.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MWObject.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/MWPublisher.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MWQuery.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MWQueryCtrl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MWRegistry.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MWReply.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/MWScope.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/MWStateReceiver.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/MWSubscriber.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ObjectImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/OnlineAccountClientImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/OperationInfoImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/OptionSelectorFilterImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewQueryObject.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/PreviewQueryBaseImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewReplyImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewReplyObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/PreviewWidgetImpl.cpp
@@ -44,6 +56,9 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryCtrlObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryMetadataImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QueryObject.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/RadioButtonsFilterImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/RatingFilterImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/RangeInputFilterImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Reaper.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/RegistryConfig.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/RegistryException.cpp
@@ -55,16 +70,23 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/ResultReplyObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/RuntimeConfig.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/RuntimeImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/safe_strerror.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/ScopeBaseImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeConfig.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeLoader.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeMetadataImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/SearchMetadataImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/SearchQueryBaseImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/SearchReplyImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/SettingsDB.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/StateReceiverObject.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/SwitchFilterImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ThreadPool.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/UniqueID.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Utils.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/ValueSliderFilterImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/VariantBuilderImpl.cpp
 )
 set(UNITY_SCOPES_LIB_SRC ${UNITY_SCOPES_LIB_SRC} ${SRC} PARENT_SCOPE)

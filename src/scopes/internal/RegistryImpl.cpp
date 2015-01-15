@@ -19,8 +19,7 @@
 #include <unity/scopes/internal/RegistryImpl.h>
 
 #include <unity/scopes/internal/MWRegistry.h>
-#include <unity/scopes/ScopeExceptions.h>
-#include <unity/UnityExceptions.h>
+#include <unity/scopes/internal/RuntimeImpl.h>
 
 using namespace std;
 
@@ -33,8 +32,8 @@ namespace scopes
 namespace internal
 {
 
-RegistryImpl::RegistryImpl(MWRegistryProxy const& mw_proxy, RuntimeImpl*) :
-    ObjectImpl(mw_proxy)
+RegistryImpl::RegistryImpl(MWRegistryProxy const& mw_proxy, RuntimeImpl* runtime)
+    : ObjectImpl(mw_proxy, runtime->logger())
 {
 }
 
@@ -52,9 +51,9 @@ MetadataMap RegistryImpl::list()
     return fwd()->list();
 }
 
-ScopeProxy RegistryImpl::locate(std::string const& scope_id)
+ObjectProxy RegistryImpl::locate(std::string const& identity)
 {
-    return fwd()->locate(scope_id);
+    return fwd()->locate(identity);
 }
 
 MetadataMap RegistryImpl::list_if(std::function<bool(ScopeMetadata const& item)> predicate)
@@ -71,7 +70,22 @@ MetadataMap RegistryImpl::list_if(std::function<bool(ScopeMetadata const& item)>
     return matching_entries;
 }
 
-MWRegistryProxy RegistryImpl::fwd() const
+bool RegistryImpl::is_scope_running(std::string const& scope_id)
+{
+    return fwd()->is_scope_running(scope_id);
+}
+
+core::ScopedConnection RegistryImpl::set_scope_state_callback(std::string const& scope_id, std::function<void(bool)> callback)
+{
+    return fwd()->set_scope_state_callback(scope_id, callback);
+}
+
+core::ScopedConnection RegistryImpl::set_list_update_callback(std::function<void()> callback)
+{
+    return fwd()->set_list_update_callback(callback);
+}
+
+MWRegistryProxy RegistryImpl::fwd()
 {
     return dynamic_pointer_cast<MWRegistry>(proxy());
 }

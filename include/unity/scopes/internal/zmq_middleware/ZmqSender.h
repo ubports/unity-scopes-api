@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQSENDER_H
-#define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_ZMQSENDER_H
+#pragma once
 
 #include <unity/util/NonCopyable.h>
 #include <capnp/common.h>
@@ -47,7 +46,9 @@ public:
 
     ZmqSender(zmqpp::socket& s);
 
-    void send(kj::ArrayPtr<kj::ArrayPtr<capnp::word const> const> segments);
+    enum WaitFlag { Wait, DontWait };
+
+    bool send(kj::ArrayPtr<kj::ArrayPtr<capnp::word const> const> segments, WaitFlag flag = Wait);
 
 private:
     zmqpp::socket& s_;
@@ -60,5 +61,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

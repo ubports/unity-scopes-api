@@ -36,72 +36,77 @@ using namespace unity::scopes;
 class MyQuery : public SearchQueryBase
 {
 public:
-    MyQuery(CannedQuery const& query, CategoryRenderer const& renderer) :
-        query_(query),
+    MyQuery(string const& scope_id, CannedQuery const& query, SearchMetadata const& metadata, CategoryRenderer const& renderer) :
+        SearchQueryBase(query, metadata),
+        scope_id_(scope_id),
         renderer_(renderer)
     {
-        cerr << "MyQuery/" << query.query_string() << " created" << endl;
+        cerr << scope_id_ << ": query instance for \"" << query.query_string() << "\" created" << endl;
     }
 
     ~MyQuery()
     {
-        cerr << "MyQuery/" << query_.query_string() << " destroyed" << endl;
+        cerr << scope_id_ << ": query instance for \"" << query().query_string() << "\" destroyed" << endl;
     }
 
     virtual void cancelled() override
     {
-        cerr << "MyQuery/" << query_.query_string() << " cancelled" << endl;
+        cerr << scope_id_ << ": \"" + query().to_uri() + "\" cancelled" << endl;
     }
 
     virtual void run(SearchReplyProxy const& reply) override
     {
-        cerr << "scope-slow: run called for \"" << query_.query_string() << "\"" << endl;
-        this_thread::sleep_for(chrono::seconds(20));
+        if (!valid())
+        {
+            return;  // Query was cancelled
+        }
+
+        cerr << scope_id_ << ": run called for \"" << query().query_string() << "\"" << endl;
+        int const short_secs = 5;
+        cerr << scope_id_ << ": sleeping for " << short_secs << " seconds" << endl;
+        this_thread::sleep_for(chrono::seconds(short_secs));
         auto cat = reply->register_category("cat1", "Category 1", "", renderer_);
         CategorisedResult result(cat);
         result.set_uri("uri");
-        result.set_title("scope-slow: result 1 for query \"" + query_.query_string() + "\"");
+        result.set_title(scope_id_ + ": result 1 for query \"" + query().query_string() + "\"");
+        cerr << scope_id_ << ": pushing result" << endl;
         reply->push(result);
-        cout << "scope-slow: query \"" << query_.query_string() << "\" complete" << endl;
+        int const long_secs = 50;
+        cerr << scope_id_ << ": sleeping for " << long_secs << " seconds" << endl;
+        this_thread::sleep_for(chrono::seconds(long_secs));
+        cout << scope_id_ << ": query \"" << query().query_string() << "\" complete" << endl;
     }
 
 private:
-    CannedQuery query_;
+    string scope_id_;
     CategoryRenderer renderer_;
 };
 
 class MyScope : public ScopeBase
 {
 public:
-    virtual int start(string const&, RegistryProxy const&) override
+    virtual void start(string const& scope_id) override
     {
-        return VERSION;
+        scope_id_ = scope_id;
     }
 
     virtual void stop() override {}
 
-    virtual SearchQueryBase::UPtr search(CannedQuery const& q, SearchMetadata const& hints) override
+    virtual SearchQueryBase::UPtr search(CannedQuery const& q, SearchMetadata const& metadata) override
     {
-        SearchQueryBase::UPtr query(new MyQuery(q, renderer_));
-        cout << "scope-slow: created query: \"" << q.query_string() << "\"" << endl;
-
-        if (hints.cardinality() > 0)
-        {
-            cerr << "result cardinality: " << hints.cardinality() << endl;
-        }
-
-        cerr << "locale: " << hints.locale() << endl;
-
+        SearchQueryBase::UPtr query(new MyQuery(scope_id_, q, metadata, renderer_));
+        cout << scope_id_ << ": created query: \"" << q.query_string() << "\"" << endl;
         return query;
     }
 
     virtual PreviewQueryBase::UPtr preview(Result const& result, ActionMetadata const&) override
     {
-        cout << "scope-S: preview: \"" << result.uri() << "\"" << endl;
+        cout << scope_id_ << ": preview: \"" << result.uri() << "\"" << endl;
         return nullptr;
     }
 
 private:
+    string scope_id_;
     CategoryRenderer renderer_;
 };
 

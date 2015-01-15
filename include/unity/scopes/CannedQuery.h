@@ -16,8 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_CANNEDQUERY_H
-#define UNITY_SCOPES_CANNEDQUERY_H
+#pragma once
 
 #include <unity/util/DefinesPtrs.h>
 #include <string>
@@ -115,7 +114,7 @@ public:
     \brief Returns a string representation of this CannedQuery object as a URI using scope:// schema.
     \return The URI for the query.
     */
-    std::string to_string() const;
+    std::string to_uri() const;
 
     /**
     \brief Get state of the filters for this CannedQuery.
@@ -132,7 +131,7 @@ public:
     \return a CannedQuery instance
     \throws InvalidArgumentException if the URI cannot be parsed.
     */
-    static CannedQuery from_string();
+    static CannedQuery from_uri(std::string const& uri);
 
 private:
     CannedQuery(internal::CannedQueryImpl *impl);
@@ -143,5 +142,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

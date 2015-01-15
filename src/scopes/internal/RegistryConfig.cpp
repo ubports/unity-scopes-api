@@ -18,8 +18,11 @@
 
 #include <unity/scopes/internal/RegistryConfig.h>
 
+#include <unity/scopes/internal/DfltConfig.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
+
+#include <stdlib.h>
 
 using namespace std;
 
@@ -32,29 +35,65 @@ namespace scopes
 namespace internal
 {
 
-constexpr char const* RegistryConfig::REGISTRY_CONFIG_GROUP;
+namespace
+{
+    const string registry_config_group = "Registry";
+    const string mw_kind_key = "Middleware";
+    const string configfile_key = ".ConfigFile";
+    const string scope_installdir_key = "Scope.InstallDir";
+    const string oem_installdir_key = "OEM.InstallDir";
+    const string click_installdir_key = "Click.InstallDir";
+    const string scoperunner_path_key = "Scoperunner.Path";
+    const string process_timeout_key = "Process.Timeout";
+}
 
 RegistryConfig::RegistryConfig(string const& identity, string const& configfile) :
-    ConfigBase(configfile)
+    ConfigBase(configfile, DFLT_REGISTRY_INI)
 {
     identity_ = identity;
     if (identity.empty())
     {
         throw InvalidArgumentException("Registry identity cannot be an empty string");
     }
-    mw_kind_ = get_middleware(REGISTRY_CONFIG_GROUP, "Middleware");
-    endpointdir_ = get_string(REGISTRY_CONFIG_GROUP, mw_kind_ + ".EndpointDir");
-    endpoint_ = get_string(REGISTRY_CONFIG_GROUP, mw_kind_ + ".Endpoint");
-    mw_configfile_ = get_string(REGISTRY_CONFIG_GROUP, mw_kind_ + ".ConfigFile");
-    scope_installdir_ = get_string(REGISTRY_CONFIG_GROUP, "Scope.InstallDir");
-    oem_installdir_ = get_optional_string(REGISTRY_CONFIG_GROUP, "OEM.InstallDir");
-    scoperunner_path_ = get_string(REGISTRY_CONFIG_GROUP, "Scoperunner.Path");
+    mw_kind_ = get_middleware(registry_config_group, mw_kind_key);
+    mw_configfile_ = get_optional_string(registry_config_group, mw_kind_ + configfile_key);
+    scope_installdir_ = get_optional_string(registry_config_group, scope_installdir_key, DFLT_SCOPE_INSTALL_DIR);
+    oem_installdir_ = get_optional_string(registry_config_group, oem_installdir_key, DFLT_OEM_INSTALL_DIR);
+    click_installdir_ = get_optional_string(registry_config_group, click_installdir_key);
+    if (click_installdir_.empty())
+    {
+        char const* home = getenv("HOME");
+        if (!home || *home == '\0')
+        {
+            throw ConfigException(configfile + ": No Click.InstallDir configured and $HOME not set");
+        }
+        click_installdir_ = string(home) + "/.local/share/unity-scopes/";
+    }
+    scoperunner_path_ = get_optional_string(registry_config_group, scoperunner_path_key, DFLT_SCOPERUNNER_PATH);
     if (scoperunner_path_[0] != '/')
     {
-        throw ConfigException(configfile + ": Scoperunner.Path must be an absolute path");
+        throw ConfigException(configfile + ": " + scoperunner_path_key + " must be an absolute path");
     }
-    ss_registry_identity_ = get_optional_string(REGISTRY_CONFIG_GROUP, "SS.Registry.Identity");
-    ss_registry_endpoint_ = get_optional_string(REGISTRY_CONFIG_GROUP, "SS.Registry.Endpoint");
+    process_timeout_ = get_optional_int(registry_config_group, process_timeout_key, DFLT_PROCESS_TIMEOUT);
+    if (process_timeout_ < 10 || process_timeout_ > 15000)
+    {
+        throw_ex("Illegal value (" + to_string(process_timeout_) + ") for " + process_timeout_key + ": value must be 10-15000 ms");
+    }
+
+    KnownEntries const known_entries = {
+                                          {  registry_config_group,
+                                             {
+                                                mw_kind_key,
+                                                mw_kind_ + configfile_key,
+                                                scope_installdir_key,
+                                                oem_installdir_key,
+                                                click_installdir_key,
+                                                scoperunner_path_key,
+                                                process_timeout_key
+                                             }
+                                          }
+                                       };
+    check_unknown_entries(known_entries);
 }
 
 RegistryConfig::~RegistryConfig()
@@ -69,16 +108,6 @@ string RegistryConfig::identity() const
 string RegistryConfig::mw_kind() const
 {
     return mw_kind_;
-}
-
-string RegistryConfig::endpointdir() const
-{
-    return endpointdir_;
-}
-
-string RegistryConfig::endpoint() const
-{
-    return endpoint_;
 }
 
 string RegistryConfig::mw_configfile() const
@@ -96,19 +125,19 @@ string RegistryConfig::oem_installdir() const
     return oem_installdir_;
 }
 
+string RegistryConfig::click_installdir() const
+{
+    return click_installdir_;
+}
+
 string RegistryConfig::scoperunner_path() const
 {
     return scoperunner_path_;
 }
 
-string RegistryConfig::ss_registry_identity() const
+int RegistryConfig::process_timeout() const
 {
-    return ss_registry_identity_;
-}
-
-string RegistryConfig::ss_registry_endpoint() const
-{
-    return ss_registry_endpoint_;
+    return process_timeout_;
 }
 
 } // namespace internal

@@ -20,6 +20,7 @@
 #include <unity/scopes/SearchMetadata.h>
 
 #include <unity/scopes/internal/QueryBaseImpl.h>
+#include <unity/scopes/internal/SearchQueryBaseImpl.h>
 
 using namespace std;
 
@@ -30,13 +31,25 @@ namespace scopes
 {
 
 /// @cond
-SearchQueryBase::SearchQueryBase() : QueryBase()
-{
-}
-
 SearchQueryBase::~SearchQueryBase()
 {
 }
+
+SearchQueryBase::SearchQueryBase(CannedQuery const& query, SearchMetadata const& metadata)
+    : QueryBase(new internal::SearchQueryBaseImpl(query, metadata))
+{
+}
+
+CannedQuery SearchQueryBase::query() const
+{
+    return fwd()->query();
+}
+
+SearchMetadata SearchQueryBase::search_metadata() const
+{
+    return fwd()->search_metadata();
+}
+
 /// @endcond
 
 /// @cond
@@ -48,7 +61,7 @@ QueryCtrlProxy SearchQueryBase::subsearch(ScopeProxy const& scope,
                                           string const& query_string,
                                           SearchListenerBase::SPtr const& reply)
 {
-    return p->subsearch(scope, query_string, reply);
+    return fwd()->subsearch(scope, query_string, reply);
 }
 
 QueryCtrlProxy SearchQueryBase::subsearch(ScopeProxy const& scope,
@@ -56,7 +69,7 @@ QueryCtrlProxy SearchQueryBase::subsearch(ScopeProxy const& scope,
                                           FilterState const& filter_state,
                                           SearchListenerBase::SPtr const& reply)
 {
-    return p->subsearch(scope, query_string, filter_state, reply);
+    return fwd()->subsearch(scope, query_string, filter_state, reply);
 }
 
 QueryCtrlProxy SearchQueryBase::subsearch(ScopeProxy const& scope,
@@ -65,7 +78,7 @@ QueryCtrlProxy SearchQueryBase::subsearch(ScopeProxy const& scope,
                                           FilterState const& filter_state,
                                           SearchListenerBase::SPtr const& reply)
 {
-    return p->subsearch(scope, query_string, department_id, filter_state, reply);
+    return fwd()->subsearch(scope, query_string, department_id, filter_state, reply);
 }
 
 QueryCtrlProxy SearchQueryBase::subsearch(ScopeProxy const& scope,
@@ -75,8 +88,24 @@ QueryCtrlProxy SearchQueryBase::subsearch(ScopeProxy const& scope,
                                           SearchMetadata const& hints,
                                           SearchListenerBase::SPtr const& reply)
 {
-    return p->subsearch(scope, query_string, department_id, filter_state, hints, reply);
+    return fwd()->subsearch(scope, query_string, department_id, filter_state, hints, reply);
 }
+
+void SearchQueryBase::set_department_id(std::string const& department_id)
+{
+    fwd()->set_department_id(department_id);
+}
+
+std::string SearchQueryBase::department_id() const
+{
+    return fwd()->department_id();
+}
+
+internal::SearchQueryBaseImpl* SearchQueryBase::fwd() const
+{
+    return dynamic_cast<internal::SearchQueryBaseImpl*>(p.get());
+}
+
 /// @endcond
 
 } // namespace scopes

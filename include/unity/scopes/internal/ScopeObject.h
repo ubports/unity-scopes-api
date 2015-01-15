@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_SCOPEOBJECT_H
-#define UNITY_SCOPES_INTERNAL_SCOPEOBJECT_H
+#pragma once
 
 #include <unity/scopes/internal/ScopeObjectBase.h>
 #include <unity/scopes/internal/QueryObjectBase.h>
@@ -52,7 +51,7 @@ class ScopeObject final : public ScopeObjectBase
 public:
     UNITY_DEFINES_PTRS(ScopeObject);
 
-    ScopeObject(RuntimeImpl* runtime, ScopeBase* scope_base_);
+    ScopeObject(RuntimeImpl* runtime, ScopeBase* scope_base, bool debug_mode = false);
     virtual ~ScopeObject();
 
     // Remote operation implementations
@@ -78,12 +77,15 @@ public:
                                      MWReplyProxy const& reply,
                                      InvokeInfo const& info) override;
 
+    virtual bool debug_mode() const override;
+
 private:
     MWQueryCtrlProxy query(MWReplyProxy const& reply, MiddlewareBase* mw_base,
         std::function<QueryBase::SPtr(void)> const& query_factory_fun,
         std::function<QueryObjectBase::SPtr(QueryBase::SPtr, MWQueryCtrlProxy)> const& query_object_factory_fun);
     RuntimeImpl* const runtime_;
     ScopeBase* const scope_base_;
+    bool const debug_mode_;
 };
 
 } // namespace internal
@@ -91,5 +93,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

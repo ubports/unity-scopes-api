@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_VARIANT_H
-#define UNITY_SCOPES_VARIANT_H
+#pragma once
 
 #include <memory>
 #include <string>
@@ -180,6 +179,19 @@ public:
     */
     void swap(Variant& other) noexcept;
 
+    /**@name Serialization
+    */
+    //@{
+    /**
+    \brief Serializes the variant to a JSON encoded string.
+    */
+    std::string serialize_json() const;
+    /**
+    \brief Deserializes a JSON encoded string to a `Variant`.
+    */
+    static Variant deserialize_json(std::string const& json_string);
+    //@}
+
 private:
     Variant(internal::NullVariant const&);
 
@@ -195,5 +207,3 @@ void swap(Variant&, Variant&) noexcept;
 } // namespace scopes
 
 } // namespace unity
-
-#endif

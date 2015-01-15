@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_MWREPLY_H
-#define UNITY_SCOPES_INTERNAL_MWREPLY_H
+#pragma once
 
 #include <unity/scopes/internal/MWObjectProxy.h>
 #include <unity/scopes/internal/MWReplyProxyFwd.h>
@@ -41,7 +40,8 @@ public:
     virtual ~MWReply();
 
     virtual void push(VariantMap const& result) = 0;
-    virtual void finished(ListenerBase::Reason reason, std::string const& error_message) = 0;
+    virtual void finished(CompletionDetails const& details) = 0;
+    virtual void info(OperationInfo const& op_info) = 0;
 
 protected:
     MWReply(MiddlewareBase* mw_base);
@@ -52,5 +52,3 @@ protected:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

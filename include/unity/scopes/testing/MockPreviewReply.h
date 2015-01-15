@@ -16,10 +16,11 @@
  * Authored by: Thomas Voß <thomas.voss@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_TESTING_MOCK_PREVIEW_REPLY_H
-#define UNITY_SCOPES_TESTING_MOCK_PREVIEW_REPLY_H
+#pragma once
 
 #include <unity/scopes/PreviewReply.h>
+
+#include <unity/scopes/testing/MockObject.h>
 
 #include <gmock/gmock.h>
 
@@ -34,7 +35,7 @@ namespace testing
 
 /// @cond
 
-class MockPreviewReply : public unity::scopes::PreviewReply
+class MockPreviewReply : public unity::scopes::PreviewReply, public unity::scopes::testing::MockObject
 {
 public:
     MockPreviewReply() = default;
@@ -42,6 +43,7 @@ public:
     // From Reply
     MOCK_METHOD0(finished, void());
     MOCK_METHOD1(error, void(std::exception_ptr));
+    MOCK_METHOD1(info, void(OperationInfo const&));
 
     // From SearchReply
     MOCK_METHOD1(register_layout, bool(ColumnLayoutList const&));
@@ -56,5 +58,3 @@ public:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

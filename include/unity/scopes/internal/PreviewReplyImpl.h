@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_PREVIEWREPLYIMPL_H
-#define UNITY_SCOPES_INTERNAL_PREVIEWREPLYIMPL_H
+#pragma once
 
 #include <unity/scopes/ColumnLayout.h>
 #include <unity/scopes/internal/MWReplyProxyFwd.h>
@@ -39,7 +38,9 @@ class QueryObjectBase;
 class PreviewReplyImpl : public virtual unity::scopes::PreviewReply, public virtual ReplyImpl
 {
 public:
-    PreviewReplyImpl(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObjectBase>const & qo);
+    PreviewReplyImpl(MWReplyProxy const& mw_proxy,
+                     std::shared_ptr<QueryObjectBase>const & qo,
+                     boost::log::sources::severity_channel_logger_mt<>& logger);
     virtual ~PreviewReplyImpl();
 
     virtual bool register_layout(unity::scopes::ColumnLayoutList const& layouts) override;
@@ -55,5 +56,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

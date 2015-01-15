@@ -16,8 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_INTERNAL_DEPARTMENTIMPL_H
-#define UNITY_INTERNAL_DEPARTMENTIMPL_H
+#pragma once
 
 #include <unity/scopes/Department.h>
 #include <unity/scopes/CannedQuery.h>
@@ -37,30 +36,37 @@ class DepartmentImpl
 public:
     DepartmentImpl(CannedQuery const& query, std::string const& label);
     DepartmentImpl(std::string const& department_id, CannedQuery const& query, std::string const& label);
-    DepartmentImpl(std::string const& department_id, CannedQuery const& query, std::string const& label, DepartmentList const& subdepartments);
     DepartmentImpl(DepartmentImpl const&) = default;
     ~DepartmentImpl() = default;
 
     DepartmentImpl& operator=(DepartmentImpl const&) = default;
 
+    void set_has_subdepartments(bool subdepartments);
     void set_subdepartments(DepartmentList const& departments);
+    void add_subdepartment(Department::SCPtr const& department);
+    void set_alternate_label(std::string const& label);
+    std::string alternate_label() const;
 
     std::string id() const;
     std::string label() const;
     CannedQuery query() const;
+    bool has_subdepartments() const;
     DepartmentList subdepartments() const;
     VariantMap serialize() const;
 
-    static Department create(VariantMap const& var);
-    static void validate_departments(DepartmentList const& departments, std::string const &current_department_id);
-    static VariantMap serialize_departments(DepartmentList const& departments, std::string const& current_department_id);
-    static DepartmentList deserialize_departments(VariantArray const& var);
+    static Department::UPtr create(VariantMap const& var);
+    static void validate_departments(Department::SCPtr const& parent);
+    static void validate_departments(Department::SCPtr const& parent, std::string const& current_id);
+    static VariantMap serialize_departments(Department::SCPtr const& parent);
+    static Department::SCPtr find_subdepartment_by_id(Department::SCPtr const& department, std::string const& id);
 
 private:
-    static void validate_departments(DepartmentList const& departments, std::unordered_set<std::string>& lookup);
+    static void validate_departments(Department::SCPtr const& department, std::unordered_set<std::string>& lookup);
     CannedQuery query_;
     std::string label_;
+    std::string alt_label_;
     DepartmentList departments_;
+    bool has_subdepartments_;
 };
 
 } // namespace internal
@@ -68,5 +74,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

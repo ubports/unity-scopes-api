@@ -43,11 +43,9 @@ namespace scopes
 namespace internal
 {
 
-ResultReplyObject::ResultReplyObject(SearchListenerBase::SPtr const& receiver,
-                                     RuntimeImpl const* runtime,
-                                     std::string const& scope_id,
-                                     int cardinality) :
-    ReplyObject(std::static_pointer_cast<ListenerBase>(receiver), runtime, scope_id),
+ResultReplyObject::ResultReplyObject(SearchListenerBase::SPtr const& receiver, RuntimeImpl const* runtime,
+                                     std::string const& scope_id, int cardinality, bool dont_reap) :
+    ReplyObject(std::static_pointer_cast<ListenerBase>(receiver), runtime, scope_id, dont_reap),
     receiver_(receiver),
     cat_registry_(new CategoryRegistry()),
     runtime_(runtime),
@@ -90,16 +88,9 @@ bool ResultReplyObject::process_data(VariantMap const& data)
     it = data.find("departments");
     if (it != data.end())
     {
-        DepartmentList const departments = DepartmentImpl::deserialize_departments(it->second.get_array());
-        it = data.find("current_department");
-        if (it != data.end())
-        {
-            receiver_->push(departments, it->second.get_string());
-        }
-        else
-        {
-            throw InvalidArgumentException("ReplyObject::process_data(): departments present but missing current_department");
-        }
+        Department::SCPtr department = DepartmentImpl::create(it->second.get_dict());
+        internal::DepartmentImpl::validate_departments(department);
+        receiver_->push(department);
     }
 
     it = data.find("annotation");

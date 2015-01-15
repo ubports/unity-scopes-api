@@ -1,10 +1,8 @@
-set(TEST_BUILD_ROOT ${CMAKE_CURRENT_BINARY_DIR})
-configure_file(scope-api-testconfig.h.in scope-api-testconfig.h @ONLY)
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
-
 add_subdirectory(gtest)
 if(${slowtests})
   add_subdirectory(headers)
 endif()
 add_subdirectory(copyright)
 add_subdirectory(whitespace)
+add_subdirectory(autopkg)
+add_subdirectory(abi-compliance)

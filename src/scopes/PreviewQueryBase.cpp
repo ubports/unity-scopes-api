@@ -18,7 +18,7 @@
 
 #include <unity/scopes/PreviewQueryBase.h>
 
-#include <unity/scopes/internal/QueryBaseImpl.h>
+#include <unity/scopes/internal/PreviewQueryBaseImpl.h>
 
 using namespace std;
 
@@ -29,7 +29,8 @@ namespace scopes
 {
 
 /// @cond
-PreviewQueryBase::PreviewQueryBase() : QueryBase()
+PreviewQueryBase::PreviewQueryBase(Result const& result, ActionMetadata const& metadata) :
+    QueryBase(new internal::PreviewQueryBaseImpl(result, metadata))
 {
 }
 
@@ -37,6 +38,21 @@ PreviewQueryBase::~PreviewQueryBase()
 {
 }
 /// @endcond
+
+Result PreviewQueryBase::result() const
+{
+    return fwd()->result();
+}
+
+ActionMetadata PreviewQueryBase::action_metadata() const
+{
+    return fwd()->action_metadata();
+}
+
+internal::PreviewQueryBaseImpl* PreviewQueryBase::fwd() const
+{
+    return dynamic_cast<internal::PreviewQueryBaseImpl*>(p.get());
+}
 
 } // namespace scopes
 

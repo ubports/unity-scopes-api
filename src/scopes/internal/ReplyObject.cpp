@@ -27,7 +27,6 @@
 #include <unity/scopes/internal/CategorisedResultImpl.h>
 
 #include <cassert>
-#include <iostream> // TODO: remove this once logging is added
 
 using namespace std;
 using namespace unity::scopes::internal;
@@ -41,26 +40,33 @@ namespace scopes
 namespace internal
 {
 
-ReplyObject::ReplyObject(ListenerBase::SPtr const& receiver_base, RuntimeImpl const* runtime, std::string const& scope_proxy) :
+ReplyObject::ReplyObject(ListenerBase::SPtr const& receiver_base, RuntimeImpl const* runtime,
+                         std::string const& scope_proxy, bool dont_reap) :
+    runtime_(runtime),
     listener_base_(receiver_base),
     finished_(false),
     origin_proxy_(scope_proxy),
-    num_push_(0)
+    num_push_(0),
+    info_occurred_(false)
 {
     assert(receiver_base);
     assert(runtime);
-    reap_item_ = runtime->reply_reaper()->add([this] {
-        cerr << "No activity on ReplyObject for scope " << this->origin_proxy_
-             << ": ReplyObject destroyed" << endl;
-        this->disconnect();
-    });
+
+    if (dont_reap == false)
+    {
+        unique_lock<mutex> lock(mutex_);  // Make sure that when lambda fires, it sees current values.
+        reap_item_ = runtime->reply_reaper()->add([this] {
+            string msg = "No activity on ReplyObject for scope " + this->origin_proxy_ + ": ReplyObject destroyed";
+            this->finished(CompletionDetails(CompletionDetails::Error, msg));
+        });
+    }
 }
 
 ReplyObject::~ReplyObject()
 {
     try
     {
-        finished(ListenerBase::Finished, "");
+        finished(CompletionDetails(CompletionDetails::OK));
     }
     catch (...)
     {
@@ -89,7 +95,10 @@ void ReplyObject::push(VariantMap const& result) noexcept
         return; // Ignore replies that arrive after finished().
     }
 
-    reap_item_->refresh();
+    if (reap_item_)
+    {
+        reap_item_->refresh();
+    }
 
     {
         unique_lock<mutex> lock(mutex_);
@@ -126,16 +135,16 @@ void ReplyObject::push(VariantMap const& result) noexcept
     if (!error.empty())
     {
         // TODO: log error
-        finished(ListenerBase::Error, error);
+        finished(CompletionDetails(CompletionDetails::Error, error));
     }
     else if (stop)
     {
         // TODO: log error
-        finished(ListenerBase::Finished, "");
+        finished(CompletionDetails(CompletionDetails::OK));
     }
 }
 
-void ReplyObject::finished(ListenerBase::Reason r, string const& error_message) noexcept
+void ReplyObject::finished(CompletionDetails const& details) noexcept
 {
     // We permit exactly one finished() call for a query. This avoids
     // a race condition where the executing down-stream query invokes
@@ -148,8 +157,15 @@ void ReplyObject::finished(ListenerBase::Reason r, string const& error_message) 
 
     // Only one thread can reach this point, any others were thrown out above.
 
-    reap_item_->destroy();
-    disconnect();               // Disconnect self from middleware, if this hasn't happened yet.
+    ReapItem::SPtr ri;
+    {
+        unique_lock<mutex> lock(mutex_);  // If finished() is called by reaper, the
+        ri = reap_item_;                  // callback needs to see the current value of reap_item_.
+    }
+    if (ri)
+    {
+        ri->cancel();
+    }
 
     // Wait until all currently executing calls to push() have completed.
     unique_lock<mutex> lock(mutex_);
@@ -158,17 +174,54 @@ void ReplyObject::finished(ListenerBase::Reason r, string const& error_message) 
     lock.unlock(); // Inform the application code that the query is complete outside synchronization.
     try
     {
-        listener_base_->finished(r, error_message);
+        CompletionDetails details_with_info(details);
+        for (auto const& info : info_list_)
+        {
+            details_with_info.add_info(info);
+        }
+        listener_base_->finished(details_with_info);
     }
     catch (std::exception const& e)
     {
-        cerr << "ReplyObject::finished(): " << e.what() << endl;
-        // TODO: log error
+        BOOST_LOG_SEV(runtime_->logger(), Logger::Error) << "ReplyObject::finished(): " << e.what();
     }
     catch (...)
     {
-        cerr << "ReplyObject::finished(): unknown exception" << endl;
-        // TODO: log error
+        BOOST_LOG_SEV(runtime_->logger(), Logger::Error) << "ReplyObject::finished(): unknown exception";
+    }
+
+    // Disconnect self from middleware, if this hasn't happened yet.
+    // We do this last because disconnect() can trigger
+    // the destructor of this instance (if finished() is called
+    // by the reaper, for example).
+    disconnect();
+}
+
+void ReplyObject::info(OperationInfo const& op_info) noexcept
+{
+    if (finished_.load())
+    {
+        return; // Ignore info messages that arrive after finished().
+    }
+
+    if (reap_item_)
+    {
+        reap_item_->refresh();
+    }
+    info_occurred_.exchange(true);
+
+    try
+    {
+        info_list_.push_back(op_info);
+        listener_base_->info(op_info);
+    }
+    catch (std::exception const& e)
+    {
+        BOOST_LOG_SEV(runtime_->logger(), Logger::Error) << "ReplyObject::info(): " << e.what();
+    }
+    catch (...)
+    {
+        BOOST_LOG_SEV(runtime_->logger(), Logger::Error) << "ReplyObject::info(): unknown exception";
     }
 }
 

@@ -22,6 +22,12 @@ endif()
 
 string(TOLOWER "${CMAKE_BUILD_TYPE}" cmake_build_type_lower) # Build types should always be lowercase but sometimes they are not.
 
+set(ACCEPTED_BUILD_TYPES "" none release debug relwithdebinfo coverage)
+list(FIND ACCEPTED_BUILD_TYPES "${cmake_build_type_lower}" IS_BUILD_TYPE_ACCEPTED)
+if(${IS_BUILD_TYPE_ACCEPTED} EQUAL -1)
+  message(FATAL_ERROR "Invalid CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}\nValid types are: ${ACCEPTED_BUILD_TYPES}")
+endif()
+
 # Static C++ checks
 
 find_program(CPPCHECK_COMMAND NAMES cppcheck)
@@ -54,11 +60,17 @@ else()
 endif()
 
 include(FindPkgConfig)
-find_package(Boost COMPONENTS regex serialization REQUIRED)
-pkg_check_modules(UNITY_API libunity-api>=0.1.1 REQUIRED)
-pkg_check_modules(PROCESS_CPP process-cpp REQUIRED)
+find_package(Boost COMPONENTS system filesystem regex serialization thread log REQUIRED)
+pkg_check_modules(UNITY_API libunity-api>=0.1.3 REQUIRED)
+pkg_check_modules(PROCESS_CPP process-cpp>=1.0.1 REQUIRED)
+pkg_check_modules(APPARMOR REQUIRED libapparmor REQUIRED)
 pkg_check_modules(LTTNG_UST lttng-ust REQUIRED)
 pkg_check_modules(LIBURCU_BP liburcu-bp REQUIRED)
+pkg_check_modules(JSONCPP jsoncpp REQUIRED)
+pkg_check_modules(LIBACCOUNTS REQUIRED libaccounts-glib)
+pkg_check_modules(LIBSIGNON REQUIRED libsignon-glib)
+pkg_check_modules(ZMQLIB libzmq REQUIRED)
+
 find_program(LTTNG_EXECUTABLE lttng)
 if (NOT LTTNG_EXECUTABLE)
     message(SEND_ERROR "Cannot find LTTng executable: ensure that lttng-tools is installed")
@@ -81,7 +93,7 @@ else()
     if (NOT DOS2UNIX_COMMAND)
         message(WARNING "Cannot find dos2unix: formatcode target will not be available")
     else()
-        find_program(CLANG_FORMAT_COMMAND NAMES clang-format-3.5)
+        find_program(CLANG_FORMAT_COMMAND NAMES clang-format-3.6 clang-format-3.5)
         if (NOT CLANG_FORMAT_COMMAND)
             message(WARNING "Cannot find clang-format >= clang-format-3.5: formatcode target will not be available")
         endif()
@@ -100,8 +112,14 @@ if(NOT CAPNPC_BIN)
 endif()
 set(CAPNPC_FLAGS "" CACHE STRING "Extra flags for capnpc.")
 
-set(OTHER_INCLUDE_DIRS ${OTHER_INCLUDE_DIRS} ${UNITY_API_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${JSONCPP_INCLUDE_DIRS} ${PROCESS_CPP_INCLUDE_DIRS})
-set(OTHER_LIBS ${UNITY_API_LDFLAGS} ${OTHER_LIBS})
+add_definitions(
+  -DDEB_HOST_MULTIARCH="${CMAKE_LIBRARY_ARCHITECTURE}"
+)
+
+set(OTHER_INCLUDE_DIRS ${OTHER_INCLUDE_DIRS} ${UNITY_API_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS}
+                       ${JSONCPP_INCLUDE_DIRS} ${PROCESS_CPP_INCLUDE_DIRS} ${APPARMOR_INCLUDE_DIRS}
+                       ${LIBACCOUNTS_INCLUDE_DIRS} ${LIBSIGNON_INCLUDE_DIRS})
+set(OTHER_LIBS ${OTHER_LIBS} ${UNITY_API_LDFLAGS} ${APPARMOR_LDFLAGS} ${LIBACCOUNTS_LIBRARIES} ${LIBSIGNON_LIBRARIES})
 
 # Standard install paths
 include(GNUInstallDirs)
@@ -113,11 +131,14 @@ include_directories(
     ${OTHER_INCLUDE_DIRS}
 )
 
-# When building the library, we set the default symbol visibility
-# to "hidden", so we don't export things by default.
-# Exported functions and classes are prefixed by a UNITY_API macro,
-# which explicitly exports a symbol if UNITY_DLL_EXPORTS is defined.
-add_definitions(-DUNITY_DLL_EXPORTS)
+# We require g++ 4.9, to avoid ABI breakage with earlier version.
+# Note that this must match what is specifed in debian/control.
+set(cxx_version_required 4.9)
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    if (NOT CMAKE_CXX_COMPILER_VERSION MATCHES "^${cxx_version_required}")
+        message(FATAL_ERROR "g++ version must be ${cxx_version_required}, found ${CMAKE_CXX_COMPILER_VERSION}!")
+    endif()
+endif()
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -pedantic -Wno-variadic-macros -Wextra -fPIC")
 
@@ -127,6 +148,13 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -pedantic -Wno-variadic-macros -Wextra
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=default")
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pedantic -Wall -Wextra")
+
+# Some additional warnings not included by the general flags set above.
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wformat -Wold-style-cast -Wredundant-decls -Wswitch-default")
+
+# TODO: Once AbstractScopeBase gets its virtual destructor, turn on the line below (bug #1360266).
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wnon-virtual-dtor")
+
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic -Wall -Wextra") # Can't use -std=c++11 with C compiler
 
 # -fno-permissive causes warnings with clang, so we only enable it for gcc
@@ -171,25 +199,19 @@ if(IPC_MONITORING)
     add_definitions(-DENABLE_IPC_MONITOR)
 endif()
 
-set(SCOPES_DEFAULT_CONFIGDIR ${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT})
+# Scopes library name. Also used as a prefix in various places, and as a subdirectory
+# name for installed files. Changing this will also require corresponding changes
+# to the debian files.
+set(UNITY_SCOPES_LIB unity-scopes)
 
 # API version
 set(UNITY_SCOPES_MAJOR 0)
-set(UNITY_SCOPES_MINOR 4)
-set(UNITY_SCOPES_MICRO 0)
-
-# Scopes library
-set(UNITY_SCOPES_LIB unity-scopes)
+set(UNITY_SCOPES_MINOR 6)
+set(UNITY_SCOPES_MICRO 10)
+set(UNITY_SCOPES_SOVERSION 3)
 
 # Version for testing, with all symbols visible
-set(UNITY_SCOPES_TEST_LIB unity-scopes-test)
-
-pkg_check_modules(JSONCPP jsoncpp REQUIRED)
-
-find_library(ZMQLIB zmq)
-if(NOT ZMQLIB)
-  message(FATAL_ERROR "Zmq lib not found.")
-endif()
+set(UNITY_SCOPES_TEST_LIB ${UNITY_SCOPES_LIB}-test)
 
 find_library(ZMQPPLIB zmqpp)
 if(NOT ZMQPPLIB)
@@ -212,6 +234,13 @@ if(NOT DLLIB)
 endif()
 
 
+# Stop complaints during the generation phase about executables depending
+# on Qt5::Core and Qt5::Network. They are bogus because only
+# only smartscopes uses these.
+if(POLICY CMP0028)
+    cmake_policy(SET CMP0028 OLD)
+endif()
+
 # Other libraries we depend on
 set(OTHER_LIBS
     ${OTHER_LIBS}
@@ -219,7 +248,7 @@ set(OTHER_LIBS
     ${JSONCPP_LDFLAGS}
     ${PROCESS_CPP_LDFLAGS}
     ${ZMQPPLIB}
-    ${ZMQLIB}
+    ${ZMQLIB_LDFLAGS}
     ${CAPNPLIB}
     ${KJLIB}
     ${DLLIB}
@@ -230,21 +259,32 @@ set(OTHER_LIBS
 # All the libraries we need to link a normal executable that uses Unity scopes
 set(LIBS ${UNITY_SCOPES_LIB})
 
-# All the libraries we need to link a gtest executable. (We link the tests against a static version
-# so we can do whitebox testing on internal classes.
-
-# TODO: HACK: static linking of the tests doesn't work because the tests won't pull in virtual methods in a
-# base class from a static library without an unresolved dependency. But, without static linking, we can't
-# do whitebox tests because of the visibility=hidden compile flags. For now, we link dynamically and
-# with visbility=default.
-
+# Test version of ${UNITY_SCOPES_LIB}, with internal symbols visible
 set(TESTLIBS ${UNITY_SCOPES_TEST_LIB})
 
 # Library install prefix
 set(LIB_INSTALL_PREFIX lib/${CMAKE_LIBRARY_ARCHITECTURE})
-
 set(LIBDIR ${CMAKE_INSTALL_LIBDIR})
-set(HDR_INSTALL_DIR include/unity-scopes-${UNITY_SCOPES_MAJOR})
+
+set(LIBSUBDIR ${LIBDIR}/${UNITY_SCOPES_LIB}})
+set(HDR_INSTALL_DIR include/${UNITY_SCOPES_LIB}-${UNITY_SCOPES_MAJOR})
+
+#####################################################################
+# Enable code coverage calculation with gcov/gcovr/lcov
+# Usage:
+#  * Switch build type to coverage (use ccmake or cmake-gui)
+#  * Invoke make, make test, make coverage (or ninja if you use that backend)
+#  * Find html report in subdir coveragereport
+#  * Find xml report suitable for jenkins in coverage.xml
+#####################################################################
+if(cmake_build_type_lower MATCHES coverage)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage -g")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --coverage -g")
+    set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} --coverage -g")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} --coverage -g")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage -g")
+endif()
+include(EnableCoverageReport)
 
 # Tests
 include(CTest)
@@ -284,28 +324,6 @@ add_custom_command(OUTPUT ${CAPNPROTO_SRC} ${CAPNPROTO_HDRS}
                    DEPENDS ${CAPNPROTO_FILES}
                    COMMAND ${CAPNPC_BIN} ${CAPNPC_FLAGS} -oc++:${CMAKE_BINARY_DIR} --src-prefix=${CMAKE_SOURCE_DIR} ${CAPNPROTO_FILES})
 
-# Set up coverage testing
-include(EnableCoverageReport)
-#####################################################################
-# Enable code coverage calculation with gcov/gcovr/lcov
-# Usage:
-#  * Switch build type to coverage (use ccmake or cmake-gui)
-#  * Invoke make, make test, make coverage (or ninja if you use that backend)
-#  * Find html report in subdir coveragereport
-#  * Find xml report suitable for jenkins in coverage.xml
-#####################################################################
-if(cmake_build_type_lower MATCHES coverage)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --coverage")
-    set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} --coverage")
-    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} --coverage")
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
-
-    # We add -g when building with coverage so valgrind reports line numbers.
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g" )
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g" )
-endif()
-
 # Pseudo-library of object files. We need a version of the library for normal clients
 # that does not expose symbols in the unity::scopes::internal namespace, and another
 # version for whitebox tests, so we can write unit tests for classes in the internal namespaces.
@@ -316,17 +334,16 @@ add_library(${UNITY_SCOPES_LIB_OBJ} OBJECT ${UNITY_SCOPES_LIB_SRC} ${CAPNPROTO_S
 set_target_properties(${UNITY_SCOPES_LIB_OBJ} PROPERTIES COMPILE_FLAGS "-fPIC")
 
 # Use the object files to make the normal library.
-set(UNITY_SCOPES_SOVERSION 0)
 add_library(${UNITY_SCOPES_LIB} SHARED $<TARGET_OBJECTS:${UNITY_SCOPES_LIB_OBJ}>)
 set_target_properties(${UNITY_SCOPES_LIB} PROPERTIES
-    VERSION "${UNITY_SCOPES_MAJOR}.${UNITY_SCOPES_MINOR}"
+    VERSION "${UNITY_SCOPES_MAJOR}.${UNITY_SCOPES_MINOR}.${UNITY_SCOPES_MICRO}"
     SOVERSION ${UNITY_SCOPES_SOVERSION}
 )
 
 # Use the object files to make the test library.
 add_library(${UNITY_SCOPES_TEST_LIB} SHARED $<TARGET_OBJECTS:${UNITY_SCOPES_LIB_OBJ}>)
 set_target_properties(${UNITY_SCOPES_TEST_LIB} PROPERTIES
-    VERSION "${UNITY_SCOPES_MAJOR}.${UNITY_SCOPES_MINOR}"
+    VERSION "${UNITY_SCOPES_MAJOR}.${UNITY_SCOPES_MINOR}.${UNITY_SCOPES_MICRO}"
     SOVERSION ${UNITY_SCOPES_SOVERSION}
 )
 
@@ -343,7 +360,7 @@ set_target_properties(${UNITY_SCOPES_TEST_LIB} PROPERTIES LINK_FLAGS "${ldflags}
 # out all symbols that (recursively) are in the unity::scopes::internal namespace,
 # except for a few exceptions that are needed by the scoperegistry, scoperunner,
 # smartscopesproxy, and any other binaries that reach into the internal namespace.
-set(symbol_map "${CMAKE_SOURCE_DIR}/unity-scopes.map")
+set(symbol_map "${CMAKE_SOURCE_DIR}/${UNITY_SCOPES_LIB}.map")
 set_target_properties(${UNITY_SCOPES_LIB} PROPERTIES
                       LINK_FLAGS "${ldflags} -Wl,--version-script,${symbol_map}")
 set_target_properties(${UNITY_SCOPES_LIB} PROPERTIES LINK_DEPENDS ${symbol_map})
@@ -357,7 +374,12 @@ install(TARGETS ${UNITY_SCOPES_LIB} LIBRARY DESTINATION ${LIB_INSTALL_PREFIX})
 # Enable coverage testing
 
 if (cmake_build_type_lower MATCHES coverage)
-  ENABLE_COVERAGE_REPORT(TARGETS ${UNITY_SCOPES_LIB} smartscopes FILTER /usr/include ${CMAKE_SOURCE_DIR}/test/* ${CMAKE_BINARY_DIR}/*)
+  ENABLE_COVERAGE_REPORT(TARGETS ${UNITY_SCOPES_LIB} smartscopes
+                         FILTER /usr/include
+                                ${CMAKE_SOURCE_DIR}/test/*
+                                ${CMAKE_SOURCE_DIR}/debian/tests/*
+                                ${CMAKE_SOURCE_DIR}/demo/*
+                                ${CMAKE_BINARY_DIR}/*)
 endif()
 
 #
@@ -366,8 +388,6 @@ endif()
 # Pass -DDEVEL_DOCS=ON to cmake for more detailed documentation
 
 option(DEVEL_DOCS "Enable detailed Doxygen documentation")
-
-set(CMAKE_INSTALL_DOCDIR doc)
 
 find_package(Doxygen)
 find_program(DOT_EXECUTABLE dot /usr/bin)
@@ -381,14 +401,14 @@ else()
       configure_file(${PROJECT_SOURCE_DIR}/doc/Doxyfile.in ${PROJECT_BINARY_DIR}/doc/Doxyfile @ONLY IMMEDIATE)
     endif()
     configure_file(${PROJECT_SOURCE_DIR}/doc/index.html ${PROJECT_BINARY_DIR}/doc/index.html COPYONLY)
-    add_custom_command(OUTPUT ${PROJECT_BINARY_DIR}/doc/${PROJECT}/index.html
+    add_custom_command(OUTPUT ${PROJECT_BINARY_DIR}/doc/${UNITY_SCOPES_LIB}/index.html
                        COMMAND ${DOXYGEN_EXECUTABLE} ${PROJECT_BINARY_DIR}/doc/Doxyfile
                        DEPENDS ${PROJECT_BINARY_DIR}/doc/Doxyfile
                                ${PROJECT_SOURCE_DIR}/doc/tutorial.dox
                                ${UNITY_SCOPES_LIB_SRC}
                                ${UNITY_SCOPES_LIB_HDRS})
     add_custom_target(doc ALL
-                       DEPENDS ${PROJECT_BINARY_DIR}/doc/${PROJECT}/index.html)
-    install(DIRECTORY ${PROJECT_BINARY_DIR}/doc/${PROJECT}
-            DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/${CMAKE_INSTALL_DOCDIR})
+                       DEPENDS ${PROJECT_BINARY_DIR}/doc/${UNITY_SCOPES_LIB}/index.html)
+    install(DIRECTORY ${PROJECT_BINARY_DIR}/doc/${UNITY_SCOPES_LIB}
+            DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/doc)
 endif()

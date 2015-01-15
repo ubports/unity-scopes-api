@@ -38,12 +38,17 @@ namespace scopes
 namespace internal
 {
 
-SearchReplyImpl::SearchReplyImpl(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObjectBase> const& qo) :
-    ObjectImpl(mw_proxy),
-    ReplyImpl(mw_proxy, qo),
-    cat_registry_(new CategoryRegistry()),
-    cardinality_(qo->cardinality({ fwd()->identity(), fwd()->mw_base() })),
-    num_pushes_(0)
+SearchReplyImpl::SearchReplyImpl(MWReplyProxy const& mw_proxy,
+                                 std::shared_ptr<QueryObjectBase> const& qo,
+                                 int cardinality,
+                                 std::string const& current_department_id,
+                                 boost::log::sources::severity_channel_logger_mt<>& logger)
+    : ObjectImpl(mw_proxy, logger)
+    , ReplyImpl(mw_proxy, qo, logger)
+    , cat_registry_(new CategoryRegistry())
+    , cardinality_(cardinality)
+    , num_pushes_(0)
+    , current_department_(current_department_id)
 {
 }
 
@@ -51,19 +56,19 @@ SearchReplyImpl::~SearchReplyImpl()
 {
 }
 
-void SearchReplyImpl::register_departments(DepartmentList const& departments, std::string current_department_id)
+void SearchReplyImpl::register_departments(Department::SCPtr const& parent)
 {
     // basic consistency check
     try
     {
-        DepartmentImpl::validate_departments(departments, current_department_id);
+        DepartmentImpl::validate_departments(parent, current_department_);
     }
     catch (unity::LogicException const &e)
     {
-        throw unity::LogicException("Reply::register_departments(): Failed to validate departments");
+        throw unity::LogicException("SearchReplyImpl::register_departments(): Failed to validate departments");
     }
 
-    ReplyImpl::push(internal::DepartmentImpl::serialize_departments(departments, current_department_id)); // ignore return value?
+    ReplyImpl::push(internal::DepartmentImpl::serialize_departments(parent)); // ignore return value?
 }
 
 void SearchReplyImpl::register_category(Category::SCPtr category)
@@ -78,7 +83,19 @@ Category::SCPtr SearchReplyImpl::register_category(std::string const& id,
                                              CategoryRenderer const& renderer_template)
 {
     // will throw if adding same category again
-    auto cat = cat_registry_->register_category(id, title, icon, renderer_template);
+    auto cat = cat_registry_->register_category(id, title, icon, nullptr, renderer_template);
+    push(cat);
+    return cat;
+}
+
+Category::SCPtr SearchReplyImpl::register_category(std::string const& id,
+                                             std::string const& title,
+                                             std::string const& icon,
+                                             CannedQuery const& query,
+                                             CategoryRenderer const& renderer_template)
+{
+    // will throw if adding same category again
+    auto cat = cat_registry_->register_category(id, title, icon, make_shared<CannedQuery>(query), renderer_template);
     push(cat);
     return cat;
 }
@@ -88,7 +105,7 @@ Category::SCPtr SearchReplyImpl::lookup_category(std::string const& id)
     return cat_registry_->lookup_category(id);
 }
 
-bool SearchReplyImpl::register_annotation(unity::scopes::Annotation const& annotation)
+bool SearchReplyImpl::push(unity::scopes::experimental::Annotation const& annotation)
 {
     VariantMap var;
     var["annotation"] = annotation.serialize();
@@ -127,6 +144,16 @@ bool SearchReplyImpl::push(unity::scopes::CategorisedResult const& result)
 
 bool SearchReplyImpl::push(unity::scopes::Filters const& filters, unity::scopes::FilterState const& filter_state)
 {
+    // basic consistency check
+    try
+    {
+        internal::FilterBaseImpl::validate_filters(filters);
+    }
+    catch (unity::LogicException const &e)
+    {
+        throw unity::LogicException("SearchReplyImpl::push(): Failed to validate filters");
+    }
+
     VariantMap var;
     var["filters"] = internal::FilterBaseImpl::serialize_filters(filters);
     var["filter_state"] = filter_state.serialize();

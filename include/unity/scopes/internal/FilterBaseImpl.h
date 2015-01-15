@@ -16,8 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_FILTERBASEIMPL_H
-#define UNITY_SCOPES_INTERNAL_FILTERBASEIMPL_H
+#pragma once
 
 #include <unity/scopes/Variant.h>
 #include <unity/scopes/FilterBase.h>
@@ -39,12 +38,15 @@ public:
     FilterBaseImpl(std::string const& id);
     FilterBaseImpl(VariantMap const& var);
     virtual ~FilterBaseImpl();
+    void set_display_hints(int hints);
     std::string id() const;
+    int display_hints() const;
     VariantMap serialize() const;
     virtual std::string filter_type() const = 0;
     static FilterBase::SCPtr deserialize(VariantMap const& var);
     static VariantArray serialize_filters(Filters const& filters);
     static Filters deserialize_filters(VariantArray const& var);
+    static void validate_filters(Filters const& filters);
 
 protected:
     virtual void serialize(VariantMap& var) const = 0;
@@ -53,6 +55,7 @@ protected:
 
 private:
     std::string id_;
+    int display_hints_;
 };
 
 } // namespace internal
@@ -60,5 +63,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

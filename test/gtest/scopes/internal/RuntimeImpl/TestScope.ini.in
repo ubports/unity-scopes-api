@@ -1,0 +1,4 @@
+[ScopeConfig]
+DisplayName = TestScope
+Description = Scope to test directory settings
+Author = Michi Henning

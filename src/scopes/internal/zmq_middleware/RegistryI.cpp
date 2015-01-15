@@ -51,24 +51,26 @@ dictionary<string, VariantMap> MetadataMap;
 
 exception NotFoundException
 {
-    string scopeName;
+    string identity;
 };
 
 interface Registry
 {
-    ScopeProxy get_metadata(string name) throws NotFoundException;
-    ScopeMap list();
-    ScopeProxy locate(string name) throws NotFoundException, RegistryException;
+    ScopeMetadata get_metadata(string scope_id) throws NotFoundException;
+    MetadataMap list();
+    ObjectProxy locate(string identity) throws NotFoundException, RegistryException;
 };
 
 */
 
-using namespace std::placeholders;
+using namespace std;
+namespace ph = std::placeholders;
 
 RegistryI::RegistryI(RegistryObjectBase::SPtr const& ro) :
-    ServantBase(ro, { { "get_metadata", bind(&RegistryI::get_metadata_, this, _1, _2, _3) },
-                      { "list", bind(&RegistryI::list_, this, _1, _2, _3) },
-                      { "locate", bind(&RegistryI::locate_, this, _1, _2, _3) } })
+    ServantBase(ro, { { "get_metadata", bind(&RegistryI::get_metadata_, this, ph::_1, ph::_2, ph::_3) },
+                      { "list", bind(&RegistryI::list_, this, ph::_1, ph::_2, ph::_3) },
+                      { "locate", bind(&RegistryI::locate_, this, ph::_1, ph::_2, ph::_3) },
+                      { "is_scope_running", bind(&RegistryI::is_scope_running_, this, ph::_1, ph::_2, ph::_3) } })
 
 {
 }
@@ -82,11 +84,11 @@ void RegistryI::get_metadata_(Current const&,
                               capnproto::Response::Builder& r)
 {
     auto req = in_params.getAs<capnproto::Registry::GetMetadataRequest>();
-    string name = req.getName().cStr();
+    string scope_id = req.getIdentity().cStr();
     auto delegate = dynamic_pointer_cast<RegistryObjectBase>(del());
     try
     {
-        auto meta = delegate->get_metadata(name);
+        auto meta = delegate->get_metadata(scope_id);
         r.setStatus(capnproto::ResponseStatus::SUCCESS);
         auto get_metadata_response = r.initPayload().getAs<capnproto::Registry::GetMetadataResponse>().initResponse();
         auto dict = get_metadata_response.initReturnValue();
@@ -96,7 +98,7 @@ void RegistryI::get_metadata_(Current const&,
     {
         r.setStatus(capnproto::ResponseStatus::USER_EXCEPTION);
         auto get_metadata_response = r.initPayload().getAs<capnproto::Registry::GetMetadataResponse>().initResponse();
-        get_metadata_response.initNotFoundException().setName(e.name().c_str());
+        get_metadata_response.initNotFoundException().setIdentity(e.name().c_str());
     }
 }
 
@@ -112,9 +114,9 @@ void RegistryI::list_(Current const&,
     int i = 0;
     for (auto& pair : metadata_map)
     {
-        dict[i].setName(pair.first.c_str());            // Scope name
+        dict[i].setName(pair.first.c_str());        // Scope ID
         auto md = dict[i].initValue().initDictVal();
-        to_value_dict(pair.second.serialize(), md);     // Scope metadata
+        to_value_dict(pair.second.serialize(), md); // Scope metadata
         ++i;
     }
 }
@@ -124,30 +126,52 @@ void RegistryI::locate_(Current const&,
                         capnproto::Response::Builder& r)
 {
     auto req = in_params.getAs<capnproto::Registry::GetMetadataRequest>();
-    string name = req.getName().cStr();
+    string identity = req.getIdentity().cStr();
     auto delegate = dynamic_pointer_cast<RegistryObjectBase>(del());
     try
     {
-        auto scope_proxy = delegate->locate(name);
+        auto proxy = delegate->locate(identity);
         r.setStatus(capnproto::ResponseStatus::SUCCESS);
         auto locate_response = r.initPayload().getAs<capnproto::Registry::LocateResponse>().initResponse();
-        auto proxy = locate_response.initReturnValue();
-        proxy.setIdentity(scope_proxy->identity());
-        proxy.setCategory("Scope");
-        proxy.setEndpoint(scope_proxy->endpoint());
-        proxy.setTimeout(scope_proxy->timeout());
+        auto return_proxy = locate_response.initReturnValue();
+        return_proxy.setIdentity(proxy->identity());
+        return_proxy.setCategory(proxy->target_category());
+        return_proxy.setEndpoint(proxy->endpoint());
+        return_proxy.setTimeout(proxy->timeout());
     }
     catch (NotFoundException const& e)
     {
         r.setStatus(capnproto::ResponseStatus::USER_EXCEPTION);
         auto locate_response = r.initPayload().getAs<capnproto::Registry::LocateResponse>().initResponse();
-        locate_response.initNotFoundException().setName(e.name().c_str());
+        locate_response.initNotFoundException().setIdentity(e.name().c_str());
     }
     catch (RegistryException const& e)
     {
         r.setStatus(capnproto::ResponseStatus::USER_EXCEPTION);
         auto locate_response = r.initPayload().getAs<capnproto::Registry::LocateResponse>().initResponse();
         locate_response.initRegistryException().setReason(e.reason().c_str());
+    }
+}
+
+void RegistryI::is_scope_running_(Current const&,
+                                  capnp::AnyPointer::Reader& in_params,
+                                  capnproto::Response::Builder& r)
+{
+    auto req = in_params.getAs<capnproto::Registry::IsScopeRunningRequest>();
+    string scope_id = req.getIdentity().cStr();
+    auto delegate = dynamic_pointer_cast<RegistryObjectBase>(del());
+    try
+    {
+        auto is_running = delegate->is_scope_running(scope_id);
+        r.setStatus(capnproto::ResponseStatus::SUCCESS);
+        auto is_scope_running_response = r.initPayload().getAs<capnproto::Registry::IsScopeRunningResponse>().initResponse();
+        is_scope_running_response.setReturnValue(is_running);
+    }
+    catch (NotFoundException const& e)
+    {
+        r.setStatus(capnproto::ResponseStatus::USER_EXCEPTION);
+        auto get_metadata_response = r.initPayload().getAs<capnproto::Registry::IsScopeRunningResponse>().initResponse();
+        get_metadata_response.initNotFoundException().setIdentity(e.name().c_str());
     }
 }
 

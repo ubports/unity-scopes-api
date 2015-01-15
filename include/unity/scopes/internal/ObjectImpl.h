@@ -16,11 +16,13 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_OBJECTIMPL_H
-#define UNITY_SCOPES_INTERNAL_OBJECTIMPL_H
+#pragma once
 
+#include<unity/scopes/internal/Logger.h>
 #include<unity/scopes/internal/MWObjectProxyFwd.h>
 #include<unity/scopes/Object.h>
+
+#include <mutex>
 
 namespace unity
 {
@@ -31,13 +33,14 @@ namespace scopes
 namespace internal
 {
 
-class ObjectImpl : public virtual Object
+class ObjectImpl : public virtual Object, public virtual std::enable_shared_from_this<ObjectImpl>
 {
 public:
-    ObjectImpl(MWProxy const& mw_proxy);
+    ObjectImpl(MWProxy const& mw_proxy, boost::log::sources::severity_channel_logger_mt<>& logger);
     virtual ~ObjectImpl();
 
     virtual std::string identity() override;
+    virtual std::string target_category() override;
     virtual std::string endpoint() override;
     virtual int64_t timeout() override;
 
@@ -47,10 +50,19 @@ public:
     virtual void ping();
 
 protected:
-    MWProxy proxy() const;                  // Non-virtual because we cannot use covariance with incomplete types.
-                                            // Each derived proxy implements a non-virtual fwd() method
-                                            // that is called from within each operation to down-cast the MWProxy.
+    MWProxy proxy();                   // Non-virtual because we cannot use covariance with incomplete types.
+                                       // Each derived proxy implements a non-virtual fwd() method
+                                       // that is called from within each operation to down-cast the MWProxy.
+
+    void set_proxy(MWProxy const& p);  // Allows a derived proxy to replace mw_proxy_ for asynchronous twoway calls.
+
     MWProxy mw_proxy_;
+    std::mutex proxy_mutex_;           // Protects mw_proxy_
+
+    boost::log::sources::severity_channel_logger_mt<>& logger_;
+
+private:
+    void check_proxy();                // Throws from operations if mw_proxy_ is null
 };
 
 } // namespace internal
@@ -58,5 +70,3 @@ protected:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

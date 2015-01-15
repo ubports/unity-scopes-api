@@ -16,8 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_ACTIVATIONREPLYOBJECT_H
-#define UNITY_SCOPES_INTERNAL_ACTIVATIONREPLYOBJECT_H
+#pragma once
 
 #include <unity/scopes/internal/ReplyObject.h>
 #include <unity/scopes/ActivationListenerBase.h>
@@ -34,7 +33,8 @@ namespace internal
 class ActivationReplyObject : public ReplyObject
 {
 public:
-    ActivationReplyObject(ActivationListenerBase::SPtr const& receiver, RuntimeImpl const* runtime, std::string const& scope_id);
+    ActivationReplyObject(ActivationListenerBase::SPtr const& receiver, RuntimeImpl const* runtime,
+                          std::string const& scope_id, bool dont_reap = false);
     virtual bool process_data(VariantMap const& data) override;
 
 private:
@@ -46,5 +46,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

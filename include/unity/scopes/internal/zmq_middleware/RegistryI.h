@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_REGISTRYI_H
-#define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_REGISTRYI_H
+#pragma once
 
 #include <unity/scopes/internal/MWRegistry.h>
 #include <unity/scopes/internal/RegistryObjectBase.h>
@@ -35,7 +34,7 @@ namespace internal
 namespace zmq_middleware
 {
 
-// Server-side implementation of a Registry object, which maps scope names to scope proxies.
+// Server-side implementation of a Registry object, which maps scope IDs to scope proxies.
 // It provides remote lookup and listing of the map contents, and local methods to manipulate the map.
 //
 // This class is thread-safe: differnt threads can concurrently update the map while lookup operations
@@ -59,6 +58,10 @@ private:
     virtual void locate_(Current const& current,
                          capnp::AnyPointer::Reader& in_params,
                          capnproto::Response::Builder& r);
+
+    virtual void is_scope_running_(Current const& current,
+                                   capnp::AnyPointer::Reader& in_params,
+                                   capnproto::Response::Builder& r);
 };
 
 } // namespace zmq_middleware
@@ -68,5 +71,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

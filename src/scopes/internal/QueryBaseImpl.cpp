@@ -18,12 +18,7 @@
 
 #include <unity/scopes/internal/QueryBaseImpl.h>
 
-#include <unity/scopes/QueryCtrl.h>
-#include <unity/scopes/Scope.h>
-#include <unity/scopes/SearchMetadata.h>
-
-#include <iostream>
-#include <cassert>
+#include <unity/scopes/internal/SettingsDB.h>
 
 using namespace std;
 
@@ -44,72 +39,16 @@ QueryBaseImpl::~QueryBaseImpl()
 {
 }
 
-QueryCtrlProxy QueryBaseImpl::subsearch(ScopeProxy const& scope,
-                                              string const& query_string,
-                                              SearchListenerBase::SPtr const& reply)
+VariantMap QueryBaseImpl::settings() const
 {
-    assert(search_metadata_);
-
-    // Forward the create request to the child scope and remember the control.
-    // This allows cancel() to forward incoming cancellations to subqueries
-    // without intervention from the scope application code.
-    QueryCtrlProxy qcp = scope->search(query_string, *search_metadata_, reply);
-    subqueries_.push_back(qcp);
-    return qcp;
+    lock_guard<mutex> lock(mutex_);
+    return db_ ? db_->settings() : VariantMap();
 }
 
-QueryCtrlProxy QueryBaseImpl::subsearch(ScopeProxy const& scope,
-                                              std::string const& query_string,
-                                              FilterState const& filter_state,
-                                              SearchListenerBase::SPtr const& reply)
+void QueryBaseImpl::set_settings_db(SettingsDB::SPtr const& db)
 {
-    assert(search_metadata_);
-
-    QueryCtrlProxy qcp = scope->search(query_string, filter_state, *search_metadata_, reply);
-    subqueries_.push_back(qcp);
-    return qcp;
-}
-
-QueryCtrlProxy QueryBaseImpl::subsearch(ScopeProxy const& scope,
-                                   std::string const& query_string,
-                                   std::string const& department_id,
-                                   FilterState const& filter_state,
-                                   SearchListenerBase::SPtr const& reply)
-{
-    assert(search_metadata_);
-
-    QueryCtrlProxy qcp = scope->search(query_string, department_id, filter_state, *search_metadata_, reply);
-    subqueries_.push_back(qcp);
-    return qcp;
-}
-
-QueryCtrlProxy QueryBaseImpl::subsearch(ScopeProxy const& scope,
-                                              std::string const& query_string,
-                                              std::string const& department_id,
-                                              FilterState const& filter_state,
-                                              SearchMetadata const& metadata,
-                                              SearchListenerBase::SPtr const& reply)
-{
-    QueryCtrlProxy qcp = scope->search(query_string, department_id, filter_state, metadata, reply);
-    subqueries_.push_back(qcp);
-    return qcp;
-}
-
-void QueryBaseImpl::set_metadata(SearchMetadata const& metadata)
-{
-    search_metadata_.reset(new SearchMetadata(metadata));
-}
-
-void QueryBaseImpl::cancel()
-{
-    for (auto& ctrl : subqueries_)
-    {
-        ctrl->cancel(); // Forward the cancellation to any subqueries that might be active
-    }
-    // We release the memory for the subquery controls here. That's just a micro-optimization
-    // because this QueryBase will be destroyed shortly anyway, once the cancelled() method
-    // of the application returns. (Not deallocating here would work too.)
-    vector<QueryCtrlProxy>().swap(subqueries_);
+    lock_guard<mutex> lock(mutex_);
+    db_ = db;
 }
 
 } // namespace internal

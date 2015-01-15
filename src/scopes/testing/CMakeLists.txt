@@ -5,6 +5,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/Result.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Statistics.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ScopeMetadataBuilder.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/TypedScopeFixture.cpp
 )
 
 set(UNITY_SCOPES_LIB_SRC ${UNITY_SCOPES_LIB_SRC} ${SRC} PARENT_SCOPE)

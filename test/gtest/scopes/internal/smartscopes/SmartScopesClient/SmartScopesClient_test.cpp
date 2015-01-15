@@ -16,11 +16,16 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#include <unity/scopes/internal/smartscopes/HttpClientNetCpp.h>
 #include <unity/scopes/internal/JsonCppNode.h>
+#include <unity/scopes/internal/Logger.h>
+#include <unity/scopes/internal/smartscopes/HttpClientNetCpp.h>
 #include <unity/scopes/internal/smartscopes/SmartScopesClient.h>
+#include <unity/scopes/OptionSelectorFilter.h>
 
 #include <unity/UnityExceptions.h>
+#include <unity/util/FileIO.h>
+#include <boost/filesystem/operations.hpp>
+#include <fstream>
 
 #include "../RaiiServer.h"
 
@@ -34,6 +39,8 @@ using namespace unity::scopes::internal;
 using namespace unity::scopes::internal::smartscopes;
 using namespace unity::test::scopes::internal::smartscopes;
 
+BOOST_LOG_INLINE_GLOBAL_LOGGER_DEFAULT(test_logger, boost::log::sources::severity_channel_logger_mt<>)
+
 namespace
 {
 
@@ -43,10 +50,26 @@ public:
     SmartScopesClientTest()
         : http_client_(new HttpClientNetCpp(20000)),
           json_node_(new JsonCppNode()),
-          server_(FAKE_SSS_PATH)
+          server_(FAKE_SSS_PATH, FAKE_SSS_LOG)
     {
+        boost::filesystem::remove(FAKE_SSS_LOG);
         sss_url_ = "http://127.0.0.1:" + std::to_string(server_.port_);
-        ssc_ = std::make_shared<SmartScopesClient>(http_client_, json_node_, sss_url_);
+        ssc_ = std::make_shared<SmartScopesClient>(http_client_, json_node_, test_logger::get(), sss_url_, PARTNER_FILE);
+    }
+
+    bool grep_string(std::string const &s)
+    {
+        std::stringstream str(unity::util::read_text_file(FAKE_SSS_LOG));
+        while (str)
+        {
+            char tmp[1024];
+            str.getline(tmp, 1024);
+            if (strstr(tmp, s.c_str()))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
 protected:
@@ -61,8 +84,17 @@ TEST_F(SmartScopesClientTest, remote_scopes)
 {
     std::vector<RemoteScope> scopes;
 
+    // first try an invalid locale (should throw)
+    EXPECT_THROW(ssc_->get_remote_scopes(scopes, "test_FAIL", false), std::exception);
+    ASSERT_EQ(0, scopes.size());
+
+    // now try an empty locale
     EXPECT_TRUE(ssc_->get_remote_scopes(scopes, "", false));
-    ASSERT_EQ(2u, scopes.size());
+    ASSERT_EQ(4u, scopes.size());
+
+    // now try a valid locale
+    EXPECT_TRUE(ssc_->get_remote_scopes(scopes, "test_TEST", false));
+    ASSERT_EQ(4u, scopes.size());
 
     EXPECT_EQ("dummy.scope", scopes[0].id);
     EXPECT_EQ("Dummy Demo Scope", scopes[0].name);
@@ -72,6 +104,10 @@ TEST_F(SmartScopesClientTest, remote_scopes)
     EXPECT_EQ("icon", *scopes[0].icon);
     EXPECT_EQ(nullptr, scopes[0].art);
     EXPECT_FALSE(scopes[0].invisible);
+    EXPECT_EQ(0, scopes[0].version);
+    EXPECT_EQ(nullptr, scopes[0].appearance);
+    EXPECT_EQ(nullptr, scopes[0].settings);
+    EXPECT_TRUE(scopes[0].keywords.empty());
 
     EXPECT_EQ("dummy.scope.2", scopes[1].id);
     EXPECT_EQ("Dummy Demo Scope 2", scopes[1].name);
@@ -81,43 +117,191 @@ TEST_F(SmartScopesClientTest, remote_scopes)
     EXPECT_EQ(nullptr, scopes[1].icon);
     EXPECT_EQ("art", *scopes[1].art);
     EXPECT_TRUE(scopes[1].invisible);
+    EXPECT_EQ(2, scopes[1].version);
+    EXPECT_EQ("#00BEEF", (*scopes[1].appearance)["background"].get_string());
+    EXPECT_EQ("logo.png", (*scopes[1].appearance)["PageHeader"].get_dict()["logo"].get_string());
+    EXPECT_EQ(nullptr, scopes[1].settings);
+    EXPECT_TRUE(scopes[1].keywords.empty());
+
+    EXPECT_EQ("dummy.scope.3", scopes[2].id);
+    EXPECT_EQ("Dummy Demo Scope 3", scopes[2].name);
+    EXPECT_EQ("Dummy demo scope 3.", scopes[2].description);
+    EXPECT_EQ("Mr.Fake", scopes[2].author);
+    EXPECT_EQ(sss_url_ + "/demo3", scopes[2].base_url);
+    EXPECT_EQ(nullptr, scopes[2].icon);
+    EXPECT_EQ(nullptr, scopes[2].art);
+    EXPECT_FALSE(scopes[2].invisible);
+    EXPECT_EQ(nullptr, scopes[2].appearance);
+    EXPECT_EQ("[{\"displayName\":\"Location\",\"id\":\"location\",\"parameters\":{\"defaultValue\":"
+              "\"London\"},\"type\":\"string\"},{\"displayName\":\"Temperature Units\",\"id\":"
+              "\"unitTemp\",\"parameters\":{\"defaultValue\":1,\"values\":[\"Celsius\",\"Fahrenheit"
+              "\"]},\"type\":\"list\"},{\"displayName\":\"Age\",\"id\":\"age\",\"parameters\":{"
+              "\"defaultValue\":23},\"type\":\"number\"},{\"displayName\":\"Enabled\",\"id\":"
+              "\"enabled\",\"parameters\":{\"defaultValue\":true},\"type\":\"boolean\"}]\n",
+              *scopes[2].settings);
+    ASSERT_EQ(4, scopes[2].keywords.size());
+    EXPECT_EQ("music", scopes[2].keywords[0]);
+    EXPECT_EQ("video", scopes[2].keywords[1]);
+    EXPECT_EQ("news", scopes[2].keywords[2]);
+    EXPECT_EQ("games", scopes[2].keywords[3]);
+
+    EXPECT_TRUE(grep_string("/remote-scopes : partner=Partner%20String"));
+}
+
+TEST_F(SmartScopesClientTest, remote_scopes_no_partner)
+{
+    std::vector<RemoteScope> scopes;
+    auto ssc_no_partner_ = std::make_shared<SmartScopesClient>(http_client_, json_node_, test_logger::get(), sss_url_, "/this/file/doesnt/exist");
+    EXPECT_TRUE(ssc_no_partner_->get_remote_scopes(scopes, "", false));
+    EXPECT_FALSE(grep_string("/remote-scopes : partner"));
 }
 
 TEST_F(SmartScopesClientTest, search)
 {
-    auto search_handle = ssc_->search(sss_url_ + "/demo", "stuff", "session_id", 0, "platform");
+    std::vector<SearchResult> results;
+    std::shared_ptr<DepartmentInfo> dept;
+    Filters filters;
+    FilterState filter_state;
+    std::vector<std::shared_ptr<SearchCategory>> categories;
 
-    std::vector<SearchResult> results = search_handle->get_search_results();
-    ASSERT_EQ(2u, results.size());
+    SearchReplyHandler handler;
+    handler.filters_handler = [&filters](Filters const &f) {
+        filters = f;
+    };
+    handler.filter_state_handler = [&filter_state](FilterState const& s) {
+        filter_state = s;
+    };
+    handler.category_handler = [&categories](std::shared_ptr<SearchCategory> const& cat) {
+        categories.push_back(cat);
+    };
+    handler.result_handler = [&results](SearchResult const& result) {
+        results.push_back(result);
+    };
+    handler.departments_handler = [&dept](std::shared_ptr<DepartmentInfo> const& deptinfo) {
+        dept = deptinfo;
+    };
+
+    auto search_handle = ssc_->search(handler, sss_url_ + "/demo", "stuff", "", "session_id", 0, "platform", VariantMap(), VariantMap(), "en_US", LocationInfo(), "ThisIsUserAgentHeader");
+    search_handle->wait();
+
+    ASSERT_EQ(3u, results.size());
+    ASSERT_EQ(1u, categories.size());
 
     EXPECT_EQ("URI", results[0].uri);
     EXPECT_EQ(nullptr, results[0].other_params["dnd_uri"]);
     EXPECT_EQ("Stuff", results[0].other_params["title"]->as_string());
     EXPECT_EQ(nullptr, results[0].other_params["icon"]);
-    EXPECT_EQ("https://productsearch.ubuntu.com/imgs/amazon.png", results[0].other_params["art"]->as_string());
-    EXPECT_EQ("cat1", results[0].category->id);
-    EXPECT_EQ("Category 1", results[0].category->title);
-    EXPECT_EQ("", results[0].category->icon);
-    EXPECT_EQ("{}", results[0].category->renderer_template);
+    EXPECT_EQ("https://dash.ubuntu.com/imgs/amazon.png", results[0].other_params["art"]->as_string());
+    EXPECT_EQ("cat1", results[0].category_id);
+
+    EXPECT_EQ("cat1", categories[0]->id);
+    EXPECT_EQ("Category 1", categories[0]->title);
+    EXPECT_EQ("", categories[0]->icon);
+    EXPECT_EQ("{}", categories[0]->renderer_template);
 
     EXPECT_EQ("URI2", results[1].uri);
     EXPECT_EQ(nullptr, results[1].other_params["dnd_uri"]);
     EXPECT_EQ("Things", results[1].other_params["title"]->as_string());
-    EXPECT_EQ("https://productsearch.ubuntu.com/imgs/google.png", results[1].other_params["icon"]->as_string());
+    EXPECT_EQ("https://dash.ubuntu.com/imgs/google.png", results[1].other_params["icon"]->as_string());
     EXPECT_EQ(nullptr, results[1].other_params["art"]);
-    EXPECT_EQ("cat1", results[1].category->id);
-    EXPECT_EQ("Category 1", results[1].category->title);
-    EXPECT_EQ("", results[1].category->icon);
-    EXPECT_EQ("{}", results[1].category->renderer_template);
+    EXPECT_EQ("cat1", results[1].category_id);
+
+    EXPECT_EQ("URI3", results[2].uri);
+    EXPECT_EQ(nullptr, results[2].other_params["dnd_uri"]);
+    EXPECT_EQ("Category Fail", results[2].other_params["title"]->as_string());
+    EXPECT_EQ(nullptr, results[2].other_params["icon"]);
+    EXPECT_EQ("https://dash.ubuntu.com/imgs/cat_fail.png", results[2].other_params["art"]->as_string());
+
+    // check departments
+    EXPECT_TRUE(dept != nullptr);
+    EXPECT_EQ("All", dept->label);
+    EXPECT_EQ("Foo", dept->alternate_label);
+    EXPECT_FALSE(dept->has_subdepartments);
+
+    auto const subdepts = dept->subdepartments;
+    EXPECT_EQ(2u, subdepts.size());
+    EXPECT_EQ("A", subdepts[0]->label);
+    EXPECT_EQ("", subdepts[0]->alternate_label);
+    EXPECT_EQ("scope://foo?q=&dep=a", subdepts[0]->canned_query);
+    EXPECT_FALSE(subdepts[0]->has_subdepartments);
+
+    {
+        auto const subdepts_a = subdepts[0]->subdepartments;
+        EXPECT_EQ(1u, subdepts_a.size());
+        EXPECT_EQ("C", subdepts_a[0]->label);
+        EXPECT_EQ("", subdepts_a[0]->alternate_label);
+        EXPECT_EQ("scope://foo?q=&dep=c", subdepts_a[0]->canned_query);
+    }
+
+    EXPECT_EQ("B", subdepts[1]->label);
+    EXPECT_EQ("scope://foo?q=&dep=b", subdepts[1]->canned_query);
+    EXPECT_FALSE(subdepts[1]->has_subdepartments);
+
+    // check filters
+    EXPECT_FALSE(filters.empty());
+    EXPECT_EQ(filters.size(), 1);
+    auto filter1 = filters.front();
+    auto option_filter = std::dynamic_pointer_cast<const OptionSelectorFilter>(filter1);
+    EXPECT_TRUE(option_filter != nullptr);
+    EXPECT_EQ(option_filter->label(), "Label");
+    EXPECT_EQ(option_filter->id(), "sorting_primary_filter");
+    EXPECT_EQ(option_filter->display_hints(), FilterBase::DisplayHints::Primary);
+    EXPECT_EQ(option_filter->multi_select(), false);
+
+    auto options = option_filter->options();
+    EXPECT_EQ(options.size(), 3);
+    EXPECT_EQ(options.front()->id(), "titlerank");
+    EXPECT_EQ(options.front()->label(), "Title rank");
+    EXPECT_EQ(options.back()->id(), "salesrank");
+    EXPECT_EQ(options.back()->label(), "Bestselling");
+
+    EXPECT_TRUE(option_filter->has_active_option(filter_state));
+    auto active_options = option_filter->active_options(filter_state);
+    EXPECT_FALSE(active_options.empty());
+    auto active_option = *(active_options.begin());
+    EXPECT_EQ(active_option->id(), "salesrank");
+}
+
+TEST_F(SmartScopesClientTest, userAgentHeader)
+{
+    std::vector<SearchResult> results;
+
+    SearchReplyHandler handler;
+    handler.filters_handler = [](Filters const &) {
+    };
+    handler.filter_state_handler = [](FilterState const&) {
+    };
+    handler.category_handler = [](std::shared_ptr<SearchCategory> const&) {
+    };
+    handler.result_handler = [&results](SearchResult const& result) {
+        results.push_back(result);
+    };
+    handler.departments_handler = [](std::shared_ptr<DepartmentInfo> const&) {
+    };
+
+    auto search_handle = ssc_->search(handler, sss_url_ + "/demo", "test_user_agent_header", "", "session_id", 0, "platform", VariantMap(), VariantMap(), "en_US", LocationInfo(), "ThisIsUserAgentHeader");
+    search_handle->wait();
+
+    ASSERT_EQ(4u, results.size());
+
+    // user agent string is expected in the result title
+    EXPECT_EQ("ThisIsUserAgentHeader", results[3].other_params["title"]->as_string());
 }
 
 TEST_F(SmartScopesClientTest, preview)
 {
-    auto preview_handle = ssc_->preview(sss_url_ + "/demo", "result", "session_id", "platform", 0);
+    PreviewReplyHandler handler;
+    PreviewHandle::Columns columns;
+    std::vector<std::string> widgets;
+    handler.widget_handler = [&widgets](std::string const& widget_json) {
+        widgets.push_back(widget_json);
+    };
+    handler.columns_handler = [&columns](PreviewHandle::Columns const &cols) {
+        columns = cols;
+    };
 
-    auto results = preview_handle->get_preview_results();
-    PreviewHandle::Columns columns = results.first;
-    PreviewHandle::Widgets widgets = results.second;
+    auto preview_handle = ssc_->preview(handler, sss_url_ + "/demo", "result", "session_id", "platform", 0);
+    preview_handle->wait();
 
     ASSERT_EQ(3u, columns.size());
 
@@ -157,41 +341,72 @@ TEST_F(SmartScopesClientTest, preview)
 
 TEST_F(SmartScopesClientTest, consecutive_searches)
 {
-    auto search_handle1 = ssc_->search(sss_url_ + "/demo", "stuff", "session_id", 0, "platform");
-    auto search_handle2 = ssc_->search(sss_url_ + "/demo", "stuff", "session_id", 0, "platform");
-    auto search_handle3 = ssc_->search(sss_url_ + "/demo", "stuff", "session_id", 0, "platform");
-    auto search_handle4 = ssc_->search(sss_url_ + "/demo", "stuff", "session_id", 0, "platform");
-    auto search_handle5 = ssc_->search(sss_url_ + "/demo", "stuff", "session_id", 0, "platform");
+    SearchReplyHandler handler1, handler2, handler3, handler4, handler5;
+    std::vector<SearchResult> results1, results2, results3, results4, results5;
 
-    std::vector<SearchResult> results = search_handle1->get_search_results();
-    EXPECT_EQ(2u, results.size());
+    handler1.filters_handler = [](Filters const &) {};
+    handler1.filter_state_handler = [](FilterState const&) {};
+    handler1.category_handler = [](std::shared_ptr<SearchCategory> const&) {};
+    handler1.departments_handler = [](std::shared_ptr<DepartmentInfo> const&) {};
 
-    results = search_handle2->get_search_results();
-    EXPECT_EQ(2u, results.size());
+    handler2 = handler3 = handler4 = handler5 = handler1;
 
-    results = search_handle3->get_search_results();
-    EXPECT_EQ(2u, results.size());
+    handler1.result_handler = [&results1](SearchResult const& result) { results1.push_back(result); };
+    handler2.result_handler = [&results2](SearchResult const& result) { results2.push_back(result); };
+    handler3.result_handler = [&results3](SearchResult const& result) { results3.push_back(result); };
+    handler4.result_handler = [&results4](SearchResult const& result) { results4.push_back(result); };
+    handler5.result_handler = [&results5](SearchResult const& result) { results5.push_back(result); };
 
-    results = search_handle4->get_search_results();
-    EXPECT_EQ(2u, results.size());
+    auto search_handle1 = ssc_->search(handler1, sss_url_ + "/demo", "stuff", "", "session_id", 0, "platform");
+    auto search_handle2 = ssc_->search(handler2, sss_url_ + "/demo", "stuff", "", "session_id", 0, "platform");
+    auto search_handle3 = ssc_->search(handler3, sss_url_ + "/demo", "stuff", "", "session_id", 0, "platform");
+    auto search_handle4 = ssc_->search(handler4, sss_url_ + "/demo", "stuff", "", "session_id", 0, "platform");
+    auto search_handle5 = ssc_->search(handler5, sss_url_ + "/demo", "stuff", "", "session_id", 0, "platform");
 
-    results = search_handle5->get_search_results();
-    EXPECT_EQ(2u, results.size());
+    search_handle1->wait();
+    EXPECT_EQ(3u, results1.size());
+
+    search_handle2->wait();
+    EXPECT_EQ(3u, results2.size());
+
+    search_handle3->wait();
+    EXPECT_EQ(3u, results3.size());
+
+    search_handle4->wait();
+    EXPECT_EQ(3u, results4.size());
+
+    search_handle5->wait();
+    EXPECT_EQ(3u, results5.size());
 }
 
 TEST_F(SmartScopesClientTest, consecutive_cancels)
 {
+    SearchReplyHandler handler;
+    handler.filters_handler = [](Filters const &) {};
+    handler.filter_state_handler = [](FilterState const&) {};
+    handler.category_handler = [](std::shared_ptr<SearchCategory> const&) {};
+    handler.result_handler = [](SearchResult const&) {};
+    handler.departments_handler = [](std::shared_ptr<DepartmentInfo> const&) {};
+
     for (int i = 0; i < 50; ++i)
     {
-        auto search_handle = ssc_->search(sss_url_ + "/demo", "stuff", "session_id", 0, "platform");
+        auto search_handle = ssc_->search(handler, sss_url_ + "/demo", "stuff", "", "session_id", 0, "platform");
         search_handle->cancel_search();
-        EXPECT_THROW(search_handle->get_search_results(), std::exception);
+        EXPECT_THROW(search_handle->wait(), std::exception);
     }
 
-    auto search_handle = ssc_->search(sss_url_ + "/demo", "stuff", "session_id", 0, "platform");
+    SearchReplyHandler handler2;
+    std::vector<SearchResult> results;
+    handler2.filters_handler = [](Filters const &) {};
+    handler2.filter_state_handler = [](FilterState const&) {};
+    handler2.category_handler = [](std::shared_ptr<SearchCategory> const&) {};
+    handler2.result_handler = [&results](SearchResult const& result) { results.push_back(result); };
+    handler2.departments_handler = [](std::shared_ptr<DepartmentInfo> const&) {};
 
-    std::vector<SearchResult> results = search_handle->get_search_results();
-    EXPECT_EQ(2u, results.size());
+    auto search_handle = ssc_->search(handler2, sss_url_ + "/demo", "stuff", "", "session_id", 0, "platform");
+
+    search_handle->wait();
+    EXPECT_EQ(3u, results.size());
 }
 
 TEST_F(SmartScopesClientTest, reset_url)
@@ -205,7 +420,7 @@ TEST_F(SmartScopesClientTest, reset_url)
 
     // reset url and check that we now have falback contant url
     EXPECT_NO_THROW(ssc_->reset_url());
-    EXPECT_EQ("https://productsearch.ubuntu.com/smartscopes/v2", ssc_->url());
+    EXPECT_EQ("https://dash.ubuntu.com/smartscopes/v2", ssc_->url());
 
     // set the environment var
     server_url_env = "SMART_SCOPES_SERVER=http://hello.com/there";

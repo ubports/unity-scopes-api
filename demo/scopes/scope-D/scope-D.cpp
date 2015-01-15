@@ -125,19 +125,20 @@ private:
 class MyQuery : public SearchQueryBase
 {
 public:
-    MyQuery(string const& scope_name,
+    MyQuery(string const& scope_id,
             CannedQuery const& query,
+            SearchMetadata const& metadata,
             Queue& queue) :
-        scope_name_(scope_name),
-        query_(query),
+        SearchQueryBase(query, metadata),
+        scope_id_(scope_id),
         queue_(queue)
     {
-        cerr << "query instance for \"" << scope_name_ << ":" << query.query_string() << "\" created" << endl;
+        cerr << scope_id_ << ": query instance for \"" << query.query_string() << "\" created" << endl;
     }
 
     virtual ~MyQuery()
     {
-        cerr << "query instance for \"" << scope_name_ << ":" << query_.query_string() << "\" destroyed" << endl;
+        cerr << scope_id_ << ": query instance for \"" << query().query_string() << "\" destroyed" << endl;
     }
 
     virtual void cancelled() override
@@ -151,22 +152,26 @@ public:
         // work may still be in progress on a query. Note that cancellations are frequent;
         // not responding to cancelled() correctly causes loss of performance.
 
-        cerr << "query for \"" << scope_name_ << ":" << query_.query_string() << "\" cancelled" << endl;
+        cerr << scope_id_ << ": query for \"" << query().query_string() << "\" cancelled" << endl;
     }
 
     virtual void run(SearchReplyProxy const& reply) override
     {
+        if (!valid())
+        {
+            return;  // Query was cancelled
+        }
+
         // The query can do anything it likes with this method, that is, run() can push results
         // directly on the provided reply, or it can save the reply for later use and return from
         // run(). It is OK to push results on the reply from a different thread.
         // The only obligation on run() is that, if cancelled() is called, and run() is still active
         // at that time, run() must tidy up and return in a timely fashion.
-        queue_.put(this, query_.query_string(), reply);
+        queue_.put(this, query().query_string(), reply);
     }
 
 private:
-    string scope_name_;
-    CannedQuery query_;
+    string scope_id_;
     Queue& queue_;
 };
 
@@ -178,10 +183,9 @@ private:
 class MyScope : public ScopeBase
 {
 public:
-    virtual int start(string const& scope_name, RegistryProxy const&) override
+    virtual void start(string const& scope_id) override
     {
-        scope_name_ = scope_name;
-        return VERSION;
+        scope_id_ = scope_id;
     }
 
     virtual void stop() override
@@ -209,7 +213,7 @@ public:
                 {
                     CategorisedResult result(cat);
                     result.set_uri("uri");
-                    result.set_title(scope_name_ + ": result " + to_string(i) + " for query \"" + query + "\"");
+                    result.set_title(scope_id_ + ": result " + to_string(i) + " for query \"" + query + "\"");
                     result.set_art("icon");
                     result.set_dnd_uri("dnd_uri");
                     if (!reply_proxy->push(result))
@@ -218,21 +222,20 @@ public:
                     }
                     sleep(1);
                 }
-                cerr << scope_name_ << ": query \"" << query << "\" complete" << endl;
+                cerr << scope_id_ << ": query \"" << query << "\" complete" << endl;
             }
         }
     }
 
-    virtual SearchQueryBase::UPtr search(CannedQuery const& q, SearchMetadata const&) override
+    virtual SearchQueryBase::UPtr search(CannedQuery const& q, SearchMetadata const& metadata) override
     {
-        SearchQueryBase::UPtr query(new MyQuery(scope_name_, q, queue_));
-        cerr << scope_name_ << ": created query: \"" << q.query_string() << "\"" << endl;
+        SearchQueryBase::UPtr query(new MyQuery(scope_id_, q, metadata, queue_));
         return query;
     }
 
     virtual PreviewQueryBase::UPtr preview(Result const& result, ActionMetadata const&) override
     {
-        cout << scope_name_ << ": preview: \"" << result.uri() << "\"" << endl;
+        cerr << scope_id_ << ": preview: \"" << result.uri() << "\"" << endl;
         return nullptr;
     }
 
@@ -242,7 +245,7 @@ public:
     }
 
 private:
-    string scope_name_;
+    string scope_id_;
     Queue queue_;
     std::atomic_bool done_;
 };

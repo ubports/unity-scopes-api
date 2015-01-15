@@ -21,7 +21,6 @@
 #include <unity/UnityExceptions.h>
 
 #include <gtest/gtest.h>
-//#include <boost/regex.hpp>  // Use Boost implementation until http://gcc.gnu.org/bugzilla/show_bug.cgi?id=53631 is fixed.
 
 using namespace std;
 using namespace unity;
@@ -42,22 +41,24 @@ public:
     }
 };
 
+const string TEST_INI = TEST_DIR "/Test.ini";
+
 TEST(ConfigBase, basic)
 {
-    MyConfig c("Test.ini");
+    MyConfig c(TEST_INI);
     EXPECT_TRUE(c.parser().get());
 }
 
 TEST(ConfigBase, optional_string)
 {
-    MyConfig c("Test.ini");
+    MyConfig c(TEST_INI);
     EXPECT_EQ("", c.get_optional_string("SomeGroup", "NoSuchKey"));
     EXPECT_EQ("", c.get_optional_string("SomeGroup", "Empty"));
 }
 
 TEST(ConfigBase, non_optional_string)
 {
-    MyConfig c("Test.ini");
+    MyConfig c(TEST_INI);
     try
     {
         c.get_string("SomeGroup", "Empty");
@@ -65,13 +66,13 @@ TEST(ConfigBase, non_optional_string)
     }
     catch (ConfigException const& e)
     {
-        EXPECT_STREQ("unity::scopes::ConfigException: \"Test.ini\": Illegal empty value for Empty", e.what());
+        EXPECT_EQ("unity::scopes::ConfigException: \"" + TEST_INI + "\": Illegal empty value for Empty", e.what());
     }
 }
 
 TEST(ConfigBase, middleware)
 {
-    MyConfig c("Test.ini");
+    MyConfig c(TEST_INI);
     EXPECT_EQ("Zmq", c.get_middleware("SomeGroup", "Zmq.Middleware"));
     EXPECT_EQ("REST", c.get_middleware("SomeGroup", "REST.Middleware"));
     try
@@ -81,9 +82,9 @@ TEST(ConfigBase, middleware)
     }
     catch (ConfigException const& e)
     {
-        EXPECT_STREQ("unity::scopes::ConfigException: \"Test.ini\": Illegal value for Zmq.BadMiddleware: \"foo\": "
-                     "legal values are \"Zmq\" and \"REST\"",
-                     e.what());
+        EXPECT_EQ("unity::scopes::ConfigException: \"" + TEST_INI + "\": Illegal value for Zmq.BadMiddleware: \"foo\": "
+                  "legal values are \"Zmq\" and \"REST\"",
+                  e.what());
     }
     try
     {
@@ -92,15 +93,15 @@ TEST(ConfigBase, middleware)
     }
     catch (ConfigException const& e)
     {
-        EXPECT_STREQ("unity::scopes::ConfigException: \"Test.ini\": Illegal value for REST.BadMiddleware: \"bar\": "
-                     "legal values are \"Zmq\" and \"REST\"",
-                     e.what());
+        EXPECT_EQ("unity::scopes::ConfigException: \"" + TEST_INI + "\": Illegal value for REST.BadMiddleware: \"bar\": "
+                  "legal values are \"Zmq\" and \"REST\"",
+                  e.what());
     }
 }
 
 TEST(ConfigBase, throw_ex)
 {
-    MyConfig c("Test.ini");
+    MyConfig c(TEST_INI);
     EXPECT_TRUE(c.parser().get());
 
     try
@@ -109,7 +110,7 @@ TEST(ConfigBase, throw_ex)
     }
     catch (ConfigException const& e)
     {
-        EXPECT_STREQ("unity::scopes::ConfigException: \"Test.ini\": error", e.what());
+        EXPECT_EQ("unity::scopes::ConfigException: \"" + TEST_INI + "\": error", e.what());
     }
 }
 
@@ -117,11 +118,57 @@ TEST(ConfigBase, FileException)
 {
     try
     {
-        MyConfig c("no_such_file");
+        MyConfig c("wrong_extension.x");
+    }
+    catch (ConfigException const& e)
+    {
+        EXPECT_STREQ("unity::scopes::ConfigException: invalid config file name: \"wrong_extension.x\": "
+                     "missing .ini extension",
+                     e.what());
+    }
+
+    try
+    {
+        MyConfig c("no_such_file.ini");
     }
     catch (FileException const& e)
     {
-        EXPECT_STREQ("unity::FileException: Could not load ini file no_such_file: No such file or directory (errno = 4)",
+        EXPECT_STREQ("unity::FileException: Could not load ini file no_such_file.ini: No such file or directory (errno = 4)",
                      e.what());
+    }
+}
+
+class TestConfigClass : public ConfigBase
+{
+public:
+    TestConfigClass(const string& filename)
+        : ConfigBase(filename)
+    {
+        const KnownEntries known_entries = {
+                                              {  "SomeGroup",
+                                                 {
+                                                    "Empty",
+                                                    "Zmq.Middleware",
+                                                    "REST.Middleware",
+                                                    "Zmq.BadMiddleware",
+                                                    "REST.BadMiddleware"
+                                                 }
+                                              },
+                                              {  "SomeOtherGroup",
+                                                 {
+                                                   "SomeString",
+                                                   "SomeLocalizedString"
+                                                 }
+                                              }
+                                           };
+        check_unknown_entries(known_entries);
+    }
+};
+
+TEST(ConfigBase, TestKnownEntries)
+{
+    {
+        TestConfigClass c(TEST_INI);
+        EXPECT_EQ("fred", c.parser()->get_locale_string("SomeOtherGroup", "SomeLocalizedString", "fr"));
     }
 }

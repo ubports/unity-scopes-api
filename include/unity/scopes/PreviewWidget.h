@@ -16,8 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_PREVIEW_WIDGET_H
-#define UNITY_SCOPES_PREVIEW_WIDGET_H
+#pragma once
 
 #include <unity/util/NonCopyable.h>
 #include <unity/util/DefinesPtrs.h>
@@ -38,6 +37,13 @@ namespace internal
     class PreviewWidgetImpl;
 }
 
+class PreviewWidget;
+
+/*! \typedef PreviewWidgetList
+\brief List of preview widgets (see unity::scopes::PreviewWidget)
+*/
+typedef std::list<PreviewWidget> PreviewWidgetList;
+
 class PreviewWidget
 {
 public:
@@ -54,6 +60,24 @@ public:
 
     /**
     \brief Create a widget from a JSON definition.
+
+    The JSON definition must be a dictionary that includes widget "id" and all the values of attributes required by desired
+    \link previewwidgets widget type\endlink. For example, a definition of image widget may look as follows:
+    \code{.cpp}
+    PreviewWidget img(R"({"id": "img", "type": "image", "source": "http://imageuri"})");
+    \endcode
+
+    For cases where attribute mappings are to be used instead of direct values, they need to be enclosed in the "components" dictionary, e.g.
+    \code{.cpp}
+    PreviewWidget img(R"({"id": "img", "type": "image", "components": { "source": "screenshot-url" } })");
+    \endcode
+    (this example assumes "screenshot-url" value is either available in the result object that's being previewed, or it will be pushed with
+    unity::scopes::PreviewReply::push() method)
+
+    \note It is recommended to create widgets via unity::scopes::PreviewWidget(std::string const&, std::string const&) constructor
+    and unity::scopes::PreviewWidget::add_attribute_value() / unity::scopes::PreviewWidget::add_attribute_mapping() methods,
+    rather than via JSON definition.
+
     \param definition The JSON definition.
     */
     PreviewWidget(std::string const& definition);
@@ -91,6 +115,18 @@ public:
     void add_attribute_mapping(std::string const& key, std::string const& field_name);
 
     /**
+      \brief Adds a widget into expandable widget.
+
+      Adds a widget into this widget, which needs to be of 'expandable' type. This method throws
+      if adding a widget into any other widget type. Also, adding an 'expandable' widget into
+      another 'expandable' is not allowed.
+
+      \throws unity::LogicException if type of this widget is other than 'expandable', or when
+      adding 'expandable' to 'expandable'.
+    */
+    void add_widget(PreviewWidget const& widget);
+
+    /**
     \brief Get the identifier of this widget.
     \return The widget identifier.
     */
@@ -119,6 +155,14 @@ public:
     VariantMap attribute_values() const;
 
     /**
+    \brief Get widgets of 'expandable' widget.
+
+    Returns the list of widget attached to this widget, which must be of 'expandable' type. This list is
+    always empty for other widget types.
+    */
+    PreviewWidgetList widgets() const;
+
+    /**
     \brief Get a JSON representation of this widget.
     \return The JSON string.
     */
@@ -134,13 +178,6 @@ private:
     friend class internal::PreviewWidgetImpl;
 };
 
-/*! \typedef PreviewWidgetList
-\brief List of preview widgets (see unity::scopes::PreviewWidget)
-*/
-typedef std::list<PreviewWidget> PreviewWidgetList;
-
 } // namespace scopes
 
 } // namespace unity
-
-#endif

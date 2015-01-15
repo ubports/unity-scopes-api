@@ -47,11 +47,13 @@ interface Reply
 
 */
 
-using namespace std::placeholders;
+using namespace std;
+namespace ph = std::placeholders;
 
 ReplyI::ReplyI(ReplyObjectBase::SPtr const& ro) :
-    ServantBase(ro, { { "push", bind(&ReplyI::push_, this, _1, _2, _3) },
-                      { "finished", bind(&ReplyI::finished_, this, _1, _2, _3) } })
+    ServantBase(ro, { { "push", bind(&ReplyI::push_, this, ph::_1, ph::_2, ph::_3) },
+                      { "finished", bind(&ReplyI::finished_, this, ph::_1, ph::_2, ph::_3) },
+                      { "info", bind(&ReplyI::info_, this, ph::_1, ph::_2, ph::_3) } })
 {
 }
 
@@ -75,34 +77,53 @@ void ReplyI::finished_(Current const&,
 {
     auto delegate = dynamic_pointer_cast<ReplyObjectBase>(del());
     auto req = in_params.getAs<capnproto::Reply::FinishedRequest>();
-    auto r = req.getReason();
-    ListenerBase::Reason reason;
-    string err;
-    switch (r)
+    auto s = req.getStatus();
+    CompletionDetails::CompletionStatus status;
+    string msg;
+    switch (s)
     {
-        case capnproto::Reply::FinishedReason::FINISHED:
+        case capnproto::Reply::CompletionStatus::OK:
         {
-            reason = ListenerBase::Finished;
+            status = CompletionDetails::OK;
+            msg = req.getMessage();
             break;
         }
-        case capnproto::Reply::FinishedReason::CANCELLED:
+        case capnproto::Reply::CompletionStatus::CANCELLED:
         {
-            reason = ListenerBase::Cancelled;
+            status = CompletionDetails::Cancelled;
+            msg = req.getMessage();
             break;
         }
-        case capnproto::Reply::FinishedReason::ERROR:
+        case capnproto::Reply::CompletionStatus::ERROR:
         {
-            reason = ListenerBase::Error;
-            err = req.getError();
+            status = CompletionDetails::Error;
+            msg = req.getMessage();
             break;
         }
         default:
         {
-            assert(false);                // LCOV_EXCL_LINE
-            reason = ListenerBase::Error; // LCOV_EXCL_LINE
+            assert(false);                     // LCOV_EXCL_LINE
+            status = CompletionDetails::Error; // LCOV_EXCL_LINE
         }
     }
-    delegate->finished(reason, err);
+    delegate->finished(CompletionDetails(status, msg));
+}
+
+void ReplyI::info_(Current const&,
+                   capnp::AnyPointer::Reader& in_params,
+                   capnproto::Response::Builder&)
+{
+    auto delegate = dynamic_pointer_cast<ReplyObjectBase>(del());
+    auto req = in_params.getAs<capnproto::Reply::InfoRequest>();
+    auto c = req.getCode();
+
+    OperationInfo::InfoCode code = OperationInfo::Unknown;
+    if (c >= 0 && c <= OperationInfo::LastInfoCode_)
+    {
+        code = static_cast<OperationInfo::InfoCode>(c);
+    }
+
+    delegate->info(OperationInfo{code, req.getMessage()});
 }
 
 } // namespace zmq_middleware

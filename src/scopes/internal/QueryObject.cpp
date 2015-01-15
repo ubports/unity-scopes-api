@@ -24,11 +24,11 @@
 #include <unity/scopes/internal/MWReply.h>
 #include <unity/scopes/internal/QueryCtrlObject.h>
 #include <unity/scopes/internal/SearchReplyImpl.h>
+#include <unity/scopes/internal/QueryBaseImpl.h>
 #include <unity/scopes/PreviewQueryBase.h>
 #include <unity/scopes/QueryBase.h>
 #include <unity/scopes/SearchQueryBase.h>
 
-#include <iostream>
 #include <cassert>
 
 using namespace std;
@@ -45,20 +45,23 @@ namespace internal
 
 QueryObject::QueryObject(std::shared_ptr<QueryBase> const& query_base,
                          MWReplyProxy const& reply,
-                         MWQueryCtrlProxy const& ctrl) :
-    QueryObject(query_base, 0, reply, ctrl)
+                         MWQueryCtrlProxy const& ctrl,
+                         boost::log::sources::severity_channel_logger_mt<>& logger)
+    : QueryObject(query_base, 0, reply, ctrl, logger)
 {
 }
 
 QueryObject::QueryObject(std::shared_ptr<QueryBase> const& query_base,
                          int cardinality,
                          MWReplyProxy const& reply,
-                         MWQueryCtrlProxy const& ctrl) :
-    query_base_(query_base),
-    reply_(reply),
-    ctrl_(ctrl),
-    pushable_(true),
-    cardinality_(cardinality)
+                         MWQueryCtrlProxy const& ctrl,
+                         boost::log::sources::severity_channel_logger_mt<>& logger)
+    : query_base_(query_base)
+    , reply_(reply)
+    , ctrl_(ctrl)
+    , pushable_(true)
+    , cardinality_(cardinality)
+    , logger_(logger)
 {
 }
 
@@ -77,6 +80,8 @@ QueryObject::~QueryObject()
 
 void QueryObject::run(MWReplyProxy const& reply, InvokeInfo const& /* info */) noexcept
 {
+    unique_lock<mutex> lock(mutex_);
+
     // It is possible for a run() to be dispatched by the middleware *after* the query
     // was cancelled. This can happen because run() and cancel() are dispatched by different
     // thread pools. If the scope implementation uses a synchronous run(), a later run()
@@ -84,16 +89,21 @@ void QueryObject::run(MWReplyProxy const& reply, InvokeInfo const& /* info */) n
     // completes, by which time the query for the later run() call may have been
     // cancelled already.
     // If the query was cancelled by the client before we even receive the
-    // run invocation, we never forward the run() to the implementation.
+    // run invocation, we never forward the run() call to the implementation.
     if (!pushable_)
     {
+        self_ = nullptr;
+        disconnect();
         return;
     }
+
+    auto search_query = dynamic_pointer_cast<SearchQueryBase>(query_base_);
+    assert(search_query);
 
     // Create the reply proxy to pass to query_base_ and keep a weak_ptr, which we will need
     // if cancel() is called later.
     assert(self_);
-    auto reply_proxy = make_shared<SearchReplyImpl>(reply, self_);
+    auto reply_proxy = make_shared<SearchReplyImpl>(reply, self_, cardinality_, search_query->department_id(), logger_);
     assert(reply_proxy);
     reply_proxy_ = reply_proxy;
 
@@ -102,41 +112,48 @@ void QueryObject::run(MWReplyProxy const& reply, InvokeInfo const& /* info */) n
     self_ = nullptr;
     disconnect();
 
-    // Synchronous call into scope implementation.
-    // On return, replies for the query may still be outstanding.
     try
     {
-        auto search_query = dynamic_pointer_cast<SearchQueryBase>(query_base_);
-        assert(search_query);
+        lock.unlock();
+
+        // Synchronous call into scope implementation.
+        // On return, replies for the query may still be outstanding.
         search_query->run(reply_proxy);
     }
     catch (std::exception const& e)
     {
         pushable_ = false;
-        // TODO: log error
-        reply_->finished(ListenerBase::Error, e.what());     // Oneway, can't block
-        cerr << "ScopeBase::run(): " << e.what() << endl;
+        BOOST_LOG_SEV(logger_, Logger::Error) << "ScopeBase::run(): " << e.what();
+        reply_->finished(CompletionDetails(CompletionDetails::Error, e.what()));  // Oneway, can't block
     }
     catch (...)
     {
         pushable_ = false;
-        // TODO: log error
-        reply_->finished(ListenerBase::Error, "unknown exception");     // Oneway, can't block
-        cerr << "ScopeBase::run(): unknown exception" << endl;
+        BOOST_LOG_SEV(logger_, Logger::Error) << "ScopeBase::run(): unknown exception";
+        reply_->finished(CompletionDetails(CompletionDetails::Error, "unknown exception"));  // Oneway, can't block
     }
 }
 
 void QueryObject::cancel(InvokeInfo const& /* info */)
 {
-    pushable_ = false;
-    auto rp = reply_proxy_.lock();
-    if (rp)
     {
-        // Send finished() to up-stream client to tell him the query is done.
-        // We send via the MWReplyProxy here because that allows passing
-        // a ListenerBase::Reason (whereas the public ReplyProxy does not).
-        reply_->finished(ListenerBase::Cancelled, "");     // Oneway, can't block
-    }
+        lock_guard<mutex> lock(mutex_);
+
+        if (!pushable_)
+        {
+            return;
+        }
+        pushable_ = false;
+
+        auto rp = reply_proxy_.lock();
+        if (rp)
+        {
+            // Send finished() to up-stream client to tell him the query is done.
+            // We send via the MWReplyProxy here because that allows passing
+            // a CompletionDetails::CompletionStatus (whereas the public ReplyProxy does not).
+            reply_->finished(CompletionDetails(CompletionDetails::Cancelled));  // Oneway, can't block
+        }
+    }  // Release lock
 
     // Forward the cancellation to the query base (which in turn will forward it to any subqueries).
     // The query base also calls the cancelled() callback to inform the application code.
@@ -145,11 +162,13 @@ void QueryObject::cancel(InvokeInfo const& /* info */)
 
 bool QueryObject::pushable(InvokeInfo const& /* info */) const noexcept
 {
+    lock_guard<mutex> lock(mutex_);
     return pushable_;
 }
 
 int QueryObject::cardinality(InvokeInfo const& /* info */) const noexcept
 {
+    lock_guard<mutex> lock(mutex_);
     return cardinality_;
 }
 
@@ -169,6 +188,8 @@ int QueryObject::cardinality(InvokeInfo const& /* info */) const noexcept
 
 void QueryObject::set_self(QueryObjectBase::SPtr const& self) noexcept
 {
+    lock_guard<mutex> lock(mutex_);
+
     assert(self);
     assert(!self_);
     self_ = self;

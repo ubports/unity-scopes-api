@@ -16,10 +16,10 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_SCOPEMETADATA_H
-#define UNITY_SCOPES_SCOPEMETADATA_H
+#pragma once
 
 #include <unity/scopes/Scope.h>
+#include <vector>
 
 namespace unity
 {
@@ -29,6 +29,7 @@ namespace scopes
 
 namespace internal
 {
+
 class ScopeMetadataImpl;
 } // namespace internal
 
@@ -48,6 +49,17 @@ Use unity::scopes::Registry to get the metadata for a specific scope or all scop
 class ScopeMetadata final
 {
 public:
+    /**
+     \brief Enum representing the expected valid lifetime of results from the scope.
+     */
+    enum class ResultsTtlType
+    {
+        None,
+        Small,
+        Medium,
+        Large
+    };
+
     /// @cond
     UNITY_DEFINES_PTRS(ScopeMetadata);
     ~ScopeMetadata();
@@ -66,7 +78,7 @@ public:
 
     /**
     \brief Get the scope identifier.
-    \return The name of the scope.
+    \return The ID of the scope.
     */
     std::string scope_id() const;
 
@@ -125,10 +137,87 @@ public:
     bool invisible() const;             // optional (default = false)
 
     /**
+    \brief Get optional display attributes.
+
+    Appearance attributes define customized look of the scope in Scopes Scope.
+    \return Map of attributes (may be empty)
+    */
+    VariantMap appearance_attributes() const;
+
+    /**
+    \brief Get directory where scope config files and .so file lives.
+
+    Note that the directory is not set for remote scopes; in such case this method throws unity::scopes::NotFoundException.
+
+    \throws unity::scopes::NotFoundException if directory is not set
+    \return path string
+    */
+    std::string scope_directory() const;
+
+    /**
     \brief Return a dictionary of all metadata attributes.
     \return Dictionary of all metadata attributes.
     */
     VariantMap serialize() const;
+
+    /**
+    \brief Return the TTL for the results this scope produces.
+    \return Enum of timeout type.
+    */
+    ResultsTtlType results_ttl_type() const;
+
+    // TODO: Flesh out documentation
+    /**
+    \brief Return the settings definitions for this scope.
+    \return The settings definition as a VariantArray. The array
+    contains the definition of the settings in their original order.
+
+    \throws unity::scopes::NotFoundException if the scope has no settings
+    \see TBD TODO
+    */
+    VariantArray settings_definitions() const;
+
+    /**
+    \brief Check if this scope wants location data.
+    \return True if this scope wants location data.
+    */
+    bool location_data_needed() const;  // optional (default = false)
+
+    /**
+    \brief Return the list of scope identifiers aggregated by this scope.
+
+    The list returned by this method comes from the .ini file.
+    The scope author must ensure that it contains all scopes that an aggregator
+    might collect results from. This list may contain scopes that are not currently
+    installed and are optional for proper functioning of the aggregator scope.
+
+    \return The list of scopes ids aggregated by this scope.
+    */
+    std::vector<std::string> child_scope_ids() const;
+
+    /**
+    \brief Return the version of the scope.
+
+    \return The version or, if the scope does not define its version,
+    the value `0`.
+    */
+    int version() const;
+
+    /**
+    \brief Return the list of keywords specified by this scope.
+
+    The list returned by this method is formulated from the value specified under
+    the "Keywords" key in the scope's .ini file.
+
+    \return The list of scope keywords specified by this scope.
+    */
+    std::vector<std::string> keywords() const;
+
+    /**
+    \brief Check if this scope is an aggregator.
+    \return True if this scope is an aggregator.
+    */
+    bool is_aggregator() const;  // optional (default = false)
 
 private:
     ScopeMetadata(std::unique_ptr<internal::ScopeMetadataImpl>);           // Instantiable only by ScopeMetadataImpl
@@ -140,5 +229,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

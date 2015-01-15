@@ -4,3 +4,11 @@ Zmq.Middleware = Zmq
 REST.Middleware = REST
 Zmq.BadMiddleware = foo
 REST.BadMiddleware = bar
+
+[SomeOtherGroup]
+SomeString = foo
+SomeLocalizedString[fr] = fred
+SomeUnknownKey = hello
+
+[SomeUnknownGroup]
+SomeUnknownKey = 55

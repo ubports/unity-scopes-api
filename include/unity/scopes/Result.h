@@ -16,8 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_RESULT_H
-#define UNITY_SCOPES_RESULT_H
+#pragma once
 
 #include <unity/scopes/Variant.h>
 #include <unity/util/DefinesPtrs.h>
@@ -146,8 +145,8 @@ public:
     /**
     \brief Get the proxy of a scope that handles activation and preview of this result.
 
-    The proxy is only available when receiving this result from a scope, otherwise
-    this method throws LogicException. Activation requests should only be sent to a scope
+    The proxy is available only when receiving this result from a scope, otherwise
+    this method throws LogicException. Activation requests should be sent to a scope
     returned by this method only if direct_activation() is false.
     \return The scope proxy.
     */
@@ -247,5 +246,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

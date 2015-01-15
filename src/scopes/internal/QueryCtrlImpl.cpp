@@ -26,7 +26,6 @@
 #include <unity/scopes/ScopeExceptions.h>
 
 #include <cassert>
-#include <iostream> // TODO: remove this once logging is added
 
 using namespace std;
 
@@ -39,14 +38,19 @@ namespace scopes
 namespace internal
 {
 
-QueryCtrlImpl::QueryCtrlImpl(MWQueryCtrlProxy const& ctrl_proxy, MWReplyProxy const& reply_proxy) :
-    ObjectImpl(ctrl_proxy),
-    reply_proxy_(reply_proxy)
+QueryCtrlImpl::QueryCtrlImpl(MWQueryCtrlProxy const& ctrl_proxy,
+                             MWReplyProxy const& reply_proxy,
+                             boost::log::sources::severity_channel_logger_mt<>& logger)
+    : ObjectImpl(ctrl_proxy, logger)
+    , reply_proxy_(reply_proxy)
 {
-    assert(ctrl_proxy);
-    assert(reply_proxy);
     // We remember the reply proxy so, when the query is cancelled, we can
     // inform the reply object belonging to this query that the query is finished.
+    assert(reply_proxy);
+
+    lock_guard<mutex> lock(mutex_);
+    ready_ = ctrl_proxy != nullptr;
+    cancelled_ = false;
 }
 
 QueryCtrlImpl::~QueryCtrlImpl()
@@ -55,24 +59,55 @@ QueryCtrlImpl::~QueryCtrlImpl()
 
 void QueryCtrlImpl::cancel()
 {
+    {
+        lock_guard<mutex> lock(mutex_);
+        if (!ready_)
+        {
+            // Remember that query was cancelled, so we can call
+            // cancel() once set_proxy() is called.
+            cancelled_ = true;
+            return;
+        }
+    }
+
     try
     {
         // Forward cancellation down-stream to the query. This does not block.
         fwd()->cancel();
 
         // Indicate (to ourselves) that this query is complete. Calling via the MWReplyProxy ensures
-        // the finished() call will be processed by a seperate server-side thread,
+        // the finished() call will be processed by a separate server-side thread,
         // so we cannot block here.
-        reply_proxy_->finished(ListenerBase::Cancelled, "");
+        reply_proxy_->finished(CompletionDetails(CompletionDetails::Cancelled));  // Oneway, can't block
     }
     catch (std::exception const& e)
     {
-        cerr << e.what() << endl;
-        // TODO: log error
+        BOOST_LOG_SEV(logger_, Logger::Error) << e.what();
     }
 }
 
-MWQueryCtrlProxy QueryCtrlImpl::fwd() const
+void QueryCtrlImpl::set_proxy(MWQueryCtrlProxy const& p)
+{
+    assert(proxy() == nullptr);
+    ObjectImpl::set_proxy(p);
+
+    bool need_cancel;
+
+    {
+        lock_guard<mutex> lock(mutex_);
+        ready_ = true;
+        need_cancel = cancelled_;
+    } // Unlock
+
+    if (need_cancel)
+    {
+        // If cancel() was called earlier, do the actual cancellation now
+        // that we have the middleware proxy.
+        cancel();
+    }
+}
+
+MWQueryCtrlProxy QueryCtrlImpl::fwd()
 {
     return dynamic_pointer_cast<MWQueryCtrl>(proxy());
 }

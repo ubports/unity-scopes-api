@@ -16,8 +16,9 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_UTIL_H
-#define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_UTIL_H
+#pragma once
+
+#include <zmqpp/socket.hpp>
 
 #include <string>
 
@@ -35,6 +36,8 @@ namespace zmq_middleware
 
 void throw_if_bad_endpoint(std::string const& endpoint);
 
+void safe_bind(zmqpp::socket& s, std::string const& endpoint);
+
 } // namespace zmq_middleware
 
 } // namespace internal
@@ -42,5 +45,3 @@ void throw_if_bad_endpoint(std::string const& endpoint);
 } // namespace scopes
 
 } // namespace unity
-
-#endif

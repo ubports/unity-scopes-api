@@ -1,0 +1,8 @@
+[ScopeConfig]
+DisplayName = scope-click.DisplayName
+Description = scope-click.Description
+Art = scope-click.Art
+Author = Canonical Ltd.
+Icon = scope-click.Icon
+SearchHint = scope-click.SearchHint
+HotKey = scope-click.HotKey

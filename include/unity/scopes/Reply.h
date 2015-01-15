@@ -16,10 +16,10 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_REPLY_H
-#define UNITY_SCOPES_REPLY_H
+#pragma once
 
 #include <unity/scopes/Object.h>
+#include <unity/scopes/OperationInfo.h>
 #include <unity/scopes/ReplyProxyFwd.h>
 
 #include <exception>
@@ -63,6 +63,19 @@ public:
     virtual void error(std::exception_ptr ex) = 0;
 
     /**
+    \brief Informs the source of a query that additional information regarding the reply is
+    available.
+
+    Calling info() does not terminate the query, it simply informs the source that something
+    interesting occured during execution of the query (usually affecting the results returned in
+    some way).
+
+    Multiple calls to info() for each condition are legal.
+    \param op_info Contains all details of the information being reported.
+    */
+    virtual void info(OperationInfo const& op_info) = 0;
+
+    /**
     \brief Destroys a Reply.
 
     If a Reply goes out of scope without a prior call to finished(), the destructor implicitly calls finished(),
@@ -79,5 +92,3 @@ protected:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

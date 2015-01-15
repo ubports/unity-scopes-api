@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_SCOPEI_H
-#define UNITY_SCOPES_INTERNAL_ZMQMIDDLEWARE_SCOPEI_H
+#pragma once
 
 #include <unity/scopes/internal/MWScope.h>
 #include <unity/scopes/internal/ScopeObjectBase.h>
@@ -43,8 +42,8 @@ public:
 
 private:
     virtual void search_(Current const& current,
-                               capnp::AnyPointer::Reader& in_params,
-                               capnproto::Response::Builder& r);
+                         capnp::AnyPointer::Reader& in_params,
+                         capnproto::Response::Builder& r);
     virtual void activate_(Current const& current,
                            capnp::AnyPointer::Reader& in_params,
                            capnproto::Response::Builder& r);
@@ -54,6 +53,9 @@ private:
     virtual void preview_(Current const& current,
                           capnp::AnyPointer::Reader& in_params,
                           capnproto::Response::Builder& r);
+    virtual void debug_mode_(Current const& current,
+                             capnp::AnyPointer::Reader& in_params,
+                             capnproto::Response::Builder& r);
 };
 
 } // namespace zmq_middleware
@@ -63,5 +65,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

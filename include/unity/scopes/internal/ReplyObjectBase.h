@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_REPLYOBJECTBASE_H
-#define UNITY_SCOPES_INTERNAL_REPLYOBJECTBASE_H
+#pragma once
 
 #include <unity/scopes/internal/AbstractObject.h>
 #include <unity/scopes/ListenerBase.h>
@@ -38,7 +37,8 @@ public:
     UNITY_DEFINES_PTRS(ReplyObjectBase);
 
     virtual void push(VariantMap const& result) noexcept = 0;
-    virtual void finished(ListenerBase::Reason reason, std::string const& error_message) noexcept = 0;
+    virtual void finished(CompletionDetails const& details) noexcept = 0;
+    virtual void info(OperationInfo const& op_info) noexcept = 0;
 };
 
 } // namespace internal
@@ -46,5 +46,3 @@ public:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

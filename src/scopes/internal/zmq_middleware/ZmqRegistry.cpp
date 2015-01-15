@@ -24,6 +24,7 @@
 #include <unity/scopes/internal/ScopeMetadataImpl.h>
 #include <unity/scopes/internal/zmq_middleware/VariantConverter.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqException.h>
+#include <unity/scopes/internal/zmq_middleware/ZmqReceiver.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqScope.h>
 #include <unity/scopes/ScopeExceptions.h>
 
@@ -51,14 +52,14 @@ dictionary<string, ScopeMetadata> MetadataMap;
 
 exception NotFoundException
 {
-    string scopeName;
+    string identity;
 };
 
 interface Registry
 {
-    ScopeMetadata get_metadata(string name) throws NotFoundException;
-    ScopeDict list();
-    ScopeProxy string( name) throws NotFoundException, RegistryException;
+    ScopeMetadata get_metadata(string scope_id) throws NotFoundException;
+    MetadataMap list();
+    ObjectProxy locate(string identity) throws NotFoundException, RegistryException;
 };
 
 */
@@ -83,13 +84,13 @@ ScopeMetadata ZmqRegistry::get_metadata(std::string const& scope_id)
     capnp::MallocMessageBuilder request_builder;
     auto request = make_request_(request_builder, "get_metadata");
     auto in_params = request.initInParams().getAs<capnproto::Registry::GetMetadataRequest>();
-    in_params.setName(scope_id.c_str());
+    in_params.setIdentity(scope_id.c_str());
 
-    auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_(request_builder); });
-    auto receiver = future.get();
-    auto segments = receiver.receive();
-    capnp::SegmentArrayMessageReader reader(segments);
-    auto response = reader.getRoot<capnproto::Response>();
+    // Registry operations can be slow during start-up of the phone
+    int64_t timeout = mw_base()->registry_timeout();
+    auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_twoway_(request_builder, timeout); });
+    auto out_params = future.get();
+    auto response = out_params.reader->getRoot<capnproto::Response>();
     throw_if_runtime_exception(response);
 
     auto get_metadata_response = response.getPayload().getAs<capnproto::Registry::GetMetadataResponse>().getResponse();
@@ -105,7 +106,7 @@ ScopeMetadata ZmqRegistry::get_metadata(std::string const& scope_id)
         case capnproto::Registry::GetMetadataResponse::Response::NOT_FOUND_EXCEPTION:
         {
             auto ex = get_metadata_response.getNotFoundException();
-            throw NotFoundException("Registry::get_metadata(): no such scope", ex.getName().cStr());
+            throw NotFoundException("Registry::get_metadata(): no such scope", ex.getIdentity().cStr());
         }
         default:
         {
@@ -119,11 +120,11 @@ MetadataMap ZmqRegistry::list()
     capnp::MallocMessageBuilder request_builder;
     make_request_(request_builder, "list");
 
-    auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_(request_builder); });
-    auto receiver = future.get();
-    auto segments = receiver.receive();
-    capnp::SegmentArrayMessageReader reader(segments);
-    auto response = reader.getRoot<capnproto::Response>();
+    // Registry operations can be slow during start-up of the phone
+    int64_t timeout = mw_base()->registry_timeout();
+    auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_twoway_(request_builder, timeout); });
+    auto out_params = future.get();
+    auto response = out_params.reader->getRoot<capnproto::Response>();
     throw_if_runtime_exception(response);
 
     auto list_response = response.getPayload().getAs<capnproto::Registry::ListResponse>();
@@ -140,20 +141,17 @@ MetadataMap ZmqRegistry::list()
     return sm;
 }
 
-ScopeProxy ZmqRegistry::locate(std::string const& scope_id)
+ObjectProxy ZmqRegistry::locate(std::string const& identity, int64_t timeout)
 {
     capnp::MallocMessageBuilder request_builder;
     auto request = make_request_(request_builder, "locate");
     auto in_params = request.initInParams().getAs<capnproto::Registry::LocateRequest>();
-    in_params.setName(scope_id.c_str());
+    in_params.setIdentity(identity.c_str());
 
-    // locate uses a custom timeout because it needs to potentially fork/exec the scope.
-    int64_t timeout = 1000; // TODO: get timeout from config
-    auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_(request_builder, timeout); });
-    auto receiver = future.get();
-    auto segments = receiver.receive();
-    capnp::SegmentArrayMessageReader reader(segments);
-    auto response = reader.getRoot<capnproto::Response>();
+    // locate uses a custom timeout because it needs to potentially fork/exec a scope.
+    auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_twoway_(request_builder, timeout); });
+    auto out_params = future.get();
+    auto response = out_params.reader->getRoot<capnproto::Response>();
     throw_if_runtime_exception(response);
 
     auto locate_response = response.getPayload().getAs<capnproto::Registry::LocateResponse>().getResponse();
@@ -169,12 +167,12 @@ ScopeProxy ZmqRegistry::locate(std::string const& scope_id)
                                                    proxy.getIdentity(),
                                                    proxy.getCategory(),
                                                    proxy.getTimeout());
-            return ScopeImpl::create(zmq_proxy, mw->runtime(), scope_id);
+            return ScopeImpl::create(zmq_proxy, mw->runtime(), identity);
         }
         case capnproto::Registry::LocateResponse::Response::NOT_FOUND_EXCEPTION:
         {
             auto ex = locate_response.getNotFoundException();
-            throw NotFoundException("Registry::locate(): no such scope", ex.getName().cStr());
+            throw NotFoundException("Registry::locate(): no such object", ex.getIdentity().cStr());
         }
         case capnproto::Registry::LocateResponse::Response::REGISTRY_EXCEPTION:
         {
@@ -187,6 +185,46 @@ ScopeProxy ZmqRegistry::locate(std::string const& scope_id)
         }
     }
 }
+
+ObjectProxy ZmqRegistry::locate(std::string const& identity)
+{
+    return locate(identity, mw_base()->locate_timeout());
+}
+
+bool ZmqRegistry::is_scope_running(std::string const& scope_id)
+{
+    string op_name = "is_scope_running";
+    capnp::MallocMessageBuilder request_builder;
+    auto request = make_request_(request_builder, op_name);
+    auto in_params = request.initInParams().getAs<capnproto::Registry::IsScopeRunningRequest>();
+    in_params.setIdentity(scope_id.c_str());
+
+    // Registry operations can be slow during start-up of the phone
+    int64_t timeout = mw_base()->registry_timeout();
+    auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_twoway_(request_builder, timeout); });
+    auto out_params = future.get();
+    auto response = out_params.reader->getRoot<capnproto::Response>();
+    throw_if_runtime_exception(response);
+
+    auto is_scope_running_response = response.getPayload().getAs<capnproto::Registry::IsScopeRunningResponse>().getResponse();
+    switch (is_scope_running_response.which())
+    {
+        case capnproto::Registry::IsScopeRunningResponse::Response::RETURN_VALUE:
+        {
+            return is_scope_running_response.getReturnValue();
+        }
+        case capnproto::Registry::IsScopeRunningResponse::Response::NOT_FOUND_EXCEPTION:
+        {
+            auto ex = is_scope_running_response.getNotFoundException();
+            throw NotFoundException("Registry::" + op_name + "(): no such scope", ex.getIdentity().cStr());
+        }
+        default:
+        {
+            throw MiddlewareException("Registry::" + op_name + "(): unknown user exception");
+        }
+    }
+}
+
 } // namespace zmq_middleware
 
 } // namespace internal

@@ -34,7 +34,7 @@ SearchListenerBase::~SearchListenerBase()
 {
 }
 
-void SearchListenerBase::push(DepartmentList const& /* departments */, std::string const& /* current_department_id */)
+void SearchListenerBase::push(Department::SCPtr const& /* parent department */)
 {
     // Intentionally empty: "do nothing" default implementation.
 }
@@ -44,12 +44,12 @@ void SearchListenerBase::push(Filters const& /* filters */, FilterState const& /
     // Intentionally empty: "do nothing" default implementation.
 }
 
-void SearchListenerBase::push(Category::SCPtr /* category */)
+void SearchListenerBase::push(Category::SCPtr const& /* category */)
 {
     // Intentionally empty: "do nothing" default implementation.
 }
 
-void SearchListenerBase::push(Annotation /* annotation */)
+void SearchListenerBase::push(experimental::Annotation /* annotation */)
 {
     // Intentionally empty: "do nothing" default implementation.
 }

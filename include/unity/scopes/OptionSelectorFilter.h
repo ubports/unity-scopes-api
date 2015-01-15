@@ -16,8 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_OPTIONSELECTOR_H
-#define UNITY_SCOPES_OPTIONSELECTOR_H
+#pragma once
 
 #include <unity/scopes/FilterBase.h>
 #include <unity/scopes/FilterOption.h>
@@ -57,7 +56,7 @@ public:
     \param multi_select If true, the filter permits more than option to be selected; otherwise, only a single
     option can be selected.
     */
-    static OptionSelectorFilter::SPtr create(std::string const& id, std::string const& label, bool multi_select = false);
+    static OptionSelectorFilter::UPtr create(std::string const& id, std::string const& label, bool multi_select = false);
 
     /**
     \brief Get the label of this filter.
@@ -84,6 +83,13 @@ public:
     std::list<FilterOption::SCPtr> options() const;
 
     /**
+    \brief Check if an option is active for this filter.
+    \param filter_state The state of filters
+    \return true if an option is active
+    */
+    bool has_active_option(FilterState const& filter_state) const;
+
+    /**
     \brief Get active options from an instance of FilterState for this filter.
     \return The set of selected filter options.
     */
@@ -106,14 +112,11 @@ public:
     static void update_state(FilterState& filter_state, std::string const& filter_id, std::string const& option_id, bool value);
 
 private:
-    OptionSelectorFilter(std::string const& id, std::string const& label, bool multi_select = false);
-    OptionSelectorFilter(VariantMap const& var);
+    OptionSelectorFilter(internal::OptionSelectorFilterImpl*);
     internal::OptionSelectorFilterImpl* fwd() const;
-    friend class internal::FilterBaseImpl;
+    friend class internal::OptionSelectorFilterImpl;
 };
 
 } // namespace scopes
 
 } // namespace unity
-
-#endif

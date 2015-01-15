@@ -35,24 +35,33 @@ namespace scopes
 namespace internal
 {
 
-ScopeMetadataImpl::ScopeMetadataImpl(MiddlewareBase* mw) :
-    mw_(mw)
+ScopeMetadataImpl::ScopeMetadataImpl(MiddlewareBase* mw)
+    : mw_(mw)
+    , results_ttl_type_(ScopeMetadata::ResultsTtlType::None)
+    , version_(0)
 {
 }
 
-ScopeMetadataImpl::ScopeMetadataImpl(const VariantMap& variant_map, MiddlewareBase* mw) :
-    mw_(mw)
+ScopeMetadataImpl::ScopeMetadataImpl(const VariantMap& variant_map, MiddlewareBase* mw)
+    : mw_(mw)
+    , results_ttl_type_(ScopeMetadata::ResultsTtlType::None)
+    , version_(0)
 {
     deserialize(variant_map);
 }
 
-ScopeMetadataImpl::ScopeMetadataImpl(ScopeMetadataImpl const& other) :
-    mw_(other.mw_),
-    scope_id_(other.scope_id_),
-    proxy_(other.proxy_),
-    display_name_(other.display_name_),
-    description_(other.description_),
-    author_(other.author_)
+ScopeMetadataImpl::ScopeMetadataImpl(ScopeMetadataImpl const& other)
+    : mw_(other.mw_)
+    , scope_id_(other.scope_id_)
+    , proxy_(other.proxy_)
+    , display_name_(other.display_name_)
+    , description_(other.description_)
+    , author_(other.author_)
+    , appearance_attributes_(other.appearance_attributes_)
+    , results_ttl_type_(other.results_ttl_type_)
+    , child_scope_ids_(other.child_scope_ids_)
+    , version_(other.version_)
+    , keywords_(other.keywords_)
 {
     if (other.art_)
     {
@@ -74,6 +83,22 @@ ScopeMetadataImpl::ScopeMetadataImpl(ScopeMetadataImpl const& other) :
     {
         invisible_.reset(new bool(*other.invisible_));
     }
+    if (other.scope_directory_)
+    {
+        scope_directory_.reset(new string(*other.scope_directory_));
+    }
+    if (other.settings_definitions_)
+    {
+        settings_definitions_.reset(new VariantArray(*other.settings_definitions_));
+    }
+    if (other.location_data_needed_)
+    {
+        location_data_needed_.reset(new bool(*other.location_data_needed_));
+    }
+    if (other.is_aggregator_)
+    {
+        is_aggregator_.reset(new bool(*other.is_aggregator_));
+    }
 }
 
 ScopeMetadataImpl& ScopeMetadataImpl::operator=(ScopeMetadataImpl const& rhs)
@@ -91,6 +116,15 @@ ScopeMetadataImpl& ScopeMetadataImpl::operator=(ScopeMetadataImpl const& rhs)
         search_hint_.reset(rhs.search_hint_ ? new string(*rhs.search_hint_) : nullptr);
         hot_key_.reset(rhs.hot_key_ ? new string(*rhs.hot_key_) : nullptr);
         invisible_.reset(rhs.invisible_ ? new bool(*rhs.invisible_) : nullptr);
+        appearance_attributes_ = rhs.appearance_attributes_;
+        scope_directory_.reset(rhs.scope_directory_ ? new string(*rhs.scope_directory_) : nullptr);
+        results_ttl_type_ = rhs.results_ttl_type_;
+        settings_definitions_.reset(rhs.settings_definitions_ ? new VariantArray(*rhs.settings_definitions_) : nullptr);
+        location_data_needed_.reset(rhs.location_data_needed_ ? new bool(*rhs.location_data_needed_) : nullptr);
+        child_scope_ids_ = rhs.child_scope_ids_;
+        version_ = rhs.version_;
+        keywords_ = rhs.keywords_;
+        is_aggregator_.reset(rhs.is_aggregator_ ? new bool(*rhs.is_aggregator_) : nullptr);
     }
     return *this;
 }
@@ -165,6 +199,67 @@ bool ScopeMetadataImpl::invisible() const
     return false;
 }
 
+VariantMap ScopeMetadataImpl::appearance_attributes() const
+{
+    return appearance_attributes_;
+}
+
+std::string ScopeMetadataImpl::scope_directory() const
+{
+    if (scope_directory_)
+    {
+        return *scope_directory_;
+    }
+   throw NotFoundException("attribute not set", "scope_directory");
+}
+
+ScopeMetadata::ResultsTtlType ScopeMetadataImpl::results_ttl_type() const
+{
+    return results_ttl_type_;
+}
+
+VariantArray ScopeMetadataImpl::settings_definitions() const
+{
+    if (settings_definitions_)
+    {
+        return *settings_definitions_;
+    }
+    throw NotFoundException("attribute not set", "settings_definitions");
+}
+
+bool ScopeMetadataImpl::location_data_needed() const
+{
+    if (location_data_needed_)
+    {
+        return *location_data_needed_;
+    }
+    return false;
+}
+
+std::vector<std::string> ScopeMetadataImpl::child_scope_ids() const
+{
+    return child_scope_ids_;
+}
+
+int ScopeMetadataImpl::version() const
+{
+    return version_;
+}
+
+std::vector<std::string> ScopeMetadataImpl::keywords() const
+{
+    return keywords_;
+}
+
+bool ScopeMetadataImpl::is_aggregator() const
+{
+    if (is_aggregator_)
+    {
+        return *is_aggregator_;
+    }
+    return false;
+}
+
 void ScopeMetadataImpl::set_scope_id(std::string const& scope_id)
 {
     scope_id_ = scope_id;
@@ -215,6 +310,55 @@ void ScopeMetadataImpl::set_invisible(bool invisible)
     invisible_.reset(new bool(invisible));
 }
 
+void ScopeMetadataImpl::set_appearance_attributes(VariantMap const& appearance_attributes)
+{
+    appearance_attributes_ = appearance_attributes;
+}
+
+void ScopeMetadataImpl::set_scope_directory(std::string const& path)
+{
+    scope_directory_.reset(new string(path));
+}
+
+void ScopeMetadataImpl::set_results_ttl_type(ScopeMetadata::ResultsTtlType results_ttl)
+{
+    results_ttl_type_ = results_ttl;
+}
+
+void ScopeMetadataImpl::set_settings_definitions(VariantArray const& settings_definitions)
+{
+    settings_definitions_.reset(new VariantArray(settings_definitions));
+}
+
+void ScopeMetadataImpl::set_location_data_needed(bool location_data_needed)
+{
+    location_data_needed_.reset(new bool(location_data_needed));
+}
+
+void ScopeMetadataImpl::set_is_aggregator(bool is_aggregator)
+{
+    is_aggregator_.reset(new bool(is_aggregator));
+}
+
+void ScopeMetadataImpl::set_child_scope_ids(std::vector<std::string> const& ids)
+{
+    child_scope_ids_ = ids;
+}
+
+void ScopeMetadataImpl::set_version(int v)
+{
+    if (v < 0)
+    {
+        throw InvalidArgumentException("ScopeMetadata::set_version(): invalid version: " + std::to_string(v));
+    }
+    version_ = v;
+}
+
+void ScopeMetadataImpl::set_keywords(std::vector<std::string> const& keywords)
+{
+    keywords_ = keywords;
+}
+
 namespace
 {
 
@@ -248,6 +392,7 @@ VariantMap ScopeMetadataImpl::serialize() const
     var["display_name"] = display_name_;
     var["description"] = description_;
     var["author"] = author_;
+    var["version"] = version_;
 
     // Optional fields
     if (art_)
@@ -269,6 +414,48 @@ VariantMap ScopeMetadataImpl::serialize() const
     if (invisible_)
     {
         var["invisible"] = *invisible_;
+    }
+    if (scope_directory_)
+    {
+        var["scope_dir"] = *scope_directory_;
+    }
+    if (appearance_attributes_.size() > 0)
+    {
+        var["appearance_attributes"] = appearance_attributes_;
+    }
+    if (results_ttl_type_ != ScopeMetadata::ResultsTtlType::None)
+    {
+        var["results_ttl_type"] = static_cast<int>(results_ttl_type_);
+    }
+    if (settings_definitions_)
+    {
+        var["settings_definitions"] = *settings_definitions_;
+    }
+    if (location_data_needed_)
+    {
+        var["location_data_needed"] = *location_data_needed_;
+    }
+    if (child_scope_ids_.size())
+    {
+        VariantArray va;
+        for (auto const& sid: child_scope_ids_)
+        {
+            va.push_back(Variant(sid));
+        }
+        var["child_scopes"] = Variant(va);
+    }
+    if (keywords_.size())
+    {
+        VariantArray va;
+        for (auto const& keyword: keywords_)
+        {
+            va.push_back(Variant(keyword));
+        }
+        var["keywords"] = Variant(va);
+    }
+    if (is_aggregator_)
+    {
+        var["is_aggregator"] = *is_aggregator_;
     }
 
     return var;
@@ -325,6 +512,19 @@ void ScopeMetadataImpl::deserialize(VariantMap const& var)
 
     // Optional fields
 
+    // Version was added in 0.6.8. When serializing, we always
+    // add the field but, when deserializing, we allow it to
+    // be absent because an aggregator compiled with this
+    // version of the API may still be talking to a scope
+    // compiled with a pre-0.6.9 version.
+    it = var.find("version");
+    version_ = it != var.end() ? it->second.get_int() : 0;
+    if (version_ < 0)
+    {
+        throw InvalidArgumentException("ScopeMetadataImpl::deserialize(): invalid attribute 'version' with value "
+                                       + std::to_string(version_));
+    }
+
     it = var.find("art");
     if (it != var.end())
     {
@@ -353,6 +553,69 @@ void ScopeMetadataImpl::deserialize(VariantMap const& var)
     if (it != var.end())
     {
         invisible_.reset(new bool(it->second.get_bool()));
+    }
+
+    it = var.find("scope_dir");
+    if (it != var.end())
+    {
+        scope_directory_.reset(new string(it->second.get_string()));
+    }
+
+    it = var.find("appearance_attributes");
+    if (it != var.end())
+    {
+        appearance_attributes_ = it->second.get_dict();
+    }
+
+    it = var.find("results_ttl_type");
+    if (it != var.end())
+    {
+        int tmp = it->second.get_int();
+        if(tmp < 0 || tmp > static_cast<int>(ScopeMetadata::ResultsTtlType::Large))
+        {
+            throw InvalidArgumentException(
+                    "ScopeMetadata::deserialize(): invalid attribute 'results_ttl_type' with value "
+                    + std::to_string(tmp));
+        }
+        results_ttl_type_ = static_cast<ScopeMetadata::ResultsTtlType>(tmp);
+    }
+
+    it = var.find("settings_definitions");
+    if (it != var.end())
+    {
+        settings_definitions_.reset(new VariantArray(it->second.get_array()));
+    }
+
+    it = var.find("location_data_needed");
+    if (it != var.end())
+    {
+        location_data_needed_.reset(new bool(it->second.get_bool()));
+    }
+
+    child_scope_ids_.clear();
+    it = var.find("child_scopes");
+    if (it != var.end())
+    {
+        for (auto const& v: it->second.get_array())
+        {
+            child_scope_ids_.push_back(v.get_string());
+        }
+    }
+
+    keywords_.clear();
+    it = var.find("keywords");
+    if (it != var.end())
+    {
+        for (auto const& v: it->second.get_array())
+        {
+            keywords_.push_back(v.get_string());
+        }
+    }
+
+    it = var.find("is_aggregator");
+    if (it != var.end())
+    {
+        is_aggregator_.reset(new bool(it->second.get_bool()));
     }
 }
 

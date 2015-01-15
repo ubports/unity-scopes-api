@@ -42,6 +42,7 @@ ScopeMetadata::ScopeMetadata(unique_ptr<internal::ScopeMetadataImpl> impl) :
     assert(p->proxy());
     assert(!p->display_name().empty());
     assert(!p->description().empty());
+    assert(!p->author().empty());
 }
 
 ScopeMetadata::ScopeMetadata(ScopeMetadata const& other) :
@@ -116,9 +117,54 @@ bool ScopeMetadata::invisible() const
     return p->invisible();
 }
 
+VariantMap ScopeMetadata::appearance_attributes() const
+{
+    return p->appearance_attributes();
+}
+
+std::string ScopeMetadata::scope_directory() const
+{
+    return p->scope_directory();
+}
+
 VariantMap ScopeMetadata::serialize() const
 {
     return p->serialize();
+}
+
+ScopeMetadata::ResultsTtlType ScopeMetadata::results_ttl_type() const
+{
+    return p->results_ttl_type();
+}
+
+VariantArray ScopeMetadata::settings_definitions() const
+{
+    return p->settings_definitions();
+}
+
+bool ScopeMetadata::location_data_needed() const
+{
+    return p->location_data_needed();
+}
+
+std::vector<std::string> ScopeMetadata::child_scope_ids() const
+{
+    return p->child_scope_ids();
+}
+
+int ScopeMetadata::version() const
+{
+    return p->version();
+}
+
+std::vector<std::string> ScopeMetadata::keywords() const
+{
+    return p->keywords();
+}
+
+bool ScopeMetadata::is_aggregator() const
+{
+    return p->is_aggregator();
 }
 
 //! @endcond

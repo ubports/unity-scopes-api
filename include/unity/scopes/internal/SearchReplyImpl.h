@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_SEARCHREPLYIMPL_H
-#define UNITY_SCOPES_INTERNAL_SEARCHREPLYIMPL_H
+#pragma once
 
 #include <unity/scopes/Category.h>
 #include <unity/scopes/Department.h>
@@ -37,7 +36,11 @@ namespace scopes
 
 class CategorisedResult;
 class CategoryRenderer;
+
+namespace experimental
+{
 class Annotation;
+}
 
 namespace internal
 {
@@ -47,19 +50,28 @@ class QueryObjectBase;
 class SearchReplyImpl : public virtual unity::scopes::SearchReply, public virtual ReplyImpl
 {
 public:
-    SearchReplyImpl(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObjectBase>const & qo);
+    SearchReplyImpl(MWReplyProxy const& mw_proxy,
+                    std::shared_ptr<QueryObjectBase>const & qo,
+                    int cardinality,
+                    std::string const& current_department_id,
+                    boost::log::sources::severity_channel_logger_mt<>& logger);
     virtual ~SearchReplyImpl();
 
-    virtual void register_departments(DepartmentList const& departments, std::string current_department_id) override;
+    virtual void register_departments(Department::SCPtr const& parent) override;
 
     virtual Category::SCPtr register_category(std::string const& id,
                                               std::string const& title,
                                               std::string const &icon,
                                               CategoryRenderer const& renderer_template) override;
+    virtual Category::SCPtr register_category(std::string const& id,
+                                              std::string const& title,
+                                              std::string const &icon,
+                                              CannedQuery const &query,
+                                              CategoryRenderer const& renderer_template) override;
     virtual void register_category(Category::SCPtr category) override;
     virtual Category::SCPtr lookup_category(std::string const& id)  override;
 
-    virtual bool register_annotation(unity::scopes::Annotation const& annotation) override;
+    virtual bool push(unity::scopes::experimental::Annotation const& annotation) override;
 
     virtual bool push(unity::scopes::CategorisedResult const& result) override;
     virtual bool push(unity::scopes::Filters const& filters, unity::scopes::FilterState const& filter_state) override;
@@ -71,6 +83,7 @@ private:
 
     std::atomic_int cardinality_;
     std::atomic_int num_pushes_;
+    std::string current_department_;
 };
 
 } // namespace internal
@@ -78,5 +91,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

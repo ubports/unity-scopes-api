@@ -64,10 +64,10 @@ void ZmqQuery::run(MWReplyProxy const& reply)
     auto rp = dynamic_pointer_cast<ZmqReply>(reply);
     proxy.setEndpoint(rp->endpoint().c_str());
     proxy.setIdentity(rp->identity().c_str());
-    proxy.setCategory(rp->category().c_str());
+    proxy.setCategory(rp->target_category().c_str());
 
-    auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_(request_builder); });
-    future.wait();
+    auto future = mw_base()->oneway_pool()->submit([&] { return this->invoke_oneway_(request_builder); });
+    future.get();
 }
 
 } // namespace zmq_middleware

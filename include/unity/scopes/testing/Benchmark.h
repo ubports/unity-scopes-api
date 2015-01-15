@@ -16,8 +16,7 @@
  * Authored by: Thomas Voß <thomas.voss@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_TESTING_BENCHMARK_H
-#define UNITY_SCOPES_TESTING_BENCHMARK_H
+#pragma once
 
 #include <unity/scopes/ActionMetadata.h>
 #include <unity/scopes/CannedQuery.h>
@@ -40,6 +39,7 @@ class ScopeBase;
 
 namespace testing
 {
+
 /**
  * \brief The Benchmark class defines an interface to provide scope authors with runtime benchmarking capabilities
  * to be used in their own testing.
@@ -70,11 +70,59 @@ public:
              /** Query the size of the sample. */
             Sample::SizeType get_size() const;
             /** Query the empirical mean of the sample. */
-            inline Sample::ValueType get_mean() const;
+            Sample::ValueType get_mean() const;
             /** Query the empirical variance of the sample. */
-            inline Sample::ValueType get_variance() const;
+            Sample::ValueType get_variance() const;
             /** Enumerate all raw observations from the sample. */
-            inline void enumerate(const Sample::Enumerator& enumerator) const;
+            void enumerate(const Sample::Enumerator& enumerator) const;
+
+            /**
+             * \brief Checks if a timing sample is statistically significantly
+             * faster than a reference timing sample.
+             * \throw std::runtime_error if either this sample or the reference sample is not normally distributed.
+             * \param reference The reference timing sample to compare to.
+             * \param alpha The critical value of the statistical test. The lower, the higher the relevance of the test.
+             * \return true iff this timing sample is significantly faster than the reference sample.
+             */
+            bool is_significantly_faster_than_reference(const Timing& reference, double alpha = 0.05) const;
+
+            /**
+             * \brief Checks if a timing sample is statistically significantly
+             * faster than a reference timing with mean 'mean and std. dev. 'std_dev'
+             * \throw std::runtime_error if this sample is not normally distributed.
+             * \param mean The reference mean to compare to.
+             * \param std_dev The reference std. dev. to compare to.
+             * \param alpha The critical value of the statistical test. The lower, the higher the relevance of the test.
+             * \return true iff this timing sample is significantly faster than the reference sample.
+             */
+            bool is_significantly_faster_than_reference(
+                    double mean,
+                    double std_dev,
+                    double alpha = 0.05) const;
+
+            /**
+             * \brief Checks if a timing sample is statistically significantly
+             * slower than a reference timing sample.
+             * \throw std::runtime_error if either this sample or the reference sample is not normally distributed.
+             * \param reference The reference timing sample to compare to.
+             * \param alpha The critical value of the statistical test. The lower, the higher the relevance of the test.
+             * \return true iff this timing sample is significantly slower than the reference.
+             */
+            bool is_significantly_slower_than_reference(const Timing& reference, double alpha = 0.05) const;
+
+            /**
+             * \brief Checks if a timing sample is statistically significantly
+             * slower than a reference timing with mean 'mean and std. dev. 'std_dev'
+             * \throw std::runtime_error if this sample is not normally distributed.
+             * \param mean The reference mean to compare to.
+             * \param std_dev The reference std. dev. to compare to.
+             * \param alpha The critical value of the statistical test. The lower, the higher the relevance of the test.
+             * \return true iff this timing sample is significantly slower than the reference.
+             */
+            bool is_significantly_slower_than_reference(
+                    double mean,
+                    double std_dev,
+                    double alpha = 0.05) const;
 
             /** Minimum execution time for the benchmarked operation. */
             Seconds min{Seconds::min()};
@@ -305,5 +353,3 @@ std::ostream& operator<<(std::ostream&, const Benchmark::Result&);
 } // namespace scopes
 
 } // namespace unity
-
-#endif

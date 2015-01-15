@@ -58,8 +58,8 @@ void ZmqQueryCtrl::cancel()
     capnp::MallocMessageBuilder request_builder;
     make_request_(request_builder, "cancel");
 
-    auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_(request_builder); });
-    future.wait();
+    auto future = mw_base()->oneway_pool()->submit([&] { return this->invoke_oneway_(request_builder); });
+    future.get();
 }
 
 void ZmqQueryCtrl::destroy()
@@ -67,8 +67,8 @@ void ZmqQueryCtrl::destroy()
     capnp::MallocMessageBuilder request_builder;
     make_request_(request_builder, "destroy");
 
-    auto future = mw_base()->invoke_pool()->submit([&] { return this->invoke_(request_builder); });
-    future.wait();
+    auto future = mw_base()->oneway_pool()->submit([&] { return this->invoke_oneway_(request_builder); });
+    future.get();
 }
 
 } // namespace zmq_middleware

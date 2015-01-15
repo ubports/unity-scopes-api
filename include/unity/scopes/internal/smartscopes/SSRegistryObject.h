@@ -16,13 +16,15 @@
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_SMARTSCOPES_SSREGISTRYOBJECT_H
-#define UNITY_SCOPES_INTERNAL_SMARTSCOPES_SSREGISTRYOBJECT_H
+#pragma once
 
 #include <unity/scopes/internal/MiddlewareBase.h>
 #include <unity/scopes/internal/RegistryObjectBase.h>
+#include <unity/scopes/internal/SettingsDB.h>
 #include <unity/scopes/internal/smartscopes/SmartScopesClient.h>
+#include <unity/scopes/internal/smartscopes/SSConfig.h>
 
+#include <condition_variable>
 #include <mutex>
 
 namespace unity
@@ -42,31 +44,44 @@ class SSRegistryObject final : public RegistryObjectBase
 public:
     UNITY_DEFINES_PTRS(SSRegistryObject);
 
-    SSRegistryObject(MiddlewareBase::SPtr middleware, std::string const& ss_scope_endpoint,
-                     uint no_reply_timeout, uint refresh_rate_in_sec, std::string const& sss_url = "",
+    SSRegistryObject(MiddlewareBase::SPtr middleware,
+                     SSConfig const& ss_config,
+                     std::string const& ss_scope_endpoint,
+                     std::string const& sss_url = "",
                      bool caching_enabled = true);
-    virtual ~SSRegistryObject() noexcept;
+    virtual ~SSRegistryObject();
 
-    ScopeMetadata get_metadata(std::string const& scope_id) override;
-    MetadataMap list() override;
+    ScopeMetadata get_metadata(std::string const& scope_id) const override;
+    MetadataMap list() const override;
 
-    ScopeProxy locate(std::string const& scope_id) override;
+    ObjectProxy locate(std::string const& identity) override;
+    bool is_scope_running(std::string const& scope_id) override;
 
     bool has_scope(std::string const& scope_id) const;
     std::string get_base_url(std::string const& scope_id) const;
     SmartScopesClient::SPtr get_ssclient() const;
 
+    SettingsDB::SPtr get_settings_db(std::string const& scope_id) const;
+
 private:
     void refresh_thread();
 
     void get_remote_scopes();
-    bool add(RemoteScope const& remotedata, ScopeMetadata const& scope);
+    static bool add(RemoteScope const& remotedata, ScopeMetadata const& scope, MetadataMap& scopes, std::map<std::string, std::string>& urls);
 
 private:
+    struct SSSettingsDef
+    {
+        std::string json;
+        SettingsDB::SPtr db;
+        bool needs_location_data;
+    };
+
     SmartScopesClient::SPtr ssclient_;
 
     MetadataMap scopes_;
     std::map<std::string, std::string> base_urls_;
+    std::map<std::string, SSSettingsDef> settings_defs_;
     mutable std::mutex scopes_mutex_;
 
     std::thread refresh_thread_;
@@ -76,10 +91,13 @@ private:
 
     MiddlewareBase::SPtr middleware_;
     std::string ss_scope_endpoint_;
-    uint const regular_refresh_timeout_;
-    uint next_refresh_timeout_;
+    unsigned int const regular_refresh_timeout_;
+    unsigned int next_refresh_timeout_;
+    unsigned int const failed_refresh_timeout_;
 
     bool caching_enabled_;
+    std::string locale_;
+    MWPublisher::SPtr publisher_;
 };
 
 }  // namespace smartscopes
@@ -89,5 +107,3 @@ private:
 }  // namespace scopes
 
 }  // namespace unity
-
-#endif  // UNITY_SCOPES_INTERNAL_SMARTSCOPES_SSREGISTRYOBJECT_H

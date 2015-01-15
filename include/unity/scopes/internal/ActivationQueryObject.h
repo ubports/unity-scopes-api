@@ -16,11 +16,10 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_ACTIVATIONQUERYOBJECT_H
-#define UNITY_SCOPES_INTERNAL_ACTIVATIONQUERYOBJECT_H
+#pragma once
 
-#include <unity/scopes/internal/QueryObject.h>
 #include <unity/scopes/internal/MWQueryCtrlProxyFwd.h>
+#include <unity/scopes/internal/QueryObject.h>
 
 namespace unity
 {
@@ -37,7 +36,10 @@ class ActivationQueryObject final : public QueryObject
 public:
     UNITY_DEFINES_PTRS(ActivationQueryObject);
 
-    ActivationQueryObject(std::shared_ptr<ActivationQueryBase> const& act_base, MWReplyProxy const& reply, MWQueryCtrlProxy const& ctrl);
+    ActivationQueryObject(std::shared_ptr<ActivationQueryBase> const& act_base,
+                          MWReplyProxy const& reply,
+                          MWQueryCtrlProxy const& ctrl,
+                          boost::log::sources::severity_channel_logger_mt<>& logger);
     virtual ~ActivationQueryObject();
     virtual void run(MWReplyProxy const& reply, InvokeInfo const& info) noexcept override;
 
@@ -50,5 +52,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

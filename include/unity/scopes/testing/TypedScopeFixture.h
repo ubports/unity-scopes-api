@@ -16,8 +16,7 @@
  * Authored by: Thomas Voß <thomas.voss@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_TESTING_TYPED_SCOPE_FIXTURE_H
-#define UNITY_SCOPES_TESTING_TYPED_SCOPE_FIXTURE_H
+#pragma once
 
 #include <unity/scopes/Version.h>
 
@@ -32,6 +31,8 @@ namespace unity
 
 namespace scopes
 {
+
+class ScopeBase;
 
 namespace testing
 {
@@ -52,21 +53,58 @@ struct ScopeTraits
     }
 };
 
+class TypedScopeFixtureHelper
+{
+    static void set_scope_directory(std::shared_ptr<ScopeBase> const& scope, std::string const& path);
+    static void set_cache_directory(std::shared_ptr<ScopeBase> const& scope, std::string const& path);
+    static void set_app_directory(std::shared_ptr<ScopeBase> const& scope, std::string const& path);
+    static void set_tmp_directory(std::shared_ptr<ScopeBase> const& scope, std::string const& path);
+    static void set_registry(std::shared_ptr<ScopeBase> const& scope, RegistryProxy const& r);
+
+    template<typename Scope>
+    friend class TypedScopeFixture;
+};
+
 template<typename Scope>
 class TypedScopeFixture : public ::testing::Test
 {
 public:
     TypedScopeFixture()
-        : scope(ScopeTraits<Scope>::construct()),
-          registry_proxy(&registry, [](unity::scopes::Registry*) {})
+        : registry_proxy(&registry, [](unity::scopes::Registry*) {})
+        , scope(ScopeTraits<Scope>::construct())
     {
+        TypedScopeFixtureHelper::set_registry(scope, registry_proxy);
     }
 
     void SetUp()
     {
-        EXPECT_EQ(UNITY_SCOPES_VERSION_MAJOR,
-                  scope->start(ScopeTraits<Scope>::name(), registry_proxy));
-        EXPECT_NO_THROW(scope->run());
+        ASSERT_NO_THROW(scope->start(ScopeTraits<Scope>::name()));
+        ASSERT_NO_THROW(scope->run());
+    }
+
+    void set_scope_directory(std::string const& path)
+    {
+        TypedScopeFixtureHelper::set_scope_directory(scope, path);
+    }
+
+    void set_cache_directory(std::string const& path)
+    {
+        TypedScopeFixtureHelper::set_cache_directory(scope, path);
+    }
+
+    void set_app_directory(std::string const& path)
+    {
+        TypedScopeFixtureHelper::set_app_directory(scope, path);
+    }
+
+    void set_tmp_directory(std::string const& path)
+    {
+        TypedScopeFixtureHelper::set_tmp_directory(scope, path);
+    }
+
+    static void set_registry(std::shared_ptr<ScopeBase> const& scope, RegistryProxy const& r)
+    {
+        TypedScopeFixtureHelper::set_registry(scope, r);
     }
 
     void TearDown()
@@ -75,9 +113,9 @@ public:
     }
 
 protected:
-    std::shared_ptr<Scope> scope;
     unity::scopes::testing::MockRegistry registry;
     unity::scopes::RegistryProxy registry_proxy;
+    std::shared_ptr<Scope> scope;
 };
 
 /// @endcond
@@ -87,4 +125,3 @@ protected:
 } // namespace scopes
 
 } // namespace unity
-#endif

@@ -17,6 +17,7 @@
 */
 
 #include <unity/scopes/internal/QueryMetadataImpl.h>
+#include <unity/UnityExceptions.h>
 #include <unity/scopes/internal/Utils.h>
 
 namespace unity
@@ -30,7 +31,8 @@ namespace internal
 
 QueryMetadataImpl::QueryMetadataImpl(std::string const& locale, std::string const& form_factor)
     : locale_(locale),
-      form_factor_(form_factor)
+      form_factor_(form_factor),
+      internet_connectivity_(QueryMetadata::Unknown)
 {
 }
 
@@ -41,6 +43,17 @@ QueryMetadataImpl::QueryMetadataImpl(VariantMap const& var)
     locale_ = it->second.get_string();
     it = find_or_throw(context, var, "form_factor");
     form_factor_ = it->second.get_string();
+    it = find_or_throw("QueryMetadataImpl()", var, "hints");
+    hints_ = it->second.get_dict();
+    it = var.find("internet_connectivity");
+    if (it != var.end())
+    {
+        internet_connectivity_ = it->second.get_bool() ? QueryMetadata::Connected : QueryMetadata::Disconnected;
+    }
+    else
+    {
+        internet_connectivity_ = QueryMetadata::Unknown;
+    }
 }
 
 std::string QueryMetadataImpl::locale() const
@@ -53,11 +66,75 @@ std::string QueryMetadataImpl::form_factor() const
     return form_factor_;
 }
 
-void QueryMetadataImpl::serialize(VariantMap &var) const
+void QueryMetadataImpl::set_internet_connectivity(QueryMetadata::ConnectivityStatus connectivity_status)
+{
+    internet_connectivity_ = connectivity_status;
+}
+
+QueryMetadata::ConnectivityStatus QueryMetadataImpl::internet_connectivity() const
+{
+    return internet_connectivity_;
+}
+
+Variant& QueryMetadataImpl::hint(std::string const& key)
+{
+    if (key.empty())
+    {
+        throw InvalidArgumentException("QueryMetadata::hint(): Invalid empty key string");
+    }
+    return hints_[key];
+}
+
+Variant const& QueryMetadataImpl::hint(std::string const& key) const
+{
+    if (key.empty())
+    {
+        throw InvalidArgumentException("QueryMetadata::hint(): Invalid empty key string");
+    }
+
+    auto const& it = hints_.find(key);
+    if (it != hints_.end())
+    {
+        return it->second;
+    }
+    std::ostringstream s;
+    s << "QueryMetadataImpl::hint(): requested key " << key << " doesn't exist";
+    throw unity::LogicException(s.str());
+}
+
+void QueryMetadataImpl::set_hint(std::string const& key, Variant const& value)
+{
+    if (key.empty())
+    {
+        throw InvalidArgumentException("QueryMetadata::set_hint(): Invalid empty key string");
+    }
+    hints_[key] = value;
+}
+
+VariantMap QueryMetadataImpl::hints() const
+{
+    return hints_;
+}
+
+bool QueryMetadataImpl::contains_hint(std::string const& key) const
+{
+    if (key.empty())
+    {
+        throw InvalidArgumentException("QueryMetadata::contains_hint(): Invalid empty key string");
+    }
+    return hints_.find(key) != hints_.end();
+}
+
+void QueryMetadataImpl::serialize(VariantMap& var) const
 {
     var["type"] = metadata_type();
     var["locale"] = locale_;
     var["form_factor"] = form_factor_;
+    var["hints"] = hints_;
+    if (internet_connectivity_ != QueryMetadata::Unknown)
+    {
+        var["internet_connectivity"] = internet_connectivity_ == QueryMetadata::Connected;
+    }
 }
 
 VariantMap QueryMetadataImpl::serialize() const

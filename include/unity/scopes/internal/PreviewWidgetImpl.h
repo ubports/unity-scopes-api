@@ -16,8 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_PREVIEWWIDGETIMPL_H
-#define UNITY_SCOPES_INTERNAL_PREVIEWWIDGETIMPL_H
+#pragma once
 
 #include <unity/scopes/PreviewWidget.h>
 #include <string>
@@ -34,31 +33,37 @@ namespace internal
 class PreviewWidgetImpl
 {
 public:
-    PreviewWidgetImpl(std::string const& json_text);
     PreviewWidgetImpl(std::string const& id, std::string const& widget_type);
     PreviewWidgetImpl(VariantMap const& var);
     PreviewWidgetImpl(PreviewWidgetImpl const& other) = default;
     ~PreviewWidgetImpl() = default;
 
+    static PreviewWidgetImpl from_json(std::string const& json_text);
+    static PreviewWidgetImpl from_json_node(VariantMap const& node);
+
     void set_id(std::string const& id);
     void set_widget_type(std::string const &widget_type);
     void add_attribute_value(std::string const& key, Variant const& value);
     void add_attribute_mapping(std::string const& key, std::string const& field_name);
+    void add_widget(PreviewWidget const& widget);
 
     std::string id() const;
     std::string widget_type() const;
     std::map<std::string, std::string> attribute_mappings() const;
     VariantMap attribute_values() const;
+    PreviewWidgetList widgets() const;
     std::string data() const;
 
     VariantMap serialize() const;
     static PreviewWidget create(VariantMap const& var);
 
 private:
+    PreviewWidgetImpl() = default;
     static void throw_on_empty(std::string const& name, std::string const& value);
     std::string id_;
     std::string type_;
     VariantMap attributes_;
+    PreviewWidgetList widgets_;
     std::map<std::string, std::string> components_;
 };
 
@@ -67,5 +72,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

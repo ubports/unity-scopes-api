@@ -16,11 +16,12 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_INTERNAL_SEARCHMETADATAIMPL_H
-#define UNITY_INTERNAL_SEARCHMETADATAIMPL_H
+#pragma once
 
 #include <unity/scopes/internal/QueryMetadataImpl.h>
 #include <unity/scopes/SearchMetadata.h>
+
+#include <boost/optional.hpp>
 
 namespace unity
 {
@@ -49,11 +50,9 @@ public:
     void set_cardinality(int cardinality);
     int cardinality() const;
 
-    bool contains_hint(std::string const& key) const;
-    void set_hint(std::string const& key, Variant const& value);
-    VariantMap hints() const;
-    Variant& hint(std::string const& key);
-    Variant const& hint(std::string const& key) const;
+    void set_location(Location const& location);
+    Location location() const;
+    bool has_location() const;
 
     virtual VariantMap serialize() const override;
 
@@ -61,13 +60,13 @@ public:
 
 protected:
     virtual std::string metadata_type() const override;
-    virtual void serialize(VariantMap &var) const override;
+    virtual void serialize(VariantMap& var) const override;
 
     void check_cardinality(std::string const& func_name, int cardinality);
 
 private:
     int cardinality_;
-    VariantMap hints_;
+    boost::optional<Location> location_;
 };
 
 } // namespace internal
@@ -75,5 +74,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

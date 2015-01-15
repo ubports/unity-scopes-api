@@ -18,6 +18,7 @@
 
 #include <unity/scopes/internal/SearchMetadataImpl.h>
 #include <unity/scopes/internal/Utils.h>
+#include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 #include <sstream>
 
@@ -49,8 +50,14 @@ SearchMetadataImpl::SearchMetadataImpl(VariantMap const& var)
     auto it = find_or_throw("SearchMetadataImpl()", var, "cardinality");
     cardinality_ = it->second.get_int();
     check_cardinality("SearchMetadataImpl(VariantMap)", cardinality_);
-    it = find_or_throw("SearchMetadataImpl()", var, "hints");
-    hints_ = it->second.get_dict();
+    try
+    {
+        it = find_or_throw("SearchMetadataImpl()", var, "location");
+        location_ = Location(it->second.get_dict());
+    }
+    catch (std::exception &e)
+    {
+    }
 }
 
 void SearchMetadataImpl::set_cardinality(int cardinality)
@@ -64,37 +71,25 @@ int SearchMetadataImpl::cardinality() const
     return cardinality_;
 }
 
-Variant& SearchMetadataImpl::hint(std::string const& key)
+void SearchMetadataImpl::set_location(Location const& location)
 {
-    return hints_[key];
+    location_ = location;
 }
 
-Variant const& SearchMetadataImpl::hint(std::string const& key) const
+Location SearchMetadataImpl::location() const
 {
-    auto const& it = hints_.find(key);
-    if (it != hints_.end())
+    if (has_location())
     {
-        return it->second;
+        return *location_;
     }
-    std::ostringstream s;
-    s << "SearchMetadataImpl::hint(): requested key " << key << " doesn't exist";
-    throw unity::LogicException(s.str());
+    throw NotFoundException("SearchMetadata::location()", "location");
 }
 
-void SearchMetadataImpl::set_hint(std::string const& key, Variant const& value)
+bool SearchMetadataImpl::has_location() const
 {
-    hints_[key] = value;
+    return location_;
 }
 
-VariantMap SearchMetadataImpl::hints() const
-{
-    return hints_;
-}
-
-bool SearchMetadataImpl::contains_hint(std::string const& key) const
-{
-    return hints_.find(key) != hints_.end();
-}
 
 std::string SearchMetadataImpl::metadata_type() const
 {
@@ -102,11 +97,14 @@ std::string SearchMetadataImpl::metadata_type() const
     return t;
 }
 
-void SearchMetadataImpl::serialize(VariantMap &var) const
+void SearchMetadataImpl::serialize(VariantMap& var) const
 {
     QueryMetadataImpl::serialize(var);
     var["cardinality"] = Variant(cardinality_);
-    var["hints"] = hints_;
+    if (location_)
+    {
+        var["location"] = location_->serialize();
+    }
 }
 
 VariantMap SearchMetadataImpl::serialize() const

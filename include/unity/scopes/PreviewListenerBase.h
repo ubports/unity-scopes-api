@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_PREVIEWLISTENERBASE_H
-#define UNITY_SCOPES_PREVIEWLISTENERBASE_H
+#pragma once
 
 #include <unity/scopes/ListenerBase.h>
 #include <unity/util/DefinesPtrs.h>
@@ -38,6 +37,8 @@ namespace scopes
 \brief Abstract base class for a scope to respond to preview requests.
 
 An instance of this class must be returned from Scope::preview().
+
+\see ListenerBase
 */
 
 class PreviewListenerBase : public ListenerBase
@@ -74,5 +75,3 @@ protected:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

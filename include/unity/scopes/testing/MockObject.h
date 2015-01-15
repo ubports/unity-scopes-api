@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_TESTING_MOCK_OBJECT_H
-#define UNITY_SCOPES_TESTING_MOCK_OBJECT_H
+#pragma once
 
 #include <unity/scopes/Object.h>
 
@@ -41,6 +40,7 @@ public:
 
     MOCK_METHOD0(endpoint, std::string());
     MOCK_METHOD0(identity, std::string());
+    MOCK_METHOD0(target_category, std::string());
     MOCK_METHOD0(timeout, int64_t());
     MOCK_METHOD0(to_string, std::string());
 };
@@ -52,5 +52,3 @@ public:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

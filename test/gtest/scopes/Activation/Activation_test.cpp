@@ -21,6 +21,7 @@
 #include <unity/scopes/CategoryRenderer.h>
 #include <unity/scopes/internal/CategoryRegistry.h>
 #include <unity/scopes/internal/CategorisedResultImpl.h>
+#include <unity/scopes/internal/RegistryObject.h>
 #include <unity/scopes/internal/ResultReplyObject.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/ScopeImpl.h>
@@ -28,6 +29,7 @@
 #include <unity/UnityExceptions.h>
 #include <functional>
 #include <gtest/gtest.h>
+#include <unity/scopes/testing/Result.h>
 #include <TestScope.h>
 
 using namespace unity::scopes;
@@ -39,12 +41,14 @@ public:
     DummyReceiver(std::function<void(CategorisedResult)> push_func)
     {
         push_func_ = push_func;
-    };
+    }
+
     void push(CategorisedResult result) override
     {
         push_func_(result);
     }
-    void finished(Reason /* r */, std::string const& /* error_message */) override {}
+
+    void finished(CompletionDetails const&) override {}
 
     std::function<void(CategorisedResult)> push_func_;
 };
@@ -55,7 +59,8 @@ public:
     void wait_until_finished()
     {
         std::unique_lock<std::mutex> lock(mutex_);
-        cond_.wait(lock, [this] { return this->query_complete_; });
+        auto ok = cond_.wait_for(lock, std::chrono::seconds(2), [this] { return this->query_complete_; });
+        ASSERT_TRUE(ok) << "query did not complete after 2 seconds";
     }
 
 protected:
@@ -68,10 +73,9 @@ protected:
     }
 
 private:
-    bool query_complete_;
+    bool query_complete_ = false;
     std::mutex mutex_;
     std::condition_variable cond_;
-
 };
 
 class SearchReceiver : public SearchListenerBase, public WaitUntilFinished
@@ -82,8 +86,9 @@ public:
         this->result = std::make_shared<Result>(result);
     }
 
-    virtual void finished(ListenerBase::Reason /* reason */, std::string const& /* error_message */) override
+    virtual void finished(CompletionDetails const& details) override
     {
+        EXPECT_EQ(CompletionDetails::OK, details.status()) << details.message();
         notify();
     }
 
@@ -98,7 +103,7 @@ public:
         this->response = std::make_shared<ActivationResponse>(response);
     }
 
-    void finished(Reason /* r */, std::string const& /* error_message */) override
+    void finished(CompletionDetails const&) override
     {
         notify();
     }
@@ -119,7 +124,7 @@ TEST(Activation, exceptions)
 {
     CategoryRegistry reg;
     CategoryRenderer rdr;
-    auto cat = reg.register_category("1", "title", "icon", rdr);
+    auto cat = reg.register_category("1", "title", "icon", nullptr, rdr);
     {
         CategorisedResult result(cat);
         result.set_uri("http://ubuntu.com");
@@ -137,13 +142,13 @@ TEST(Activation, direct_activation)
 {
     CategoryRegistry reg;
     CategoryRenderer rdr;
-    auto cat = reg.register_category("1", "title", "icon", rdr);
+    auto cat = reg.register_category("1", "title", "icon", nullptr, rdr);
 
     // activation interception not set
     {
         std::shared_ptr<CategorisedResult> received_result;
         auto df = []() -> void {};
-        auto runtime = internal::RuntimeImpl::create("", "Runtime.ini");
+        auto runtime = internal::RuntimeImpl::create("", TEST_DIR "/Runtime.ini");
         auto receiver = std::make_shared<DummyReceiver>([&received_result](CategorisedResult result)
                 {
                     received_result.reset(new CategorisedResult(result));
@@ -171,12 +176,12 @@ TEST(Activation, direct_activation_agg_scope_doesnt_store)
 {
     CategoryRegistry reg;
     CategoryRenderer rdr;
-    auto cat = reg.register_category("1", "title", "icon", rdr);
+    auto cat = reg.register_category("1", "title", "icon", nullptr, rdr);
 
     {
         std::shared_ptr<CategorisedResult> received_result;
         auto df = []() -> void {};
-        auto runtime = internal::RuntimeImpl::create("", "Runtime.ini");
+        auto runtime = internal::RuntimeImpl::create("", TEST_DIR "/Runtime.ini");
         auto receiver = std::make_shared<DummyReceiver>([&received_result](CategorisedResult result)
                 {
                     received_result.reset(new CategorisedResult(result));
@@ -223,12 +228,12 @@ TEST(Activation, direct_activation_agg_scope_stores)
 {
     CategoryRegistry reg;
     CategoryRenderer rdr;
-    auto cat = reg.register_category("1", "title", "icon", rdr);
+    auto cat = reg.register_category("1", "title", "icon", nullptr, rdr);
 
     {
         std::shared_ptr<CategorisedResult> received_result;
         auto df = []() -> void {};
-        auto runtime = internal::RuntimeImpl::create("", "Runtime.ini");
+        auto runtime = internal::RuntimeImpl::create("", TEST_DIR "/Runtime.ini");
         auto receiver = std::make_shared<DummyReceiver>([&received_result](CategorisedResult result)
                 {
                     received_result.reset(new CategorisedResult(result));
@@ -281,12 +286,12 @@ TEST(Activation, agg_scope_doesnt_store_and_doesnt_intercept)
 {
     CategoryRegistry reg;
     CategoryRenderer rdr;
-    auto cat = reg.register_category("1", "title", "icon", rdr);
+    auto cat = reg.register_category("1", "title", "icon", nullptr, rdr);
 
     {
         std::shared_ptr<CategorisedResult> received_result;
         auto df = []() -> void {};
-        auto runtime = internal::RuntimeImpl::create("", "Runtime.ini");
+        auto runtime = internal::RuntimeImpl::create("", TEST_DIR "/Runtime.ini");
         auto receiver = std::make_shared<DummyReceiver>([&received_result](CategorisedResult result)
                 {
                     received_result.reset(new CategorisedResult(result));
@@ -335,12 +340,12 @@ TEST(Activation, agg_scope_doesnt_store_and_sets_intercept)
 {
     CategoryRegistry reg;
     CategoryRenderer rdr;
-    auto cat = reg.register_category("1", "title", "icon", rdr);
+    auto cat = reg.register_category("1", "title", "icon", nullptr, rdr);
 
     {
         std::shared_ptr<CategorisedResult> received_result;
         auto df = []() -> void {};
-        auto runtime = internal::RuntimeImpl::create("", "Runtime.ini");
+        auto runtime = internal::RuntimeImpl::create("", TEST_DIR "/Runtime.ini");
         auto receiver = std::make_shared<DummyReceiver>([&received_result](CategorisedResult result)
                 {
                     received_result.reset(new CategorisedResult(result));
@@ -390,12 +395,12 @@ TEST(Activation, agg_scope_stores_and_doesnt_intercept)
 {
     CategoryRegistry reg;
     CategoryRenderer rdr;
-    auto cat = reg.register_category("1", "title", "icon", rdr);
+    auto cat = reg.register_category("1", "title", "icon", nullptr, rdr);
 
     {
         std::shared_ptr<CategorisedResult> received_result;
         auto df = []() -> void {};
-        auto runtime = internal::RuntimeImpl::create("", "Runtime.ini");
+        auto runtime = internal::RuntimeImpl::create("", TEST_DIR "/Runtime.ini");
         auto receiver = std::make_shared<DummyReceiver>([&received_result](CategorisedResult result)
                 {
                     received_result.reset(new CategorisedResult(result));
@@ -449,12 +454,12 @@ TEST(Activation, agg_scope_stores_and_intercepts)
 {
     CategoryRegistry reg;
     CategoryRenderer rdr;
-    auto cat = reg.register_category("1", "title", "icon", rdr);
+    auto cat = reg.register_category("1", "title", "icon", nullptr, rdr);
 
     {
         std::shared_ptr<CategorisedResult> received_result;
         auto df = []() -> void {};
-        auto runtime = internal::RuntimeImpl::create("", "Runtime.ini");
+        auto runtime = internal::RuntimeImpl::create("", TEST_DIR "/Runtime.ini");
         auto receiver = std::make_shared<DummyReceiver>([&received_result](CategorisedResult result)
                 {
                     received_result.reset(new CategorisedResult(result));
@@ -504,18 +509,49 @@ TEST(Activation, agg_scope_stores_and_intercepts)
     }
 }
 
-void scope_thread(RuntimeImpl::SPtr const& rt)
+template <typename ScopeType>
+struct RaiiScopeThread
 {
-    TestScope scope;
-    rt->run_scope(&scope);
+    ScopeType scope;
+    Runtime::UPtr runtime;
+    std::thread scope_thread;
+
+    RaiiScopeThread(Runtime::UPtr rt)
+        : runtime(move(rt)),
+          scope_thread([this]{ runtime->run_scope(&scope, ""); })
+    {
+    }
+
+    ~RaiiScopeThread()
+    {
+        runtime->destroy();
+        scope_thread.join();
+    }
+};
+
+std::shared_ptr<core::posix::SignalTrap> trap(core::posix::trap_signals_for_all_subsequent_threads({core::posix::Signal::sig_chld}));
+std::unique_ptr<core::posix::ChildProcess::DeathObserver> death_observer(core::posix::ChildProcess::DeathObserver::create_once_with_signal_trap(trap));
+
+RuntimeImpl::SPtr run_test_registry()
+{
+    RuntimeImpl::SPtr runtime = RuntimeImpl::create("TestRegistry", TEST_DIR "/Runtime.ini");
+    MiddlewareBase::SPtr middleware = runtime->factory()->create("TestRegistry", "Zmq", TEST_DIR "/Zmq.ini");
+    RegistryObject::SPtr reg_obj(std::make_shared<RegistryObject>(*death_observer, std::make_shared<Executor>(), middleware));
+    middleware->add_registry_object("TestRegistry", reg_obj);
+    return runtime;
 }
 
 // does actual activation with a test scope
 TEST(Activation, scope)
 {
+    auto reg_rt = run_test_registry();
+
+    auto scope_rt = Runtime::create_scope_runtime("TestScope", TEST_DIR "/Runtime.ini");
+    RaiiScopeThread<TestScope> scope_thread(move(scope_rt));
+
     // parent: connect to scope and run a query
-    auto rt = internal::RuntimeImpl::create("", "Runtime.ini");
-    auto mw = rt->factory()->create("TestScope", "Zmq", "Zmq.ini");
+    auto rt = internal::RuntimeImpl::create("", TEST_DIR "/Runtime.ini");
+    auto mw = rt->factory()->create("TestScope", "Zmq", TEST_DIR "/Zmq.ini");
     mw->start();
     auto proxy = mw->create_scope_proxy("TestScope");
     auto scope = internal::ScopeImpl::create(proxy, rt.get(), "TestScope");
@@ -526,7 +562,7 @@ TEST(Activation, scope)
     receiver->wait_until_finished();
 
     auto result = receiver->result;
-    EXPECT_TRUE(result != nullptr);
+    ASSERT_TRUE(result != nullptr);
     EXPECT_FALSE(result->direct_activation());
     EXPECT_EQ("uri", result->uri());
     EXPECT_EQ("dnd_uri", result->dnd_uri());
@@ -571,13 +607,21 @@ TEST(Activation, scope)
     }
 }
 
-int main(int argc, char **argv)
+class MyActivation : public ActivationQueryBase
 {
-    ::testing::InitGoogleTest(&argc, argv);
-    RuntimeImpl::SPtr rt = move(RuntimeImpl::create("TestScope", "Runtime.ini"));
-    std::thread scope_t(scope_thread, rt);
-    auto rc = RUN_ALL_TESTS();
-    rt->destroy();
-    scope_t.join();
-    return rc;
+public:
+    MyActivation(Result const& result, ActionMetadata const& metadata)
+        : ActivationQueryBase(result, metadata)
+    {
+    }
+};
+
+// check that parameters to ActivationQueryBase ctor are accessible via getters
+TEST(Activation, activation_query_base)
+{
+    unity::scopes::testing::Result res;
+    ActionMetadata hints("pl", "phone");
+    MyActivation act(res, hints);
+    EXPECT_EQ("", act.result().uri());
+    EXPECT_EQ("pl", act.action_metadata().locale());
 }

@@ -19,6 +19,7 @@
 // You may also include individual headers if you prefer.
 #include <unity-scopes.h>
 
+#include <boost/filesystem.hpp>
 #include <condition_variable>
 #include <cstdlib>
 #include <string.h>
@@ -56,11 +57,11 @@ std::string to_string(FilterBase const& filter)
     return str.str();
 }
 
-std::string to_string(Department const& dep, std::string const& indent = "")
+std::string to_string(Department::SCPtr const& dep, std::string const& indent = "")
 {
     std::ostringstream str;
-    str << indent << "department id=" << dep.id() << ", name=" << dep.label() << endl;
-    auto const subdeps = dep.subdepartments();
+    str << indent << "department id=" << dep->id() << ", name=" << dep->label() << ", has_children=" << dep->has_subdepartments() << endl;
+    auto const subdeps = dep->subdepartments();
     if (!subdeps.empty())
     {
         str << indent << "\tsubdepartments:" << endl;
@@ -117,26 +118,46 @@ std::string to_string(Variant const& var)
     return str.str();
 }
 
+std::string to_string(PreviewWidget const& widget, std::string const& indent = "")
+{
+    std::ostringstream str;
+    str << indent << "widget: id=" << widget.id() << ", type=" << widget.widget_type() << endl
+        << indent << "attributes: " << to_string(Variant(widget.attribute_values())) << endl
+        << indent << "components: {";
+    for (const auto kv: widget.attribute_mappings())
+    {
+        str << "\"" << kv.first << "\": \"" << kv.second << "\", ";
+    }
+    str << "}" << endl;
+    if (widget.widget_type() == "expandable")
+    {
+        str << indent << "\twidgets = {";
+        for (const auto w: widget.widgets())
+        {
+            str << to_string(w, indent + "\t\t");
+        }
+        str << "}" << std::endl;
+    }
+    return str.str();
+}
+
 class Receiver : public SearchListenerBase
 {
 public:
     Receiver(int index_to_save)
-        : index_to_save_(index_to_save),
-          push_result_count_(0)
+        : query_complete_(false),
+          push_result_count_(0),
+          index_to_save_(index_to_save)
     {
     }
 
-    virtual void push(DepartmentList const& departments, std::string const& current_department_id) override
+    virtual void push(Department::SCPtr const& parent) override
     {
         cout << "\treceived departments:" << endl;
-        for (auto const& dep: departments)
-        {
-            cout << to_string(dep);
-        }
-        cout << "\tcurrent department=" << current_department_id << endl;
+        cout << to_string(parent);
     }
 
-    virtual void push(Category::SCPtr category) override
+    virtual void push(Category::SCPtr const& category) override
     {
         cout << "received category: id=" << category->id()
              << " title=" << category->title()
@@ -147,11 +168,14 @@ public:
 
     virtual void push(CategorisedResult result) override
     {
-        cout << "received result: uri=" << result.uri()
-             << " title=" << result.title()
-             << " category id: "
-             << result.category()->id()
-             << endl;
+        VariantMap result_dict(result.serialize());
+        result_dict = result_dict["attrs"].get_dict();
+        cout << "received result: category id=" << result.category()->id() << endl << "{" << endl;
+        for (auto attr_it = result_dict.begin(); attr_it != result_dict.end(); ++attr_it)
+        {
+            cout << "\t\"" << attr_it->first << "\": " << attr_it->second.serialize_json();
+        }
+        cout << "}" << endl;
         ++push_result_count_;
         if (index_to_save_ > 0 && push_result_count_ == index_to_save_)
         {
@@ -159,7 +183,7 @@ public:
         }
     }
 
-    virtual void push(Annotation annotation) override
+    virtual void push(experimental::Annotation annotation) override
     {
         auto links = annotation.links();
         cout << "received annotation of type " << annotation.annotation_type()
@@ -167,7 +191,7 @@ public:
              << endl;
         for (auto link: links)
         {
-            cout << "  " << link->query().to_string() << endl;
+            cout << "  " << link->query().to_uri() << endl;
         }
     }
 
@@ -180,12 +204,12 @@ public:
         }
     }
 
-    virtual void finished(ListenerBase::Reason reason, string const& error_message) override
+    virtual void finished(CompletionDetails const& details) override
     {
-        cout << "query complete, status: " << to_string(reason);
-        if (reason == ListenerBase::Error)
+        cout << "query complete, status: " << to_string(details.status());
+        if (details.status() == CompletionDetails::Error)
         {
-            cout << ": " << error_message;
+            cout << ": " << details.message();
         }
         cout << endl;
         {
@@ -211,41 +235,44 @@ public:
         return push_result_count_;
     }
 
-    Receiver() :
-        query_complete_(false)
-    {
-    }
-
 private:
     bool query_complete_;
+    int push_result_count_ = 0;
     int index_to_save_;
+    std::shared_ptr<Result> saved_result_;
     mutex mutex_;
     condition_variable condvar_;
-    int push_result_count_ = 0;
-    std::shared_ptr<Result> saved_result_;
 };
 
 class ActivationReceiver : public ActivationListenerBase
 {
 public:
+    ActivationReceiver()
+        : query_complete_(false)
+    {
+    }
+
     void activated(ActivationResponse const& response) override
     {
         cout << "\tGot activation response: " << response.status() << endl;
     }
 
-    void finished(Reason r, std::string const& error_message)
+    void finished(CompletionDetails const& details)
     {
-        cout << "\tActivation finished, reason: " << r << ", error_message: " << error_message << endl;
+        cout << "\tActivation finished, status: " << to_string(details.status()) << ", message: " << details.message() << endl;
+        lock_guard<decltype(mutex_)> lock(mutex_);
+        query_complete_ = true;
         condvar_.notify_one();
     }
 
     void wait_until_finished()
     {
         unique_lock<decltype(mutex_)> lock(mutex_);
-        condvar_.wait(lock);
+        condvar_.wait(lock, [this](){ return query_complete_; });
     }
 
 private:
+    bool query_complete_;
     mutex mutex_;
     condition_variable condvar_;
 };
@@ -253,6 +280,11 @@ private:
 class PreviewReceiver : public PreviewListenerBase
 {
 public:
+    PreviewReceiver()
+        : query_complete_(false)
+    {
+    }
+
     void push(ColumnLayoutList const& columns) override
     {
         cout << "\tGot column layouts:" << endl;
@@ -277,14 +309,7 @@ public:
         cout << "\tGot preview widgets:" << endl;
         for (auto it = widgets.begin(); it != widgets.end(); ++it)
         {
-            cout << "\t\twidget: id=" << it->id() << ", type=" << it->widget_type() << endl
-                 << "\t\t attributes: " << to_string(Variant(it->attribute_values())) << endl
-                 << "\t\t components: {";
-            for (const auto kv: it->attribute_mappings())
-            {
-                cout << "\"" << kv.first << "\": \"" << kv.second << "\", ";
-            }
-            cout << "}" << endl;
+            cout << to_string(*it) << endl;
         }
     }
 
@@ -294,30 +319,35 @@ public:
         cout << to_string(value) << endl;
     }
 
-    void finished(Reason r, std::string const& error_message) override
+    void finished(CompletionDetails const& details) override
     {
-        cout << "\tPreview finished, reason: " << r << ", error_message: " << error_message << endl;
+        lock_guard<decltype(mutex_)> lock(mutex_);
+        cout << "\tPreview finished, status: " << to_string(details.status()) << ", message: " << details.message() << endl;
+        query_complete_ = true;
         condvar_.notify_one();
     }
 
     void wait_until_finished()
     {
         unique_lock<decltype(mutex_)> lock(mutex_);
-        condvar_.wait(lock);
+        condvar_.wait(lock, [this](){ return query_complete_; });
     }
 
 private:
+    bool query_complete_;
     mutex mutex_;
     condition_variable condvar_;
 };
 
 void print_usage()
 {
-    cerr << "usage: ./client <scope-name> query [activate n] | [preview n]" << endl;
-    cerr << "   or: ./client list" << endl;
-    cerr << "For example: ./client scope-B iron" << endl;
-    cerr << "         or: ./client scope-B iron activate 1" << endl;
-    cerr << "         or: ./client scope-B iron preview 1" << endl;
+    cerr << "usage: ./scopes-client <scope-id> query [activate n] | [preview n]" << endl;
+    cerr << "   or: ./scopes-client <canned-query> [activate n] | [preview n]" << endl;
+    cerr << "   or: ./scopes-client list" << endl;
+    cerr << "   canned query format is: scope://<scope-id>?q=<query>&dep=<department-id>&filters=<filter-state-json>" << endl;
+    cerr << "For example: ./scopes-client scope-B iron" << endl;
+    cerr << "         or: ./scopes-client scope-B iron activate 1" << endl;
+    cerr << "         or: ./scopes-client \"scope://scope-A?q=iron\" preview 1" << endl;
     exit(1);
 }
 
@@ -333,18 +363,45 @@ int main(int argc, char* argv[])
     int result_index = 0; //the default index of 0 won't activate
     ResultOperation result_op = ResultOperation::None;
     bool do_list = false;
+    string scope_id;
+    string search_string;
+    string department_id;
+    FilterState filter_state;
 
     // poor man's getopt
-    if (argc == 5)
+    int index = 1;
+    if (argc == 2 && strcmp(argv[1], "list") == 0)
     {
-        if (strcmp(argv[3], "activate") == 0)
+        do_list = true;
+    }
+    else if (argc > 1 && strncmp(argv[index], "scope://", 8) == 0)
+    {
+        auto q = CannedQuery::from_uri(argv[index++]);
+        scope_id = q.scope_id();
+        search_string = q.query_string();
+        department_id = q.department_id();
+        filter_state = q.filter_state();
+    }
+    else if (argc > 2)
+    {
+        scope_id = argv[index++];
+        search_string = argv[index++];
+    }
+    else
+    {
+        print_usage();
+    }
+
+    if (argc == index + 2)
+    {
+        if (strcmp(argv[index], "activate") == 0)
         {
-            result_index = atoi(argv[4]);
+            result_index = atoi(argv[++index]);
             result_op = ResultOperation::Activation;
         }
-        else if (strcmp(argv[3], "preview") == 0)
+        else if (strcmp(argv[index], "preview") == 0)
         {
-            result_index = atoi(argv[4]);
+            result_index = atoi(argv[++index]);
             result_op = ResultOperation::Preview;
         }
         else
@@ -352,18 +409,20 @@ int main(int argc, char* argv[])
             print_usage();
         }
     }
-    else if (argc == 2 && strcmp(argv[1], "list") == 0)
-    {
-        do_list = true;
-    }
-    else if (argc != 3)
-    {
-        print_usage();
-    }
 
     try
     {
-        Runtime::UPtr rt = Runtime::create(DEMO_RUNTIME_PATH);
+        Runtime::UPtr rt;
+        // use Runtime.ini from the current directory if present, otherwise let the API pick the default one
+        const boost::filesystem::path path("Runtime.ini");
+        if (boost::filesystem::exists(path))
+        {
+            rt = Runtime::create(path.native());
+        }
+        else
+        {
+            rt = Runtime::create();
+        }
         RegistryProxy r = rt->registry();
 
         if (do_list)
@@ -377,14 +436,12 @@ int main(int argc, char* argv[])
             return 0;
         }
 
-        string scope_id = argv[1];
-        string search_string = argv[2];
-
         auto meta = r->get_metadata(scope_id);
-        cout << "Scope metadata:   " << endl;
-        cout << "\tscope_id:       " << meta.scope_id() << endl;
-        cout << "\tdisplay_name:   " << meta.display_name() << endl;
-        cout << "\tdescription:    " << meta.description() << endl;
+        cout << "Scope metadata:    " << endl;
+        cout << "\tscope_id:        " << meta.scope_id() << endl;
+        cout << "\tdisplay_name:    " << meta.display_name() << endl;
+        cout << "\tdescription:     " << meta.description() << endl;
+        cout << "\tappearance attr: " << to_string(Variant(meta.appearance_attributes())) << endl;
         string tmp;
         try
         {
@@ -422,10 +479,9 @@ int main(int argc, char* argv[])
 
         SearchMetadata metadata("C", "desktop");
         metadata.set_cardinality(10);
-        auto ctrl = meta.proxy()->search(search_string, metadata, reply); // May raise TimeoutException
+        auto ctrl = meta.proxy()->search(search_string, department_id, filter_state, metadata, reply); // May raise TimeoutException
         cout << "client: created query" << endl;
         reply->wait_until_finished();
-        cout << "client: wait returned" << endl;
 
         // handle activation
         if (result_index > 0)
@@ -457,7 +513,7 @@ int main(int argc, char* argv[])
                 shared_ptr<PreviewReceiver> preview_reply(new PreviewReceiver);
                 cout << "client: previewing result item #" << result_index << ", uri:" << result->uri() << endl;
                 auto target_scope = result->target_scope_proxy();
-                cout << "\tactivation scope name: " << target_scope->to_string() << endl;
+                cout << "\tactivation scope ID: " << target_scope->to_string() << endl;
                 target_scope->preview(*result, metadata, preview_reply);
                 preview_reply->wait_until_finished();
             }

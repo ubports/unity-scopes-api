@@ -27,9 +27,54 @@ namespace scopes
 namespace internal
 {
 
+using namespace std;
+
+ActivationQueryBaseImpl::ActivationQueryBaseImpl(Result const& result, ActionMetadata const& metadata, std::string const& widget_id,
+        std::string const& action_id) :
+    QueryBaseImpl(),
+    result_(result),
+    metadata_(metadata),
+    widget_id_(widget_id),
+    action_id_(action_id),
+    valid_(true)
+{
+}
+
 ActivationResponse ActivationQueryBaseImpl::activate()
 {
     return ActivationResponse(ActivationResponse::Status::NotHandled);
+}
+
+void ActivationQueryBaseImpl::cancel()
+{
+    lock_guard<mutex> lock(mutex_);
+    valid_ = false;
+}
+
+bool ActivationQueryBaseImpl::valid() const
+{
+    lock_guard<mutex> lock(mutex_);
+    return valid_;
+}
+
+Result ActivationQueryBaseImpl::result() const
+{
+    return result_;
+}
+
+ActionMetadata ActivationQueryBaseImpl::action_metadata() const
+{
+    return metadata_;
+}
+
+std::string ActivationQueryBaseImpl::widget_id() const
+{
+    return widget_id_;
+}
+
+std::string ActivationQueryBaseImpl::action_id() const
+{
+    return action_id_;
 }
 
 } // namespace internal

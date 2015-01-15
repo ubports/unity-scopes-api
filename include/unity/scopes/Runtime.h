@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_RUNTIME_H
-#define UNITY_SCOPES_RUNTIME_H
+#pragma once
 
 #include <unity/scopes/ObjectProxyFwd.h>
 #include <unity/scopes/RegistryProxyFwd.h>
@@ -78,6 +77,21 @@ public:
     static UPtr create(std::string const& configfile = "");
 
     /**
+    \brief Create a run time for a scope.
+
+           This method is provided for custom scoperunner implementations,
+           for example, for scopes written in Go.
+
+    \param scope_id The unique ID of the scope. If scope_id is empty, a
+    unique ID is used. Calling `create_scope_runtime("", "Runtime.ini")` is
+    equivalent to calling `create("Runtime.ini")`.
+    \param configfile The path to the run time .ini file. If empty,
+    the default configuration is used.
+    \return A `unique_ptr` to the run time instance.
+    */
+    static UPtr create_scope_runtime(std::string const& scope_id, std::string const& configfile = "");
+
+    /**
     \brief Shuts down the run time, reclaiming all associated resources.
 
     Calling destroy() is optional; the destructor implicitly calls destroy() if it was not called explicitly.
@@ -97,11 +111,32 @@ public:
     /**
     \brief Run a scope without going through the scope runner.
 
-    This method is intended to run a scope that can not be loaded via the scope runner, such as those written in languages that can not be dynamically loaded.
+    This method is intended to run a scope that can not be loaded via the scope runner, such as
+    those written in languages that cannot be dynamically loaded.
+
+    \note This method is deprecated. Use
+    `void run_scope(ScopeBase *const scope_base, std::string const& scope_ini_file)` instead.
 
     \param scope_base The scope implementation
+    \param runtime_ini_file This parameter is ignored.
+    \param scope_ini_file The full path of scope configuration file
     */
-    void run_scope(ScopeBase *const scope_base);
+    /// @cond
+    // TODO: next ABI incompatible release, strip out this method.
+    __attribute__ ((deprecated))
+    /// @endcond
+    void run_scope(ScopeBase *const scope_base, std::string const& runtime_ini_file, std::string const& scope_ini_file);
+
+    /**
+    \brief Run a scope without going through the scope runner.
+
+    This method is intended to run a scope that can not be loaded via the scope runner, such as
+    those written in languages that cannot be dynamically loaded.
+
+    \param scope_base The scope implementation
+    \param scope_ini_file The full path of scope configuration file
+    */
+    void run_scope(ScopeBase *const scope_base, std::string const& scope_ini_file);
 
     // TODO: Flesh out documentation for this, especially syntax.
     /**
@@ -149,5 +184,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

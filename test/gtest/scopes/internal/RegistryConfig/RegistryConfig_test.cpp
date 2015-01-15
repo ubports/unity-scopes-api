@@ -20,6 +20,7 @@
 #include <unity/UnityExceptions.h>
 #include <unity/scopes/ScopeExceptions.h>
 
+#include <boost/regex.hpp>  // Use Boost implementation until http://gcc.gnu.org/bugzilla/show_bug.cgi?id=53631 is fixed.
 #include <gtest/gtest.h>
 
 using namespace std;
@@ -29,18 +30,18 @@ using namespace unity::scopes::internal;
 
 TEST(RegistryConfig, basic)
 {
-    RegistryConfig c("Registry", "Registry.ini");
+    RegistryConfig c("Registry", TEST_REGISTRY_PATH);
     EXPECT_EQ("Registry", c.identity());
     EXPECT_EQ("Zmq", c.mw_kind());
-    EXPECT_EQ("ipc:///tmp/socket_for_registry", c.endpoint());
     EXPECT_EQ("Zmq.ini", c.mw_configfile());
+    EXPECT_EQ(3000, c.process_timeout());
 }
 
 TEST(RegistryConfig, RegistryIDEmpty)
 {
     try
     {
-        RegistryConfig c("", "Registry.ini");
+        RegistryConfig c("", TEST_REGISTRY_PATH);
         FAIL();
     }
     catch (InvalidArgumentException const& e)
@@ -50,10 +51,27 @@ TEST(RegistryConfig, RegistryIDEmpty)
     }
 }
 
+TEST(RegistryConfig, HomeNotSet)
+{
+    try
+    {
+        putenv(const_cast<char*>("HOME="));
+        RegistryConfig c("Registry", TEST_REGISTRY_PATH);
+        FAIL();
+    }
+    catch (ConfigException const& e)
+    {
+        boost::regex r( "unity::scopes::ConfigException: .*: No Click.InstallDir "
+                        "configured and \\$HOME not set");
+        EXPECT_TRUE(boost::regex_match(e.what(), r)) << e.what();
+    }
+}
+
 TEST(RegistryConfig, ScoperunnerRelativePath)
 {
     try
     {
+        putenv(const_cast<char*>("HOME=/tmp"));
         RegistryConfig c("Registry", "ScoperunnerRelativePath.ini");
         FAIL();
     }

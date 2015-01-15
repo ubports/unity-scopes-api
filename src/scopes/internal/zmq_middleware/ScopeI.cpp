@@ -60,18 +60,20 @@ interface Scope
     QueryCtrl* preview(ValueDict result, ValueDict hints, Reply* replyProxy);
     QueryCtrl* perform_action(ValueDict result, ValueDict hints, string action_id, Reply* replyProxy);
     QueryCtrl* activate(ValueDict result, ValueDict hints, Reply* replyProxy);
+    bool debug_mode();
 };
 
 */
 
-using namespace std::placeholders;
+using namespace std;
+namespace ph = std::placeholders;
 
 ScopeI::ScopeI(ScopeObjectBase::SPtr const& so) :
-    ServantBase(so, {
-        { "search", bind(&ScopeI::search_, this, _1, _2, _3) },
-        { "preview", bind(&ScopeI::preview_, this, _1, _2, _3) },
-        { "activate", bind(&ScopeI::activate_, this, _1, _2, _3) },
-        { "perform_action", bind(&ScopeI::perform_action_, this, _1, _2, _3) }
+    ServantBase(so, { { "search", bind(&ScopeI::search_, this, ph::_1, ph::_2, ph::_3) },
+                      { "preview", bind(&ScopeI::preview_, this, ph::_1, ph::_2, ph::_3) },
+                      { "activate", bind(&ScopeI::activate_, this, ph::_1, ph::_2, ph::_3) },
+                      { "perform_action", bind(&ScopeI::perform_action_, this, ph::_1, ph::_2, ph::_3) },
+                      { "debug_mode", bind(&ScopeI::debug_mode_, this, ph::_1, ph::_2, ph::_3) }
     })
 {
 }
@@ -81,8 +83,8 @@ ScopeI::~ScopeI()
 }
 
 void ScopeI::search_(Current const& current,
-                           capnp::AnyPointer::Reader& in_params,
-                           capnproto::Response::Builder& r)
+                     capnp::AnyPointer::Reader& in_params,
+                     capnproto::Response::Builder& r)
 {
     auto req = in_params.getAs<capnproto::Scope::CreateQueryRequest>();
     auto query = internal::CannedQueryImpl::create(to_variant_map(req.getQuery()));
@@ -95,16 +97,16 @@ void ScopeI::search_(Current const& current,
     auto delegate = dynamic_pointer_cast<ScopeObjectBase>(del());
     assert(delegate);
     auto ctrl_proxy = dynamic_pointer_cast<ZmqQueryCtrl>(delegate->search(query,
-                                                                                metadata,
-                                                                                reply_proxy,
-                                                                                to_info(current)));
+                                                                          metadata,
+                                                                          reply_proxy,
+                                                                          to_info(current)));
     assert(ctrl_proxy);
     r.setStatus(capnproto::ResponseStatus::SUCCESS);
     auto search_response = r.initPayload().getAs<capnproto::Scope::CreateQueryResponse>();
     auto p = search_response.initReturnValue();
     p.setEndpoint(ctrl_proxy->endpoint().c_str());
     p.setIdentity(ctrl_proxy->identity().c_str());
-    p.setCategory(ctrl_proxy->category().c_str());
+    p.setCategory(ctrl_proxy->target_category().c_str());
 }
 
 void ScopeI::activate_(Current const& current,
@@ -131,12 +133,12 @@ void ScopeI::activate_(Current const& current,
     auto p = search_response.initReturnValue();
     p.setEndpoint(ctrl_proxy->endpoint().c_str());
     p.setIdentity(ctrl_proxy->identity().c_str());
-    p.setCategory(ctrl_proxy->category().c_str());
+    p.setCategory(ctrl_proxy->target_category().c_str());
 }
 
 void ScopeI::perform_action_(Current const& current,
-                           capnp::AnyPointer::Reader& in_params,
-                           capnproto::Response::Builder& r)
+                             capnp::AnyPointer::Reader& in_params,
+                             capnproto::Response::Builder& r)
 {
     auto req = in_params.getAs<capnproto::Scope::ActionActivationRequest>();
     auto result = ResultImpl::create_result(to_variant_map(req.getResult()));
@@ -162,7 +164,7 @@ void ScopeI::perform_action_(Current const& current,
     auto p = search_response.initReturnValue();
     p.setEndpoint(ctrl_proxy->endpoint().c_str());
     p.setIdentity(ctrl_proxy->identity().c_str());
-    p.setCategory(ctrl_proxy->category().c_str());
+    p.setCategory(ctrl_proxy->target_category().c_str());
 }
 
 void ScopeI::preview_(Current const& current,
@@ -189,7 +191,19 @@ void ScopeI::preview_(Current const& current,
     auto p = search_response.initReturnValue();
     p.setEndpoint(ctrl_proxy->endpoint().c_str());
     p.setIdentity(ctrl_proxy->identity().c_str());
-    p.setCategory(ctrl_proxy->category().c_str());
+    p.setCategory(ctrl_proxy->target_category().c_str());
+}
+
+void ScopeI::debug_mode_(Current const&,
+                         capnp::AnyPointer::Reader&,
+                         capnproto::Response::Builder& r)
+{
+    auto delegate = dynamic_pointer_cast<ScopeObjectBase>(del());
+    assert(delegate);
+    auto debug_mode = delegate->debug_mode();
+    r.setStatus(capnproto::ResponseStatus::SUCCESS);
+    auto debug_mode_response = r.initPayload().getAs<capnproto::Scope::DebugModeResponse>();
+    debug_mode_response.setReturnValue(debug_mode);
 }
 
 } // namespace zmq_middleware

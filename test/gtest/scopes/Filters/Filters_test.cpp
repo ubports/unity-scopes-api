@@ -16,15 +16,22 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
+#include <unity/scopes/internal/RegistryObject.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/ScopeImpl.h>
+#include <unity/scopes/internal/FilterBaseImpl.h>
 #include <unity/scopes/FilterOption.h>
+#include <unity/scopes/RadioButtonsFilter.h>
+#include <unity/scopes/RatingFilter.h>
+#include <unity/scopes/SwitchFilter.h>
+#include <unity/scopes/ValueSliderFilter.h>
 #include <unity/scopes/SearchMetadata.h>
 #include <unity/UnityExceptions.h>
 #include <gtest/gtest.h>
 #include <TestScope.h>
 
 using namespace unity::scopes;
+using namespace unity::scopes::experimental;
 using namespace unity::scopes::internal;
 
 class WaitUntilFinished
@@ -33,7 +40,8 @@ public:
     void wait_until_finished()
     {
         std::unique_lock<std::mutex> lock(mutex_);
-        cond_.wait(lock, [this] { return this->query_complete_; });
+        auto ok = cond_.wait_for(lock, std::chrono::seconds(2), [this] { return this->query_complete_; });
+        ASSERT_TRUE(ok) << "query did not complete after 2 seconds";
     }
 
 protected:
@@ -46,7 +54,7 @@ protected:
     }
 
 private:
-    bool query_complete_;
+    bool query_complete_ = false;
     std::mutex mutex_;
     std::condition_variable cond_;
 };
@@ -62,8 +70,9 @@ public:
         this->filter_state = filter_state;
     }
 
-    virtual void finished(ListenerBase::Reason /* reason */, std::string const& /* error_message */) override
+    virtual void finished(CompletionDetails const& details) override
     {
+        ASSERT_EQ(CompletionDetails::OK, details.status()) << details.message();
         notify();
     }
 
@@ -71,17 +80,48 @@ public:
     FilterState filter_state;
 };
 
-void scope_thread(RuntimeImpl::SPtr const& rt)
+template <typename ScopeType>
+struct RaiiScopeThread
 {
-    TestScope scope;
-    rt->run_scope(&scope);
+    ScopeType scope;
+    Runtime::UPtr runtime;
+    std::thread scope_thread;
+
+    RaiiScopeThread(Runtime::UPtr rt)
+        : runtime(move(rt)),
+          scope_thread([this]{ runtime->run_scope(&scope, ""); })
+    {
+    }
+
+    ~RaiiScopeThread()
+    {
+        runtime->destroy();
+        scope_thread.join();
+    }
+};
+
+std::shared_ptr<core::posix::SignalTrap> trap(core::posix::trap_signals_for_all_subsequent_threads({core::posix::Signal::sig_chld}));
+std::unique_ptr<core::posix::ChildProcess::DeathObserver> death_observer(core::posix::ChildProcess::DeathObserver::create_once_with_signal_trap(trap));
+
+RuntimeImpl::SPtr run_test_registry()
+{
+    RuntimeImpl::SPtr runtime = RuntimeImpl::create("TestRegistry", TEST_DIR "/Runtime.ini");
+    MiddlewareBase::SPtr middleware = runtime->factory()->create("TestRegistry", "Zmq", TEST_DIR "/Zmq.ini");
+    RegistryObject::SPtr reg_obj(std::make_shared<RegistryObject>(*death_observer, std::make_shared<Executor>(), middleware));
+    middleware->add_registry_object("TestRegistry", reg_obj);
+    return runtime;
 }
 
 TEST(Filters, scope)
 {
+    auto reg_rt = run_test_registry();
+
+    auto scope_rt = Runtime::create_scope_runtime("TestScope", TEST_DIR "/Runtime.ini");
+    RaiiScopeThread<TestScope> scope_thread(move(scope_rt));
+
     // parent: connect to scope and run a query
-    auto rt = internal::RuntimeImpl::create("", "Runtime.ini");
-    auto mw = rt->factory()->create("TestScope", "Zmq", "Zmq.ini");
+    auto rt = internal::RuntimeImpl::create("", TEST_DIR "/Runtime.ini");
+    auto mw = rt->factory()->create("TestScope", "Zmq", TEST_DIR "/Zmq.ini");
     mw->start();
     auto proxy = mw->create_scope_proxy("TestScope");
     auto scope = internal::ScopeImpl::create(proxy, rt.get(), "TestScope");
@@ -94,7 +134,7 @@ TEST(Filters, scope)
     auto filter_state = receiver->filter_state; // copy filter state, it will be sent with 2nd query
     {
         auto filters = receiver->filters;
-        EXPECT_EQ(1u, filters.size());
+        ASSERT_EQ(1u, filters.size());
         EXPECT_EQ("f1", filters.front()->id());
         auto filter_type = filters.front()->filter_type();
         EXPECT_EQ("option_selector", filter_type);
@@ -114,19 +154,101 @@ TEST(Filters, scope)
         auto filters = receiver->filters;
         auto filter_state2 = receiver->filter_state;
         auto selector = std::dynamic_pointer_cast<const OptionSelectorFilter>(filters.front());
-        EXPECT_EQ(1u, selector->active_options(filter_state2).size());
+        ASSERT_EQ(1u, selector->active_options(filter_state2).size());
         auto option1 = *(selector->active_options(filter_state2).begin());
         EXPECT_EQ("o1", option1->id());
     }
 }
 
-int main(int argc, char **argv)
+TEST(Filters, deserialize)
 {
-    ::testing::InitGoogleTest(&argc, argv);
-    RuntimeImpl::SPtr rt = move(RuntimeImpl::create("TestScope", "Runtime.ini"));
-    std::thread scope_t(scope_thread, rt);
-    auto rc = RUN_ALL_TESTS();
-    rt->destroy();
-    scope_t.join();
-    return rc;
+    // check that FilterBaseImpl::deserialize() creates valid instances of all filter types
+    {
+        OptionSelectorFilter::SPtr filter1 = OptionSelectorFilter::create("f1", "Options", false);
+        auto option1 = filter1->add_option("1", "Option 1");
+        auto var = filter1->serialize();
+
+        auto f = internal::FilterBaseImpl::deserialize(var);
+        EXPECT_TRUE(std::dynamic_pointer_cast<OptionSelectorFilter const>(f) != nullptr);
+        EXPECT_EQ("option_selector", f->filter_type());
+
+        const Filters filters {filter1};
+        EXPECT_NO_THROW(internal::FilterBaseImpl::validate_filters(filters));
+    }
+
+    {
+        RadioButtonsFilter::SPtr filter1 = RadioButtonsFilter::create("f1", "Options");
+        auto option1 = filter1->add_option("1", "Option 1");
+        auto var = filter1->serialize();
+
+        auto f = internal::FilterBaseImpl::deserialize(var);
+        EXPECT_TRUE(std::dynamic_pointer_cast<RadioButtonsFilter const>(f) != nullptr);
+        EXPECT_EQ("radio_buttons", f->filter_type());
+
+        const Filters filters {filter1};
+        EXPECT_NO_THROW(internal::FilterBaseImpl::validate_filters(filters));
+    }
+
+    {
+        RatingFilter::SPtr filter1 = RatingFilter::create("f1", "Options", 5);
+        auto var = filter1->serialize();
+
+        auto f = internal::FilterBaseImpl::deserialize(var);
+        EXPECT_TRUE(std::dynamic_pointer_cast<RatingFilter const>(f) != nullptr);
+        EXPECT_EQ("rating", f->filter_type());
+
+        const Filters filters {filter1};
+        EXPECT_NO_THROW(internal::FilterBaseImpl::validate_filters(filters));
+    }
+
+    {
+        SwitchFilter::SPtr filter1 = SwitchFilter::create("f1", "Latest");
+        auto var = filter1->serialize();
+
+        auto f = internal::FilterBaseImpl::deserialize(var);
+        EXPECT_TRUE(std::dynamic_pointer_cast<SwitchFilter const>(f) != nullptr);
+        EXPECT_EQ("switch", f->filter_type());
+
+        const Filters filters {filter1};
+        EXPECT_NO_THROW(internal::FilterBaseImpl::validate_filters(filters));
+    }
+
+    {
+        ValueSliderFilter::SPtr filter1 = ValueSliderFilter::create("f1", "Max size", "Less than %f", 0.0f, 100.0f);
+        auto var = filter1->serialize();
+
+        auto f = internal::FilterBaseImpl::deserialize(var);
+        EXPECT_TRUE(std::dynamic_pointer_cast<ValueSliderFilter const>(f) != nullptr);
+        EXPECT_EQ("value_slider", f->filter_type());
+
+        const Filters filters {filter1};
+        EXPECT_NO_THROW(internal::FilterBaseImpl::validate_filters(filters));
+    }
+
+    {
+        // invalid data (no filter_type)
+        VariantMap var;
+        EXPECT_THROW(internal::FilterBaseImpl::deserialize(var), unity::LogicException);
+    }
+}
+
+TEST(Filters, validate)
+{
+    {
+        FilterBase::SPtr filter1 = OptionSelectorFilter::create("f1", "Options", false);
+        const Filters filters {filter1};
+        EXPECT_THROW(internal::FilterBaseImpl::validate_filters(filters), unity::LogicException);
+    }
+
+    {
+        FilterBase::SPtr filter1 = RadioButtonsFilter::create("f1", "Options");
+        const Filters filters {filter1};
+        EXPECT_THROW(internal::FilterBaseImpl::validate_filters(filters), unity::LogicException);
+    }
+
+    {
+        FilterBase::SPtr filter1 = RatingFilter::create("f1", "Options");
+        const Filters filters {filter1};
+        EXPECT_THROW(internal::FilterBaseImpl::validate_filters(filters), unity::LogicException);
+    }
 }

@@ -16,8 +16,7 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_CATEGORYREGISTRY_H
-#define UNITY_SCOPES_INTERNAL_CATEGORYREGISTRY_H
+#pragma once
 
 #include <unity/scopes/Category.h>
 #include <unity/scopes/Variant.h>
@@ -56,7 +55,7 @@ public:
     \brief Creates category from supplied parameters. Throws if category with same id exists.
     \return category instance
     */
-    Category::SCPtr register_category(std::string const& id, std::string const& title, std::string const& icon, CategoryRenderer const& renderer_template);
+    Category::SCPtr register_category(std::string const& id, std::string const& title, std::string const& icon, CannedQuery::SCPtr const& query, CategoryRenderer const& renderer_template);
 
     /**
     \brief Finds category instance with give id.
@@ -80,5 +79,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

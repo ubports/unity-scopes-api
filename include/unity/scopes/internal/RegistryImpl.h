@@ -16,8 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#ifndef UNITY_SCOPES_INTERNAL_REGISTRYIMPL_H
-#define UNITY_SCOPES_INTERNAL_REGISTRYIMPL_H
+#pragma once
 
 #include <unity/scopes/internal/MWRegistryProxyFwd.h>
 #include <unity/scopes/internal/ObjectImpl.h>
@@ -43,12 +42,16 @@ public:
     virtual ScopeMetadata get_metadata(std::string const& scope_id) override;
     virtual MetadataMap list() override;
     virtual MetadataMap list_if(std::function<bool(ScopeMetadata const& item)> predicate) override;
+    virtual bool is_scope_running(std::string const& scope_id) override;
+
+    virtual core::ScopedConnection set_scope_state_callback(std::string const& scope_id, std::function<void(bool)> callback) override;
+    virtual core::ScopedConnection set_list_update_callback(std::function<void()> callback) override;
 
     // Remote operation. Not part of public API, hence not override.
-    ScopeProxy locate(std::string const& scope_id);
+    ObjectProxy locate(std::string const& identity);
 
 private:
-    MWRegistryProxy fwd() const;
+    MWRegistryProxy fwd();
 };
 
 } // namespace internal
@@ -56,5 +59,3 @@ private:
 } // namespace scopes
 
 } // namespace unity
-
-#endif

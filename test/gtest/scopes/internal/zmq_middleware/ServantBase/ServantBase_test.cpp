@@ -23,7 +23,6 @@
 #include <unity/UnityExceptions.h>
 
 #include <gtest/gtest.h>
-#include <scope-api-testconfig.h>
 
 #include <cassert>
 
@@ -33,13 +32,15 @@ using namespace unity::scopes;
 using namespace unity::scopes::internal;
 using namespace unity::scopes::internal::zmq_middleware;
 
+string const zmq_ini = TEST_DIR "/Zmq.ini";
+
 // Test servant that throws the exception passed to the constructor from the op() method.
 
 class MyDelegate : public AbstractObject
 {
 };
 
-using namespace std::placeholders;
+namespace ph = std::placeholders;
 
 class MyServant : public ServantBase
 {
@@ -47,7 +48,7 @@ public:
     enum ThrowType { NoException, UnityException, StdException, OtherException };
 
     MyServant(ThrowType t) :
-        ServantBase(make_shared<MyDelegate>(), { { "op", bind(&MyServant::op, this, _1, _2, _3) } }),
+        ServantBase(make_shared<MyDelegate>(), { { "op", bind(&MyServant::op, this, ph::_1, ph::_2, ph::_3) } }),
         t_(t)
     {
     }
@@ -93,8 +94,7 @@ private:
 
 TEST(ServantBase, success)
 {
-    ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ServantBase/Zmq.ini",
-                     (RuntimeImpl*)0x1);
+    ZmqMiddleware mw("testscope", nullptr, zmq_ini);
     ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Twoway, 1);
     Current current;
     current.op_name = "op";
@@ -110,8 +110,7 @@ TEST(ServantBase, success)
 
 TEST(ServantBase, ping)
 {
-    ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ServantBase/Zmq.ini",
-                     (RuntimeImpl*)0x1);
+    ZmqMiddleware mw("testscope", nullptr, zmq_ini);
     ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Twoway, 1);
     Current current;
     current.op_name = "ping";
@@ -127,8 +126,7 @@ TEST(ServantBase, ping)
 
 TEST(ServantBase, exceptions)
 {
-    ZmqMiddleware mw("testscope", TEST_BUILD_ROOT "/gtest/scopes/internal/zmq_middleware/ServantBase/Zmq.ini",
-                     (RuntimeImpl*)0x1);
+    ZmqMiddleware mw("testscope", nullptr, zmq_ini);
     ObjectAdapter a(mw, "testscope", "ipc://testscope", RequestMode::Twoway, 1);
     Current current;
     current.op_name = "op";
