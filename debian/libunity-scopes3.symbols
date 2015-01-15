@@ -1,4 +1,4 @@
-libunity-scopes.so.3 libunity-scopes4 #MINVER#
+libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"typeinfo for unity::scopes::AbstractScopeBase@Base" 0.6.0+14.10.20140804.1
  (c++)"typeinfo for unity::scopes::ActionMetadata@Base" 0.6.0+14.10.20140804.1
  (c++)"typeinfo for unity::scopes::ActivationListenerBase@Base" 0.4.0+14.04.20140312.1
