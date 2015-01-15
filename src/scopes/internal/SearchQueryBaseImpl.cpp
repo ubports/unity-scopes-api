@@ -60,80 +60,43 @@ SearchMetadata SearchQueryBaseImpl::search_metadata() const
 }
 
 QueryCtrlProxy SearchQueryBaseImpl::subsearch(ScopeProxy const& scope,
-                                              string const& query_string,
-                                              SearchListenerBase::SPtr const& reply)
-{
-    function<QueryCtrlProxy()> search;
-    auto scope_impl = dynamic_pointer_cast<ScopeImpl>(scope);
-    if (scope_impl)
-    {
-        search = [&]{ return scope_impl->search(query_string, "", FilterState(), search_metadata_, history_, reply); };
-    }
-    else
-    {
-        // scope_impl can be nullptr if we use a mock scope: TypedScopeFixture<testing::Scope>
-        // If so, we call the normal search without passing the history through, because
-        // we don't need loop detection for mock scopes.
-        search = [&]{ return scope->search(query_string, "", FilterState(), search_metadata_, reply); };
-    }
-    return do_subsearch(scope, reply, search);
-}
-
-QueryCtrlProxy SearchQueryBaseImpl::subsearch(ScopeProxy const& scope,
-                                              std::string const& query_string,
-                                              FilterState const& filter_state,
-                                              SearchListenerBase::SPtr const& reply)
-{
-    function<QueryCtrlProxy()> search;
-    auto scope_impl = dynamic_pointer_cast<ScopeImpl>(scope);
-    if (scope_impl)
-    {
-        search = [&]{ return scope_impl->search(query_string, "", filter_state, search_metadata_, history_, reply); };
-    }
-    else
-    {
-        search = [&]{ return scope->search(query_string, "", filter_state, search_metadata_, reply); };
-    }
-    return do_subsearch(scope, reply, search);
-}
-
-QueryCtrlProxy SearchQueryBaseImpl::subsearch(ScopeProxy const& scope,
-                                   std::string const& query_string,
-                                   std::string const& department_id,
-                                   FilterState const& filter_state,
-                                   SearchListenerBase::SPtr const& reply)
-{
-    function<QueryCtrlProxy()> search;
-    auto scope_impl = dynamic_pointer_cast<ScopeImpl>(scope);
-    if (scope_impl)
-    {
-        search = [&]{ return scope_impl->search(query_string, department_id, filter_state, search_metadata_, history_, reply); };
-    }
-    else
-    {
-        search = [&]{ return scope->search(query_string, department_id, filter_state, search_metadata_, reply); };
-    }
-    return do_subsearch(scope, reply, search);
-}
-
-QueryCtrlProxy SearchQueryBaseImpl::subsearch(ScopeProxy const& scope,
                                               std::string const& query_string,
                                               std::string const& department_id,
                                               FilterState const& filter_state,
                                               SearchMetadata const& metadata,
                                               SearchListenerBase::SPtr const& reply)
 {
-    function<QueryCtrlProxy()> search;
+    if (!scope)
+    {
+        throw InvalidArgumentException("QueryBase::subsearch(): scope cannot be nullptr");
+    }
+    if (!reply)
+    {
+        throw InvalidArgumentException("QueryBase::subsearch(): reply cannot be nullptr");
+    }
+
+    auto query_ctrl = check_for_query_loop(scope, reply);
+    if (query_ctrl)
+    {
+        return query_ctrl;  // Loop was detected, return dummy QueryCtrlProxy.
+    }
+
+    // scope_impl can be nullptr if we use a mock scope: TypedScopeFixture<testing::Scope>
+    // If so, we call the normal search without passing the history through because
+    // we don't need loop detection for mock scopes.
     auto scope_impl = dynamic_pointer_cast<ScopeImpl>(scope);
     if (scope_impl)
     {
-        search = [&]{ return scope_impl->search(query_string, department_id, filter_state, metadata, history_, reply); };
+        query_ctrl = scope_impl->search(query_string, department_id, filter_state, metadata, history_, reply);
     }
     else
     {
-        search = [&]{ return scope->search(query_string, department_id, filter_state, metadata, reply); };
+        query_ctrl = scope->search(query_string, department_id, filter_state, metadata, reply);
     }
-    return do_subsearch(scope, reply, search);
+
+    lock_guard<mutex> lock(mutex_);
+    subqueries_.push_back(query_ctrl);  // Remember subsearch in case we get a cancel() later that we need to forward.
+    return query_ctrl;
 }
 
 void SearchQueryBaseImpl::cancel()
@@ -185,18 +148,6 @@ bool SearchQueryBaseImpl::valid() const
     return valid_;
 }
 
-void SearchQueryBaseImpl::check_subsearch_params(ScopeProxy const& scope, SearchListenerBase::SPtr const& reply)
-{
-    if (!scope)
-    {
-        throw InvalidArgumentException("QueryBase::subsearch(): scope cannot be nullptr");
-    }
-    if (!reply)
-    {
-        throw InvalidArgumentException("QueryBase::subsearch(): reply cannot be nullptr");
-    }
-}
-
 // Check if this query has been through this aggregator before by checking the
 // history. The history is a list of <client, aggregator, receiver> scope ID tuples.
 // If a query loops around to this aggregator, and has been sent to the same child
@@ -217,7 +168,7 @@ QueryCtrlProxy SearchQueryBaseImpl::check_for_query_loop(ScopeProxy const& scope
 {
     shared_ptr<QueryCtrlImpl> ctrl_proxy;
 
-    assert(!mutex_.try_lock());
+    lock_guard<mutex> lock(mutex_);
 
     HistoryData tuple = make_tuple(client_id_, canned_query_.scope_id(), scope->identity());
     auto it = find(history_.begin(), history_.end(), tuple);
@@ -240,34 +191,6 @@ QueryCtrlProxy SearchQueryBaseImpl::check_for_query_loop(ScopeProxy const& scope
     }
 
     return ctrl_proxy;  // null proxy if there was no loop
-}
-
-// Add the query ctrl for a subsearch to the list of subqueries so, if a cancel()
-// arrives, we can forward the cancel to all the subsearches.
-
-void SearchQueryBaseImpl::remember_subsearch(QueryCtrlProxy const& qcp)
-{
-    assert(!mutex_.try_lock());
-
-    subqueries_.push_back(qcp);
-}
-
-QueryCtrlProxy SearchQueryBaseImpl::do_subsearch(ScopeProxy const& scope,
-                                                 SearchListenerBase::SPtr const& reply,
-                                                 function<QueryCtrlProxy()> search_func)
-{
-    check_subsearch_params(scope, reply);
-
-    lock_guard<mutex> lock(mutex_);
-
-    auto query_ctrl = check_for_query_loop(scope, reply);
-    if (query_ctrl)
-    {
-        return query_ctrl;            // Loop was detected, return dummy QueryCtrlProxy.
-    }
-    query_ctrl = search_func();       // Run the real search on the child scope.
-    remember_subsearch(query_ctrl);
-    return query_ctrl;
 }
 
 } // namespace internal

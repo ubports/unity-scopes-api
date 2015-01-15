@@ -54,18 +54,6 @@ public:
 
     QueryCtrlProxy subsearch(ScopeProxy const& scope,
                                    std::string const& query_string,
-                                   SearchListenerBase::SPtr const& reply);
-    QueryCtrlProxy subsearch(ScopeProxy const& scope,
-                                   std::string const& query_string,
-                                   FilterState const& filter_state,
-                                   SearchListenerBase::SPtr const& reply);
-    QueryCtrlProxy subsearch(ScopeProxy const& scope,
-                                   std::string const& query_string,
-                                   std::string const& department_id,
-                                   FilterState const& filter_state,
-                                   SearchListenerBase::SPtr const& reply);
-    QueryCtrlProxy subsearch(ScopeProxy const& scope,
-                                   std::string const& query_string,
                                    std::string const& department_id,
                                    FilterState const& filter_state,
                                    SearchMetadata const& metadata,
@@ -85,12 +73,7 @@ private:
     History history_;
     std::vector<QueryCtrlProxy> subqueries_;
 
-    void check_subsearch_params(ScopeProxy const& scope, SearchListenerBase::SPtr const& reply);
     QueryCtrlProxy check_for_query_loop(ScopeProxy const& scope, SearchListenerBase::SPtr const& reply);
-    void remember_subsearch(QueryCtrlProxy const& qcp);
-    QueryCtrlProxy do_subsearch(ScopeProxy const& scope,
-                                SearchListenerBase::SPtr const& reply,
-                                std::function<QueryCtrlProxy()> search_func);
 };
 
 } // namespace internal
