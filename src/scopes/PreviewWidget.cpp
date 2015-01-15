@@ -372,7 +372,7 @@ The table widget is used to show a table with labels and values
 
 List of attributes:
 \arg \c title A string specifying the title to be shown on top
-\arg \c values An array with as many entries as rows desired. Each entry is an array of two strings: label and value
+\arg \c values An array with one element per row. Each element is an array of two strings: label and value
 
 \code
     PreviewWidget table("details", "table");
