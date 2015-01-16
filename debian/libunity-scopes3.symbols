@@ -422,11 +422,12 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::internal::RuntimeImpl::confined() const@Base" 0.6.8+15.04.20141119
  (c++)"unity::scopes::internal::RuntimeImpl::confinement_type() const@Base" 0.6.8+15.04.20141119
  (c++)"unity::scopes::internal::RuntimeImpl::create(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::internal::RuntimeImpl::demangled_id() const@Base" 0.6.8+15.04.20141119
+ (c++)"unity::scopes::internal::RuntimeImpl::demangled_id(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0replaceme
  (c++)"unity::scopes::internal::RuntimeImpl::destroy()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RuntimeImpl::factory() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RuntimeImpl::find_app_dir() const@Base" 0.6.9+15.04.20141129
  (c++)"unity::scopes::internal::RuntimeImpl::find_cache_dir() const@Base" 0.6.8+15.04.20141119
+ (c++)"unity::scopes::internal::RuntimeImpl::find_log_dir(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0replaceme
  (c++)"unity::scopes::internal::RuntimeImpl::find_tmp_dir() const@Base" 0.6.8+15.04.20141119
  (c++)"unity::scopes::internal::RuntimeImpl::future_queue() const@Base" 0.4.3+14.10.20140428
  (c++)"unity::scopes::internal::RuntimeImpl::logger() const@Base" 0.6.10+15.04.20141210.2
