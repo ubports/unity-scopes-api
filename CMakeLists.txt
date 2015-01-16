@@ -72,6 +72,26 @@ pkg_check_modules(LIBSIGNON REQUIRED libsignon-glib)
 pkg_check_modules(ZMQLIB libzmq REQUIRED)
 pkg_check_modules(NET_CPP net-cpp REQUIRED)
 
+find_library(ZMQPPLIB zmqpp)
+if(NOT ZMQPPLIB)
+  message(FATAL_ERROR "Zmqpp lib not found.")
+endif()
+
+find_library(CAPNPLIB capnp)
+if(NOT CAPNPLIB)
+  message(FATAL_ERROR "Cap'n Proto lib not found.")
+endif()
+
+find_library(KJLIB kj)
+if(NOT KJLIB)
+  message(FATAL_ERROR "Kj lib not found.")
+endif()
+
+find_library(DLLIB dl)
+if(NOT DLLIB)
+  message(FATAL_ERROR "Dl lib not found.")
+endif()
+
 find_program(LTTNG_EXECUTABLE lttng)
 if (NOT LTTNG_EXECUTABLE)
     message(SEND_ERROR "Cannot find LTTng executable: ensure that lttng-tools is installed")
@@ -215,34 +235,6 @@ set(UNITY_SCOPES_SOVERSION 3)
 
 # Version for testing, with all symbols visible
 set(UNITY_SCOPES_TEST_LIB ${UNITY_SCOPES_LIB}-test)
-
-find_library(ZMQPPLIB zmqpp)
-if(NOT ZMQPPLIB)
-  message(FATAL_ERROR "Zmqpp lib not found.")
-endif()
-
-find_library(CAPNPLIB capnp)
-if(NOT CAPNPLIB)
-  message(FATAL_ERROR "Cap'n Proto lib not found.")
-endif()
-
-find_library(KJLIB kj)
-if(NOT KJLIB)
-  message(FATAL_ERROR "Kj lib not found.")
-endif()
-
-find_library(DLLIB dl)
-if(NOT DLLIB)
-  message(FATAL_ERROR "Dl lib not found.")
-endif()
-
-
-# Stop complaints during the generation phase about executables depending
-# on Qt5::Core and Qt5::Network. They are bogus because only
-# only smartscopes uses these.
-if(POLICY CMP0028)
-    cmake_policy(SET CMP0028 OLD)
-endif()
 
 # All the libraries we need to link a normal executable that uses Unity scopes
 set(LIBS ${UNITY_SCOPES_LIB})

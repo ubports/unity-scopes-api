@@ -63,52 +63,6 @@
     obj:/lib/x86_64-linux-gnu/ld-2.18.so
 }
 
-# False positives for memory leaks in Qt
-
-{
-   QNetworkConfigurationManager
-   Memcheck:Leak
-   fun:*alloc
-   ...
-   fun:_ZN35QNetworkConfigurationManagerPrivate20updateConfigurationsEv
-   fun:_ZN35QNetworkConfigurationManagerPrivate10initializeEv
-}
-
-{
-   QCoreApplication
-   Memcheck:Leak
-   fun:realloc
-   ...
-   fun:_ZN7QObject5eventEP6QEvent
-   fun:_ZN16QCoreApplication6notifyEP7QObjectP6QEvent
-}
-
-{
-   QNetworkAccessManager
-   Memcheck:Leak
-   ...
-   fun:_ZN21QNetworkAccessManager13createRequestENS_9OperationERK15QNetworkRequestP9QIODevice
-   fun:_ZN21QNetworkAccessManager3getERK15QNetworkRequest
-}
-
-{
-   QNetworkConfigurationManager
-   Memcheck:Leak
-   match-leak-kinds: possible
-   ...
-   fun:_ZN7QThread5startENS_8PriorityE
-   fun:_ZN35QNetworkConfigurationManagerPrivate10initializeEv
-   fun:_Z35qNetworkConfigurationManagerPrivatev
-}
-
-{
-   QFactoryLoader
-   Memcheck:Leak
-   fun:*alloc
-   ...
-   fun:_ZNK14QFactoryLoader8instanceEi
-}
-
 # Bogus "invalid read" reports for ::putenv and ::genenv
 
 {
