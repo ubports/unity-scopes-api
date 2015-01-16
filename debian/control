@@ -1,34 +1,39 @@
 Source: unity-scopes-api
 Priority: optional
 Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
-Build-Depends: g++-4.9,
-               debhelper (>= 9),
+Build-Depends: capnproto,
                click-dev (>= 0.2.2),
                cmake,
+               dbus-test-runner,
+               debhelper (>= 9),
                doxygen,
+# We rely on C++11 features, and to prevent from ABI breaks
+# in libstdc++ causing us issues, we explicitly select a G++
+# version. To allow cross-compiling to work, we also must
+# append :native to g++-4.9 so we don't try to run armhf g++
+# on an x86 CPU for example, when cross-compiling.
+               g++-4.9:native,
                google-mock,
                graphviz,
-               pkg-config,
-               python3:any,
-               capnproto,
+               libaccounts-glib-dev,
                libapparmor-dev,
-               libprocess-cpp-dev (>= 1.0.1),
-               libunity-api-dev (>= 7.80.7~),
                libboost-filesystem-dev,
+               libboost-log-dev,
                libboost-regex-dev,
                libboost-serialization-dev,
-               libboost-log-dev,
                libcapnp-dev (>= 0.4.0),
+               libdbustest1-dev,
+               libjsoncpp-dev,
+               liblttng-ust-dev,
+               libprocess-cpp-dev (>= 1.0.1),
+               libsignon-glib-dev,
+               libunity-api-dev (>= 7.80.7~),
                libzmq3-dev,
                libzmqpp-dev,
-               liblttng-ust-dev,
                lttng-tools,
+               pkg-config,
+               python3:any,
                qtbase5-dev,
-               libjsoncpp-dev,
-               libaccounts-glib-dev,
-               libsignon-glib-dev,
-               dbus-test-runner,
-               libdbustest1-dev,
                valgrind,
 Standards-Version: 3.9.5
 XS-Testsuite: autopkgtest
@@ -45,7 +50,7 @@ Architecture: any
 Multi-Arch: same
 Pre-Depends: ${misc:Pre-Depends},
 Depends: ${misc:Depends},
-         ${shlibs:Depends}
+         ${shlibs:Depends},
 Replaces: libunity-scopes0,
           libunity-scopes1,
           libunity-scopes2,
@@ -60,9 +65,9 @@ Section: libdevel
 Architecture: any
 Multi-Arch: same
 Pre-Depends: ${misc:Pre-Depends},
-Depends: libunity-scopes3 (= ${binary:Version}),
-         libproperties-cpp-dev,
+Depends: libproperties-cpp-dev,
          libunity-api-dev,
+         libunity-scopes3 (= ${binary:Version}),
          ${misc:Depends},
 Description: Header files for Unity scopes API
  Library to integrate scopes with the Unity shell (dev files)
@@ -73,8 +78,8 @@ Architecture: any
 Multi-Arch: foreign
 Pre-Depends: ${misc:Pre-Depends},
 Depends: libunity-scopes3 (= ${binary:Version}),
-         ${shlibs:Depends},
          ${misc:Depends},
+         ${shlibs:Depends},
 Description: Client utility for Unity scopes API
  Commandline client utility for querying Unity scopes, useful for testing.
 
