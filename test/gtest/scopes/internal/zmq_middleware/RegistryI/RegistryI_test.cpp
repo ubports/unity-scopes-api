@@ -33,9 +33,11 @@
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
+#include <boost/algorithm/string.hpp>
 #include <boost/range/adaptor/filtered.hpp>
 #include <boost/range/algorithm/copy.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/filesystem/path.hpp>
 
 #include <gtest/gtest.h>
 
@@ -50,6 +52,8 @@ using namespace unity;
 using namespace unity::scopes;
 using namespace unity::scopes::internal;
 using namespace unity::scopes::internal::zmq_middleware;
+
+namespace fs = boost::filesystem;
 
 string const runtime_ini = TEST_DIR "/Runtime.ini";
 
@@ -451,6 +455,42 @@ public:
         return count_child_procs() - start_process_count;
     }
 
+    string convert_custom_exec(fs::path const& scope_dir, string const& custom_exec)
+    {
+        string result;
+
+        vector<string> split;
+        boost::split(split, custom_exec, boost::is_space());
+        fs::path program(split.front());
+        if (program.is_relative())
+        {
+            // First look inside the arch-specific directory
+            if (fs::exists(scope_dir / DEB_HOST_MULTIARCH / program))
+            {
+                // Join the full command, not just the program path
+                result = (scope_dir / DEB_HOST_MULTIARCH / custom_exec).native();
+            }
+            // Next try in the non arch-aware directory
+            else if (fs::exists(scope_dir / program))
+            {
+                // Join the full command, not just the program path
+                result = (scope_dir / custom_exec).native();
+            }
+            else
+            {
+                throw unity::InvalidArgumentException(
+                        "Nonexistent scope runner '" + custom_exec
+                                + "' executable for scope");
+            }
+        }
+        else
+        {
+            result = custom_exec;
+        }
+
+        return result;
+    }
+
     ScopeProxy start_testscopeB()
     {
         std::string test_scope_id = "testscopeB";
@@ -469,7 +509,7 @@ public:
 
         RegistryObject::ScopeExecData exec_data;
         exec_data.scope_id = test_scope_id;
-        exec_data.custom_exec = sc.scope_runner();
+        exec_data.custom_exec = convert_custom_exec(REGISTRY_TEST_DIR "/scopes/testscopeB", sc.scope_runner());
         exec_data.runtime_config = runtime_ini;
         exec_data.scope_config = test_scope_config;
         exec_data.timeout_ms = process_timeout;

@@ -102,7 +102,7 @@ You must also update the manifest file 'architecture' property to enumerate the 
     "architecture": ["armhf", "amd64"]
 \endcode 
 
-\subsubsection multiarch Multi-arch scope runner
+\subsubsection multiarch-scoperunner Multi-arch scope runner
 Similarly to the shared libraries, when a relative path is provided the search path for custom scope runners is as follows:
 
 <ul>

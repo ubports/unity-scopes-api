@@ -1,9 +1,39 @@
-unity-scopes-api (0.6.10-0ubuntu1) UNRELEASED; urgency=medium
+unity-scopes-api (0.6.10+15.04.20141212-0ubuntu1) vivid; urgency=low
 
+  [ Pawel Stolowski ]
+  * Use get() on future of the http request to get exceptions reported
+    when error occur (std::future::wait() doesn't throw). (LP: #1401560)
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Fri, 12 Dec 2014 11:48:25 +0000
+
+unity-scopes-api (0.6.10+15.04.20141211-0ubuntu1) vivid; urgency=low
+
+  [ Pawel Stolowski ]
+  * Use 'partner' in UserAgent instead of partner_id for consistency
+    with shell plugin
+
+  [ Michi Henning ]
+  * Replace old references to Ice with zmq.
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Thu, 11 Dec 2014 11:37:01 +0000
+
+unity-scopes-api (0.6.10+15.04.20141210.2-0ubuntu1) vivid; urgency=medium
+
+  [ Marcus Tomlinson ]
   * Renamed "Tags" scope .ini option to "Keywords".
   * Added support for IsAggregator scope .ini option.
 
- -- Marcus Tomlinson <marcus.tomlinson@canonical.com>  Wed, 03 Dec 2014 09:47:07 +0200
+  [ Pawel Stolowski ]
+  * Pass partner-id via UserAgent with remote-scopes call (LP: #1389273).
+  * Implemented BufferedResultForwarder API.
+  * Allow multi-arch click packages for scopes (LP: #1398998).
+  * Use SIGNON_POLICY_NO_USER_INTERACTION by default unless UNITY_SCOPES_OA_UI_POLICY
+    is set (LP: #1380914).
+
+  [ Ubuntu daily release ]
+  * debian/libunity-scopes3.symbols: auto-update to released version
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Wed, 10 Dec 2014 12:59:48 +0000
 
 unity-scopes-api (0.6.9+15.04.20141129-0ubuntu1) vivid; urgency=medium
 
