@@ -474,10 +474,10 @@ SearchHandle::UPtr SmartScopesClient::search(SearchReplyHandler const& handler,
         headers.push_back(std::make_pair("User-Agent", user_agent_hdr));
     }
 
-    std::mutex reponse_mutex;
-    query_results_[search_id] = http_client_->get(search_uri.str(), [this, handler, &reponse_mutex](std::string const& line_data)
+    auto reponse_mutex = std::make_shared<std::mutex>();
+    query_results_[search_id] = http_client_->get(search_uri.str(), [this, handler, reponse_mutex](std::string const& line_data)
     {
-        std::lock_guard<std::mutex> lock(reponse_mutex);
+        std::lock_guard<std::mutex> lock(*reponse_mutex);
         try
         {
             parse_line(line_data, handler);
@@ -542,10 +542,10 @@ PreviewHandle::UPtr SmartScopesClient::preview(PreviewReplyHandler const& handle
 
     BOOST_LOG_SEV(logger_, Logger::Info) << "SmartScopesClient.preview(): GET " << preview_uri.str();
 
-    std::mutex reponse_mutex;
-    query_results_[preview_id] = http_client_->get(preview_uri.str(), [this, handler, &reponse_mutex](std::string const& line_data)
+    auto reponse_mutex = std::make_shared<std::mutex>();
+    query_results_[preview_id] = http_client_->get(preview_uri.str(), [this, handler, reponse_mutex](std::string const& line_data)
     {
-        std::lock_guard<std::mutex> lock(reponse_mutex);
+        std::lock_guard<std::mutex> lock(*reponse_mutex);
         try
         {
             parse_line(line_data, handler);
