@@ -37,7 +37,7 @@ const std::string c_test_url = "http://127.0.0.1";
 class HttpClientTest : public Test
 {
 public:
-    HttpClientTest(uint no_reply_timeout = 20000)
+    HttpClientTest(unsigned int no_reply_timeout = 20000)
         : http_client_(new HttpClientNetCpp(no_reply_timeout)),
           server_(FAKE_SERVER_PATH)
     {

@@ -26,7 +26,6 @@
 #include <core/net/http/status.h>
 
 #include <iostream>
-#include <strstream>
 #include <unordered_map>
 
 namespace net = core::net;
@@ -63,7 +62,7 @@ struct CancellationRegistry
         return cr;
     }
 
-    std::pair<uint, std::shared_ptr<Cancelable>> add()
+    std::pair<unsigned int, std::shared_ptr<Cancelable>> add()
     {
         auto cancelable = std::make_shared<Cancelable>();
         auto id = add(cancelable);
@@ -71,18 +70,18 @@ struct CancellationRegistry
         return std::make_pair(id, cancelable);
     }
 
-    uint add(const std::shared_ptr<Cancelable>& cancelable)
+    unsigned int add(const std::shared_ptr<Cancelable>& cancelable)
     {
         std::lock_guard<std::mutex> lg(guard);
 
-        uint result{++request_id};
+        unsigned int result{++request_id};
 
         store.insert(std::make_pair(result, cancelable));
 
         return result;
     }
 
-    void cancel_and_remove_for_id(uint id)
+    void cancel_and_remove_for_id(unsigned int id)
     {
         std::lock_guard<std::mutex> lg(guard);
 
@@ -95,13 +94,13 @@ struct CancellationRegistry
         }
     }
 
-    uint request_id{0};
+    unsigned int request_id{0};
     std::mutex guard;
-    std::unordered_map<uint, std::shared_ptr<Cancelable>> store;
+    std::unordered_map<unsigned int, std::shared_ptr<Cancelable>> store;
 };
 }
 
-HttpClientNetCpp::HttpClientNetCpp(uint no_reply_timeout)
+HttpClientNetCpp::HttpClientNetCpp(unsigned int no_reply_timeout)
     : no_reply_timeout{no_reply_timeout},
       client{http::make_client()},
       worker([this]() { client->run(); })
@@ -117,7 +116,7 @@ HttpClientNetCpp::~HttpClientNetCpp()
 }
 
 HttpResponseHandle::SPtr HttpClientNetCpp::get(std::string const& request_url,
-                                               std::function<void(std::string const&)> const& lineData,
+                                               std::function<void(std::string const&)> const& line_data,
                                                HttpHeaders const& headers)
 {
     auto http_config = http::Request::Configuration::from_uri_as_string(request_url);
@@ -144,7 +143,7 @@ HttpResponseHandle::SPtr HttpClientNetCpp::get(std::string const& request_url,
                                     http::Request::Progress::Next::abort_operation :
                                     http::Request::Progress::Next::continue_operation;
                     })
-                    .on_response([lineData, promise](const http::Response& response)
+                    .on_response([line_data, promise](const http::Response& response)
                     {
                         if (response.status != http::Status::ok)
                         {
@@ -155,11 +154,11 @@ HttpResponseHandle::SPtr HttpClientNetCpp::get(std::string const& request_url,
                             promise->set_exception(std::make_exception_ptr(e));
                         } else
                         {
-                            std::istrstream in(response.body.c_str());
+                            std::istringstream in(response.body);
                             std::string line;
                             while (std::getline(in, line))
                             {
-                                lineData(line);
+                                line_data(line);
                             }
                             promise->set_value();
                         }
@@ -176,7 +175,7 @@ HttpResponseHandle::SPtr HttpClientNetCpp::get(std::string const& request_url,
                 future);
 }
 
-void HttpClientNetCpp::cancel_get(uint id)
+void HttpClientNetCpp::cancel_get(unsigned int id)
 {
     CancellationRegistry::instance().cancel_and_remove_for_id(id);
 }

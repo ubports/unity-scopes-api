@@ -59,7 +59,7 @@ using namespace unity::scopes::internal::smartscopes;
 
 //-- SearchHandle
 
-SearchHandle::SearchHandle(uint search_id, SmartScopesClient::SPtr ssc)
+SearchHandle::SearchHandle(unsigned int search_id, SmartScopesClient::SPtr ssc)
     : search_id_(search_id)
     , ssc_(ssc)
 {
@@ -82,7 +82,7 @@ void SearchHandle::cancel_search()
 
 //-- PreviewHandle
 
-PreviewHandle::PreviewHandle(uint preview_id, SmartScopesClient::SPtr ssc)
+PreviewHandle::PreviewHandle(unsigned int preview_id, SmartScopesClient::SPtr ssc)
     : preview_id_(preview_id)
     , ssc_(ssc)
 {
@@ -410,7 +410,7 @@ SearchHandle::UPtr SmartScopesClient::search(SearchReplyHandler const& handler,
                                              std::string const& locale,
                                              LocationInfo const& location,
                                              std::string const& user_agent_hdr,
-                                             uint limit)
+                                             unsigned int limit)
 {
     std::ostringstream search_uri;
     search_uri.imbue(std::locale::classic()); // so that doubles use one standard formatting wrt decimal point
@@ -459,7 +459,7 @@ SearchHandle::UPtr SmartScopesClient::search(SearchReplyHandler const& handler,
     }
 
     std::lock_guard<std::mutex> lock(query_results_mutex_);
-    uint search_id = ++query_counter_;
+    unsigned int search_id = ++query_counter_;
 
     BOOST_LOG_SEV(logger_, Logger::Info) << "SmartScopesClient.search(): GET " << search_uri.str();
 
@@ -470,10 +470,10 @@ SearchHandle::UPtr SmartScopesClient::search(SearchReplyHandler const& handler,
         headers.push_back(std::make_pair("User-Agent", user_agent_hdr));
     }
 
-    query_results_[search_id] = http_client_->get(search_uri.str(), [this, handler](std::string const& lineData) {
+    query_results_[search_id] = http_client_->get(search_uri.str(), [this, handler](std::string const& line_data) {
             try
             {
-                parse_line(lineData, handler);
+                parse_line(line_data, handler);
             }
             catch (std::exception const &e)
             {
@@ -489,7 +489,7 @@ PreviewHandle::UPtr SmartScopesClient::preview(PreviewReplyHandler const& handle
                                                std::string const& result,
                                                std::string const& session_id,
                                                std::string const& platform,
-                                               const uint widgets_api_version,
+                                               const unsigned int widgets_api_version,
                                                VariantMap const& settings,
                                                std::string const& locale,
                                                std::string const& country,
@@ -531,13 +531,13 @@ PreviewHandle::UPtr SmartScopesClient::preview(PreviewReplyHandler const& handle
     }
 
     std::lock_guard<std::mutex> lock(query_results_mutex_);
-    uint preview_id = ++query_counter_;
+    unsigned int preview_id = ++query_counter_;
 
     BOOST_LOG_SEV(logger_, Logger::Info) << "SmartScopesClient.preview(): GET " << preview_uri.str();
-    query_results_[preview_id] = http_client_->get(preview_uri.str(), [this, handler](std::string const& lineData) {
+    query_results_[preview_id] = http_client_->get(preview_uri.str(), [this, handler](std::string const& line_data) {
             try
             {
-                parse_line(lineData, handler);
+                parse_line(line_data, handler);
             }
             catch (std::exception const &e)
             {
@@ -681,7 +681,7 @@ void SmartScopesClient::parse_line(std::string const& json, SearchReplyHandler c
     }
 }
 
-void SmartScopesClient::wait_for_search(uint search_id)
+void SmartScopesClient::wait_for_search(unsigned int search_id)
 {
     try
     {
@@ -787,7 +787,7 @@ FilterState SmartScopesClient::parse_filter_state(JsonNodeInterface::SPtr node)
     return FilterStateImpl::deserialize(node->to_variant().get_dict());
 }
 
-void SmartScopesClient::wait_for_preview(uint preview_id)
+void SmartScopesClient::wait_for_preview(unsigned int preview_id)
 {
     try
     {
@@ -823,7 +823,7 @@ std::vector<std::string> SmartScopesClient::extract_json_stream(std::string cons
 {
     std::vector<std::string> jsons;
 
-    uint start_pos = 0;
+    unsigned int start_pos = 0;
 
     while (start_pos < json_stream.size())
     {
@@ -841,7 +841,7 @@ std::vector<std::string> SmartScopesClient::extract_json_stream(std::string cons
     return jsons;
 }
 
-void SmartScopesClient::cancel_query(uint query_id)
+void SmartScopesClient::cancel_query(unsigned int query_id)
 {
     std::lock_guard<std::mutex> lock(query_results_mutex_);
 

@@ -50,19 +50,19 @@ namespace smartscopes
 class HttpClientNetCpp : public HttpClientInterface
 {
 public:
-    explicit HttpClientNetCpp(uint no_reply_timeout);
+    explicit HttpClientNetCpp(unsigned int no_reply_timeout);
     ~HttpClientNetCpp();
 
     HttpResponseHandle::SPtr get(std::string const& request_url,
-                                 std::function<void(std::string const&)> const& lineData = [](std::string const&) {},
+                                 std::function<void(std::string const&)> const& line_data = [](std::string const&) {},
                                  HttpHeaders const& headers = HttpHeaders()) override;
 
     std::string to_percent_encoding(std::string const& string) override;
 
 private:
-    void cancel_get(uint session_id) override;
+    void cancel_get(unsigned int session_id) override;
 
-    uint no_reply_timeout;
+    unsigned int no_reply_timeout;
     std::shared_ptr<core::net::http::Client> client;
     std::thread worker;
 };
