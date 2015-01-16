@@ -252,6 +252,11 @@ bool JsonCppNode::as_bool() const
 
 bool JsonCppNode::has_node(std::string const& node_name) const
 {
+    if (!root_)
+    {
+        throw unity::LogicException("Current node is empty");
+    }
+
     return root_.isMember(node_name);
 }
 
