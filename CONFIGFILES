@@ -123,22 +123,23 @@ The following keys are recognized:
 
 - ConfigDir
 
-  The parent directory under which the run time writes the scope configration files.
+  The parent directory under which the run time writes the scope configuration files.
 
   The default value is $HOME/.cache/unity-scopes.
 
 - LogDir
 
-  The parent directory under which the run time writes the scope configration files.
+  The parent directory under which the run time writes the scope log files.
   Setting this value explicitly to the empty string disables file logging and forces
   all log entries to go to stderr.
 
-  The default value is $HOME/.config/unity-scopes.
+  The default value is $HOME/.local/share/unity-scopes.
 
-  Note that the actual configuration is written into subdirectories of this
+  Note that the actual logs are written into subdirectories of this
   directory. Specifically:
 
-  $HOME/.config/unity-scopes/<scope_id>/settings.ini
+  $HOME/.local/share/unity-scopes/leaf-net/<scope_id>/logs (for confined scopes)
+  and $HOME/.local/share/unity-scopes/unconfined/<scope_id>/logs (for unconfined scopes).
 
   The environment variable UNITY_SCOPES_LOGDIR overrides this key.
   Setting this variable explicitly to the empty string disables file logging and forces

@@ -93,13 +93,14 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
         // Now that we have the config, change the logger to log to a file.
         // If log_dir was explicitly set to the empty string, continue
         // logging to std::clog.
-        string log_dir = config.log_directory();
-        if (!log_dir.empty())
+        log_dir_ = config.log_directory();
+        if (!log_dir_.empty())
         {
-            logger_->set_log_file(config.log_directory() + "/" + log_file_basename,
+            logger_->set_log_file(find_log_dir(log_file_basename) + "/" + log_file_basename,
                                   config.max_log_file_size(),
                                   config.max_log_dir_size());
         }
+            BOOST_LOG_SEV(logger(), Logger::Info) << "BLAH";
 
         string default_middleware = config.default_middleware();
         string middleware_configfile = config.default_middleware_configfile();
@@ -522,14 +523,14 @@ string RuntimeImpl::proxy_to_string(ObjectProxy const& proxy) const
     }
 }
 
-string RuntimeImpl::demangled_id() const
+string RuntimeImpl::demangled_id(string const& scope_id) const
 {
     // For scopes that are in a click package together with an app,
     // such as YouTube, the scope id is <scope_id>_<app_id>
     // The app directory and cache directory names are the scope ID up to the first
     // underscore. For example, com.ubuntu.scopes.youtube_youtube is the
     // scope ID, but the cache dir name is com.ubuntu.scopes.youtube.
-    auto id = scope_id_;
+    auto id = scope_id;
     if (confined())
     {
         auto pos = id.find('_');
@@ -571,7 +572,7 @@ string RuntimeImpl::find_cache_dir() const
     !confined() && !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700);
 
     // A confined scope is allowed to create this dir.
-    dir += "/" + demangled_id();
+    dir += "/" + demangled_id(scope_id_);
     !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700);
 
     return dir;
@@ -582,8 +583,26 @@ string RuntimeImpl::find_app_dir() const
     // Create the app_dir_/<id> directories if they don't exist.
     boost::system::error_code ec;
     !confined() && !boost::filesystem::exists(app_dir_, ec) && ::mkdir(app_dir_.c_str(), 0700);
-    string dir = app_dir_ + "/" + demangled_id();
+    string dir = app_dir_ + "/" + demangled_id(scope_id_);
     !confined() && !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700);
+
+    return dir;
+}
+
+string RuntimeImpl::find_log_dir(string const& id) const
+{
+    // Create the log_dir_/<confinement-type>/<id>/logs directories if they don't exist.
+    boost::system::error_code ec;
+    !confined() && !boost::filesystem::exists(log_dir_, ec) && ::mkdir(log_dir_.c_str(), 0700);
+    string dir = log_dir_ + "/" + confinement_type();
+    !confined() && !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700);
+
+    // A confined scope is allowed to create this dir.
+    dir += "/" + demangled_id(id);
+    !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700);
+    dir += "/logs";
+    cerr << "Creating " << dir << endl;
+    !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700);
 
     return dir;
 }
