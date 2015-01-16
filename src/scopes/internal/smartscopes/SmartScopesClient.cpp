@@ -195,9 +195,13 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
             BOOST_LOG_SEV(logger_, Logger::Error) << "SmartScopesClient.get_remote_scopes(): failed to read " << partner_file_ << ": " << e.what();
         }
 
-        HttpResponseHandle::SPtr response = http_client_->get(remote_scopes_uri.str(), [&response_str](std::string const& replyLine) {
-                response_str += replyLine; // accumulate all reply lines
+        std::mutex reponse_mutex;
+        HttpResponseHandle::SPtr response = http_client_->get(remote_scopes_uri.str(), [&response_str, &reponse_mutex](std::string const& replyLine)
+        {
+            std::lock_guard<std::mutex> lock(reponse_mutex);
+            response_str += replyLine; // accumulate all reply lines
         }, headers);
+
         response->get();
 
         BOOST_LOG_SEV(logger_, Logger::Info)
@@ -470,15 +474,18 @@ SearchHandle::UPtr SmartScopesClient::search(SearchReplyHandler const& handler,
         headers.push_back(std::make_pair("User-Agent", user_agent_hdr));
     }
 
-    query_results_[search_id] = http_client_->get(search_uri.str(), [this, handler](std::string const& line_data) {
-            try
-            {
-                parse_line(line_data, handler);
-            }
-            catch (std::exception const &e)
-            {
-                BOOST_LOG_SEV(logger_, Logger::Error) << "SmartScopesClient.search(): Failed to parse: " << e.what();
-            }
+    std::mutex reponse_mutex;
+    query_results_[search_id] = http_client_->get(search_uri.str(), [this, handler, &reponse_mutex](std::string const& line_data)
+    {
+        std::lock_guard<std::mutex> lock(reponse_mutex);
+        try
+        {
+            parse_line(line_data, handler);
+        }
+        catch (std::exception const &e)
+        {
+            BOOST_LOG_SEV(logger_, Logger::Error) << "SmartScopesClient.search(): Failed to parse: " << e.what();
+        }
     }, headers);
 
     return SearchHandle::UPtr(new SearchHandle(search_id, shared_from_this()));
@@ -534,15 +541,19 @@ PreviewHandle::UPtr SmartScopesClient::preview(PreviewReplyHandler const& handle
     unsigned int preview_id = ++query_counter_;
 
     BOOST_LOG_SEV(logger_, Logger::Info) << "SmartScopesClient.preview(): GET " << preview_uri.str();
-    query_results_[preview_id] = http_client_->get(preview_uri.str(), [this, handler](std::string const& line_data) {
-            try
-            {
-                parse_line(line_data, handler);
-            }
-            catch (std::exception const &e)
-            {
-                BOOST_LOG_SEV(logger_, Logger::Error) << "SmartScopesClient.preview(): Failed to parse: " << e.what();
-            }
+
+    std::mutex reponse_mutex;
+    query_results_[preview_id] = http_client_->get(preview_uri.str(), [this, handler, &reponse_mutex](std::string const& line_data)
+    {
+        std::lock_guard<std::mutex> lock(reponse_mutex);
+        try
+        {
+            parse_line(line_data, handler);
+        }
+        catch (std::exception const &e)
+        {
+            BOOST_LOG_SEV(logger_, Logger::Error) << "SmartScopesClient.preview(): Failed to parse: " << e.what();
+        }
     }, headers);
 
     return PreviewHandle::UPtr(new PreviewHandle(preview_id, shared_from_this()));

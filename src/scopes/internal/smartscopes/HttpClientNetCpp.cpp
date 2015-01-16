@@ -112,7 +112,9 @@ HttpClientNetCpp::~HttpClientNetCpp()
     client->stop();
 
     if (worker.joinable())
+    {
         worker.join();
+    }
 }
 
 HttpResponseHandle::SPtr HttpClientNetCpp::get(std::string const& request_url,
@@ -152,7 +154,8 @@ HttpResponseHandle::SPtr HttpClientNetCpp::get(std::string const& request_url,
                             unity::ResourceException e(msg.str());
 
                             promise->set_exception(std::make_exception_ptr(e));
-                        } else
+                        }
+                        else
                         {
                             std::istringstream in(response.body);
                             std::string line;
