@@ -70,6 +70,7 @@ pkg_check_modules(JSONCPP jsoncpp REQUIRED)
 pkg_check_modules(LIBACCOUNTS REQUIRED libaccounts-glib)
 pkg_check_modules(LIBSIGNON REQUIRED libsignon-glib)
 pkg_check_modules(ZMQLIB libzmq REQUIRED)
+pkg_check_modules(NET_CPP net-cpp REQUIRED)
 
 find_program(LTTNG_EXECUTABLE lttng)
 if (NOT LTTNG_EXECUTABLE)
@@ -118,8 +119,10 @@ add_definitions(
 
 set(OTHER_INCLUDE_DIRS ${OTHER_INCLUDE_DIRS} ${UNITY_API_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS}
                        ${JSONCPP_INCLUDE_DIRS} ${PROCESS_CPP_INCLUDE_DIRS} ${APPARMOR_INCLUDE_DIRS}
-                       ${LIBACCOUNTS_INCLUDE_DIRS} ${LIBSIGNON_INCLUDE_DIRS})
-set(OTHER_LIBS ${OTHER_LIBS} ${UNITY_API_LDFLAGS} ${APPARMOR_LDFLAGS} ${LIBACCOUNTS_LIBRARIES} ${LIBSIGNON_LIBRARIES})
+                       ${LIBACCOUNTS_INCLUDE_DIRS} ${LIBSIGNON_INCLUDE_DIRS} ${NET_CPP_INCLUDE_DIRS})
+set(OTHER_LIBS ${OTHER_LIBS} ${UNITY_API_LDFLAGS} ${APPARMOR_LDFLAGS} ${LIBACCOUNTS_LIBRARIES}
+               ${LIBSIGNON_LIBRARIES} ${Boost_LIBRARIES} ${JSONCPP_LDFLAGS} ${PROCESS_CPP_LDFLAGS}
+               ${ZMQPPLIB} ${ZMQLIB_LDFLAGS} ${CAPNPLIB} ${KJLIB} ${DLLIB} ${NET_CPP_LDFLAGS} pthread)
 
 # Standard install paths
 include(GNUInstallDirs)
@@ -240,21 +243,6 @@ endif()
 if(POLICY CMP0028)
     cmake_policy(SET CMP0028 OLD)
 endif()
-
-# Other libraries we depend on
-set(OTHER_LIBS
-    ${OTHER_LIBS}
-    ${Boost_LIBRARIES}
-    ${JSONCPP_LDFLAGS}
-    ${PROCESS_CPP_LDFLAGS}
-    ${ZMQPPLIB}
-    ${ZMQLIB_LDFLAGS}
-    ${CAPNPLIB}
-    ${KJLIB}
-    ${DLLIB}
-    pthread
-    smartscopes
-)
 
 # All the libraries we need to link a normal executable that uses Unity scopes
 set(LIBS ${UNITY_SCOPES_LIB})
