@@ -397,7 +397,7 @@ TEST(JsonSettingsSchema, exceptions)
                     {
                         "id": "x",
                         "type": "number",
-                         "displayName": "X",
+                        "displayName": "X",
                         "parameters": {
                             "defaultValue": "banana"
                         }
@@ -457,7 +457,7 @@ TEST(JsonSettingsSchema, exceptions)
     }
     catch (ResourceException const& e)
     {
-        EXPECT_STREQ("unity::ResourceException: JsonSettingsSchema(): missing \"parameters\" definition, id = \"x\"",
+        EXPECT_STREQ("unity::ResourceException: JsonSettingsSchema(): missing \"displayName\" definition, id = \"x\"",
                      e.what());
     }
 
