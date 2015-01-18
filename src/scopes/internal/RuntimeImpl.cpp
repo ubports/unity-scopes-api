@@ -100,7 +100,6 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
                                   config.max_log_file_size(),
                                   config.max_log_dir_size());
         }
-            BOOST_LOG_SEV(logger(), Logger::Info) << "BLAH";
 
         string default_middleware = config.default_middleware();
         string middleware_configfile = config.default_middleware_configfile();
@@ -601,7 +600,6 @@ string RuntimeImpl::find_log_dir(string const& id) const
     dir += "/" + demangled_id(id);
     !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700);
     dir += "/logs";
-    cerr << "Creating " << dir << endl;
     !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700);
 
     return dir;
