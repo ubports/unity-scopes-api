@@ -1,5 +1,6 @@
 unity-scopes-api (0.6.11+15.04.20141212-0ubuntu2) UNRELEASED; urgency=medium
 
+  [ Michi Henning ]
   * The JSON for a CategoryRenderer now supports a "fallback" field in the
     "art" and "mascot" entries of the "components" dictionary.
     This allows a scope to specify a category-specific
@@ -9,6 +10,9 @@ unity-scopes-api (0.6.11+15.04.20141212-0ubuntu2) UNRELEASED; urgency=medium
     "gallery", and "header" widget types. This allows the scope
     to specify a fallback image in case the artwork for a widget
     cannot be retrieved.
+
+  [ Ubuntu daily release ]
+  * debian/libunity-scopes3.symbols: auto-update to released version
 
  -- Michi Henning <michi.henning@canonical.com>  Tue, 06 Jan 2015 14:03:54 +1000
 
