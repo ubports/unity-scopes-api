@@ -6,3 +6,4 @@ Zmq.ConfigFile = @CMAKE_CURRENT_BINARY_DIR@/Zmq.ini
 CacheDir = @CMAKE_CURRENT_BINARY_DIR@/cache_dir
 AppDir = @CMAKE_CURRENT_BINARY_DIR@/app_dir
 ConfigDir = @CMAKE_CURRENT_BINARY_DIR@/config_dir
+LogDir=

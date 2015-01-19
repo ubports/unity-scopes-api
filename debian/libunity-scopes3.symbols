@@ -403,8 +403,12 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::internal::RuntimeConfig::default_app_directory()@Base" 0.6.9+15.04.20141129
  (c++)"unity::scopes::internal::RuntimeConfig::default_cache_directory()@Base" 0.6.9+15.04.20141129
  (c++)"unity::scopes::internal::RuntimeConfig::default_config_directory()@Base" 0.6.2+rtm+rtm+rtm+14.09.20140818
+ (c++)"unity::scopes::internal::RuntimeConfig::default_log_directory()@Base" 0replaceme
  (c++)"unity::scopes::internal::RuntimeConfig::default_middleware_configfile() const@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::internal::RuntimeConfig::default_middleware() const@Base" 0.4.2+14.04.20140404.2
+ (c++)"unity::scopes::internal::RuntimeConfig::log_directory() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::RuntimeConfig::max_log_dir_size() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::RuntimeConfig::max_log_file_size() const@Base" 0replaceme
  (c++)"unity::scopes::internal::RuntimeConfig::reap_expiry() const@Base" 0.4.5+14.10.20140513
  (c++)"unity::scopes::internal::RuntimeConfig::reap_interval() const@Base" 0.4.5+14.10.20140513
  (c++)"unity::scopes::internal::RuntimeConfig::registry_configfile() const@Base" 0.4.2+14.04.20140404.2
@@ -413,18 +417,21 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::internal::RuntimeConfig::RuntimeConfig(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::internal::RuntimeConfig::ss_configfile() const@Base" 0.4.4+14.10.20140508
  (c++)"unity::scopes::internal::RuntimeConfig::ss_registry_identity() const@Base" 0.4.4+14.10.20140508
+ (c++)"unity::scopes::internal::RuntimeConfig::trace_channels() const@Base" 0replaceme
  (c++)"unity::scopes::internal::RuntimeImpl::async_pool() const@Base" 0.4.3+14.10.20140428
  (c++)"unity::scopes::internal::RuntimeImpl::confined() const@Base" 0.6.8+15.04.20141119
  (c++)"unity::scopes::internal::RuntimeImpl::confinement_type() const@Base" 0.6.8+15.04.20141119
  (c++)"unity::scopes::internal::RuntimeImpl::create(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::internal::RuntimeImpl::demangled_id() const@Base" 0.6.8+15.04.20141119
+ (c++)"unity::scopes::internal::RuntimeImpl::demangled_id(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0replaceme
  (c++)"unity::scopes::internal::RuntimeImpl::destroy()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RuntimeImpl::factory() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RuntimeImpl::find_app_dir() const@Base" 0.6.9+15.04.20141129
  (c++)"unity::scopes::internal::RuntimeImpl::find_cache_dir() const@Base" 0.6.8+15.04.20141119
+ (c++)"unity::scopes::internal::RuntimeImpl::find_log_dir(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0replaceme
  (c++)"unity::scopes::internal::RuntimeImpl::find_tmp_dir() const@Base" 0.6.8+15.04.20141119
  (c++)"unity::scopes::internal::RuntimeImpl::future_queue() const@Base" 0.4.3+14.10.20140428
  (c++)"unity::scopes::internal::RuntimeImpl::logger() const@Base" 0.6.10+15.04.20141210.2
+ (c++)"unity::scopes::internal::RuntimeImpl::logger(unity::scopes::internal::Logger::Channel) const@Base" 0replaceme
  (c++)"unity::scopes::internal::RuntimeImpl::proxy_to_string(std::shared_ptr<unity::scopes::Object> const&) const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RuntimeImpl::registry_configfile() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RuntimeImpl::registry() const@Base" 0.4.0+14.04.20140312.1
@@ -462,12 +469,12 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::internal::ScopeConfig::search_hint() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeConfig::version() const@Base" 0.6.9+15.04.20141129
  (c++)"unity::scopes::internal::ScopeImpl::activate(unity::scopes::Result const&, unity::scopes::ActionMetadata const&, std::shared_ptr<unity::scopes::ActivationListenerBase> const&)@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::internal::ScopeImpl::create(std::shared_ptr<unity::scopes::internal::MWScope> const&, unity::scopes::internal::RuntimeImpl*, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::internal::ScopeImpl::create(std::shared_ptr<unity::scopes::internal::MWScope> const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
  (c++)"unity::scopes::internal::ScopeImpl::fwd()@Base" 0.4.3+14.10.20140428
  (c++)"unity::scopes::internal::ScopeImpl::perform_action(unity::scopes::Result const&, unity::scopes::ActionMetadata const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::shared_ptr<unity::scopes::ActivationListenerBase> const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeImpl::preview(unity::scopes::Result const&, unity::scopes::ActionMetadata const&, std::shared_ptr<unity::scopes::PreviewListenerBase> const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeImpl::~ScopeImpl()@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::internal::ScopeImpl::ScopeImpl(std::shared_ptr<unity::scopes::internal::MWScope> const&, unity::scopes::internal::RuntimeImpl*, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::internal::ScopeImpl::ScopeImpl(std::shared_ptr<unity::scopes::internal::MWScope> const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
  (c++)"unity::scopes::internal::ScopeImpl::search(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::FilterState const&, unity::scopes::SearchMetadata const&, std::shared_ptr<unity::scopes::SearchListenerBase> const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeImpl::search(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::FilterState const&, unity::scopes::SearchMetadata const&, std::shared_ptr<unity::scopes::SearchListenerBase> const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeImpl::search(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::SearchMetadata const&, std::shared_ptr<unity::scopes::SearchListenerBase> const&)@Base" 0.4.0+14.04.20140312.1
@@ -532,7 +539,7 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::internal::ScopeObject::preview(unity::scopes::Result const&, unity::scopes::ActionMetadata const&, std::shared_ptr<unity::scopes::internal::MWReply> const&, unity::scopes::internal::InvokeInfo const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeObject::query(std::shared_ptr<unity::scopes::internal::MWReply> const&, unity::scopes::internal::MiddlewareBase*, std::function<std::shared_ptr<unity::scopes::QueryBase> ()> const&, std::function<std::shared_ptr<unity::scopes::internal::QueryObjectBase> (std::shared_ptr<unity::scopes::QueryBase>, std::shared_ptr<unity::scopes::internal::MWQueryCtrl>)> const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeObject::~ScopeObject()@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::internal::ScopeObject::ScopeObject(unity::scopes::internal::RuntimeImpl*, unity::scopes::ScopeBase*, bool)@Base" 0.6.2+rtm+rtm+rtm+14.09.20140818
+ (c++)"unity::scopes::internal::ScopeObject::ScopeObject(unity::scopes::ScopeBase*, bool)@Base" 0replaceme
  (c++)"unity::scopes::internal::ScopeObject::search(unity::scopes::CannedQuery const&, unity::scopes::SearchMetadata const&, std::shared_ptr<unity::scopes::internal::MWReply> const&, unity::scopes::internal::InvokeInfo const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::smartscopes::SSConfig::http_reply_timeout() const@Base" 0.4.4+14.10.20140508
  (c++)"unity::scopes::internal::smartscopes::SSConfig::reg_refresh_fail_timeout() const@Base" 0.4.4+14.10.20140508

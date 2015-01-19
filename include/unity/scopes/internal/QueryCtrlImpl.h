@@ -37,9 +37,7 @@ class ScopeImpl;
 class QueryCtrlImpl : public virtual unity::scopes::QueryCtrl, public virtual ObjectImpl
 {
 public:
-    QueryCtrlImpl(MWQueryCtrlProxy const& ctrl_proxy,
-                  MWReplyProxy const& reply_proxy,
-                  boost::log::sources::severity_channel_logger_mt<>& logger);
+    QueryCtrlImpl(MWQueryCtrlProxy const& ctrl_proxy, MWReplyProxy const& reply_proxy);
     virtual ~QueryCtrlImpl();
 
     virtual void cancel() override;
