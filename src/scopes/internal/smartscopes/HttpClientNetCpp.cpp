@@ -137,7 +137,6 @@ HttpResponseHandle::SPtr HttpClientNetCpp::get(std::string const& request_url,
 
     auto id_and_cancelable = CancellationRegistry::instance().add();
 
-    auto tmp_data = std::make_shared<std::string>();
     request->async_execute(
                 http::Request::Handler()
                     .on_progress([id_and_cancelable](const http::Request::Progress&)
@@ -146,25 +145,7 @@ HttpResponseHandle::SPtr HttpClientNetCpp::get(std::string const& request_url,
                                     http::Request::Progress::Next::abort_operation :
                                     http::Request::Progress::Next::continue_operation;
                     })
-                    .on_data([tmp_data, line_data](const std::string& const_data)
-                    {
-                        // prepend any leftover data from the previous on_data() call
-                        std::string data = *tmp_data + const_data;
-
-                        // read data line-by-line calling line_data() for each
-                        auto newline_pos = 0;
-                        auto endline_pos = data.find('\n');
-                        while (endline_pos != std::string::npos)
-                        {
-                            line_data(data.substr(newline_pos, endline_pos - newline_pos));
-                            newline_pos = endline_pos + 1;
-                            endline_pos = data.find('\n', newline_pos);
-                        }
-
-                        // store the leftover data in tmp_data
-                        *tmp_data = data.substr(newline_pos, data.size() - newline_pos);
-                    })
-                    .on_response([promise, tmp_data, line_data](const http::Response& response)
+                    .on_response([line_data, promise](const http::Response& response)
                     {
                         if (response.status != http::Status::ok)
                         {
@@ -176,10 +157,11 @@ HttpResponseHandle::SPtr HttpClientNetCpp::get(std::string const& request_url,
                         }
                         else
                         {
-                            // call line_data() for the leftover data from on_data()
-                            if (!(*tmp_data).empty())
+                            std::istringstream in(response.body);
+                            std::string line;
+                            while (std::getline(in, line))
                             {
-                                line_data(*tmp_data);
+                                line_data(line);
                             }
                             promise->set_value();
                         }
