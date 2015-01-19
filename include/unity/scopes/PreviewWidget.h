@@ -64,12 +64,14 @@ public:
     The JSON definition must be a dictionary that includes widget "id" and all the values of attributes required by desired
     \link previewwidgets widget type\endlink. For example, a definition of image widget may look as follows:
     \code{.cpp}
-    PreviewWidget img(R"({"id": "img", "type": "image", "source": "http://imageuri"})");
+    PreviewWidget img(R"({"id": "img", "type": "image", "source": "http://imageuri",
+                          "fallback": "file:///tmp/image.png"})");
     \endcode
 
     For cases where attribute mappings are to be used instead of direct values, they need to be enclosed in the "components" dictionary, e.g.
     \code{.cpp}
-    PreviewWidget img(R"({"id": "img", "type": "image", "components": { "source": "screenshot-url" } })");
+    PreviewWidget img(R"({"id": "img", "type": "image", "fallback": "file:///tmp/image.png",
+                          "components": { "source": "screenshot-url" } })");
     \endcode
     (this example assumes "screenshot-url" value is either available in the result object that's being previewed, or it will be pushed with
     unity::scopes::PreviewReply::push() method)
