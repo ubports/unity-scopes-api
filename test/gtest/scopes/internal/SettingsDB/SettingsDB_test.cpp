@@ -349,9 +349,9 @@ TEST(SettingsDB, exceptions)
         db->settings();
         FAIL();
     }
-    catch (ResourceException const& e)
+    catch (SyscallException const& e)
     {
-        boost::regex r("unity::ResourceException: SettingsDB::add_watch\\(\\): failed to add watch for path: \".*\". inotify_add_watch\\(\\) failed. \\(fd = [0-9]+, path = .*\\)");
+        boost::regex r("unity::SyscallException: SettingsDB::add_watch\\(\\): failed to add watch for path: \".*\". inotify_add_watch\\(\\) failed. \\(fd = [0-9]+, path = .*\\) \\(errno = 13\\)");
         EXPECT_TRUE(boost::regex_match(e.what(), r)) << e.what();
     }
 

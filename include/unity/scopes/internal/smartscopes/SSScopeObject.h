@@ -91,8 +91,6 @@ private:
 
     std::unique_ptr<SmartScope> const smartscope_;
     SSRegistryObject::SPtr ss_registry_;
-
-    boost::log::sources::severity_channel_logger_mt<>& logger_;
 };
 
 }  // namespace smartscopes

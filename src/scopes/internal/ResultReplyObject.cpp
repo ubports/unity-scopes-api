@@ -17,7 +17,6 @@
  */
 
 #include <unity/scopes/internal/ResultReplyObject.h>
-#include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/AnnotationImpl.h>
 #include <unity/scopes/ListenerBase.h>
 #include <unity/scopes/Category.h>
@@ -42,6 +41,8 @@ namespace scopes
 
 namespace internal
 {
+
+class RuntimeImpl;
 
 ResultReplyObject::ResultReplyObject(SearchListenerBase::SPtr const& receiver, RuntimeImpl const* runtime,
                                      std::string const& scope_id, int cardinality, bool dont_reap) :

@@ -1,11 +1,36 @@
-unity-scopes-api (0.6.11-0ubuntu1) UNRELEASED; urgency=medium
+unity-scopes-api (0.6.12-0ubuntu1) UNRELEASED; urgency=medium
 
   * Introduced child_scopes() methods for aggregators to return their
     list of child scopes at runtime.
   * Added missing virtual destructor to AbstractScopeBase. (LP: #1360266)
   * Removed deprecated Runtime::run_scope() method.
 
- -- Marcus Tomlinson <marcus.tomlinson@canonical.com>  Thu, 15 Jan 2015 07:11:14 +0200
+ -- Marcus Tomlinson <marcus.tomlinson@canonical.com>  Tue, 20 Jan 2015 07:52:23 +0200
+
+unity-scopes-api (0.6.11+15.04.20150119-0ubuntu1) vivid; urgency=medium
+
+  [ Michi Henning ]
+  * The JSON for a CategoryRenderer now supports a "fallback" field in the
+    "art" and "mascot" entries of the "components" dictionary.
+    This allows a scope to specify a category-specific
+    fallback image in case the artwork for a result cannot be retrieved.
+
+  * PreviewWidget now supports a "fallback" field for the "image",
+    "gallery", and "header" widget types. This allows the scope
+    to specify a fallback image in case the artwork for a widget
+    cannot be retrieved.
+  * Documented missing config settings. (LP: #1398729)
+
+  [ Ubuntu daily release ]
+  * debian/libunity-scopes3.symbols: auto-update to released version
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Mon, 19 Jan 2015 08:09:11 +0000
+
+unity-scopes-api (0.6.11-0ubuntu1) UNRELEASED; urgency=medium
+
+  * Improved logging internals.
+
+ -- Michi Henning <michi.henning@canonical.com>  Fri, 09 Jan 2015 19:56:38 +1000
 
 unity-scopes-api (0.6.10+15.04.20141212-0ubuntu1) vivid; urgency=low
 

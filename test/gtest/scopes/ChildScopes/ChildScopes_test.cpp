@@ -51,7 +51,7 @@ public:
         auto scope_mw = proxy_rt_->factory()->create("TestScope", "Zmq", "Zmq.ini");
         scope_mw->start();
         auto proxy = scope_mw->create_scope_proxy("TestScope");
-        test_scope = ScopeImpl::create(proxy, proxy_rt_.get(), "TestScope");
+        test_scope = ScopeImpl::create(proxy, "TestScope");
     }
 
     ~ChildScopesTest()

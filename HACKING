@@ -190,33 +190,6 @@ src/compat_reports/libunity-scopes.so/[version]_to_[version]/compat_report.html
 
 The report provides a nicely layed-out page with all the details.
 
-Debugging IPC
--------------
-
-There are lots of messages being passed between the various scope processes,
-and therefore it might be sometimes useful to see those to help with debugging.
-There is a special monitoring code that is enabled if you pass
--DIPC_MONITORING=ON to cmake. When you build the library with this code,
-the messages can be introspected using the python scripts in the tools directory.
-
-Note that the tools require python dependencies that are otherwise not required
-for regular builds, to get those, grab python-zmq and python-capnproto.
-
-As of time of writing this, python-capnproto is not present in the distro,
-so get it from https://github.com/jparyani/pycapnp.git, also note that the master
-branch is compatible with capnproto 0.3, not 0.4 which we're using, so you need
-to switch to the "feature/v0.4" branch.
-
-Once you have the extra python dependencies you need to run:
-
-    $ ./zmq-monitor-host.py &
-
-This runs a monitor proxy that forwards the monitored messages from all publishers
-to all subscribers.
-Then you can run a subscriber that will display content of the messages:
-
-    $ ./zmq-parser.py
-
 Autopkg test suite
 ------------------
 

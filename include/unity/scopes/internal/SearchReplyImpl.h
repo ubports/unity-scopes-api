@@ -53,8 +53,7 @@ public:
     SearchReplyImpl(MWReplyProxy const& mw_proxy,
                     std::shared_ptr<QueryObjectBase>const & qo,
                     int cardinality,
-                    std::string const& current_department_id,
-                    boost::log::sources::severity_channel_logger_mt<>& logger);
+                    std::string const& current_department_id);
     virtual ~SearchReplyImpl();
 
     virtual void register_departments(Department::SCPtr const& parent) override;

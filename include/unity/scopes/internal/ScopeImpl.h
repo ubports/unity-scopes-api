@@ -45,7 +45,7 @@ class RuntimeImpl;
 class ScopeImpl : public virtual unity::scopes::Scope, public virtual ObjectImpl
 {
 public:
-    ScopeImpl(MWScopeProxy const& mw_proxy, RuntimeImpl* runtime, std::string const& scope_id);
+    ScopeImpl(MWScopeProxy const& mw_proxy, std::string const& scope_id);
     virtual ~ScopeImpl();
 
     virtual QueryCtrlProxy search(std::string const& q,
@@ -84,7 +84,7 @@ public:
     virtual ChildScopeList child_scopes_ordered() override;
     virtual bool set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered) override;
 
-    static ScopeProxy create(MWScopeProxy const& mw_proxy, RuntimeImpl* runtime, std::string const& scope_id);
+    static ScopeProxy create(MWScopeProxy const& mw_proxy, std::string const& scope_id);
 
 private:
     MWScopeProxy fwd();
