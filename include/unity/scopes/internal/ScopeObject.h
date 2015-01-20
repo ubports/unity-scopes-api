@@ -81,6 +81,7 @@ public:
 
 private:
     MWQueryCtrlProxy query(MWReplyProxy const& reply, MiddlewareBase* mw_base,
+        std::string const& method,
         std::function<QueryBase::SPtr(void)> const& query_factory_fun,
         std::function<QueryObjectBase::SPtr(QueryBase::SPtr, MWQueryCtrlProxy)> const& query_object_factory_fun);
     RuntimeImpl* const runtime_;

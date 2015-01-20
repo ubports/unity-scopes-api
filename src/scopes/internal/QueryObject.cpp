@@ -122,15 +122,21 @@ void QueryObject::run(MWReplyProxy const& reply, InvokeInfo const& /* info */) n
     }
     catch (std::exception const& e)
     {
-        pushable_ = false;
-        BOOST_LOG_SEV(logger_, Logger::Error) << "ScopeBase::run(): " << e.what();
-        reply_->finished(CompletionDetails(CompletionDetails::Error, e.what()));  // Oneway, can't block
+        {
+            lock_guard<mutex> lock(mutex_);
+            pushable_ = false;
+        }
+        BOOST_LOG_SEV(logger_, Logger::Error) << "QueryBase::run(): " << e.what();
+        reply_->finished(CompletionDetails(CompletionDetails::Error, string("QueryBase::run(): ") + e.what()));
     }
     catch (...)
     {
-        pushable_ = false;
-        BOOST_LOG_SEV(logger_, Logger::Error) << "ScopeBase::run(): unknown exception";
-        reply_->finished(CompletionDetails(CompletionDetails::Error, "unknown exception"));  // Oneway, can't block
+        {
+            lock_guard<mutex> lock(mutex_);
+            pushable_ = false;
+        }
+        BOOST_LOG_SEV(logger_, Logger::Error) << "QueryBase::run(): unknown exception";
+        reply_->finished(CompletionDetails(CompletionDetails::Error, "QueryBase::run(): unknown exception"));
     }
 }
 
@@ -144,6 +150,13 @@ void QueryObject::cancel(InvokeInfo const& /* info */)
             return;
         }
         pushable_ = false;
+    }  // Release lock
+
+    try
+    {
+        // Forward the cancellation to the query base (which in turn will forward it to any subqueries).
+        // The query base also calls the cancelled() callback to inform the application code.
+        query_base_->cancel();
 
         auto rp = reply_proxy_.lock();
         if (rp)
@@ -153,11 +166,17 @@ void QueryObject::cancel(InvokeInfo const& /* info */)
             // a CompletionDetails::CompletionStatus (whereas the public ReplyProxy does not).
             reply_->finished(CompletionDetails(CompletionDetails::Cancelled));  // Oneway, can't block
         }
-    }  // Release lock
-
-    // Forward the cancellation to the query base (which in turn will forward it to any subqueries).
-    // The query base also calls the cancelled() callback to inform the application code.
-    query_base_->cancel();
+    }
+    catch (std::exception const& e)
+    {
+        BOOST_LOG_SEV(logger_, Logger::Error) << "QueryBase::cancelled(): " << e.what();
+        reply_->finished(CompletionDetails(CompletionDetails::Error, string("QueryBase::cancelled(): ") + e.what()));
+    }
+    catch (...)
+    {
+        BOOST_LOG_SEV(logger_, Logger::Error) << "QueryBase::cancelled(): unknown exception";
+        reply_->finished(CompletionDetails(CompletionDetails::Error, "QueryBase::cancelled(): unknown exception"));
+    }
 }
 
 bool QueryObject::pushable(InvokeInfo const& /* info */) const noexcept

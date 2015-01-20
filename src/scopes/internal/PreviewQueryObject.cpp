@@ -56,6 +56,16 @@ PreviewQueryObject::~PreviewQueryObject()
 
 void PreviewQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& /* info */) noexcept
 {
+    unique_lock<mutex> lock(mutex_);
+
+    // See comment in QueryObject::run()
+    if (!pushable_)
+    {
+        self_ = nullptr;
+        disconnect();
+        return;
+    }
+
     assert(self_);
 
     auto reply_proxy = make_shared<PreviewReplyImpl>(reply, self_, logger_);
@@ -67,24 +77,35 @@ void PreviewQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& /* inf
     self_ = nullptr;
     disconnect();
 
-    // Synchronous call into scope implementation.
-    // On return, replies for the query may still be outstanding.
     try
     {
+        lock.unlock();
+
+        // Synchronous call into scope implementation.
+        // On return, replies for the preview may still be outstanding.
         auto preview_query = dynamic_pointer_cast<PreviewQueryBase>(query_base_);
         assert(preview_query);
         preview_query->run(reply_proxy);
     }
     catch (std::exception const& e)
     {
-        pushable_ = false;
-        BOOST_LOG_SEV(logger_, Logger::Error) << "PreviewQueryObject::run(): " << e.what();
-        reply_->finished(CompletionDetails(CompletionDetails::Error, e.what()));  // Oneway, can't block
+        {
+            lock_guard<mutex> lock(mutex_);
+            pushable_ = false;
+        }
+        BOOST_LOG_SEV(logger_, Logger::Error) << "PreviewQueryBase::run(): " << e.what();
+        reply_->finished(CompletionDetails(CompletionDetails::Error,
+                                           string("PreviewQueryBase::run(): ") + e.what()));
     }
     catch (...)
     {
-        BOOST_LOG_SEV(logger_, Logger::Error) << "PreviewQueryObject::run(): unknown exception";
-        reply_->finished(CompletionDetails(CompletionDetails::Error, "unknown exception"));  // Oneway, can't block
+        {
+            lock_guard<mutex> lock(mutex_);
+            pushable_ = false;
+        }
+        BOOST_LOG_SEV(logger_, Logger::Error) << "PreviewQueryBase::run(): unknown exception";
+        reply_->finished(CompletionDetails(CompletionDetails::Error,
+                                           string("PreviewQueryBase::run(): unknown exception")));
     }
 }
 

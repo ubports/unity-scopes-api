@@ -60,6 +60,7 @@ ScopeObject::~ScopeObject()
 }
 
 MWQueryCtrlProxy ScopeObject::query(MWReplyProxy const& reply, MiddlewareBase* mw_base,
+        std::string const& method,
         std::function<QueryBase::SPtr()> const& query_factory_fun,
         std::function<QueryObjectBase::SPtr(QueryBase::SPtr, MWQueryCtrlProxy)> const& query_object_factory_fun)
 {
@@ -70,7 +71,7 @@ MWQueryCtrlProxy ScopeObject::query(MWReplyProxy const& reply, MiddlewareBase* m
         // to be safe, we don't assert, in case someone is running a broken client.
 
         // TODO: log error about incoming request containing an invalid reply proxy.
-        throw LogicException("Scope \"" + runtime_->scope_id() + "\": query() called with null reply proxy");
+        throw LogicException("Scope \"" + runtime_->scope_id() + "\": " + method + " called with null reply proxy");
     }
 
     // Ask scope to instantiate a new query.
@@ -80,7 +81,7 @@ MWQueryCtrlProxy ScopeObject::query(MWReplyProxy const& reply, MiddlewareBase* m
         query_base = query_factory_fun();
         if (!query_base)
         {
-            string msg = "Scope \"" + runtime_->scope_id() + "\" returned nullptr from query_factory_fun()";
+            string msg = "Scope \"" + runtime_->scope_id() + "\" returned nullptr from " + method + "()";
             BOOST_LOG_SEV(runtime_->logger(), Logger::Error) << msg;
             throw ResourceException(msg);
         }
@@ -88,7 +89,7 @@ MWQueryCtrlProxy ScopeObject::query(MWReplyProxy const& reply, MiddlewareBase* m
     }
     catch (...)
     {
-        string msg = "Scope \"" + runtime_->scope_id() + "\" threw an exception from query_factory_fun()";
+        string msg = "Scope \"" + runtime_->scope_id() + "\" threw an exception from " + method + "()";
         BOOST_LOG_SEV(runtime_->logger(), Logger::Error) << msg;
         throw ResourceException(msg);
     }
@@ -153,6 +154,7 @@ MWQueryCtrlProxy ScopeObject::search(CannedQuery const& q,
                                      InvokeInfo const& info)
 {
     return query(reply, info.mw,
+            "search",
             [&q, &hints, this]() -> SearchQueryBase::UPtr {
                  auto search_query = this->scope_base_->search(q, hints);
                  search_query->set_department_id(q.department_id());
@@ -170,6 +172,7 @@ MWQueryCtrlProxy ScopeObject::activate(Result const& result,
                                            InvokeInfo const& info)
 {
     return query(reply, info.mw,
+            "activate",
             [&result, &hints, this]() -> QueryBase::SPtr {
                 return this->scope_base_->activate(result, hints);
             },
@@ -189,6 +192,7 @@ MWQueryCtrlProxy ScopeObject::perform_action(Result const& result,
                                              InvokeInfo const& info)
 {
     return query(reply, info.mw,
+            "perform_action",
             [&result, &hints, &widget_id, &action_id, this]() -> QueryBase::SPtr {
                 return this->scope_base_->perform_action(result, hints, widget_id, action_id);
             },
@@ -206,6 +210,7 @@ MWQueryCtrlProxy ScopeObject::preview(Result const& result,
                                       InvokeInfo const& info)
 {
     return query(reply, info.mw,
+            "preview",
             [&result, &hints, this]() -> QueryBase::SPtr {
                 return this->scope_base_->preview(result, hints);
             },
