@@ -418,6 +418,28 @@ TEST_F(ThrowingScopeTest, throw_from_activation_cancelled)
     EXPECT_EQ("", alistener->completion_msg());
 }
 
+TEST_F(ThrowingScopeTest, throw_from_perform_action)
+{
+    auto receiver = make_shared<Receiver>();
+    scope()->search("throw from perform_action", SearchMetadata("unused", "unused"), receiver);
+    receiver->wait_until_finished();
+
+    EXPECT_EQ(CompletionDetails::CompletionStatus::OK, receiver->completion_status());
+    EXPECT_EQ("", receiver->completion_msg());
+    auto r = receiver->results();
+    EXPECT_EQ(1, r.size());
+
+    auto alistener = make_shared<ActivationListener>();
+    scope()->perform_action(r[0], ActionMetadata("unused", "unused"), "", "", alistener);
+    alistener->wait_until_finished();
+
+    EXPECT_EQ(CompletionDetails::CompletionStatus::Error, alistener->completion_status());
+    EXPECT_EQ("unity::scopes::MiddlewareException: unity::ResourceException: Scope \"ThrowingScope\" "
+                  "threw an exception from perform_action():\n"
+                  "    unity::ResourceException: exception from perform_action",
+              alistener->completion_msg());
+}
+
 int main(int argc, char **argv)
 {
     ::testing::InitGoogleTest(&argc, argv);

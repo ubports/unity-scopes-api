@@ -38,6 +38,11 @@ public:
     virtual unity::scopes::ActivationQueryBase::UPtr activate(unity::scopes::Result const&,
                                                               unity::scopes::ActionMetadata const &) override;
 
+    virtual unity::scopes::ActivationQueryBase::UPtr perform_action(unity::scopes::Result const&,
+                                                                    unity::scopes::ActionMetadata const &,
+                                                                    std::string const &,
+                                                                    std::string const&) override;
+
 private:
     std::string id_;
     std::mutex mutex_;

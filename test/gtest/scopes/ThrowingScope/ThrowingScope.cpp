@@ -220,6 +220,19 @@ ActivationQueryBase::UPtr ThrowingScope::activate(Result const& result, ActionMe
     return ActivationQueryBase::UPtr(new TestActivation(result, metadata));
 }
 
+ActivationQueryBase::UPtr ThrowingScope::perform_action(Result const& result,
+                                                        ActionMetadata const& metadata,
+                                                        string const& /* widget_id */,
+                                                        string const& /* action_id */)
+{
+    if (result.title() == "throw from perform_action")
+    {
+        throw ResourceException("exception from perform_action");
+    }
+    lock_guard<mutex> lock(mutex_);
+    return ActivationQueryBase::UPtr(new TestActivation(result, metadata));
+}
+
 extern "C"
 {
 
