@@ -49,7 +49,8 @@ The most important part of a category definition is the unity::scopes::CategoryR
 
 As specified by the \c "category-layout" key of the \c "template" dictionary, Unity will render results associated with this category in a grid layout. The \c "components" dictionary specifies which result fields are used by Unity. In case of this definition, each tile of the grid will map the "title" field from the result (set also by the call to unity::scopes::Result::set_title()) as title for the grid tile, and "art" field from the result (see unity::scopes::Result::set_art()) as the icon for the grid tile.
 
-To sum up, the \c "template" dictionary contains information to determine the correct renderer and its parameters, and the \c "components" dictionary contains mapping specifying which fields of the results are used by the renderer, where keys of the dictionary are understood by Unity and values specify either field name of the results directly (<tt>{"title": "album_name"}</tt> would mean that Unity will use <tt>result["album_name"]</tt> as a title for the grid tile), or the value can specify extra hints for the renderer as well as the result field name (<tt>{"art": {"field": "icon", "aspect-ratio": 1.3}}</tt>).
+To sum up, the \c "template" dictionary contains information to determine the correct renderer and its parameters, and the \c "components" dictionary contains mapping specifying which fields of the results are used by the renderer, where keys of the dictionary are understood by Unity and values specify either field name of the results directly (<tt>{"title": "album_name"}</tt> would mean that Unity will use <tt>result["album_name"]</tt> as a title for the grid tile), or the value can specify extra hints for the renderer as well as the result field name and a fallback image
+(<tt>{"art": {"field": "icon", "aspect-ratio": 1.3, "fallback": "file:///path_to_fallback_image}}</tt>).
 
 \section jsonschema1 JSON structure (v1)
 
@@ -68,9 +69,11 @@ When using <tt>{"schema-version": 1}</tt>, the following keys are understood:
 \subsection components1 components keys
 
 \arg \c title String specifying card's title
-\arg \c art URI specifying card's art (primary graphics), can contain subkeys: \c "aspect-ratio" (double specifying the aspect ratio of the graphics, default: 1.0)
 \arg \c subtitle String specifying subtitle of a card
-\arg \c mascot URI specifying card's mascot (secondary graphics)
+\arg \c art URI specifying card's art (primary graphics), can contain subkeys: \c "aspect-ratio" (double specifying the aspect ratio of the graphics, default: 1.0), \c "field" (specifying the result's field name that contains the URI), and
+\c "fallback" (fallback image to be used if the URI for a result's artwork cannot be retrieved).
+\arg \c mascot URI specifying card's mascot (secondary graphics), can contain subkeys: \c "aspect-ratio" (double specifying the aspect ratio of the graphics, default: 1.0), \c "field" (specifying the result's field name that contains the URI), and
+\c "fallback" (fallback image to be used if the URI for a result's mascot cannot be retrieved).
 \arg \c emblem URI specifying card's emblem
 \arg \c summary String specifying text summary
 \arg \c background Card background URI, can override the default specified in the card-background field of the template section (same format as for card-background)
@@ -79,9 +82,13 @@ When using <tt>{"schema-version": 1}</tt>, the following keys are understood:
 
 \section example Example
 
-In the following example a category named "Recommended" containing three components is created (title, art and subtitle), and a result providing values for these components is pushed.
+In the following example a category named "Recommended" containing three components is created (title,
+art, and subtitle), and a result providing values for these components is pushed.
 
-Note that the scope is free to set any other extra result fields even if they are not used by the renderer (and therefore not specified in the \c "components" dictionary), such fields will be preserved and available to the scope when handling result-specific methods (for example unity::scopes::ScopeBase::preview()).
+Note that the scope is free to set any other extra result fields even if they are not used by the
+renderer (and therefore not specified in the \c "components" dictionary), such fields will be
+preserved and available to the scope when handling result-specific methods (for example
+unity::scopes::ScopeBase::preview()).
 
 \code{.cpp}
 // use raw string literal, so we don't have to escape all the quotes
@@ -90,15 +97,16 @@ std::string CATEGORY_DEFINITION = R"(
   "schema-version" : 1,
   "template" : {
     "category-layout" : "carousel",
-    "card-size": "small"
+    "card-size" : "small"
   },
   "components" : {
     "title" : "title",
     "art" : {
-      "field": "art",
-      "aspect-ratio": 1.3
+      "field" : "art",
+      "aspect-ratio" : 1.3
+      "fallback" : "file:///path_to_fallback_image",
     },
-    "subtitle": "publisher"
+    "subtitle" : "publisher"
   }
 }
 )";

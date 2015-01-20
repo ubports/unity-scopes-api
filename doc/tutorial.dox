@@ -1141,6 +1141,9 @@ following keys:
     ResultsTtlType = None, Small, Medium, or Large
     ChildScopes =
     Keywords =
+    IdleTimeout = idle timeout in seconds
+    LocationDataNeeded = true or false
+    ScopeRunner = path_to_scope_runner args... %R %S
 
     [Appearance]
     ForegroundColor = default text color (defaults to theme-provided foreground color)
@@ -1155,7 +1158,10 @@ following keys:
     PageHeader.DividerColor = color of the header divider
     PageHeader.NavigationBackground = background scheme of the navigation bar
 
-The `ScopeConfig` group is mandatory and must contain settings for at least `DisplayName`, `Description`, and `Author`.
+The `ScopeConfig` group is mandatory. The information in this group makes the scope known to the registry.
+In addition, this information controls how the scope appears in the "Scopes" scope.
+
+The `ScopeConfig` group must contain settings for at least `DisplayName`, `Description`, and `Author`.
 `DisplayName` and `Description` can (and should) be localized. For example:
 
 `Description[de_DE] = Fu&szlig;ballergebnisse`
@@ -1167,11 +1173,27 @@ This allows an aggregating scope to adjust its behavior according to which versi
 your scope is installed.
 If not set, the default value is 0. You can set the value to any integer >= 1.
 
-In addition to allowing the registry to make the scope available, this information controls how the scope appears
-in the "Scopes" scope.
+The `IdleTimeout` key controls how long a scope can remain idle before it is told to stop by the registry (or
+killed if it does not stop within 4 seconds). The default idle timeout is 40 seconds, meaning that a
+scope will be told to stop if no query was sent to it for that amount of time.
 
-The group `Appearance` and all keys within are optional and can be used to customize the look of the scope.
-Some of the `Appearance` keys (like `PageHeader.Background`) require background scheme uris. Valid uris for these keys include:
+`LocationDataNeeded` should be set to `true` if the scope requires location data. In that case, the
+\link unity::scopes::SearchMetadata SearchMetadata\endlink provides access to
+\link unity::scopes::Location Location\endlink information
+(assuming the user has granted location permission to the scope). If not set, the default value is `false`.
+
+The `Scoperunner` key defines a command line to be executed when the scope is started by the registry.
+Typically, scopes do not need to change this setting. It is provided mainly to allow scopes implemented
+in languages other than C++ to be started, as well as for debugging.
+For example, the following setting causes a scope to be run under `gdb`:
+
+`ScopeRunner = /usr/bin/gdb --ex run --args /usr/lib/x86_64-linux-gnu/unity-scopes/scoperunner %R %S`
+
+The `%R` expands to the path to the `Runtime.ini` config file, and `%S` expands to the scope's `.ini` file.
+
+The `Appearance` group and all keys within it are optional and can be used to customize the look of the scope.
+Some of the `Appearance` keys (such as `PageHeader.Background`) require background scheme uris.
+Valid uris for these keys include:
 
 <ul>
 <li>color:///\#aarrggbb</li>

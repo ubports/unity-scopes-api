@@ -130,7 +130,7 @@ void ReplyImpl::error(exception_ptr ex)
     catch (std::exception const& e)
     {
         BOOST_LOG(mw_proxy_->mw_base()->runtime()->logger())
-            << "ReplyImpl::error(): excpetion from finished(): " << error_message;
+            << "ReplyImpl::error(): exception from finished(): " << error_message;
     }
 }
 
@@ -148,7 +148,7 @@ void ReplyImpl::info(OperationInfo const& op_info)
     catch (std::exception const& e)
     {
         BOOST_LOG(mw_proxy_->mw_base()->runtime()->logger())
-            << "ReplyImpl::error(): excpetion from info(): " << e.what();
+            << "ReplyImpl::error(): exception from info(): " << e.what();
     }
 }
 

@@ -70,11 +70,12 @@ public:
 private:
     RuntimeImpl(std::string const& scope_id, std::string const& configfile);
     void waiter_thread(ThreadSafeQueue<std::future<void>>::SPtr const& queue) const noexcept;
-    std::string demangled_id() const;
+    std::string demangled_id(std::string const& scope_id) const;
     bool confined() const;
     std::string confinement_type() const;
     std::string find_cache_dir() const;
     std::string find_app_dir() const;
+    std::string find_log_dir(std::string const& id) const;
     std::string find_tmp_dir() const;
 
     bool destroyed_;
@@ -91,6 +92,7 @@ private:
     int reap_interval_;
     std::string cache_dir_;
     std::string app_dir_;
+    std::string log_dir_;
     std::string config_dir_;
     Logger::UPtr logger_;
     mutable Reaper::SPtr reply_reaper_;
