@@ -93,7 +93,7 @@ ScopeMetadata make_meta(const string& scope_id, MWScopeProxy const& proxy, Middl
     mi->set_search_hint("search hint " + scope_id);
     mi->set_hot_key("hot key " + scope_id);
     mi->set_scope_directory("/foo");
-    ScopeProxy p = ScopeImpl::create(proxy, mw->runtime(), scope_id);
+    ScopeProxy p = ScopeImpl::create(proxy, scope_id);
     mi->set_proxy(p);
     return ScopeMetadataImpl::create(move(mi));
 }
@@ -407,7 +407,7 @@ public:
         scope_ids = { {"scope-A", "scope-B", "scope-C", "scope-D", "scope-N", "scope-S"} };
         for (auto& scope_id : scope_ids)
         {
-            proxies[scope_id] = ScopeImpl::create(mw->create_scope_proxy(scope_id), mw->runtime(), scope_id);
+            proxies[scope_id] = ScopeImpl::create(mw->create_scope_proxy(scope_id), scope_id);
 
             unique_ptr<ScopeMetadataImpl> mi(new ScopeMetadataImpl(mw.get()));
             mi->set_scope_id(scope_id);
@@ -496,7 +496,7 @@ public:
         std::string test_scope_id = "testscopeB";
         std::string test_scope_config = REGISTRY_TEST_DIR "/scopes/testscopeB/testscopeB.ini";
         ScopeConfig sc(test_scope_config);
-        ScopeProxy test_proxy = ScopeImpl::create(mw->create_scope_proxy(test_scope_id), mw->runtime(), test_scope_id);
+        ScopeProxy test_proxy = ScopeImpl::create(mw->create_scope_proxy(test_scope_id), test_scope_id);
 
         unique_ptr<ScopeMetadataImpl> mi(new ScopeMetadataImpl(mw.get()));
         mi->set_scope_id(test_scope_id);

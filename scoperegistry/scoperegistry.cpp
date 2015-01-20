@@ -408,7 +408,7 @@ void add_local_scope(RegistryObject::SPtr const& registry,
     {
     }
 
-    ScopeProxy proxy = ScopeImpl::create(mw->create_scope_proxy(scope.first), mw->runtime(), scope.first);
+    ScopeProxy proxy = ScopeImpl::create(mw->create_scope_proxy(scope.first), scope.first);
     mi->set_proxy(proxy);
     auto meta = ScopeMetadataImpl::create(std::move(mi));
 

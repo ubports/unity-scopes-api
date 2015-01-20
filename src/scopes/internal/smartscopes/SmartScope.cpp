@@ -19,6 +19,7 @@
 
 #include <unity/scopes/internal/smartscopes/SmartScope.h>
 
+#include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/PreviewReply.h>
 #include <unity/scopes/SearchReply.h>
 
@@ -105,7 +106,7 @@ void SmartQuery::run(SearchReplyProxy const& reply)
         }
         catch (std::exception const& e)
         {
-            BOOST_LOG_SEV(ss_client_->logger(), Logger::Error)
+            BOOST_LOG(ss_client_->logger())
                 << "SmartScope::run(): Failed to register filters for scope '" << filters_data.scope_id
                 << "': " << e.what();
         }
@@ -117,7 +118,7 @@ void SmartQuery::run(SearchReplyProxy const& reply)
         }
         catch (std::exception const& e)
         {
-            BOOST_LOG_SEV(ss_client_->logger(), Logger::Error)
+            BOOST_LOG(ss_client_->logger())
                 << "SmartScope::run(): Failed to set filter state for scope '" << filters_data.scope_id
                 << "': " << e.what();
         }
@@ -130,7 +131,7 @@ void SmartQuery::run(SearchReplyProxy const& reply)
         }
         catch (std::exception const& e)
         {
-            BOOST_LOG_SEV(this->ss_client_->logger(), Logger::Error)
+            BOOST_LOG(this->ss_client_->logger())
                 << "SmartScope: failed to register category: \"" << category->id
                 << "\" for scope \"" << scope_id_ << "\" and query: \"" << query_.query_string() << "\"";
         }
@@ -153,7 +154,7 @@ void SmartQuery::run(SearchReplyProxy const& reply)
         }
         else
         {
-            BOOST_LOG_SEV(this->ss_client_->logger(), Logger::Error)
+            BOOST_LOG(this->ss_client_->logger())
                 << "SmartScope: result for query: \"" << scope_id_ << "\": \"" << query_.query_string()
                 << "\" returned an invalid cat_id. Skipping result.";
         }
@@ -166,7 +167,7 @@ void SmartQuery::run(SearchReplyProxy const& reply)
         }
         catch (std::exception const& e)
         {
-            BOOST_LOG_SEV(this->ss_client_->logger(), Logger::Error)
+            BOOST_LOG(this->ss_client_->logger())
                 << "SmartScope::run(): Failed to register departments for scope '" << scope_id_ << "': " << e.what();
         }
     };

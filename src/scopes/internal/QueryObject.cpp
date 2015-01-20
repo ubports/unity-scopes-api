@@ -22,9 +22,10 @@
 #include <unity/scopes/ActivationQueryBase.h>
 #include <unity/scopes/internal/MWQueryCtrl.h>
 #include <unity/scopes/internal/MWReply.h>
-#include <unity/scopes/internal/QueryCtrlObject.h>
-#include <unity/scopes/internal/SearchReplyImpl.h>
 #include <unity/scopes/internal/QueryBaseImpl.h>
+#include <unity/scopes/internal/QueryCtrlObject.h>
+#include <unity/scopes/internal/RuntimeImpl.h>
+#include <unity/scopes/internal/SearchReplyImpl.h>
 #include <unity/scopes/PreviewQueryBase.h>
 #include <unity/scopes/QueryBase.h>
 #include <unity/scopes/SearchQueryBase.h>
@@ -45,23 +46,20 @@ namespace internal
 
 QueryObject::QueryObject(std::shared_ptr<QueryBase> const& query_base,
                          MWReplyProxy const& reply,
-                         MWQueryCtrlProxy const& ctrl,
-                         boost::log::sources::severity_channel_logger_mt<>& logger)
-    : QueryObject(query_base, 0, reply, ctrl, logger)
+                         MWQueryCtrlProxy const& ctrl)
+    : QueryObject(query_base, 0, reply, ctrl)
 {
 }
 
 QueryObject::QueryObject(std::shared_ptr<QueryBase> const& query_base,
                          int cardinality,
                          MWReplyProxy const& reply,
-                         MWQueryCtrlProxy const& ctrl,
-                         boost::log::sources::severity_channel_logger_mt<>& logger)
+                         MWQueryCtrlProxy const& ctrl)
     : query_base_(query_base)
     , reply_(reply)
     , ctrl_(ctrl)
     , pushable_(true)
     , cardinality_(cardinality)
-    , logger_(logger)
 {
 }
 
@@ -78,7 +76,7 @@ QueryObject::~QueryObject()
     }
 }
 
-void QueryObject::run(MWReplyProxy const& reply, InvokeInfo const& /* info */) noexcept
+void QueryObject::run(MWReplyProxy const& reply, InvokeInfo const& info) noexcept
 {
     unique_lock<mutex> lock(mutex_);
 
@@ -103,7 +101,10 @@ void QueryObject::run(MWReplyProxy const& reply, InvokeInfo const& /* info */) n
     // Create the reply proxy to pass to query_base_ and keep a weak_ptr, which we will need
     // if cancel() is called later.
     assert(self_);
-    auto reply_proxy = make_shared<SearchReplyImpl>(reply, self_, cardinality_, search_query->department_id(), logger_);
+    auto reply_proxy = make_shared<SearchReplyImpl>(reply,
+                                                    self_,
+                                                    cardinality_,
+                                                    search_query->department_id());
     assert(reply_proxy);
     reply_proxy_ = reply_proxy;
 
@@ -123,13 +124,13 @@ void QueryObject::run(MWReplyProxy const& reply, InvokeInfo const& /* info */) n
     catch (std::exception const& e)
     {
         pushable_ = false;
-        BOOST_LOG_SEV(logger_, Logger::Error) << "ScopeBase::run(): " << e.what();
+        BOOST_LOG(info.mw->runtime()->logger()) << "ScopeBase::run(): " << e.what();
         reply_->finished(CompletionDetails(CompletionDetails::Error, e.what()));  // Oneway, can't block
     }
     catch (...)
     {
         pushable_ = false;
-        BOOST_LOG_SEV(logger_, Logger::Error) << "ScopeBase::run(): unknown exception";
+        BOOST_LOG(info.mw->runtime()->logger()) << "ScopeBase::run(): unknown exception";
         reply_->finished(CompletionDetails(CompletionDetails::Error, "unknown exception"));  // Oneway, can't block
     }
 }

@@ -48,7 +48,10 @@ kj::ArrayPtr<kj::ArrayPtr<capnp::word const> const> create_unknown_response(capn
 kj::ArrayPtr<kj::ArrayPtr<capnp::word const> const> create_object_not_exist_response(capnp::MessageBuilder& b,
                                                                                      Current const& c);
 
-void throw_if_runtime_exception(capnproto::Response::Reader const& reader);
+void throw_if_runtime_exception(capnproto::Response::Reader const& response);
+
+std::string decode_runtime_exception(capnproto::Response::Reader const& response);
+std::string decode_status(capnproto::Response::Reader const& response);
 
 } // namespace zmq_middleware
 

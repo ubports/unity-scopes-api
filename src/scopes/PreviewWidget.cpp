@@ -152,12 +152,14 @@ List of attributes:
 
 \arg \c source A URI pointing to the image
 \arg \c zoomable A boolean specifying whether the image is zoomable (default: \c false)
+\arg \c fallback A fallback image to be used if the image URI cannot be retrieved (default: none)
 
 \code{.cpp}
 {
     PreviewWidget w1("img1", "image");
 
-    w1.add_attribute_value("source", Variant("file:///tmp/image.jpg"));
+    w1.add_attribute_value("source", Variant("http://example.com/image.jpg"));
+    w1.add_attribute_value("fallback", Variant("file:///tmp/image.jpg"));
     ...
 }
 \endcode
@@ -169,16 +171,18 @@ The gallery widget displays a set of images.
 List of attributes:
 
 \arg \c sources An array of image URIs
+\arg \c fallback A fallback image to be used if an image URI cannot be resolved (default: none)
 
 \code{.cpp}
 {
     PreviewWidget w1("gal", "gallery");
 
     VariantArray arr;
-    arr.push_back(Variant("file:///tmp/image1.jpg"));
+    arr.push_back(Variant("http://example.com/image1.jpg"));
     arr.push_back(Variant("file:///tmp/image2.jpg"));
     arr.push_back(Variant("file:///tmp/image3.jpg"));
     w1.add_attribute_value("sources", Variant(arr));
+    w1.add_attribute_value("fallback", Variant("file:///tmp/fallback.png"));
     ...
 }
 \endcode
@@ -192,6 +196,7 @@ List of attributes:
 \arg \c title A string specifying the title
 \arg \c subtitle A string specifying the subtitle
 \arg \c mascot A URI specifying the mascot
+\arg \c fallback A fallback image to be used if the mascot URI cannot be retrieved (default: none)
 \arg \c emblem A URI specifying the emblem
 
 \code{.cpp}
@@ -199,7 +204,8 @@ List of attributes:
     PreviewWidget w1("hdr", "header");
 
     w1.add_attribute_value("title", Variant("Result item"));
-    w1.add_attribute_value("mascot", Variant("file:///tmp/mascot.png"));
+    w1.add_attribute_value("mascot", Variant("http://example.com/image.png"));
+    w1.add_attribute_value("fallback", Variant("file:///tmp/fallback_mascot.png"));
     ...
 }
 \endcode
