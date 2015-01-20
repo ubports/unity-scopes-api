@@ -187,7 +187,7 @@ QVariant const& QResultImpl::value(QString const& key) const
     return return_const_variants[key];
 }
 
-VariantMap QResultImpl::serialize() const
+QVariantMap QResultImpl::serialize() const
 {
-    return api_result_->serialize();
+    return scopeVariantMapToQVariantMap(api_result_->serialize());
 }

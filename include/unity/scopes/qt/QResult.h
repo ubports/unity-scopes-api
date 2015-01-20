@@ -242,7 +242,7 @@ public:
     \brief Returns a dictionary of all attributes of this Result instance.
     \return All base attributes and custom attributes set with add_metadata().
     */
-    VariantMap serialize() const;
+    QVariantMap serialize() const;
 
 protected:
     /// @cond

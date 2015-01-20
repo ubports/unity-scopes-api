@@ -157,7 +157,7 @@ QVariant const& QResult::value(QString const& key) const
     return p->value(key);
 }
 
-VariantMap QResult::serialize() const
+QVariantMap QResult::serialize() const
 {
     return p->serialize();
 }
