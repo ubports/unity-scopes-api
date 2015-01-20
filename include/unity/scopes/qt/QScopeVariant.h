@@ -46,7 +46,6 @@ public:
     explicit QScopeVariant() noexcept;
     ~QScopeVariant();
 
-
     QScopeVariant(QScopeVariant const& other);
     QScopeVariant(QScopeVariant&&);
 

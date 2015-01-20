@@ -62,26 +62,31 @@ public:
     \param id The unique widget identifier.
     \param widget_type The type of the widget.
     */
-    QPreviewWidget(QString const& id, QString const &widget_type);
+    QPreviewWidget(QString const& id, QString const& widget_type);
 
     /**
     \brief Create a widget from a JSON definition.
 
-    The JSON definition must be a dictionary that includes widget "id" and all the values of attributes required by desired
+    The JSON definition must be a dictionary that includes widget "id" and all the values of attributes required by
+    desired
     \link QPreviewWidget widget type\endlink. For example, a definition of image widget may look as follows:
     \code{.cpp}
     PreviewWidget img(R"({"id": "img", "type": "image", "source": "http://imageuri"})");
     \endcode
 
-    For cases where attribute mappings are to be used instead of direct values, they need to be enclosed in the "components" dictionary, e.g.
+    For cases where attribute mappings are to be used instead of direct values, they need to be enclosed in the
+    "components" dictionary, e.g.
     \code{.cpp}
     PreviewWidget img(R"({"id": "img", "type": "image", "components": { "source": "screenshot-url" } })");
     \endcode
-    (this example assumes "screenshot-url" value is either available in the result object that's being previewed, or it will be pushed with
+    (this example assumes "screenshot-url" value is either available in the result object that's being previewed, or it
+    will be pushed with
     unity::scopes::PreviewReply::push() method)
 
-    \note It is recommended to create widgets via unity::scopes::PreviewWidget(QString const&, QString const&) constructor
-    and unity::scopes::PreviewWidget::add_attribute_value() / unity::scopes::PreviewWidget::add_attribute_mapping() methods,
+    \note It is recommended to create widgets via unity::scopes::PreviewWidget(QString const&, QString const&)
+    constructor
+    and unity::scopes::PreviewWidget::add_attribute_value() / unity::scopes::PreviewWidget::add_attribute_mapping()
+    methods,
     rather than via JSON definition.
 
     \param definition The JSON definition.
@@ -179,15 +184,15 @@ public:
 
 private:
     std::unique_ptr<internal::QPreviewWidgetImpl> p;
-    QPreviewWidget(internal::QPreviewWidgetImpl * widget);
+    QPreviewWidget(internal::QPreviewWidgetImpl* widget);
 
     friend class internal::QPreviewWidgetImpl;
     friend class internal::QPreviewReplyImpl;
     /// @endcond
 };
 
-} // namespace qt
+}  // namespace qt
 
-} // namespace scopes
+}  // namespace scopes
 
-} // namespace unity
+}  // namespace unity

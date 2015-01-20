@@ -41,7 +41,8 @@ class QPreviewQueryBaseImpl;
 
 /**
 \brief Metadata passed to scopes for preview and activation.
-\see unity::scopes::qt::QScopeBase::preview, unity::scopes::ScopeBase::activate, unity::scopes::ScopeBase::perform_action
+\see unity::scopes::qt::QScopeBase::preview, unity::scopes::ScopeBase::activate,
+unity::scopes::ScopeBase::perform_action
 */
 class QActionMetadata
 {

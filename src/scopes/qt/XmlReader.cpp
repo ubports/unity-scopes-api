@@ -94,4 +94,3 @@ XmlReader::QXmlStreamReaderSptr XmlReader::read(QString const& host,
     return item;
 }
 /// @endcond
-

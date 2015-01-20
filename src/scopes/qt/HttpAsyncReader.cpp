@@ -66,8 +66,6 @@ HttpAsyncReader::~HttpAsyncReader()
 {
 }
 
-
-
 core::net::http::Request::Progress::Next HttpAsyncReader::progress_report(
     core::net::http::Request::Progress const&) const
 {

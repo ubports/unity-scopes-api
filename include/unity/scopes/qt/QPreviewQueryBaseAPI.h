@@ -68,7 +68,6 @@ public:
     NONCOPYABLE(QPreviewQueryBaseAPI);
     UNITY_DEFINES_PTRS(QPreviewQueryBaseAPI);
 
-
     virtual ~QPreviewQueryBaseAPI();
 
 protected:

@@ -27,7 +27,7 @@ using namespace unity::scopes;
 using namespace unity::scopes::qt;
 using namespace unity::scopes::qt::internal;
 
-QPreviewWidgetImpl::QPreviewWidgetImpl(QString const& id, QString const &widget_type)
+QPreviewWidgetImpl::QPreviewWidgetImpl(QString const& id, QString const& widget_type)
     : api_widget_(new PreviewWidget(id.toUtf8().data(), widget_type.toUtf8().data()))
 {
 }
@@ -48,7 +48,7 @@ QPreviewWidgetImpl::~QPreviewWidgetImpl() = default;
 
 QPreviewWidgetImpl& QPreviewWidgetImpl::operator=(QPreviewWidgetImpl const& other)
 {
-    if(&other != this)
+    if (&other != this)
     {
         api_widget_.reset(new PreviewWidget(*other.api_widget_));
     }
@@ -85,7 +85,7 @@ QString QPreviewWidgetImpl::widget_type() const
 QMap<QString, QString> QPreviewWidgetImpl::attribute_mappings() const
 {
     QMap<QString, QString> ret_map;
-    for(auto item: api_widget_->attribute_mappings())
+    for (auto item : api_widget_->attribute_mappings())
     {
         ret_map[QString::fromUtf8(item.first.c_str())] = QString::fromUtf8(item.second.c_str());
     }
@@ -100,7 +100,7 @@ QVariantMap QPreviewWidgetImpl::attribute_values() const
 QPreviewWidgetList QPreviewWidgetImpl::widgets() const
 {
     QPreviewWidgetList ret_list;
-    for(auto item: api_widget_->widgets())
+    for (auto item : api_widget_->widgets())
     {
         ret_list.push_back(QPreviewWidget(new QPreviewWidgetImpl(item)));
     }
@@ -117,7 +117,7 @@ QVariantMap QPreviewWidgetImpl::serialize() const
     return scopeVariantMapToQVariantMap(api_widget_->serialize());
 }
 
-QPreviewWidgetImpl::QPreviewWidgetImpl(PreviewWidget const &api_widget)
+QPreviewWidgetImpl::QPreviewWidgetImpl(PreviewWidget const& api_widget)
     : api_widget_(new PreviewWidget(api_widget))
 {
 }

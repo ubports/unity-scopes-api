@@ -46,7 +46,7 @@ bool QPreviewReplyImpl::push(QPreviewWidgetList const& widget_list)
 {
     PreviewWidgetList api_list;
     QListIterator<QPreviewWidget> it(widget_list);
-    while(it.hasNext())
+    while (it.hasNext())
     {
         api_list.push_back(PreviewWidget(*it.next().p->api_widget_));
     }

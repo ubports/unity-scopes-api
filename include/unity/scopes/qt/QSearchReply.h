@@ -85,12 +85,16 @@ public:
      such as "World War Two" and "Ancient", the code
      that registers departments for current search in "History" may look like this:
      \code{.cpp}
-     unity::scopes::qt::QDepartment::SPtr books = move(unity::scopes::qt::QDepartment::create("books", query, "Books")); // the
+     unity::scopes::qt::QDepartment::SPtr books = move(unity::scopes::qt::QDepartment::create("books", query, "Books"));
+     // the
      parent of "History"
-     unity::scopes::Department::SPtr history = move(unity::scopes::qt::QDepartment::create("history", query, "History"));
+     unity::scopes::Department::SPtr history = move(unity::scopes::qt::QDepartment::create("history", query,
+     "History"));
      unity::scopes::DepartmentList history_depts({
-                                                 move(unity::scopes::qt::QDepartment::create("ww2", query, "World War Two")),
-                                                 move(unity::scopes::qt::QDepartment::create("ancient", query, "Ancient"))});
+                                                 move(unity::scopes::qt::QDepartment::create("ww2", query, "World War
+     Two")),
+                                                 move(unity::scopes::qt::QDepartment::create("ancient", query,
+     "Ancient"))});
      history->set_subdepartments(history_depts);
      books->set_subdepartments({history});
      reply->register_departments(books);

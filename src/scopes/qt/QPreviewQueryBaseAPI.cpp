@@ -74,7 +74,6 @@ public:
     unity::scopes::PreviewReplyProxy proxy_;
 };
 
-
 QPreviewQueryBaseAPI::QPreviewQueryBaseAPI(std::shared_ptr<QCoreApplication> qtapp,
                                            QScopeBase& qtscope,
                                            unity::scopes::Result const& result,

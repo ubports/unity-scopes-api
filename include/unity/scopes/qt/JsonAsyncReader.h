@@ -291,7 +291,6 @@ JsonAsyncReader::ResultsFuture<T> JsonAsyncReader::async_get(std::string const& 
     return p_->async_get<T, T, QJsonDocument>(uri, object_name, JsonAsyncReader::create_parser_with_data, parse);
 }
 
-
 template <typename B, typename T>
 static bool get_results_json_object(QJsonObject& root,
                                     const std::string& object_name,

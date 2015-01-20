@@ -23,7 +23,7 @@
 using namespace unity::scopes::qt;
 
 /// @cond
-QPreviewWidget::QPreviewWidget(QString const& id, QString const &widget_type)
+QPreviewWidget::QPreviewWidget(QString const& id, QString const& widget_type)
     : p(new internal::QPreviewWidgetImpl(id.toUtf8().data(), widget_type.toUtf8().data()))
 {
 }
@@ -44,7 +44,7 @@ QPreviewWidget::~QPreviewWidget() = default;
 
 QPreviewWidget& QPreviewWidget::operator=(QPreviewWidget const& other)
 {
-    if(&other != this)
+    if (&other != this)
     {
         p.reset(new internal::QPreviewWidgetImpl(*other.p->api_widget_));
     }
@@ -103,7 +103,7 @@ QVariantMap QPreviewWidget::serialize() const
     return p->serialize();
 }
 
-QPreviewWidget::QPreviewWidget(internal::QPreviewWidgetImpl *widget)
+QPreviewWidget::QPreviewWidget(internal::QPreviewWidgetImpl* widget)
     : p(new internal::QPreviewWidgetImpl(*widget))
 {
 }
