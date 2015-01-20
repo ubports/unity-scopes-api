@@ -26,7 +26,7 @@ using namespace unity::scopes::qt;
 
 /// @cond
 QResult::QResult()
-    : p(new internal::QResultImpl(VariantMap()))
+    : p(new internal::QResultImpl(QVariantMap()))
 {
 }
 
@@ -35,7 +35,7 @@ QResult::QResult(internal::QResultImpl* impl)
 {
 }
 
-QResult::QResult(const VariantMap& variant_map)
+QResult::QResult(const QVariantMap& variant_map)
     : p(new internal::QResultImpl(variant_map))
 {
 }

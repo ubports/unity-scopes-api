@@ -21,7 +21,6 @@
 #include <unity/util/DefinesPtrs.h>
 
 #include <unity/scopes/ScopeProxyFwd.h>
-#include <unity/scopes/Variant.h>
 
 #include <unity/scopes/qt/QScopeVariant.h>
 
@@ -246,7 +245,7 @@ public:
 
 protected:
     /// @cond
-    explicit QResult(const VariantMap& variant_map);
+    explicit QResult(const QVariantMap& variant_map);
     explicit QResult(internal::QResultImpl* impl);
     explicit QResult(unity::scopes::Result const& result);
 
