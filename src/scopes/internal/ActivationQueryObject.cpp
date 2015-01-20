@@ -71,13 +71,15 @@ void ActivationQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& inf
     }
     catch (std::exception const& e)
     {
-        BOOST_LOG(info.mw->runtime()->logger()) << "ActivationQueryObject::run(): " << e.what();
-        reply_->finished(CompletionDetails(CompletionDetails::Error, e.what()));  // Oneway, can't block
+        BOOST_LOG(info.mw->runtime()->logger()) << "ActivationQueryBase::activate(): " << e.what();
+        reply_->finished(CompletionDetails(CompletionDetails::Error,
+                                           string("ActivationQueryBase::activate(): ") + e.what()));
     }
     catch (...)
     {
-        BOOST_LOG(info.mw->runtime()->logger()) << "ActivationQueryObject::run(): unknown exception";
-        reply_->finished(CompletionDetails(CompletionDetails::Error, "unknown exception"));  // Oneway, can't block
+        BOOST_LOG(info.mw->runtime()->logger()) << "ActivationQueryBase::activate(): unknown exception";
+        reply_->finished(CompletionDetails(CompletionDetails::Error,
+                                           "ActivationQueryBase::activate(): unknown exception"));
     }
 }
 

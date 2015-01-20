@@ -76,6 +76,7 @@ public:
         CategorisedResult res(cat);
         res.set_uri("uri");
         res.set_title(query_string);
+        res.set_intercept_activation();
         if (valid())
         {
             reply->push(res);
@@ -131,6 +132,48 @@ private:
     condition_variable cond_;
 };
 
+class TestActivation : public ActivationQueryBase
+{
+public:
+    TestActivation(Result const& result, ActionMetadata const& metadata)
+        : ActivationQueryBase(result, metadata)
+        , result_(result)
+        , activate_cancelled_(false)
+    {
+    }
+
+    virtual void cancelled() override
+    {
+        if (result_.title() == "throw from activation cancelled")
+        {
+            lock_guard<mutex> lock(mutex_);
+            activate_cancelled_ = true;
+            cond_.notify_all();
+            throw ResourceException("exception from activation cancelled");
+        }
+    }
+
+    virtual ActivationResponse activate() override
+    {
+        if (result_.title() == "throw from activation activate")
+        {
+            throw ResourceException(result_.title());
+        }
+        else if (result_.title() == "throw from activation cancelled")
+        {
+            unique_lock<mutex> lock(mutex_);
+            cond_.wait(lock, [this] { return this->activate_cancelled_; });
+        }
+        return ActivationResponse(ActivationResponse::NotHandled);
+    }
+
+private:
+    Result result_;
+    bool activate_cancelled_;
+    mutex mutex_;
+    condition_variable cond_;
+};
+
 }  // namespace
 
 void ThrowingScope::start(string const& scope_id)
@@ -165,6 +208,16 @@ PreviewQueryBase::UPtr ThrowingScope::preview(Result const& result, ActionMetada
     }
     lock_guard<mutex> lock(mutex_);
     return PreviewQueryBase::UPtr(new TestPreview(result, metadata));
+}
+
+ActivationQueryBase::UPtr ThrowingScope::activate(Result const& result, ActionMetadata const& metadata)
+{
+    if (result.title() == "throw from activate")
+    {
+        throw ResourceException("exception from activate");
+    }
+    lock_guard<mutex> lock(mutex_);
+    return ActivationQueryBase::UPtr(new TestActivation(result, metadata));
 }
 
 extern "C"

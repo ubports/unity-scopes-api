@@ -35,6 +35,9 @@ public:
     virtual unity::scopes::PreviewQueryBase::UPtr preview(unity::scopes::Result const&,
                                                           unity::scopes::ActionMetadata const &) override;
 
+    virtual unity::scopes::ActivationQueryBase::UPtr activate(unity::scopes::Result const&,
+                                                              unity::scopes::ActionMetadata const &) override;
+
 private:
     std::string id_;
     std::mutex mutex_;
