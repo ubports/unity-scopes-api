@@ -18,7 +18,6 @@
 
 #include <unity/scopes/internal/zmq_middleware/ZmqScope.h>
 
-#include <unity/scopes/internal/Logger.h>
 #include <unity/scopes/internal/QueryCtrlImpl.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <scopes/internal/zmq_middleware/capnproto/Scope.capnp.h>
@@ -105,7 +104,7 @@ QueryCtrlProxy ZmqScope::search(CannedQuery const& query, VariantMap const& hint
                                          proxy.getEndpoint().cStr(),
                                          proxy.getIdentity().cStr(),
                                          proxy.getCategory().cStr()));
-    return make_shared<QueryCtrlImpl>(p, reply_proxy, mw_base()->runtime()->logger());
+    return make_shared<QueryCtrlImpl>(p, reply_proxy);
 }
 
 QueryCtrlProxy ZmqScope::activate(VariantMap const& result, VariantMap const& hints, MWReplyProxy const& reply)
@@ -135,7 +134,7 @@ QueryCtrlProxy ZmqScope::activate(VariantMap const& result, VariantMap const& hi
                                          proxy.getEndpoint().cStr(),
                                          proxy.getIdentity().cStr(),
                                          proxy.getCategory().cStr()));
-    return make_shared<QueryCtrlImpl>(p, reply_proxy, mw_base()->runtime()->logger());
+    return make_shared<QueryCtrlImpl>(p, reply_proxy);
 }
 
 QueryCtrlProxy ZmqScope::perform_action(VariantMap const& result,
@@ -168,7 +167,7 @@ QueryCtrlProxy ZmqScope::perform_action(VariantMap const& result,
                                          proxy.getEndpoint().cStr(),
                                          proxy.getIdentity().cStr(),
                                          proxy.getCategory().cStr()));
-    return make_shared<QueryCtrlImpl>(p, reply_proxy, mw_base()->runtime()->logger());
+    return make_shared<QueryCtrlImpl>(p, reply_proxy);
 }
 
 QueryCtrlProxy ZmqScope::preview(VariantMap const& result, VariantMap const& hints, MWReplyProxy const& reply)
@@ -198,7 +197,7 @@ QueryCtrlProxy ZmqScope::preview(VariantMap const& result, VariantMap const& hin
                                          proxy.getEndpoint().cStr(),
                                          proxy.getIdentity().cStr(),
                                          proxy.getCategory().cStr()));
-    return make_shared<QueryCtrlImpl>(p, reply_proxy, mw_base()->runtime()->logger());
+    return make_shared<QueryCtrlImpl>(p, reply_proxy);
 }
 
 bool ZmqScope::debug_mode()

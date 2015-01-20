@@ -24,7 +24,9 @@
 #include <boost/log/sources/record_ostream.hpp>
 #include <boost/log/support/date_time.hpp>
 #include <boost/log/trivial.hpp>
+#include <boost/phoenix/bind.hpp>
 #include <boost/utility/empty_deleter.hpp>
+#include <unity/UnityExceptions.h>
 
 using namespace std;
 
@@ -47,9 +49,14 @@ namespace internal
 namespace
 {
 
-string const& severity(int s)
+static array<string, Logger::LastChannelEnum_> const channel_names =
+    {
+        "IPC"
+    };
+
+string const& to_severity(int s)
 {
-    static array<string, 5> const severities = { { "TRACE", "INFO", "WARNING", "ERROR", "FATAL" } };
+    static array<string, 5> const severities = { { "INFO", "WARNING", "ERROR", "FATAL", "TRACE" } };
     static string const unknown = "UNKNOWN";
 
     if (s < 0 || s >= static_cast<int>(severities.size()))
@@ -59,31 +66,13 @@ string const& severity(int s)
     return severities[s];
 }
 
-void formatter(logging::record_view const& rec, logging::formatting_ostream& strm, string const& scope_id)
-{
-    strm << "[" << expr::format_date_time<boost::posix_time::ptime>("TimeStamp", "%Y-%m-%d %H:%M:%S.%f")(rec) << "] "
-         << severity(expr::attr<int>("Severity")(rec).get()) << ": "
-         << scope_id << ": "
-         << rec[expr::smessage];
-}
-
 }
 
 // Instantiate a logger for the scope/client with the given ID.
-//
-// Note: channel is our own address in memory. This gives
-//       us a unique identity. The id passed by the run time
-//       is *not* necessarily unique. (It is normally, but
-//       some of the tests instantiate more than one run time
-//       in a single address space, not always necessarily with
-//       a unique scope id. Using a unique ID guarantees
-//       that a log message writting by one run time isn't
-//       also written a second time by a run time that
-//       happens to have the same ID.
 
 Logger::Logger(string const& scope_id)
     : scope_id_(scope_id)
-    , logger_(keywords::channel = to_string(reinterpret_cast<ptrdiff_t>(this)))
+    , logger_(keywords::severity = Logger::Error)
     , severity_(Logger::Info)
 {
     namespace ph = std::placeholders;
@@ -92,11 +81,21 @@ Logger::Logger(string const& scope_id)
 
     logger_.add_attribute("TimeStamp", attrs::local_clock());
 
+    // Create a channel logger for each channel.
+    for (auto&& name : channel_names)
+    {
+        auto clogger = boost::log::sources::severity_channel_logger_mt<>(keywords::severity = Logger::Trace,
+                                                                         keywords::channel = name);
+        clogger.add_attribute("TimeStamp", attrs::local_clock());
+        channel_loggers_[name] = make_pair(clogger, false);
+    }
+
     // Set up sink that logs to std::clog.
     clog_sink_ = boost::make_shared<ClogSinkT>();
-    clog_sink_->set_formatter(std::bind(formatter, ph::_1, ph::_2, scope_id));
+    clog_sink_->set_formatter(bind(&Logger::formatter, this, ph::_1, ph::_2));
     boost::shared_ptr<std::ostream> console_stream(&std::clog, boost::empty_deleter());
     clog_sink_->locked_backend()->add_stream(console_stream);
+    clog_sink_->locked_backend()->auto_flush(true);
     logging::core::get()->add_sink(clog_sink_);
 
     set_severity_threshold(severity_);
@@ -104,49 +103,128 @@ Logger::Logger(string const& scope_id)
 
 Logger::~Logger()
 {
+    lock_guard<mutex> lock(mutex_);
+
     if (clog_sink_)
     {
         logging::core::get()->remove_sink(clog_sink_);
+        clog_sink_->stop();
+        clog_sink_->flush();
     }
     else
     {
         logging::core::get()->remove_sink(file_sink_);
+        file_sink_->stop();
+        file_sink_->flush();
     }
 }
 
 Logger::operator boost::log::sources::severity_channel_logger_mt<>&()
 {
-    return logger_;
+    return logger_;  // No lock needed, immutable
 }
 
-void Logger::set_log_file(string const& path)
+src::severity_channel_logger_mt<>& Logger::operator()(Channel c)
+{
+    // No lock needed: channel_loggers_ is immutable, and the boolean is atomic.
+    return channel_loggers_[channel_names[c]].first;
+}
+
+bool Logger::set_channel(Channel c, bool enable)
+{
+    auto it = channel_loggers_.find(channel_names[c]);
+    assert(it != channel_loggers_.end());
+    bool was_enabled = it->second.second.exchange(enable);
+    return was_enabled;
+}
+
+bool Logger::set_channel(string channel_name, bool enable)
+{
+    auto it = channel_loggers_.find(channel_name);
+    if (it == channel_loggers_.end())
+    {
+        throw InvalidArgumentException("Logger::set_channel(): invalid channel name: " + channel_name);
+    }
+    bool was_enabled = it->second.second.exchange(enable);
+    return was_enabled;
+}
+
+void Logger::enable_channels(vector<string> const& names)
+{
+    exception_ptr ep;
+    for (auto&& name : names)
+    {
+        try
+        {
+            set_channel(name, true);
+        }
+        catch (InvalidArgumentException& e)
+        {
+            ep = ep ? make_exception_ptr(current_exception()) : e.remember(ep);
+        }
+    }
+    if (ep)
+    {
+        rethrow_exception(ep);
+    }
+}
+
+void Logger::set_log_file(string const& path, int rotation_size, int dir_size)
 {
     namespace ph = std::placeholders;
 
     FileSinkPtr s = boost::make_shared<FileSinkT>(
-                        keywords::file_name = path + "_%N.log",
-                        keywords::rotation_size = 5 * 1024 * 1024,
-                        keywords::time_based_rotation = sinks::file::rotation_at_time_point(12, 0, 0));
-    if (clog_sink_)
+                        keywords::file_name = path + "-%N.log",
+                        keywords::rotation_size = rotation_size);
+
+    string parent = boost::filesystem::path(path).parent_path().native();
+    s->locked_backend()->set_file_collector(sinks::file::make_collector(keywords::target = parent,
+                                                                        keywords::max_size = dir_size));
+    try
     {
-        logging::core::get()->remove_sink(clog_sink_);
+        s->locked_backend()->scan_for_files();
     }
-    else
+    catch (std::exception const& e)
     {
-        logging::core::get()->remove_sink(file_sink_);
+        BOOST_LOG_SEV(logger_, Warning)
+            << "RuntimeImpl::Logger(): log rotation failed (path = " << parent << "): " << e.what();
+        return;
     }
-    file_sink_ = s;
+    catch (...)
+    {
+        BOOST_LOG_SEV(logger_, Warning)
+            << "RuntimeImpl::Logger(): log rotation failed (path = " << parent << "): unknown exception";
+        return;
+    }
+
+    {
+        lock_guard<mutex> lock(mutex_);
+
+        if (clog_sink_)
+        {
+            logging::core::get()->remove_sink(clog_sink_);
+            clog_sink_ = nullptr;
+        }
+        else
+        {
+            logging::core::get()->remove_sink(file_sink_);
+        }
+
+        file_sink_ = s;
+        file_sink_->locked_backend()->auto_flush(true);
+        file_sink_->set_formatter(bind(&Logger::formatter, this, ph::_1, ph::_2));
+        logging::core::get()->add_sink(file_sink_);
+    }
     set_severity_threshold(severity_);
-    file_sink_->set_formatter(std::bind(formatter, ph::_1, ph::_2, scope_id_));
-    logging::core::get()->add_sink(s);
 }
 
 Logger::Severity Logger::set_severity_threshold(Logger::Severity s)
 {
-    auto old_s = severity_;
-    severity_ = s;
-    auto filter = expr::attr<string>("Channel") == to_string(reinterpret_cast<ptrdiff_t>(this))
-                  && expr::attr<int>("Severity") >= static_cast<int>(severity_);
+    auto old_s = severity_.exchange(s);
+
+    lock_guard<mutex> lock(mutex_);
+
+    auto filter = boost::phoenix::bind(&Logger::filter, this, severity.or_none(), channel.or_none());
     if (clog_sink_)
     {
         clog_sink_->set_filter(filter);
@@ -155,7 +233,38 @@ Logger::Severity Logger::set_severity_threshold(Logger::Severity s)
     {
         file_sink_->set_filter(filter);
     }
+
     return old_s;
+}
+
+bool Logger::filter(logging::value_ref<int, tag::severity> const& level,
+                    logging::value_ref<string, tag::channel> const& channel)
+{
+    if (level.get() < static_cast<int>(severity_))  // atomic
+    {
+        return false;
+    }
+    if (channel.get().empty())
+    {
+        return true;
+    }
+    // No lock needed: channel_loggers_ is immutable, and the boolean is atomic.
+    auto it = channel_loggers_.find(channel.get());
+    assert(it != channel_loggers_.end());
+    return it->second.second;
+}
+
+void Logger::formatter(logging::record_view const& rec,
+                       logging::formatting_ostream& strm)
+{
+    string channel = expr::attr<string>("Channel")(rec).get();
+
+    string prefix = channel.empty() ? to_severity(expr::attr<int>("Severity")(rec).get()) : channel;
+
+    strm << "[" << expr::format_date_time<boost::posix_time::ptime>("TimeStamp", "%Y-%m-%d %H:%M:%S.%f")(rec) << "] "
+         << prefix << ": "
+         << scope_id_ << ": "
+         << rec[expr::smessage];
 }
 
 } // namespace internal

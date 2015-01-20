@@ -554,7 +554,7 @@ TEST(Activation, scope)
     auto mw = rt->factory()->create("TestScope", "Zmq", TEST_DIR "/Zmq.ini");
     mw->start();
     auto proxy = mw->create_scope_proxy("TestScope");
-    auto scope = internal::ScopeImpl::create(proxy, rt.get(), "TestScope");
+    auto scope = internal::ScopeImpl::create(proxy, "TestScope");
 
     VariantMap hints;
     auto receiver = std::make_shared<SearchReceiver>();

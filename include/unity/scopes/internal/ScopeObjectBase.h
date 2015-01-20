@@ -19,7 +19,6 @@
 #pragma once
 
 #include <unity/scopes/internal/AbstractObject.h>
-#include <unity/scopes/internal/InvokeInfo.h>
 #include <unity/scopes/internal/MWQueryCtrlProxyFwd.h>
 #include <unity/scopes/internal/MWReplyProxyFwd.h>
 #include <unity/scopes/Result.h>
@@ -38,6 +37,8 @@ class CannedQuery;
 
 namespace internal
 {
+
+class InvokeInfo;
 
 class ScopeObjectBase : public AbstractObject
 {

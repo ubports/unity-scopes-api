@@ -38,10 +38,8 @@ namespace scopes
 namespace internal
 {
 
-ReplyImpl::ReplyImpl(MWReplyProxy const& mw_proxy,
-                     std::shared_ptr<QueryObjectBase> const& qo,
-                     boost::log::sources::severity_channel_logger_mt<>& logger)
-    : ObjectImpl(mw_proxy, logger)
+ReplyImpl::ReplyImpl(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObjectBase> const& qo)
+    : ObjectImpl(mw_proxy)
     , qo_(qo)
     , finished_(false)
 {
@@ -123,7 +121,7 @@ void ReplyImpl::error(exception_ptr ex)
     {
         error_message = "unknown exception";
     }
-    BOOST_LOG_SEV(logger_, Logger::Error) << "ReplyImpl::error(): " << error_message;
+    BOOST_LOG(mw_proxy_->mw_base()->runtime()->logger()) << "ReplyImpl::error(): " << error_message;
 
     try
     {
@@ -131,7 +129,8 @@ void ReplyImpl::error(exception_ptr ex)
     }
     catch (std::exception const& e)
     {
-        BOOST_LOG_SEV(logger_, Logger::Error) << "ReplyImpl::error(): excpetion from finished(): " << error_message;
+        BOOST_LOG(mw_proxy_->mw_base()->runtime()->logger())
+            << "ReplyImpl::error(): exception from finished(): " << error_message;
     }
 }
 
@@ -148,7 +147,8 @@ void ReplyImpl::info(OperationInfo const& op_info)
     }
     catch (std::exception const& e)
     {
-        BOOST_LOG_SEV(logger_, Logger::Error) << "ReplyImpl::error(): excpetion from info(): " << e.what();
+        BOOST_LOG(mw_proxy_->mw_base()->runtime()->logger())
+            << "ReplyImpl::error(): exception from info(): " << e.what();
     }
 }
 

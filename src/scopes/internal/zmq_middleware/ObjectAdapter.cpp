@@ -56,10 +56,16 @@ namespace
 
 char const* pump_suffix = "-pump";
 
-}  // namespace
+// Some tests use a nullptr for the run time, so we use different loggers in that case.
 
-// Some tests use a nullptr for the run time, so we use a different logger in that case.
-BOOST_LOG_INLINE_GLOBAL_LOGGER_DEFAULT(object_adapter_test_logger, boost::log::sources::severity_channel_logger_mt<>)
+BOOST_LOG_INLINE_GLOBAL_LOGGER_DEFAULT(oa_test_logger, boost::log::sources::severity_channel_logger_mt<>)
+
+BOOST_LOG_INLINE_GLOBAL_LOGGER_CTOR_ARGS(
+    oa_test_ipc_logger,
+    boost::log::sources::severity_channel_logger_mt<>,
+    ((boost::log::keywords::severity = Logger::Trace, boost::log::keywords::channel = "IPC")))
+
+}  // namespace
 
 ObjectAdapter::ObjectAdapter(ZmqMiddleware& mw, string const& name, string const& endpoint, RequestMode m,
                              int pool_size, int64_t idle_timeout) :
@@ -69,8 +75,7 @@ ObjectAdapter::ObjectAdapter(ZmqMiddleware& mw, string const& name, string const
     mode_(m),
     pool_size_(pool_size),
     idle_timeout_(idle_timeout != -1 ? idle_timeout : zmqpp::poller::wait_forever),
-    state_(Inactive),
-    logger_(mw.runtime() ? mw.runtime()->logger() : object_adapter_test_logger::get())
+    state_(Inactive)
 {
     assert(!name.empty());
     assert(!endpoint.empty());
@@ -86,12 +91,12 @@ ObjectAdapter::~ObjectAdapter()
     }
     catch (std::exception const& e)
     {
-        BOOST_LOG_SEV(logger_, Logger::Error) << "~ObjectAdapter(): exception from shutdown(): " << e.what();
+        BOOST_LOG(logger()) << "~ObjectAdapter(): exception from shutdown(): " << e.what();
     }
     // LCOV_EXCL_START
     catch (...)
     {
-        BOOST_LOG_SEV(logger_, Logger::Error) << "~ObjectAdapter(): unknown exception from shutdown()";
+        BOOST_LOG(logger()) << "~ObjectAdapter(): unknown exception from shutdown()";
     }
     // LCOV_EXCL_STOP
 
@@ -103,12 +108,12 @@ ObjectAdapter::~ObjectAdapter()
     }
     catch (std::exception const& e)
     {
-        BOOST_LOG_SEV(logger_, Logger::Error) << "~ObjectAdapter(): exception from wait_for_shutdown(): " << e.what();
+        BOOST_LOG(logger()) << "~ObjectAdapter(): exception from wait_for_shutdown(): " << e.what();
     }
     // LCOV_EXCL_START
     catch (...)
     {
-        BOOST_LOG_SEV(logger_, Logger::Error) << "~ObjectAdapter(): unknown exception from wait_for_shutdown()";
+        BOOST_LOG(logger()) << "~ObjectAdapter(): unknown exception from wait_for_shutdown()";
     }
     // LCOV_EXCL_STOP
 }
@@ -729,7 +734,7 @@ void ObjectAdapter::dispatch(zmqpp::socket& pump, string const& client_address)
             }
             else
             {
-                BOOST_LOG_SEV(logger_, Logger::Error)
+                BOOST_LOG(logger())
                     << "ObjectAdapter: invalid oneway message header "
                      << "(id: " << current.id << ", adapter: " << name_ << ", op: " << current.op_name << ")";
             }
@@ -751,7 +756,7 @@ void ObjectAdapter::dispatch(zmqpp::socket& pump, string const& client_address)
             }
             else
             {
-                BOOST_LOG_SEV(logger_, Logger::Error)
+                BOOST_LOG(logger())
                     << "ObjectAdapter: twoway invocation sent to oneway adapter "
                     << "(id: " << current.id << ", adapter: " << name_ << ", op: " << current.op_name << ")";
             }
@@ -774,7 +779,7 @@ void ObjectAdapter::dispatch(zmqpp::socket& pump, string const& client_address)
         }
         else
         {
-            BOOST_LOG_SEV(logger_, Logger::Error) << s.str();
+            BOOST_LOG(logger()) << s.str();
         }
         return;
     }
@@ -800,6 +805,12 @@ void ObjectAdapter::dispatch(zmqpp::socket& pump, string const& client_address)
             auto exr = create_object_not_exist_response(b, current);
             sender.send(exr);
         }
+        else
+        {
+            BOOST_LOG_SEV(logger(), Logger::Warning)
+                << "ObjectAdapter: no servant for oneway request "
+                << "(id: " << current.id << ", adapter: " << name_ << ", op: " << current.op_name << ")";
+        }
         return;
     }
 
@@ -808,9 +819,11 @@ void ObjectAdapter::dispatch(zmqpp::socket& pump, string const& client_address)
     auto in_params = req.getInParams();
     capnp::MallocMessageBuilder b;
     auto r = b.initRoot<capnproto::Response>();
+    trace_dispatch(current);
     servant->safe_dispatch_(current, in_params, r); // noexcept
     if (mode_ == RequestMode::Twoway)
     {
+        BOOST_LOG(ipc_logger()) << decode_status(b.getRoot<capnproto::Response>());
         pump.send(client_address, zmqpp::socket::send_more);
         pump.send("", zmqpp::socket::send_more);
         sender.send(b.getSegmentsForOutput());
@@ -851,6 +864,26 @@ void ObjectAdapter::store_exception(MiddlewareException& ex)
     exception_ = ex.remember(exception_);
     state_ = Failed;
     state_changed_.notify_all();
+}
+
+boost::log::sources::severity_channel_logger_mt<>& ObjectAdapter::logger() const
+{
+    return mw_.runtime() ? mw_.runtime()->logger() : oa_test_logger::get();
+}
+
+boost::log::sources::severity_channel_logger_mt<>& ObjectAdapter::ipc_logger() const
+{
+    return mw_.runtime() ? mw_.runtime()->logger(Logger::Channel::IPC) : oa_test_ipc_logger::get();
+}
+
+void ObjectAdapter::trace_dispatch(Current const& c)
+{
+    BOOST_LOG(ipc_logger())
+        << "received request: "
+        << "op = " << c.op_name
+        << ", id = " << c.id
+        << ", cat = " << c.category
+        << ", mode = " << (mode_ == RequestMode::Oneway ? "oneway" : "twoway");
 }
 
 } // namespace zmq_middleware

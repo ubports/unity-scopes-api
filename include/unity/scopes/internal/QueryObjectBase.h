@@ -19,7 +19,6 @@
 #pragma once
 
 #include <unity/scopes/internal/AbstractObject.h>
-#include <unity/scopes/internal/InvokeInfo.h>
 #include <unity/scopes/internal/MWReplyProxyFwd.h>
 #include <unity/util/DefinesPtrs.h>
 
@@ -31,6 +30,8 @@ namespace scopes
 
 namespace internal
 {
+
+class InvokeInfo;
 
 class QueryObjectBase : public AbstractObject
 {

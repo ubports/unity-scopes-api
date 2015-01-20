@@ -196,12 +196,6 @@ else()
     message(FATAL_ERROR "Invalid SANITIZER setting: ${SANITIZER}")
 endif()
 
-option(IPC_MONITORING "Enable IPC traffic monitoring")
-
-if(IPC_MONITORING)
-    add_definitions(-DENABLE_IPC_MONITOR)
-endif()
-
 # Scopes library name. Also used as a prefix in various places, and as a subdirectory
 # name for installed files. Changing this will also require corresponding changes
 # to the debian files.
@@ -210,7 +204,7 @@ set(UNITY_SCOPES_LIB unity-scopes)
 # API version
 set(UNITY_SCOPES_MAJOR 0)
 set(UNITY_SCOPES_MINOR 6)
-set(UNITY_SCOPES_MICRO 10)
+set(UNITY_SCOPES_MICRO 11)
 set(UNITY_SCOPES_SOVERSION 3)
 
 # Version for testing, with all symbols visible

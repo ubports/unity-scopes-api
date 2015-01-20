@@ -34,11 +34,9 @@ namespace scopes
 namespace internal
 {
 
-PreviewReplyImpl::PreviewReplyImpl(MWReplyProxy const& mw_proxy,
-                                   shared_ptr<QueryObjectBase> const& qo,
-                                   boost::log::sources::severity_channel_logger_mt<>& logger)
-    : ObjectImpl(mw_proxy, logger)
-    , ReplyImpl(mw_proxy, qo, logger)
+PreviewReplyImpl::PreviewReplyImpl(MWReplyProxy const& mw_proxy, shared_ptr<QueryObjectBase> const& qo)
+    : ObjectImpl(mw_proxy)
+    , ReplyImpl(mw_proxy, qo)
     , layouts_push_disallowed_(false)
 {
 }

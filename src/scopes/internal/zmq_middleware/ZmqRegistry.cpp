@@ -167,7 +167,7 @@ ObjectProxy ZmqRegistry::locate(std::string const& identity, int64_t timeout)
                                                    proxy.getIdentity(),
                                                    proxy.getCategory(),
                                                    proxy.getTimeout());
-            return ScopeImpl::create(zmq_proxy, mw->runtime(), identity);
+            return ScopeImpl::create(zmq_proxy, identity);
         }
         case capnproto::Registry::LocateResponse::Response::NOT_FOUND_EXCEPTION:
         {

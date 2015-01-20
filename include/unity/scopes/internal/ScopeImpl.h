@@ -45,7 +45,7 @@ class RuntimeImpl;
 class ScopeImpl : public virtual unity::scopes::Scope, public virtual ObjectImpl
 {
 public:
-    ScopeImpl(MWScopeProxy const& mw_proxy, RuntimeImpl* runtime, std::string const& scope_id);
+    ScopeImpl(MWScopeProxy const& mw_proxy, std::string const& scope_id);
     virtual ~ScopeImpl();
 
     virtual QueryCtrlProxy search(std::string const& q,
@@ -81,7 +81,7 @@ public:
                                    ActionMetadata const& hints,
                                    PreviewListenerBase::SPtr const& reply) override;
 
-    static ScopeProxy create(MWScopeProxy const& mw_proxy, RuntimeImpl* runtime, std::string const& scope_id);
+    static ScopeProxy create(MWScopeProxy const& mw_proxy, std::string const& scope_id);
 
 private:
     MWScopeProxy fwd();
