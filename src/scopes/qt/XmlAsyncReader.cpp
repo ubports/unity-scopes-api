@@ -24,6 +24,7 @@
 using namespace std;
 using namespace unity::scopes::qt;
 
+/// @cond
 XmlAsyncReader::XmlAsyncReader()
     : p_(new HttpAsyncReader)
 {
@@ -54,3 +55,4 @@ XmlAsyncReader::QXmlStreamReaderFuture XmlAsyncReader::async_get_parser(
     std::string uri = p_->get_uri(host, params);
     return p_->async_get_parser<QXmlStreamReader>(uri, XmlAsyncReader::create_parser_with_data);
 }
+/// @endcond

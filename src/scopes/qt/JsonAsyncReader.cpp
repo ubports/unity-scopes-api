@@ -27,7 +27,6 @@ JsonAsyncReader::JsonAsyncReader()
     : p_(new HttpAsyncReader)
 {
 }
-/// @endcond
 
 JsonAsyncReader::QJsonDocumentSptr JsonAsyncReader::create_parser_with_data(std::string const& data, std::string& error)
 {
@@ -58,3 +57,5 @@ JsonAsyncReader::JsonDocumentFuture JsonAsyncReader::async_get_parser(
     std::string uri = p_->get_uri(host, params);
     return p_->async_get_parser<QJsonDocument>(uri, JsonAsyncReader::create_parser_with_data);
 }
+
+/// @endcond

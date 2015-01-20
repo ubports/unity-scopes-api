@@ -1,15 +1,53 @@
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
 set(SCOPES_QT_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/HttpAsyncReader.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/JsonAsyncReader.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/JsonReader.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/XmlAsyncReader.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/XmlReader.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/internal/QScopeBaseImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/internal/QScopeBaseAPIImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/internal/QSearchQueryBaseImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/internal/QSearchReplyImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/internal/QCategoryImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/internal/QResultImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/internal/QCategorisedResultImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/internal/QVariantBuilderImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/internal/QCannedQueryImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/internal/QSearchMetadataImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/internal/QDepartmentImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/internal/QPreviewQueryBaseImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/internal/QActionMetadataImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/internal/QColumnLayoutImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/internal/QPreviewReplyImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/internal/QPreviewWidgetImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/QSearchQueryBaseAPI.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/QPreviewQueryBaseAPI.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/QSearchReply.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/QScopeBase.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/QSearchQueryBase.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/QPreviewQueryBase.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/QScopeBaseAPI.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/QCategory.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/QResult.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/QCategorisedResult.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/QUtils.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/QVariantBuilder.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/QScopeVariant.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/QCannedQuery.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/QSearchMetadata.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/QDepartment.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/QActionMetadata.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/QColumnLayout.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/QPreviewReply.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/QPreviewWidget.cpp
+    ${CMAKE_SOURCE_DIR}/include/unity/scopes/qt/QSearchQueryBaseAPI.h
+    ${CMAKE_SOURCE_DIR}/include/unity/scopes/qt/QPreviewQueryBaseAPI.h
 )
 
 # -- libunity-scopes-qt --
-
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 include(CheckCXXSourceCompiles)
 CHECK_CXX_SOURCE_COMPILES("#ifdef __clang__\n#else\n#error \"Not clang.\"\n#endif\nint main(int argc, char **argv) { return 0; }" IS_CLANG)

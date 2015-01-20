@@ -24,6 +24,7 @@
 
 #include <unity/scopes/qt/HttpAsyncReader.h>
 
+/// @cond
 using namespace unity::scopes::qt;
 
 const static int64_t SECONDS_TIMEOUT = 10;
@@ -91,3 +92,4 @@ JsonReader::QJsonDocumentSptr JsonReader::read(QString const& host, JsonReader::
     }
     return item;
 }
+/// @endcond

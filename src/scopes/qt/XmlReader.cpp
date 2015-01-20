@@ -26,6 +26,7 @@ using namespace unity::scopes::qt;
 
 const static int64_t SECONDS_TIMEOUT = 10;
 
+/// @cond
 XmlReader::XmlReader()
     : p_(new XmlAsyncReader)
 {
@@ -92,3 +93,5 @@ XmlReader::QXmlStreamReaderSptr XmlReader::read(QString const& host,
 
     return item;
 }
+/// @endcond
+
