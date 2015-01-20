@@ -4,3 +4,4 @@ Registry.ConfigFile = @CMAKE_CURRENT_BINARY_DIR@/TestRegistry.ini
 Default.Middleware = Zmq
 Zmq.ConfigFile = @CMAKE_CURRENT_BINARY_DIR@/Zmq.ini
 Smartscopes.Registry.Identity =
+LogDir=

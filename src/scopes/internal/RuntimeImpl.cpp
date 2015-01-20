@@ -59,15 +59,17 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
 {
     try
     {
-        lock_guard<mutex> lock(mutex_);
+        lock_guard<mutex> lock(mutex_);  // TODO: shouldn't be necessary.
 
         destroyed_ = false;
 
         scope_id_ = scope_id;
+        string log_file_basename = scope_id;
         if (scope_id_.empty())
         {
             UniqueID id;
             scope_id_ = "c-" + id.gen();
+            log_file_basename = "client";  // Don't make lots of log files named like c-c4c758b100000000.
         }
 
         // Until we know where the scope's cache directory is,
@@ -77,6 +79,28 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
         // Create the middleware factory and get the registry identity and config filename.
         runtime_configfile_ = configfile;
         RuntimeConfig config(configfile);
+
+        // Configure trace channels.
+        try
+        {
+            logger_->enable_channels(config.trace_channels());
+        }
+        catch (...)
+        {
+            throw InvalidArgumentException("Runtime(): invalid trace channel name(s)");
+        }
+
+        // Now that we have the config, change the logger to log to a file.
+        // If log_dir was explicitly set to the empty string, continue
+        // logging to std::clog.
+        log_dir_ = config.log_directory();
+        if (!log_dir_.empty())
+        {
+            logger_->set_log_file(find_log_dir(log_file_basename) + "/" + log_file_basename,
+                                  config.max_log_file_size(),
+                                  config.max_log_dir_size());
+        }
+
         string default_middleware = config.default_middleware();
         string middleware_configfile = config.default_middleware_configfile();
         middleware_factory_.reset(new MiddlewareFactory(this));
@@ -104,7 +128,7 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
             // Create the registry proxy
             RegistryConfig reg_config(registry_identity_, registry_configfile_);
             auto registry_mw_proxy = middleware_->registry_proxy();
-            registry_ = make_shared<RegistryImpl>(registry_mw_proxy, this);
+            registry_ = make_shared<RegistryImpl>(registry_mw_proxy);
         }
 
         cache_dir_ = config.cache_directory();
@@ -117,7 +141,7 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
         string msg = "Cannot instantiate run time for " + (scope_id.empty() ? "client" : scope_id) +
                      ", config file: " + configfile;
         ConfigException ex(msg);
-        BOOST_LOG_SEV(logger(), Logger::Error) << ex.what();
+        BOOST_LOG(logger()) << ex.what();
         throw ex;
     }
 }
@@ -130,11 +154,11 @@ RuntimeImpl::~RuntimeImpl()
     }
     catch (std::exception const& e) // LCOV_EXCL_LINE
     {
-        BOOST_LOG_SEV(logger(), Logger::Error) << "~RuntimeImpl(): " << e.what();
+        BOOST_LOG(logger()) << "~RuntimeImpl(): " << e.what();
     }
     catch (...) // LCOV_EXCL_LINE
     {
-        BOOST_LOG_SEV(logger(), Logger::Error) << "~RuntimeImpl(): unknown exception";
+        BOOST_LOG(logger()) << "~RuntimeImpl(): unknown exception";
     }
 }
 
@@ -293,6 +317,11 @@ boost::log::sources::severity_channel_logger_mt<>& RuntimeImpl::logger() const
     return *logger_;
 }
 
+boost::log::sources::severity_channel_logger_mt<>& RuntimeImpl::logger(Logger::Channel channel) const
+{
+    return (*logger_)(channel);
+}
+
 namespace
 {
 
@@ -411,14 +440,13 @@ void RuntimeImpl::run_scope(ScopeBase* scope_base,
             // Check if this scope has requested debug mode, if so, disable the idle timeout
             ScopeConfig scope_config(scope_ini_file);
             int idle_timeout_ms = scope_config.debug_mode() ? -1 : scope_config.idle_timeout() * 1000;
-            auto scope = unique_ptr<internal::ScopeObject>(new internal::ScopeObject(this,
-                                                                                     scope_base,
+            auto scope = unique_ptr<internal::ScopeObject>(new internal::ScopeObject(scope_base,
                                                                                      scope_config.debug_mode()));
             mw->add_scope_object(scope_id_, move(scope), idle_timeout_ms);
         }
         else
         {
-            auto scope = unique_ptr<internal::ScopeObject>(new internal::ScopeObject(this, scope_base));
+            auto scope = unique_ptr<internal::ScopeObject>(new internal::ScopeObject(scope_base));
             mw->add_scope_object(scope_id_, move(scope));
         }
 
@@ -430,7 +458,7 @@ void RuntimeImpl::run_scope(ScopeBase* scope_base,
 
         promise.set_value();
         mw->wait_for_shutdown();
-        cleanup_scope.dealloc();   // Causes ScopeBase::run() to terminate if the scope is properly written
+        cleanup_scope.dealloc();   // Causes ScopeBase::run() to return if the scope is properly written
 
         {
             // mw is now shut down, so we need a separate one to send the state update to the registry.
@@ -494,14 +522,14 @@ string RuntimeImpl::proxy_to_string(ObjectProxy const& proxy) const
     }
 }
 
-string RuntimeImpl::demangled_id() const
+string RuntimeImpl::demangled_id(string const& scope_id) const
 {
     // For scopes that are in a click package together with an app,
     // such as YouTube, the scope id is <scope_id>_<app_id>
     // The app directory and cache directory names are the scope ID up to the first
     // underscore. For example, com.ubuntu.scopes.youtube_youtube is the
     // scope ID, but the cache dir name is com.ubuntu.scopes.youtube.
-    auto id = scope_id_;
+    auto id = scope_id;
     if (confined())
     {
         auto pos = id.find('_');
@@ -543,7 +571,7 @@ string RuntimeImpl::find_cache_dir() const
     !confined() && !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700);
 
     // A confined scope is allowed to create this dir.
-    dir += "/" + demangled_id();
+    dir += "/" + demangled_id(scope_id_);
     !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700);
 
     return dir;
@@ -554,8 +582,25 @@ string RuntimeImpl::find_app_dir() const
     // Create the app_dir_/<id> directories if they don't exist.
     boost::system::error_code ec;
     !confined() && !boost::filesystem::exists(app_dir_, ec) && ::mkdir(app_dir_.c_str(), 0700);
-    string dir = app_dir_ + "/" + demangled_id();
+    string dir = app_dir_ + "/" + demangled_id(scope_id_);
     !confined() && !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700);
+
+    return dir;
+}
+
+string RuntimeImpl::find_log_dir(string const& id) const
+{
+    // Create the log_dir_/<confinement-type>/<id>/logs directories if they don't exist.
+    boost::system::error_code ec;
+    !confined() && !boost::filesystem::exists(log_dir_, ec) && ::mkdir(log_dir_.c_str(), 0700);
+    string dir = log_dir_ + "/" + confinement_type();
+    !confined() && !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700);
+
+    // A confined scope is allowed to create this dir.
+    dir += "/" + demangled_id(id);
+    !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700);
+    dir += "/logs";
+    !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700);
 
     return dir;
 }

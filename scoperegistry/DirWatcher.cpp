@@ -137,12 +137,11 @@ void DirWatcher::cleanup()
             }
             catch (std::exception const& e)
             {
-                BOOST_LOG_SEV(logger_, Logger::Error) << "~DirWatcher(): " << e.what();
+                BOOST_LOG(logger_) << "~DirWatcher(): " << e.what();
             }
             catch (...)
             {
-                BOOST_LOG_SEV(logger_, Logger::Error)
-                    << "~DirWatcher(): watch_thread was aborted due to an unknown exception";
+                BOOST_LOG(logger_) << "~DirWatcher(): watch_thread was aborted due to an unknown exception";
             }
         }
         else
@@ -178,8 +177,6 @@ void DirWatcher::watch_thread()
 #pragma GCC diagnostic pop
 
         int bytes_avail = 0;
-        static_assert(std::alignment_of<char*>::value >= std::alignment_of<struct inotify_event>::value,
-                      "cannot use std::string as buffer for inotify events");
         std::string buffer;
         std::string event_path;
 
@@ -223,7 +220,12 @@ void DirWatcher::watch_thread()
             int i = 0;
             while (i < bytes_read)
             {
+                static_assert(std::alignment_of<char*>::value >= std::alignment_of<struct inotify_event>::value,
+                              "cannot use std::string as buffer for inotify events");
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-align"
                 auto event = reinterpret_cast<inotify_event const*>(&buffer[i]);
+#pragma GCC diagnostic pop
                 {
                     event_path = "";
                     std::lock_guard<std::mutex> lock(mutex_);
@@ -281,14 +283,14 @@ void DirWatcher::watch_thread()
     }
     catch (std::exception const& e)
     {
-        BOOST_LOG_SEV(logger_, Logger::Error) << e.what();
+        BOOST_LOG(logger_) << "DirWatcher::watch_thread(): " << e.what();
         std::lock_guard<std::mutex> lock(mutex_);
         thread_state_ = Failed;
         thread_exception_ = std::current_exception();
     }
     catch (...)
     {
-        BOOST_LOG_SEV(logger_, Logger::Error) << "DirWatcher::watch_thread(): Thread aborted: unknown exception";
+        BOOST_LOG(logger_) << "DirWatcher::watch_thread(): Thread aborted: unknown exception";
         std::lock_guard<std::mutex> lock(mutex_);
         thread_state_ = Failed;
         thread_exception_ = std::current_exception();

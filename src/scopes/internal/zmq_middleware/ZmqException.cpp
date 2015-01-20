@@ -123,9 +123,58 @@ void throw_if_runtime_exception(capnproto::Response::Reader const& response)
         {
             throw MiddlewareException(payload.getUnknown().cStr());
         }
+        // LCOV_EXCL_START
         default:
-            break;
+        {
+            assert(false);
+        }
+        // LCOV_EXCL_STOP
     }
+}
+
+string decode_runtime_exception(capnproto::Response::Reader const& response)
+{
+    assert(response.getStatus() == capnproto::ResponseStatus::RUNTIME_EXCEPTION);
+
+    try
+    {
+        throw_if_runtime_exception(response);
+        return "";  // LCOV_EXCL_LINE (not reached, dummy return to prevent compiler warning
+    }
+    catch (MiddlewareException const& e)
+    {
+        return e.what();
+    }
+}
+
+string decode_status(capnproto::Response::Reader const& response)
+{
+    string s;
+    switch (response.getStatus())
+    {
+        case capnproto::ResponseStatus::SUCCESS:
+        {
+            s = "status = Success";
+            break;
+        }
+        case capnproto::ResponseStatus::USER_EXCEPTION:
+        {
+            s = "status = User exception";
+            break;
+        }
+        case capnproto::ResponseStatus::RUNTIME_EXCEPTION:
+        {
+            s = decode_runtime_exception(response);
+            break;
+        }
+        // LCOV_EXCL_START
+        default:
+        {
+            assert(false);
+        }
+        // LCOV_EXCL_STOP
+    }
+    return s;
 }
 
 } // namespace zmq_middleware
