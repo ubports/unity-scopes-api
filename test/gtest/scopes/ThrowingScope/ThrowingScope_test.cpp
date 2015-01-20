@@ -452,7 +452,7 @@ int main(int argc, char **argv)
     auto rpid = fork();
     if (rpid == 0)
     {
-        const char* const args[] = {"scoperegistry [Exception_test]", TEST_RUNTIME_FILE, nullptr};
+        const char* const args[] = {"scoperegistry [ThrowingScope_test]", TEST_RUNTIME_FILE, nullptr};
         if (execv(TEST_REGISTRY_PATH "/scoperegistry", const_cast<char* const*>(args)) < 0)
         {
             perror("Error starting scoperegistry:");
