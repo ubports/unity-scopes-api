@@ -67,7 +67,7 @@ public:
 
 protected:
     std::shared_ptr<QueryBase> query_base_;
-    MWReplyProxy reply_;
+    MWReplyProxy const reply_;
     std::weak_ptr<unity::scopes::Reply> reply_proxy_;
     MWQueryCtrlProxy const ctrl_;
     bool pushable_;

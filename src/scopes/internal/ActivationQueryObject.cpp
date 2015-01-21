@@ -55,8 +55,8 @@ void ActivationQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& inf
 {
     assert(self_);
 
-    // The reply proxy now holds our reference count high, so
-    // we can drop our own smart pointer and disconnect from the middleware.
+    // Disconnect from middleware. While this request is in progress,
+    // this instance will not be deallocated.
     self_ = nullptr;
     disconnect();
 
