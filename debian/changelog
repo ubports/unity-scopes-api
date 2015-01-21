@@ -1,8 +1,27 @@
-unity-scopes-api (0.6.11+15.04.20150119-0ubuntu2) UNRELEASED; urgency=low
+unity-scopes-api (0.6.11+15.04.20150121.2-0ubuntu1) vivid; urgency=low
 
+  [ Ubuntu daily release ]
   * debian/libunity-scopes3.symbols: auto-update to released version
 
- -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Wed, 21 Jan 2015 12:46:34 +0000
+  [ thomas-voss ]
+  * Switch from QNetwork to net-cpp (LP: #1326816, #1409995)
+
+  [ Michał Sawicz ]
+  * Depend on :native version of g++ to allow cross-compiling to work.
+    Also run `wrap-and-sort -at` (LP: #1353855)
+
+  [ Marcus Tomlinson ]
+  * Switch from QNetwork to net-cpp (LP: #1326816, #1409995)
+
+  [ Michi Henning ]
+  * Added utility subdir to header tests.
+  * Bunch of miscellaneous fixes:
+
+  [ James Henstridge ]
+  * Expose the deserialize() static method on FilterBase and FilterState
+    for use by the Go bindings.
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Wed, 21 Jan 2015 12:46:41 +0000
 
 unity-scopes-api (0.6.11+15.04.20150119-0ubuntu1) vivid; urgency=medium
 
