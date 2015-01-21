@@ -47,7 +47,6 @@ QueryCtrlImpl::QueryCtrlImpl(MWQueryCtrlProxy const& ctrl_proxy,
     // inform the reply object belonging to this query that the query is finished.
     assert(reply_proxy);
 
-    lock_guard<mutex> lock(mutex_);
     ready_ = ctrl_proxy != nullptr;
     cancelled_ = false;
 }

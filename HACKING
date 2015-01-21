@@ -193,7 +193,7 @@ The report provides a nicely layed-out page with all the details.
 Autopkg test suite
 ------------------
 
-Scopes comes with an autopkg smoke test.
+Scopes come with an autopkg smoke test.
 
 http://packaging.ubuntu.com/html/auto-pkg-test.html
 
