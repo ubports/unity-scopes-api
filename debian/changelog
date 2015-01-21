@@ -1,3 +1,9 @@
+unity-scopes-api (0.6.11+15.04.20150119-0ubuntu2) UNRELEASED; urgency=low
+
+  * debian/libunity-scopes3.symbols: auto-update to released version
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Wed, 21 Jan 2015 12:46:34 +0000
+
 unity-scopes-api (0.6.11+15.04.20150119-0ubuntu1) vivid; urgency=medium
 
   [ Michi Henning ]
