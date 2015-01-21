@@ -99,7 +99,7 @@ TEST(ReplyReaper, reap)
         auto mw = rt->factory()->create("NoReplyScope", "Zmq", TEST_DIR "/Zmq.ini");
         mw->start();
         auto proxy = mw->create_scope_proxy("NoReplyScope");
-        auto scope = internal::ScopeImpl::create(proxy, rt.get(), "NoReplyScope");
+        auto scope = internal::ScopeImpl::create(proxy, "NoReplyScope");
 
         auto receiver = make_shared<NullReceiver>();
         scope->search("test", SearchMetadata("en", "phone"), receiver);
@@ -171,7 +171,7 @@ TEST(ReplyReaper, no_reap_in_debug_mode)
         auto mw = rt->factory()->create("NoReplyScope", "Zmq", TEST_DIR "/Zmq.ini");
         mw->start();
         auto proxy = mw->create_scope_proxy("NoReplyScope");
-        auto scope = internal::ScopeImpl::create(proxy, rt.get(), "NoReplyScope");
+        auto scope = internal::ScopeImpl::create(proxy, "NoReplyScope");
 
         auto receiver = make_shared<NoReapReceiver>();
         scope->search("test", SearchMetadata("en", "phone"), receiver);

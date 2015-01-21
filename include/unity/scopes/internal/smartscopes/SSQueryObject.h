@@ -18,7 +18,6 @@
 
 #pragma once
 
-#include <unity/scopes/internal/Logger.h>
 #include <unity/scopes/internal/QueryObjectBase.h>
 #include <unity/scopes/ReplyProxyFwd.h>
 
@@ -68,7 +67,7 @@ class SSQueryObject : public QueryObjectBase, public std::enable_shared_from_thi
 public:
     UNITY_DEFINES_PTRS(SSQueryObject);
 
-    SSQueryObject(boost::log::sources::severity_channel_logger_mt<>& logger);
+    SSQueryObject();
     virtual ~SSQueryObject();
 
     // Remote operation implementations
@@ -98,7 +97,6 @@ private:
     mutable std::mutex queries_mutex_;
 
     std::map<std::string, SSQuery::SPtr> queries_;               // reply ID : query
-    boost::log::sources::severity_channel_logger_mt<>& logger_;
 };
 
 }  // namespace smartscopes
