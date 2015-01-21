@@ -53,7 +53,7 @@ public:
     virtual ~HttpClientInterface() = default;
 
     virtual std::shared_ptr<HttpResponseHandle> get(std::string const& request_url,
-            std::function<void(std::string const&)> const& lineData = [](std::string const&) {},
+            std::function<void(std::string const&)> const& line_data = [](std::string const&) {},
             HttpHeaders const& headers = HttpHeaders()) = 0;
 
     virtual std::string to_percent_encoding(std::string const& string) = 0;

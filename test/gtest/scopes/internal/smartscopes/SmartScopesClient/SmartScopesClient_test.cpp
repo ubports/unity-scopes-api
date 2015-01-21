@@ -17,7 +17,8 @@
  */
 
 #include <unity/scopes/internal/JsonCppNode.h>
-#include <unity/scopes/internal/smartscopes/HttpClientQt.h>
+#include <unity/scopes/internal/Logger.h>
+#include <unity/scopes/internal/smartscopes/HttpClientNetCpp.h>
 #include <unity/scopes/internal/smartscopes/SmartScopesClient.h>
 #include <unity/scopes/OptionSelectorFilter.h>
 
@@ -45,7 +46,7 @@ class SmartScopesClientTest : public Test
 {
 public:
     SmartScopesClientTest()
-        : http_client_(new HttpClientQt(20000)),
+        : http_client_(new HttpClientNetCpp(20000)),
           json_node_(new JsonCppNode()),
           server_(FAKE_SSS_PATH, FAKE_SSS_LOG)
     {

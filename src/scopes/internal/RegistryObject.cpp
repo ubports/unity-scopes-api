@@ -766,7 +766,7 @@ std::vector<std::string> RegistryObject::ScopeProcess::expand_custom_exec()
         util::ResourcePtr<wordexp_t*, decltype(&wordfree)> free_guard(&exp, wordfree);
 
         command_args.push_back(exp.we_wordv[0]);
-        for (uint i = 1; i < exp.we_wordc; ++i)
+        for (unsigned int i = 1; i < exp.we_wordc; ++i)
         {
             std::string arg = exp.we_wordv[i];
             // Replace "%R" placeholders with the runtime config

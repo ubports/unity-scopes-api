@@ -117,7 +117,7 @@ Variant JsonCppNode::to_variant(Json::Value const& value)
             return Variant(value.asString());
         case Json::ValueType::intValue:
         case Json::ValueType::uintValue:
-            return Variant(value.asInt()); // this can throw std::runtime_error from jsoncpp if uint to int conversion is not possible
+            return Variant(value.asInt()); // this can throw std::runtime_error from jsoncpp if unsigned int to int conversion is not possible
         case Json::ValueType::realValue:
             return Variant(value.asDouble());
         case Json::ValueType::booleanValue:
@@ -220,11 +220,11 @@ int JsonCppNode::as_int() const
     return root_.asInt();
 }
 
-uint JsonCppNode::as_uint() const
+unsigned int JsonCppNode::as_uint() const
 {
     if (!root_.isConvertibleTo(Json::uintValue))
     {
-        throw unity::LogicException("Node does not contain a uint value");
+        throw unity::LogicException("Node does not contain a unsigned int value");
     }
 
     return root_.asUInt();
@@ -281,7 +281,7 @@ JsonNodeInterface::SPtr JsonCppNode::get_node(std::string const& node_name) cons
     return std::make_shared<JsonCppNode>(value_node);
 }
 
-JsonNodeInterface::SPtr JsonCppNode::get_node(uint node_index) const
+JsonNodeInterface::SPtr JsonCppNode::get_node(unsigned int node_index) const
 {
     if (root_.type() != Json::arrayValue)
     {
