@@ -111,7 +111,7 @@ As of clang-format-3.7, you can use
     void    unformatted_code  ;
     // clang-format on
 
-to supress formatting for a section of code.
+to suppress formatting for a section of code.
 
 To format specific files:
 
