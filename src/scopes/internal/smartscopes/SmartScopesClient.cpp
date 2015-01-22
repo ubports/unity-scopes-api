@@ -116,7 +116,6 @@ SmartScopesClient::SmartScopesClient(HttpClientInterface::SPtr http_client,
                                      std::string const& partner_id_path)
     : http_client_(http_client)
     , json_node_(json_node)
-    , runtime_(runtime)
     , logger_(runtime ? runtime->logger() : test_logger::get())
     , have_latest_cache_(false)
     , query_counter_(0)

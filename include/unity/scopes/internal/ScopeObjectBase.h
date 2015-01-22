@@ -38,7 +38,7 @@ class CannedQuery;
 namespace internal
 {
 
-class InvokeInfo;
+struct InvokeInfo;
 
 class ScopeObjectBase : public AbstractObject
 {
