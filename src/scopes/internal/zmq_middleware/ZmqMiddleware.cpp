@@ -171,13 +171,11 @@ ZmqMiddleware::~ZmqMiddleware()
                 << " ms to complete for " << server_name_;
         }
     }
-    catch (std::exception const& e)
-    {
-        BOOST_LOG(logger_) << "~ZmqMiddleware(): " << e.what();
-    }
     catch (...)
     {
-        BOOST_LOG(logger_) << "~ZmqMiddleware(): unknown exception";
+        // Don't log here. RuntimeImpl does that after calling wait_for_shutdown().
+        // We may no longer have a logger here if something holds the middleware
+        // in scope beyond the life time of the runtime.
     }
 }
 
