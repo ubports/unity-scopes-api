@@ -40,10 +40,10 @@ class QActionMetadataImpl;
 }
 
 /// @cond
-class QScopeVariant
+class QScopeVariant : public QVariant
 {
 public:
-    explicit QScopeVariant() noexcept;
+//    explicit QScopeVariant() noexcept;
     ~QScopeVariant();
 
     QScopeVariant(QScopeVariant const& other);
@@ -58,7 +58,7 @@ public:
     QScopeVariant& operator=(QString const& val);
     QScopeVariant& operator=(char const* val);  // Required to prevent v = "Hello" from storing a bool
     QScopeVariant& operator=(QVariantMap const& val);
-    QScopeVariant& operator=(QVariant const& val);
+    virtual QScopeVariant& operator=(QVariant const& val);
 
     std::string get_string() const;
 
@@ -69,11 +69,14 @@ private:
     explicit QScopeVariant(Variant* val) noexcept;
 
     void setInternalVariant(Variant* val);
+
+    void sync();
     friend class internal::QResultImpl;
     friend class internal::QSearchMetadataImpl;
     friend class internal::QActionMetadataImpl;
 
     Variant* internal_variant_;
+    QVariant ret_variant;
 };
 /// @endcond
 

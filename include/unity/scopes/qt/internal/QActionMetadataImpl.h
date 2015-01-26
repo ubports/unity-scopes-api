@@ -131,9 +131,12 @@ public:
 private:
     QActionMetadataImpl(ActionMetadata const& api_metadata);
 
-    QMap<QString, QScopeVariant> return_variants;
-    mutable QVariantMap return_const_variants;
+    void sync_values() const;
+
     std::unique_ptr<ActionMetadata> api_metadata_;
+
+    mutable QMap<QString, std::shared_ptr<QScopeVariant>> ret_variants_;
+    mutable QList<std::shared_ptr<QScopeVariant>> unsync_variants_;
 
     friend class internal::QPreviewQueryBaseImpl;
     friend class unity::scopes::qt::QPreviewQueryBaseAPI;

@@ -5,3 +5,4 @@ add_definitions(
 
 add_subdirectory(XmlAsyncReader)
 add_subdirectory(JsonAsyncReader)
+add_subdirectory(qt-bindings)

@@ -35,6 +35,8 @@ namespace scopes
 namespace qt
 {
 
+class QCategory;
+
 namespace internal
 {
 class QCategorisedResultImpl;
@@ -84,6 +86,8 @@ public:
     // @cond
     QVariantMap serialize() const;
 
+
+    static std::shared_ptr<QCategory> create(unity::scopes::Category::SCPtr category);
 private:
     unity::scopes::Category::SCPtr api_category_;
     friend class QCategorisedResultImpl;

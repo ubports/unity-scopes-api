@@ -36,13 +36,13 @@ QCategorisedResultImpl::QCategorisedResultImpl(QCategory::SCPtr category)
 }
 
 QCategorisedResultImpl::QCategorisedResultImpl(QCategorisedResultImpl const& other)
-    : QResultImpl(other)
+    : QResultImpl(new CategorisedResult(*other.api_object()))
 {
 }
 
 QCategorisedResultImpl& QCategorisedResultImpl::operator=(QCategorisedResultImpl const& other)
 {
-    api_result_.reset(other.api_result_.get());
+    api_result_.reset(new CategorisedResult(*other.api_object()));
     return *this;
 }
 
@@ -61,6 +61,7 @@ QCategory::SCPtr QCategorisedResultImpl::category() const
 
 CategorisedResult* QCategorisedResultImpl::api_object() const
 {
+    sync_values();
     CategorisedResult* categorisedResult = dynamic_cast<CategorisedResult*>(api_result_.get());
     assert(categorisedResult);
     return categorisedResult;

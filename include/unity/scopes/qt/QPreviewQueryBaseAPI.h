@@ -74,7 +74,8 @@ protected:
     QPreviewQueryBaseAPI(std::shared_ptr<QCoreApplication> qtapp,
                          QScopeBase& qtscope,
                          unity::scopes::Result const& result,
-                         unity::scopes::ActionMetadata const& metadata);
+                         unity::scopes::ActionMetadata const& metadata,
+                         QObject *parent=0);
 
     bool event(QEvent* e) override;
     /// @endcond

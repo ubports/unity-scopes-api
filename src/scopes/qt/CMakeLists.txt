@@ -45,6 +45,11 @@ set(SCOPES_QT_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/QPreviewWidget.cpp
     ${CMAKE_SOURCE_DIR}/include/unity/scopes/qt/QSearchQueryBaseAPI.h
     ${CMAKE_SOURCE_DIR}/include/unity/scopes/qt/QPreviewQueryBaseAPI.h
+    ${CMAKE_SOURCE_DIR}/include/unity/scopes/qt/QPreviewQueryBase.h
+    ${CMAKE_SOURCE_DIR}/include/unity/scopes/qt/QSearchQueryBase.h
+    ${CMAKE_SOURCE_DIR}/include/unity/scopes/qt/QPreviewReply.h
+    ${CMAKE_SOURCE_DIR}/include/unity/scopes/qt/QScopeBase.h
+    ${CMAKE_SOURCE_DIR}/include/unity/scopes/qt/QSearchReply.h
 )
 
 # -- libunity-scopes-qt --

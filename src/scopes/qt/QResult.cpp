@@ -117,7 +117,7 @@ ScopeProxy QResult::target_scope_proxy() const
     return p->target_scope_proxy();
 }
 
-QScopeVariant& QResult::operator[](QString const& key)
+QVariant& QResult::operator[](QString const& key)
 {
     return (*p)[key];
 }

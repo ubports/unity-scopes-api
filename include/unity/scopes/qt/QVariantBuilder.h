@@ -61,7 +61,7 @@ VariantBuilder builder;
 builder.add_tuple({{"rating", Variant::null())}, {"review", Variant::null()}, {"author", Variant::null()}});
 \endcode
 */
-class QVariantBuilder
+class QVariantBuilder final
 {
 public:
     QVariantBuilder();
@@ -113,6 +113,7 @@ public:
 
 private:
     ///@cond
+    QVariantBuilder(internal::QVariantBuilderImpl *impl);
     std::unique_ptr<internal::QVariantBuilderImpl> p;
     friend class internal::QVariantBuilderImpl;
     ///@endcond

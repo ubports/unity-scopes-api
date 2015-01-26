@@ -17,9 +17,11 @@
  */
 
 #include <unity/scopes/qt/internal/QCategoryImpl.h>
+#include <unity/scopes/qt/QCategory.h>
 #include <unity/scopes/qt/QUtils.h>
 
 using namespace unity::scopes;
+using namespace unity::scopes::qt;
 using namespace unity::scopes::qt::internal;
 
 QCategoryImpl::QCategoryImpl(unity::scopes::Category::SCPtr category)
@@ -64,4 +66,10 @@ QVariantMap QCategoryImpl::serialize() const
         ret_map[QString::fromStdString(items.first)] = scopeVariantToQVariant(items.second);
     }
     return ret_map;
+}
+
+std::shared_ptr<QCategory> QCategoryImpl::create(unity::scopes::Category::SCPtr category)
+{
+    std::shared_ptr<QCategory> ret(new QCategory(new QCategoryImpl(category)));
+    return ret;
 }

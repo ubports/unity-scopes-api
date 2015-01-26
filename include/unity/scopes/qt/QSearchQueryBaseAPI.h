@@ -70,7 +70,8 @@ protected:
     QSearchQueryBaseAPI(std::shared_ptr<QCoreApplication> qtapp,
                         QScopeBase& qtscope,
                         unity::scopes::CannedQuery const& query,
-                        unity::scopes::SearchMetadata const& metadata);
+                        unity::scopes::SearchMetadata const& metadata,
+                        QObject *parent=0);
 
     bool event(QEvent* e) override;
     /// @endcond

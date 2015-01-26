@@ -172,7 +172,7 @@ public:
     \return A reference to the attribute.
     \throws unity::Invalidargument if no attribute with the given name exists.
     */
-    QScopeVariant& operator[](QString const& key);
+    QVariant& operator[](QString const& key);
 
     /**
     \brief Returns a const reference to a Result attribute.

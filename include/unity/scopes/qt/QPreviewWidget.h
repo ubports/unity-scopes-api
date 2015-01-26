@@ -50,7 +50,7 @@ typedef QList<QPreviewWidget> QPreviewWidgetList;
 /**
     \brief Widget used in Preview.
 */
-class QPreviewWidget
+class QPreviewWidget final
 {
 public:
     /// @cond

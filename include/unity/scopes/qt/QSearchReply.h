@@ -49,10 +49,9 @@ class QSearchReplyImpl;
 /**
 \brief Allows the results of a search query to be sent to the query source.
 */
-class QSearchReply
+class QSearchReply : public QObject
 {
-    friend class QSearchQueryBaseAPI;
-
+    Q_OBJECT
 public:
     /// @cond
     NONCOPYABLE(QSearchReply);
@@ -151,10 +150,11 @@ public:
     virtual void error(std::exception_ptr ex);
 
 private:
-    QSearchReply(unity::scopes::SearchReplyProxy& reply);
+    QSearchReply(unity::scopes::SearchReplyProxy& reply, QObject *parent=0);
 
     std::unique_ptr<internal::QSearchReplyImpl> p;
     friend class internal::QSearchReplyImpl;
+    friend class QSearchQueryBaseAPI;
 };
 
 }  // namespace unity

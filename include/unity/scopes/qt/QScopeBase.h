@@ -25,6 +25,7 @@
 #include <unity/util/NonCopyable.h>
 
 #include <QtCore/QString>
+#include <QtCore/QObject>
 
 namespace unity
 {
@@ -106,16 +107,17 @@ All calls to the methods of this class will be done from the main QThread.
 The scope implementation, if it does not return from run(), is expected to return from run() in response to a
 call to stop() in a timely manner.
 */
-class QScopeBase
+class QScopeBase : public QObject
 {
+    Q_OBJECT
 public:
     /// @cond
     NONCOPYABLE(QScopeBase);
     UNITY_DEFINES_PTRS(QScopeBase);
-    /// @endcond
 
-    QScopeBase();
+    QScopeBase(QObject *parent=0);
     virtual ~QScopeBase();
+    /// @endcond
 
     /**
      * Called once at startup

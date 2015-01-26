@@ -69,6 +69,10 @@ public:
     QString to_uri() const;
     static QCannedQuery from_uri(QString const& uri);
 
+    // added for testing purposes
+    static QCannedQuery create(QCannedQueryImpl *internal);
+    // added for testing purposes
+    CannedQuery * get_api_query();
 private:
     std::unique_ptr<CannedQuery> api_query_;
     friend class QDepartmentImpl;

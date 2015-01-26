@@ -26,6 +26,8 @@
 #include <unity/scopes/qt/QSearchReplyProxy.h>
 #include <unity/scopes/qt/QCannedQuery.h>
 
+#include <QtCore/QObject>
+
 namespace unity
 {
 
@@ -53,10 +55,9 @@ A scope must return an instance of this class from its implementation of ScopeBa
 \note The constructor of the instance must complete in a timely manner. Do not perform anything in the
 constructor that might block.
 */
-class QSearchQueryBase
+class QSearchQueryBase : public QObject
 {
-    friend class QSearchQueryBaseAPI;
-
+    Q_OBJECT
 public:
     /// @cond
     NONCOPYABLE(QSearchQueryBase);
@@ -144,13 +145,14 @@ public:
 
 protected:
     ///@cond
-    QSearchQueryBase();
+    QSearchQueryBase(QObject *parent=0);
 
 private:
     void init(QSearchQueryBaseAPI* query_api);
 
     std::unique_ptr<internal::QSearchQueryBaseImpl> p;
     friend class internal::QSearchQueryBaseImpl;
+    friend class QSearchQueryBaseAPI;
     ///@endcond
 };
 

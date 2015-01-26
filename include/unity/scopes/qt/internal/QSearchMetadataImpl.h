@@ -153,8 +153,11 @@ public:
     QVariant const& value(QString const& key) const;
 
 private:
-    QMap<QString, QScopeVariant> return_variants;
-    mutable QVariantMap return_const_variants;
+    void sync_values() const;
+
+    mutable QMap<QString, std::shared_ptr<QScopeVariant>> ret_variants_;
+    mutable QList<std::shared_ptr<QScopeVariant>> unsync_variants_;
+
     std::unique_ptr<unity::scopes::SearchMetadata> api_search_metadata_;
 };
 

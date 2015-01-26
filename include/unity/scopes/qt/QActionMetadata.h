@@ -44,7 +44,7 @@ class QPreviewQueryBaseImpl;
 \see unity::scopes::qt::QScopeBase::preview, unity::scopes::ScopeBase::activate,
 unity::scopes::ScopeBase::perform_action
 */
-class QActionMetadata
+class QActionMetadata final
 {
 public:
     /// @cond
@@ -115,7 +115,7 @@ public:
     \param key The name of the hint.
     \return A reference to the hint.
     */
-    QScopeVariant& operator[](QString const& key);
+    QVariant& operator[](QString const& key);
 
     /**
     \brief Returns a const reference to a hint.

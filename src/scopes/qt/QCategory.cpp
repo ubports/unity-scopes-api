@@ -28,6 +28,11 @@ QCategory::QCategory(unity::scopes::Category::SCPtr category)
 {
 }
 
+QCategory::QCategory(internal::QCategoryImpl * impl)
+    : p(impl)
+{
+}
+
 QCategory::~QCategory()
 {
 }

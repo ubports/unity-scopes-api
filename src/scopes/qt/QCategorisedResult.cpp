@@ -28,7 +28,7 @@ QCategorisedResult::QCategorisedResult(QCategory::SCPtr category)
 }
 
 QCategorisedResult::QCategorisedResult(QCategorisedResult const& other)
-    : QResult(other.fwd())
+    : QResult(new internal::QCategorisedResultImpl(*other.fwd()))
 {
 }
 
@@ -36,7 +36,7 @@ QCategorisedResult& QCategorisedResult::operator=(QCategorisedResult const& othe
 {
     if (this != &other)
     {
-        p.reset(other.fwd());
+        p.reset(new internal::QCategorisedResultImpl(*other.fwd()));
     }
     return *this;
 }
@@ -57,6 +57,9 @@ QCategory::SCPtr QCategorisedResult::category() const
 
 internal::QCategorisedResultImpl* QCategorisedResult::fwd() const
 {
+    // synchronize the internal values in case anything was
+    // changed by the [] operator
+    p->sync_values();
     return dynamic_cast<internal::QCategorisedResultImpl*>(p.get());
 }
 

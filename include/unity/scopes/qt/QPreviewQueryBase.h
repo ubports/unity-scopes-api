@@ -28,6 +28,8 @@
 #include <unity/scopes/qt/QPreviewReplyProxy.h>
 #include <unity/scopes/qt/QResult.h>
 
+#include <QtCore/QObject>
+
 namespace unity
 {
 
@@ -58,8 +60,9 @@ A scope must return an instance of this class from its implementation of ScopeBa
 \note The constructor of the instance must complete in a timely manner. Do not perform anything in the
 constructor that might block.
 */
-class QPreviewQueryBase
+class QPreviewQueryBase : public QObject
 {
+    Q_OBJECT
 public:
     /// @cond
     NONCOPYABLE(QPreviewQueryBase);
@@ -115,7 +118,7 @@ public:
 
 protected:
     /// @cond
-    QPreviewQueryBase();
+    QPreviewQueryBase(QObject *parent=0);
 
 private:
     void init(QPreviewQueryBaseAPI* query_api);

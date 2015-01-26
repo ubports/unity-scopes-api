@@ -114,16 +114,13 @@ QVariantMap QDepartmentImpl::serialize() const
     return scopeVariantMapToQVariantMap(api_department_->serialize());
 }
 
-// static QDepartment::UPtr QDepartmentImpl::create(QVariantMap const& var)
-//{
-//
-//}
-// static void QDepartmentImpl::validate_departments(QDepartment::SCPtr const& parent);
-// static void QDepartmentImpl::validate_departments(QDepartment::SCPtr const& parent, QString const& current_id);
-// static QVariantMap QDepartmentImpl::serialize_departments(QDepartment::SCPtr const& parent);
-// static QDepartment::SCPtr QDepartmentImpl::find_subdepartment_by_id(QDepartment::SCPtr const& department, QString
-// const& id);
-//
-//
-// static void QDepartmentImpl::validate_departments(QDepartment::SCPtr const& department, std::unordered_set<QString>&
-// lookup);
+// added for testing purposes
+unity::scopes::qt::QDepartment QDepartmentImpl::create(QDepartmentImpl *internal)
+{
+    return QDepartment(internal);
+}
+// added for testing purposes
+unity::scopes::Department * QDepartmentImpl::get_api()
+{
+    return api_department_.get();
+}

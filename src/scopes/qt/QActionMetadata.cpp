@@ -63,7 +63,7 @@ QActionMetadata& QActionMetadata::operator=(QActionMetadata const& other)
     return *this;
 }
 
-QActionMetadata& QActionMetadata::operator=(QActionMetadata&&) = default;
+QActionMetadata& QActionMetadata::operator=(QActionMetadata &&) = default;
 
 void QActionMetadata::set_hint(QString const& key, QVariant const& value)
 {
@@ -80,7 +80,7 @@ bool QActionMetadata::contains_hint(QString const& key) const
     return p->contains_hint(key);
 }
 
-QScopeVariant& QActionMetadata::operator[](QString const& key)
+QVariant& QActionMetadata::operator[](QString const& key)
 {
     return (*p)[key];
 }

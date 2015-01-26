@@ -59,3 +59,10 @@ QVariant QVariantBuilder::end()
 {
     return p->end();
 }
+
+///@cond
+QVariantBuilder::QVariantBuilder(internal::QVariantBuilderImpl *impl)
+    : p(impl)
+{
+}
+///@endcond

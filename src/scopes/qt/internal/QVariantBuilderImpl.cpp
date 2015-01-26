@@ -23,6 +23,7 @@
 #include <unity/scopes/VariantBuilder.h>
 
 using namespace unity::scopes;
+using namespace unity::scopes::qt;
 using namespace unity::scopes::qt::internal;
 
 QVariantBuilderImpl::QVariantBuilderImpl()
@@ -63,4 +64,14 @@ void QVariantBuilderImpl::add_tuple(QVector<QPair<QString, QVariant>> const& tup
 QVariant QVariantBuilderImpl::end()
 {
     return scopeVariantToQVariant(api_builder_->end());
+}
+
+QVariantBuilder QVariantBuilderImpl::create(QVariantBuilderImpl *internal)
+{
+    return QVariantBuilder(internal);
+}
+
+unity::scopes::VariantBuilder * QVariantBuilderImpl::get_api()
+{
+    return api_builder_.get();
 }

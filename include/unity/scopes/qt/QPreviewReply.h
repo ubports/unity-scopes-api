@@ -27,6 +27,7 @@
 #include <unity/scopes/qt/QPreviewWidget.h>
 
 #include <QtCore/QVariant>
+#include <QtCore/QObject>
 
 namespace unity
 {
@@ -48,8 +49,9 @@ class QPreviewReplyImpl;
 \brief Allows the results of a preview to be sent to the preview requester.
 */
 
-class QPreviewReply
+class QPreviewReply : public QObject
 {
+    Q_OBJECT
 public:
     /// @cond
     NONCOPYABLE(QPreviewReply);
@@ -85,7 +87,7 @@ public:
 
 protected:
     /// @cond
-    QPreviewReply(unity::scopes::PreviewReplyProxy& reply);
+    QPreviewReply(unity::scopes::PreviewReplyProxy& reply, QObject *parent=0);
 
 private:
     std::unique_ptr<internal::QPreviewReplyImpl> p;

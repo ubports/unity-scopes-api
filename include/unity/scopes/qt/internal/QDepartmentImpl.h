@@ -63,16 +63,10 @@ public:
     QDepartmentList subdepartments() const;
     QVariantMap serialize() const;
 
-    //    static QDepartment::UPtr create(QVariantMap const& var);
-    //    static void validate_departments(QDepartment::SCPtr const& parent);
-    //    static void validate_departments(QDepartment::SCPtr const& parent, QString const& current_id);
-    //    static QVariantMap serialize_departments(QDepartment::SCPtr const& parent);
-    //    static QDepartment::SCPtr find_subdepartment_by_id(QDepartment::SCPtr const& department, QString const& id);
-    //
-    // private:
-    //    static void validate_departments(QDepartment::SCPtr const& department, std::unordered_set<QString>& lookup);
-
     std::shared_ptr<unity::scopes::Department> api_department_;
+
+    static unity::scopes::qt::QDepartment create(QDepartmentImpl *internal);
+    unity::scopes::Department * get_api();
 
     friend class QDepartment;
 };

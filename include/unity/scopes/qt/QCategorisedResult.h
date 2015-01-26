@@ -40,7 +40,7 @@ class QCategorisedResultImpl;
 \brief A result, including the category it belongs to.
 */
 
-class QCategorisedResult : public QResult
+class QCategorisedResult final : public QResult
 {
 public:
     /// @cond

@@ -45,7 +45,7 @@ class QSearchMetadataImpl;
 /**
 \brief Metadata passed with search requests.
 */
-class QSearchMetadata
+class QSearchMetadata final
 {
 public:
     /// @cond
@@ -145,7 +145,7 @@ public:
     \param key The name of the hint.
     \return A reference to the hint.
     */
-    QScopeVariant& operator[](QString const& key);
+    QVariant& operator[](QString const& key);
 
     /**
     \brief Returns a const reference to a hint.

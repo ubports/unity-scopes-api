@@ -95,3 +95,14 @@ QColumnLayoutImpl::QColumnLayoutImpl(ColumnLayout* api_layout)
     : api_layout_(new ColumnLayout(*api_layout))
 {
 }
+
+// added for testing purposes
+unity::scopes::qt::QColumnLayout QColumnLayoutImpl::create(QColumnLayoutImpl *internal)
+{
+    return QColumnLayout(internal);
+}
+// added for testing purposes
+unity::scopes::ColumnLayout * QColumnLayoutImpl::get_api()
+{
+    return api_layout_.get();
+}

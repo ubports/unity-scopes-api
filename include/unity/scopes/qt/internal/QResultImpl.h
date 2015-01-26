@@ -43,9 +43,12 @@ namespace qt
 
 class QResult;
 class QScopeVariant;
+class QCategorisedResult;
 
 namespace internal
 {
+
+class QCategorisedResultImpl;
 
 class QResultImpl
 {
@@ -163,7 +166,7 @@ public:
     \return A reference to the attribute.
     \throws unity::Invalidargument if no attribute with the given name exists.
     */
-    QScopeVariant& operator[](QString const& key);
+    QVariant& operator[](QString const& key);
 
     /**
     \brief Returns a const reference to a Result attribute.
@@ -243,10 +246,15 @@ protected:
     std::unique_ptr<unity::scopes::Result> api_result_;
 
 private:
-    QMap<QString, QScopeVariant> return_variants;
-    mutable QVariantMap return_const_variants;
+
+    void sync_values() const;
+
+    mutable QMap<QString, std::shared_ptr<QScopeVariant>> ret_variants_;
+    mutable QList<std::shared_ptr<QScopeVariant>> unsync_variants_;
 
     friend class unity::scopes::qt::QResult;
+    friend class QCategorisedResultImpl;
+    friend class unity::scopes::qt::QCategorisedResult;
 };
 
 }  // namespace internal

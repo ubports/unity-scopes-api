@@ -84,7 +84,7 @@ bool QSearchMetadata::contains_hint(QString const& key) const
     return p->contains_hint(key);
 }
 
-QScopeVariant& QSearchMetadata::operator[](QString const& key)
+QVariant& QSearchMetadata::operator[](QString const& key)
 {
     return (*p)[key];
 }

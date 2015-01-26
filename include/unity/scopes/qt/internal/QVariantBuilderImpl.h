@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <unity/scopes/qt/QVariantBuilder.h>
+
 #include <QtCore/QPair>
 #include <QtCore/QString>
 #include <QtCore/QVariant>
@@ -51,6 +53,9 @@ public:
     void add_tuple(std::initializer_list<QPair<QString, QVariant>> const& tuple);
     void add_tuple(QVector<QPair<QString, QVariant>> const& tuple);
     QVariant end();
+
+    static unity::scopes::qt::QVariantBuilder create(QVariantBuilderImpl *internal);
+    unity::scopes::VariantBuilder * get_api();
 
 private:
     std::unique_ptr<unity::scopes::VariantBuilder> api_builder_;

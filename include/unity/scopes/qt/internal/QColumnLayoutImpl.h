@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <unity/scopes/qt/QColumnLayout.h>
+
 #include <unity/util/DefinesPtrs.h>
 
 #include <QtCore/QVariant>
@@ -33,8 +35,6 @@ class ColumnLayout;
 
 namespace qt
 {
-
-class QColumnLayout;
 
 namespace internal
 {
@@ -103,6 +103,10 @@ public:
     QVariantMap serialize() const;
     /// @endcond
 
+    // added for testing purposes
+    static unity::scopes::qt::QColumnLayout create(QColumnLayoutImpl *internal);
+    // added for testing purposes
+    unity::scopes::ColumnLayout * get_api();
 private:
     QColumnLayoutImpl(ColumnLayout* api_layout);
     std::unique_ptr<ColumnLayout> api_layout_;

@@ -23,6 +23,10 @@
 
 #include <unity/scopes/ActionMetadata.h>
 
+#include <unity/UnityExceptions.h>
+
+#include <sstream>
+
 using namespace unity::scopes::qt;
 using namespace unity::scopes::qt::internal;
 
@@ -49,8 +53,9 @@ QVariant QActionMetadataImpl::scope_data() const
 }
 
 QActionMetadataImpl::QActionMetadataImpl(QActionMetadataImpl const& other)
-    : api_metadata_(new ActionMetadata(*other.api_metadata_))
 {
+    other.sync_values();
+    api_metadata_.reset(new ActionMetadata(*other.api_metadata_));
 }
 
 QActionMetadataImpl::QActionMetadataImpl(QActionMetadataImpl&&) = default;
@@ -59,6 +64,7 @@ QActionMetadataImpl& QActionMetadataImpl::operator=(QActionMetadataImpl const& o
 {
     if (&other != this)
     {
+        other.sync_values();
         api_metadata_.reset(new ActionMetadata(*other.api_metadata_));
     }
 
@@ -74,23 +80,52 @@ void QActionMetadataImpl::set_hint(QString const& key, QVariant const& value)
 
 QVariantMap QActionMetadataImpl::hints() const
 {
+    sync_values();
     return (scopeVariantMapToQVariantMap(api_metadata_->hints()));
 }
 
 bool QActionMetadataImpl::contains_hint(QString const& key) const
 {
+    sync_values();
     return api_metadata_->contains_hint(key.toUtf8().data());
 }
 
 QScopeVariant& QActionMetadataImpl::operator[](QString const& key)
 {
-    QScopeVariant qVariant(&((*api_metadata_)[key.toUtf8().data()]));
-    return_variants[key] = qVariant;
-    return return_variants[key];
+    sync_values();
+    // look if the key already exists.
+    if(ret_variants_.find(key) == ret_variants_.end())
+    {
+        std::shared_ptr<QScopeVariant> scopeVariant(new QScopeVariant(&((*api_metadata_)[key.toUtf8().data()])));
+        ret_variants_.insert(key, scopeVariant);
+    }
+    auto it = ret_variants_.find(key);
+
+    unsync_variants_.push_back(it.value());
+    return *it.value();
 }
 
 QVariant const& QActionMetadataImpl::value(QString const& key) const
 {
-    return_const_variants[key] = scopeVariantToQVariant((*api_metadata_)[key.toUtf8().data()]);
-    return return_const_variants[key];
+    sync_values();
+    if (ret_variants_.find(key) == ret_variants_.end())
+    {
+        std::shared_ptr<QScopeVariant> scopeVariant(new QScopeVariant(&((*api_metadata_)[key.toUtf8().data()])));
+        ret_variants_.insert(key, scopeVariant);
+    }
+    std::shared_ptr<QScopeVariant> scopeVariant(new QScopeVariant(&((*api_metadata_)[key.toUtf8().data()])));
+    ret_variants_.insert(key, scopeVariant);
+
+    return *ret_variants_.find(key).value();
 }
+
+void QActionMetadataImpl::sync_values() const
+{
+    QListIterator<std::shared_ptr<QScopeVariant>> it(unsync_variants_);
+    while(it.hasNext())
+    {
+        it.next()->sync();
+    }
+    unsync_variants_.clear();
+}
+

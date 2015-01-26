@@ -80,8 +80,9 @@ QResultImpl::QResultImpl(internal::QResultImpl* impl)
 }
 
 QResultImpl::QResultImpl(QResultImpl const& other)
-    : api_result_(other.api_result_.get())
 {
+    other.sync_values();
+    api_result_.reset(new Result(*other.api_result_.get()));
 }
 
 QResultImpl::QResultImpl(unity::scopes::Result const& other)
@@ -141,18 +142,33 @@ ScopeProxy QResultImpl::target_scope_proxy() const
     return api_result_->target_scope_proxy();
 }
 
-QScopeVariant& QResultImpl::operator[](QString const& key)
+QVariant& QResultImpl::operator[](QString const& key)
 {
-    QScopeVariant qVariant(&((*api_result_)[key.toUtf8().data()]));
-    return_variants[key] = qVariant;
-    return return_variants[key];
+    sync_values();
+    // look if the key already exists.
+    if(ret_variants_.find(key) == ret_variants_.end())
+    {
+        std::shared_ptr<QScopeVariant> scopeVariant(new QScopeVariant(&((*api_result_)[key.toUtf8().data()])));
+        ret_variants_.insert(key, scopeVariant);
+    }
+    auto it = ret_variants_.find(key);
+
+    unsync_variants_.push_back(it.value());
+    return *it.value();
 }
 
 QVariant const& QResultImpl::operator[](QString const& key) const
 {
-    QVariant ret = scopeVariantToQVariant((*api_result_)[key.toUtf8().data()]);
-    return_const_variants[key] = ret;
-    return return_const_variants[key];
+    sync_values();
+    if (ret_variants_.find(key) == ret_variants_.end())
+    {
+        std::shared_ptr<QScopeVariant> scopeVariant(new QScopeVariant(&((*api_result_)[key.toUtf8().data()])));
+        ret_variants_.insert(key, scopeVariant);
+    }
+    std::shared_ptr<QScopeVariant> scopeVariant(new QScopeVariant(&((*api_result_)[key.toUtf8().data()])));
+    ret_variants_.insert(key, scopeVariant);
+
+    return *ret_variants_.find(key).value();
 }
 
 QString QResultImpl::uri() const noexcept
@@ -182,12 +198,30 @@ bool QResultImpl::contains(QString const& key) const
 
 QVariant const& QResultImpl::value(QString const& key) const
 {
-    QVariant ret = scopeVariantToQVariant(api_result_->value(key.toUtf8().data()));
-    return_const_variants[key] = ret;
-    return return_const_variants[key];
+    sync_values();
+    if (ret_variants_.find(key) == ret_variants_.end())
+    {
+        std::shared_ptr<QScopeVariant> scopeVariant(new QScopeVariant(&((*api_result_)[key.toUtf8().data()])));
+        ret_variants_.insert(key, scopeVariant);
+    }
+    std::shared_ptr<QScopeVariant> scopeVariant(new QScopeVariant(&((*api_result_)[key.toUtf8().data()])));
+    ret_variants_.insert(key, scopeVariant);
+
+    return *ret_variants_.find(key).value();
 }
 
 QVariantMap QResultImpl::serialize() const
 {
+    sync_values();
     return scopeVariantMapToQVariantMap(api_result_->serialize());
+}
+
+void QResultImpl::sync_values() const
+{
+    QListIterator<std::shared_ptr<QScopeVariant>> it(unsync_variants_);
+    while(it.hasNext())
+    {
+        it.next()->sync();
+    }
+    unsync_variants_.clear();
 }

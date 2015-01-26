@@ -37,8 +37,9 @@ QSearchMetadataImpl::QSearchMetadataImpl(int cardinality, QString const& locale,
 }
 
 QSearchMetadataImpl::QSearchMetadataImpl(QSearchMetadataImpl const& other)
-    : api_search_metadata_(new SearchMetadata(*other.api_search_metadata_))
 {
+    other.sync_values();
+    api_search_metadata_.reset(new SearchMetadata(*other.api_search_metadata_));
 }
 
 QSearchMetadataImpl::QSearchMetadataImpl(QSearchMetadataImpl&&) = default;
@@ -49,6 +50,7 @@ QSearchMetadataImpl& QSearchMetadataImpl::operator=(QSearchMetadataImpl const& o
 {
     if (&other != this)
     {
+        other.sync_values();
         api_search_metadata_.reset(new SearchMetadata(*other.api_search_metadata_));
     }
     return *this;
@@ -61,6 +63,7 @@ void QSearchMetadataImpl::set_cardinality(int cardinality)
 
 int QSearchMetadataImpl::cardinality() const
 {
+    sync_values();
     return api_search_metadata_->cardinality();
 }
 
@@ -71,6 +74,7 @@ void QSearchMetadataImpl::set_location(Location const& location)
 
 Location QSearchMetadataImpl::location() const
 {
+    sync_values();
     return api_search_metadata_->location();
 }
 
@@ -86,6 +90,7 @@ void QSearchMetadataImpl::set_hint(QString const& key, QVariant const& value)
 
 QVariantMap QSearchMetadataImpl::hints() const
 {
+    sync_values();
     return scopeVariantMapToQVariantMap(api_search_metadata_->hints());
 }
 
@@ -96,17 +101,40 @@ bool QSearchMetadataImpl::contains_hint(QString const& key) const
 
 QScopeVariant& QSearchMetadataImpl::operator[](QString const& key)
 {
-    // we maintain an internal map of values to keep valid references to
-    // the internal api's Variants
-    QScopeVariant qVariant(&((*api_search_metadata_)[key.toUtf8().data()]));
-    return_variants[key] = qVariant;
-    return return_variants[key];
+    sync_values();
+    // look if the key already exists.
+    if(ret_variants_.find(key) == ret_variants_.end())
+    {
+        std::shared_ptr<QScopeVariant> scopeVariant(new QScopeVariant(&((*api_search_metadata_)[key.toUtf8().data()])));
+        ret_variants_.insert(key, scopeVariant);
+    }
+    auto it = ret_variants_.find(key);
+
+    unsync_variants_.push_back(it.value());
+    return *it.value();
 }
 
 QVariant const& QSearchMetadataImpl::value(QString const& key) const
 {
-    // we maintain an internal map of values to keep valid references to
-    // the internal api's Variants
-    return_const_variants[key] = scopeVariantToQVariant((*api_search_metadata_)[key.toUtf8().data()]);
-    return return_const_variants[key];
+    sync_values();
+    if (ret_variants_.find(key) == ret_variants_.end())
+    {
+        std::shared_ptr<QScopeVariant> scopeVariant(new QScopeVariant(&((*api_search_metadata_)[key.toUtf8().data()])));
+        ret_variants_.insert(key, scopeVariant);
+    }
+    std::shared_ptr<QScopeVariant> scopeVariant(new QScopeVariant(&((*api_search_metadata_)[key.toUtf8().data()])));
+    ret_variants_.insert(key, scopeVariant);
+
+    return *ret_variants_.find(key).value();
 }
+
+void QSearchMetadataImpl::sync_values() const
+{
+    QListIterator<std::shared_ptr<QScopeVariant>> it(unsync_variants_);
+    while(it.hasNext())
+    {
+        it.next()->sync();
+    }
+    unsync_variants_.clear();
+}
+
