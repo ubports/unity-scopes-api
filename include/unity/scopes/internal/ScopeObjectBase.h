@@ -19,9 +19,9 @@
 #pragma once
 
 #include <unity/scopes/internal/AbstractObject.h>
-#include <unity/scopes/internal/InvokeInfo.h>
 #include <unity/scopes/internal/MWQueryCtrlProxyFwd.h>
 #include <unity/scopes/internal/MWReplyProxyFwd.h>
+#include <unity/scopes/ChildScope.h>
 #include <unity/scopes/Result.h>
 #include <unity/scopes/Variant.h>
 
@@ -38,6 +38,8 @@ class CannedQuery;
 
 namespace internal
 {
+
+class InvokeInfo;
 
 class ScopeObjectBase : public AbstractObject
 {
@@ -66,6 +68,9 @@ public:
                                      ActionMetadata const& hints,
                                      MWReplyProxy const& reply,
                                      InvokeInfo const& info) = 0;
+
+    virtual ChildScopeList child_scopes_ordered() const = 0;
+    virtual bool set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered) = 0;
 
     virtual bool debug_mode() const = 0;
 };

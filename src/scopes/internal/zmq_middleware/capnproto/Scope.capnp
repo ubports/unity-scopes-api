@@ -66,6 +66,27 @@ struct PreviewRequest
     replyProxy @2 : Proxy.Proxy;
 }
 
+struct ChildScope
+{
+    id      @0 : Text;
+    enabled @1 : Bool;
+}
+
+struct ChildScopesOrderedResponse
+{
+    returnValue @0 : List(ChildScope);
+}
+
+struct SetChildScopesOrderedRequest
+{
+    childScopesOrdered @0 : List(ChildScope);
+}
+
+struct SetChildScopesOrderedResponse
+{
+    returnValue @0 : Bool;
+}
+
 struct DebugModeResponse
 {
     returnValue @0 : Bool;

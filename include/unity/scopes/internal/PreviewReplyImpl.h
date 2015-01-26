@@ -39,8 +39,7 @@ class PreviewReplyImpl : public virtual unity::scopes::PreviewReply, public virt
 {
 public:
     PreviewReplyImpl(MWReplyProxy const& mw_proxy,
-                     std::shared_ptr<QueryObjectBase>const & qo,
-                     boost::log::sources::severity_channel_logger_mt<>& logger);
+                     std::shared_ptr<QueryObjectBase>const & qo);
     virtual ~PreviewReplyImpl();
 
     virtual bool register_layout(unity::scopes::ColumnLayoutList const& layouts) override;

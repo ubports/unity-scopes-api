@@ -39,8 +39,7 @@ public:
 
     PreviewQueryObject(std::shared_ptr<PreviewQueryBase> const& preview_base,
                        MWReplyProxy const& reply,
-                       MWQueryCtrlProxy const& ctrl,
-                       boost::log::sources::severity_channel_logger_mt<>& logger);
+                       MWQueryCtrlProxy const& ctrl);
     virtual ~PreviewQueryObject();
     void run(MWReplyProxy const& reply, InvokeInfo const& info) noexcept override;
 

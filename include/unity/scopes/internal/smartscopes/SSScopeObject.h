@@ -74,6 +74,9 @@ public:
                              MWReplyProxy const& reply,
                              InvokeInfo const& info) override;
 
+    ChildScopeList child_scopes_ordered() const override;
+    bool set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered) override;
+
     bool debug_mode() const override;
 
 private:
@@ -89,8 +92,6 @@ private:
 
     std::unique_ptr<SmartScope> const smartscope_;
     SSRegistryObject::SPtr ss_registry_;
-
-    boost::log::sources::severity_channel_logger_mt<>& logger_;
 };
 
 }  // namespace smartscopes

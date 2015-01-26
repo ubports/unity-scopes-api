@@ -21,8 +21,9 @@
 #include <unity/scopes/internal/MWObjectProxy.h>
 #include <unity/scopes/internal/MWReplyProxyFwd.h>
 #include <unity/scopes/internal/MWScopeProxyFwd.h>
-#include <unity/scopes/QueryCtrlProxyFwd.h>
 #include <unity/scopes/CannedQuery.h>
+#include <unity/scopes/ChildScope.h>
+#include <unity/scopes/QueryCtrlProxyFwd.h>
 #include <unity/scopes/Variant.h>
 
 namespace unity
@@ -57,6 +58,9 @@ public:
     virtual QueryCtrlProxy preview(VariantMap const& result,
                                    VariantMap const& hints,
                                    MWReplyProxy const& reply) = 0;
+
+    virtual ChildScopeList child_scopes_ordered() = 0;
+    virtual bool set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered) = 0;
 
     virtual bool debug_mode() = 0;
 

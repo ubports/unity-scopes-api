@@ -46,13 +46,15 @@ public:
     CategoryRegistry() = default;
 
     /**
-    \brief Deserializes category from a variant_map and registers it. Throws if category with same id exists.
+    \brief Deserializes category from a variant_map and registers it.
+    \throws unity::InvalidArgumentException if a category with the same id exists already.
     \return category instance
     */
     Category::SCPtr register_category(VariantMap const& variant_map);
 
     /**
-    \brief Creates category from supplied parameters. Throws if category with same id exists.
+    \brief Creates category from supplied parameters.
+    \throws unity::InvalidArgumentException if a category with the same id exists already.
     \return category instance
     */
     Category::SCPtr register_category(std::string const& id, std::string const& title, std::string const& icon, CannedQuery::SCPtr const& query, CategoryRenderer const& renderer_template);
@@ -65,7 +67,7 @@ public:
 
     /**
     \brief Register an existing category instance with this registry.
-    Throws if category with sane id exists.
+    \throws unity::InvalidArgumentException if a category with the same id exists already.
     */
     void register_category(Category::SCPtr category);
 

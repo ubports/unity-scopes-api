@@ -19,7 +19,6 @@
 #pragma once
 
 #include <unity/scopes/internal/AbstractObject.h>
-#include <unity/scopes/internal/InvokeInfo.h>
 
 namespace unity
 {
@@ -29,6 +28,8 @@ namespace scopes
 
 namespace internal
 {
+
+class InvokeInfo;
 
 class QueryCtrlObjectBase : public AbstractObject
 {

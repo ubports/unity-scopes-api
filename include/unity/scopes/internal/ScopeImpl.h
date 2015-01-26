@@ -46,7 +46,7 @@ class RuntimeImpl;
 class ScopeImpl : public virtual unity::scopes::Scope, public virtual ObjectImpl
 {
 public:
-    ScopeImpl(MWScopeProxy const& mw_proxy, RuntimeImpl* runtime, std::string const& scope_id);
+    ScopeImpl(MWScopeProxy const& mw_proxy, std::string const& scope_id);
     virtual ~ScopeImpl();
 
     RuntimeImpl* runtime() const;
@@ -92,7 +92,10 @@ public:
                                    ActionMetadata const& hints,
                                    PreviewListenerBase::SPtr const& reply) override;
 
-    static ScopeProxy create(MWScopeProxy const& mw_proxy, RuntimeImpl* runtime, std::string const& scope_id);
+    virtual ChildScopeList child_scopes_ordered() override;
+    virtual bool set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered) override;
+
+    static ScopeProxy create(MWScopeProxy const& mw_proxy, std::string const& scope_id);
 
 private:
     MWScopeProxy fwd();

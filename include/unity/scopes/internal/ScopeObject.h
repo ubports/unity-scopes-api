@@ -40,7 +40,6 @@ namespace internal
 {
 
 class MiddlewareBase;
-class RuntimeImpl;
 
 // A ScopeObject sits in between the incoming requests from the middleware layer and the
 // ScopeBase-derived implementation provided by the scope. It forwards incoming
@@ -51,7 +50,7 @@ class ScopeObject final : public ScopeObjectBase
 public:
     UNITY_DEFINES_PTRS(ScopeObject);
 
-    ScopeObject(RuntimeImpl* runtime, ScopeBase* scope_base, bool debug_mode = false);
+    ScopeObject(ScopeBase* scope_base, bool debug_mode = false);
     virtual ~ScopeObject();
 
     // Remote operation implementations
@@ -78,13 +77,15 @@ public:
                                      MWReplyProxy const& reply,
                                      InvokeInfo const& info) override;
 
+    virtual ChildScopeList child_scopes_ordered() const override;
+    virtual bool set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered) override;
+
     virtual bool debug_mode() const override;
 
 private:
     MWQueryCtrlProxy query(MWReplyProxy const& reply, MiddlewareBase* mw_base,
         std::function<QueryBase::SPtr(void)> const& query_factory_fun,
         std::function<QueryObjectBase::SPtr(QueryBase::SPtr, MWQueryCtrlProxy)> const& query_object_factory_fun);
-    RuntimeImpl* const runtime_;
     ScopeBase* const scope_base_;
     bool const debug_mode_;
 };
