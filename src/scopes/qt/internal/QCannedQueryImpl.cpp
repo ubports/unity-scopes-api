@@ -97,12 +97,12 @@ QCannedQuery QCannedQueryImpl::from_uri(QString const& uri)
     return QCannedQuery(internal_query);
 }
 
-QCannedQuery QCannedQueryImpl::create(QCannedQueryImpl *internal)
+QCannedQuery QCannedQueryImpl::create(QCannedQueryImpl* internal)
 {
     return QCannedQuery(internal);
 }
 
-CannedQuery * QCannedQueryImpl::get_api_query()
+CannedQuery* QCannedQueryImpl::get_api_query()
 {
     return api_query_.get();
 }

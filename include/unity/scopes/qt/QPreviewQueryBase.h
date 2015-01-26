@@ -118,7 +118,7 @@ public:
 
 protected:
     /// @cond
-    QPreviewQueryBase(QObject *parent=0);
+    QPreviewQueryBase(QObject* parent = 0);
 
 private:
     void init(QPreviewQueryBaseAPI* query_api);

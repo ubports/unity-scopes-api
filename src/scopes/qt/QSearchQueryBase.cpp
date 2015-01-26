@@ -28,8 +28,9 @@ using namespace unity::scopes;
 using namespace unity::scopes::qt;
 
 /// @cond
-QSearchQueryBase::QSearchQueryBase(QObject *parent)
-    : QObject(parent), p(new internal::QSearchQueryBaseImpl())
+QSearchQueryBase::QSearchQueryBase(QObject* parent)
+    : QObject(parent)
+    , p(new internal::QSearchQueryBaseImpl())
 {
 }
 

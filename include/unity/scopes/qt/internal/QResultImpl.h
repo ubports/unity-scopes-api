@@ -246,7 +246,6 @@ protected:
     std::unique_ptr<unity::scopes::Result> api_result_;
 
 private:
-
     void sync_values() const;
 
     mutable QMap<QString, std::shared_ptr<QScopeVariant>> ret_variants_;

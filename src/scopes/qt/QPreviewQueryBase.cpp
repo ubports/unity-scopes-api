@@ -24,8 +24,9 @@ using namespace unity::scopes;
 using namespace unity::scopes::qt;
 
 /// @cond
-QPreviewQueryBase::QPreviewQueryBase(QObject *parent)
-    : QObject(parent), p(new internal::QPreviewQueryBaseImpl())
+QPreviewQueryBase::QPreviewQueryBase(QObject* parent)
+    : QObject(parent)
+    , p(new internal::QPreviewQueryBaseImpl())
 {
 }
 

@@ -112,7 +112,7 @@ public:
     /// @endcond
 
 private:
-    QColumnLayout(internal::QColumnLayoutImpl * impl);
+    QColumnLayout(internal::QColumnLayoutImpl* impl);
     /// @cond
     std::unique_ptr<internal::QColumnLayoutImpl> p;
     friend class internal::QColumnLayoutImpl;

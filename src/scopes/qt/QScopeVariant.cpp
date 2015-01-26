@@ -29,7 +29,7 @@ using namespace std;
 using namespace unity::scopes::qt;
 
 /// @cond
-//QScopeVariant::QScopeVariant() noexcept : QVariant(), internal_variant_(nullptr)
+// QScopeVariant::QScopeVariant() noexcept : QVariant(), internal_variant_(nullptr)
 //{
 //}
 
@@ -40,8 +40,8 @@ QScopeVariant::QScopeVariant(Variant* val) noexcept : QVariant(scopeVariantToQVa
 QScopeVariant::~QScopeVariant() = default;
 
 QScopeVariant::QScopeVariant(QScopeVariant const& other)
-    : QVariant(scopeVariantToQVariant(*other.internal_variant_)),
-      internal_variant_(other.internal_variant_)
+    : QVariant(scopeVariantToQVariant(*other.internal_variant_))
+    , internal_variant_(other.internal_variant_)
 {
 }
 

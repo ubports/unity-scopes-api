@@ -65,8 +65,8 @@ public:
 
     std::shared_ptr<unity::scopes::Department> api_department_;
 
-    static unity::scopes::qt::QDepartment create(QDepartmentImpl *internal);
-    unity::scopes::Department * get_api();
+    static unity::scopes::qt::QDepartment create(QDepartmentImpl* internal);
+    unity::scopes::Department* get_api();
 
     friend class QDepartment;
 };

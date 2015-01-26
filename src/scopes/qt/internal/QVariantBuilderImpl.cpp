@@ -66,12 +66,12 @@ QVariant QVariantBuilderImpl::end()
     return scopeVariantToQVariant(api_builder_->end());
 }
 
-QVariantBuilder QVariantBuilderImpl::create(QVariantBuilderImpl *internal)
+QVariantBuilder QVariantBuilderImpl::create(QVariantBuilderImpl* internal)
 {
     return QVariantBuilder(internal);
 }
 
-unity::scopes::VariantBuilder * QVariantBuilderImpl::get_api()
+unity::scopes::VariantBuilder* QVariantBuilderImpl::get_api()
 {
     return api_builder_.get();
 }

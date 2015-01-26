@@ -115,7 +115,7 @@ public:
     NONCOPYABLE(QScopeBase);
     UNITY_DEFINES_PTRS(QScopeBase);
 
-    QScopeBase(QObject *parent=0);
+    QScopeBase(QObject* parent = 0);
     virtual ~QScopeBase();
     /// @endcond
 

@@ -22,8 +22,9 @@
 using namespace unity::scopes::qt;
 namespace sc = unity::scopes;
 
-QSearchReply::QSearchReply(unity::scopes::SearchReplyProxy& reply, QObject *parent)
-    : QObject(parent), p(new internal::QSearchReplyImpl(reply))
+QSearchReply::QSearchReply(unity::scopes::SearchReplyProxy& reply, QObject* parent)
+    : QObject(parent)
+    , p(new internal::QSearchReplyImpl(reply))
 {
 }
 

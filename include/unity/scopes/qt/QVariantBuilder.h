@@ -113,7 +113,7 @@ public:
 
 private:
     ///@cond
-    QVariantBuilder(internal::QVariantBuilderImpl *impl);
+    QVariantBuilder(internal::QVariantBuilderImpl* impl);
     std::unique_ptr<internal::QVariantBuilderImpl> p;
     friend class internal::QVariantBuilderImpl;
     ///@endcond

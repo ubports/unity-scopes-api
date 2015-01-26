@@ -43,7 +43,7 @@ class QActionMetadataImpl;
 class QScopeVariant : public QVariant
 {
 public:
-//    explicit QScopeVariant() noexcept;
+    //    explicit QScopeVariant() noexcept;
     ~QScopeVariant();
 
     QScopeVariant(QScopeVariant const& other);

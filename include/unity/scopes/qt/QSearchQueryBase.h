@@ -145,7 +145,7 @@ public:
 
 protected:
     ///@cond
-    QSearchQueryBase(QObject *parent=0);
+    QSearchQueryBase(QObject* parent = 0);
 
 private:
     void init(QSearchQueryBaseAPI* query_api);

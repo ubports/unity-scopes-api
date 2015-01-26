@@ -96,7 +96,7 @@ public:
 private:
     /// @cond
     QCategory(unity::scopes::Category::SCPtr category);
-    QCategory(internal::QCategoryImpl * impl);
+    QCategory(internal::QCategoryImpl* impl);
     friend class unity::scopes::qt::internal::QSearchReplyImpl;
 
     std::unique_ptr<internal::QCategoryImpl> p;

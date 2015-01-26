@@ -40,8 +40,9 @@ bool QPreviewReply::push(QString const& key, QVariant const& value)
 
 QPreviewReply::~QPreviewReply() = default;
 
-QPreviewReply::QPreviewReply(unity::scopes::PreviewReplyProxy& reply, QObject *parent)
-    : QObject(parent), p(new internal::QPreviewReplyImpl(reply))
+QPreviewReply::QPreviewReply(unity::scopes::PreviewReplyProxy& reply, QObject* parent)
+    : QObject(parent)
+    , p(new internal::QPreviewReplyImpl(reply))
 {
 }
 /// @endcond

@@ -104,9 +104,10 @@ public:
     /// @endcond
 
     // added for testing purposes
-    static unity::scopes::qt::QColumnLayout create(QColumnLayoutImpl *internal);
+    static unity::scopes::qt::QColumnLayout create(QColumnLayoutImpl* internal);
     // added for testing purposes
-    unity::scopes::ColumnLayout * get_api();
+    unity::scopes::ColumnLayout* get_api();
+
 private:
     QColumnLayoutImpl(ColumnLayout* api_layout);
     std::unique_ptr<ColumnLayout> api_layout_;

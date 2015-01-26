@@ -150,7 +150,7 @@ public:
     virtual void error(std::exception_ptr ex);
 
 private:
-    QSearchReply(unity::scopes::SearchReplyProxy& reply, QObject *parent=0);
+    QSearchReply(unity::scopes::SearchReplyProxy& reply, QObject* parent = 0);
 
     std::unique_ptr<internal::QSearchReplyImpl> p;
     friend class internal::QSearchReplyImpl;

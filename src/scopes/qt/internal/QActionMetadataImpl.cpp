@@ -94,7 +94,7 @@ QScopeVariant& QActionMetadataImpl::operator[](QString const& key)
 {
     sync_values();
     // look if the key already exists.
-    if(ret_variants_.find(key) == ret_variants_.end())
+    if (ret_variants_.find(key) == ret_variants_.end())
     {
         std::shared_ptr<QScopeVariant> scopeVariant(new QScopeVariant(&((*api_metadata_)[key.toUtf8().data()])));
         ret_variants_.insert(key, scopeVariant);
@@ -122,10 +122,9 @@ QVariant const& QActionMetadataImpl::value(QString const& key) const
 void QActionMetadataImpl::sync_values() const
 {
     QListIterator<std::shared_ptr<QScopeVariant>> it(unsync_variants_);
-    while(it.hasNext())
+    while (it.hasNext())
     {
         it.next()->sync();
     }
     unsync_variants_.clear();
 }
-

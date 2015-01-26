@@ -164,4 +164,3 @@ include_directories(${Qt5Core_INCLUDE_DIRS})
 qt5_use_modules(QVariantBuilder_test Core)
 
 add_test(QVariantBuilder QVariantBuilder_test)
-

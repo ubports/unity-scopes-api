@@ -146,7 +146,7 @@ QVariant& QResultImpl::operator[](QString const& key)
 {
     sync_values();
     // look if the key already exists.
-    if(ret_variants_.find(key) == ret_variants_.end())
+    if (ret_variants_.find(key) == ret_variants_.end())
     {
         std::shared_ptr<QScopeVariant> scopeVariant(new QScopeVariant(&((*api_result_)[key.toUtf8().data()])));
         ret_variants_.insert(key, scopeVariant);
@@ -219,7 +219,7 @@ QVariantMap QResultImpl::serialize() const
 void QResultImpl::sync_values() const
 {
     QListIterator<std::shared_ptr<QScopeVariant>> it(unsync_variants_);
-    while(it.hasNext())
+    while (it.hasNext())
     {
         it.next()->sync();
     }

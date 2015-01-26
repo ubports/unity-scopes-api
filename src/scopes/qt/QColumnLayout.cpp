@@ -44,7 +44,8 @@ QColumnLayout& QColumnLayout::operator=(QColumnLayout const& other)
     return *this;
 }
 
-QColumnLayout::QColumnLayout(internal::QColumnLayoutImpl * impl) : p(impl)
+QColumnLayout::QColumnLayout(internal::QColumnLayoutImpl* impl)
+    : p(impl)
 {
 }
 

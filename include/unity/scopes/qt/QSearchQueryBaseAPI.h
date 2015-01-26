@@ -71,7 +71,7 @@ protected:
                         QScopeBase& qtscope,
                         unity::scopes::CannedQuery const& query,
                         unity::scopes::SearchMetadata const& metadata,
-                        QObject *parent=0);
+                        QObject* parent = 0);
 
     bool event(QEvent* e) override;
     /// @endcond

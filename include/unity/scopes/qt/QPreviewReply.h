@@ -87,7 +87,7 @@ public:
 
 protected:
     /// @cond
-    QPreviewReply(unity::scopes::PreviewReplyProxy& reply, QObject *parent=0);
+    QPreviewReply(unity::scopes::PreviewReplyProxy& reply, QObject* parent = 0);
 
 private:
     std::unique_ptr<internal::QPreviewReplyImpl> p;

@@ -115,12 +115,12 @@ QVariantMap QDepartmentImpl::serialize() const
 }
 
 // added for testing purposes
-unity::scopes::qt::QDepartment QDepartmentImpl::create(QDepartmentImpl *internal)
+unity::scopes::qt::QDepartment QDepartmentImpl::create(QDepartmentImpl* internal)
 {
     return QDepartment(internal);
 }
 // added for testing purposes
-unity::scopes::Department * QDepartmentImpl::get_api()
+unity::scopes::Department* QDepartmentImpl::get_api()
 {
     return api_department_.get();
 }

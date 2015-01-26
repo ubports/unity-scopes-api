@@ -22,8 +22,9 @@
 using namespace unity::scopes::qt;
 
 ///@cond
-QScopeBase::QScopeBase(QObject *parent)
-    : QObject(parent), p(new internal::QScopeBaseImpl())
+QScopeBase::QScopeBase(QObject* parent)
+    : QObject(parent)
+    , p(new internal::QScopeBaseImpl())
 {
 }
 
@@ -31,7 +32,6 @@ QScopeBase::~QScopeBase()
 {
 }
 ///@endcond
-
 
 void QScopeBase::start(QString const& start_string)
 {

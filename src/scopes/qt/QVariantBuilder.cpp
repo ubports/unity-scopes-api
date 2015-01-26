@@ -61,7 +61,7 @@ QVariant QVariantBuilder::end()
 }
 
 ///@cond
-QVariantBuilder::QVariantBuilder(internal::QVariantBuilderImpl *impl)
+QVariantBuilder::QVariantBuilder(internal::QVariantBuilderImpl* impl)
     : p(impl)
 {
 }

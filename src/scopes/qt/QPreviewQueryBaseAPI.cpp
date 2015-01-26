@@ -78,7 +78,7 @@ QPreviewQueryBaseAPI::QPreviewQueryBaseAPI(std::shared_ptr<QCoreApplication> qta
                                            QScopeBase& qtscope,
                                            unity::scopes::Result const& result,
                                            unity::scopes::ActionMetadata const& metadata,
-                                           QObject *parent)
+                                           QObject* parent)
     : QObject(parent)
     , PreviewQueryBase(result, metadata)
     , qtapp_(qtapp)

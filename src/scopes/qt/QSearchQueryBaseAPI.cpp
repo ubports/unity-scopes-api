@@ -74,7 +74,7 @@ QSearchQueryBaseAPI::QSearchQueryBaseAPI(std::shared_ptr<QCoreApplication> app,
                                          QScopeBase& qtscope,
                                          CannedQuery const& query,
                                          SearchMetadata const& metadata,
-                                         QObject *parent)
+                                         QObject* parent)
     : QObject(parent)
     , SearchQueryBase(query, metadata)
     , qtapp_(app)

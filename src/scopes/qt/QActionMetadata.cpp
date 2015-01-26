@@ -63,7 +63,7 @@ QActionMetadata& QActionMetadata::operator=(QActionMetadata const& other)
     return *this;
 }
 
-QActionMetadata& QActionMetadata::operator=(QActionMetadata &&) = default;
+QActionMetadata& QActionMetadata::operator=(QActionMetadata&&) = default;
 
 void QActionMetadata::set_hint(QString const& key, QVariant const& value)
 {
