@@ -62,6 +62,10 @@ VariantMap FilterState::serialize() const
     return p->serialize();
 }
 
+FilterState FilterState::deserialize(VariantMap const& var) {
+    return internal::FilterStateImpl::deserialize(var);
+}
+
 /// @endcond
 
 bool FilterState::has_filter(std::string const& id) const

@@ -308,6 +308,7 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::experimental::ValueSliderFilter::~ValueSliderFilter()@Base" 0.5.0+14.10.20140619
  (c++)"unity::scopes::experimental::ValueSliderFilter::ValueSliderFilter(unity::scopes::internal::ValueSliderFilterImpl*)@Base" 0.5.0+14.10.20140619
  (c++)"unity::scopes::experimental::ValueSliderFilter::value(unity::scopes::FilterState const&) const@Base" 0.5.0+14.10.20140619
+ (c++)"unity::scopes::FilterBase::deserialize(std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unity::scopes::Variant> > > const&)@Base" 0.6.11+15.04.20150121.2
  (c++)"unity::scopes::FilterBase::display_hints() const@Base" 0.4.6+14.10.20140519
  (c++)"unity::scopes::FilterBase::~FilterBase()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::FilterBase::FilterBase(unity::scopes::internal::FilterBaseImpl*)@Base" 0.4.0+14.04.20140312.1
@@ -319,6 +320,7 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::FilterOption::FilterOption(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::FilterOption::id() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::FilterOption::label() const@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::FilterState::deserialize(std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unity::scopes::Variant> > > const&)@Base" 0.6.11+15.04.20150121.2
  (c++)"unity::scopes::FilterState::~FilterState()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::FilterState::FilterState()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::FilterState::FilterState(unity::scopes::FilterState&&)@Base" 0.4.0+14.04.20140312.1
