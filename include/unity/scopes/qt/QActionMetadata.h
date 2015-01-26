@@ -31,7 +31,6 @@ namespace qt
 {
 
 class QPreviewQueryBaseAPI;
-class QScopeVariant;
 
 namespace internal
 {
@@ -102,7 +101,7 @@ public:
     /**
     \brief Check if this SearchMetadata has a hint.
     \param key The hint name.
-    \return True if the hint is set.QScopeVariant
+    \return True if the hint is set.
     */
     bool contains_hint(QString const& key) const;
 

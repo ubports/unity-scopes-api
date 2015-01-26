@@ -21,9 +21,8 @@
 #include <unity/util/DefinesPtrs.h>
 #include <unity/scopes/Location.h>
 
-#include <unity/scopes/qt/QScopeVariant.h>
-
 #include <QtCore/QString>
+#include <QtCore/QVariant>
 
 namespace unity
 {
@@ -39,6 +38,7 @@ namespace qt
 namespace internal
 {
 
+class QScopeVariant;
 class QSearchMetadataImpl
 {
 public:

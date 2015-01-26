@@ -348,6 +348,52 @@ libunity-scopes-qt.so.01 libunity-scopes-qt #MINVER#
  (c++)"vtable for unity::scopes::qt::QPreviewQueryBaseAPI@Base" 0.6.10-0ubuntu1
  (c++)"vtable for unity::scopes::qt::QResult@Base" 0.6.10-0ubuntu1
  (c++)"vtable for unity::scopes::qt::QCategory@Base" 0.6.10-0ubuntu1
+  (c++)"unity::scopes::qt::QScopeBase::qt_metacall(QMetaObject::Call, int, void**)@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::QScopeBase::qt_metacast(char const*)@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::QScopeBase::staticMetaObject@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::QScopeBase::QScopeBase(QObject*)@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::QScopeBase::QScopeBase(QObject*)@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::QSearchReply::qt_metacall(QMetaObject::Call, int, void**)@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::QSearchReply::qt_metacast(char const*)@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::QSearchReply::staticMetaObject@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::QSearchReply::QSearchReply(std::shared_ptr<unity::scopes::SearchReply>&, QObject*)@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::QSearchReply::QSearchReply(std::shared_ptr<unity::scopes::SearchReply>&, QObject*)@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::QColumnLayout::QColumnLayout(unity::scopes::qt::internal::QColumnLayoutImpl*)@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::QColumnLayout::QColumnLayout(unity::scopes::qt::internal::QColumnLayoutImpl*)@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::QPreviewReply::qt_metacall(QMetaObject::Call, int, void**)@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::QPreviewReply::qt_metacast(char const*)@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::QPreviewReply::staticMetaObject@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::QPreviewReply::QPreviewReply(std::shared_ptr<unity::scopes::PreviewReply>&, QObject*)@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::QPreviewReply::QPreviewReply(std::shared_ptr<unity::scopes::PreviewReply>&, QObject*)@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::QScopeVariant::sync()@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::QVariantBuilder::QVariantBuilder(unity::scopes::qt::internal::QVariantBuilderImpl*)@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::QVariantBuilder::QVariantBuilder(unity::scopes::qt::internal::QVariantBuilderImpl*)@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::QSearchQueryBase::qt_metacall(QMetaObject::Call, int, void**)@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::QSearchQueryBase::qt_metacast(char const*)@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::QSearchQueryBase::staticMetaObject@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::QSearchQueryBase::QSearchQueryBase(QObject*)@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::QSearchQueryBase::QSearchQueryBase(QObject*)@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::QPreviewQueryBase::qt_metacall(QMetaObject::Call, int, void**)@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::QPreviewQueryBase::qt_metacast(char const*)@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::QPreviewQueryBase::staticMetaObject@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::QPreviewQueryBase::QPreviewQueryBase(QObject*)@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::QPreviewQueryBase::QPreviewQueryBase(QObject*)@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::QSearchQueryBaseAPI::QSearchQueryBaseAPI(std::shared_ptr<QCoreApplication>, unity::scopes::qt::QScopeBase&, unity::scopes::CannedQuery const&, unity::scopes::SearchMetadata const&, QObject*)@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::QSearchQueryBaseAPI::QSearchQueryBaseAPI(std::shared_ptr<QCoreApplication>, unity::scopes::qt::QScopeBase&, unity::scopes::CannedQuery const&, unity::scopes::SearchMetadata const&, QObject*)@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::QPreviewQueryBaseAPI::QPreviewQueryBaseAPI(std::shared_ptr<QCoreApplication>, unity::scopes::qt::QScopeBase&, unity::scopes::Result const&, unity::scopes::ActionMetadata const&, QObject*)@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::QPreviewQueryBaseAPI::QPreviewQueryBaseAPI(std::shared_ptr<QCoreApplication>, unity::scopes::qt::QScopeBase&, unity::scopes::Result const&, unity::scopes::ActionMetadata const&, QObject*)@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::QResult::QResult(QMap<QString, QVariant> const&)@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::QResult::QResult(QMap<QString, QVariant> const&)@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::QCategory::QCategory(unity::scopes::qt::internal::QCategoryImpl*)@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::QCategory::QCategory(unity::scopes::qt::internal::QCategoryImpl*)@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::QScopeBase::metaObject() const@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::QSearchReply::metaObject() const@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::QPreviewReply::metaObject() const@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::QSearchQueryBase::metaObject() const@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::QPreviewQueryBase::metaObject() const@Base" 0.6.10-0ubuntu1
+ (c++)"typeinfo for unity::scopes::qt::QScopeVariant@Base" 0.6.10-0ubuntu1
+ (c++)"typeinfo name for unity::scopes::qt::QScopeVariant@Base" 0.6.10-0ubuntu1
+ (c++)"vtable for unity::scopes::qt::QScopeVariant@Base" 0.6.10-0ubuntu1
  (c++)"core::net::Error::~Error()@Base" 0.6.10+15.04.20141211
  (c++)"core::net::Error::~Error()@Base" 0.6.10+15.04.20141211
  (c++)"core::net::Error::~Error()@Base" 0.6.10+15.04.20141211

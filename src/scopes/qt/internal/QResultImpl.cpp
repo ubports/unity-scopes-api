@@ -17,9 +17,9 @@
  */
 
 #include <unity/scopes/qt/internal/QResultImpl.h>
+#include <unity/scopes/qt/internal/QScopeVariant.h>
 
 #include <unity/scopes/qt/QResult.h>
-#include <unity/scopes/qt/QScopeVariant.h>
 #include <unity/scopes/qt/QUtils.h>
 
 #include <unity/scopes/Result.h>

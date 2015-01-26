@@ -22,8 +22,6 @@
 
 #include <unity/scopes/ScopeProxyFwd.h>
 
-#include <unity/scopes/qt/QScopeVariant.h>
-
 #include <QtCore/QString>
 #include <QtCore/QVariant>
 

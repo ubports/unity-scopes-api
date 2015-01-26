@@ -16,7 +16,7 @@
  * Authored by: Xavi Garcia <xavi.garcia.mena@canonical.com>
  */
 
-#include <unity/scopes/qt/QScopeVariant.h>
+#include <unity/scopes/qt/internal/QScopeVariant.h>
 #include <unity/scopes/qt/QUtils.h>
 
 #include <unity/scopes/Variant.h>
@@ -26,7 +26,7 @@
 #include <cassert>
 
 using namespace std;
-using namespace unity::scopes::qt;
+using namespace unity::scopes::qt::internal;
 
 /// @cond
 // QScopeVariant::QScopeVariant() noexcept : QVariant(), internal_variant_(nullptr)

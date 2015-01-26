@@ -21,8 +21,6 @@
 #include <unity/util/DefinesPtrs.h>
 #include <unity/scopes/Location.h>
 
-#include <unity/scopes/qt/QScopeVariant.h>
-
 #include <QtCore/QString>
 #include <QtCore/QVariantMap>
 
@@ -34,8 +32,6 @@ namespace scopes
 
 namespace qt
 {
-
-class QScopeVariant;
 
 namespace internal
 {

@@ -23,6 +23,7 @@ set(SCOPES_QT_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/internal/QColumnLayoutImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/internal/QPreviewReplyImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/internal/QPreviewWidgetImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/internal/QScopeVariant.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QSearchQueryBaseAPI.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QPreviewQueryBaseAPI.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QSearchReply.cpp
@@ -35,7 +36,6 @@ set(SCOPES_QT_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/QCategorisedResult.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QUtils.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QVariantBuilder.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/QScopeVariant.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QCannedQuery.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QSearchMetadata.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/QDepartment.cpp

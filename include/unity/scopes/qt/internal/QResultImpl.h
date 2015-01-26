@@ -22,8 +22,6 @@
 
 #include <unity/scopes/ScopeProxyFwd.h>
 
-#include <unity/scopes/qt/QScopeVariant.h>
-
 #include <QtCore/QString>
 #include <QtCore/QVariantMap>
 
@@ -42,12 +40,12 @@ namespace qt
 {
 
 class QResult;
-class QScopeVariant;
 class QCategorisedResult;
 
 namespace internal
 {
 
+class QScopeVariant;
 class QCategorisedResultImpl;
 
 class QResultImpl

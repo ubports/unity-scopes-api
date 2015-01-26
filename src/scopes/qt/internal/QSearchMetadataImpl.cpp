@@ -17,6 +17,7 @@
  */
 
 #include <unity/scopes/qt/internal/QSearchMetadataImpl.h>
+#include <unity/scopes/qt/internal/QScopeVariant.h>
 
 #include <unity/scopes/qt/QUtils.h>
 

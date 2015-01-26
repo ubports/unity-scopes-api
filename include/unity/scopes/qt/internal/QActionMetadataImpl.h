@@ -33,10 +33,10 @@ namespace qt
 {
 
 class QPreviewQueryBaseAPI;
-class QScopeVariant;
 
 namespace internal
 {
+class QScopeVariant;
 
 class QPreviewQueryBaseImpl;
 

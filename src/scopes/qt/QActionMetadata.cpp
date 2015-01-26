@@ -17,9 +17,9 @@
  */
 
 #include <unity/scopes/qt/QActionMetadata.h>
-#include <unity/scopes/qt/QScopeVariant.h>
 
 #include <unity/scopes/qt/internal/QActionMetadataImpl.h>
+#include <unity/scopes/qt/internal/QScopeVariant.h>
 
 using namespace unity::scopes::qt;
 

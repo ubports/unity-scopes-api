@@ -37,14 +37,13 @@ namespace internal
 class QResultImpl;
 class QSearchMetadataImpl;
 class QActionMetadataImpl;
-}
 
 /// @cond
 class QScopeVariant : public QVariant
 {
 public:
     //    explicit QScopeVariant() noexcept;
-    ~QScopeVariant();
+    virtual ~QScopeVariant();
 
     QScopeVariant(QScopeVariant const& other);
     QScopeVariant(QScopeVariant&&);
@@ -79,6 +78,8 @@ private:
     QVariant ret_variant;
 };
 /// @endcond
+
+}  // namespace internal
 
 }  // namespace qt
 

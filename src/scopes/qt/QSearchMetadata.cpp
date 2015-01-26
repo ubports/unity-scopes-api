@@ -20,6 +20,7 @@
 #include <unity/scopes/qt/QUtils.h>
 
 #include <unity/scopes/qt/internal/QSearchMetadataImpl.h>
+#include <unity/scopes/qt/internal/QScopeVariant.h>
 
 using namespace unity::scopes;
 using namespace unity::scopes::qt;
