@@ -1,11 +1,15 @@
 unity-scopes-api (0.6.12-0ubuntu1) UNRELEASED; urgency=medium
 
+  [ Marcus Tomlinson ]
   * Introduced child_scopes() methods for aggregators to return their
     list of child scopes at runtime.
   * Added missing virtual destructor to AbstractScopeBase. (LP: #1360266)
   * Removed deprecated Runtime::run_scope() method.
   * Prevent query from looping indefinitely if a query is forwarded
     among aggregators and loops back to an earlier aggregator.
+
+  [ Ubuntu daily release ]
+  * debian/libunity-scopes3.symbols: auto-update to released version
 
  -- Marcus Tomlinson <marcus.tomlinson@canonical.com>  Mon, 26 Jan 2015 10:25:49 +0200
 
