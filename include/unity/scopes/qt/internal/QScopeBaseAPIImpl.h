@@ -26,8 +26,11 @@
 #include <unity/scopes/SearchQueryBase.h>
 #include <unity/scopes/PreviewQueryBase.h>
 
+#include <QtCore/QObject>
+
 #include <thread>
 #include <memory>
+#include <atomic>
 
 class QCoreApplication;
 
@@ -45,15 +48,19 @@ class QScopeBase;
 namespace internal
 {
 
-class QScopeBaseAPIImpl
+class QScopeBaseAPIImpl : public QObject
 {
+    Q_OBJECT
 public:
     /// @cond
     NONCOPYABLE(QScopeBaseAPIImpl);
     UNITY_DEFINES_PTRS(QScopeBaseAPIImpl);
-    /// @endcond
-    QScopeBaseAPIImpl(QScopeBase& qtscope);
+
+    QScopeBaseAPIImpl(QScopeBase& qtscope, QObject *parent=0);
     virtual ~QScopeBaseAPIImpl();
+
+    bool event(QEvent* e) override;
+    /// @endcond
 
     /**
     \brief Called by the scopes run time after the create function completes.
@@ -95,6 +102,7 @@ protected:
 
     std::shared_ptr<QCoreApplication> qtapp_;
     std::unique_ptr<std::thread> qtthread_;
+    std::atomic<bool> qtapp_ready_;
 
     QScopeBase& qtscope_impl_;
 };

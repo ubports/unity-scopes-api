@@ -23,11 +23,42 @@
 
 #include <QtCore/QCoreApplication>
 
+#include <chrono>
+
 using namespace unity::scopes::qt::internal;
 namespace sc = unity::scopes;
 
-QScopeBaseAPIImpl::QScopeBaseAPIImpl(QScopeBase& qtscope)
-    : qtscope_impl_(qtscope)
+// Qt user events start at QEvent::User, which is 1000...
+enum EventType
+{
+    Start = QEvent::User,
+    Stop
+};
+
+class StartEvent : public QEvent
+{
+public:
+    StartEvent(QString const& scope_id)
+        : QEvent(static_cast<QEvent::Type>(Start)),
+          scope_id_(scope_id)
+    {
+    }
+    QString scope_id_;
+};
+
+class StopEvent : public QEvent
+{
+public:
+    StopEvent()
+        : QEvent(static_cast<QEvent::Type>(Stop))
+    {
+    }
+};
+
+QScopeBaseAPIImpl::QScopeBaseAPIImpl(QScopeBase& qtscope, QObject *parent)
+    : QObject(parent),
+      qtapp_ready_(false),
+      qtscope_impl_(qtscope)
 {
 }
 
@@ -35,20 +66,53 @@ QScopeBaseAPIImpl::~QScopeBaseAPIImpl()
 {
 }
 
+bool QScopeBaseAPIImpl::event(QEvent* e)
+{
+    StartEvent* start_event = nullptr;
+    EventType type = static_cast<EventType>(e->type());
+
+    QSearchReplyProxy qt_search_reply;
+    switch (type)
+    {
+        case Start:
+            start_event = dynamic_cast<StartEvent*>(e);
+            qtscope_impl_.start(start_event->scope_id_);
+            break;
+        case Stop:
+            qtscope_impl_.stop();
+
+            // exit the QCoreApplication
+            qtapp_->quit();
+            break;
+        default:
+            break;
+    }
+    return true;
+}
+
 void QScopeBaseAPIImpl::start(std::string const& scope_id)
 {
-    qtscope_impl_.start(QString::fromUtf8(scope_id.c_str()));
-
     // start the QT thread
     // TODO change to make_unique when using C++14
     qtthread_ = std::unique_ptr<std::thread>(new std::thread(&QScopeBaseAPIImpl::startQtThread, this));
+    while(!qtapp_ready_)
+    {
+        std::chrono::milliseconds dura(10);
+        std::this_thread::sleep_for(dura);
+    }
+
+    // Move this class to the Qt main thread
+    this->moveToThread(qtapp_->thread());
+
+    // now we can call start in the client's scope
+    // Post event to initialize the object in the Qt thread
+    qtapp_->postEvent(this, new StartEvent(scope_id.c_str()));
 }
 
 void QScopeBaseAPIImpl::stop()
 {
-    qtscope_impl_.stop();
-    // exit the QCoreApplication
-    qtapp_->quit();
+    // Post event to initialize the object in the Qt thread
+    qtapp_->postEvent(this, new StopEvent());
 }
 
 sc::PreviewQueryBase::UPtr QScopeBaseAPIImpl::preview(const sc::Result& result, const sc::ActionMetadata& metadata)
@@ -73,6 +137,7 @@ void QScopeBaseAPIImpl::startQtThread()
         int argc = 0;
         char* argv = NULL;
         qtapp_ = std::make_shared<QCoreApplication>(argc, &argv);
+        qtapp_ready_=true;
         qtapp_->exec();
     }
 }

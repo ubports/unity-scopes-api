@@ -50,6 +50,7 @@ set(SCOPES_QT_SRC
     ${CMAKE_SOURCE_DIR}/include/unity/scopes/qt/QPreviewReply.h
     ${CMAKE_SOURCE_DIR}/include/unity/scopes/qt/QScopeBase.h
     ${CMAKE_SOURCE_DIR}/include/unity/scopes/qt/QSearchReply.h
+    ${CMAKE_SOURCE_DIR}/include/unity/scopes/qt/internal/QScopeBaseAPIImpl.h
 )
 
 # -- libunity-scopes-qt --
