@@ -209,7 +209,7 @@ public:
     The set returned by this method is formulated from the value specified under
     the "Keywords" key in the scope's .ini file.
 
-    \return The set of scope keywords specified by this scope.
+    \return The set of keywords specified by this scope.
     */
     std::set<std::string> keywords() const;
 
