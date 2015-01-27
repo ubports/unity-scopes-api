@@ -19,7 +19,7 @@
 #pragma once
 
 #include <unity/scopes/Scope.h>
-#include <vector>
+#include <set>
 
 namespace unity
 {
@@ -204,14 +204,14 @@ public:
     int version() const;
 
     /**
-    \brief Return the list of keywords specified by this scope.
+    \brief Return the set of keywords specified by this scope.
 
-    The list returned by this method is formulated from the value specified under
+    The set returned by this method is formulated from the value specified under
     the "Keywords" key in the scope's .ini file.
 
-    \return The list of scope keywords specified by this scope.
+    \return The set of scope keywords specified by this scope.
     */
-    std::vector<std::string> keywords() const;
+    std::set<std::string> keywords() const;
 
     /**
     \brief Check if this scope is an aggregator.

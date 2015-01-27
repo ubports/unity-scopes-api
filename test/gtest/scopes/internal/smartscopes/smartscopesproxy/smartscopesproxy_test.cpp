@@ -141,10 +141,10 @@ TEST_F(smartscopesproxytest, ss_registry)
         EXPECT_EQ("Celsius", meta.settings_definitions()[1].get_dict()["displayValues"].get_array()[0].get_string());
         EXPECT_EQ("Fahrenheit", meta.settings_definitions()[1].get_dict()["displayValues"].get_array()[1].get_string());
         ASSERT_EQ(4, meta.keywords().size());
-        EXPECT_EQ("music", meta.keywords()[0]);
-        EXPECT_EQ("video", meta.keywords()[1]);
-        EXPECT_EQ("news", meta.keywords()[2]);
-        EXPECT_EQ("games", meta.keywords()[3]);
+        EXPECT_NE(meta.keywords().end(), meta.keywords().find("music"));
+        EXPECT_NE(meta.keywords().end(), meta.keywords().find("video"));
+        EXPECT_NE(meta.keywords().end(), meta.keywords().find("news"));
+        EXPECT_NE(meta.keywords().end(), meta.keywords().find("games"));
     }
 
     // non-existent scope (via mw)

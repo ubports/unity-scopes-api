@@ -246,7 +246,7 @@ int ScopeMetadataImpl::version() const
     return version_;
 }
 
-std::vector<std::string> ScopeMetadataImpl::keywords() const
+std::set<std::string> ScopeMetadataImpl::keywords() const
 {
     return keywords_;
 }
@@ -354,7 +354,7 @@ void ScopeMetadataImpl::set_version(int v)
     version_ = v;
 }
 
-void ScopeMetadataImpl::set_keywords(std::vector<std::string> const& keywords)
+void ScopeMetadataImpl::set_keywords(std::set<std::string> const& keywords)
 {
     keywords_ = keywords;
 }
@@ -608,7 +608,7 @@ void ScopeMetadataImpl::deserialize(VariantMap const& var)
     {
         for (auto const& v: it->second.get_array())
         {
-            keywords_.push_back(v.get_string());
+            keywords_.emplace(v.get_string());
         }
     }
 

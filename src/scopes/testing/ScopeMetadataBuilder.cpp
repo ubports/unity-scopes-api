@@ -48,7 +48,7 @@ struct testing::ScopeMetadataBuilder::Private
     Optional<bool> location_data_needed;
     Optional<std::vector<std::string>> child_scope_ids;
     Optional<int> version;
-    Optional<std::vector<std::string>> keywords;
+    Optional<std::set<std::string>> keywords;
     Optional<bool> is_aggregator;
 };
 
@@ -162,7 +162,7 @@ testing::ScopeMetadataBuilder& testing::ScopeMetadataBuilder::version(Optional<i
     return *this;
 }
 
-testing::ScopeMetadataBuilder& testing::ScopeMetadataBuilder::keywords(Optional<std::vector<std::string>> const& value)
+testing::ScopeMetadataBuilder& testing::ScopeMetadataBuilder::keywords(Optional<std::set<std::string>> const& value)
 {
     p->keywords = value;
     return *this;

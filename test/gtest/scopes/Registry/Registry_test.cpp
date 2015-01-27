@@ -113,9 +113,9 @@ TEST(Registry, metadata)
     EXPECT_EQ(1, meta.version());
     auto keywords = meta.keywords();
     EXPECT_EQ(3u, keywords.size());
-    EXPECT_EQ("music", keywords[0]);
-    EXPECT_EQ("news", keywords[1]);
-    EXPECT_EQ("foo", keywords[2]);
+    EXPECT_NE(keywords.end(), keywords.find("music"));
+    EXPECT_NE(keywords.end(), keywords.find("news"));
+    EXPECT_NE(keywords.end(), keywords.find("foo"));
     EXPECT_FALSE(meta.is_aggregator());
 
     auto attrs = meta.appearance_attributes();
