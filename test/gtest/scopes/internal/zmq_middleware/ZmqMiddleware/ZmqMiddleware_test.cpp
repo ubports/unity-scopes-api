@@ -421,6 +421,7 @@ public:
 
     virtual MWQueryCtrlProxy search(CannedQuery const&,
                                           SearchMetadata const&,
+                                          VariantMap const&,
                                           MWReplyProxy const&,
                                           InvokeInfo const&) override
     {

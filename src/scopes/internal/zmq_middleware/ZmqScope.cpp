@@ -78,7 +78,10 @@ ZmqScope::~ZmqScope()
 {
 }
 
-QueryCtrlProxy ZmqScope::search(CannedQuery const& query, VariantMap const& hints, MWReplyProxy const& reply)
+QueryCtrlProxy ZmqScope::search(CannedQuery const& query,
+                                VariantMap const& hints,
+                                VariantMap const& context,
+                                MWReplyProxy const& reply)
 {
     capnp::MallocMessageBuilder request_builder;
     auto reply_proxy = dynamic_pointer_cast<ZmqReply>(reply);
@@ -93,6 +96,8 @@ QueryCtrlProxy ZmqScope::search(CannedQuery const& query, VariantMap const& hint
         p.setEndpoint(reply_proxy->endpoint().c_str());
         p.setIdentity(reply_proxy->identity().c_str());
         p.setCategory(reply_proxy->target_category().c_str());
+        auto d = in_params.initContext();
+        to_value_dict(context, d);
     }
 
     auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_scope_(request_builder); });

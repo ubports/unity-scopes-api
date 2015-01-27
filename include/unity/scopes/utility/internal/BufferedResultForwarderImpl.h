@@ -55,8 +55,8 @@ private:
     std::atomic<bool> ready_;
     std::atomic<bool> has_previous_;
     std::atomic<bool> previous_ready_;
-    unity::scopes::SearchReplyProxy const upstream_;  // Immutable
-    BufferedResultForwarder::SPtr next_;              // Immutable
+    unity::scopes::SearchReplyProxy const upstream_;
+    BufferedResultForwarder::SPtr const next_;
 };
 
 } // namespace internal

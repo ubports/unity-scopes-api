@@ -45,8 +45,9 @@ public:
     virtual ~ZmqScope();
 
     virtual QueryCtrlProxy search(CannedQuery const& query,
-                                        VariantMap const& hints,
-                                        MWReplyProxy const& reply) override;
+                                  VariantMap const& hints,
+                                  VariantMap const& context,
+                                  MWReplyProxy const& reply) override;
 
     virtual QueryCtrlProxy activate(VariantMap const& result,
                                     VariantMap const& hints,

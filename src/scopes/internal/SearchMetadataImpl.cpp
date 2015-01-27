@@ -50,6 +50,7 @@ SearchMetadataImpl::SearchMetadataImpl(VariantMap const& var)
     auto it = find_or_throw("SearchMetadataImpl()", var, "cardinality");
     cardinality_ = it->second.get_int();
     check_cardinality("SearchMetadataImpl(VariantMap)", cardinality_);
+
     try
     {
         it = find_or_throw("SearchMetadataImpl()", var, "location");
@@ -89,7 +90,6 @@ bool SearchMetadataImpl::has_location() const
 {
     return location_;
 }
-
 
 std::string SearchMetadataImpl::metadata_type() const
 {

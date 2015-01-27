@@ -1,0 +1,4 @@
+[ScopeConfig]
+DisplayName = LoopScope
+Description = Aggregator scope that makes various loops
+Author = Michi
