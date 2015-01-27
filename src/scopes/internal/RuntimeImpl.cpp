@@ -18,6 +18,7 @@
 
 #include <unity/scopes/internal/RuntimeImpl.h>
 
+#include <unity/scopes/internal/ChildScopesRepository.h>
 #include <unity/scopes/internal/DfltConfig.h>
 #include <unity/scopes/internal/Logger.h>
 #include <unity/scopes/internal/MWStateReceiver.h>
@@ -388,6 +389,12 @@ void RuntimeImpl::run_scope(ScopeBase* scope_base,
         {
             scope_base->p->set_settings_db(nullptr);
         }
+
+        // Configure the child scopes repository
+        string child_scopes_repo = config_dir + "/child-scopes.json";
+
+        auto repo = make_shared<ChildScopesRepository>(child_scopes_repo, logger());
+        scope_base->p->set_child_scopes_repo(repo);
     }
 
     scope_base->p->set_registry(registry_);

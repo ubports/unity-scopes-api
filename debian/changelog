@@ -1,3 +1,12 @@
+unity-scopes-api (0.6.12-0ubuntu1) UNRELEASED; urgency=medium
+
+  * Introduced child_scopes() methods for aggregators to return their
+    list of child scopes at runtime.
+  * Added missing virtual destructor to AbstractScopeBase. (LP: #1360266)
+  * Removed deprecated Runtime::run_scope() method.
+
+ -- Marcus Tomlinson <marcus.tomlinson@canonical.com>  Tue, 20 Jan 2015 07:52:23 +0200
+
 unity-scopes-api (0.6.11+15.04.20150126-0ubuntu1) vivid; urgency=low
 
   [ Marcus Tomlinson ]

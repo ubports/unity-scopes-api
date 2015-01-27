@@ -213,6 +213,16 @@ MWQueryCtrlProxy ScopeObject::preview(Result const& result,
     );
 }
 
+ChildScopeList ScopeObject::child_scopes_ordered() const
+{
+    return scope_base_->child_scopes_ordered();
+}
+
+bool ScopeObject::set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered)
+{
+    return scope_base_->p->set_child_scopes_ordered(child_scopes_ordered);
+}
+
 bool ScopeObject::debug_mode() const
 {
     return debug_mode_;

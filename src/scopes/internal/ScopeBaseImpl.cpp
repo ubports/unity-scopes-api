@@ -19,7 +19,9 @@
 #include <unity/scopes/internal/ScopeBaseImpl.h>
 
 #include <unity/UnityExceptions.h>
+#include <unity/scopes/internal/ChildScopesRepository.h>
 #include <unity/scopes/internal/SettingsDB.h>
+#include <unity/scopes/Registry.h>
 #include <unity/scopes/ScopeExceptions.h>
 
 using namespace unity;
@@ -42,6 +44,7 @@ ScopeBaseImpl::ScopeBaseImpl()
     , tmp_dir_initialized_(false)
     , registry_initialized_(false)
     , settings_db_initialized_(false)
+    , child_scopes_repo_initialized_(false)
 {
 }
 
@@ -169,6 +172,53 @@ VariantMap ScopeBaseImpl::settings() const
         throw LogicException("ScopeBase::settings_db() cannot be called from constructor");
     }
     return db_ ? db_->settings() : VariantMap();
+}
+
+void ScopeBaseImpl::set_child_scopes_repo(std::shared_ptr<ChildScopesRepository> const& child_scopes_repo)
+{
+    lock_guard<mutex> lock(mutex_);
+    child_scopes_repo_ = child_scopes_repo;
+    child_scopes_repo_initialized_ = true;
+}
+
+ChildScopeList ScopeBaseImpl::child_scopes() const
+{
+    // Get a copy of the registry proxy
+    RegistryProxy reg = registry();
+    if (!reg)
+    {
+        return ChildScopeList();
+    }
+
+    // The default behaviour of this method is to simply return all available scopes on the system.
+    ChildScopeList return_list;
+    auto all_scopes = reg->list();
+    for (auto const& scope : all_scopes)
+    {
+        // New scopes are added disabled by default
+        return_list.push_back( ChildScope{scope.first, false} );
+    }
+    return return_list;
+}
+
+ChildScopeList ScopeBaseImpl::child_scopes_ordered(ChildScopeList const& child_scopes_unordered) const
+{
+    lock_guard<mutex> lock(mutex_);
+    if (!child_scopes_repo_initialized_)
+    {
+        throw LogicException("ScopeBase::child_scopes_ordered() cannot be called from constructor");
+    }
+    return child_scopes_repo_ ? child_scopes_repo_->child_scopes_ordered(child_scopes_unordered) : ChildScopeList();
+}
+
+bool ScopeBaseImpl::set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered)
+{
+    lock_guard<mutex> lock(mutex_);
+    if (!child_scopes_repo_initialized_)
+    {
+        throw LogicException("ScopeBase::set_child_scopes_ordered() cannot be called from constructor");
+    }
+    return child_scopes_repo_ ? child_scopes_repo_->set_child_scopes_ordered(child_scopes_ordered) : false;
 }
 
 } // namespace internal

@@ -56,6 +56,8 @@ interface Scope
     QueryCtrl* activate(string query, ValueDict hints, Reply* replyProxy);
     QueryCtrl* perform_action(string query, ValueDict hints, string action_id, Reply* replyProxy);
     QueryCtrl* preview(string query, ValueDict hints, Reply* replyProxy);
+    ChildScopeList child_scopes_ordered();
+    bool set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered);
     bool debug_mode();
 };
 
@@ -198,6 +200,54 @@ QueryCtrlProxy ZmqScope::preview(VariantMap const& result, VariantMap const& hin
                                          proxy.getIdentity().cStr(),
                                          proxy.getCategory().cStr()));
     return make_shared<QueryCtrlImpl>(p, reply_proxy);
+}
+
+ChildScopeList ZmqScope::child_scopes_ordered()
+{
+    capnp::MallocMessageBuilder request_builder;
+    make_request_(request_builder, "child_scopes_ordered");
+
+    auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_scope_(request_builder); });
+
+    auto out_params = future.get();
+    auto response = out_params.reader->getRoot<capnproto::Response>();
+    throw_if_runtime_exception(response);
+
+    auto list = response.getPayload().getAs<capnproto::Scope::ChildScopesOrderedResponse>().getReturnValue();
+
+    ChildScopeList child_scope_list;
+    for (size_t i = 0; i < list.size(); ++i)
+    {
+        string id = list[i].getId();
+        bool enabled = list[i].getEnabled();
+        child_scope_list.push_back( ChildScope{id, enabled} );
+    }
+    return child_scope_list;
+}
+
+bool ZmqScope::set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered)
+{
+    capnp::MallocMessageBuilder request_builder;
+    auto request = make_request_(request_builder, "set_child_scopes_ordered");
+
+    auto in_params = request.initInParams().getAs<capnproto::Scope::SetChildScopesOrderedRequest>();
+    auto list = in_params.initChildScopesOrdered(child_scopes_ordered.size());
+
+    int i = 0;
+    for (auto const& child_scope : child_scopes_ordered)
+    {
+        list[i].setId(child_scope.id);
+        list[i].setEnabled(child_scope.enabled);
+        ++i;
+    }
+
+    auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_scope_(request_builder); });
+    auto out_params = future.get();
+    auto r = out_params.reader->getRoot<capnproto::Response>();
+    throw_if_runtime_exception(r);
+
+    auto response = r.getPayload().getAs<capnproto::Scope::SetChildScopesOrderedResponse>();
+    return response.getReturnValue();
 }
 
 bool ZmqScope::debug_mode()

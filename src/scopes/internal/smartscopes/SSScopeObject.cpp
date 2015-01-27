@@ -191,6 +191,16 @@ MWQueryCtrlProxy SSScopeObject::query(InvokeInfo const& info,
     return info.mw->create_query_ctrl_proxy(reply->identity() + ".c", info.mw->get_query_ctrl_endpoint());
 }
 
+ChildScopeList SSScopeObject::child_scopes_ordered() const
+{
+    return ChildScopeList();
+}
+
+bool SSScopeObject::set_child_scopes_ordered(ChildScopeList const&)
+{
+    return false;
+}
+
 bool SSScopeObject::debug_mode() const
 {
     return false;

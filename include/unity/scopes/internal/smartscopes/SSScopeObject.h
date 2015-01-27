@@ -73,6 +73,9 @@ public:
                              MWReplyProxy const& reply,
                              InvokeInfo const& info) override;
 
+    ChildScopeList child_scopes_ordered() const override;
+    bool set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered) override;
+
     bool debug_mode() const override;
 
 private:
