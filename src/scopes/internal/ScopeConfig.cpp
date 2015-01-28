@@ -225,8 +225,7 @@ ScopeConfig::ScopeConfig(string const& configfile) :
     try
     {
         auto keywords_vec = parser()->get_string_array(scope_config_group, keywords_key);
-        set<string> keywords_set(keywords_vec.begin(), keywords_vec.end());
-        keywords_ = keywords_set;
+        keywords_ = set<string>(keywords_vec.begin(), keywords_vec.end());
     }
     catch (LogicException const&)
     {
