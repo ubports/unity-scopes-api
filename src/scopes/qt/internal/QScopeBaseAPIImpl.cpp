@@ -104,6 +104,9 @@ void QScopeBaseAPIImpl::start(std::string const& scope_id)
     // Move this class to the Qt main thread
     this->moveToThread(qtapp_->thread());
 
+    // Move the user's scope to the Qt main thread
+    qtscope_impl_.moveToThread(qtapp_->thread());
+
     // now we can call start in the client's scope
     // Post event to initialize the object in the Qt thread
     qtapp_->postEvent(this, new StartEvent(scope_id.c_str()));
