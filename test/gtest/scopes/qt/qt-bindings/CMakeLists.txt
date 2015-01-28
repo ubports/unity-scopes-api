@@ -164,3 +164,23 @@ include_directories(${Qt5Core_INCLUDE_DIRS})
 qt5_use_modules(QVariantBuilder_test Core)
 
 add_test(QVariantBuilder QVariantBuilder_test)
+
+###################################################
+
+add_executable(
+  QScopeBaseAPIImpl_test
+  QScopeBaseAPIImpl_test.cpp
+  QScopeBaseAPIMock.h)
+
+target_link_libraries(
+    QScopeBaseAPIImpl_test
+    ${LIBGTEST}
+    ${TESTLIBS_QT}
+    ${TESTLIBS})
+
+find_package(Qt5Core REQUIRED)
+include_directories(${Qt5Core_INCLUDE_DIRS})
+
+qt5_use_modules(QScopeBaseAPIImpl_test Core)
+
+add_test(QScopeBaseAPIImpl QScopeBaseAPIImpl_test)

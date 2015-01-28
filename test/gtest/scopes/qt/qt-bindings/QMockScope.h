@@ -18,60 +18,41 @@
 
 #pragma once
 
-#include <unity/scopes/qt/QScopeBase.h>
-#include <unity/scopes/qt/QPreviewQueryBase.h>
-#include <unity/scopes/qt/QSearchQueryBase.h>
+#include "FakeScope.h"
+#include <gtest/gtest.h>
+#include <gmock/gmock.h>
 
-#include <unity/scopes/CannedQuery.h>
-#include <unity/scopes/SearchMetadata.h>
+#include <QtCore/QThread>
 
-class QQuery : public unity::scopes::qt::QSearchQueryBase
+class QScopeMock : public QScope
 {
 public:
-    virtual void run(unity::scopes::qt::QSearchReplyProxy const& ) override
+    QScopeMock()
+        : QScope(),
+          qt_thread(nullptr)
+    {};
+
+    void setQtThread(QThread *thread)
     {
-        std::cout << "QQuery::run()" << std::endl;
+        qt_thread = thread;
     }
 
-    virtual void cancelled() override
-    {
-        std::cout << "QQuery::cancelled()" << std::endl;
-    }
-};
-
-class QPreview : public unity::scopes::qt::QPreviewQueryBase
-{
-public:
-    virtual void run(unity::scopes::qt::QPreviewReplyProxy const& ) override
-    {
-        std::cout << "QQuery::run()" << std::endl;
-    }
-
-    virtual void cancelled() override
-    {
-        std::cout << "QQuery::cancelled()" << std::endl;
-    }
-};
-
-class QScope : public unity::scopes::qt::QScopeBase
-{
-public:
-
-    virtual void start(QString const&) override
-    {
-        std::cerr << "QScope::start()" << std::endl;
-    }
-
+    MOCK_METHOD1(start, void(QString const&));
+    MOCK_METHOD0(stop, void());
     virtual unity::scopes::qt::QPreviewQueryBase::UPtr preview(const unity::scopes::qt::QResult&,
                                                                const unity::scopes::qt::QActionMetadata&) override
     {
+        EXPECT_EQ(QThread::currentThread(),qt_thread);
         return unity::scopes::qt::QPreviewQueryBase::UPtr(new QPreview());
     }
 
     virtual unity::scopes::qt::QSearchQueryBase::UPtr search(unity::scopes::CannedQuery const&,
                                           unity::scopes::SearchMetadata const&) override
     {
+        EXPECT_EQ(QThread::currentThread(),qt_thread);
         return unity::scopes::qt::QSearchQueryBase::UPtr(new QQuery());
     }
 
+protected:
+    QThread *qt_thread;
 };

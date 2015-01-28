@@ -36,7 +36,12 @@ public:
     {
         std::cout << "Type is: " << e->type() << std::endl;
         std::cout << "Thread id when matching is: " << QThread::currentThreadId() << std::endl;
-        return ((e->type() == type_to_check_ || e->type() < 1000) && thread_id_ == QThread::currentThreadId());
+        bool sameThread = true;
+        if(thread_id_)
+        {
+            sameThread = thread_id_ == QThread::currentThreadId();
+        }
+        return ((e->type() == type_to_check_ || e->type() < 1000) && sameThread);
     }
 
     virtual void DescribeTo(::std::ostream* os) const {

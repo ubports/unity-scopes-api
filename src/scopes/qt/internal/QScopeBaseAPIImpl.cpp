@@ -22,6 +22,7 @@
 #include <unity/scopes/qt/QPreviewQueryBaseAPI.h>
 
 #include <QtCore/QCoreApplication>
+#include <QtCore/QThread>
 
 #include <chrono>
 
@@ -64,6 +65,7 @@ QScopeBaseAPIImpl::QScopeBaseAPIImpl(QScopeBase& qtscope, QObject *parent)
 
 QScopeBaseAPIImpl::~QScopeBaseAPIImpl()
 {
+    qtthread_->join();
 }
 
 bool QScopeBaseAPIImpl::event(QEvent* e)
@@ -142,5 +144,7 @@ void QScopeBaseAPIImpl::startQtThread()
         qtapp_ = std::make_shared<QCoreApplication>(argc, &argv);
         qtapp_ready_=true;
         qtapp_->exec();
+        // delete QtCoreApplication in the same thread it was created
+        qtapp_.reset();
     }
 }
