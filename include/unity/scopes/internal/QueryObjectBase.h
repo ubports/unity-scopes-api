@@ -31,7 +31,7 @@ namespace scopes
 namespace internal
 {
 
-class InvokeInfo;
+struct InvokeInfo;
 
 class QueryObjectBase : public AbstractObject
 {

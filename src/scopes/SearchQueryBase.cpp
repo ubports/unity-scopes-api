@@ -61,7 +61,7 @@ QueryCtrlProxy SearchQueryBase::subsearch(ScopeProxy const& scope,
                                           string const& query_string,
                                           SearchListenerBase::SPtr const& reply)
 {
-    return fwd()->subsearch(scope, query_string, reply);
+    return subsearch(scope, query_string, "", FilterState(), fwd()->search_metadata(), reply);
 }
 
 QueryCtrlProxy SearchQueryBase::subsearch(ScopeProxy const& scope,
@@ -69,7 +69,7 @@ QueryCtrlProxy SearchQueryBase::subsearch(ScopeProxy const& scope,
                                           FilterState const& filter_state,
                                           SearchListenerBase::SPtr const& reply)
 {
-    return fwd()->subsearch(scope, query_string, filter_state, reply);
+    return subsearch(scope, query_string, "", filter_state, fwd()->search_metadata(), reply);
 }
 
 QueryCtrlProxy SearchQueryBase::subsearch(ScopeProxy const& scope,
@@ -78,7 +78,7 @@ QueryCtrlProxy SearchQueryBase::subsearch(ScopeProxy const& scope,
                                           FilterState const& filter_state,
                                           SearchListenerBase::SPtr const& reply)
 {
-    return fwd()->subsearch(scope, query_string, department_id, filter_state, reply);
+    return subsearch(scope, query_string, department_id, filter_state, fwd()->search_metadata(), reply);
 }
 
 QueryCtrlProxy SearchQueryBase::subsearch(ScopeProxy const& scope,

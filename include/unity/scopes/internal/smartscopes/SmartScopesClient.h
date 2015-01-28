@@ -229,7 +229,6 @@ private:
 
     HttpClientInterface::SPtr http_client_;
     JsonNodeInterface::SPtr json_node_;
-    RuntimeImpl* runtime_;
     boost::log::sources::severity_channel_logger_mt<>& logger_;
     std::string url_;
 

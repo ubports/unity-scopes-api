@@ -211,7 +211,7 @@ TEST_F(TestScopeFixture, performing_an_aggregating_query_works)
         &queryctrl, [](unity::scopes::QueryCtrl*) {});
 
     auto push_childscope_results =
-        [queryctrl_proxy](Unused, Unused, unity::scopes::SearchListenerBase::SPtr const& listener) -> unity::scopes::QueryCtrlProxy {
+        [queryctrl_proxy](Unused, Unused, Unused, Unused, unity::scopes::SearchListenerBase::SPtr const& listener) -> unity::scopes::QueryCtrlProxy {
         unity::scopes::Category::SCPtr cat(
             new unity::scopes::testing::Category(
                 "id", "title", "icon", unity::scopes::CategoryRenderer()));
@@ -229,7 +229,7 @@ TEST_F(TestScopeFixture, performing_an_aggregating_query_works)
     };
 
     NiceMock<unity::scopes::testing::MockScope> childscope;
-    EXPECT_CALL(childscope, search(aggregator_query, _, _))
+    EXPECT_CALL(childscope, search(aggregator_query, _, _, _, _))
         .WillOnce(Invoke(push_childscope_results));
     unity::scopes::ScopeProxy childscope_proxy(
         &childscope, [](unity::scopes::Scope*) {});

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Canonical Ltd
+ * Copyright (C) 2014 Canonical Ltd
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License version 3 as
@@ -18,30 +18,24 @@
 
 #pragma once
 
-#include <unity/scopes/internal/AbstractObject.h>
+#include <unity/scopes/ScopeBase.h>
 
-namespace unity
-{
-
-namespace scopes
-{
-
-namespace internal
-{
-
-struct InvokeInfo;
-
-class QueryCtrlObjectBase : public AbstractObject
+class LoopScope : public unity::scopes::ScopeBase
 {
 public:
-    UNITY_DEFINES_PTRS(QueryCtrlObjectBase);
+    virtual void start(std::string const&) override;
 
-    virtual void cancel(InvokeInfo const& info) = 0;
-    virtual void destroy(InvokeInfo const& info) = 0;
+    virtual void stop() override;
+
+    virtual void run() override;
+
+    virtual unity::scopes::SearchQueryBase::UPtr search(unity::scopes::CannedQuery const &,
+                                                        unity::scopes::SearchMetadata const &) override;
+
+    virtual unity::scopes::PreviewQueryBase::UPtr preview(unity::scopes::Result const&,
+                                                          unity::scopes::ActionMetadata const &) override;
+
+private:
+    std::string id_;
+    std::mutex mutex_;
 };
-
-} // namespace internal
-
-} // namespace scopes
-
-} // namespace unity

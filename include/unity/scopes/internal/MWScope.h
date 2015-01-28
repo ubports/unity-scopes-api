@@ -40,12 +40,28 @@ class MWScope : public virtual MWObjectProxy
 public:
     virtual ~MWScope();
 
-    virtual QueryCtrlProxy search(CannedQuery const& query, VariantMap const& hints, MWReplyProxy const& reply) = 0;
-    virtual QueryCtrlProxy activate(VariantMap const& result, VariantMap const& hints, MWReplyProxy const& reply) = 0;
-    virtual QueryCtrlProxy perform_action(VariantMap const& result, VariantMap const& hints, std::string const& widget_id, std::string const& action_id, MWReplyProxy const& reply) = 0;
-    virtual QueryCtrlProxy preview(VariantMap const& result, VariantMap const& hints, MWReplyProxy const& reply) = 0;
+    virtual QueryCtrlProxy search(CannedQuery const& query,
+                                  VariantMap const& hints,
+                                  VariantMap const& details,
+                                  MWReplyProxy const& reply) = 0;
+
+    virtual QueryCtrlProxy activate(VariantMap const& result,
+                                    VariantMap const& hints,
+                                    MWReplyProxy const& reply) = 0;
+
+    virtual QueryCtrlProxy perform_action(VariantMap const& result,
+                                          VariantMap const& hints,
+                                          std::string const& widget_id,
+                                          std::string const& action_id,
+                                          MWReplyProxy const& reply) = 0;
+
+    virtual QueryCtrlProxy preview(VariantMap const& result,
+                                   VariantMap const& hints,
+                                   MWReplyProxy const& reply) = 0;
+
     virtual ChildScopeList child_scopes_ordered() = 0;
     virtual bool set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered) = 0;
+
     virtual bool debug_mode() = 0;
 
 protected:

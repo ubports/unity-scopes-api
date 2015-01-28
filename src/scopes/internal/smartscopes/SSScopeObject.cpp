@@ -64,9 +64,10 @@ SSScopeObject::~SSScopeObject()
 }
 
 MWQueryCtrlProxy SSScopeObject::search(CannedQuery const& q,
-                                             SearchMetadata const& hints,
-                                             MWReplyProxy const& reply,
-                                             InvokeInfo const& info)
+                                       SearchMetadata const& hints,
+                                       VariantMap const& /* context */,
+                                       MWReplyProxy const& reply,
+                                       InvokeInfo const& info)
 {
     return query(info,
                  reply,

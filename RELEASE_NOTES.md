@@ -7,6 +7,8 @@ Changes in version 0.6.12
     list of child scopes at runtime.
   - Added missing virtual destructor to AbstractScopeBase. (LP: #1360266)
   - Removed deprecated Runtime::run_scope() method.
+  - Prevent query from looping indefinitely if a query is forwarded
+    among aggregators and loops back to an earlier aggregator.
 
 Changes in version 0.6.11
 =========================

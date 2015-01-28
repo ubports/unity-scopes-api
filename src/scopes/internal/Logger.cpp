@@ -51,7 +51,7 @@ namespace
 
 static array<string, Logger::LastChannelEnum_> const channel_names =
     {
-        "IPC"
+        { "IPC" }
     };
 
 string const& to_severity(int s)

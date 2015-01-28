@@ -39,7 +39,7 @@ class CannedQuery;
 namespace internal
 {
 
-class InvokeInfo;
+struct InvokeInfo;
 
 class ScopeObjectBase : public AbstractObject
 {
@@ -48,6 +48,7 @@ public:
 
     virtual MWQueryCtrlProxy search(CannedQuery const& query,
                                           SearchMetadata const& hints,
+                                          VariantMap const& context,
                                           MWReplyProxy const& reply,
                                           InvokeInfo const& info) = 0;
 
