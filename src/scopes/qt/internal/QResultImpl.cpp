@@ -28,6 +28,18 @@ using namespace unity::scopes;
 using namespace unity::scopes::qt;
 using namespace unity::scopes::qt::internal;
 
+namespace unity
+{
+
+namespace scopes
+{
+
+namespace qt
+{
+
+namespace internal
+{
+
 class APIResult : public Result
 {
 public:
@@ -63,6 +75,14 @@ public:
         return retMap;
     }
 };
+
+}  // namespace internal
+
+}  // namespace qt
+
+}  // namespace scopes
+
+}  // namespace unity
 
 QResultImpl::QResultImpl(unity::scopes::Result* api_result)
     : api_result_(api_result)

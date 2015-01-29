@@ -32,6 +32,15 @@ using namespace unity::scopes::qt;
 using namespace unity::scopes;
 
 // Qt user events start at QEvent::User, which is 1000...
+namespace unity
+{
+
+namespace scopes
+{
+
+namespace qt
+{
+
 enum EventType
 {
     Initialize = QEvent::User,
@@ -69,6 +78,12 @@ public:
 
     unity::scopes::SearchReplyProxy proxy_;
 };
+
+}  // namespace qt
+
+}  // namespace scopes
+
+}  // namespace unity
 
 QSearchQueryBaseAPI::QSearchQueryBaseAPI(std::shared_ptr<QCoreApplication> app,
                                          QScopeBase& qtscope,

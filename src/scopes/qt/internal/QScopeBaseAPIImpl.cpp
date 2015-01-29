@@ -31,6 +31,17 @@ using namespace std;
 using namespace unity::scopes::qt::internal;
 namespace sc = unity::scopes;
 
+namespace unity
+{
+
+namespace scopes
+{
+
+namespace qt
+{
+
+namespace internal
+{
 
 // Qt user events start at QEvent::User, which is 1000...
 enum EventType
@@ -58,6 +69,14 @@ public:
     {
     }
 };
+
+}  // namespace internal
+
+}  // namespace qt
+
+}  // namespace scopes
+
+}  // namespace unity
 
 QScopeBaseAPIImpl::QScopeBaseAPIImpl(QScopeBase& qtscope, QObject *parent)
     : QObject(parent),

@@ -36,6 +36,15 @@ using namespace unity::scopes::qt;
 using namespace unity::scopes;
 
 /// @cond
+namespace unity
+{
+
+namespace scopes
+{
+
+namespace qt
+{
+
 // Qt user events start at QEvent::User, which is 1000...
 enum EventType
 {
@@ -73,6 +82,12 @@ public:
 
     unity::scopes::PreviewReplyProxy proxy_;
 };
+
+}  // namespace qt
+
+}  // namespace scopes
+
+}  // namespace unity
 
 QPreviewQueryBaseAPI::QPreviewQueryBaseAPI(std::shared_ptr<QCoreApplication> qtapp,
                                            QScopeBase& qtscope,
