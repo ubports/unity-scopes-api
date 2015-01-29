@@ -81,22 +81,25 @@ Rather than hard-coding the names of the functions, use the UNITY_SCOPE_CREATE_F
 UNITY_SCOPE_DESTROY_FUNCTION macros, for example:
 
 ~~~
+
+// You must provide a function that creates your own scope
+// That function must have no parameters and return a pointer to QScopeBase
+unity::scopes::qt::QScopeBase *create_my_scope()
+{
+    return new MyScope();
+}
+
 unity::scopes::ScopeBase*
 UNITY_SCOPE_CREATE_FUNCTION()
 {
-    // instantiate MyScope
-    MyScope* scope = new MyScope();
-
-    // Initialize scope. This line is mandatory, you should pass your scope to
-    // the class QScopeBaseAPI, which will initialize the internal structures used
-    // by the scopes API
-    return new QScopeBaseAPI(*scope);
+    // Initialize scope. This line is mandatory, you should pass your creation scope function to
+    // the class QScopeBaseAPI, which will instantiate your class in the correct Qt Thread.
+    return new QScopeBaseAPI(create_my_scope);
 }
 
 void
 UNITY_SCOPE_DESTROY_FUNCTION(unity::scopes::ScopeBase* scope)
 {
-    delete scope;       // Example only, heap-allocation is not mandatory
 }
 ~~~
 

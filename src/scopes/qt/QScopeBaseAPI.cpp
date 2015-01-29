@@ -28,8 +28,8 @@ using namespace std;
 using namespace unity::scopes::qt;
 
 /// @cond
-QScopeBaseAPI::QScopeBaseAPI(QScopeBase& qtscope)
-    : p(new internal::QScopeBaseAPIImpl(qtscope))
+QScopeBaseAPI::QScopeBaseAPI(FactoryFunc const& creator)
+    : p(new internal::QScopeBaseAPIImpl(creator))
 {
 }
 

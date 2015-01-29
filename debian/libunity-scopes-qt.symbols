@@ -394,6 +394,8 @@ libunity-scopes-qt.so.01 libunity-scopes-qt #MINVER#
  (c++)"typeinfo for unity::scopes::qt::QScopeVariant@Base" 0.6.10-0ubuntu1
  (c++)"typeinfo name for unity::scopes::qt::QScopeVariant@Base" 0.6.10-0ubuntu1
  (c++)"vtable for unity::scopes::qt::QScopeVariant@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::QScopeBaseAPI::QScopeBaseAPI(std::function<unity::scopes::qt::QScopeBase* ()> const&)@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::QScopeBaseAPI::QScopeBaseAPI(std::function<unity::scopes::qt::QScopeBase* ()> const&)@Base" 0.6.10-0ubuntu1
  (c++)"core::net::Error::~Error()@Base" 0.6.10+15.04.20141211
  (c++)"core::net::Error::~Error()@Base" 0.6.10+15.04.20141211
  (c++)"core::net::Error::~Error()@Base" 0.6.10+15.04.20141211

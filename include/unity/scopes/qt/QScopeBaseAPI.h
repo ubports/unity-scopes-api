@@ -38,6 +38,8 @@ namespace scopes
 namespace qt
 {
 
+class QScopeBase;
+
 namespace internal
 {
 class QScopeBaseAPIImpl;
@@ -55,10 +57,12 @@ class QScopeBaseAPI : public unity::scopes::ScopeBase
 {
 public:
     /// @cond
+    using FactoryFunc = std::function<QScopeBase*()>;
+
     NONCOPYABLE(QScopeBaseAPI);
     UNITY_DEFINES_PTRS(QScopeBaseAPI);
 
-    QScopeBaseAPI(QScopeBase& qtscope);
+    QScopeBaseAPI(FactoryFunc const& creator);
     virtual ~QScopeBaseAPI() = default;
     /// @endcond
 

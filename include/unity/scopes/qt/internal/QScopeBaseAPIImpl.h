@@ -53,10 +53,13 @@ class QScopeBaseAPIImpl : public QObject
     Q_OBJECT
 public:
     /// @cond
+    using FactoryFunc = std::function<QScopeBase*()>;
+
     NONCOPYABLE(QScopeBaseAPIImpl);
     UNITY_DEFINES_PTRS(QScopeBaseAPIImpl);
 
     QScopeBaseAPIImpl(QScopeBase& qtscope, QObject *parent=0);
+    QScopeBaseAPIImpl(FactoryFunc const& creator, QObject *parent=0);
     virtual ~QScopeBaseAPIImpl();
 
     bool event(QEvent* e) override;
@@ -104,7 +107,9 @@ protected:
     std::unique_ptr<std::thread> qtthread_;
     std::atomic<bool> qtapp_ready_;
 
-    QScopeBase& qtscope_impl_;
+    QScopeBase* qtscope_impl_;
+
+    FactoryFunc qtscope_creator_;
 };
 
 }  // namespace internal

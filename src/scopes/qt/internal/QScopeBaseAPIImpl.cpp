@@ -24,10 +24,13 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QThread>
 
+#include <cassert>
 #include <chrono>
 
+using namespace std;
 using namespace unity::scopes::qt::internal;
 namespace sc = unity::scopes;
+
 
 // Qt user events start at QEvent::User, which is 1000...
 enum EventType
@@ -59,7 +62,15 @@ public:
 QScopeBaseAPIImpl::QScopeBaseAPIImpl(QScopeBase& qtscope, QObject *parent)
     : QObject(parent),
       qtapp_ready_(false),
-      qtscope_impl_(qtscope)
+      qtscope_impl_(&qtscope)
+{
+}
+
+QScopeBaseAPIImpl::QScopeBaseAPIImpl(FactoryFunc const& creator, QObject *parent)
+    : QObject(parent),
+      qtapp_ready_(false),
+      qtscope_impl_(nullptr),
+      qtscope_creator_(creator)
 {
 }
 
@@ -77,11 +88,21 @@ bool QScopeBaseAPIImpl::event(QEvent* e)
     switch (type)
     {
         case Start:
+            // create the client's scope in the
+            // Qt main thread
+            if(!qtscope_impl_)
+            {
+                qtscope_impl_ = qtscope_creator_();
+                assert(qtscope_impl_);
+            }
+            // Move the user's scope to the Qt main thread
+            qtscope_impl_->moveToThread(qtapp_->thread());
+
             start_event = dynamic_cast<StartEvent*>(e);
-            qtscope_impl_.start(start_event->scope_id_);
+            qtscope_impl_->start(start_event->scope_id_);
             break;
         case Stop:
-            qtscope_impl_.stop();
+            qtscope_impl_->stop();
 
             // exit the QCoreApplication
             qtapp_->quit();
@@ -106,9 +127,6 @@ void QScopeBaseAPIImpl::start(std::string const& scope_id)
     // Move this class to the Qt main thread
     this->moveToThread(qtapp_->thread());
 
-    // Move the user's scope to the Qt main thread
-    qtscope_impl_.moveToThread(qtapp_->thread());
-
     // now we can call start in the client's scope
     // Post event to initialize the object in the Qt thread
     qtapp_->postEvent(this, new StartEvent(scope_id.c_str()));
@@ -123,7 +141,7 @@ void QScopeBaseAPIImpl::stop()
 sc::PreviewQueryBase::UPtr QScopeBaseAPIImpl::preview(const sc::Result& result, const sc::ActionMetadata& metadata)
 {
     // Boilerplate construction of Preview
-    return sc::PreviewQueryBase::UPtr(new QPreviewQueryBaseAPI(qtapp_, qtscope_impl_, result, metadata));
+    return sc::PreviewQueryBase::UPtr(new QPreviewQueryBaseAPI(qtapp_, *qtscope_impl_, result, metadata));
 }
 
 /**
@@ -132,7 +150,7 @@ sc::PreviewQueryBase::UPtr QScopeBaseAPIImpl::preview(const sc::Result& result, 
 sc::SearchQueryBase::UPtr QScopeBaseAPIImpl::search(sc::CannedQuery const& query, sc::SearchMetadata const& metadata)
 {
     // Boilerplate construction of Query
-    return sc::SearchQueryBase::UPtr(new QSearchQueryBaseAPI(qtapp_, qtscope_impl_, query, metadata));
+    return sc::SearchQueryBase::UPtr(new QSearchQueryBaseAPI(qtapp_, *qtscope_impl_, query, metadata));
 }
 
 void QScopeBaseAPIImpl::startQtThread()
