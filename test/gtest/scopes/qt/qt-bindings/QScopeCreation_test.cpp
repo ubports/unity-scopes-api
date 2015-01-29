@@ -83,6 +83,6 @@ TEST(CreationTest, bindings)
     // same than the one filled in the creation function
     EXPECT_EQ(qt_thread, impl.getQtAppThread());
 
-    // stop the Qt appliction
+    // stop the Qt application
     impl.stop();
 }
