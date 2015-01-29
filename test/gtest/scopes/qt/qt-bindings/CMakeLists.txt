@@ -184,3 +184,22 @@ include_directories(${Qt5Core_INCLUDE_DIRS})
 qt5_use_modules(QScopeBaseAPIImpl_test Core)
 
 add_test(QScopeBaseAPIImpl QScopeBaseAPIImpl_test)
+
+###################################################
+
+add_executable(
+  QScopeCreation_test
+  QScopeCreation_test.cpp)
+
+target_link_libraries(
+    QScopeCreation_test
+    ${LIBGTEST}
+    ${TESTLIBS_QT}
+    ${TESTLIBS})
+
+find_package(Qt5Core REQUIRED)
+include_directories(${Qt5Core_INCLUDE_DIRS})
+
+qt5_use_modules(QScopeCreation_test Core)
+
+add_test(QScopeCreation QScopeCreation_test)

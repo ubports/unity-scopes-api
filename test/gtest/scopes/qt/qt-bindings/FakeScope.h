@@ -25,6 +25,8 @@
 #include <unity/scopes/CannedQuery.h>
 #include <unity/scopes/SearchMetadata.h>
 
+#include <iostream>
+
 class QQuery : public unity::scopes::qt::QSearchQueryBase
 {
 public:
@@ -59,7 +61,7 @@ public:
 
     virtual void start(QString const&) override
     {
-        std::cerr << "QScope::start()" << std::endl;
+        std::cout << "QScope::start()" << std::endl;
     }
 
     virtual unity::scopes::qt::QPreviewQueryBase::UPtr preview(const unity::scopes::qt::QResult&,
