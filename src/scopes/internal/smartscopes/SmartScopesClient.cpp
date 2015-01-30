@@ -337,7 +337,7 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
                     {
                         try
                         {
-                            scope.keywords.push_back(keyword.get_string());
+                            scope.keywords.emplace(keyword.get_string());
                         }
                         catch (unity::LogicException const& e)
                         {

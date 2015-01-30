@@ -530,7 +530,7 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::internal::ScopeMetadataImpl::set_icon(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeMetadataImpl::set_invisible(bool)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeMetadataImpl::set_is_aggregator(bool)@Base" 0.6.10+15.04.20141210.2
- (c++)"unity::scopes::internal::ScopeMetadataImpl::set_keywords(std::vector<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&)@Base" 0.6.9+15.04.20141129
+ (c++)"unity::scopes::internal::ScopeMetadataImpl::set_keywords(std::set<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&)@Base" 0replaceme
  (c++)"unity::scopes::internal::ScopeMetadataImpl::set_location_data_needed(bool)@Base" 0.5.2+14.10.20140709.2
  (c++)"unity::scopes::internal::ScopeMetadataImpl::set_proxy(std::shared_ptr<unity::scopes::Scope> const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeMetadataImpl::set_results_ttl_type(unity::scopes::ScopeMetadata::ResultsTtlType)@Base" 0.4.6+14.10.20140519
@@ -895,7 +895,7 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::testing::ScopeMetadataBuilder::icon(unity::scopes::testing::ScopeMetadataBuilder::Optional<std::basic_string<char, std::char_traits<char>, std::allocator<char> > > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::testing::ScopeMetadataBuilder::invisible(unity::scopes::testing::ScopeMetadataBuilder::Optional<bool> const&)@Base" 0.5.0+14.10.20140619
  (c++)"unity::scopes::testing::ScopeMetadataBuilder::is_aggregator(unity::scopes::testing::ScopeMetadataBuilder::Optional<bool> const&)@Base" 0.6.10+15.04.20141210.2
- (c++)"unity::scopes::testing::ScopeMetadataBuilder::keywords(unity::scopes::testing::ScopeMetadataBuilder::Optional<std::vector<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > > const&)@Base" 0.6.9+15.04.20141129
+ (c++)"unity::scopes::testing::ScopeMetadataBuilder::keywords(unity::scopes::testing::ScopeMetadataBuilder::Optional<std::set<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > > const&)@Base" 0replaceme
  (c++)"unity::scopes::testing::ScopeMetadataBuilder::location_data_needed(unity::scopes::testing::ScopeMetadataBuilder::Optional<bool> const&)@Base" 0.6.9+15.04.20141129
  (c++)"unity::scopes::testing::ScopeMetadataBuilder::operator()() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::testing::ScopeMetadataBuilder::proxy(std::shared_ptr<unity::scopes::Scope> const&)@Base" 0.4.0+14.04.20140312.1

@@ -1,6 +1,10 @@
 Release notes
 =============
 
+Changes in version 0.6.13
+=========================
+  - Return keywords as a set rather than a vector.
+
 Changes in version 0.6.12
 =========================
   - Introduced child_scopes() methods for aggregators to return their

@@ -138,10 +138,10 @@ TEST_F(SmartScopesClientTest, remote_scopes)
               "\"enabled\",\"parameters\":{\"defaultValue\":true},\"type\":\"boolean\"}]\n",
               *scopes[2].settings);
     ASSERT_EQ(4, scopes[2].keywords.size());
-    EXPECT_EQ("music", scopes[2].keywords[0]);
-    EXPECT_EQ("video", scopes[2].keywords[1]);
-    EXPECT_EQ("news", scopes[2].keywords[2]);
-    EXPECT_EQ("games", scopes[2].keywords[3]);
+    EXPECT_NE(scopes[2].keywords.end(), scopes[2].keywords.find("music"));
+    EXPECT_NE(scopes[2].keywords.end(), scopes[2].keywords.find("video"));
+    EXPECT_NE(scopes[2].keywords.end(), scopes[2].keywords.find("news"));
+    EXPECT_NE(scopes[2].keywords.end(), scopes[2].keywords.find("games"));
 
     EXPECT_TRUE(grep_string("/remote-scopes : partner=Partner%20String"));
 }

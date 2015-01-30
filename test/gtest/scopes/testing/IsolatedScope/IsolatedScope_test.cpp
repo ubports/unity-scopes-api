@@ -94,7 +94,7 @@ TEST(ScopeMetadataBuilder, construct_full)
     settings_defs.push_back(unity::scopes::Variant(a_setting));
 
     std::vector<std::string> child_scope_ids{ "joe", "mary" };
-    std::vector<std::string> keywords{ "people", "things" };
+    std::set<std::string> keywords{ "people", "things" };
 
     unity::scopes::testing::ScopeMetadataBuilder builder;
     builder.scope_id(scope_id)
