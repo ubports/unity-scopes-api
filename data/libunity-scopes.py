@@ -75,7 +75,7 @@ def add_info(report, ui):
     # check whether it's a click package or deb and collect additional pkg info
     if scope_ini_path.find('.local/share') >= 0:
         report['ClickPackage'] = 'True'
-        collect_click_info(report, os.path.split(scope_ini_path)[-1])
+        collect_click_info(report, scope_ini_path)
     else:
         collect_dpkg_info(report, scope_ini_path)
 
