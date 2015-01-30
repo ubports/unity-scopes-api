@@ -166,7 +166,10 @@ void ScopesWatcher::add_scope_dir(std::string const& dir)
         // Add a watch for this directory (ignore exception if already exists)
         try
         {
-            add_watch(dir);
+            if (filesystem::is_directory(dir))
+            {
+                add_watch(dir);  // Avoid noise if someone drops a file in here
+            }
         }
         catch (unity::LogicException const&) {}
 

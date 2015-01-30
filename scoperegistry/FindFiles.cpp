@@ -18,18 +18,12 @@
 
 #include "FindFiles.h"
 
-#include <unity/scopes/internal/safe_strerror.h>
 #include <unity/UnityExceptions.h>
-#include <unity/util/ResourcePtr.h>
 
 #include <boost/algorithm/string.hpp>
-#include <boost/filesystem/path.hpp>
+#include <boost/filesystem.hpp>
 
 #include <map>
-
-#include <dirent.h>
-#include <string.h>
-#include <sys/stat.h>
 
 using namespace std;
 using namespace unity;
@@ -39,44 +33,38 @@ namespace scoperegistry
 {
 
 // Return all paths underneath the given dir that are of the given type
-// or are a symbolic link.
+// or are a symbolic link to the given type.
 
 vector<string> find_entries(string const& install_dir, EntryType type)
 {
-    DIR* d = opendir(install_dir.c_str());
-    if (d == NULL)
-    {
-        throw FileException("cannot open scope installation directory \"" + install_dir + "\": "
-                                + scopes::internal::safe_strerror(errno),
-                            errno);
-    }
-    util::ResourcePtr<DIR*, decltype(&closedir)> dir_ptr(d, closedir);  // Clean up automatically
-
     vector<string> entries;
 
-    struct dirent* entry;
-    while ((entry = readdir(dir_ptr.get())) != NULL)
+    if (!filesystem::is_directory(install_dir))
     {
-        string name = entry->d_name;
-        if (name == "." || name == "..")
+        return entries;
+    }
+
+    auto end_it = filesystem::directory_iterator();
+    try
+    {
+        for (filesystem::directory_iterator dir_it(install_dir); dir_it != end_it; ++dir_it)
         {
-            continue;   // Ignore current and parent dir
+            if (type == File && !filesystem::is_regular_file(*dir_it))
+            {
+                continue;
+            }
+            if (type == Directory && !filesystem::is_directory(*dir_it))
+            {
+                continue;
+            }
+            entries.emplace_back(install_dir + "/" + dir_it->path().filename().native());
         }
-        struct stat st;
-        int rc = lstat((install_dir + "/" + name).c_str(), &st);
-        if (rc == -1)
-        {
-            continue;   // We ignore errors, such as a file having been unlinked in the mean time.
-        }
-        if (type == File && !S_ISREG(st.st_mode) && !S_ISLNK(st.st_mode))
-        {
-            continue;   // Not a regular file or symbolic link
-        }
-        else if (type == Directory && !S_ISDIR(st.st_mode) && !S_ISLNK(st.st_mode))
-        {
-            continue;   // Not a directory or symbolic link
-        }
-        entries.emplace_back(install_dir + "/" + name);
+    }
+    catch (std::exception const&)
+    {
+        // Ignore permission errors and the like.
+        // If a scope installation directory lacks permission, we still get
+        // get an error later, when we try to establish a watch for the install dir.
     }
 
     return entries;
