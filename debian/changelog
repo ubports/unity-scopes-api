@@ -1,4 +1,4 @@
-unity-scopes-api (0.6.13-0ubuntu1) UNRELEASED; urgency=medium
+unity-scopes-api (0.6.13+15.04.20150130-0ubuntu1) vivid; urgency=medium
 
   [ Marcus Tomlinson ]
   * Return keywords as a set rather than a vector.
@@ -6,7 +6,13 @@ unity-scopes-api (0.6.13-0ubuntu1) UNRELEASED; urgency=medium
   [ Ubuntu daily release ]
   * debian/libunity-scopes3.symbols: auto-update to released version
 
- -- Marcus Tomlinson <marcus.tomlinson@canonical.com>  Wed, 28 Jan 2015 11:04:15 +0200
+  [ Michi Henning ]
+  * Removed a bunch of noise that was logged by the registry if the
+    scope installation dirs contained unexpected files or files without
+    permission. Simplified FindFiles.cpp by using boost::filesystem
+    instead of dirent.
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Fri, 30 Jan 2015 12:34:42 +0000
 
 unity-scopes-api (0.6.12+15.04.20150127.2-0ubuntu1) vivid; urgency=medium
 
