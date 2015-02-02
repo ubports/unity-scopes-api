@@ -16,10 +16,12 @@
  * Authored by: Michal Hruby <michal.hruby@canonical.com>
 */
 
+#include <unity/scopes/internal/PreviewQueryObject.h>
+
 #include <unity/scopes/internal/MWQueryCtrl.h>
 #include <unity/scopes/internal/MWReply.h>
-#include <unity/scopes/internal/PreviewQueryObject.h>
 #include <unity/scopes/internal/PreviewReplyImpl.h>
+#include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/ListenerBase.h>
 #include <unity/scopes/PreviewReply.h>
 #include <unity/scopes/QueryBase.h>
@@ -41,9 +43,8 @@ namespace internal
 
 PreviewQueryObject::PreviewQueryObject(std::shared_ptr<PreviewQueryBase> const& preview_base,
                                        MWReplyProxy const& reply,
-                                       MWQueryCtrlProxy const& ctrl,
-                                       boost::log::sources::severity_channel_logger_mt<>& logger)
-    : QueryObject(preview_base, reply, ctrl, logger)
+                                       MWQueryCtrlProxy const& ctrl)
+    : QueryObject(preview_base, reply, ctrl)
     , preview_base_(preview_base)
 {
     assert(preview_base);
@@ -54,11 +55,11 @@ PreviewQueryObject::~PreviewQueryObject()
     // parent destructor will call ctrl_->destroy()
 }
 
-void PreviewQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& /* info */) noexcept
+void PreviewQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& info) noexcept
 {
     assert(self_);
 
-    auto reply_proxy = make_shared<PreviewReplyImpl>(reply, self_, logger_);
+    auto reply_proxy = make_shared<PreviewReplyImpl>(reply, self_);
     assert(reply_proxy);
     reply_proxy_ = reply_proxy;
 
@@ -78,12 +79,12 @@ void PreviewQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& /* inf
     catch (std::exception const& e)
     {
         pushable_ = false;
-        BOOST_LOG_SEV(logger_, Logger::Error) << "PreviewQueryObject::run(): " << e.what();
+        BOOST_LOG(info.mw->runtime()->logger()) << "PreviewQueryObject::run(): " << e.what();
         reply_->finished(CompletionDetails(CompletionDetails::Error, e.what()));  // Oneway, can't block
     }
     catch (...)
     {
-        BOOST_LOG_SEV(logger_, Logger::Error) << "PreviewQueryObject::run(): unknown exception";
+        BOOST_LOG(info.mw->runtime()->logger()) << "PreviewQueryObject::run(): unknown exception";
         reply_->finished(CompletionDetails(CompletionDetails::Error, "unknown exception"));  // Oneway, can't block
     }
 }

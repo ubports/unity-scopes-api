@@ -36,6 +36,10 @@ VariantMap FilterBase::serialize() const
     return p->serialize();
 }
 
+FilterBase::SCPtr FilterBase::deserialize(VariantMap const& var) {
+    return internal::FilterBaseImpl::deserialize(var);
+}
+
 FilterBase::~FilterBase() = default;
 /// @endcond
 

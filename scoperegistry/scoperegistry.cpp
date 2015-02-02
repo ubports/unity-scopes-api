@@ -408,7 +408,7 @@ void add_local_scope(RegistryObject::SPtr const& registry,
     {
     }
 
-    ScopeProxy proxy = ScopeImpl::create(mw->create_scope_proxy(scope.first), mw->runtime(), scope.first);
+    ScopeProxy proxy = ScopeImpl::create(mw->create_scope_proxy(scope.first), scope.first);
     mi->set_proxy(proxy);
     auto meta = ScopeMetadataImpl::create(std::move(mi));
 
@@ -527,7 +527,7 @@ int main(int argc, char* argv[])
         // And finally creating our runtime.
         string identity;
         string ss_reg_id;
-        RuntimeImpl::UPtr runtime;
+        RuntimeImpl::SPtr runtime;
         {
             RuntimeConfig rt_config(config_file);
             runtime = RuntimeImpl::create(rt_config.registry_identity(), config_file);
@@ -576,18 +576,16 @@ int main(int argc, char* argv[])
             process_timeout = c.process_timeout();
         } // Release memory for config parser
 
-        MiddlewareBase::SPtr middleware = runtime->factory()->find(identity, mw_kind);
-
-        // Inform the signal thread that it should shutdown the middleware
+        // Inform the signal thread that it should shutdown the runtime
         // if we get a termination signal.
-        signal_handler_wrapper.signal_raised().connect([middleware](core::posix::Signal signal)
+        signal_handler_wrapper.signal_raised().connect([runtime](core::posix::Signal signal)
         {
             switch(signal)
             {
             case core::posix::Signal::sig_int:
             case core::posix::Signal::sig_hup:
             case core::posix::Signal::sig_term:
-                middleware->stop();
+                runtime->destroy();
                 break;
             default:
                 break;
@@ -595,6 +593,7 @@ int main(int argc, char* argv[])
         });
 
         // The registry object stores the local and remote scopes
+        MiddlewareBase::SPtr middleware = runtime->factory()->find(identity, mw_kind);
         Executor::SPtr executor = std::make_shared<Executor>();
         RegistryObject::SPtr registry(new RegistryObject(*signal_handler_wrapper.death_observer, executor, middleware, true));
 

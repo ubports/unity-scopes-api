@@ -183,11 +183,11 @@ void ReplyObject::finished(CompletionDetails const& details) noexcept
     }
     catch (std::exception const& e)
     {
-        BOOST_LOG_SEV(runtime_->logger(), Logger::Error) << "ReplyObject::finished(): " << e.what();
+        BOOST_LOG(runtime_->logger()) << "ReplyObject::finished(): " << e.what();
     }
     catch (...)
     {
-        BOOST_LOG_SEV(runtime_->logger(), Logger::Error) << "ReplyObject::finished(): unknown exception";
+        BOOST_LOG(runtime_->logger()) << "ReplyObject::finished(): unknown exception";
     }
 
     // Disconnect self from middleware, if this hasn't happened yet.
@@ -217,11 +217,11 @@ void ReplyObject::info(OperationInfo const& op_info) noexcept
     }
     catch (std::exception const& e)
     {
-        BOOST_LOG_SEV(runtime_->logger(), Logger::Error) << "ReplyObject::info(): " << e.what();
+        BOOST_LOG(runtime_->logger()) << "ReplyObject::info(): " << e.what();
     }
     catch (...)
     {
-        BOOST_LOG_SEV(runtime_->logger(), Logger::Error) << "ReplyObject::info(): unknown exception";
+        BOOST_LOG(runtime_->logger()) << "ReplyObject::info(): unknown exception";
     }
 }
 

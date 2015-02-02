@@ -32,8 +32,8 @@ namespace scopes
 namespace internal
 {
 
-RegistryImpl::RegistryImpl(MWRegistryProxy const& mw_proxy, RuntimeImpl* runtime)
-    : ObjectImpl(mw_proxy, runtime->logger())
+RegistryImpl::RegistryImpl(MWRegistryProxy const& mw_proxy)
+    : ObjectImpl(mw_proxy)
 {
 }
 

@@ -124,7 +124,7 @@ TEST(Filters, scope)
     auto mw = rt->factory()->create("TestScope", "Zmq", TEST_DIR "/Zmq.ini");
     mw->start();
     auto proxy = mw->create_scope_proxy("TestScope");
-    auto scope = internal::ScopeImpl::create(proxy, rt.get(), "TestScope");
+    auto scope = internal::ScopeImpl::create(proxy, "TestScope");
 
     SearchMetadata hints("pl", "phone");
     auto receiver = std::make_shared<SearchReceiver>();
@@ -162,13 +162,13 @@ TEST(Filters, scope)
 
 TEST(Filters, deserialize)
 {
-    // check that FilterBaseImpl::deserialize() creates valid instances of all filter types
+    // check that FilterBase::deserialize() creates valid instances of all filter types
     {
         OptionSelectorFilter::SPtr filter1 = OptionSelectorFilter::create("f1", "Options", false);
         auto option1 = filter1->add_option("1", "Option 1");
         auto var = filter1->serialize();
 
-        auto f = internal::FilterBaseImpl::deserialize(var);
+        auto f = FilterBase::deserialize(var);
         EXPECT_TRUE(std::dynamic_pointer_cast<OptionSelectorFilter const>(f) != nullptr);
         EXPECT_EQ("option_selector", f->filter_type());
 
@@ -181,7 +181,7 @@ TEST(Filters, deserialize)
         auto option1 = filter1->add_option("1", "Option 1");
         auto var = filter1->serialize();
 
-        auto f = internal::FilterBaseImpl::deserialize(var);
+        auto f = FilterBase::deserialize(var);
         EXPECT_TRUE(std::dynamic_pointer_cast<RadioButtonsFilter const>(f) != nullptr);
         EXPECT_EQ("radio_buttons", f->filter_type());
 
@@ -193,7 +193,7 @@ TEST(Filters, deserialize)
         RatingFilter::SPtr filter1 = RatingFilter::create("f1", "Options", 5);
         auto var = filter1->serialize();
 
-        auto f = internal::FilterBaseImpl::deserialize(var);
+        auto f = FilterBase::deserialize(var);
         EXPECT_TRUE(std::dynamic_pointer_cast<RatingFilter const>(f) != nullptr);
         EXPECT_EQ("rating", f->filter_type());
 
@@ -205,7 +205,7 @@ TEST(Filters, deserialize)
         SwitchFilter::SPtr filter1 = SwitchFilter::create("f1", "Latest");
         auto var = filter1->serialize();
 
-        auto f = internal::FilterBaseImpl::deserialize(var);
+        auto f = FilterBase::deserialize(var);
         EXPECT_TRUE(std::dynamic_pointer_cast<SwitchFilter const>(f) != nullptr);
         EXPECT_EQ("switch", f->filter_type());
 
@@ -217,7 +217,7 @@ TEST(Filters, deserialize)
         ValueSliderFilter::SPtr filter1 = ValueSliderFilter::create("f1", "Max size", "Less than %f", 0.0f, 100.0f);
         auto var = filter1->serialize();
 
-        auto f = internal::FilterBaseImpl::deserialize(var);
+        auto f = FilterBase::deserialize(var);
         EXPECT_TRUE(std::dynamic_pointer_cast<ValueSliderFilter const>(f) != nullptr);
         EXPECT_EQ("value_slider", f->filter_type());
 
@@ -228,7 +228,7 @@ TEST(Filters, deserialize)
     {
         // invalid data (no filter_type)
         VariantMap var;
-        EXPECT_THROW(internal::FilterBaseImpl::deserialize(var), unity::LogicException);
+        EXPECT_THROW(FilterBase::deserialize(var), unity::LogicException);
     }
 }
 

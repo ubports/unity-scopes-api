@@ -454,6 +454,7 @@ void OnlineAccountClientImpl::register_account_login_item(Result& result,
     }
 
     VariantMap account_details_map;
+    account_details_map["scope_id"] = query.scope_id();
     account_details_map["service_name"] = service_name_;
     account_details_map["service_type"] = service_type_;
     account_details_map["provider_name"] = provider_name_;
@@ -468,6 +469,7 @@ void OnlineAccountClientImpl::register_account_login_item(PreviewWidget& widget,
                                                           OnlineAccountClient::PostLoginAction login_failed_action)
 {
     VariantMap account_details_map;
+    account_details_map["scope_id"] = "";
     account_details_map["service_name"] = service_name_;
     account_details_map["service_type"] = service_type_;
     account_details_map["provider_name"] = provider_name_;

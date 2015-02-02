@@ -88,6 +88,11 @@ public:
     ~smartscopesproxytest()
     {
         rt_->destroy();
+        // zmq shutdown is asynchronous and, if we don't wait,
+        // the next RuntimeImpl instance that is created may
+        // fail because the zmq endpoints may not have been unlinked
+        // in the filesystem yet.
+        std::this_thread::sleep_for(std::chrono::milliseconds(300));
     }
 
 protected:

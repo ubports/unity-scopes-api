@@ -35,6 +35,7 @@ namespace scopes
 namespace internal
 {
 
+struct InvokeInfo;
 class RuntimeImpl;
 
 // A ReplyObject sits in between the incoming requests from the middleware layer and the

@@ -184,8 +184,6 @@ void SettingsDB::watch_thread()
 #pragma GCC diagnostic pop
 
         int bytes_avail = 0;
-        static_assert(std::alignment_of<char*>::value >= std::alignment_of<struct inotify_event>::value,
-                      "cannot use std::string as buffer for inotify events");
         string buffer;
 
         // Poll for notifications until stop is requested
@@ -230,7 +228,12 @@ void SettingsDB::watch_thread()
             int i = 0;
             while (i < bytes_read)
             {
+                static_assert(std::alignment_of<char*>::value >= std::alignment_of<struct inotify_event>::value,
+                              "cannot use std::string as buffer for inotify events");
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-align"
                 auto event = reinterpret_cast<inotify_event const*>(&buffer[i]);
+#pragma GCC diagnostic pop
 
                 if (event->mask & IN_DELETE_SELF)
                 {
@@ -262,13 +265,13 @@ void SettingsDB::watch_thread()
     }
     catch (exception const& e)
     {
-        BOOST_LOG_SEV(logger_, Logger::Error) << "SettingsDB::watch_thread(): Thread aborted: " << e.what();
+        BOOST_LOG(logger_) << "SettingsDB::watch_thread(): Thread aborted: " << e.what();
         lock_guard<mutex> lock(mutex_);
         thread_state_ = Failed;
     }
     catch (...)
     {
-        BOOST_LOG_SEV(logger_, Logger::Error) << "SettingsDB::watch_thread(): Thread aborted: unknown exception";
+        BOOST_LOG(logger_) << "SettingsDB::watch_thread(): Thread aborted: unknown exception";
         lock_guard<mutex> lock(mutex_);
         thread_state_ = Failed;
     }
@@ -337,9 +340,9 @@ void SettingsDB::process_all_docs()
                                            | IN_DELETE_SELF));
             if (watch_.get() < 0)
             {
-                throw ResourceException("SettingsDB::add_watch(): failed to add watch for path: \"" +
-                                        db_path_ + "\". inotify_add_watch() failed. (fd = " +
-                                        to_string(fd_.get()) + ", path = " + db_path_ + ")");
+                throw SyscallException("SettingsDB::add_watch(): failed to add watch for path: \"" +
+                                       db_path_ + "\". inotify_add_watch() failed. (fd = " +
+                                       to_string(fd_.get()) + ", path = " + db_path_ + ")", errno);
             }
 
             state_changed_ = true;

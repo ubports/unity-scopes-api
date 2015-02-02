@@ -27,6 +27,8 @@
 #include <unity/scopes/internal/QueryObject.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/ScopeBaseImpl.h>
+#include <unity/scopes/internal/SearchMetadataImpl.h>
+#include <unity/scopes/internal/SearchQueryBaseImpl.h>
 #include <unity/scopes/ScopeBase.h>
 #include <unity/UnityExceptions.h>
 
@@ -46,12 +48,10 @@ namespace scopes
 namespace internal
 {
 
-ScopeObject::ScopeObject(RuntimeImpl* runtime, ScopeBase* scope_base, bool debug_mode) :
-    runtime_(runtime),
+ScopeObject::ScopeObject(ScopeBase* scope_base, bool debug_mode) :
     scope_base_(scope_base),
     debug_mode_(debug_mode)
 {
-    assert(runtime);
     assert(scope_base);
 }
 
@@ -70,7 +70,7 @@ MWQueryCtrlProxy ScopeObject::query(MWReplyProxy const& reply, MiddlewareBase* m
         // to be safe, we don't assert, in case someone is running a broken client.
 
         // TODO: log error about incoming request containing an invalid reply proxy.
-        throw LogicException("Scope \"" + runtime_->scope_id() + "\": query() called with null reply proxy");
+        throw LogicException("Scope \"" + mw_base->runtime()->scope_id() + "\": query() called with null reply proxy");
     }
 
     // Ask scope to instantiate a new query.
@@ -80,16 +80,16 @@ MWQueryCtrlProxy ScopeObject::query(MWReplyProxy const& reply, MiddlewareBase* m
         query_base = query_factory_fun();
         if (!query_base)
         {
-            string msg = "Scope \"" + runtime_->scope_id() + "\" returned nullptr from query_factory_fun()";
-            BOOST_LOG_SEV(runtime_->logger(), Logger::Error) << msg;
+            string msg = "Scope \"" + mw_base->runtime()->scope_id() + "\" returned nullptr from query_factory_fun()";
+            BOOST_LOG(mw_base->runtime()->logger()) << msg;
             throw ResourceException(msg);
         }
         query_base->p->set_settings_db(scope_base_->p->settings_db());
     }
     catch (...)
     {
-        string msg = "Scope \"" + runtime_->scope_id() + "\" threw an exception from query_factory_fun()";
-        BOOST_LOG_SEV(runtime_->logger(), Logger::Error) << msg;
+        string msg = "Scope \"" + mw_base->runtime()->scope_id() + "\" threw an exception from query_factory_fun()";
+        BOOST_LOG(mw_base->runtime()->logger()) << msg;
         throw ResourceException(msg);
     }
 
@@ -127,8 +127,7 @@ MWQueryCtrlProxy ScopeObject::query(MWReplyProxy const& reply, MiddlewareBase* m
         catch (...)
         {
         }
-        BOOST_LOG_SEV(runtime_->logger(), Logger::Error)
-            << "ScopeObject::query(): " << e.what();
+        BOOST_LOG(mw_base->runtime()->logger()) << "ScopeObject::query(): " << e.what();
         throw;
     }
     catch (...)
@@ -140,8 +139,7 @@ MWQueryCtrlProxy ScopeObject::query(MWReplyProxy const& reply, MiddlewareBase* m
         catch (...)
         {
         }
-        BOOST_LOG_SEV(runtime_->logger(), Logger::Error)
-            << "ScopeObject::query(): unknown exception";
+        BOOST_LOG(mw_base->runtime()->logger()) << "ScopeObject::query(): unknown exception";
         throw;
     }
     return ctrl_proxy;
@@ -149,17 +147,48 @@ MWQueryCtrlProxy ScopeObject::query(MWReplyProxy const& reply, MiddlewareBase* m
 
 MWQueryCtrlProxy ScopeObject::search(CannedQuery const& q,
                                      SearchMetadata const& hints,
+                                     VariantMap const& context,
                                      MWReplyProxy const& reply,
                                      InvokeInfo const& info)
 {
     return query(reply, info.mw,
-            [&q, &hints, this]() -> SearchQueryBase::UPtr {
+            [&q, &hints, &context, this]() -> SearchQueryBase::UPtr {
                  auto search_query = this->scope_base_->search(q, hints);
                  search_query->set_department_id(q.department_id());
+
+                 auto sqb = dynamic_cast<SearchQueryBaseImpl*>(search_query->fwd());
+                 assert(sqb);
+
+                 // Set client ID and history that we received in the SearchQueryBase
+                 // for loop detection.
+                 auto const c_it = context.find("client_id");
+                 if (c_it != context.end())
+                 {
+                     string client_id;
+                     client_id = c_it->second.get_string();
+                     sqb->set_client_id(client_id);
+                 }
+
+                 auto const h_it = context.find("history");
+                 if (h_it != context.end())
+                 {
+                    auto const hlist = h_it->second.get_array();
+                    SearchQueryBaseImpl::History history;
+                    for (auto const& t : hlist)
+                    {
+                        string client_id = t.get_dict()["c"].get_string();
+                        string agg = t.get_dict()["a"].get_string();
+                        string recv = t.get_dict()["r"].get_string();
+                        SearchQueryBaseImpl::HistoryData hd = make_tuple(client_id, agg, recv);
+                        history.push_back(hd);
+                    }
+                    sqb->set_history(history);
+                 }
+
                  return search_query;
             },
             [&reply, &hints, this](QueryBase::SPtr query_base, MWQueryCtrlProxy ctrl_proxy) -> QueryObjectBase::SPtr {
-                return make_shared<QueryObject>(query_base, hints.cardinality(), reply, ctrl_proxy, runtime_->logger());
+                return make_shared<QueryObject>(query_base, hints.cardinality(), reply, ctrl_proxy);
             }
     );
 }
@@ -176,7 +205,7 @@ MWQueryCtrlProxy ScopeObject::activate(Result const& result,
             [&reply, this](QueryBase::SPtr query_base, MWQueryCtrlProxy ctrl_proxy) -> QueryObjectBase::SPtr {
                 auto activation_base = dynamic_pointer_cast<ActivationQueryBase>(query_base);
                 assert(activation_base);
-                return make_shared<ActivationQueryObject>(activation_base, reply, ctrl_proxy, runtime_->logger());
+                return make_shared<ActivationQueryObject>(activation_base, reply, ctrl_proxy);
             }
     );
 }
@@ -195,7 +224,7 @@ MWQueryCtrlProxy ScopeObject::perform_action(Result const& result,
             [&reply, this](QueryBase::SPtr query_base, MWQueryCtrlProxy ctrl_proxy) -> QueryObjectBase::SPtr {
                 auto activation_base = dynamic_pointer_cast<ActivationQueryBase>(query_base);
                 assert(activation_base);
-                return make_shared<ActivationQueryObject>(activation_base, reply, ctrl_proxy, runtime_->logger());
+                return make_shared<ActivationQueryObject>(activation_base, reply, ctrl_proxy);
             }
     );
 }
@@ -212,9 +241,19 @@ MWQueryCtrlProxy ScopeObject::preview(Result const& result,
             [&reply, this](QueryBase::SPtr query_base, MWQueryCtrlProxy ctrl_proxy) -> QueryObjectBase::SPtr {
                 auto preview_query = dynamic_pointer_cast<PreviewQueryBase>(query_base);
                 assert(preview_query);
-                return make_shared<PreviewQueryObject>(preview_query, reply, ctrl_proxy, runtime_->logger());
+                return make_shared<PreviewQueryObject>(preview_query, reply, ctrl_proxy);
             }
     );
+}
+
+ChildScopeList ScopeObject::child_scopes_ordered() const
+{
+    return scope_base_->child_scopes_ordered();
+}
+
+bool ScopeObject::set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered)
+{
+    return scope_base_->p->set_child_scopes_ordered(child_scopes_ordered);
 }
 
 bool ScopeObject::debug_mode() const

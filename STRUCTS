@@ -161,10 +161,10 @@ ActivationResponse (returned by serialize())
 
 QueryMetadata (returned by serialize())
 =======================================
- 'type'        : string (metadata type)
- 'locale'      : string
- 'form_factor' : string
- 'hints'       : dict
+ 'type'                  : string (metadata type)
+ 'locale'                : string
+ 'form_factor'           : string
+ 'hints'                 : dict
  'internet_connectivity' : bool (optional)
 
 SearchMetadata (returned by serialize())
