@@ -43,7 +43,7 @@ def collect_click_info(report, inifile):
         manifest = json.loads(click_info)
         report['Package'] = '%s %s' % (manifest['name'], manifest['version'])
         name = manifest['name']
-        if click_name_to_src.has_key(name):
+        if name in click_name_to_src:
             report['SourcePackage'] = click_name_to_src[name]
         else:
             report['SourcePackage'] = name
@@ -64,8 +64,6 @@ def add_info(report, ui):
     if len(args) != 2:
         return
 
-    #
-    # prepend 'Problem' value with scope display name
     scope_ini_path = args[1]
     scope_name = get_scope_display_name(scope_ini_path)
     if scope_name:
