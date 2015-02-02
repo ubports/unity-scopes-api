@@ -80,12 +80,3 @@ def add_info(report, ui):
         collect_click_info(report, scope_ini_path)
     else:
         collect_dpkg_info(report, scope_ini_path)
-
-## Only for debugging ##
-if __name__ == '__main__':
-    report = {'ExecutablePath':'/usr/lib/arm-linux-gnueabihf/unity-scopes/scoperunner', \
-     'ProcCmdline':'/usr/lib/arm-linux-gnueabihf/unity-scopes/scoperunner \
-         /usr/lib/arm-linux-gnueabihf/unity-scopes/clickstore/com.canonical.scopes.clickstore.ini'}
-    add_info(report, None)
-    for key in report:
-        print('%s: %s' % (key, report[key]))
