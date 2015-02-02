@@ -1,7 +1,11 @@
 from os import path
 import subprocess, json, configparser
 
-click_name_to_src = {'com.ubuntu.scopes.youtube': 'unity-scope-youtube'}
+# map 'name' from click package manifest to LP project (if known)
+click_name_to_src = {
+    'com.ubuntu.scopes.youtube': 'unity-scope-youtube',
+    'com.ubuntu.scopes.vimeo': 'unity-scope-vimeo'
+}
 
 def get_scope_display_name(ini_file_path):
     try:
