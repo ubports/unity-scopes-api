@@ -90,7 +90,7 @@ protected:
     /// @endcond
 
 private:
-    PreviewReplyProxy& api_reply_;
+    PreviewReplyProxy api_reply_;
 
     friend class unity::scopes::qt::QPreviewReply;
 };

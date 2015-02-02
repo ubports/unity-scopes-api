@@ -24,7 +24,10 @@
 #include <unity/scopes/SearchMetadata.h>
 #include <unity/scopes/SearchQueryBase.h>
 
+#include <unity/UnityExceptions.h>
+
 #include <cassert>
+#include <sstream>
 
 using namespace unity::scopes::qt;
 using namespace unity::scopes::qt::internal;

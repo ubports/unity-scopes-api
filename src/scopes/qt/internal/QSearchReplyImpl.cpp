@@ -26,6 +26,8 @@
 #include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/Category.h>
 
+#include <iostream>
+
 using namespace unity::scopes;
 using namespace unity::scopes::qt;
 using namespace unity::scopes::qt::internal;

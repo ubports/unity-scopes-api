@@ -118,6 +118,7 @@ bool QSearchQueryBaseAPI::event(QEvent* e)
             // initialize the query object
             qtquery_ = qtscope_.search(SearchQueryBase::query(), SearchQueryBase::search_metadata());
             qtquery_->init(this);
+            connect(this, SIGNAL(run_signal(QSearchReplyProxy const&)), qtquery_.get(), SLOT(run(QSearchReplyProxy const&)));
             break;
         case Run:
             assert(qtquery_);
@@ -125,7 +126,8 @@ bool QSearchQueryBaseAPI::event(QEvent* e)
             assert(run_event);
             // execute the run method that must be implemented by the user
             qt_search_reply.reset(new QSearchReply(run_event->proxy_));
-            qtquery_->run(qt_search_reply);
+
+            emit run_signal(qt_search_reply);
             break;
         case Cancelled:
             assert(qtquery_);

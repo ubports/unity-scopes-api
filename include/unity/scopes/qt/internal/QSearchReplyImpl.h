@@ -145,7 +145,7 @@ public:
     void error(std::exception_ptr ex);
 
 protected:
-    unity::scopes::SearchReplyProxy& api_reply_;
+    unity::scopes::SearchReplyProxy api_reply_;
 
 private:
     QSearchReplyImpl(unity::scopes::SearchReplyProxy& reply);

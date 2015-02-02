@@ -414,6 +414,7 @@ libunity-scopes-qt.so.01 libunity-scopes-qt #MINVER#
  (c++)"vtable for unity::scopes::qt::CancelledEvent@Base" 0.6.10-0ubuntu1
  (c++)"vtable for unity::scopes::qt::InitializeEvent@Base" 0.6.10-0ubuntu1
  (c++)"vtable for unity::scopes::qt::RunEvent@Base" 0.6.10-0ubuntu1
+ (c++)"unity::scopes::qt::QSearchQueryBaseAPI::run_signal(std::shared_ptr<unity::scopes::qt::QSearchReply> const&)@Base" 0.6.10-0ubuntu1
  (c++)"core::net::Error::~Error()@Base" 0.6.10+15.04.20141211
  (c++)"core::net::Error::~Error()@Base" 0.6.10+15.04.20141211
  (c++)"core::net::Error::~Error()@Base" 0.6.10+15.04.20141211

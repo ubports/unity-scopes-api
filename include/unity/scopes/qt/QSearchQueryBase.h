@@ -67,37 +67,6 @@ public:
     virtual ~QSearchQueryBase();
 
     /**
-    \brief Called by scopes run time to start the query.
-
-    Your implementation of run() can use the reply proxy to push results
-    for the query. You can push results from within run(), in which case
-    the query implicitly completes when run() returns. Alternatively,
-    run() can store the reply proxy and return immediately. In this
-    case, you can use the stored proxy to push results from another
-    thread. It is safe to call `push()` from multiple threads without
-    synchronization.
-
-    The query completes either when run() returns, or when the
-    last stored reply proxy goes out of scope (whichever happens
-    last).
-
-    \param reply The proxy on which to push results for the query.
-    */
-    virtual void run(QSearchReplyProxy const& reply) = 0;
-
-    /**
-    \brief Called by the scopes run time when the query originator
-    cancels a query.
-
-    Your implementation of this method should ensure that the scope stops
-    processing the current query as soon as possible. Any calls to a `push()` method
-    once a query is cancelled are ignored, so continuing to push after cancellation
-    only wastes CPU cycles. (`push()` returns `false` once a query is cancelled or
-    exceeds its cardinality limit.)
-    */
-    virtual void cancelled() = 0;  // Originator cancelled the query
-
-    /**
      \brief Get a canned query for this search request.
 
      \return The canned query.
@@ -142,6 +111,38 @@ public:
                              FilterState const& filter_state,
                              SearchMetadata const& hints,
                              SearchListenerBase::SPtr const& reply);
+
+public Q_SLOTS:
+    /**
+    \brief Called by scopes run time to start the query.
+
+    Your implementation of run() can use the reply proxy to push results
+    for the query. You can push results from within run(), in which case
+    the query implicitly completes when run() returns. Alternatively,
+    run() can store the reply proxy and return immediately. In this
+    case, you can use the stored proxy to push results from another
+    thread. It is safe to call `push()` from multiple threads without
+    synchronization.
+
+    The query completes either when run() returns, or when the
+    last stored reply proxy goes out of scope (whichever happens
+    last).
+
+    \param reply The proxy on which to push results for the query.
+    */
+    virtual void run(QSearchReplyProxy const& reply) = 0;
+
+    /**
+    \brief Called by the scopes run time when the query originator
+    cancels a query.
+
+    Your implementation of this method should ensure that the scope stops
+    processing the current query as soon as possible. Any calls to a `push()` method
+    once a query is cancelled are ignored, so continuing to push after cancellation
+    only wastes CPU cycles. (`push()` returns `false` once a query is cancelled or
+    exceeds its cardinality limit.)
+    */
+    virtual void cancelled() = 0;  // Originator cancelled the query
 
 protected:
     ///@cond

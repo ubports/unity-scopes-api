@@ -25,6 +25,7 @@
 #include <unity/scopes/QueryCtrlProxyFwd.h>
 
 #include <unity/scopes/qt/QCannedQuery.h>
+#include <unity/scopes/qt/QSearchReplyProxy.h>
 
 namespace unity
 {

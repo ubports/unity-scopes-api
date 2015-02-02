@@ -113,6 +113,9 @@ protected:
     QScopeBase& qtscope_;
 
     friend internal::QScopeBaseAPIImpl;
+
+Q_SIGNALS:
+    void run_signal(QSearchReplyProxy const&);
     /// @endcond
 };
 
