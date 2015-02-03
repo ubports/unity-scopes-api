@@ -421,6 +421,7 @@ public:
 
     virtual MWQueryCtrlProxy search(CannedQuery const&,
                                           SearchMetadata const&,
+                                          VariantMap const&,
                                           MWReplyProxy const&,
                                           InvokeInfo const&) override
     {
@@ -451,6 +452,16 @@ public:
                                      InvokeInfo const&) override
     {
         return nullptr;
+    }
+
+    virtual ChildScopeList child_scopes_ordered() const override
+    {
+        return ChildScopeList();
+    }
+
+    virtual bool set_child_scopes_ordered(ChildScopeList const&) override
+    {
+        return false;
     }
 
     virtual bool debug_mode() const override

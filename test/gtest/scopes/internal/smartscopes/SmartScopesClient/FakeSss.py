@@ -32,7 +32,10 @@ def response(environ, start_response):
 
     if outfile != '':
         f = open(outfile, 'a')
-        f.writelines(["%s : %s\n" % (environ['PATH_INFO'], environ['HTTP_USER_AGENT'])])
+        if environ.has_key('HTTP_USER_AGENT'):
+            f.writelines(["%s : %s\n" % (environ['PATH_INFO'], environ['HTTP_USER_AGENT'])])
+        else:
+            f.writelines(["%s : \n" % (environ['PATH_INFO'])])
 
     if environ['PATH_INFO'] == '/remote-scopes' and (environ['QUERY_STRING'] == '' or environ['QUERY_STRING'] == 'locale=test_TEST'):
         return [remote_scopes_response]

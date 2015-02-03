@@ -82,6 +82,7 @@ public:
 
     /// @cond
     VariantMap serialize() const;
+    static FilterBase::SCPtr deserialize(VariantMap const& var);
     /// @endcond
 
     /**

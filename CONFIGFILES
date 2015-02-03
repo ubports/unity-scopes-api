@@ -167,7 +167,7 @@ The following keys are recognized:
     Trace inter-process messages activity.
 
   The environment variable UNITY_SCOPES_LOG_TRACECHANNELS overrides this key.
-  The value must be a semicolon-separate list of channel names.
+  The value must be a semicolon-separated list of channel names.
 
 
 Zmq.ini

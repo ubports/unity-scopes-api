@@ -51,7 +51,7 @@ namespace
 
 static array<string, Logger::LastChannelEnum_> const channel_names =
     {
-        "IPC"
+        { "IPC" }
     };
 
 string const& to_severity(int s)
@@ -119,7 +119,7 @@ Logger::~Logger()
     }
 }
 
-Logger::operator src::severity_channel_logger_mt<>&()
+Logger::operator boost::log::sources::severity_channel_logger_mt<>&()
 {
     return logger_;  // No lock needed, immutable
 }

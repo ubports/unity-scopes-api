@@ -25,7 +25,7 @@
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/ScopeImpl.h>
 #include <unity/scopes/internal/ScopeMetadataImpl.h>
-#include <unity/scopes/internal/smartscopes/HttpClientQt.h>
+#include <unity/scopes/internal/smartscopes/HttpClientNetCpp.h>
 #include <unity/scopes/internal/Utils.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
@@ -48,7 +48,7 @@ SSRegistryObject::SSRegistryObject(MiddlewareBase::SPtr middleware,
                                    std::string const& sss_url,
                                    bool caching_enabled)
     : ssclient_(std::make_shared<SmartScopesClient>(
-                    std::make_shared<HttpClientQt>(ss_config.http_reply_timeout() * 1000),  // need millisecs
+                    std::make_shared<HttpClientNetCpp>(ss_config.http_reply_timeout() * 1000),  // need millisecs
                     std::make_shared<JsonCppNode>(),
                     middleware->runtime(),
                     sss_url))

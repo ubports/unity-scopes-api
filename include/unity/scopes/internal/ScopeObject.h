@@ -55,14 +55,15 @@ public:
 
     // Remote operation implementations
     virtual MWQueryCtrlProxy search(CannedQuery const& q,
-                                          SearchMetadata const& hints,
-                                          MWReplyProxy const& reply,
-                                          InvokeInfo const& info) override;
+                                    SearchMetadata const& hints,
+                                    VariantMap const& context,
+                                    MWReplyProxy const& reply,
+                                    InvokeInfo const& info) override;
 
     virtual MWQueryCtrlProxy activate(Result const& result,
-                              ActionMetadata const& hints,
-                              MWReplyProxy const &reply,
-                              InvokeInfo const& info) override;
+                                      ActionMetadata const& hints,
+                                      MWReplyProxy const &reply,
+                                      InvokeInfo const& info) override;
 
     virtual MWQueryCtrlProxy perform_action(Result const& result,
                                             ActionMetadata const& hints,
@@ -75,6 +76,9 @@ public:
                                      ActionMetadata const& hints,
                                      MWReplyProxy const& reply,
                                      InvokeInfo const& info) override;
+
+    virtual ChildScopeList child_scopes_ordered() const override;
+    virtual bool set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered) override;
 
     virtual bool debug_mode() const override;
 

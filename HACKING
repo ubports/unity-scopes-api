@@ -61,12 +61,7 @@ To build with the flags for coverage testing enabled and get coverage:
     $ make test
     $ make coverage
 
-Note that, with gcc 4.7.2 and cmake 2.8.10, you may get a bunch of
-warnings. To fix this, you can build cmake 2.8.10 with the following patch:
-
-http://cmake.org/gitweb?p=cmake.git;a=commitdiff;h=61ace1df2616e472d056b302e4269cbf112fb020#patch1
-
-Unfortunately, it is not possibly to get 100% coverage for some files,
+Unfortunately, it is not possible to get 100% coverage for some files,
 mainly due to gcc's generation of two destructors for dynamic and non-
 dynamic instances. For abstract base classes and for classes that
 prevent stack and static allocation, this causes one of the destructors
@@ -85,7 +80,8 @@ into the old coverage output. You can get rid of this problem by running
 
     $ make clean-coverage
 
-This deletes all the .gcda files, allowing the merge to succeed again.
+This deletes all the .gcda files, allowing the merge to (sometimes) succeed again.
+If this doesn't work either, the only remedy is to do a clean build.
 
 If lcov complains about unrecognized lines involving '=====',
 you can patch geninfo and gcovr as explained here:
@@ -102,12 +98,20 @@ Code style
 We use a format tool that fixes a whole lot of issues
 regarding code style. The formatting changes made by
 the tool are generally sensible (even though they may not be your
-personal preference in all case). If there is a case where the formatting
+personal preference in all cases). If there is a case where the formatting
 really messes things up, consider re-arranging the code to avoid the problem.
 The convenience of running the entire code base through the pretty-printer
 far outweighs any minor glitches with pretty printing, and it means that
 we get consistent code style for free, rather than endlessly having to
 watch out for formatting issues during code reviews.
+
+As of clang-format-3.7, you can use
+
+    // clang-format off
+    void    unformatted_code  ;
+    // clang-format on
+
+to suppress formatting for a section of code.
 
 To format specific files:
 
@@ -193,7 +197,7 @@ The report provides a nicely layed-out page with all the details.
 Autopkg test suite
 ------------------
 
-Scopes comes with an autopkg smoke test.
+Scopes come with an autopkg smoke test.
 
 http://packaging.ubuntu.com/html/auto-pkg-test.html
 
