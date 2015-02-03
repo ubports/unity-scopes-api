@@ -24,6 +24,9 @@
 
 from os import path
 import subprocess, json, configparser
+import apport
+import apport.fileutils
+from apport.packaging_impl import impl as packaging
 
 # map 'name' from click package manifest to LP project (if known)
 click_name_to_src = {
@@ -43,24 +46,10 @@ def get_scope_display_name(ini_file_path):
 def collect_dpkg_info(report, inifile):
     try:
         # find deb package that owns this inifile
-        dpkg_find_file = subprocess.check_output(['dpkg', '-S', inifile], universal_newlines=True)
-        pkg = dpkg_find_file.split(':')[0]
-        srcpkg = None
-        ver = ''
-        # parse 'apt-cache show' output to find actual package and source package of affected scope
-        pkg_info = subprocess.check_output(['apt-cache', 'show', pkg], universal_newlines=True)
-        for line in pkg_info.splitlines():
-            if not line.startswith(' '):
-                vals = line.split(sep=':')
-                if len(vals) == 2:
-                    if vals[0] == 'Source':
-                        srcpkg = vals[1].strip()
-                    if vals[0] == 'Version':
-                        ver = vals[1].strip()
-        if not srcpkg:
-            srcpkg = pkg
+        pkg = apport.fileutils.find_file_package(inifile)
+        ver = packaging.get_version(pkg)
         report['Package'] = '%s %s' % (pkg, ver)
-        report['SourcePackage'] = srcpkg
+        report['SourcePackage'] = packaging.get_source(pkg)
     except:
        pass
 
