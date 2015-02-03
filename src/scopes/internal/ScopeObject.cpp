@@ -160,10 +160,10 @@ MWQueryCtrlProxy ScopeObject::search(CannedQuery const& q,
                  [&q, &hints, &context, this]() -> SearchQueryBase::UPtr {
                       auto search_query = this->scope_base_->search(q, hints);
                       search_query->set_department_id(q.department_id());
-     
+
                       auto sqb = dynamic_cast<SearchQueryBaseImpl*>(search_query->fwd());
                       assert(sqb);
-     
+
                       // Set client ID and history that we received in the SearchQueryBase
                       // for loop detection.
                       auto const c_it = context.find("client_id");
@@ -173,7 +173,7 @@ MWQueryCtrlProxy ScopeObject::search(CannedQuery const& q,
                           client_id = c_it->second.get_string();
                           sqb->set_client_id(client_id);
                       }
-     
+
                       auto const h_it = context.find("history");
                       if (h_it != context.end())
                       {
@@ -189,7 +189,7 @@ MWQueryCtrlProxy ScopeObject::search(CannedQuery const& q,
                          }
                          sqb->set_history(history);
                       }
-     
+
                       return search_query;
                  },
                  [&reply, &hints, this](QueryBase::SPtr query_base, MWQueryCtrlProxy ctrl_proxy) -> QueryObjectBase::SPtr {
