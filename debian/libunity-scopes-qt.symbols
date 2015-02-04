@@ -1,0 +1,734 @@
+libunity-scopes-qt.so.01 libunity-scopes-qt #MINVER#
+ (c++)"QByteArray::~QByteArray()@Base" 0replaceme
+ (c++)"QByteArray::~QByteArray()@Base" 0replaceme
+ (c++)"core::net::Uri::~Uri()@Base" 0replaceme
+ (c++)"core::net::Uri::~Uri()@Base" 0replaceme
+ (c++)"core::net::http::Request::Configuration::~Configuration()@Base" 0replaceme
+ (c++)"core::net::http::Request::Configuration::~Configuration()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QScopeBase::stop()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QScopeBase::start(QString const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QScopeBase::QScopeBase()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QScopeBase::QScopeBase()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QScopeBase::~QScopeBase()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QScopeBase::~QScopeBase()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QScopeBase::~QScopeBase()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QDepartment::add_subdepartment(std::shared_ptr<unity::scopes::qt::QDepartment const> const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QDepartment::set_subdepartments(QList<QSharedPointer<unity::scopes::qt::QDepartment const> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QDepartment::set_alternate_label(QString const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QDepartment::set_has_subdepartments(bool)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QDepartment::create(QString const&, unity::scopes::qt::QCannedQuery const&, QString const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QDepartment::create(unity::scopes::qt::QCannedQuery const&, QString const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QDepartment::QDepartment(unity::scopes::qt::QDepartment&&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QDepartment::QDepartment(unity::scopes::qt::internal::QDepartmentImpl*)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QDepartment::QDepartment(unity::scopes::qt::QDepartment const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QDepartment::QDepartment(unity::scopes::qt::QDepartment&&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QDepartment::QDepartment(unity::scopes::qt::internal::QDepartmentImpl*)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QDepartment::QDepartment(unity::scopes::qt::QDepartment const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QDepartment::~QDepartment()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QDepartment::~QDepartment()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QDepartment::operator=(unity::scopes::qt::QDepartment&&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QDepartment::operator=(unity::scopes::qt::QDepartment const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QCannedQuery::set_filter_state(unity::scopes::FilterState const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QCannedQuery::set_query_string(QString const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QCannedQuery::set_department_id(QString const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QCannedQuery::from_uri(QString const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QCannedQuery::QCannedQuery(unity::scopes::qt::QCannedQuery&&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QCannedQuery::QCannedQuery(unity::scopes::qt::internal::QCannedQueryImpl*)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QCannedQuery::QCannedQuery(QString const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QCannedQuery::QCannedQuery(QString const&, QString const&, QString const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QCannedQuery::QCannedQuery(unity::scopes::CannedQuery const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QCannedQuery::QCannedQuery(unity::scopes::qt::QCannedQuery const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QCannedQuery::QCannedQuery(unity::scopes::qt::QCannedQuery&&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QCannedQuery::QCannedQuery(unity::scopes::qt::internal::QCannedQueryImpl*)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QCannedQuery::QCannedQuery(QString const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QCannedQuery::QCannedQuery(QString const&, QString const&, QString const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QCannedQuery::QCannedQuery(unity::scopes::CannedQuery const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QCannedQuery::QCannedQuery(unity::scopes::qt::QCannedQuery const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QCannedQuery::~QCannedQuery()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QCannedQuery::~QCannedQuery()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QCannedQuery::operator=(unity::scopes::qt::QCannedQuery&&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QCannedQuery::operator=(unity::scopes::qt::QCannedQuery const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchReply::register_category(QString const&, QString const&, QString const&, unity::scopes::CategoryRenderer const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchReply::register_departments(std::shared_ptr<unity::scopes::qt::QDepartment const> const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchReply::push(unity::scopes::qt::QCategorisedResult const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchReply::error(std::__exception_ptr::exception_ptr)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchReply::QSearchReply(std::shared_ptr<unity::scopes::SearchReply>&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchReply::QSearchReply(std::shared_ptr<unity::scopes::SearchReply>&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchReply::~QSearchReply()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchReply::~QSearchReply()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchReply::~QSearchReply()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QColumnLayout::add_column(QVector<QString>)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QColumnLayout::QColumnLayout(unity::scopes::qt::QColumnLayout&&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QColumnLayout::QColumnLayout(unity::scopes::qt::QColumnLayout const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QColumnLayout::QColumnLayout(int)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QColumnLayout::QColumnLayout(unity::scopes::qt::QColumnLayout&&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QColumnLayout::QColumnLayout(unity::scopes::qt::QColumnLayout const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QColumnLayout::QColumnLayout(int)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QColumnLayout::~QColumnLayout()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QColumnLayout::~QColumnLayout()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QColumnLayout::operator=(unity::scopes::qt::QColumnLayout&&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QColumnLayout::operator=(unity::scopes::qt::QColumnLayout const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewReply::register_layout(QList<unity::scopes::qt::QColumnLayout> const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewReply::push(QList<unity::scopes::qt::QPreviewWidget> const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewReply::push(QString const&, QVariant const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewReply::QPreviewReply(std::shared_ptr<unity::scopes::PreviewReply>&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewReply::QPreviewReply(std::shared_ptr<unity::scopes::PreviewReply>&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewReply::~QPreviewReply()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewReply::~QPreviewReply()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewReply::~QPreviewReply()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QScopeBaseAPI::stop()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QScopeBaseAPI::start(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QScopeBaseAPI::search(unity::scopes::CannedQuery const&, unity::scopes::SearchMetadata const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QScopeBaseAPI::preview(unity::scopes::Result const&, unity::scopes::ActionMetadata const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QScopeBaseAPI::QScopeBaseAPI(unity::scopes::qt::QScopeBase&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QScopeBaseAPI::QScopeBaseAPI(unity::scopes::qt::QScopeBase&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QScopeBaseAPI::~QScopeBaseAPI()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QScopeBaseAPI::~QScopeBaseAPI()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QScopeBaseAPI::~QScopeBaseAPI()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QScopeVariant::setInternalVariant(unity::scopes::Variant*)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QScopeVariant::QScopeVariant(unity::scopes::qt::QScopeVariant&&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QScopeVariant::QScopeVariant(unity::scopes::Variant*)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QScopeVariant::QScopeVariant(unity::scopes::qt::QScopeVariant const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QScopeVariant::QScopeVariant()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QScopeVariant::QScopeVariant(unity::scopes::qt::QScopeVariant&&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QScopeVariant::QScopeVariant(unity::scopes::Variant*)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QScopeVariant::QScopeVariant(unity::scopes::qt::QScopeVariant const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QScopeVariant::QScopeVariant()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QScopeVariant::~QScopeVariant()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QScopeVariant::~QScopeVariant()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QScopeVariant::operator=(unity::scopes::qt::QScopeVariant&&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QScopeVariant::operator=(char const*)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QScopeVariant::operator=(QMap<QString, QVariant> const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QScopeVariant::operator=(QString const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QScopeVariant::operator=(QVariant const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QScopeVariant::operator=(unity::scopes::qt::QScopeVariant const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QScopeVariant::operator=(bool)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QScopeVariant::operator=(double)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QScopeVariant::operator=(int)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewWidget::add_widget(unity::scopes::qt::QPreviewWidget const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewWidget::add_attribute_value(QString const&, QVariant const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewWidget::add_attribute_mapping(QString const&, QString const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewWidget::QPreviewWidget(unity::scopes::qt::QPreviewWidget&&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewWidget::QPreviewWidget(unity::scopes::qt::internal::QPreviewWidgetImpl*)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewWidget::QPreviewWidget(QString const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewWidget::QPreviewWidget(QString const&, QString const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewWidget::QPreviewWidget(unity::scopes::qt::QPreviewWidget const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewWidget::QPreviewWidget(unity::scopes::qt::QPreviewWidget&&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewWidget::QPreviewWidget(unity::scopes::qt::internal::QPreviewWidgetImpl*)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewWidget::QPreviewWidget(QString const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewWidget::QPreviewWidget(QString const&, QString const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewWidget::QPreviewWidget(unity::scopes::qt::QPreviewWidget const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewWidget::~QPreviewWidget()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewWidget::~QPreviewWidget()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewWidget::~QPreviewWidget()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewWidget::operator=(unity::scopes::qt::QPreviewWidget&&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewWidget::operator=(unity::scopes::qt::QPreviewWidget const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QActionMetadata::set_scope_data(QVariant const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QActionMetadata::set_hint(QString const&, QVariant const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QActionMetadata::QActionMetadata(unity::scopes::qt::QActionMetadata&&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QActionMetadata::QActionMetadata(unity::scopes::qt::internal::QActionMetadataImpl*)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QActionMetadata::QActionMetadata(QString const&, QString const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QActionMetadata::QActionMetadata(unity::scopes::qt::QActionMetadata const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QActionMetadata::QActionMetadata(unity::scopes::qt::QActionMetadata&&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QActionMetadata::QActionMetadata(unity::scopes::qt::internal::QActionMetadataImpl*)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QActionMetadata::QActionMetadata(QString const&, QString const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QActionMetadata::QActionMetadata(unity::scopes::qt::QActionMetadata const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QActionMetadata::~QActionMetadata()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QActionMetadata::~QActionMetadata()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QActionMetadata::operator=(unity::scopes::qt::QActionMetadata&&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QActionMetadata::operator=(unity::scopes::qt::QActionMetadata const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QActionMetadata::operator[](QString const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchMetadata::set_location(unity::scopes::Location const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchMetadata::set_cardinality(int)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchMetadata::set_hint(QString const&, QVariant const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchMetadata::QSearchMetadata(unity::scopes::qt::QSearchMetadata&&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchMetadata::QSearchMetadata(QString const&, QString const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchMetadata::QSearchMetadata(unity::scopes::qt::QSearchMetadata const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchMetadata::QSearchMetadata(int, QString const&, QString const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchMetadata::QSearchMetadata(unity::scopes::qt::QSearchMetadata&&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchMetadata::QSearchMetadata(QString const&, QString const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchMetadata::QSearchMetadata(unity::scopes::qt::QSearchMetadata const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchMetadata::QSearchMetadata(int, QString const&, QString const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchMetadata::~QSearchMetadata()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchMetadata::~QSearchMetadata()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchMetadata::operator[](QString const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QVariantBuilder::end()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QVariantBuilder::add_tuple(QVector<QPair<QString, QVariant> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QVariantBuilder::QVariantBuilder(unity::scopes::qt::QVariantBuilder&&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QVariantBuilder::QVariantBuilder(unity::scopes::qt::QVariantBuilder const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QVariantBuilder::QVariantBuilder()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QVariantBuilder::QVariantBuilder(unity::scopes::qt::QVariantBuilder&&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QVariantBuilder::QVariantBuilder(unity::scopes::qt::QVariantBuilder const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QVariantBuilder::QVariantBuilder()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QVariantBuilder::~QVariantBuilder()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QVariantBuilder::~QVariantBuilder()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QVariantBuilder::~QVariantBuilder()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QVariantBuilder::operator=(unity::scopes::qt::QVariantBuilder&&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QVariantBuilder::operator=(unity::scopes::qt::QVariantBuilder const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchQueryBase::init(unity::scopes::qt::QSearchQueryBaseAPI*)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchQueryBase::subsearch(std::shared_ptr<unity::scopes::Scope> const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::FilterState const&, std::shared_ptr<unity::scopes::SearchListenerBase> const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchQueryBase::subsearch(std::shared_ptr<unity::scopes::Scope> const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::shared_ptr<unity::scopes::SearchListenerBase> const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchQueryBase::subsearch(std::shared_ptr<unity::scopes::Scope> const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::FilterState const&, unity::scopes::SearchMetadata const&, std::shared_ptr<unity::scopes::SearchListenerBase> const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchQueryBase::subsearch(std::shared_ptr<unity::scopes::Scope> const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::FilterState const&, std::shared_ptr<unity::scopes::SearchListenerBase> const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchQueryBase::QSearchQueryBase()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchQueryBase::QSearchQueryBase()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchQueryBase::~QSearchQueryBase()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchQueryBase::~QSearchQueryBase()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchQueryBase::~QSearchQueryBase()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewQueryBase::init(unity::scopes::qt::QPreviewQueryBaseAPI*)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewQueryBase::QPreviewQueryBase()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewQueryBase::QPreviewQueryBase()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewQueryBase::~QPreviewQueryBase()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewQueryBase::~QPreviewQueryBase()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewQueryBase::~QPreviewQueryBase()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QCategorisedResult::set_category(std::shared_ptr<unity::scopes::qt::QCategory const>)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QCategorisedResult::QCategorisedResult(unity::scopes::qt::QCategorisedResult&&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QCategorisedResult::QCategorisedResult(unity::scopes::qt::QCategorisedResult const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QCategorisedResult::QCategorisedResult(std::shared_ptr<unity::scopes::qt::QCategory const>)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QCategorisedResult::QCategorisedResult(unity::scopes::qt::QCategorisedResult&&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QCategorisedResult::QCategorisedResult(unity::scopes::qt::QCategorisedResult const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QCategorisedResult::QCategorisedResult(std::shared_ptr<unity::scopes::qt::QCategory const>)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QCategorisedResult::~QCategorisedResult()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QCategorisedResult::~QCategorisedResult()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QCategorisedResult::~QCategorisedResult()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QCategorisedResult::operator=(unity::scopes::qt::QCategorisedResult&&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QCategorisedResult::operator=(unity::scopes::qt::QCategorisedResult const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchQueryBaseAPI::qt_metacall(QMetaObject::Call, int, void**)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchQueryBaseAPI::qt_metacast(char const*)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchQueryBaseAPI::staticMetaObject@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchQueryBaseAPI::run(std::shared_ptr<unity::scopes::SearchReply> const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchQueryBaseAPI::event(QEvent*)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchQueryBaseAPI::cancelled()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchQueryBaseAPI::QSearchQueryBaseAPI(std::shared_ptr<QCoreApplication>, unity::scopes::qt::QScopeBase&, unity::scopes::CannedQuery const&, unity::scopes::SearchMetadata const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchQueryBaseAPI::QSearchQueryBaseAPI(std::shared_ptr<QCoreApplication>, unity::scopes::qt::QScopeBase&, unity::scopes::CannedQuery const&, unity::scopes::SearchMetadata const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchQueryBaseAPI::~QSearchQueryBaseAPI()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchQueryBaseAPI::~QSearchQueryBaseAPI()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchQueryBaseAPI::~QSearchQueryBaseAPI()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewQueryBaseAPI::qt_metacall(QMetaObject::Call, int, void**)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewQueryBaseAPI::qt_metacast(char const*)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewQueryBaseAPI::staticMetaObject@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewQueryBaseAPI::run(std::shared_ptr<unity::scopes::PreviewReply> const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewQueryBaseAPI::event(QEvent*)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewQueryBaseAPI::cancelled()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewQueryBaseAPI::QPreviewQueryBaseAPI(std::shared_ptr<QCoreApplication>, unity::scopes::qt::QScopeBase&, unity::scopes::Result const&, unity::scopes::ActionMetadata const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewQueryBaseAPI::QPreviewQueryBaseAPI(std::shared_ptr<QCoreApplication>, unity::scopes::qt::QScopeBase&, unity::scopes::Result const&, unity::scopes::ActionMetadata const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewQueryBaseAPI::~QPreviewQueryBaseAPI()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewQueryBaseAPI::~QPreviewQueryBaseAPI()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewQueryBaseAPI::~QPreviewQueryBaseAPI()@Base" 0replaceme
+ (c++)"unity::scopes::qt::qVariantToScopeVariant(QVariant const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::scopeVariantToQVariant(unity::scopes::Variant const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::qVariantMapToScopeVariantMap(QMap<QString, QVariant> const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::scopeVariantMapToQVariantMap(std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unity::scopes::Variant> > > const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QResult::set_dnd_uri(QString const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QResult::set_intercept_activation()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QResult::store(unity::scopes::qt::QResult const&, bool)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QResult::set_art(QString const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QResult::set_uri(QString const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QResult::set_title(QString const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QResult::QResult(unity::scopes::qt::QResult&&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QResult::QResult(unity::scopes::qt::internal::QResultImpl*)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QResult::QResult(unity::scopes::Result const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QResult::QResult(unity::scopes::qt::QResult const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QResult::QResult(std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unity::scopes::Variant> > > const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QResult::QResult()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QResult::QResult(unity::scopes::qt::QResult&&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QResult::QResult(unity::scopes::qt::internal::QResultImpl*)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QResult::QResult(unity::scopes::Result const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QResult::QResult(unity::scopes::qt::QResult const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QResult::QResult(std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unity::scopes::Variant> > > const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QResult::QResult()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QResult::~QResult()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QResult::~QResult()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QResult::~QResult()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QResult::operator=(unity::scopes::qt::QResult&&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QResult::operator=(unity::scopes::qt::QResult const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QResult::operator[](QString const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QCategory::QCategory(std::shared_ptr<unity::scopes::Category const>)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QCategory::QCategory(std::shared_ptr<unity::scopes::Category const>)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QCategory::~QCategory()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QCategory::~QCategory()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QCategory::~QCategory()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QDepartment::subdepartments() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QDepartment::alternate_label() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QDepartment::has_subdepartments() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QDepartment::id() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QDepartment::label() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QDepartment::query() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QDepartment::serialize() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QCannedQuery::filter_state() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QCannedQuery::query_string() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QCannedQuery::department_id() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QCannedQuery::to_uri() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QCannedQuery::scope_id() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QCannedQuery::serialize() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QColumnLayout::number_of_columns() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QColumnLayout::size() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QColumnLayout::column(int) const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QColumnLayout::serialize() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QScopeVariant::get_string() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewWidget::widget_type() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewWidget::attribute_values() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewWidget::attribute_mappings() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewWidget::id() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewWidget::data() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewWidget::widgets() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewWidget::serialize() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QActionMetadata::scope_data() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QActionMetadata::contains_hint(QString const&) const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QActionMetadata::hints() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QActionMetadata::operator[](QString const&) const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchMetadata::cardinality() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchMetadata::has_location() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchMetadata::contains_hint(QString const&) const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchMetadata::hints() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchMetadata::location() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchMetadata::operator[](QString const&) const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchQueryBase::search_metadata() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchQueryBase::query() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewQueryBase::action_metadata() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewQueryBase::result() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QCategorisedResult::fwd() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QCategorisedResult::category() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchQueryBaseAPI::metaObject() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewQueryBaseAPI::metaObject() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QResult::direct_activation() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QResult::has_stored_result() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QResult::target_scope_proxy() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QResult::art() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QResult::uri() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QResult::title() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QResult::value(QString const&) const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QResult::dnd_uri() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QResult::contains(QString const&) const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QResult::retrieve() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QResult::serialize() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QResult::operator[](QString const&) const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QCategory::renderer_template() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QCategory::id() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QCategory::icon() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QCategory::query() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QCategory::title() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QCategory::serialize() const@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::qt::QScopeBase@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::qt::QSearchReply@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::qt::QPreviewReply@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::qt::QScopeBaseAPI@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::qt::QPreviewWidget@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::qt::QVariantBuilder@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::qt::QSearchQueryBase@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::qt::QPreviewQueryBase@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::qt::QCategorisedResult@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::qt::QSearchQueryBaseAPI@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::qt::QPreviewQueryBaseAPI@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::qt::QResult@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::qt::QCategory@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::qt::QScopeBase@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::qt::QSearchReply@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::qt::QPreviewReply@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::qt::QScopeBaseAPI@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::qt::QPreviewWidget@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::qt::QVariantBuilder@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::qt::QSearchQueryBase@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::qt::QPreviewQueryBase@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::qt::QCategorisedResult@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::qt::QSearchQueryBaseAPI@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::qt::QPreviewQueryBaseAPI@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::qt::QResult@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::qt::QCategory@Base" 0replaceme
+ (c++)"vtable for unity::scopes::qt::QScopeBase@Base" 0replaceme
+ (c++)"vtable for unity::scopes::qt::QSearchReply@Base" 0replaceme
+ (c++)"vtable for unity::scopes::qt::QPreviewReply@Base" 0replaceme
+ (c++)"vtable for unity::scopes::qt::QScopeBaseAPI@Base" 0replaceme
+ (c++)"vtable for unity::scopes::qt::QPreviewWidget@Base" 0replaceme
+ (c++)"vtable for unity::scopes::qt::QVariantBuilder@Base" 0replaceme
+ (c++)"vtable for unity::scopes::qt::QSearchQueryBase@Base" 0replaceme
+ (c++)"vtable for unity::scopes::qt::QPreviewQueryBase@Base" 0replaceme
+ (c++)"vtable for unity::scopes::qt::QCategorisedResult@Base" 0replaceme
+ (c++)"vtable for unity::scopes::qt::QSearchQueryBaseAPI@Base" 0replaceme
+ (c++)"vtable for unity::scopes::qt::QPreviewQueryBaseAPI@Base" 0replaceme
+ (c++)"vtable for unity::scopes::qt::QResult@Base" 0replaceme
+ (c++)"vtable for unity::scopes::qt::QCategory@Base" 0replaceme
+  (c++)"unity::scopes::qt::QScopeBase::qt_metacall(QMetaObject::Call, int, void**)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QScopeBase::qt_metacast(char const*)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QScopeBase::staticMetaObject@Base" 0replaceme
+ (c++)"unity::scopes::qt::QScopeBase::QScopeBase(QObject*)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QScopeBase::QScopeBase(QObject*)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchReply::qt_metacall(QMetaObject::Call, int, void**)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchReply::qt_metacast(char const*)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchReply::staticMetaObject@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchReply::QSearchReply(std::shared_ptr<unity::scopes::SearchReply>&, QObject*)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchReply::QSearchReply(std::shared_ptr<unity::scopes::SearchReply>&, QObject*)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QColumnLayout::QColumnLayout(unity::scopes::qt::internal::QColumnLayoutImpl*)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QColumnLayout::QColumnLayout(unity::scopes::qt::internal::QColumnLayoutImpl*)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewReply::qt_metacall(QMetaObject::Call, int, void**)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewReply::qt_metacast(char const*)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewReply::staticMetaObject@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewReply::QPreviewReply(std::shared_ptr<unity::scopes::PreviewReply>&, QObject*)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewReply::QPreviewReply(std::shared_ptr<unity::scopes::PreviewReply>&, QObject*)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QScopeVariant::sync()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QVariantBuilder::QVariantBuilder(unity::scopes::qt::internal::QVariantBuilderImpl*)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QVariantBuilder::QVariantBuilder(unity::scopes::qt::internal::QVariantBuilderImpl*)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchQueryBase::qt_metacall(QMetaObject::Call, int, void**)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchQueryBase::qt_metacast(char const*)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchQueryBase::staticMetaObject@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchQueryBase::QSearchQueryBase(QObject*)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchQueryBase::QSearchQueryBase(QObject*)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewQueryBase::qt_metacall(QMetaObject::Call, int, void**)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewQueryBase::qt_metacast(char const*)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewQueryBase::staticMetaObject@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewQueryBase::QPreviewQueryBase(QObject*)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewQueryBase::QPreviewQueryBase(QObject*)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchQueryBaseAPI::QSearchQueryBaseAPI(std::shared_ptr<QCoreApplication>, unity::scopes::qt::QScopeBase&, unity::scopes::CannedQuery const&, unity::scopes::SearchMetadata const&, QObject*)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchQueryBaseAPI::QSearchQueryBaseAPI(std::shared_ptr<QCoreApplication>, unity::scopes::qt::QScopeBase&, unity::scopes::CannedQuery const&, unity::scopes::SearchMetadata const&, QObject*)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewQueryBaseAPI::QPreviewQueryBaseAPI(std::shared_ptr<QCoreApplication>, unity::scopes::qt::QScopeBase&, unity::scopes::Result const&, unity::scopes::ActionMetadata const&, QObject*)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewQueryBaseAPI::QPreviewQueryBaseAPI(std::shared_ptr<QCoreApplication>, unity::scopes::qt::QScopeBase&, unity::scopes::Result const&, unity::scopes::ActionMetadata const&, QObject*)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QResult::QResult(QMap<QString, QVariant> const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QResult::QResult(QMap<QString, QVariant> const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QCategory::QCategory(unity::scopes::qt::internal::QCategoryImpl*)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QCategory::QCategory(unity::scopes::qt::internal::QCategoryImpl*)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QScopeBase::metaObject() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchReply::metaObject() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewReply::metaObject() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchQueryBase::metaObject() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewQueryBase::metaObject() const@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::qt::QScopeVariant@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::qt::QScopeVariant@Base" 0replaceme
+ (c++)"vtable for unity::scopes::qt::QScopeVariant@Base" 0replaceme
+ (c++)"unity::scopes::qt::QScopeBaseAPI::QScopeBaseAPI(std::function<unity::scopes::qt::QScopeBase* ()> const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QScopeBaseAPI::QScopeBaseAPI(std::function<unity::scopes::qt::QScopeBase* ()> const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::CancelledEvent::~CancelledEvent()@Base" 0replaceme
+ (c++)"unity::scopes::qt::CancelledEvent::~CancelledEvent()@Base" 0replaceme
+ (c++)"unity::scopes::qt::CancelledEvent::~CancelledEvent()@Base" 0replaceme
+ (c++)"unity::scopes::qt::InitializeEvent::~InitializeEvent()@Base" 0replaceme
+ (c++)"unity::scopes::qt::InitializeEvent::~InitializeEvent()@Base" 0replaceme
+ (c++)"unity::scopes::qt::InitializeEvent::~InitializeEvent()@Base" 0replaceme
+ (c++)"unity::scopes::qt::RunEvent::~RunEvent()@Base" 0replaceme
+ (c++)"unity::scopes::qt::RunEvent::~RunEvent()@Base" 0replaceme
+ (c++)"unity::scopes::qt::RunEvent::~RunEvent()@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::qt::CancelledEvent@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::qt::InitializeEvent@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::qt::RunEvent@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::qt::CancelledEvent@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::qt::InitializeEvent@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::qt::RunEvent@Base" 0replaceme
+ (c++)"vtable for unity::scopes::qt::CancelledEvent@Base" 0replaceme
+ (c++)"vtable for unity::scopes::qt::InitializeEvent@Base" 0replaceme
+ (c++)"vtable for unity::scopes::qt::RunEvent@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchQueryBaseAPI::run_signal(std::shared_ptr<unity::scopes::qt::QSearchReply> const&)@Base" 0replaceme
+ (c++)"core::net::Error::~Error()@Base" 0replaceme
+ (c++)"core::net::Error::~Error()@Base" 0replaceme
+ (c++)"core::net::Error::~Error()@Base" 0replaceme
+ (c++)"unity::scopes::qt::JsonReader::JsonReader()@Base" 0replaceme
+ (c++)"unity::scopes::qt::JsonReader::JsonReader()@Base" 0replaceme
+ (c++)"unity::scopes::qt::XmlAsyncReader::create_parser_with_data(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::XmlAsyncReader::XmlAsyncReader()@Base" 0replaceme
+ (c++)"unity::scopes::qt::XmlAsyncReader::XmlAsyncReader()@Base" 0replaceme
+ (c++)"unity::scopes::qt::XmlAsyncReader::~XmlAsyncReader()@Base" 0replaceme
+ (c++)"unity::scopes::qt::XmlAsyncReader::~XmlAsyncReader()@Base" 0replaceme
+ (c++)"unity::scopes::qt::XmlAsyncReader::~XmlAsyncReader()@Base" 0replaceme
+ (c++)"unity::scopes::qt::HttpAsyncReader::Priv::~Priv()@Base" 0replaceme
+ (c++)"unity::scopes::qt::HttpAsyncReader::Priv::~Priv()@Base" 0replaceme
+ (c++)"unity::scopes::qt::HttpAsyncReader::HttpAsyncReader()@Base" 0replaceme
+ (c++)"unity::scopes::qt::HttpAsyncReader::HttpAsyncReader()@Base" 0replaceme
+ (c++)"unity::scopes::qt::HttpAsyncReader::~HttpAsyncReader()@Base" 0replaceme
+ (c++)"unity::scopes::qt::HttpAsyncReader::~HttpAsyncReader()@Base" 0replaceme
+ (c++)"unity::scopes::qt::HttpAsyncReader::~HttpAsyncReader()@Base" 0replaceme
+ (c++)"unity::scopes::qt::JsonAsyncReader::create_parser_with_data(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::JsonAsyncReader::JsonAsyncReader()@Base" 0replaceme
+ (c++)"unity::scopes::qt::JsonAsyncReader::JsonAsyncReader()@Base" 0replaceme
+ (c++)"unity::scopes::qt::JsonAsyncReader::~JsonAsyncReader()@Base" 0replaceme
+ (c++)"unity::scopes::qt::JsonAsyncReader::~JsonAsyncReader()@Base" 0replaceme
+ (c++)"unity::scopes::qt::JsonAsyncReader::~JsonAsyncReader()@Base" 0replaceme
+ (c++)"unity::scopes::qt::XmlReader::XmlReader()@Base" 0replaceme
+ (c++)"unity::scopes::qt::XmlReader::XmlReader()@Base" 0replaceme
+ (c++)"unity::scopes::utils::qt::JsonReader::JsonReader()@Base" 0replaceme
+ (c++)"unity::scopes::utils::qt::JsonReader::JsonReader()@Base" 0replaceme
+ (c++)"unity::scopes::utils::qt::XmlAsyncReader::create_parser_with_data(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)@Base" 0replaceme
+ (c++)"unity::scopes::utils::qt::XmlAsyncReader::XmlAsyncReader()@Base" 0replaceme
+ (c++)"unity::scopes::utils::qt::XmlAsyncReader::XmlAsyncReader()@Base" 0replaceme
+ (c++)"unity::scopes::utils::qt::XmlAsyncReader::~XmlAsyncReader()@Base" 0replaceme
+ (c++)"unity::scopes::utils::qt::XmlAsyncReader::~XmlAsyncReader()@Base" 0replaceme
+ (c++)"unity::scopes::utils::qt::XmlAsyncReader::~XmlAsyncReader()@Base" 0replaceme
+ (c++)"std::shared_ptr<QJsonDocument> unity::scopes::utils::qt::HttpAsyncReader::get_or_throw<std::shared_ptr<QJsonDocument> >(std::future<std::shared_ptr<QJsonDocument> >&, long)@Base" 0replaceme
+ (c++)"std::shared_ptr<QXmlStreamReader> unity::scopes::utils::qt::HttpAsyncReader::get_or_throw<std::shared_ptr<QXmlStreamReader> >(std::future<std::shared_ptr<QXmlStreamReader> >&, long)@Base" 0replaceme
+ (c++)"unity::scopes::utils::qt::HttpAsyncReader::Priv::~Priv()@Base" 0replaceme
+ (c++)"unity::scopes::utils::qt::HttpAsyncReader::Priv::~Priv()@Base" 0replaceme
+ (c++)"unity::scopes::utils::qt::HttpAsyncReader::HttpAsyncReader()@Base" 0replaceme
+ (c++)"unity::scopes::utils::qt::HttpAsyncReader::HttpAsyncReader()@Base" 0replaceme
+ (c++)"unity::scopes::utils::qt::HttpAsyncReader::~HttpAsyncReader()@Base" 0replaceme
+ (c++)"unity::scopes::utils::qt::HttpAsyncReader::~HttpAsyncReader()@Base" 0replaceme
+ (c++)"unity::scopes::utils::qt::HttpAsyncReader::~HttpAsyncReader()@Base" 0replaceme
+ (c++)"unity::scopes::utils::qt::JsonAsyncReader::create_parser_with_data(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)@Base" 0replaceme
+ (c++)"unity::scopes::utils::qt::JsonAsyncReader::JsonAsyncReader()@Base" 0replaceme
+ (c++)"unity::scopes::utils::qt::JsonAsyncReader::JsonAsyncReader()@Base" 0replaceme
+ (c++)"unity::scopes::utils::qt::JsonAsyncReader::~JsonAsyncReader()@Base" 0replaceme
+ (c++)"unity::scopes::utils::qt::JsonAsyncReader::~JsonAsyncReader()@Base" 0replaceme
+ (c++)"unity::scopes::utils::qt::JsonAsyncReader::~JsonAsyncReader()@Base" 0replaceme
+ (c++)"unity::scopes::utils::qt::XmlReader::XmlReader()@Base" 0replaceme
+ (c++)"unity::scopes::utils::qt::XmlReader::XmlReader()@Base" 0replaceme
+ (c++)"QString::~QString()@Base" 0replaceme
+ (c++)"QString::~QString()@Base" 0replaceme
+ (c++)"std::basic_string<char, std::char_traits<char>, std::allocator<char> > __gnu_cxx::__to_xstring<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, char>(int (*)(char*, unsigned long, char const*, __va_list_tag*), unsigned long, char const*, ...)@Base" 0replaceme
+ (c++)"unity::scopes::qt::JsonReader::read(QUrl const&) const@Base" 0replaceme
+ (c++)"unity::scopes::qt::JsonReader::read(QString const&, QVector<QPair<QString, QString> > const&) const@Base" 0replaceme
+ (c++)"unity::scopes::qt::XmlAsyncReader::async_get_parser(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0replaceme
+ (c++)"unity::scopes::qt::XmlAsyncReader::async_get_parser(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::vector<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > > const&) const@Base" 0replaceme
+ (c++)"unity::scopes::qt::HttpAsyncReader::async_execute(core::net::http::Request::Handler const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0replaceme
+ (c++)"unity::scopes::qt::HttpAsyncReader::progress_report(core::net::http::Request::Progress const&) const@Base" 0replaceme
+ (c++)"unity::scopes::qt::HttpAsyncReader::get_uri(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::vector<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > > const&) const@Base" 0replaceme
+ (c++)"unity::scopes::qt::JsonAsyncReader::async_get_parser(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0replaceme
+ (c++)"unity::scopes::qt::JsonAsyncReader::async_get_parser(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::vector<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > > const&) const@Base" 0replaceme
+ (c++)"unity::scopes::qt::XmlReader::read(QUrl const&) const@Base" 0replaceme
+ (c++)"unity::scopes::qt::XmlReader::read(QString const&, QVector<QPair<QString, QString> > const&) const@Base" 0replaceme
+ (c++)"unity::scopes::utils::qt::JsonReader::read(QUrl const&) const@Base" 0replaceme
+ (c++)"unity::scopes::utils::qt::JsonReader::read(QString const&, QVector<QPair<QString, QString> > const&) const@Base" 0replaceme
+ (c++)"unity::scopes::utils::qt::XmlAsyncReader::async_get_parser(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0replaceme
+ (c++)"unity::scopes::utils::qt::XmlAsyncReader::async_get_parser(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::vector<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > > const&) const@Base" 0replaceme
+ (c++)"unity::scopes::utils::qt::HttpAsyncReader::async_execute(core::net::http::Request::Handler const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0replaceme
+ (c++)"unity::scopes::utils::qt::HttpAsyncReader::progress_report(core::net::http::Request::Progress const&) const@Base" 0replaceme
+ (c++)"std::future<std::shared_ptr<QJsonDocument> > unity::scopes::utils::qt::HttpAsyncReader::async_get_parser<QJsonDocument>(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::function<std::shared_ptr<QJsonDocument> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)> const&) const@Base" 0replaceme
+ (c++)"std::future<std::shared_ptr<QXmlStreamReader> > unity::scopes::utils::qt::HttpAsyncReader::async_get_parser<QXmlStreamReader>(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::function<std::shared_ptr<QXmlStreamReader> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)> const&) const@Base" 0replaceme
+ (c++)"unity::scopes::utils::qt::HttpAsyncReader::get_uri(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::vector<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > > const&) const@Base" 0replaceme
+ (c++)"unity::scopes::utils::qt::JsonAsyncReader::async_get_parser(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0replaceme
+ (c++)"unity::scopes::utils::qt::JsonAsyncReader::async_get_parser(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::vector<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > > const&) const@Base" 0replaceme
+ (c++)"unity::scopes::utils::qt::XmlReader::read(QUrl const&) const@Base" 0replaceme
+ (c++)"unity::scopes::utils::qt::XmlReader::read(QString const&, QVector<QPair<QString, QString> > const&) const@Base" 0replaceme
+ (c++)"QString::toStdString() const@Base" 0replaceme
+ (c++)"std::__future_base::_State_baseV2::_M_has_deferred() const@Base" 0replaceme
+ (c++)"std::unique_lock<std::mutex>::unlock()@Base" 0replaceme
+ (c++)"std::__future_base::_State_baseV2::_M_complete_async()@Base" 0replaceme
+ (c++)"std::__future_base::_State_baseV2::_M_do_set(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>&, bool&)@Base" 0replaceme
+ (c++)"std::__future_base::_State_baseV2::~_State_baseV2()@Base" 0replaceme
+ (c++)"std::__future_base::_State_baseV2::~_State_baseV2()@Base" 0replaceme
+ (c++)"std::__future_base::_State_baseV2::~_State_baseV2()@Base" 0replaceme
+ (c++)"std::__future_base::_Result<std::shared_ptr<QJsonDocument> >::_M_destroy()@Base" 0replaceme
+ (c++)"std::__future_base::_Result<std::shared_ptr<QJsonDocument> >::~_Result()@Base" 0replaceme
+ (c++)"std::__future_base::_Result<std::shared_ptr<QJsonDocument> >::~_Result()@Base" 0replaceme
+ (c++)"std::__future_base::_Result<std::shared_ptr<QJsonDocument> >::~_Result()@Base" 0replaceme
+ (c++)"std::__future_base::_Result<std::shared_ptr<QXmlStreamReader> >::_M_destroy()@Base" 0replaceme
+ (c++)"std::__future_base::_Result<std::shared_ptr<QXmlStreamReader> >::~_Result()@Base" 0replaceme
+ (c++)"std::__future_base::_Result<std::shared_ptr<QXmlStreamReader> >::~_Result()@Base" 0replaceme
+ (c++)"std::__future_base::_Result<std::shared_ptr<QXmlStreamReader> >::~_Result()@Base" 0replaceme
+ (c++)"std::_Function_base::_Base_manager<std::__future_base::_State_baseV2::_Setter<std::shared_ptr<QJsonDocument>, std::__future_base::_State_baseV2::__exception_ptr_tag> >::_M_manager(std::_Any_data&, std::_Any_data const&, std::_Manager_operation)@Base" 0replaceme
+ (c++)"std::_Function_base::_Base_manager<std::__future_base::_State_baseV2::_Setter<std::shared_ptr<QJsonDocument>, std::shared_ptr<QJsonDocument> const&> >::_M_manager(std::_Any_data&, std::_Any_data const&, std::_Manager_operation)@Base" 0replaceme
+ (c++)"std::_Function_base::_Base_manager<std::__future_base::_State_baseV2::_Setter<std::shared_ptr<QXmlStreamReader>, std::__future_base::_State_baseV2::__exception_ptr_tag> >::_M_manager(std::_Any_data&, std::_Any_data const&, std::_Manager_operation)@Base" 0replaceme
+ (c++)"std::_Function_base::_Base_manager<std::__future_base::_State_baseV2::_Setter<std::shared_ptr<QXmlStreamReader>, std::shared_ptr<QXmlStreamReader> const&> >::_M_manager(std::_Any_data&, std::_Any_data const&, std::_Manager_operation)@Base" 0replaceme
+ (c++)"std::_Function_base::_Base_manager<std::shared_ptr<QJsonDocument> (*)(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)>::_M_manager(std::_Any_data&, std::_Any_data const&, std::_Manager_operation)@Base" 0replaceme
+ (c++)"std::_Function_base::_Base_manager<std::shared_ptr<QXmlStreamReader> (*)(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)>::_M_manager(std::_Any_data&, std::_Any_data const&, std::_Manager_operation)@Base" 0replaceme
+ (c++)"std::_Function_base::_Base_manager<std::_Bind<std::_Mem_fn<core::net::http::Request::Progress::Next (unity::scopes::utils::qt::HttpAsyncReader::*)(core::net::http::Request::Progress const&) const> (unity::scopes::utils::qt::HttpAsyncReader const*, std::_Placeholder<1>)> >::_M_manager(std::_Any_data&, std::_Any_data const&, std::_Manager_operation)@Base" 0replaceme
+ (c++)"std::_Function_base::_Base_manager<std::future<std::shared_ptr<QJsonDocument> > unity::scopes::utils::qt::HttpAsyncReader::async_get_parser<QJsonDocument>(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::function<std::shared_ptr<QJsonDocument> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)> const&) const::{lambda(core::net::http::Response const&)#2}>::_M_manager(std::_Any_data&, std::_Function_base::_Base_manager<std::future<std::shared_ptr<QJsonDocument> > unity::scopes::utils::qt::HttpAsyncReader::async_get_parser<QJsonDocument>(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::function<std::shared_ptr<QJsonDocument> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)> const&) const::{lambda(core::net::http::Response const&)#2}> const&, std::_Manager_operation)@Base" 0replaceme
+ (c++)"std::_Function_base::_Base_manager<std::future<std::shared_ptr<QJsonDocument> > unity::scopes::utils::qt::HttpAsyncReader::async_get_parser<QJsonDocument>(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::function<std::shared_ptr<QJsonDocument> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)> const&) const::{lambda(core::net::Error const&)#1}>::_M_manager(std::_Any_data&, std::_Function_base::_Base_manager<std::future<std::shared_ptr<QJsonDocument> > unity::scopes::utils::qt::HttpAsyncReader::async_get_parser<QJsonDocument>(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::function<std::shared_ptr<QJsonDocument> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)> const&) const::{lambda(core::net::Error const&)#1}> const&, std::_Manager_operation)@Base" 0replaceme
+ (c++)"std::_Function_base::_Base_manager<std::future<std::shared_ptr<QXmlStreamReader> > unity::scopes::utils::qt::HttpAsyncReader::async_get_parser<QXmlStreamReader>(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::function<std::shared_ptr<QXmlStreamReader> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)> const&) const::{lambda(core::net::http::Response const&)#2}>::_M_manager(std::_Any_data&, std::_Function_base::_Base_manager<std::future<std::shared_ptr<QXmlStreamReader> > unity::scopes::utils::qt::HttpAsyncReader::async_get_parser<QXmlStreamReader>(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::function<std::shared_ptr<QXmlStreamReader> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)> const&) const::{lambda(core::net::http::Response const&)#2}> const&, std::_Manager_operation)@Base" 0replaceme
+ (c++)"std::_Function_base::_Base_manager<std::future<std::shared_ptr<QXmlStreamReader> > unity::scopes::utils::qt::HttpAsyncReader::async_get_parser<QXmlStreamReader>(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::function<std::shared_ptr<QXmlStreamReader> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)> const&) const::{lambda(core::net::Error const&)#1}>::_M_manager(std::_Any_data&, std::_Function_base::_Base_manager<std::future<std::shared_ptr<QXmlStreamReader> > unity::scopes::utils::qt::HttpAsyncReader::async_get_parser<QXmlStreamReader>(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::function<std::shared_ptr<QXmlStreamReader> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)> const&) const::{lambda(core::net::Error const&)#1}> const&, std::_Manager_operation)@Base" 0replaceme
+ (c++)"std::__basic_future<std::shared_ptr<QJsonDocument> >::_Reset::~_Reset()@Base" 0replaceme
+ (c++)"std::__basic_future<std::shared_ptr<QJsonDocument> >::_Reset::~_Reset()@Base" 0replaceme
+ (c++)"std::__basic_future<std::shared_ptr<QXmlStreamReader> >::_Reset::~_Reset()@Base" 0replaceme
+ (c++)"std::__basic_future<std::shared_ptr<QXmlStreamReader> >::_Reset::~_Reset()@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr<QJsonDocument*, (__gnu_cxx::_Lock_policy)2>::_M_destroy()@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr<QJsonDocument*, (__gnu_cxx::_Lock_policy)2>::_M_dispose()@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr<QJsonDocument*, (__gnu_cxx::_Lock_policy)2>::_M_get_deleter(std::type_info const&)@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr<QJsonDocument*, (__gnu_cxx::_Lock_policy)2>::~_Sp_counted_ptr()@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr<QJsonDocument*, (__gnu_cxx::_Lock_policy)2>::~_Sp_counted_ptr()@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr<QJsonDocument*, (__gnu_cxx::_Lock_policy)2>::~_Sp_counted_ptr()@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr<QXmlStreamReader*, (__gnu_cxx::_Lock_policy)2>::_M_destroy()@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr<QXmlStreamReader*, (__gnu_cxx::_Lock_policy)2>::_M_dispose()@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr<QXmlStreamReader*, (__gnu_cxx::_Lock_policy)2>::_M_get_deleter(std::type_info const&)@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr<QXmlStreamReader*, (__gnu_cxx::_Lock_policy)2>::~_Sp_counted_ptr()@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr<QXmlStreamReader*, (__gnu_cxx::_Lock_policy)2>::~_Sp_counted_ptr()@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr<QXmlStreamReader*, (__gnu_cxx::_Lock_policy)2>::~_Sp_counted_ptr()@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr<unity::scopes::utils::qt::XmlAsyncReader*, (__gnu_cxx::_Lock_policy)2>::_M_destroy()@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr<unity::scopes::utils::qt::XmlAsyncReader*, (__gnu_cxx::_Lock_policy)2>::_M_dispose()@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr<unity::scopes::utils::qt::XmlAsyncReader*, (__gnu_cxx::_Lock_policy)2>::_M_get_deleter(std::type_info const&)@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr<unity::scopes::utils::qt::XmlAsyncReader*, (__gnu_cxx::_Lock_policy)2>::~_Sp_counted_ptr()@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr<unity::scopes::utils::qt::XmlAsyncReader*, (__gnu_cxx::_Lock_policy)2>::~_Sp_counted_ptr()@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr<unity::scopes::utils::qt::XmlAsyncReader*, (__gnu_cxx::_Lock_policy)2>::~_Sp_counted_ptr()@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr<unity::scopes::utils::qt::HttpAsyncReader::Priv*, (__gnu_cxx::_Lock_policy)2>::_M_destroy()@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr<unity::scopes::utils::qt::HttpAsyncReader::Priv*, (__gnu_cxx::_Lock_policy)2>::_M_dispose()@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr<unity::scopes::utils::qt::HttpAsyncReader::Priv*, (__gnu_cxx::_Lock_policy)2>::_M_get_deleter(std::type_info const&)@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr<unity::scopes::utils::qt::HttpAsyncReader::Priv*, (__gnu_cxx::_Lock_policy)2>::~_Sp_counted_ptr()@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr<unity::scopes::utils::qt::HttpAsyncReader::Priv*, (__gnu_cxx::_Lock_policy)2>::~_Sp_counted_ptr()@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr<unity::scopes::utils::qt::HttpAsyncReader::Priv*, (__gnu_cxx::_Lock_policy)2>::~_Sp_counted_ptr()@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr<unity::scopes::utils::qt::HttpAsyncReader*, (__gnu_cxx::_Lock_policy)2>::_M_destroy()@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr<unity::scopes::utils::qt::HttpAsyncReader*, (__gnu_cxx::_Lock_policy)2>::_M_dispose()@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr<unity::scopes::utils::qt::HttpAsyncReader*, (__gnu_cxx::_Lock_policy)2>::_M_get_deleter(std::type_info const&)@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr<unity::scopes::utils::qt::HttpAsyncReader*, (__gnu_cxx::_Lock_policy)2>::~_Sp_counted_ptr()@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr<unity::scopes::utils::qt::HttpAsyncReader*, (__gnu_cxx::_Lock_policy)2>::~_Sp_counted_ptr()@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr<unity::scopes::utils::qt::HttpAsyncReader*, (__gnu_cxx::_Lock_policy)2>::~_Sp_counted_ptr()@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr<unity::scopes::utils::qt::JsonAsyncReader*, (__gnu_cxx::_Lock_policy)2>::_M_destroy()@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr<unity::scopes::utils::qt::JsonAsyncReader*, (__gnu_cxx::_Lock_policy)2>::_M_dispose()@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr<unity::scopes::utils::qt::JsonAsyncReader*, (__gnu_cxx::_Lock_policy)2>::_M_get_deleter(std::type_info const&)@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr<unity::scopes::utils::qt::JsonAsyncReader*, (__gnu_cxx::_Lock_policy)2>::~_Sp_counted_ptr()@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr<unity::scopes::utils::qt::JsonAsyncReader*, (__gnu_cxx::_Lock_policy)2>::~_Sp_counted_ptr()@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr<unity::scopes::utils::qt::JsonAsyncReader*, (__gnu_cxx::_Lock_policy)2>::~_Sp_counted_ptr()@Base" 0replaceme
+ (c++)"std::_Sp_counted_base<(__gnu_cxx::_Lock_policy)2>::_M_destroy()@Base" 0replaceme
+ (c++)"std::_Sp_counted_base<(__gnu_cxx::_Lock_policy)2>::_M_release()@Base" 0replaceme
+ (c++)"std::_Function_handler<core::net::http::Request::Progress::Next (core::net::http::Request::Progress const&), std::_Bind<std::_Mem_fn<core::net::http::Request::Progress::Next (unity::scopes::utils::qt::HttpAsyncReader::*)(core::net::http::Request::Progress const&) const> (unity::scopes::utils::qt::HttpAsyncReader const*, std::_Placeholder<1>)> >::_M_invoke(std::_Any_data const&, core::net::http::Request::Progress const&)@Base" 0replaceme
+ (c++)"std::_Function_handler<std::shared_ptr<QJsonDocument> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&), std::shared_ptr<QJsonDocument> (*)(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)>::_M_invoke(std::_Any_data const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)@Base" 0replaceme
+ (c++)"std::_Function_handler<std::shared_ptr<QXmlStreamReader> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&), std::shared_ptr<QXmlStreamReader> (*)(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)>::_M_invoke(std::_Any_data const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)@Base" 0replaceme
+ (c++)"std::_Function_handler<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> (), std::__future_base::_State_baseV2::_Setter<std::shared_ptr<QJsonDocument>, std::__future_base::_State_baseV2::__exception_ptr_tag> >::_M_invoke(std::_Any_data const&)@Base" 0replaceme
+ (c++)"std::_Function_handler<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> (), std::__future_base::_State_baseV2::_Setter<std::shared_ptr<QJsonDocument>, std::shared_ptr<QJsonDocument> const&> >::_M_invoke(std::_Any_data const&)@Base" 0replaceme
+ (c++)"std::_Function_handler<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> (), std::__future_base::_State_baseV2::_Setter<std::shared_ptr<QXmlStreamReader>, std::__future_base::_State_baseV2::__exception_ptr_tag> >::_M_invoke(std::_Any_data const&)@Base" 0replaceme
+ (c++)"std::_Function_handler<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> (), std::__future_base::_State_baseV2::_Setter<std::shared_ptr<QXmlStreamReader>, std::shared_ptr<QXmlStreamReader> const&> >::_M_invoke(std::_Any_data const&)@Base" 0replaceme
+ (c++)"std::_Function_handler<void (core::net::http::Response const&), std::future<std::shared_ptr<QJsonDocument> > unity::scopes::utils::qt::HttpAsyncReader::async_get_parser<QJsonDocument>(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::function<std::shared_ptr<QJsonDocument> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)> const&) const::{lambda(core::net::http::Response const&)#2}>::_M_invoke(std::_Any_data const&, core::net::http::Response const&)@Base" 0replaceme
+ (c++)"std::_Function_handler<void (core::net::http::Response const&), std::future<std::shared_ptr<QXmlStreamReader> > unity::scopes::utils::qt::HttpAsyncReader::async_get_parser<QXmlStreamReader>(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::function<std::shared_ptr<QXmlStreamReader> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)> const&) const::{lambda(core::net::http::Response const&)#2}>::_M_invoke(std::_Any_data const&, core::net::http::Response const&)@Base" 0replaceme
+ (c++)"std::_Function_handler<void (core::net::Error const&), std::future<std::shared_ptr<QJsonDocument> > unity::scopes::utils::qt::HttpAsyncReader::async_get_parser<QJsonDocument>(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::function<std::shared_ptr<QJsonDocument> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)> const&) const::{lambda(core::net::Error const&)#1}>::_M_invoke(std::_Any_data const&, core::net::Error const&)@Base" 0replaceme
+ (c++)"std::_Function_handler<void (core::net::Error const&), std::future<std::shared_ptr<QXmlStreamReader> > unity::scopes::utils::qt::HttpAsyncReader::async_get_parser<QXmlStreamReader>(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::function<std::shared_ptr<QXmlStreamReader> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)> const&) const::{lambda(core::net::Error const&)#1}>::_M_invoke(std::_Any_data const&, core::net::Error const&)@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr_inplace<std::__future_base::_State_baseV2, std::allocator<std::__future_base::_State_baseV2>, (__gnu_cxx::_Lock_policy)2>::_M_destroy()@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr_inplace<std::__future_base::_State_baseV2, std::allocator<std::__future_base::_State_baseV2>, (__gnu_cxx::_Lock_policy)2>::_M_dispose()@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr_inplace<std::__future_base::_State_baseV2, std::allocator<std::__future_base::_State_baseV2>, (__gnu_cxx::_Lock_policy)2>::_M_get_deleter(std::type_info const&)@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr_inplace<std::__future_base::_State_baseV2, std::allocator<std::__future_base::_State_baseV2>, (__gnu_cxx::_Lock_policy)2>::~_Sp_counted_ptr_inplace()@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr_inplace<std::__future_base::_State_baseV2, std::allocator<std::__future_base::_State_baseV2>, (__gnu_cxx::_Lock_policy)2>::~_Sp_counted_ptr_inplace()@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr_inplace<std::__future_base::_State_baseV2, std::allocator<std::__future_base::_State_baseV2>, (__gnu_cxx::_Lock_policy)2>::~_Sp_counted_ptr_inplace()@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr_inplace<std::thread::_Impl<std::_Bind_simple<unity::scopes::utils::qt::HttpAsyncReader::Priv::Priv()::{lambda()#1} ()> >, std::allocator<std::_Bind_simple<unity::scopes::utils::qt::HttpAsyncReader::Priv::Priv()::{lambda()#1} ()> >, (__gnu_cxx::_Lock_policy)2>::_M_destroy()@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr_inplace<std::thread::_Impl<std::_Bind_simple<unity::scopes::utils::qt::HttpAsyncReader::Priv::Priv()::{lambda()#1} ()> >, std::allocator<std::_Bind_simple<unity::scopes::utils::qt::HttpAsyncReader::Priv::Priv()::{lambda()#1} ()> >, (__gnu_cxx::_Lock_policy)2>::_M_dispose()@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr_inplace<std::thread::_Impl<std::_Bind_simple<unity::scopes::utils::qt::HttpAsyncReader::Priv::Priv()::{lambda()#1} ()> >, std::allocator<std::_Bind_simple<unity::scopes::utils::qt::HttpAsyncReader::Priv::Priv()::{lambda()#1} ()> >, (__gnu_cxx::_Lock_policy)2>::_M_get_deleter(std::type_info const&)@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr_inplace<std::thread::_Impl<std::_Bind_simple<unity::scopes::utils::qt::HttpAsyncReader::Priv::Priv()::{lambda()#1} ()> >, std::allocator<std::_Bind_simple<unity::scopes::utils::qt::HttpAsyncReader::Priv::Priv()::{lambda()#1} ()> >, (__gnu_cxx::_Lock_policy)2>::~_Sp_counted_ptr_inplace()@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr_inplace<std::thread::_Impl<std::_Bind_simple<unity::scopes::utils::qt::HttpAsyncReader::Priv::Priv()::{lambda()#1} ()> >, std::allocator<std::_Bind_simple<unity::scopes::utils::qt::HttpAsyncReader::Priv::Priv()::{lambda()#1} ()> >, (__gnu_cxx::_Lock_policy)2>::~_Sp_counted_ptr_inplace()@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr_inplace<std::thread::_Impl<std::_Bind_simple<unity::scopes::utils::qt::HttpAsyncReader::Priv::Priv()::{lambda()#1} ()> >, std::allocator<std::_Bind_simple<unity::scopes::utils::qt::HttpAsyncReader::Priv::Priv()::{lambda()#1} ()> >, (__gnu_cxx::_Lock_policy)2>::~_Sp_counted_ptr_inplace()@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr_inplace<std::promise<std::shared_ptr<QJsonDocument> >, std::allocator<std::promise<std::shared_ptr<QJsonDocument> > >, (__gnu_cxx::_Lock_policy)2>::_M_destroy()@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr_inplace<std::promise<std::shared_ptr<QJsonDocument> >, std::allocator<std::promise<std::shared_ptr<QJsonDocument> > >, (__gnu_cxx::_Lock_policy)2>::_M_dispose()@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr_inplace<std::promise<std::shared_ptr<QJsonDocument> >, std::allocator<std::promise<std::shared_ptr<QJsonDocument> > >, (__gnu_cxx::_Lock_policy)2>::_M_get_deleter(std::type_info const&)@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr_inplace<std::promise<std::shared_ptr<QJsonDocument> >, std::allocator<std::promise<std::shared_ptr<QJsonDocument> > >, (__gnu_cxx::_Lock_policy)2>::~_Sp_counted_ptr_inplace()@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr_inplace<std::promise<std::shared_ptr<QJsonDocument> >, std::allocator<std::promise<std::shared_ptr<QJsonDocument> > >, (__gnu_cxx::_Lock_policy)2>::~_Sp_counted_ptr_inplace()@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr_inplace<std::promise<std::shared_ptr<QJsonDocument> >, std::allocator<std::promise<std::shared_ptr<QJsonDocument> > >, (__gnu_cxx::_Lock_policy)2>::~_Sp_counted_ptr_inplace()@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr_inplace<std::promise<std::shared_ptr<QXmlStreamReader> >, std::allocator<std::promise<std::shared_ptr<QXmlStreamReader> > >, (__gnu_cxx::_Lock_policy)2>::_M_destroy()@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr_inplace<std::promise<std::shared_ptr<QXmlStreamReader> >, std::allocator<std::promise<std::shared_ptr<QXmlStreamReader> > >, (__gnu_cxx::_Lock_policy)2>::_M_dispose()@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr_inplace<std::promise<std::shared_ptr<QXmlStreamReader> >, std::allocator<std::promise<std::shared_ptr<QXmlStreamReader> > >, (__gnu_cxx::_Lock_policy)2>::_M_get_deleter(std::type_info const&)@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr_inplace<std::promise<std::shared_ptr<QXmlStreamReader> >, std::allocator<std::promise<std::shared_ptr<QXmlStreamReader> > >, (__gnu_cxx::_Lock_policy)2>::~_Sp_counted_ptr_inplace()@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr_inplace<std::promise<std::shared_ptr<QXmlStreamReader> >, std::allocator<std::promise<std::shared_ptr<QXmlStreamReader> > >, (__gnu_cxx::_Lock_policy)2>::~_Sp_counted_ptr_inplace()@Base" 0replaceme
+ (c++)"std::_Sp_counted_ptr_inplace<std::promise<std::shared_ptr<QXmlStreamReader> >, std::allocator<std::promise<std::shared_ptr<QXmlStreamReader> > >, (__gnu_cxx::_Lock_policy)2>::~_Sp_counted_ptr_inplace()@Base" 0replaceme
+ (c++)"std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > >::~pair()@Base" 0replaceme
+ (c++)"std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > >::~pair()@Base" 0replaceme
+ (c++)"std::thread::_Impl<std::_Bind_simple<unity::scopes::utils::qt::HttpAsyncReader::Priv::Priv()::{lambda()#1} ()> >::_M_run()@Base" 0replaceme
+ (c++)"std::thread::_Impl<std::_Bind_simple<unity::scopes::utils::qt::HttpAsyncReader::Priv::Priv()::{lambda()#1} ()> >::~_Impl()@Base" 0replaceme
+ (c++)"std::thread::_Impl<std::_Bind_simple<unity::scopes::utils::qt::HttpAsyncReader::Priv::Priv()::{lambda()#1} ()> >::~_Impl()@Base" 0replaceme
+ (c++)"std::thread::_Impl<std::_Bind_simple<unity::scopes::utils::qt::HttpAsyncReader::Priv::Priv()::{lambda()#1} ()> >::~_Impl()@Base" 0replaceme
+ (c++)"void std::vector<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >::_M_emplace_back_aux<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > > const&>(std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > > const&)@Base" 0replaceme
+ (c++)"void std::vector<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >::_M_emplace_back_aux<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > > const&>(std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > > const&)@Base" 0replaceme
+ (c++)"std::vector<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >::~vector()@Base" 0replaceme
+ (c++)"std::vector<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >::~vector()@Base" 0replaceme
+ (c++)"std::_Rb_tree<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::_Identity<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char> > > >::_M_erase(std::_Rb_tree_node<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >*)@Base" 0replaceme
+ (c++)"std::_Rb_tree<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, std::set<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >, std::_Select1st<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, std::set<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > > >, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, std::set<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > > > >::_M_erase(std::_Rb_tree_node<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, std::set<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > > >*)@Base" 0replaceme
+ (c++)"std::function<std::shared_ptr<QJsonDocument> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)>::function(std::function<std::shared_ptr<QJsonDocument> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)> const&)@Base" 0replaceme
+ (c++)"std::function<std::shared_ptr<QJsonDocument> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)>::function(std::function<std::shared_ptr<QJsonDocument> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)> const&)@Base" 0replaceme
+ (c++)"std::function<std::shared_ptr<QXmlStreamReader> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)>::function(std::function<std::shared_ptr<QXmlStreamReader> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)> const&)@Base" 0replaceme
+ (c++)"std::function<std::shared_ptr<QXmlStreamReader> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)>::function(std::function<std::shared_ptr<QXmlStreamReader> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)> const&)@Base" 0replaceme
+ (c++)"std::function<void (core::net::http::Response const&)>::function<std::future<std::shared_ptr<QJsonDocument> > unity::scopes::utils::qt::HttpAsyncReader::async_get_parser<QJsonDocument>(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::function<std::shared_ptr<QJsonDocument> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)> const&) const::{lambda(core::net::http::Response const&)#2}, void>(std::future<std::shared_ptr<QJsonDocument> > unity::scopes::utils::qt::HttpAsyncReader::async_get_parser<QJsonDocument>(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::function<std::shared_ptr<QJsonDocument> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)> const&) const::{lambda(core::net::http::Response const&)#2})@Base" 0replaceme
+ (c++)"std::function<void (core::net::http::Response const&)>::function<std::future<std::shared_ptr<QXmlStreamReader> > unity::scopes::utils::qt::HttpAsyncReader::async_get_parser<QXmlStreamReader>(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::function<std::shared_ptr<QXmlStreamReader> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)> const&) const::{lambda(core::net::http::Response const&)#2}, void>(std::future<std::shared_ptr<QXmlStreamReader> > unity::scopes::utils::qt::HttpAsyncReader::async_get_parser<QXmlStreamReader>(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::function<std::shared_ptr<QXmlStreamReader> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)> const&) const::{lambda(core::net::http::Response const&)#2})@Base" 0replaceme
+ (c++)"std::function<void (core::net::http::Response const&)>::function<std::future<std::shared_ptr<QJsonDocument> > unity::scopes::utils::qt::HttpAsyncReader::async_get_parser<QJsonDocument>(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::function<std::shared_ptr<QJsonDocument> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)> const&) const::{lambda(core::net::http::Response const&)#2}, void>(std::future<std::shared_ptr<QJsonDocument> > unity::scopes::utils::qt::HttpAsyncReader::async_get_parser<QJsonDocument>(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::function<std::shared_ptr<QJsonDocument> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)> const&) const::{lambda(core::net::http::Response const&)#2})@Base" 0replaceme
+ (c++)"std::function<void (core::net::http::Response const&)>::function<std::future<std::shared_ptr<QXmlStreamReader> > unity::scopes::utils::qt::HttpAsyncReader::async_get_parser<QXmlStreamReader>(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::function<std::shared_ptr<QXmlStreamReader> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)> const&) const::{lambda(core::net::http::Response const&)#2}, void>(std::future<std::shared_ptr<QXmlStreamReader> > unity::scopes::utils::qt::HttpAsyncReader::async_get_parser<QXmlStreamReader>(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::function<std::shared_ptr<QXmlStreamReader> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)> const&) const::{lambda(core::net::http::Response const&)#2})@Base" 0replaceme
+ (c++)"void std::__once_call_impl<std::_Bind_simple<std::_Mem_fn<void (std::__future_base::_State_baseV2::*)(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>&, bool&)> (std::__future_base::_State_baseV2*, std::reference_wrapper<std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()> >, std::reference_wrapper<bool>)> >()@Base" 0replaceme
+ (c++)"std::__exception_ptr::exception_ptr std::make_exception_ptr<core::net::Error>(core::net::Error)@Base" 0replaceme
+ (c++)"std::__exception_ptr::exception_ptr std::make_exception_ptr<std::future_error>(std::future_error)@Base" 0replaceme
+ (c++)"std::basic_string<char, std::char_traits<char>, std::allocator<char> > std::operator+<char, std::char_traits<char>, std::allocator<char> >(char const*, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
+ (c++)"typeinfo for std::shared_ptr<QJsonDocument> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)@Base" 0replaceme
+ (c++)"typeinfo for std::shared_ptr<QXmlStreamReader> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)@Base" 0replaceme
+ (c++)"typeinfo for core::net::Error@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::qt::XmlAsyncReader@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::qt::HttpAsyncReader@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::qt::JsonAsyncReader@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::utils::qt::XmlAsyncReader@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::utils::qt::HttpAsyncReader@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::utils::qt::JsonAsyncReader@Base" 0replaceme
+ (c++)"typeinfo for std::__future_base::_State_baseV2::_Setter<std::shared_ptr<QJsonDocument>, std::__future_base::_State_baseV2::__exception_ptr_tag>@Base" 0replaceme
+ (c++)"typeinfo for std::__future_base::_State_baseV2::_Setter<std::shared_ptr<QJsonDocument>, std::shared_ptr<QJsonDocument> const&>@Base" 0replaceme
+ (c++)"typeinfo for std::__future_base::_State_baseV2::_Setter<std::shared_ptr<QXmlStreamReader>, std::__future_base::_State_baseV2::__exception_ptr_tag>@Base" 0replaceme
+ (c++)"typeinfo for std::__future_base::_State_baseV2::_Setter<std::shared_ptr<QXmlStreamReader>, std::shared_ptr<QXmlStreamReader> const&>@Base" 0replaceme
+ (c++)"typeinfo for std::__future_base::_State_baseV2@Base" 0replaceme
+ (c++)"typeinfo for std::__future_base::_Result<std::shared_ptr<QJsonDocument> >@Base" 0replaceme
+ (c++)"typeinfo for std::__future_base::_Result<std::shared_ptr<QXmlStreamReader> >@Base" 0replaceme
+ (c++)"typeinfo for std::thread::_Impl_base@Base" 0replaceme
+ (c++)"typeinfo for std::thread::_Impl<std::_Bind_simple<unity::scopes::utils::qt::HttpAsyncReader::Priv::Priv()::{lambda()#1} ()> >@Base" 0replaceme
+ (c++)"typeinfo for std::shared_ptr<QJsonDocument> (*)(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)@Base" 0replaceme
+ (c++)"typeinfo for std::shared_ptr<QXmlStreamReader> (*)(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)@Base" 0replaceme
+ (c++)"typeinfo for std::_Mutex_base<(__gnu_cxx::_Lock_policy)2>@Base" 0replaceme
+ (c++)"typeinfo for std::_Sp_counted_ptr<QJsonDocument*, (__gnu_cxx::_Lock_policy)2>@Base" 0replaceme
+ (c++)"typeinfo for std::_Sp_counted_ptr<QXmlStreamReader*, (__gnu_cxx::_Lock_policy)2>@Base" 0replaceme
+ (c++)"typeinfo for std::_Sp_counted_ptr<unity::scopes::utils::qt::XmlAsyncReader*, (__gnu_cxx::_Lock_policy)2>@Base" 0replaceme
+ (c++)"typeinfo for std::_Sp_counted_ptr<unity::scopes::utils::qt::HttpAsyncReader::Priv*, (__gnu_cxx::_Lock_policy)2>@Base" 0replaceme
+ (c++)"typeinfo for std::_Sp_counted_ptr<unity::scopes::utils::qt::HttpAsyncReader*, (__gnu_cxx::_Lock_policy)2>@Base" 0replaceme
+ (c++)"typeinfo for std::_Sp_counted_ptr<unity::scopes::utils::qt::JsonAsyncReader*, (__gnu_cxx::_Lock_policy)2>@Base" 0replaceme
+ (c++)"typeinfo for std::_Sp_counted_base<(__gnu_cxx::_Lock_policy)2>@Base" 0replaceme
+ (c++)"typeinfo for std::_Weak_result_type<std::_Mem_fn<core::net::http::Request::Progress::Next (unity::scopes::utils::qt::HttpAsyncReader::*)(core::net::http::Request::Progress const&) const> >@Base" 0replaceme
+ (c++)"typeinfo for std::_Sp_make_shared_tag@Base" 0replaceme
+ (c++)"typeinfo for std::_Maybe_get_result_type<true, std::_Mem_fn<core::net::http::Request::Progress::Next (unity::scopes::utils::qt::HttpAsyncReader::*)(core::net::http::Request::Progress const&) const> >@Base" 0replaceme
+ (c++)"typeinfo for std::_Weak_result_type_impl<std::_Mem_fn<core::net::http::Request::Progress::Next (unity::scopes::utils::qt::HttpAsyncReader::*)(core::net::http::Request::Progress const&) const> >@Base" 0replaceme
+ (c++)"typeinfo for std::_Sp_counted_ptr_inplace<std::__future_base::_State_baseV2, std::allocator<std::__future_base::_State_baseV2>, (__gnu_cxx::_Lock_policy)2>@Base" 0replaceme
+ (c++)"typeinfo for std::_Sp_counted_ptr_inplace<std::thread::_Impl<std::_Bind_simple<unity::scopes::utils::qt::HttpAsyncReader::Priv::Priv()::{lambda()#1} ()> >, std::allocator<std::_Bind_simple<unity::scopes::utils::qt::HttpAsyncReader::Priv::Priv()::{lambda()#1} ()> >, (__gnu_cxx::_Lock_policy)2>@Base" 0replaceme
+ (c++)"typeinfo for std::_Sp_counted_ptr_inplace<std::promise<std::shared_ptr<QJsonDocument> >, std::allocator<std::promise<std::shared_ptr<QJsonDocument> > >, (__gnu_cxx::_Lock_policy)2>@Base" 0replaceme
+ (c++)"typeinfo for std::_Sp_counted_ptr_inplace<std::promise<std::shared_ptr<QXmlStreamReader> >, std::allocator<std::promise<std::shared_ptr<QXmlStreamReader> > >, (__gnu_cxx::_Lock_policy)2>@Base" 0replaceme
+ (c++)"typeinfo for std::_Bind<std::_Mem_fn<core::net::http::Request::Progress::Next (unity::scopes::utils::qt::HttpAsyncReader::*)(core::net::http::Request::Progress const&) const> (unity::scopes::utils::qt::HttpAsyncReader const*, std::_Placeholder<1>)>@Base" 0replaceme
+ (c++)"typeinfo for std::future<std::shared_ptr<QJsonDocument> > unity::scopes::utils::qt::HttpAsyncReader::async_get_parser<QJsonDocument>(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::function<std::shared_ptr<QJsonDocument> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)> const&) const::{lambda(core::net::http::Response const&)#2}@Base" 0replaceme
+ (c++)"typeinfo for std::future<std::shared_ptr<QJsonDocument> > unity::scopes::utils::qt::HttpAsyncReader::async_get_parser<QJsonDocument>(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::function<std::shared_ptr<QJsonDocument> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)> const&) const::{lambda(core::net::Error const&)#1}@Base" 0replaceme
+ (c++)"typeinfo for std::future<std::shared_ptr<QXmlStreamReader> > unity::scopes::utils::qt::HttpAsyncReader::async_get_parser<QXmlStreamReader>(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::function<std::shared_ptr<QXmlStreamReader> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)> const&) const::{lambda(core::net::http::Response const&)#2}@Base" 0replaceme
+ (c++)"typeinfo for std::future<std::shared_ptr<QXmlStreamReader> > unity::scopes::utils::qt::HttpAsyncReader::async_get_parser<QXmlStreamReader>(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::function<std::shared_ptr<QXmlStreamReader> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)> const&) const::{lambda(core::net::Error const&)#1}@Base" 0replaceme
+ (c++)"typeinfo name for std::shared_ptr<QJsonDocument> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)@Base" 0replaceme
+ (c++)"typeinfo name for std::shared_ptr<QXmlStreamReader> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)@Base" 0replaceme
+ (c++)"typeinfo name for core::net::Error@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::qt::XmlAsyncReader@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::qt::HttpAsyncReader@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::qt::JsonAsyncReader@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::utils::qt::XmlAsyncReader@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::utils::qt::HttpAsyncReader@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::utils::qt::JsonAsyncReader@Base" 0replaceme
+ (c++)"typeinfo name for std::__future_base::_State_baseV2::_Setter<std::shared_ptr<QJsonDocument>, std::__future_base::_State_baseV2::__exception_ptr_tag>@Base" 0replaceme
+ (c++)"typeinfo name for std::__future_base::_State_baseV2::_Setter<std::shared_ptr<QJsonDocument>, std::shared_ptr<QJsonDocument> const&>@Base" 0replaceme
+ (c++)"typeinfo name for std::__future_base::_State_baseV2::_Setter<std::shared_ptr<QXmlStreamReader>, std::__future_base::_State_baseV2::__exception_ptr_tag>@Base" 0replaceme
+ (c++)"typeinfo name for std::__future_base::_State_baseV2::_Setter<std::shared_ptr<QXmlStreamReader>, std::shared_ptr<QXmlStreamReader> const&>@Base" 0replaceme
+ (c++)"typeinfo name for std::__future_base::_State_baseV2@Base" 0replaceme
+ (c++)"typeinfo name for std::__future_base::_Result<std::shared_ptr<QJsonDocument> >@Base" 0replaceme
+ (c++)"typeinfo name for std::__future_base::_Result<std::shared_ptr<QXmlStreamReader> >@Base" 0replaceme
+ (c++)"typeinfo name for std::thread::_Impl_base@Base" 0replaceme
+ (c++)"typeinfo name for std::thread::_Impl<std::_Bind_simple<unity::scopes::utils::qt::HttpAsyncReader::Priv::Priv()::{lambda()#1} ()> >@Base" 0replaceme
+ (c++)"typeinfo name for std::shared_ptr<QJsonDocument> (*)(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)@Base" 0replaceme
+ (c++)"typeinfo name for std::shared_ptr<QXmlStreamReader> (*)(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)@Base" 0replaceme
+ (c++)"typeinfo name for std::_Mutex_base<(__gnu_cxx::_Lock_policy)2>@Base" 0replaceme
+ (c++)"typeinfo name for std::_Sp_counted_ptr<QJsonDocument*, (__gnu_cxx::_Lock_policy)2>@Base" 0replaceme
+ (c++)"typeinfo name for std::_Sp_counted_ptr<QXmlStreamReader*, (__gnu_cxx::_Lock_policy)2>@Base" 0replaceme
+ (c++)"typeinfo name for std::_Sp_counted_ptr<unity::scopes::utils::qt::XmlAsyncReader*, (__gnu_cxx::_Lock_policy)2>@Base" 0replaceme
+ (c++)"typeinfo name for std::_Sp_counted_ptr<unity::scopes::utils::qt::HttpAsyncReader::Priv*, (__gnu_cxx::_Lock_policy)2>@Base" 0replaceme
+ (c++)"typeinfo name for std::_Sp_counted_ptr<unity::scopes::utils::qt::HttpAsyncReader*, (__gnu_cxx::_Lock_policy)2>@Base" 0replaceme
+ (c++)"typeinfo name for std::_Sp_counted_ptr<unity::scopes::utils::qt::JsonAsyncReader*, (__gnu_cxx::_Lock_policy)2>@Base" 0replaceme
+ (c++)"typeinfo name for std::_Sp_counted_base<(__gnu_cxx::_Lock_policy)2>@Base" 0replaceme
+ (c++)"typeinfo name for std::_Weak_result_type<std::_Mem_fn<core::net::http::Request::Progress::Next (unity::scopes::utils::qt::HttpAsyncReader::*)(core::net::http::Request::Progress const&) const> >@Base" 0replaceme
+ (c++)"typeinfo name for std::_Sp_make_shared_tag@Base" 0replaceme
+ (c++)"typeinfo name for std::_Maybe_get_result_type<true, std::_Mem_fn<core::net::http::Request::Progress::Next (unity::scopes::utils::qt::HttpAsyncReader::*)(core::net::http::Request::Progress const&) const> >@Base" 0replaceme
+ (c++)"typeinfo name for std::_Weak_result_type_impl<std::_Mem_fn<core::net::http::Request::Progress::Next (unity::scopes::utils::qt::HttpAsyncReader::*)(core::net::http::Request::Progress const&) const> >@Base" 0replaceme
+ (c++)"typeinfo name for std::_Sp_counted_ptr_inplace<std::__future_base::_State_baseV2, std::allocator<std::__future_base::_State_baseV2>, (__gnu_cxx::_Lock_policy)2>@Base" 0replaceme
+ (c++)"typeinfo name for std::_Sp_counted_ptr_inplace<std::thread::_Impl<std::_Bind_simple<unity::scopes::utils::qt::HttpAsyncReader::Priv::Priv()::{lambda()#1} ()> >, std::allocator<std::_Bind_simple<unity::scopes::utils::qt::HttpAsyncReader::Priv::Priv()::{lambda()#1} ()> >, (__gnu_cxx::_Lock_policy)2>@Base" 0replaceme
+ (c++)"typeinfo name for std::_Sp_counted_ptr_inplace<std::promise<std::shared_ptr<QJsonDocument> >, std::allocator<std::promise<std::shared_ptr<QJsonDocument> > >, (__gnu_cxx::_Lock_policy)2>@Base" 0replaceme
+ (c++)"typeinfo name for std::_Sp_counted_ptr_inplace<std::promise<std::shared_ptr<QXmlStreamReader> >, std::allocator<std::promise<std::shared_ptr<QXmlStreamReader> > >, (__gnu_cxx::_Lock_policy)2>@Base" 0replaceme
+ (c++)"typeinfo name for std::_Bind<std::_Mem_fn<core::net::http::Request::Progress::Next (unity::scopes::utils::qt::HttpAsyncReader::*)(core::net::http::Request::Progress const&) const> (unity::scopes::utils::qt::HttpAsyncReader const*, std::_Placeholder<1>)>@Base" 0replaceme
+ (c++)"typeinfo name for std::future<std::shared_ptr<QJsonDocument> > unity::scopes::utils::qt::HttpAsyncReader::async_get_parser<QJsonDocument>(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::function<std::shared_ptr<QJsonDocument> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)> const&) const::{lambda(core::net::http::Response const&)#2}@Base" 0replaceme
+ (c++)"typeinfo name for std::future<std::shared_ptr<QJsonDocument> > unity::scopes::utils::qt::HttpAsyncReader::async_get_parser<QJsonDocument>(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::function<std::shared_ptr<QJsonDocument> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)> const&) const::{lambda(core::net::Error const&)#1}@Base" 0replaceme
+ (c++)"typeinfo name for std::future<std::shared_ptr<QXmlStreamReader> > unity::scopes::utils::qt::HttpAsyncReader::async_get_parser<QXmlStreamReader>(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::function<std::shared_ptr<QXmlStreamReader> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)> const&) const::{lambda(core::net::http::Response const&)#2}@Base" 0replaceme
+ (c++)"typeinfo name for std::future<std::shared_ptr<QXmlStreamReader> > unity::scopes::utils::qt::HttpAsyncReader::async_get_parser<QXmlStreamReader>(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::function<std::shared_ptr<QXmlStreamReader> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)> const&) const::{lambda(core::net::Error const&)#1}@Base" 0replaceme
+ (c++)"vtable for core::net::Error@Base" 0replaceme
+ (c++)"vtable for unity::scopes::qt::XmlAsyncReader@Base" 0replaceme
+ (c++)"vtable for unity::scopes::qt::HttpAsyncReader@Base" 0replaceme
+ (c++)"vtable for unity::scopes::qt::JsonAsyncReader@Base" 0replaceme
+ (c++)"vtable for unity::scopes::utils::qt::XmlAsyncReader@Base" 0replaceme
+ (c++)"vtable for unity::scopes::utils::qt::HttpAsyncReader@Base" 0replaceme
+ (c++)"vtable for unity::scopes::utils::qt::JsonAsyncReader@Base" 0replaceme
+ (c++)"vtable for std::__future_base::_State_baseV2@Base" 0replaceme
+ (c++)"vtable for std::__future_base::_Result<std::shared_ptr<QJsonDocument> >@Base" 0replaceme
+ (c++)"vtable for std::__future_base::_Result<std::shared_ptr<QXmlStreamReader> >@Base" 0replaceme
+ (c++)"vtable for std::thread::_Impl_base@Base" 0replaceme
+ (c++)"vtable for std::thread::_Impl<std::_Bind_simple<unity::scopes::utils::qt::HttpAsyncReader::Priv::Priv()::{lambda()#1} ()> >@Base" 0replaceme
+ (c++)"vtable for std::_Sp_counted_ptr<QJsonDocument*, (__gnu_cxx::_Lock_policy)2>@Base" 0replaceme
+ (c++)"vtable for std::_Sp_counted_ptr<QXmlStreamReader*, (__gnu_cxx::_Lock_policy)2>@Base" 0replaceme
+ (c++)"vtable for std::_Sp_counted_ptr<unity::scopes::utils::qt::XmlAsyncReader*, (__gnu_cxx::_Lock_policy)2>@Base" 0replaceme
+ (c++)"vtable for std::_Sp_counted_ptr<unity::scopes::utils::qt::HttpAsyncReader::Priv*, (__gnu_cxx::_Lock_policy)2>@Base" 0replaceme
+ (c++)"vtable for std::_Sp_counted_ptr<unity::scopes::utils::qt::HttpAsyncReader*, (__gnu_cxx::_Lock_policy)2>@Base" 0replaceme
+ (c++)"vtable for std::_Sp_counted_ptr<unity::scopes::utils::qt::JsonAsyncReader*, (__gnu_cxx::_Lock_policy)2>@Base" 0replaceme
+ (c++)"vtable for std::_Sp_counted_base<(__gnu_cxx::_Lock_policy)2>@Base" 0replaceme
+ (c++)"vtable for std::_Sp_counted_ptr_inplace<std::__future_base::_State_baseV2, std::allocator<std::__future_base::_State_baseV2>, (__gnu_cxx::_Lock_policy)2>@Base" 0replaceme
+ (c++)"vtable for std::_Sp_counted_ptr_inplace<std::thread::_Impl<std::_Bind_simple<unity::scopes::utils::qt::HttpAsyncReader::Priv::Priv()::{lambda()#1} ()> >, std::allocator<std::_Bind_simple<unity::scopes::utils::qt::HttpAsyncReader::Priv::Priv()::{lambda()#1} ()> >, (__gnu_cxx::_Lock_policy)2>@Base" 0replaceme
+ (c++)"vtable for std::_Sp_counted_ptr_inplace<std::promise<std::shared_ptr<QJsonDocument> >, std::allocator<std::promise<std::shared_ptr<QJsonDocument> > >, (__gnu_cxx::_Lock_policy)2>@Base" 0replaceme
+ (c++)"vtable for std::_Sp_counted_ptr_inplace<std::promise<std::shared_ptr<QXmlStreamReader> >, std::allocator<std::promise<std::shared_ptr<QXmlStreamReader> > >, (__gnu_cxx::_Lock_policy)2>@Base" 0replaceme
+ (c++)"std::future<std::shared_ptr<QJsonDocument> > unity::scopes::utils::qt::HttpAsyncReader::async_get_parser<QJsonDocument>(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::function<std::shared_ptr<QJsonDocument> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)> const&) const::{lambda(core::net::http::Response const&)#2}::operator()(core::net::http::Response const&) const@Base" 0replaceme
+ (c++)"std::future<std::shared_ptr<QJsonDocument> > unity::scopes::utils::qt::HttpAsyncReader::async_get_parser<QJsonDocument>(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::function<std::shared_ptr<QJsonDocument> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)> const&) const::{lambda(core::net::http::Response const&)#2}::~Response()@Base" 0replaceme
+ (c++)"std::future<std::shared_ptr<QJsonDocument> > unity::scopes::utils::qt::HttpAsyncReader::async_get_parser<QJsonDocument>(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::function<std::shared_ptr<QJsonDocument> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)> const&) const::{lambda(core::net::http::Response const&)#2}::~Response()@Base" 0replaceme
+ (c++)"std::future<std::shared_ptr<QXmlStreamReader> > unity::scopes::utils::qt::HttpAsyncReader::async_get_parser<QXmlStreamReader>(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::function<std::shared_ptr<QXmlStreamReader> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)> const&) const::{lambda(core::net::http::Response const&)#2}::operator()(core::net::http::Response const&) const@Base" 0replaceme
+ (c++)"std::future<std::shared_ptr<QXmlStreamReader> > unity::scopes::utils::qt::HttpAsyncReader::async_get_parser<QXmlStreamReader>(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::function<std::shared_ptr<QXmlStreamReader> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)> const&) const::{lambda(core::net::http::Response const&)#2}::~Response()@Base" 0replaceme
+ (c++)"std::future<std::shared_ptr<QXmlStreamReader> > unity::scopes::utils::qt::HttpAsyncReader::async_get_parser<QXmlStreamReader>(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::function<std::shared_ptr<QXmlStreamReader> (std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)> const&) const::{lambda(core::net::http::Response const&)#2}::~Response()@Base" 0replaceme
