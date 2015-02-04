@@ -111,8 +111,8 @@ TEST(BadUrlException, state)
     XmlAsyncReader reader;
     try
     {
-        auto reader_future = reader.async_get<Client::Result, Client::Result>(
-            "http://ws.audioscrobbler.com/1.0/user/test/recenttracks.ss", "item");
+        auto reader_future =
+            reader.async_get<Client::Result, Client::Result>("http://bad_host_name.com/test.xml", "item");
         // do your stuff
         auto items = HttpAsyncReader::get_or_throw(reader_future);
         FAIL();
@@ -120,7 +120,7 @@ TEST(BadUrlException, state)
     catch (unity::LogicException& e)
     {
         std::string error_msg = e.what();
-        EXPECT_EQ(error_msg.find("<title>404 Not Found</title>") != std::string::npos, true);
+        EXPECT_EQ(error_msg.find("Couldn't resolve host name") != std::string::npos, true);
     }
     catch (...)
     {
