@@ -360,10 +360,7 @@ void SearchReplyImpl::push_surfacing_results_from_cache() noexcept
         for (auto const& r : result_array)
         {
             VariantMap dict = r.get_dict();
-            string const cat_id = dict.at("internal").get_dict().at("cat_id").get_string();
-            auto cat = lookup_category(cat_id);
-            auto crip = new CategorisedResultImpl(move(cat), move(dict));
-            auto cr = CategorisedResult(crip);
+            auto cr = CategorisedResult(new CategorisedResultImpl(*cat_registry_, dict));
             push(cr);
         }
     }
