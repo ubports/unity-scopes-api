@@ -53,6 +53,12 @@ private:
     virtual void preview_(Current const& current,
                           capnp::AnyPointer::Reader& in_params,
                           capnproto::Response::Builder& r);
+    virtual void child_scopes_ordered_(Current const& current,
+                          capnp::AnyPointer::Reader& in_params,
+                          capnproto::Response::Builder& r);
+    virtual void set_child_scopes_ordered_(Current const& current,
+                          capnp::AnyPointer::Reader& in_params,
+                          capnproto::Response::Builder& r);
     virtual void debug_mode_(Current const& current,
                              capnp::AnyPointer::Reader& in_params,
                              capnproto::Response::Builder& r);

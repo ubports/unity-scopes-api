@@ -64,7 +64,7 @@ struct RemoteScope
     std::shared_ptr<bool> needs_location_data;  // optional
     bool invisible = false;
     int version;
-    std::vector<std::string> keywords;          // optional
+    std::set<std::string> keywords;             // optional
 };
 
 struct SearchCategory
@@ -229,7 +229,6 @@ private:
 
     HttpClientInterface::SPtr http_client_;
     JsonNodeInterface::SPtr json_node_;
-    RuntimeImpl* runtime_;
     boost::log::sources::severity_channel_logger_mt<>& logger_;
     std::string url_;
 

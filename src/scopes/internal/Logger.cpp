@@ -51,7 +51,7 @@ namespace
 
 static array<string, Logger::LastChannelEnum_> const channel_names =
     {
-        "IPC"
+        { "IPC" }
     };
 
 string const& to_severity(int s)
@@ -119,7 +119,7 @@ Logger::~Logger()
     }
 }
 
-Logger::operator src::severity_channel_logger_mt<>&()
+Logger::operator boost::log::sources::severity_channel_logger_mt<>&()
 {
     return logger_;  // No lock needed, immutable
 }
@@ -180,7 +180,22 @@ void Logger::set_log_file(string const& path, int rotation_size, int dir_size)
     string parent = boost::filesystem::path(path).parent_path().native();
     s->locked_backend()->set_file_collector(sinks::file::make_collector(keywords::target = parent,
                                                                         keywords::max_size = dir_size));
-    s->locked_backend()->scan_for_files();
+    try
+    {
+        s->locked_backend()->scan_for_files();
+    }
+    catch (std::exception const& e)
+    {
+        BOOST_LOG_SEV(logger_, Warning)
+            << "RuntimeImpl::Logger(): log rotation failed (path = " << parent << "): " << e.what();
+        return;
+    }
+    catch (...)
+    {
+        BOOST_LOG_SEV(logger_, Warning)
+            << "RuntimeImpl::Logger(): log rotation failed (path = " << parent << "): unknown exception";
+        return;
+    }
 
     {
         lock_guard<mutex> lock(mutex_);

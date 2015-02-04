@@ -1,6 +1,31 @@
 Release notes
 =============
 
+Changes in version 0.6.13
+=========================
+  - Return keywords as a set rather than a vector.
+
+Changes in version 0.6.12
+=========================
+  - Introduced child_scopes() methods for aggregators to return their
+    list of child scopes at runtime.
+  - Added missing virtual destructor to AbstractScopeBase. (LP: #1360266)
+  - Removed deprecated Runtime::run_scope() method.
+  - Prevent query from looping indefinitely if a query is forwarded
+    among aggregators and loops back to an earlier aggregator.
+
+Changes in version 0.6.11
+=========================
+  - The JSON for a CategoryRenderer now supports a "fallback" field in the
+    "art" and "mascot" entries of the "components" dictionary.
+    This allows a scope to specify a category-specific
+    fallback image in case the artwork for a result cannot be retrieved.
+
+  - PreviewWidget now supports a "fallback" field for the "image",
+    "gallery", and "header" widget types. This allows the scope
+    to specify a fallback image in case the artwork for a widget
+    cannot be retrieved.
+
 Changes in version 0.6.10
 =========================
   - Renamed "Tags" scope .ini option to "Keywords".

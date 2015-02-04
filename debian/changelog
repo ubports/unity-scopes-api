@@ -1,3 +1,100 @@
+unity-scopes-api (0.6.13+15.04.20150130-0ubuntu1) vivid; urgency=medium
+
+  [ Marcus Tomlinson ]
+  * Return keywords as a set rather than a vector.
+
+  [ Ubuntu daily release ]
+  * debian/libunity-scopes3.symbols: auto-update to released version
+
+  [ Michi Henning ]
+  * Removed a bunch of noise that was logged by the registry if the
+    scope installation dirs contained unexpected files or files without
+    permission. Simplified FindFiles.cpp by using boost::filesystem
+    instead of dirent.
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Fri, 30 Jan 2015 12:34:42 +0000
+
+unity-scopes-api (0.6.12+15.04.20150127.2-0ubuntu1) vivid; urgency=medium
+
+  [ Marcus Tomlinson ]
+  * Introduced child_scopes() methods for aggregators to return their
+    list of child scopes at runtime.
+  * Added missing virtual destructor to AbstractScopeBase. (LP: #1360266)
+  * Removed deprecated Runtime::run_scope() method.
+  * Prevent query from looping indefinitely if a query is forwarded
+    among aggregators and loops back to an earlier aggregator.
+
+  [ Ubuntu daily release ]
+  * debian/libunity-scopes3.symbols: auto-update to released version
+  * New rebuild forced
+
+  [ Michi Henning ]
+  * Fixed memory leak in BufferedResultForwarder. Fixed a bunch of
+    warnings for clang build. Minor updates to HACKING.
+  * Fixed coverage build.
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Tue, 27 Jan 2015 09:38:46 +0000
+
+unity-scopes-api (0.6.11+15.04.20150126-0ubuntu1) vivid; urgency=low
+
+  [ Marcus Tomlinson ]
+  * Embed scope ID into the OA details of a log-in item (LP: #1414560)
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Mon, 26 Jan 2015 09:01:09 +0000
+
+unity-scopes-api (0.6.11+15.04.20150121.2-0ubuntu1) vivid; urgency=low
+
+  [ Ubuntu daily release ]
+  * debian/libunity-scopes3.symbols: auto-update to released version
+
+  [ thomas-voss ]
+  * Switch from QNetwork to net-cpp (LP: #1326816, #1409995)
+
+  [ Michał Sawicz ]
+  * Depend on :native version of g++ to allow cross-compiling to work.
+    Also run `wrap-and-sort -at` (LP: #1353855)
+
+  [ Marcus Tomlinson ]
+  * Switch from QNetwork to net-cpp (LP: #1326816, #1409995)
+
+  [ Michi Henning ]
+  * Added utility subdir to header tests.
+  * Bunch of miscellaneous fixes:
+    - Added warning for non-virtual destructors.
+    - Warnings will disappear once Marcus's child_scopes branch is merged.
+    - Tidied up the way compiler flags are set in CMakeLists.txt for clarity.
+    - Added missing dependencies to demos, so we can't run with an out-of-date registry or scoperunner.
+    - Fixed a number of warnings when building the developer doc.
+    - Minor doc fixes.
+    - Minor stylistic code fixes.
+    - Added missing tmp_dir_initialized_ initializer to ScopeBaseImpl.
+    - Removed redundant lock in QueryCtrlImpl constructor.
+
+  [ James Henstridge ]
+  * Expose the deserialize() static method on FilterBase and FilterState
+    for use by the Go bindings.
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Wed, 21 Jan 2015 12:46:41 +0000
+
+unity-scopes-api (0.6.11+15.04.20150119-0ubuntu1) vivid; urgency=medium
+
+  [ Michi Henning ]
+  * The JSON for a CategoryRenderer now supports a "fallback" field in the
+    "art" and "mascot" entries of the "components" dictionary.
+    This allows a scope to specify a category-specific
+    fallback image in case the artwork for a result cannot be retrieved.
+
+  * PreviewWidget now supports a "fallback" field for the "image",
+    "gallery", and "header" widget types. This allows the scope
+    to specify a fallback image in case the artwork for a widget
+    cannot be retrieved.
+  * Documented missing config settings. (LP: #1398729)
+
+  [ Ubuntu daily release ]
+  * debian/libunity-scopes3.symbols: auto-update to released version
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Mon, 19 Jan 2015 08:09:11 +0000
+
 unity-scopes-api (0.6.11-0ubuntu1) UNRELEASED; urgency=medium
 
   * Improved logging internals.

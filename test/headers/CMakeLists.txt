@@ -7,6 +7,7 @@ set(root_inc_dir ${CMAKE_SOURCE_DIR}/include)
 set(subdirs
     unity/scopes
     unity/scopes/testing
+    unity/scopes/utility
 )
 foreach(dir ${OTHER_INCLUDE_DIRS})
     set(other_inc_dirs "${other_inc_dirs} -I${dir}")

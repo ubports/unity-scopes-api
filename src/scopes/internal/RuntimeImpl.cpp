@@ -18,6 +18,7 @@
 
 #include <unity/scopes/internal/RuntimeImpl.h>
 
+#include <unity/scopes/internal/ChildScopesRepository.h>
 #include <unity/scopes/internal/DfltConfig.h>
 #include <unity/scopes/internal/Logger.h>
 #include <unity/scopes/internal/MWStateReceiver.h>
@@ -100,7 +101,6 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
                                   config.max_log_file_size(),
                                   config.max_log_dir_size());
         }
-            BOOST_LOG_SEV(logger(), Logger::Info) << "BLAH";
 
         string default_middleware = config.default_middleware();
         string middleware_configfile = config.default_middleware_configfile();
@@ -389,6 +389,12 @@ void RuntimeImpl::run_scope(ScopeBase* scope_base,
         {
             scope_base->p->set_settings_db(nullptr);
         }
+
+        // Configure the child scopes repository
+        string child_scopes_repo = config_dir + "/child-scopes.json";
+
+        auto repo = make_shared<ChildScopesRepository>(child_scopes_repo, logger());
+        scope_base->p->set_child_scopes_repo(repo);
     }
 
     scope_base->p->set_registry(registry_);
@@ -601,7 +607,6 @@ string RuntimeImpl::find_log_dir(string const& id) const
     dir += "/" + demangled_id(id);
     !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700);
     dir += "/logs";
-    cerr << "Creating " << dir << endl;
     !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700);
 
     return dir;

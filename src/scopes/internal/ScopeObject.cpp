@@ -27,6 +27,8 @@
 #include <unity/scopes/internal/QueryObject.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/ScopeBaseImpl.h>
+#include <unity/scopes/internal/SearchMetadataImpl.h>
+#include <unity/scopes/internal/SearchQueryBaseImpl.h>
 #include <unity/scopes/ScopeBase.h>
 #include <unity/UnityExceptions.h>
 
@@ -145,13 +147,44 @@ MWQueryCtrlProxy ScopeObject::query(MWReplyProxy const& reply, MiddlewareBase* m
 
 MWQueryCtrlProxy ScopeObject::search(CannedQuery const& q,
                                      SearchMetadata const& hints,
+                                     VariantMap const& context,
                                      MWReplyProxy const& reply,
                                      InvokeInfo const& info)
 {
     return query(reply, info.mw,
-            [&q, &hints, this]() -> SearchQueryBase::UPtr {
+            [&q, &hints, &context, this]() -> SearchQueryBase::UPtr {
                  auto search_query = this->scope_base_->search(q, hints);
                  search_query->set_department_id(q.department_id());
+
+                 auto sqb = dynamic_cast<SearchQueryBaseImpl*>(search_query->fwd());
+                 assert(sqb);
+
+                 // Set client ID and history that we received in the SearchQueryBase
+                 // for loop detection.
+                 auto const c_it = context.find("client_id");
+                 if (c_it != context.end())
+                 {
+                     string client_id;
+                     client_id = c_it->second.get_string();
+                     sqb->set_client_id(client_id);
+                 }
+
+                 auto const h_it = context.find("history");
+                 if (h_it != context.end())
+                 {
+                    auto const hlist = h_it->second.get_array();
+                    SearchQueryBaseImpl::History history;
+                    for (auto const& t : hlist)
+                    {
+                        string client_id = t.get_dict()["c"].get_string();
+                        string agg = t.get_dict()["a"].get_string();
+                        string recv = t.get_dict()["r"].get_string();
+                        SearchQueryBaseImpl::HistoryData hd = make_tuple(client_id, agg, recv);
+                        history.push_back(hd);
+                    }
+                    sqb->set_history(history);
+                 }
+
                  return search_query;
             },
             [&reply, &hints, this](QueryBase::SPtr query_base, MWQueryCtrlProxy ctrl_proxy) -> QueryObjectBase::SPtr {
@@ -211,6 +244,16 @@ MWQueryCtrlProxy ScopeObject::preview(Result const& result,
                 return make_shared<PreviewQueryObject>(preview_query, reply, ctrl_proxy);
             }
     );
+}
+
+ChildScopeList ScopeObject::child_scopes_ordered() const
+{
+    return scope_base_->child_scopes_ordered();
+}
+
+bool ScopeObject::set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered)
+{
+    return scope_base_->p->set_child_scopes_ordered(child_scopes_ordered);
 }
 
 bool ScopeObject::debug_mode() const

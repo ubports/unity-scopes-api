@@ -129,6 +129,10 @@ BufferedResultForwarder::BufferedResultForwarder(unity::scopes::SearchReplyProxy
 {
 }
 
+/// @cond
+BufferedResultForwarder::~BufferedResultForwarder() = default;
+/// @endcond
+
 bool BufferedResultForwarder::is_ready() const
 {
     return p->is_ready();

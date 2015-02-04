@@ -160,24 +160,27 @@ ZmqMiddleware::~ZmqMiddleware()
         // Until we figure out what's going on here, we measure
         // how long it takes and print a warning if it takes
         // longer than 100 ms.
+        //
+        // Update: This happens only when build nodes on
+        // Jenkins are ridiculously slow. Leaving the
+        // diagnostic in place for the time being, which
+        // helps with realizing when something isn't working
+        // right on Jenkins.
         auto start_time = chrono::system_clock::now();
         context_.terminate();
         auto end_time = chrono::system_clock::now();
         auto millisecs = chrono::duration_cast<chrono::milliseconds>(end_time - start_time).count();
         if (millisecs > 100)
         {
-            BOOST_LOG(logger_)
-                << "warning: ~ZmqMiddleware(): context_.terminate() took " << millisecs
-                << " ms to complete for " << server_name_;
+            cerr << "warning: ~ZmqMiddleware(): context_.terminate() took " << millisecs
+                 << " ms to complete for " << server_name_ << endl;
         }
-    }
-    catch (std::exception const& e)
-    {
-        BOOST_LOG(logger_) << "~ZmqMiddleware(): " << e.what();
     }
     catch (...)
     {
-        BOOST_LOG(logger_) << "~ZmqMiddleware(): unknown exception";
+        // Don't log here. RuntimeImpl does that after calling wait_for_shutdown().
+        // We may no longer have a logger here if something holds the middleware
+        // in scope beyond the life time of the runtime.
     }
 }
 
