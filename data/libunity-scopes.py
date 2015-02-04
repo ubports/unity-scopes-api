@@ -31,7 +31,8 @@ from apport.packaging_impl import impl as packaging
 # map 'name' from click package manifest to LP project (if known)
 click_name_to_src = {
     'com.ubuntu.scopes.youtube': 'unity-scope-youtube',
-    'com.ubuntu.scopes.vimeo': 'unity-scope-vimeo'
+    'com.ubuntu.scopes.vimeo': 'unity-scope-vimeo',
+    'com.ubuntu.scopes.soundcloud': 'unity-scope-soundcloud'
 }
 
 def get_scope_display_name(ini_file_path):
