@@ -165,7 +165,7 @@ TEST(ScopeMetadataImpl, basic)
     mi2->set_settings_definitions(va);
     mi2->set_location_data_needed(true);
     mi2->set_child_scope_ids(vector<string>{"abc", "def"});
-    mi2->set_keywords(vector<string>{"music", "video", "news"});
+    mi2->set_keywords(set<string>{"music", "video", "news"});
     mi2->set_is_aggregator(true);
 
     // Make another copy, so we get coverage on the entire copy constructor
@@ -180,7 +180,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ(va, m.settings_definitions());
     EXPECT_TRUE(m.location_data_needed());
     EXPECT_EQ((vector<string>{"abc", "def"}), m.child_scope_ids());
-    EXPECT_EQ((vector<string>{"music", "video", "news"}), m.keywords());
+    EXPECT_EQ((set<string>{"music", "video", "news"}), m.keywords());
     EXPECT_TRUE(m.is_aggregator());
 
     // Make another value
@@ -205,7 +205,7 @@ TEST(ScopeMetadataImpl, basic)
     ti->set_settings_definitions(tmp_va);
     ti->set_location_data_needed(true);
     ti->set_child_scope_ids(vector<string>{"tmp abc", "tmp def"});
-    ti->set_keywords(vector<string>{"music", "video"});
+    ti->set_keywords(set<string>{"music", "video"});
     ti->set_is_aggregator(true);
 
     // Check impl assignment operator
@@ -229,7 +229,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_TRUE(ci.location_data_needed());
     EXPECT_EQ((vector<string>{"tmp abc", "tmp def"}), ci.child_scope_ids());
     EXPECT_EQ(99, ci.version());
-    EXPECT_EQ((vector<string>{"music", "video"}), ci.keywords());
+    EXPECT_EQ((set<string>{"music", "video"}), ci.keywords());
     EXPECT_TRUE(ci.is_aggregator());
 
     // Check public assignment operator
@@ -253,7 +253,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ(tmp_va, m.settings_definitions());
     EXPECT_TRUE(m.location_data_needed());
     EXPECT_EQ((vector<string>{"tmp abc", "tmp def"}), m.child_scope_ids());
-    EXPECT_EQ((vector<string>{"music", "video"}), m.keywords());
+    EXPECT_EQ((set<string>{"music", "video"}), m.keywords());
     EXPECT_TRUE(m.is_aggregator());
 
     // Self-assignment
@@ -276,7 +276,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ(tmp_va, tmp.settings_definitions());
     EXPECT_TRUE(tmp.location_data_needed());
     EXPECT_EQ((vector<string>{"tmp abc", "tmp def"}), tmp.child_scope_ids());
-    EXPECT_EQ((vector<string>{"music", "video"}), tmp.keywords());
+    EXPECT_EQ((set<string>{"music", "video"}), tmp.keywords());
     EXPECT_TRUE(tmp.is_aggregator());
 
     // Copy constructor
@@ -299,7 +299,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ(tmp_va, tmp2.settings_definitions());
     EXPECT_TRUE(tmp2.location_data_needed());
     EXPECT_EQ((vector<string>{"tmp abc", "tmp def"}), tmp2.child_scope_ids());
-    EXPECT_EQ((vector<string>{"music", "video"}), tmp2.keywords());
+    EXPECT_EQ((set<string>{"music", "video"}), tmp2.keywords());
     EXPECT_TRUE(tmp2.is_aggregator());
 }
 
@@ -360,8 +360,8 @@ TEST(ScopeMetadataImpl, serialize)
     EXPECT_EQ("com.foo.bar", var["child_scopes"].get_array()[0].get_string());
     EXPECT_EQ("com.foo.baz", var["child_scopes"].get_array()[1].get_string());
     EXPECT_EQ(2u, var["keywords"].get_array().size());
-    EXPECT_EQ("news", var["keywords"].get_array()[0].get_string());
-    EXPECT_EQ("games", var["keywords"].get_array()[1].get_string());
+    EXPECT_EQ("games", var["keywords"].get_array()[0].get_string());
+    EXPECT_EQ("news", var["keywords"].get_array()[1].get_string());
     EXPECT_FALSE(var["is_aggregator"].get_bool());
 
     // Make another instance from the VariantMap and check its fields
@@ -388,8 +388,8 @@ TEST(ScopeMetadataImpl, serialize)
     EXPECT_EQ("com.foo.bar", c.child_scope_ids()[0]);
     EXPECT_EQ("com.foo.baz", c.child_scope_ids()[1]);
     EXPECT_EQ(2u, c.keywords().size());
-    EXPECT_EQ("news", c.keywords()[0]);
-    EXPECT_EQ("games", c.keywords()[1]);
+    EXPECT_NE(c.keywords().end(), c.keywords().find("news"));
+    EXPECT_NE(c.keywords().end(), c.keywords().find("games"));
     EXPECT_FALSE(c.is_aggregator());
 }
 

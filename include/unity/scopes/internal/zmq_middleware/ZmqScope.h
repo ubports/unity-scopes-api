@@ -45,8 +45,9 @@ public:
     virtual ~ZmqScope();
 
     virtual QueryCtrlProxy search(CannedQuery const& query,
-                                        VariantMap const& hints,
-                                        MWReplyProxy const& reply) override;
+                                  VariantMap const& hints,
+                                  VariantMap const& context,
+                                  MWReplyProxy const& reply) override;
 
     virtual QueryCtrlProxy activate(VariantMap const& result,
                                     VariantMap const& hints,
@@ -61,6 +62,9 @@ public:
     virtual QueryCtrlProxy preview(VariantMap const& result,
                                    VariantMap const& hints,
                                    MWReplyProxy const& reply) override;
+
+    virtual ChildScopeList child_scopes_ordered() override;
+    virtual bool set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered) override;
 
     virtual bool debug_mode() override;
 

@@ -52,9 +52,10 @@ public:
 
     // Remote operation implementations
     MWQueryCtrlProxy search(CannedQuery const& q,
-                                  SearchMetadata const& hints,
-                                  MWReplyProxy const& reply,
-                                  InvokeInfo const& info) override;
+                            SearchMetadata const& hints,
+                            VariantMap const& context,
+                            MWReplyProxy const& reply,
+                            InvokeInfo const& info) override;
 
     MWQueryCtrlProxy activate(Result const& result,
                               ActionMetadata const& hints,
@@ -72,6 +73,9 @@ public:
                              ActionMetadata const& hints,
                              MWReplyProxy const& reply,
                              InvokeInfo const& info) override;
+
+    ChildScopeList child_scopes_ordered() const override;
+    bool set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered) override;
 
     bool debug_mode() const override;
 

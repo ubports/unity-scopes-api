@@ -313,12 +313,14 @@ TEST_F(OnlineAccountClientTest, register_account_login_result)
 
     VariantMap details = result.value("online_account_details").get_dict();
 
+    EXPECT_NE(details.end(), details.find("scope_id"));
     EXPECT_NE(details.end(), details.find("service_name"));
     EXPECT_NE(details.end(), details.find("service_type"));
     EXPECT_NE(details.end(), details.find("provider_name"));
     EXPECT_NE(details.end(), details.find("login_passed_action"));
     EXPECT_NE(details.end(), details.find("login_failed_action"));
 
+    EXPECT_EQ("test", details.at("scope_id").get_string());
     EXPECT_EQ("test_service_name", details.at("service_name").get_string());
     EXPECT_EQ("test_service_type", details.at("service_type").get_string());
     EXPECT_EQ("test_provider", details.at("provider_name").get_string());
@@ -340,12 +342,14 @@ TEST_F(OnlineAccountClientTest, register_account_login_widget)
 
     VariantMap details = values.at("online_account_details").get_dict();
 
+    EXPECT_NE(details.end(), details.find("scope_id"));
     EXPECT_NE(details.end(), details.find("service_name"));
     EXPECT_NE(details.end(), details.find("service_type"));
     EXPECT_NE(details.end(), details.find("provider_name"));
     EXPECT_NE(details.end(), details.find("login_passed_action"));
     EXPECT_NE(details.end(), details.find("login_failed_action"));
 
+    EXPECT_EQ("", details.at("scope_id").get_string());
     EXPECT_EQ("test_service_name", details.at("service_name").get_string());
     EXPECT_EQ("test_service_type", details.at("service_type").get_string());
     EXPECT_EQ("test_provider", details.at("provider_name").get_string());

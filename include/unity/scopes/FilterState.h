@@ -51,6 +51,7 @@ public:
 
     ~FilterState();
     VariantMap serialize() const;
+    static FilterState deserialize(VariantMap const& var);
     /// @endcond
 
     /**

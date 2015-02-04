@@ -157,7 +157,7 @@ int ScopeMetadata::version() const
     return p->version();
 }
 
-std::vector<std::string> ScopeMetadata::keywords() const
+std::set<std::string> ScopeMetadata::keywords() const
 {
     return p->keywords();
 }
