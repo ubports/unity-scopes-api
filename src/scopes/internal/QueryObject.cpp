@@ -171,12 +171,19 @@ void QueryObject::cancel(InvokeInfo const& info)
     catch (std::exception const& e)
     {
         BOOST_LOG(info.mw->runtime()->logger()) << "QueryBase::cancelled(): " << e.what();
-        reply_->finished(CompletionDetails(CompletionDetails::Error, string("QueryBase::cancelled(): ") + e.what()));
+        // Deliberately no error completion here. On the client side, we short-cut the cancelled()
+        // callback locally, which unregisters the servant for the cancel message and assumes that
+        // cancellation will work, passing a Cancelled status, even if cancellation throws in the scope.
+        // But, removing the servant may be slow, allowing the finished message below to occasionally
+        // reach the client. If it does, we want the same completion status that we get if the
+        // local short-cut call hasn't done the job yet.
+        reply_->finished(CompletionDetails(CompletionDetails::Cancelled, ""));
     }
     catch (...)
     {
         BOOST_LOG(info.mw->runtime()->logger()) << "QueryBase::cancelled(): unknown exception";
-        reply_->finished(CompletionDetails(CompletionDetails::Error, "QueryBase::cancelled(): unknown exception"));
+        // Same caveat as for std::exception here.
+        reply_->finished(CompletionDetails(CompletionDetails::Cancelled, ""));
     }
 }
 

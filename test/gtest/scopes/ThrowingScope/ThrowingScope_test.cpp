@@ -69,6 +69,7 @@ public:
 
         return completion_status_;
     }
+
     string completion_msg()
     {
         lock_guard<mutex> lock(mutex_);
@@ -124,6 +125,7 @@ public:
 
         return completion_status_;
     }
+
     string completion_msg()
     {
         lock_guard<mutex> lock(mutex_);
@@ -190,6 +192,7 @@ public:
 
         return completion_status_;
     }
+
     string completion_msg()
     {
         lock_guard<mutex> lock(mutex_);

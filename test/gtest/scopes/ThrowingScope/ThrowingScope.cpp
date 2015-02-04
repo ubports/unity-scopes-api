@@ -28,6 +28,7 @@
 
 #include <condition_variable>
 #include <mutex>
+#include <thread>
 
 using namespace std;
 using namespace unity;
@@ -81,6 +82,13 @@ public:
         {
             reply->push(res);
         }
+        // Need to wait a while here, to make sure that the exception thrown from cancelled()
+        // is picked up by the runtime and the cancelled message is sent back to the client.
+        // If we don't do this, a successful completion message will be sent as soon as
+        // we return from here, and that might happen before the runtime has managed to send the
+        // cancelled message, causing the test to fail because then we see successful
+        // completion instead of cancelled completion.
+        this_thread::sleep_for(chrono::milliseconds(200));
     }
 
 private:
@@ -121,7 +129,13 @@ public:
         {
             unique_lock<mutex> lock(mutex_);
             cond_.wait(lock, [this] { return this->preview_cancelled_; });
-            return;
+            // Need to wait a while here, to make sure that the exception thrown from cancelled()
+            // is picked up by the runtime and the cancelled message is sent back to the client.
+            // If we don't do this, a successful completion message will be sent as soon as
+            // we return from here, and that might happen before the runtime has managed to send the
+            // cancelled message, causing the test to fail because then we see successful
+            // completion instead of cancelled completion.
+            this_thread::sleep_for(chrono::milliseconds(200));
         }
     }
 
@@ -163,6 +177,13 @@ public:
         {
             unique_lock<mutex> lock(mutex_);
             cond_.wait(lock, [this] { return this->activate_cancelled_; });
+            // Need to wait a while here, to make sure that the exception thrown from cancelled()
+            // is picked up by the runtime and the cancelled message is sent back to the client.
+            // If we don't do this, a successful completion message will be sent as soon as
+            // we return from here, and that might happen before the runtime has managed to send the
+            // cancelled message, causing the test to fail because then we see successful
+            // completion instead of cancelled completion.
+            this_thread::sleep_for(chrono::milliseconds(200));
         }
         return ActivationResponse(ActivationResponse::NotHandled);
     }
