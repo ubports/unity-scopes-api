@@ -14,6 +14,10 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/smart-scopes-proxy.conf DESTINATION ${
 configure_file(scope-registry.conf.in scope-registry.conf @ONLY)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/scope-registry.conf DESTINATION ${CMAKE_INSTALL_DATADIR}/upstart/sessions)
 
+# apport package hook
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libunity-scopes.py libunity-scopes${UNITY_SCOPES_SOVERSION}.py COPYONLY)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libunity-scopes${UNITY_SCOPES_SOVERSION}.py DESTINATION /usr/share/apport/package-hooks)
+
 # Empty directory for scopes to put their conf files into
 # If we start install our own conf files here, this can be
 # removed (installing files implicitly creates the subdirs)
