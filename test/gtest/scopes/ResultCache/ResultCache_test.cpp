@@ -20,6 +20,7 @@
 #include <unity/scopes/internal/RegistryObject.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/ScopeImpl.h>
+#include <unity/scopes/OptionSelectorFilter.h>
 
 #include <boost/filesystem.hpp>
 #include <gtest/gtest.h>
@@ -42,6 +43,13 @@ public:
     {
         lock_guard<mutex> lock(mutex_);
         dept_ = parent;
+    }
+
+    virtual void push(Filters const& filters, FilterState const& filter_state) override
+    {
+        lock_guard<mutex> lock(mutex_);
+        filters_ = filters;
+        filter_state_ = filter_state;
     }
 
     virtual void push(CategorisedResult result) override
@@ -71,6 +79,18 @@ public:
         return dept_;
     }
 
+    Filters filters() const
+    {
+        lock_guard<mutex> lock(mutex_);
+        return filters_;
+    }
+
+    FilterState filter_state() const
+    {
+        lock_guard<mutex> lock(mutex_);
+        return filter_state_;
+    }
+
     CategorisedResult::SCPtr result() const
     {
         lock_guard<mutex> lock(mutex_);
@@ -79,6 +99,8 @@ public:
 
 private:
     Department::SCPtr dept_;
+    Filters filters_;
+    FilterState filter_state_;
     CategorisedResult::SCPtr result_;
     bool query_complete_;
     mutable mutex mutex_;
@@ -162,6 +184,7 @@ TEST_F(CacheScopeTest, surfacing_query)
     // Empty query, so there must be a cache file.
     boost::system::error_code ec;
     EXPECT_TRUE(boost::filesystem::exists(TEST_RUNTIME_PATH "/unconfined/CacheScope/.surfacing_cache", ec));
+    system("cat " TEST_RUNTIME_PATH "/unconfined/CacheScope/.surfacing_cache");
 }
 
 // Run another non-surfacing query before checking that the cache contains the
@@ -197,6 +220,16 @@ TEST_F(CacheScopeTest, push_from_cache)
     EXPECT_EQ(d->id(), "");
     auto sd = *d->subdepartments().begin();
     EXPECT_EQ(sd->id(), "sub");
+    auto filters = receiver->filters();
+    ASSERT_EQ(1, filters.size());
+    auto f = *filters.begin();
+    EXPECT_EQ("option_selector", f->filter_type());
+    auto osf = dynamic_pointer_cast<OptionSelectorFilter const>(f);
+    ASSERT_TRUE(osf != nullptr);
+    EXPECT_EQ("Choose an option", osf->label());
+    auto fs = receiver->filter_state();
+    EXPECT_TRUE(fs.has_filter("f1"));
+    EXPECT_TRUE(osf->has_active_option(fs));
 
     // Cache file must still be there.
     boost::system::error_code ec;
@@ -240,6 +273,16 @@ TEST_F(CacheScopeTest, surfacing_query_2)
     EXPECT_EQ(d->id(), "");
     auto sd = *d->subdepartments().begin();
     EXPECT_EQ(sd->id(), "sub");
+    auto filters = receiver->filters();
+    ASSERT_EQ(1, filters.size());
+    auto f = *filters.begin();
+    EXPECT_EQ("option_selector", f->filter_type());
+    auto osf = dynamic_pointer_cast<OptionSelectorFilter const>(f);
+    ASSERT_TRUE(osf != nullptr);
+    EXPECT_EQ("Choose an option", osf->label());
+    auto fs = receiver->filter_state();
+    EXPECT_TRUE(fs.has_filter("f1"));
+    EXPECT_TRUE(osf->has_active_option(fs));
 
     // New cache file must have been created
     boost::system::error_code ec;
@@ -283,6 +326,34 @@ TEST_F(CacheScopeTest, missing_categories)
 {
     // Get coverage on missing categories entry
     system("cp " TEST_SOURCE_PATH "/no_cat_cache " TEST_RUNTIME_PATH "/unconfined/CacheScope/.surfacing_cache");
+    auto receiver = make_shared<Receiver>();
+    scope()->search("", SearchMetadata("unused", "unused"), receiver);
+    receiver->wait_until_finished();
+    EXPECT_EQ(receiver->result(), nullptr);
+
+    // Cache file must still be there, but decode will have failed.
+    boost::system::error_code ec;
+    EXPECT_TRUE(boost::filesystem::exists(TEST_RUNTIME_PATH "/unconfined/CacheScope/.surfacing_cache", ec));
+}
+
+TEST_F(CacheScopeTest, missing_filters)
+{
+    // Get coverage on missing filters entry
+    system("cp " TEST_SOURCE_PATH "/no_filters_cache " TEST_RUNTIME_PATH "/unconfined/CacheScope/.surfacing_cache");
+    auto receiver = make_shared<Receiver>();
+    scope()->search("", SearchMetadata("unused", "unused"), receiver);
+    receiver->wait_until_finished();
+    EXPECT_EQ(receiver->result(), nullptr);
+
+    // Cache file must still be there, but decode will have failed.
+    boost::system::error_code ec;
+    EXPECT_TRUE(boost::filesystem::exists(TEST_RUNTIME_PATH "/unconfined/CacheScope/.surfacing_cache", ec));
+}
+
+TEST_F(CacheScopeTest, missing_filter_state)
+{
+    // Get coverage on missing filters_state entry
+    system("cp " TEST_SOURCE_PATH "/no_filter_state_cache " TEST_RUNTIME_PATH "/unconfined/CacheScope/.surfacing_cache");
     auto receiver = make_shared<Receiver>();
     scope()->search("", SearchMetadata("unused", "unused"), receiver);
     receiver->wait_until_finished();

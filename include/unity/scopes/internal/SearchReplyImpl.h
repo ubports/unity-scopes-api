@@ -92,8 +92,10 @@ private:
     std::string query_string_;
     std::string current_department_;
 
-    std::vector<unity::scopes::CategorisedResult> cached_results_;
     Department::SCPtr cached_departments_;
+    unity::scopes::Filters cached_filters_;
+    unity::scopes::FilterState cached_filter_state_;
+    std::vector<unity::scopes::CategorisedResult> cached_results_;
     std::mutex mutex_;
 };
 

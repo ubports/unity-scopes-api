@@ -23,6 +23,7 @@
 #include <unity/scopes/internal/CategorisedResultImpl.h>
 #include <unity/scopes/internal/DepartmentImpl.h>
 #include <unity/scopes/internal/FilterBaseImpl.h>
+#include <unity/scopes/internal/FilterStateImpl.h>
 #include <unity/scopes/internal/MWReply.h>
 #include <unity/scopes/internal/QueryObjectBase.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
@@ -176,6 +177,13 @@ bool SearchReplyImpl::push(unity::scopes::Filters const& filters, unity::scopes:
         throw unity::LogicException("SearchReplyImpl::push(): Failed to validate filters");
     }
 
+    if (query_string_.empty())
+    {
+        lock_guard<mutex> lock(mutex_);
+        cached_filters_ = filters;
+        cached_filter_state_ = filter_state;
+    }
+
     VariantMap var;
     var["filters"] = internal::FilterBaseImpl::serialize_filters(filters);
     var["filter_state"] = filter_state.serialize();
@@ -241,6 +249,8 @@ void SearchReplyImpl::write_cached_results() noexcept
         {
             departments = cached_departments_->serialize();
         }
+        auto filters = internal::FilterBaseImpl::serialize_filters(cached_filters_);
+        auto filter_state = cached_filter_state_.serialize();
         VariantArray categories = cat_registry_->serialize();
         VariantArray results;
         for (auto const& r : cached_results_)
@@ -250,6 +260,8 @@ void SearchReplyImpl::write_cached_results() noexcept
         VariantMap vm;
         vm["departments"] = move(departments);
         vm["categories"] = move(categories);
+        vm["filters"] = move(filters);
+        vm["filter_state"] = move(filter_state);
         vm["results"] = move(results);
         string const json = Variant(move(vm)).serialize_json();
 
@@ -335,6 +347,20 @@ void SearchReplyImpl::push_surfacing_results_from_cache() noexcept
         }
         auto category_array = it->second.get_array();
 
+        it = vm.find("filters");
+        if (it == vm.end())
+        {
+            throw unity::scopes::NotFoundException("malformed cache file", "filters");
+        }
+        auto filter_array = it->second.get_array();
+
+        it = vm.find("filter_state");
+        if (it == vm.end())
+        {
+            throw unity::scopes::NotFoundException("malformed cache file", "filter_state");
+        }
+        auto filter_state_dict = it->second.get_dict();
+
         it = vm.find("results");
         if (it == vm.end())
         {
@@ -346,16 +372,20 @@ void SearchReplyImpl::push_surfacing_results_from_cache() noexcept
         // and re-instate them.
         if (!department_dict.empty())
         {
-            auto departments = DepartmentImpl::create(department_dict);
+            auto departments = DepartmentImpl::create(move(department_dict));
             register_departments(move(departments));
         }
 
         for (auto const& c : category_array)
         {
             // Can't use make_shared here because that isn't a friend of Category.
-            auto cp = Category::SCPtr(new Category(c.get_dict()));
+            auto cp = Category::SCPtr(new Category(move(c.get_dict())));
             register_category(cp);
         }
+
+        auto filters = FilterBaseImpl::deserialize_filters(move(filter_array));
+        auto filter_state = FilterStateImpl::deserialize(move(filter_state_dict));
+        push(filters, filter_state);
 
         for (auto const& r : result_array)
         {

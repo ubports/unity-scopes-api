@@ -19,6 +19,7 @@
 #include "CacheScope.h"
 
 #include <unity/scopes/CategorisedResult.h>
+#include <unity/scopes/OptionSelectorFilter.h>
 #include <unity/scopes/ScopeBase.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/scopes/SearchReply.h>
@@ -85,6 +86,19 @@ public:
         auto sub_dept = Department::create("sub" + query().query_string(), query(), "Sub");
         depts->add_subdepartment(move(sub_dept));
         reply->register_departments(move(depts));
+
+        Filters filters;
+        OptionSelectorFilter::SPtr filter = OptionSelectorFilter::create("f1", "Choose an option", false);
+        filter->add_option("o1", "Option 1");
+        auto active_opt = filter->add_option("o2", "Option 2");
+        FilterState fstate;
+        filter->update_state(fstate, active_opt, true);
+        filters.push_back(filter);
+        if (valid())
+        {
+            reply->push(filters, fstate);
+        }
+
         auto cat = reply->register_category(id_, "", "");
         CategorisedResult res(cat);
         res.set_uri("uri");
