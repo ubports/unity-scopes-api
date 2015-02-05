@@ -1,411 +1,411 @@
 libunity-scopes-qt.so.01 libunity-scopes-qt #MINVER#
- (c++)"unity::scopes::qt::JsonReader::JsonReader()@Base" 0replaceme
- (c++)"unity::scopes::qt::JsonReader::JsonReader()@Base" 0replaceme
- (c++)"unity::scopes::qt::QScopeBase::qt_metacall(QMetaObject::Call, int, void**)@Base" 0replaceme
- (c++)"unity::scopes::qt::QScopeBase::qt_metacast(char const*)@Base" 0replaceme
- (c++)"unity::scopes::qt::QScopeBase::staticMetaObject@Base" 0replaceme
- (c++)"unity::scopes::qt::QScopeBase::stop()@Base" 0replaceme
- (c++)"unity::scopes::qt::QScopeBase::start(QString const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QScopeBase::QScopeBase(QObject*)@Base" 0replaceme
- (c++)"unity::scopes::qt::QScopeBase::QScopeBase(QObject*)@Base" 0replaceme
- (c++)"unity::scopes::qt::QScopeBase::~QScopeBase()@Base" 0replaceme
- (c++)"unity::scopes::qt::QScopeBase::~QScopeBase()@Base" 0replaceme
- (c++)"unity::scopes::qt::QScopeBase::~QScopeBase()@Base" 0replaceme
- (c++)"unity::scopes::qt::QDepartment::add_subdepartment(std::shared_ptr<unity::scopes::qt::QDepartment const> const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QDepartment::set_subdepartments(QList<QSharedPointer<unity::scopes::qt::QDepartment const> > const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QDepartment::set_alternate_label(QString const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QDepartment::set_has_subdepartments(bool)@Base" 0replaceme
- (c++)"unity::scopes::qt::QDepartment::create(QString const&, unity::scopes::qt::QCannedQuery const&, QString const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QDepartment::create(unity::scopes::qt::QCannedQuery const&, QString const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QDepartment::QDepartment(unity::scopes::qt::QDepartment&&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QDepartment::QDepartment(unity::scopes::qt::internal::QDepartmentImpl*)@Base" 0replaceme
- (c++)"unity::scopes::qt::QDepartment::QDepartment(unity::scopes::qt::QDepartment const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QDepartment::QDepartment(unity::scopes::qt::QDepartment&&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QDepartment::QDepartment(unity::scopes::qt::internal::QDepartmentImpl*)@Base" 0replaceme
- (c++)"unity::scopes::qt::QDepartment::QDepartment(unity::scopes::qt::QDepartment const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QDepartment::~QDepartment()@Base" 0replaceme
- (c++)"unity::scopes::qt::QDepartment::~QDepartment()@Base" 0replaceme
- (c++)"unity::scopes::qt::QDepartment::operator=(unity::scopes::qt::QDepartment&&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QDepartment::operator=(unity::scopes::qt::QDepartment const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QCannedQuery::set_filter_state(unity::scopes::FilterState const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QCannedQuery::set_query_string(QString const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QCannedQuery::set_department_id(QString const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QCannedQuery::from_uri(QString const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QCannedQuery::QCannedQuery(unity::scopes::qt::QCannedQuery&&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QCannedQuery::QCannedQuery(unity::scopes::qt::internal::QCannedQueryImpl*)@Base" 0replaceme
- (c++)"unity::scopes::qt::QCannedQuery::QCannedQuery(QString const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QCannedQuery::QCannedQuery(QString const&, QString const&, QString const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QCannedQuery::QCannedQuery(unity::scopes::CannedQuery const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QCannedQuery::QCannedQuery(unity::scopes::qt::QCannedQuery const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QCannedQuery::QCannedQuery(unity::scopes::qt::QCannedQuery&&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QCannedQuery::QCannedQuery(unity::scopes::qt::internal::QCannedQueryImpl*)@Base" 0replaceme
- (c++)"unity::scopes::qt::QCannedQuery::QCannedQuery(QString const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QCannedQuery::QCannedQuery(QString const&, QString const&, QString const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QCannedQuery::QCannedQuery(unity::scopes::CannedQuery const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QCannedQuery::QCannedQuery(unity::scopes::qt::QCannedQuery const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QCannedQuery::~QCannedQuery()@Base" 0replaceme
- (c++)"unity::scopes::qt::QCannedQuery::~QCannedQuery()@Base" 0replaceme
- (c++)"unity::scopes::qt::QCannedQuery::operator=(unity::scopes::qt::QCannedQuery&&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QCannedQuery::operator=(unity::scopes::qt::QCannedQuery const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchReply::qt_metacall(QMetaObject::Call, int, void**)@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchReply::qt_metacast(char const*)@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchReply::staticMetaObject@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchReply::register_category(QString const&, QString const&, QString const&, unity::scopes::CategoryRenderer const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchReply::register_departments(std::shared_ptr<unity::scopes::qt::QDepartment const> const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchReply::push(unity::scopes::qt::QCategorisedResult const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchReply::error(std::__exception_ptr::exception_ptr)@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchReply::QSearchReply(std::shared_ptr<unity::scopes::SearchReply>&, QObject*)@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchReply::QSearchReply(std::shared_ptr<unity::scopes::SearchReply>&, QObject*)@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchReply::~QSearchReply()@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchReply::~QSearchReply()@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchReply::~QSearchReply()@Base" 0replaceme
- (c++)"unity::scopes::qt::QColumnLayout::add_column(QVector<QString>)@Base" 0replaceme
- (c++)"unity::scopes::qt::QColumnLayout::QColumnLayout(unity::scopes::qt::QColumnLayout&&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QColumnLayout::QColumnLayout(unity::scopes::qt::internal::QColumnLayoutImpl*)@Base" 0replaceme
- (c++)"unity::scopes::qt::QColumnLayout::QColumnLayout(unity::scopes::qt::QColumnLayout const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QColumnLayout::QColumnLayout(int)@Base" 0replaceme
- (c++)"unity::scopes::qt::QColumnLayout::QColumnLayout(unity::scopes::qt::QColumnLayout&&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QColumnLayout::QColumnLayout(unity::scopes::qt::internal::QColumnLayoutImpl*)@Base" 0replaceme
- (c++)"unity::scopes::qt::QColumnLayout::QColumnLayout(unity::scopes::qt::QColumnLayout const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QColumnLayout::QColumnLayout(int)@Base" 0replaceme
- (c++)"unity::scopes::qt::QColumnLayout::~QColumnLayout()@Base" 0replaceme
- (c++)"unity::scopes::qt::QColumnLayout::~QColumnLayout()@Base" 0replaceme
- (c++)"unity::scopes::qt::QColumnLayout::operator=(unity::scopes::qt::QColumnLayout&&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QColumnLayout::operator=(unity::scopes::qt::QColumnLayout const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewReply::qt_metacall(QMetaObject::Call, int, void**)@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewReply::qt_metacast(char const*)@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewReply::register_layout(QList<unity::scopes::qt::QColumnLayout> const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewReply::staticMetaObject@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewReply::push(QList<unity::scopes::qt::QPreviewWidget> const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewReply::push(QString const&, QVariant const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewReply::QPreviewReply(std::shared_ptr<unity::scopes::PreviewReply>&, QObject*)@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewReply::QPreviewReply(std::shared_ptr<unity::scopes::PreviewReply>&, QObject*)@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewReply::~QPreviewReply()@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewReply::~QPreviewReply()@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewReply::~QPreviewReply()@Base" 0replaceme
- (c++)"unity::scopes::qt::QScopeBaseAPI::stop()@Base" 0replaceme
- (c++)"unity::scopes::qt::QScopeBaseAPI::start(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QScopeBaseAPI::search(unity::scopes::CannedQuery const&, unity::scopes::SearchMetadata const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QScopeBaseAPI::preview(unity::scopes::Result const&, unity::scopes::ActionMetadata const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QScopeBaseAPI::QScopeBaseAPI(std::function<unity::scopes::qt::QScopeBase* ()> const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QScopeBaseAPI::QScopeBaseAPI(std::function<unity::scopes::qt::QScopeBase* ()> const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QScopeBaseAPI::~QScopeBaseAPI()@Base" 0replaceme
- (c++)"unity::scopes::qt::QScopeBaseAPI::~QScopeBaseAPI()@Base" 0replaceme
- (c++)"unity::scopes::qt::QScopeBaseAPI::~QScopeBaseAPI()@Base" 0replaceme
- (c++)"unity::scopes::qt::CancelledEvent::~CancelledEvent()@Base" 0replaceme
- (c++)"unity::scopes::qt::CancelledEvent::~CancelledEvent()@Base" 0replaceme
- (c++)"unity::scopes::qt::CancelledEvent::~CancelledEvent()@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewWidget::add_widget(unity::scopes::qt::QPreviewWidget const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewWidget::add_attribute_value(QString const&, QVariant const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewWidget::add_attribute_mapping(QString const&, QString const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewWidget::QPreviewWidget(unity::scopes::qt::QPreviewWidget&&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewWidget::QPreviewWidget(unity::scopes::qt::internal::QPreviewWidgetImpl*)@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewWidget::QPreviewWidget(QString const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewWidget::QPreviewWidget(QString const&, QString const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewWidget::QPreviewWidget(unity::scopes::qt::QPreviewWidget const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewWidget::QPreviewWidget(unity::scopes::qt::QPreviewWidget&&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewWidget::QPreviewWidget(unity::scopes::qt::internal::QPreviewWidgetImpl*)@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewWidget::QPreviewWidget(QString const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewWidget::QPreviewWidget(QString const&, QString const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewWidget::QPreviewWidget(unity::scopes::qt::QPreviewWidget const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewWidget::~QPreviewWidget()@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewWidget::~QPreviewWidget()@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewWidget::~QPreviewWidget()@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewWidget::operator=(unity::scopes::qt::QPreviewWidget&&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewWidget::operator=(unity::scopes::qt::QPreviewWidget const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::XmlAsyncReader::create_parser_with_data(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)@Base" 0replaceme
- (c++)"unity::scopes::qt::XmlAsyncReader::XmlAsyncReader()@Base" 0replaceme
- (c++)"unity::scopes::qt::XmlAsyncReader::XmlAsyncReader()@Base" 0replaceme
- (c++)"unity::scopes::qt::XmlAsyncReader::~XmlAsyncReader()@Base" 0replaceme
- (c++)"unity::scopes::qt::XmlAsyncReader::~XmlAsyncReader()@Base" 0replaceme
- (c++)"unity::scopes::qt::XmlAsyncReader::~XmlAsyncReader()@Base" 0replaceme
- (c++)"unity::scopes::qt::HttpAsyncReader::Priv::~Priv()@Base" 0replaceme
- (c++)"unity::scopes::qt::HttpAsyncReader::Priv::~Priv()@Base" 0replaceme
- (c++)"unity::scopes::qt::HttpAsyncReader::HttpAsyncReader()@Base" 0replaceme
- (c++)"unity::scopes::qt::HttpAsyncReader::HttpAsyncReader()@Base" 0replaceme
- (c++)"unity::scopes::qt::HttpAsyncReader::~HttpAsyncReader()@Base" 0replaceme
- (c++)"unity::scopes::qt::HttpAsyncReader::~HttpAsyncReader()@Base" 0replaceme
- (c++)"unity::scopes::qt::HttpAsyncReader::~HttpAsyncReader()@Base" 0replaceme
- (c++)"unity::scopes::qt::InitializeEvent::~InitializeEvent()@Base" 0replaceme
- (c++)"unity::scopes::qt::InitializeEvent::~InitializeEvent()@Base" 0replaceme
- (c++)"unity::scopes::qt::InitializeEvent::~InitializeEvent()@Base" 0replaceme
- (c++)"unity::scopes::qt::JsonAsyncReader::create_parser_with_data(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)@Base" 0replaceme
- (c++)"unity::scopes::qt::JsonAsyncReader::JsonAsyncReader()@Base" 0replaceme
- (c++)"unity::scopes::qt::JsonAsyncReader::JsonAsyncReader()@Base" 0replaceme
- (c++)"unity::scopes::qt::JsonAsyncReader::~JsonAsyncReader()@Base" 0replaceme
- (c++)"unity::scopes::qt::JsonAsyncReader::~JsonAsyncReader()@Base" 0replaceme
- (c++)"unity::scopes::qt::JsonAsyncReader::~JsonAsyncReader()@Base" 0replaceme
- (c++)"unity::scopes::qt::QActionMetadata::set_scope_data(QVariant const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QActionMetadata::set_hint(QString const&, QVariant const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QActionMetadata::QActionMetadata(unity::scopes::qt::QActionMetadata&&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QActionMetadata::QActionMetadata(unity::scopes::qt::internal::QActionMetadataImpl*)@Base" 0replaceme
- (c++)"unity::scopes::qt::QActionMetadata::QActionMetadata(QString const&, QString const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QActionMetadata::QActionMetadata(unity::scopes::qt::QActionMetadata const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QActionMetadata::QActionMetadata(unity::scopes::qt::QActionMetadata&&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QActionMetadata::QActionMetadata(unity::scopes::qt::internal::QActionMetadataImpl*)@Base" 0replaceme
- (c++)"unity::scopes::qt::QActionMetadata::QActionMetadata(QString const&, QString const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QActionMetadata::QActionMetadata(unity::scopes::qt::QActionMetadata const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QActionMetadata::~QActionMetadata()@Base" 0replaceme
- (c++)"unity::scopes::qt::QActionMetadata::~QActionMetadata()@Base" 0replaceme
- (c++)"unity::scopes::qt::QActionMetadata::operator=(unity::scopes::qt::QActionMetadata&&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QActionMetadata::operator=(unity::scopes::qt::QActionMetadata const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QActionMetadata::operator[](QString const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchMetadata::set_location(unity::scopes::Location const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchMetadata::set_cardinality(int)@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchMetadata::set_hint(QString const&, QVariant const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchMetadata::QSearchMetadata(unity::scopes::qt::QSearchMetadata&&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchMetadata::QSearchMetadata(QString const&, QString const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchMetadata::QSearchMetadata(unity::scopes::qt::QSearchMetadata const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchMetadata::QSearchMetadata(int, QString const&, QString const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchMetadata::QSearchMetadata(unity::scopes::qt::QSearchMetadata&&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchMetadata::QSearchMetadata(QString const&, QString const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchMetadata::QSearchMetadata(unity::scopes::qt::QSearchMetadata const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchMetadata::QSearchMetadata(int, QString const&, QString const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchMetadata::~QSearchMetadata()@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchMetadata::~QSearchMetadata()@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchMetadata::operator[](QString const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QVariantBuilder::end()@Base" 0replaceme
- (c++)"unity::scopes::qt::QVariantBuilder::add_tuple(QVector<QPair<QString, QVariant> > const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QVariantBuilder::QVariantBuilder(unity::scopes::qt::QVariantBuilder&&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QVariantBuilder::QVariantBuilder(unity::scopes::qt::internal::QVariantBuilderImpl*)@Base" 0replaceme
- (c++)"unity::scopes::qt::QVariantBuilder::QVariantBuilder(unity::scopes::qt::QVariantBuilder const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QVariantBuilder::QVariantBuilder()@Base" 0replaceme
- (c++)"unity::scopes::qt::QVariantBuilder::QVariantBuilder(unity::scopes::qt::QVariantBuilder&&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QVariantBuilder::QVariantBuilder(unity::scopes::qt::internal::QVariantBuilderImpl*)@Base" 0replaceme
- (c++)"unity::scopes::qt::QVariantBuilder::QVariantBuilder(unity::scopes::qt::QVariantBuilder const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QVariantBuilder::QVariantBuilder()@Base" 0replaceme
- (c++)"unity::scopes::qt::QVariantBuilder::~QVariantBuilder()@Base" 0replaceme
- (c++)"unity::scopes::qt::QVariantBuilder::~QVariantBuilder()@Base" 0replaceme
- (c++)"unity::scopes::qt::QVariantBuilder::~QVariantBuilder()@Base" 0replaceme
- (c++)"unity::scopes::qt::QVariantBuilder::operator=(unity::scopes::qt::QVariantBuilder&&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QVariantBuilder::operator=(unity::scopes::qt::QVariantBuilder const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchQueryBase::qt_metacall(QMetaObject::Call, int, void**)@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchQueryBase::qt_metacast(char const*)@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchQueryBase::staticMetaObject@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchQueryBase::init(unity::scopes::qt::QSearchQueryBaseAPI*)@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchQueryBase::subsearch(std::shared_ptr<unity::scopes::Scope> const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::FilterState const&, std::shared_ptr<unity::scopes::SearchListenerBase> const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchQueryBase::subsearch(std::shared_ptr<unity::scopes::Scope> const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::shared_ptr<unity::scopes::SearchListenerBase> const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchQueryBase::subsearch(std::shared_ptr<unity::scopes::Scope> const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::FilterState const&, unity::scopes::SearchMetadata const&, std::shared_ptr<unity::scopes::SearchListenerBase> const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchQueryBase::subsearch(std::shared_ptr<unity::scopes::Scope> const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::FilterState const&, std::shared_ptr<unity::scopes::SearchListenerBase> const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchQueryBase::QSearchQueryBase(QObject*)@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchQueryBase::QSearchQueryBase(QObject*)@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchQueryBase::~QSearchQueryBase()@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchQueryBase::~QSearchQueryBase()@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchQueryBase::~QSearchQueryBase()@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewQueryBase::qt_metacall(QMetaObject::Call, int, void**)@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewQueryBase::qt_metacast(char const*)@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewQueryBase::staticMetaObject@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewQueryBase::init(unity::scopes::qt::QPreviewQueryBaseAPI*)@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewQueryBase::QPreviewQueryBase(QObject*)@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewQueryBase::QPreviewQueryBase(QObject*)@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewQueryBase::~QPreviewQueryBase()@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewQueryBase::~QPreviewQueryBase()@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewQueryBase::~QPreviewQueryBase()@Base" 0replaceme
- (c++)"unity::scopes::qt::QCategorisedResult::set_category(std::shared_ptr<unity::scopes::qt::QCategory const>)@Base" 0replaceme
- (c++)"unity::scopes::qt::QCategorisedResult::QCategorisedResult(unity::scopes::qt::QCategorisedResult&&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QCategorisedResult::QCategorisedResult(unity::scopes::qt::QCategorisedResult const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QCategorisedResult::QCategorisedResult(std::shared_ptr<unity::scopes::qt::QCategory const>)@Base" 0replaceme
- (c++)"unity::scopes::qt::QCategorisedResult::QCategorisedResult(unity::scopes::qt::QCategorisedResult&&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QCategorisedResult::QCategorisedResult(unity::scopes::qt::QCategorisedResult const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QCategorisedResult::QCategorisedResult(std::shared_ptr<unity::scopes::qt::QCategory const>)@Base" 0replaceme
- (c++)"unity::scopes::qt::QCategorisedResult::~QCategorisedResult()@Base" 0replaceme
- (c++)"unity::scopes::qt::QCategorisedResult::~QCategorisedResult()@Base" 0replaceme
- (c++)"unity::scopes::qt::QCategorisedResult::~QCategorisedResult()@Base" 0replaceme
- (c++)"unity::scopes::qt::QCategorisedResult::operator=(unity::scopes::qt::QCategorisedResult&&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QCategorisedResult::operator=(unity::scopes::qt::QCategorisedResult const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchQueryBaseAPI::run_signal(std::shared_ptr<unity::scopes::qt::QSearchReply> const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchQueryBaseAPI::qt_metacall(QMetaObject::Call, int, void**)@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchQueryBaseAPI::qt_metacast(char const*)@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchQueryBaseAPI::staticMetaObject@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchQueryBaseAPI::run(std::shared_ptr<unity::scopes::SearchReply> const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchQueryBaseAPI::event(QEvent*)@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchQueryBaseAPI::cancelled()@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchQueryBaseAPI::QSearchQueryBaseAPI(std::shared_ptr<QCoreApplication>, unity::scopes::qt::QScopeBase&, unity::scopes::CannedQuery const&, unity::scopes::SearchMetadata const&, QObject*)@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchQueryBaseAPI::QSearchQueryBaseAPI(std::shared_ptr<QCoreApplication>, unity::scopes::qt::QScopeBase&, unity::scopes::CannedQuery const&, unity::scopes::SearchMetadata const&, QObject*)@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchQueryBaseAPI::~QSearchQueryBaseAPI()@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchQueryBaseAPI::~QSearchQueryBaseAPI()@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchQueryBaseAPI::~QSearchQueryBaseAPI()@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewQueryBaseAPI::qt_metacall(QMetaObject::Call, int, void**)@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewQueryBaseAPI::qt_metacast(char const*)@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewQueryBaseAPI::staticMetaObject@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewQueryBaseAPI::run(std::shared_ptr<unity::scopes::PreviewReply> const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewQueryBaseAPI::event(QEvent*)@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewQueryBaseAPI::cancelled()@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewQueryBaseAPI::QPreviewQueryBaseAPI(std::shared_ptr<QCoreApplication>, unity::scopes::qt::QScopeBase&, unity::scopes::Result const&, unity::scopes::ActionMetadata const&, QObject*)@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewQueryBaseAPI::QPreviewQueryBaseAPI(std::shared_ptr<QCoreApplication>, unity::scopes::qt::QScopeBase&, unity::scopes::Result const&, unity::scopes::ActionMetadata const&, QObject*)@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewQueryBaseAPI::~QPreviewQueryBaseAPI()@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewQueryBaseAPI::~QPreviewQueryBaseAPI()@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewQueryBaseAPI::~QPreviewQueryBaseAPI()@Base" 0replaceme
- (c++)"unity::scopes::qt::qVariantToScopeVariant(QVariant const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::scopeVariantToQVariant(unity::scopes::Variant const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::qVariantMapToScopeVariantMap(QMap<QString, QVariant> const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::scopeVariantMapToQVariantMap(std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unity::scopes::Variant> > > const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QResult::set_dnd_uri(QString const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QResult::set_intercept_activation()@Base" 0replaceme
- (c++)"unity::scopes::qt::QResult::store(unity::scopes::qt::QResult const&, bool)@Base" 0replaceme
- (c++)"unity::scopes::qt::QResult::set_art(QString const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QResult::set_uri(QString const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QResult::set_title(QString const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QResult::QResult(unity::scopes::qt::QResult&&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QResult::QResult(unity::scopes::qt::internal::QResultImpl*)@Base" 0replaceme
- (c++)"unity::scopes::qt::QResult::QResult(QMap<QString, QVariant> const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QResult::QResult(unity::scopes::Result const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QResult::QResult(unity::scopes::qt::QResult const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QResult::QResult()@Base" 0replaceme
- (c++)"unity::scopes::qt::QResult::QResult(unity::scopes::qt::QResult&&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QResult::QResult(unity::scopes::qt::internal::QResultImpl*)@Base" 0replaceme
- (c++)"unity::scopes::qt::QResult::QResult(QMap<QString, QVariant> const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QResult::QResult(unity::scopes::Result const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QResult::QResult(unity::scopes::qt::QResult const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QResult::QResult()@Base" 0replaceme
- (c++)"unity::scopes::qt::QResult::~QResult()@Base" 0replaceme
- (c++)"unity::scopes::qt::QResult::~QResult()@Base" 0replaceme
- (c++)"unity::scopes::qt::QResult::~QResult()@Base" 0replaceme
- (c++)"unity::scopes::qt::QResult::operator=(unity::scopes::qt::QResult&&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QResult::operator=(unity::scopes::qt::QResult const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::QResult::operator[](QString const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::RunEvent::~RunEvent()@Base" 0replaceme
- (c++)"unity::scopes::qt::RunEvent::~RunEvent()@Base" 0replaceme
- (c++)"unity::scopes::qt::RunEvent::~RunEvent()@Base" 0replaceme
- (c++)"unity::scopes::qt::QCategory::QCategory(unity::scopes::qt::internal::QCategoryImpl*)@Base" 0replaceme
- (c++)"unity::scopes::qt::QCategory::QCategory(std::shared_ptr<unity::scopes::Category const>)@Base" 0replaceme
- (c++)"unity::scopes::qt::QCategory::QCategory(unity::scopes::qt::internal::QCategoryImpl*)@Base" 0replaceme
- (c++)"unity::scopes::qt::QCategory::QCategory(std::shared_ptr<unity::scopes::Category const>)@Base" 0replaceme
- (c++)"unity::scopes::qt::QCategory::~QCategory()@Base" 0replaceme
- (c++)"unity::scopes::qt::QCategory::~QCategory()@Base" 0replaceme
- (c++)"unity::scopes::qt::QCategory::~QCategory()@Base" 0replaceme
- (c++)"unity::scopes::qt::XmlReader::XmlReader()@Base" 0replaceme
- (c++)"unity::scopes::qt::XmlReader::XmlReader()@Base" 0replaceme
- (c++)"unity::scopes::qt::JsonReader::read(QUrl const&) const@Base" 0replaceme
- (c++)"unity::scopes::qt::JsonReader::read(QString const&, QVector<QPair<QString, QString> > const&) const@Base" 0replaceme
- (c++)"unity::scopes::qt::QScopeBase::metaObject() const@Base" 0replaceme
- (c++)"unity::scopes::qt::QDepartment::subdepartments() const@Base" 0replaceme
- (c++)"unity::scopes::qt::QDepartment::alternate_label() const@Base" 0replaceme
- (c++)"unity::scopes::qt::QDepartment::has_subdepartments() const@Base" 0replaceme
- (c++)"unity::scopes::qt::QDepartment::id() const@Base" 0replaceme
- (c++)"unity::scopes::qt::QDepartment::label() const@Base" 0replaceme
- (c++)"unity::scopes::qt::QDepartment::query() const@Base" 0replaceme
- (c++)"unity::scopes::qt::QDepartment::serialize() const@Base" 0replaceme
- (c++)"unity::scopes::qt::QCannedQuery::filter_state() const@Base" 0replaceme
- (c++)"unity::scopes::qt::QCannedQuery::query_string() const@Base" 0replaceme
- (c++)"unity::scopes::qt::QCannedQuery::department_id() const@Base" 0replaceme
- (c++)"unity::scopes::qt::QCannedQuery::to_uri() const@Base" 0replaceme
- (c++)"unity::scopes::qt::QCannedQuery::scope_id() const@Base" 0replaceme
- (c++)"unity::scopes::qt::QCannedQuery::serialize() const@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchReply::metaObject() const@Base" 0replaceme
- (c++)"unity::scopes::qt::QColumnLayout::number_of_columns() const@Base" 0replaceme
- (c++)"unity::scopes::qt::QColumnLayout::size() const@Base" 0replaceme
- (c++)"unity::scopes::qt::QColumnLayout::column(int) const@Base" 0replaceme
- (c++)"unity::scopes::qt::QColumnLayout::serialize() const@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewReply::metaObject() const@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewWidget::widget_type() const@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewWidget::attribute_values() const@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewWidget::attribute_mappings() const@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewWidget::id() const@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewWidget::data() const@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewWidget::widgets() const@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewWidget::serialize() const@Base" 0replaceme
- (c++)"unity::scopes::qt::XmlAsyncReader::async_get_parser(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0replaceme
- (c++)"unity::scopes::qt::XmlAsyncReader::async_get_parser(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::vector<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > > const&) const@Base" 0replaceme
- (c++)"unity::scopes::qt::HttpAsyncReader::async_execute(core::net::http::Request::Handler const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0replaceme
- (c++)"unity::scopes::qt::HttpAsyncReader::progress_report(core::net::http::Request::Progress const&) const@Base" 0replaceme
- (c++)"unity::scopes::qt::HttpAsyncReader::get_uri(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::vector<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > > const&) const@Base" 0replaceme
- (c++)"unity::scopes::qt::JsonAsyncReader::async_get_parser(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0replaceme
- (c++)"unity::scopes::qt::JsonAsyncReader::async_get_parser(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::vector<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > > const&) const@Base" 0replaceme
- (c++)"unity::scopes::qt::QActionMetadata::scope_data() const@Base" 0replaceme
- (c++)"unity::scopes::qt::QActionMetadata::contains_hint(QString const&) const@Base" 0replaceme
- (c++)"unity::scopes::qt::QActionMetadata::hints() const@Base" 0replaceme
- (c++)"unity::scopes::qt::QActionMetadata::operator[](QString const&) const@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchMetadata::cardinality() const@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchMetadata::has_location() const@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchMetadata::contains_hint(QString const&) const@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchMetadata::hints() const@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchMetadata::location() const@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchMetadata::operator[](QString const&) const@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchQueryBase::metaObject() const@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchQueryBase::search_metadata() const@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchQueryBase::query() const@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewQueryBase::metaObject() const@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewQueryBase::action_metadata() const@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewQueryBase::result() const@Base" 0replaceme
- (c++)"unity::scopes::qt::QCategorisedResult::fwd() const@Base" 0replaceme
- (c++)"unity::scopes::qt::QCategorisedResult::category() const@Base" 0replaceme
- (c++)"unity::scopes::qt::QSearchQueryBaseAPI::metaObject() const@Base" 0replaceme
- (c++)"unity::scopes::qt::QPreviewQueryBaseAPI::metaObject() const@Base" 0replaceme
- (c++)"unity::scopes::qt::QResult::direct_activation() const@Base" 0replaceme
- (c++)"unity::scopes::qt::QResult::has_stored_result() const@Base" 0replaceme
- (c++)"unity::scopes::qt::QResult::target_scope_proxy() const@Base" 0replaceme
- (c++)"unity::scopes::qt::QResult::art() const@Base" 0replaceme
- (c++)"unity::scopes::qt::QResult::uri() const@Base" 0replaceme
- (c++)"unity::scopes::qt::QResult::title() const@Base" 0replaceme
- (c++)"unity::scopes::qt::QResult::value(QString const&) const@Base" 0replaceme
- (c++)"unity::scopes::qt::QResult::dnd_uri() const@Base" 0replaceme
- (c++)"unity::scopes::qt::QResult::contains(QString const&) const@Base" 0replaceme
- (c++)"unity::scopes::qt::QResult::retrieve() const@Base" 0replaceme
- (c++)"unity::scopes::qt::QResult::serialize() const@Base" 0replaceme
- (c++)"unity::scopes::qt::QResult::operator[](QString const&) const@Base" 0replaceme
- (c++)"unity::scopes::qt::QCategory::renderer_template() const@Base" 0replaceme
- (c++)"unity::scopes::qt::QCategory::id() const@Base" 0replaceme
- (c++)"unity::scopes::qt::QCategory::icon() const@Base" 0replaceme
- (c++)"unity::scopes::qt::QCategory::query() const@Base" 0replaceme
- (c++)"unity::scopes::qt::QCategory::title() const@Base" 0replaceme
- (c++)"unity::scopes::qt::QCategory::serialize() const@Base" 0replaceme
- (c++)"unity::scopes::qt::XmlReader::read(QUrl const&) const@Base" 0replaceme
- (c++)"unity::scopes::qt::XmlReader::read(QString const&, QVector<QPair<QString, QString> > const&) const@Base" 0replaceme
- (c++)"typeinfo for unity::scopes::qt::QScopeBase@Base" 0replaceme
- (c++)"typeinfo for unity::scopes::qt::QSearchReply@Base" 0replaceme
- (c++)"typeinfo for unity::scopes::qt::QPreviewReply@Base" 0replaceme
- (c++)"typeinfo for unity::scopes::qt::QScopeBaseAPI@Base" 0replaceme
- (c++)"typeinfo for unity::scopes::qt::CancelledEvent@Base" 0replaceme
- (c++)"typeinfo for unity::scopes::qt::QPreviewWidget@Base" 0replaceme
- (c++)"typeinfo for unity::scopes::qt::XmlAsyncReader@Base" 0replaceme
- (c++)"typeinfo for unity::scopes::qt::HttpAsyncReader@Base" 0replaceme
- (c++)"typeinfo for unity::scopes::qt::InitializeEvent@Base" 0replaceme
- (c++)"typeinfo for unity::scopes::qt::JsonAsyncReader@Base" 0replaceme
- (c++)"typeinfo for unity::scopes::qt::QVariantBuilder@Base" 0replaceme
- (c++)"typeinfo for unity::scopes::qt::QSearchQueryBase@Base" 0replaceme
- (c++)"typeinfo for unity::scopes::qt::QPreviewQueryBase@Base" 0replaceme
- (c++)"typeinfo for unity::scopes::qt::QCategorisedResult@Base" 0replaceme
- (c++)"typeinfo for unity::scopes::qt::QSearchQueryBaseAPI@Base" 0replaceme
- (c++)"typeinfo for unity::scopes::qt::QPreviewQueryBaseAPI@Base" 0replaceme
- (c++)"typeinfo for unity::scopes::qt::QResult@Base" 0replaceme
- (c++)"typeinfo for unity::scopes::qt::RunEvent@Base" 0replaceme
- (c++)"typeinfo for unity::scopes::qt::QCategory@Base" 0replaceme
- (c++)"typeinfo name for unity::scopes::qt::QScopeBase@Base" 0replaceme
- (c++)"typeinfo name for unity::scopes::qt::QSearchReply@Base" 0replaceme
- (c++)"typeinfo name for unity::scopes::qt::QPreviewReply@Base" 0replaceme
- (c++)"typeinfo name for unity::scopes::qt::QScopeBaseAPI@Base" 0replaceme
- (c++)"typeinfo name for unity::scopes::qt::CancelledEvent@Base" 0replaceme
- (c++)"typeinfo name for unity::scopes::qt::QPreviewWidget@Base" 0replaceme
- (c++)"typeinfo name for unity::scopes::qt::XmlAsyncReader@Base" 0replaceme
- (c++)"typeinfo name for unity::scopes::qt::HttpAsyncReader@Base" 0replaceme
- (c++)"typeinfo name for unity::scopes::qt::InitializeEvent@Base" 0replaceme
- (c++)"typeinfo name for unity::scopes::qt::JsonAsyncReader@Base" 0replaceme
- (c++)"typeinfo name for unity::scopes::qt::QVariantBuilder@Base" 0replaceme
- (c++)"typeinfo name for unity::scopes::qt::QSearchQueryBase@Base" 0replaceme
- (c++)"typeinfo name for unity::scopes::qt::QPreviewQueryBase@Base" 0replaceme
- (c++)"typeinfo name for unity::scopes::qt::QCategorisedResult@Base" 0replaceme
- (c++)"typeinfo name for unity::scopes::qt::QSearchQueryBaseAPI@Base" 0replaceme
- (c++)"typeinfo name for unity::scopes::qt::QPreviewQueryBaseAPI@Base" 0replaceme
- (c++)"typeinfo name for unity::scopes::qt::QResult@Base" 0replaceme
- (c++)"typeinfo name for unity::scopes::qt::RunEvent@Base" 0replaceme
- (c++)"typeinfo name for unity::scopes::qt::QCategory@Base" 0replaceme
- (c++)"vtable for unity::scopes::qt::QScopeBase@Base" 0replaceme
- (c++)"vtable for unity::scopes::qt::QSearchReply@Base" 0replaceme
- (c++)"vtable for unity::scopes::qt::QPreviewReply@Base" 0replaceme
- (c++)"vtable for unity::scopes::qt::QScopeBaseAPI@Base" 0replaceme
- (c++)"vtable for unity::scopes::qt::CancelledEvent@Base" 0replaceme
- (c++)"vtable for unity::scopes::qt::QPreviewWidget@Base" 0replaceme
- (c++)"vtable for unity::scopes::qt::XmlAsyncReader@Base" 0replaceme
- (c++)"vtable for unity::scopes::qt::HttpAsyncReader@Base" 0replaceme
- (c++)"vtable for unity::scopes::qt::InitializeEvent@Base" 0replaceme
- (c++)"vtable for unity::scopes::qt::JsonAsyncReader@Base" 0replaceme
- (c++)"vtable for unity::scopes::qt::QVariantBuilder@Base" 0replaceme
- (c++)"vtable for unity::scopes::qt::QSearchQueryBase@Base" 0replaceme
- (c++)"vtable for unity::scopes::qt::QPreviewQueryBase@Base" 0replaceme
- (c++)"vtable for unity::scopes::qt::QCategorisedResult@Base" 0replaceme
- (c++)"vtable for unity::scopes::qt::QSearchQueryBaseAPI@Base" 0replaceme
- (c++)"vtable for unity::scopes::qt::QPreviewQueryBaseAPI@Base" 0replaceme
- (c++)"vtable for unity::scopes::qt::QResult@Base" 0replaceme
- (c++)"vtable for unity::scopes::qt::RunEvent@Base" 0replaceme
- (c++)"vtable for unity::scopes::qt::QCategory@Base" 0replaceme
+ (c++)"unity::scopes::qt::JsonReader::JsonReader()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::JsonReader::JsonReader()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QScopeBase::qt_metacall(QMetaObject::Call, int, void**)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QScopeBase::qt_metacast(char const*)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QScopeBase::staticMetaObject@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QScopeBase::stop()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QScopeBase::start(QString const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QScopeBase::QScopeBase(QObject*)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QScopeBase::QScopeBase(QObject*)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QScopeBase::~QScopeBase()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QScopeBase::~QScopeBase()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QScopeBase::~QScopeBase()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QDepartment::add_subdepartment(std::shared_ptr<unity::scopes::qt::QDepartment const> const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QDepartment::set_subdepartments(QList<QSharedPointer<unity::scopes::qt::QDepartment const> > const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QDepartment::set_alternate_label(QString const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QDepartment::set_has_subdepartments(bool)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QDepartment::create(QString const&, unity::scopes::qt::QCannedQuery const&, QString const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QDepartment::create(unity::scopes::qt::QCannedQuery const&, QString const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QDepartment::QDepartment(unity::scopes::qt::QDepartment&&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QDepartment::QDepartment(unity::scopes::qt::internal::QDepartmentImpl*)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QDepartment::QDepartment(unity::scopes::qt::QDepartment const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QDepartment::QDepartment(unity::scopes::qt::QDepartment&&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QDepartment::QDepartment(unity::scopes::qt::internal::QDepartmentImpl*)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QDepartment::QDepartment(unity::scopes::qt::QDepartment const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QDepartment::~QDepartment()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QDepartment::~QDepartment()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QDepartment::operator=(unity::scopes::qt::QDepartment&&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QDepartment::operator=(unity::scopes::qt::QDepartment const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QCannedQuery::set_filter_state(unity::scopes::FilterState const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QCannedQuery::set_query_string(QString const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QCannedQuery::set_department_id(QString const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QCannedQuery::from_uri(QString const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QCannedQuery::QCannedQuery(unity::scopes::qt::QCannedQuery&&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QCannedQuery::QCannedQuery(unity::scopes::qt::internal::QCannedQueryImpl*)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QCannedQuery::QCannedQuery(QString const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QCannedQuery::QCannedQuery(QString const&, QString const&, QString const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QCannedQuery::QCannedQuery(unity::scopes::CannedQuery const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QCannedQuery::QCannedQuery(unity::scopes::qt::QCannedQuery const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QCannedQuery::QCannedQuery(unity::scopes::qt::QCannedQuery&&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QCannedQuery::QCannedQuery(unity::scopes::qt::internal::QCannedQueryImpl*)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QCannedQuery::QCannedQuery(QString const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QCannedQuery::QCannedQuery(QString const&, QString const&, QString const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QCannedQuery::QCannedQuery(unity::scopes::CannedQuery const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QCannedQuery::QCannedQuery(unity::scopes::qt::QCannedQuery const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QCannedQuery::~QCannedQuery()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QCannedQuery::~QCannedQuery()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QCannedQuery::operator=(unity::scopes::qt::QCannedQuery&&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QCannedQuery::operator=(unity::scopes::qt::QCannedQuery const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchReply::qt_metacall(QMetaObject::Call, int, void**)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchReply::qt_metacast(char const*)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchReply::staticMetaObject@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchReply::register_category(QString const&, QString const&, QString const&, unity::scopes::CategoryRenderer const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchReply::register_departments(std::shared_ptr<unity::scopes::qt::QDepartment const> const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchReply::push(unity::scopes::qt::QCategorisedResult const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchReply::error(std::__exception_ptr::exception_ptr)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchReply::QSearchReply(std::shared_ptr<unity::scopes::SearchReply>&, QObject*)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchReply::QSearchReply(std::shared_ptr<unity::scopes::SearchReply>&, QObject*)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchReply::~QSearchReply()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchReply::~QSearchReply()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchReply::~QSearchReply()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QColumnLayout::add_column(QVector<QString>)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QColumnLayout::QColumnLayout(unity::scopes::qt::QColumnLayout&&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QColumnLayout::QColumnLayout(unity::scopes::qt::internal::QColumnLayoutImpl*)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QColumnLayout::QColumnLayout(unity::scopes::qt::QColumnLayout const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QColumnLayout::QColumnLayout(int)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QColumnLayout::QColumnLayout(unity::scopes::qt::QColumnLayout&&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QColumnLayout::QColumnLayout(unity::scopes::qt::internal::QColumnLayoutImpl*)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QColumnLayout::QColumnLayout(unity::scopes::qt::QColumnLayout const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QColumnLayout::QColumnLayout(int)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QColumnLayout::~QColumnLayout()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QColumnLayout::~QColumnLayout()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QColumnLayout::operator=(unity::scopes::qt::QColumnLayout&&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QColumnLayout::operator=(unity::scopes::qt::QColumnLayout const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewReply::qt_metacall(QMetaObject::Call, int, void**)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewReply::qt_metacast(char const*)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewReply::register_layout(QList<unity::scopes::qt::QColumnLayout> const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewReply::staticMetaObject@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewReply::push(QList<unity::scopes::qt::QPreviewWidget> const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewReply::push(QString const&, QVariant const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewReply::QPreviewReply(std::shared_ptr<unity::scopes::PreviewReply>&, QObject*)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewReply::QPreviewReply(std::shared_ptr<unity::scopes::PreviewReply>&, QObject*)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewReply::~QPreviewReply()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewReply::~QPreviewReply()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewReply::~QPreviewReply()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QScopeBaseAPI::stop()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QScopeBaseAPI::start(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QScopeBaseAPI::search(unity::scopes::CannedQuery const&, unity::scopes::SearchMetadata const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QScopeBaseAPI::preview(unity::scopes::Result const&, unity::scopes::ActionMetadata const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QScopeBaseAPI::QScopeBaseAPI(std::function<unity::scopes::qt::QScopeBase* ()> const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QScopeBaseAPI::QScopeBaseAPI(std::function<unity::scopes::qt::QScopeBase* ()> const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QScopeBaseAPI::~QScopeBaseAPI()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QScopeBaseAPI::~QScopeBaseAPI()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QScopeBaseAPI::~QScopeBaseAPI()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::CancelledEvent::~CancelledEvent()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::CancelledEvent::~CancelledEvent()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::CancelledEvent::~CancelledEvent()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewWidget::add_widget(unity::scopes::qt::QPreviewWidget const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewWidget::add_attribute_value(QString const&, QVariant const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewWidget::add_attribute_mapping(QString const&, QString const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewWidget::QPreviewWidget(unity::scopes::qt::QPreviewWidget&&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewWidget::QPreviewWidget(unity::scopes::qt::internal::QPreviewWidgetImpl*)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewWidget::QPreviewWidget(QString const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewWidget::QPreviewWidget(QString const&, QString const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewWidget::QPreviewWidget(unity::scopes::qt::QPreviewWidget const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewWidget::QPreviewWidget(unity::scopes::qt::QPreviewWidget&&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewWidget::QPreviewWidget(unity::scopes::qt::internal::QPreviewWidgetImpl*)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewWidget::QPreviewWidget(QString const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewWidget::QPreviewWidget(QString const&, QString const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewWidget::QPreviewWidget(unity::scopes::qt::QPreviewWidget const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewWidget::~QPreviewWidget()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewWidget::~QPreviewWidget()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewWidget::~QPreviewWidget()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewWidget::operator=(unity::scopes::qt::QPreviewWidget&&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewWidget::operator=(unity::scopes::qt::QPreviewWidget const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::XmlAsyncReader::create_parser_with_data(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::XmlAsyncReader::XmlAsyncReader()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::XmlAsyncReader::XmlAsyncReader()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::XmlAsyncReader::~XmlAsyncReader()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::XmlAsyncReader::~XmlAsyncReader()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::XmlAsyncReader::~XmlAsyncReader()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::HttpAsyncReader::Priv::~Priv()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::HttpAsyncReader::Priv::~Priv()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::HttpAsyncReader::HttpAsyncReader()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::HttpAsyncReader::HttpAsyncReader()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::HttpAsyncReader::~HttpAsyncReader()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::HttpAsyncReader::~HttpAsyncReader()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::HttpAsyncReader::~HttpAsyncReader()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::InitializeEvent::~InitializeEvent()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::InitializeEvent::~InitializeEvent()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::InitializeEvent::~InitializeEvent()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::JsonAsyncReader::create_parser_with_data(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::JsonAsyncReader::JsonAsyncReader()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::JsonAsyncReader::JsonAsyncReader()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::JsonAsyncReader::~JsonAsyncReader()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::JsonAsyncReader::~JsonAsyncReader()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::JsonAsyncReader::~JsonAsyncReader()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QActionMetadata::set_scope_data(QVariant const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QActionMetadata::set_hint(QString const&, QVariant const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QActionMetadata::QActionMetadata(unity::scopes::qt::QActionMetadata&&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QActionMetadata::QActionMetadata(unity::scopes::qt::internal::QActionMetadataImpl*)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QActionMetadata::QActionMetadata(QString const&, QString const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QActionMetadata::QActionMetadata(unity::scopes::qt::QActionMetadata const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QActionMetadata::QActionMetadata(unity::scopes::qt::QActionMetadata&&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QActionMetadata::QActionMetadata(unity::scopes::qt::internal::QActionMetadataImpl*)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QActionMetadata::QActionMetadata(QString const&, QString const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QActionMetadata::QActionMetadata(unity::scopes::qt::QActionMetadata const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QActionMetadata::~QActionMetadata()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QActionMetadata::~QActionMetadata()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QActionMetadata::operator=(unity::scopes::qt::QActionMetadata&&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QActionMetadata::operator=(unity::scopes::qt::QActionMetadata const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QActionMetadata::operator[](QString const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchMetadata::set_location(unity::scopes::Location const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchMetadata::set_cardinality(int)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchMetadata::set_hint(QString const&, QVariant const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchMetadata::QSearchMetadata(unity::scopes::qt::QSearchMetadata&&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchMetadata::QSearchMetadata(QString const&, QString const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchMetadata::QSearchMetadata(unity::scopes::qt::QSearchMetadata const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchMetadata::QSearchMetadata(int, QString const&, QString const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchMetadata::QSearchMetadata(unity::scopes::qt::QSearchMetadata&&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchMetadata::QSearchMetadata(QString const&, QString const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchMetadata::QSearchMetadata(unity::scopes::qt::QSearchMetadata const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchMetadata::QSearchMetadata(int, QString const&, QString const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchMetadata::~QSearchMetadata()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchMetadata::~QSearchMetadata()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchMetadata::operator[](QString const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QVariantBuilder::end()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QVariantBuilder::add_tuple(QVector<QPair<QString, QVariant> > const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QVariantBuilder::QVariantBuilder(unity::scopes::qt::QVariantBuilder&&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QVariantBuilder::QVariantBuilder(unity::scopes::qt::internal::QVariantBuilderImpl*)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QVariantBuilder::QVariantBuilder(unity::scopes::qt::QVariantBuilder const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QVariantBuilder::QVariantBuilder()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QVariantBuilder::QVariantBuilder(unity::scopes::qt::QVariantBuilder&&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QVariantBuilder::QVariantBuilder(unity::scopes::qt::internal::QVariantBuilderImpl*)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QVariantBuilder::QVariantBuilder(unity::scopes::qt::QVariantBuilder const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QVariantBuilder::QVariantBuilder()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QVariantBuilder::~QVariantBuilder()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QVariantBuilder::~QVariantBuilder()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QVariantBuilder::~QVariantBuilder()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QVariantBuilder::operator=(unity::scopes::qt::QVariantBuilder&&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QVariantBuilder::operator=(unity::scopes::qt::QVariantBuilder const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchQueryBase::qt_metacall(QMetaObject::Call, int, void**)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchQueryBase::qt_metacast(char const*)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchQueryBase::staticMetaObject@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchQueryBase::init(unity::scopes::qt::QSearchQueryBaseAPI*)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchQueryBase::subsearch(std::shared_ptr<unity::scopes::Scope> const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::FilterState const&, std::shared_ptr<unity::scopes::SearchListenerBase> const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchQueryBase::subsearch(std::shared_ptr<unity::scopes::Scope> const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::shared_ptr<unity::scopes::SearchListenerBase> const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchQueryBase::subsearch(std::shared_ptr<unity::scopes::Scope> const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::FilterState const&, unity::scopes::SearchMetadata const&, std::shared_ptr<unity::scopes::SearchListenerBase> const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchQueryBase::subsearch(std::shared_ptr<unity::scopes::Scope> const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::FilterState const&, std::shared_ptr<unity::scopes::SearchListenerBase> const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchQueryBase::QSearchQueryBase(QObject*)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchQueryBase::QSearchQueryBase(QObject*)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchQueryBase::~QSearchQueryBase()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchQueryBase::~QSearchQueryBase()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchQueryBase::~QSearchQueryBase()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewQueryBase::qt_metacall(QMetaObject::Call, int, void**)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewQueryBase::qt_metacast(char const*)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewQueryBase::staticMetaObject@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewQueryBase::init(unity::scopes::qt::QPreviewQueryBaseAPI*)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewQueryBase::QPreviewQueryBase(QObject*)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewQueryBase::QPreviewQueryBase(QObject*)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewQueryBase::~QPreviewQueryBase()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewQueryBase::~QPreviewQueryBase()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewQueryBase::~QPreviewQueryBase()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QCategorisedResult::set_category(std::shared_ptr<unity::scopes::qt::QCategory const>)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QCategorisedResult::QCategorisedResult(unity::scopes::qt::QCategorisedResult&&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QCategorisedResult::QCategorisedResult(unity::scopes::qt::QCategorisedResult const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QCategorisedResult::QCategorisedResult(std::shared_ptr<unity::scopes::qt::QCategory const>)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QCategorisedResult::QCategorisedResult(unity::scopes::qt::QCategorisedResult&&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QCategorisedResult::QCategorisedResult(unity::scopes::qt::QCategorisedResult const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QCategorisedResult::QCategorisedResult(std::shared_ptr<unity::scopes::qt::QCategory const>)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QCategorisedResult::~QCategorisedResult()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QCategorisedResult::~QCategorisedResult()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QCategorisedResult::~QCategorisedResult()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QCategorisedResult::operator=(unity::scopes::qt::QCategorisedResult&&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QCategorisedResult::operator=(unity::scopes::qt::QCategorisedResult const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchQueryBaseAPI::run_signal(std::shared_ptr<unity::scopes::qt::QSearchReply> const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchQueryBaseAPI::qt_metacall(QMetaObject::Call, int, void**)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchQueryBaseAPI::qt_metacast(char const*)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchQueryBaseAPI::staticMetaObject@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchQueryBaseAPI::run(std::shared_ptr<unity::scopes::SearchReply> const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchQueryBaseAPI::event(QEvent*)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchQueryBaseAPI::cancelled()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchQueryBaseAPI::QSearchQueryBaseAPI(std::shared_ptr<QCoreApplication>, unity::scopes::qt::QScopeBase&, unity::scopes::CannedQuery const&, unity::scopes::SearchMetadata const&, QObject*)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchQueryBaseAPI::QSearchQueryBaseAPI(std::shared_ptr<QCoreApplication>, unity::scopes::qt::QScopeBase&, unity::scopes::CannedQuery const&, unity::scopes::SearchMetadata const&, QObject*)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchQueryBaseAPI::~QSearchQueryBaseAPI()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchQueryBaseAPI::~QSearchQueryBaseAPI()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchQueryBaseAPI::~QSearchQueryBaseAPI()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewQueryBaseAPI::qt_metacall(QMetaObject::Call, int, void**)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewQueryBaseAPI::qt_metacast(char const*)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewQueryBaseAPI::staticMetaObject@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewQueryBaseAPI::run(std::shared_ptr<unity::scopes::PreviewReply> const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewQueryBaseAPI::event(QEvent*)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewQueryBaseAPI::cancelled()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewQueryBaseAPI::QPreviewQueryBaseAPI(std::shared_ptr<QCoreApplication>, unity::scopes::qt::QScopeBase&, unity::scopes::Result const&, unity::scopes::ActionMetadata const&, QObject*)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewQueryBaseAPI::QPreviewQueryBaseAPI(std::shared_ptr<QCoreApplication>, unity::scopes::qt::QScopeBase&, unity::scopes::Result const&, unity::scopes::ActionMetadata const&, QObject*)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewQueryBaseAPI::~QPreviewQueryBaseAPI()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewQueryBaseAPI::~QPreviewQueryBaseAPI()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewQueryBaseAPI::~QPreviewQueryBaseAPI()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::qVariantToScopeVariant(QVariant const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::scopeVariantToQVariant(unity::scopes::Variant const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::qVariantMapToScopeVariantMap(QMap<QString, QVariant> const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::scopeVariantMapToQVariantMap(std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unity::scopes::Variant> > > const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QResult::set_dnd_uri(QString const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QResult::set_intercept_activation()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QResult::store(unity::scopes::qt::QResult const&, bool)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QResult::set_art(QString const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QResult::set_uri(QString const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QResult::set_title(QString const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QResult::QResult(unity::scopes::qt::QResult&&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QResult::QResult(unity::scopes::qt::internal::QResultImpl*)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QResult::QResult(QMap<QString, QVariant> const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QResult::QResult(unity::scopes::Result const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QResult::QResult(unity::scopes::qt::QResult const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QResult::QResult()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QResult::QResult(unity::scopes::qt::QResult&&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QResult::QResult(unity::scopes::qt::internal::QResultImpl*)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QResult::QResult(QMap<QString, QVariant> const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QResult::QResult(unity::scopes::Result const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QResult::QResult(unity::scopes::qt::QResult const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QResult::QResult()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QResult::~QResult()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QResult::~QResult()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QResult::~QResult()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QResult::operator=(unity::scopes::qt::QResult&&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QResult::operator=(unity::scopes::qt::QResult const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QResult::operator[](QString const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::RunEvent::~RunEvent()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::RunEvent::~RunEvent()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::RunEvent::~RunEvent()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QCategory::QCategory(unity::scopes::qt::internal::QCategoryImpl*)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QCategory::QCategory(std::shared_ptr<unity::scopes::Category const>)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QCategory::QCategory(unity::scopes::qt::internal::QCategoryImpl*)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QCategory::QCategory(std::shared_ptr<unity::scopes::Category const>)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QCategory::~QCategory()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QCategory::~QCategory()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QCategory::~QCategory()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::XmlReader::XmlReader()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::XmlReader::XmlReader()@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::JsonReader::read(QUrl const&) const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::JsonReader::read(QString const&, QVector<QPair<QString, QString> > const&) const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QScopeBase::metaObject() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QDepartment::subdepartments() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QDepartment::alternate_label() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QDepartment::has_subdepartments() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QDepartment::id() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QDepartment::label() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QDepartment::query() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QDepartment::serialize() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QCannedQuery::filter_state() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QCannedQuery::query_string() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QCannedQuery::department_id() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QCannedQuery::to_uri() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QCannedQuery::scope_id() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QCannedQuery::serialize() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchReply::metaObject() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QColumnLayout::number_of_columns() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QColumnLayout::size() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QColumnLayout::column(int) const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QColumnLayout::serialize() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewReply::metaObject() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewWidget::widget_type() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewWidget::attribute_values() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewWidget::attribute_mappings() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewWidget::id() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewWidget::data() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewWidget::widgets() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewWidget::serialize() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::XmlAsyncReader::async_get_parser(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::XmlAsyncReader::async_get_parser(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::vector<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > > const&) const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::HttpAsyncReader::async_execute(core::net::http::Request::Handler const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::HttpAsyncReader::progress_report(core::net::http::Request::Progress const&) const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::HttpAsyncReader::get_uri(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::vector<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > > const&) const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::JsonAsyncReader::async_get_parser(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::JsonAsyncReader::async_get_parser(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::vector<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > > const&) const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QActionMetadata::scope_data() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QActionMetadata::contains_hint(QString const&) const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QActionMetadata::hints() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QActionMetadata::operator[](QString const&) const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchMetadata::cardinality() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchMetadata::has_location() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchMetadata::contains_hint(QString const&) const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchMetadata::hints() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchMetadata::location() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchMetadata::operator[](QString const&) const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchQueryBase::metaObject() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchQueryBase::search_metadata() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchQueryBase::query() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewQueryBase::metaObject() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewQueryBase::action_metadata() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewQueryBase::result() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QCategorisedResult::fwd() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QCategorisedResult::category() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchQueryBaseAPI::metaObject() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QPreviewQueryBaseAPI::metaObject() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QResult::direct_activation() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QResult::has_stored_result() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QResult::target_scope_proxy() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QResult::art() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QResult::uri() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QResult::title() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QResult::value(QString const&) const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QResult::dnd_uri() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QResult::contains(QString const&) const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QResult::retrieve() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QResult::serialize() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QResult::operator[](QString const&) const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QCategory::renderer_template() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QCategory::id() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QCategory::icon() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QCategory::query() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QCategory::title() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QCategory::serialize() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::XmlReader::read(QUrl const&) const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::XmlReader::read(QString const&, QVector<QPair<QString, QString> > const&) const@Base" 0.6.13+15.04.20150205.1
+ (c++)"typeinfo for unity::scopes::qt::QScopeBase@Base" 0.6.13+15.04.20150205.1
+ (c++)"typeinfo for unity::scopes::qt::QSearchReply@Base" 0.6.13+15.04.20150205.1
+ (c++)"typeinfo for unity::scopes::qt::QPreviewReply@Base" 0.6.13+15.04.20150205.1
+ (c++)"typeinfo for unity::scopes::qt::QScopeBaseAPI@Base" 0.6.13+15.04.20150205.1
+ (c++)"typeinfo for unity::scopes::qt::CancelledEvent@Base" 0.6.13+15.04.20150205.1
+ (c++)"typeinfo for unity::scopes::qt::QPreviewWidget@Base" 0.6.13+15.04.20150205.1
+ (c++)"typeinfo for unity::scopes::qt::XmlAsyncReader@Base" 0.6.13+15.04.20150205.1
+ (c++)"typeinfo for unity::scopes::qt::HttpAsyncReader@Base" 0.6.13+15.04.20150205.1
+ (c++)"typeinfo for unity::scopes::qt::InitializeEvent@Base" 0.6.13+15.04.20150205.1
+ (c++)"typeinfo for unity::scopes::qt::JsonAsyncReader@Base" 0.6.13+15.04.20150205.1
+ (c++)"typeinfo for unity::scopes::qt::QVariantBuilder@Base" 0.6.13+15.04.20150205.1
+ (c++)"typeinfo for unity::scopes::qt::QSearchQueryBase@Base" 0.6.13+15.04.20150205.1
+ (c++)"typeinfo for unity::scopes::qt::QPreviewQueryBase@Base" 0.6.13+15.04.20150205.1
+ (c++)"typeinfo for unity::scopes::qt::QCategorisedResult@Base" 0.6.13+15.04.20150205.1
+ (c++)"typeinfo for unity::scopes::qt::QSearchQueryBaseAPI@Base" 0.6.13+15.04.20150205.1
+ (c++)"typeinfo for unity::scopes::qt::QPreviewQueryBaseAPI@Base" 0.6.13+15.04.20150205.1
+ (c++)"typeinfo for unity::scopes::qt::QResult@Base" 0.6.13+15.04.20150205.1
+ (c++)"typeinfo for unity::scopes::qt::RunEvent@Base" 0.6.13+15.04.20150205.1
+ (c++)"typeinfo for unity::scopes::qt::QCategory@Base" 0.6.13+15.04.20150205.1
+ (c++)"typeinfo name for unity::scopes::qt::QScopeBase@Base" 0.6.13+15.04.20150205.1
+ (c++)"typeinfo name for unity::scopes::qt::QSearchReply@Base" 0.6.13+15.04.20150205.1
+ (c++)"typeinfo name for unity::scopes::qt::QPreviewReply@Base" 0.6.13+15.04.20150205.1
+ (c++)"typeinfo name for unity::scopes::qt::QScopeBaseAPI@Base" 0.6.13+15.04.20150205.1
+ (c++)"typeinfo name for unity::scopes::qt::CancelledEvent@Base" 0.6.13+15.04.20150205.1
+ (c++)"typeinfo name for unity::scopes::qt::QPreviewWidget@Base" 0.6.13+15.04.20150205.1
+ (c++)"typeinfo name for unity::scopes::qt::XmlAsyncReader@Base" 0.6.13+15.04.20150205.1
+ (c++)"typeinfo name for unity::scopes::qt::HttpAsyncReader@Base" 0.6.13+15.04.20150205.1
+ (c++)"typeinfo name for unity::scopes::qt::InitializeEvent@Base" 0.6.13+15.04.20150205.1
+ (c++)"typeinfo name for unity::scopes::qt::JsonAsyncReader@Base" 0.6.13+15.04.20150205.1
+ (c++)"typeinfo name for unity::scopes::qt::QVariantBuilder@Base" 0.6.13+15.04.20150205.1
+ (c++)"typeinfo name for unity::scopes::qt::QSearchQueryBase@Base" 0.6.13+15.04.20150205.1
+ (c++)"typeinfo name for unity::scopes::qt::QPreviewQueryBase@Base" 0.6.13+15.04.20150205.1
+ (c++)"typeinfo name for unity::scopes::qt::QCategorisedResult@Base" 0.6.13+15.04.20150205.1
+ (c++)"typeinfo name for unity::scopes::qt::QSearchQueryBaseAPI@Base" 0.6.13+15.04.20150205.1
+ (c++)"typeinfo name for unity::scopes::qt::QPreviewQueryBaseAPI@Base" 0.6.13+15.04.20150205.1
+ (c++)"typeinfo name for unity::scopes::qt::QResult@Base" 0.6.13+15.04.20150205.1
+ (c++)"typeinfo name for unity::scopes::qt::RunEvent@Base" 0.6.13+15.04.20150205.1
+ (c++)"typeinfo name for unity::scopes::qt::QCategory@Base" 0.6.13+15.04.20150205.1
+ (c++)"vtable for unity::scopes::qt::QScopeBase@Base" 0.6.13+15.04.20150205.1
+ (c++)"vtable for unity::scopes::qt::QSearchReply@Base" 0.6.13+15.04.20150205.1
+ (c++)"vtable for unity::scopes::qt::QPreviewReply@Base" 0.6.13+15.04.20150205.1
+ (c++)"vtable for unity::scopes::qt::QScopeBaseAPI@Base" 0.6.13+15.04.20150205.1
+ (c++)"vtable for unity::scopes::qt::CancelledEvent@Base" 0.6.13+15.04.20150205.1
+ (c++)"vtable for unity::scopes::qt::QPreviewWidget@Base" 0.6.13+15.04.20150205.1
+ (c++)"vtable for unity::scopes::qt::XmlAsyncReader@Base" 0.6.13+15.04.20150205.1
+ (c++)"vtable for unity::scopes::qt::HttpAsyncReader@Base" 0.6.13+15.04.20150205.1
+ (c++)"vtable for unity::scopes::qt::InitializeEvent@Base" 0.6.13+15.04.20150205.1
+ (c++)"vtable for unity::scopes::qt::JsonAsyncReader@Base" 0.6.13+15.04.20150205.1
+ (c++)"vtable for unity::scopes::qt::QVariantBuilder@Base" 0.6.13+15.04.20150205.1
+ (c++)"vtable for unity::scopes::qt::QSearchQueryBase@Base" 0.6.13+15.04.20150205.1
+ (c++)"vtable for unity::scopes::qt::QPreviewQueryBase@Base" 0.6.13+15.04.20150205.1
+ (c++)"vtable for unity::scopes::qt::QCategorisedResult@Base" 0.6.13+15.04.20150205.1
+ (c++)"vtable for unity::scopes::qt::QSearchQueryBaseAPI@Base" 0.6.13+15.04.20150205.1
+ (c++)"vtable for unity::scopes::qt::QPreviewQueryBaseAPI@Base" 0.6.13+15.04.20150205.1
+ (c++)"vtable for unity::scopes::qt::QResult@Base" 0.6.13+15.04.20150205.1
+ (c++)"vtable for unity::scopes::qt::RunEvent@Base" 0.6.13+15.04.20150205.1
+ (c++)"vtable for unity::scopes::qt::QCategory@Base" 0.6.13+15.04.20150205.1
