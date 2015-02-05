@@ -2,6 +2,10 @@
 configure_file(lib${UNITY_SCOPES_LIB}.pc.in lib${UNITY_SCOPES_LIB}.pc @ONLY)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/lib${UNITY_SCOPES_LIB}.pc DESTINATION ${LIB_INSTALL_PREFIX}/pkgconfig)
 
+# Set up package config.
+configure_file(lib${LIB_QT}.pc.in lib${LIB_QT}.pc @ONLY)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/lib${LIB_QT}.pc DESTINATION ${LIB_INSTALL_PREFIX}/pkgconfig)
+
 # upstart job for smart scopes proxy
 configure_file(smart-scopes-proxy.conf.in smart-scopes-proxy.conf @ONLY)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/smart-scopes-proxy.conf DESTINATION ${CMAKE_INSTALL_DATADIR}/upstart/sessions)

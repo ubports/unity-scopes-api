@@ -14,7 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Authored by: James Henstridge <james.henstridge@canonical.com>
- *              Thomas Voß <thomas.voss@canonical.com>
+ *              Thomas Voss <thomas.voss@canonical.com>
  */
 
 #include <unity/scopes/ScopeBase.h>
