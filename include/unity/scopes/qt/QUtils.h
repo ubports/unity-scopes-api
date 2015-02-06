@@ -18,7 +18,10 @@
 
 #pragma once
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
 #include <QtCore/QVariant>
+#pragma GCC diagnostic pop
 #include <unity/scopes/Variant.h>
 
 #define EXPORT __attribute__((visibility("default")))

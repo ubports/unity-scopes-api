@@ -20,7 +20,10 @@
 
 #include <unity/util/DefinesPtrs.h>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
 #include <QtCore/QVariantMap>
+#pragma GCC diagnostic pop
 #include <QtCore/QString>
 #include <QtCore/QSharedPointer>
 #include <QtCore/QScopedPointer>
