@@ -17,12 +17,13 @@
  */
 
 #include <unity/scopes/CategorisedResult.h>
-#include <unity/scopes/internal/RegistryObject.h>
-#include <unity/scopes/internal/RuntimeImpl.h>
-#include <unity/scopes/internal/ScopeImpl.h>
 #include <unity/scopes/QueryCtrl.h>
+#include <unity/scopes/Runtime.h>
 
 #include <gtest/gtest.h>
+
+#include <condition_variable>
+#include <thread>
 
 #include "ThrowingScope.h"
 
@@ -229,11 +230,6 @@ private:
     Runtime::UPtr runtime_;
     ScopeProxy scope_;
 };
-
-// The command file for each scope is called A.cmd, B.cmd, etc. It contains scope IDs, one per
-// line. For each scope ID in its command file, the scope sends a subsearch to that scope.
-// Once a scope's subsearch completes, it pushes a single result with the scope's ID as the
-// category ID. This allows us to set up various callgraphs by writing to the various command files.
 
 TEST_F(ThrowingScopeTest, no_error)
 {

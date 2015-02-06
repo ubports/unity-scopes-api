@@ -227,7 +227,6 @@ PreviewQueryBase::UPtr ThrowingScope::preview(Result const& result, ActionMetada
     {
         throw ResourceException("exception from preview");
     }
-    lock_guard<mutex> lock(mutex_);
     return PreviewQueryBase::UPtr(new TestPreview(result, metadata));
 }
 
@@ -237,7 +236,6 @@ ActivationQueryBase::UPtr ThrowingScope::activate(Result const& result, ActionMe
     {
         throw ResourceException("exception from activate");
     }
-    lock_guard<mutex> lock(mutex_);
     return ActivationQueryBase::UPtr(new TestActivation(result, metadata));
 }
 
@@ -250,7 +248,6 @@ ActivationQueryBase::UPtr ThrowingScope::perform_action(Result const& result,
     {
         throw ResourceException("exception from perform_action");
     }
-    lock_guard<mutex> lock(mutex_);
     return ActivationQueryBase::UPtr(new TestActivation(result, metadata));
 }
 
