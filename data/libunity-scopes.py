@@ -29,7 +29,7 @@ import apport.fileutils
 from apport.packaging_impl import impl as packaging
 
 # map 'name' from click package manifest to LP project (if known)
-click_name_to_src = {
+click_name_to_lp = {
     'com.ubuntu.scopes.youtube': 'unity-scope-youtube',
     'com.ubuntu.scopes.vimeo': 'unity-scope-vimeo',
     'com.ubuntu.scopes.soundcloud': 'unity-scope-soundcloud'
@@ -59,13 +59,17 @@ def collect_click_info(report, inifile):
         # get click manifest of a click package that owns this inifile
         click_info = subprocess.check_output(['click', 'info', inifile], universal_newlines=True)
         manifest = json.loads(click_info)
-        report['Package'] = '%s %s' % (manifest['name'], manifest['version'])
         name = manifest['name']
-        if name in click_name_to_src:
-            report['SourcePackage'] = click_name_to_src[name]
-        else:
-            report['SourcePackage'] = name
+        report['Package'] = '%s %s' % (name, manifest['version'])
+        report['SourcePackage'] = name
         report['PackageArchitecture'] = manifest['architecture']
+        lp_project = None
+        if name in click_name_to_lp:
+            lp_project = click_name_to_lp[name]
+        elif 'Canonical Content Partners' in manifest['maintainer'] and 'canonical' in name:
+            lp_project = 'savilerow'
+        if lp_project:
+            report['CrashDB'] = '{"impl": "launchpad", "project": "' + lp_project + '", bugpatterns/bugpatterns.xml"}'
     except:
         pass
 
