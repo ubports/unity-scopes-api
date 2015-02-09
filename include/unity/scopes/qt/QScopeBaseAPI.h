@@ -75,7 +75,7 @@ public:
 
     \param scope_id The name of the scope as defined by the scope's configuration file.
     */
-    virtual void start(std::string const& scope_id);
+    virtual void start(std::string const& scope_id) override;
 
     /**
     \brief Called by the scopes run time when the scope should shut down.
@@ -88,7 +88,7 @@ public:
 
     The call to stop() is made by the same thread that calls the create function and start().
     */
-    virtual void stop();
+    virtual void stop() override;
 
     /**
      * Called each time a new preview is requested
