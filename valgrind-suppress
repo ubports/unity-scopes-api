@@ -190,3 +190,18 @@
    fun:zmq_getsockopt
 }
 
+# Leaks in net-cpp. See bug #1419620
+# TODO: Remove these two suppressions once that bug is fixed.
+{
+    net_cpp_client_leak
+    Memcheck:Leak
+    ...
+    fun:_ZN4core3net4http4impl4curl6Client3getERKNS1_7Request13ConfigurationE
+}
+
+{
+    net_cpp_client_leak_2
+    Memcheck:Leak
+    ...
+    fun:_ZN4core3net4http11make_clientEv
+}
