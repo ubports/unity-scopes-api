@@ -27,7 +27,10 @@
 #include <unity/scopes/qt/QColumnLayout.h>
 #include <unity/scopes/qt/QPreviewWidget.h>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
 #include <QtCore/QVariant>
+#pragma GCC diagnostic pop
 
 namespace unity
 {

@@ -431,7 +431,7 @@ public:
     virtual MWQueryCtrlProxy activate(Result const&,
                                       ActionMetadata const&,
                                       MWReplyProxy const&,
-                                      InvokeInfo const&)
+                                      InvokeInfo const&) override
     {
         return nullptr;
     }
