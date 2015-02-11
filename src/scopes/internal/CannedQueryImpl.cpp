@@ -56,6 +56,18 @@ CannedQueryImpl::CannedQueryImpl(std::string const& scope_id, std::string const&
     }
 }
 
+CannedQueryImpl::CannedQueryImpl(CannedQueryImpl const &other)
+{
+    scope_id_ = other.scope_id_;
+    query_string_ = other.query_string_;
+    department_id_ = other.department_id_;
+    filter_state_ = other.filter_state_;
+    if (other.data_ != nullptr)
+    {
+        data_.reset(new Variant(*other.data_));
+    }
+}
+
 CannedQueryImpl::CannedQueryImpl(VariantMap const& variant)
 {
     auto it = variant.find("scope");
@@ -86,6 +98,12 @@ CannedQueryImpl::CannedQueryImpl(VariantMap const& variant)
     if (it != variant.end())
     {
         query_string_ = it->second.get_string();
+    }
+
+    it = variant.find("data");
+    if (it != variant.end())
+    {
+        set_data(it->second);
     }
 }
 
@@ -124,6 +142,25 @@ FilterState CannedQueryImpl::filter_state() const
     return filter_state_;
 }
 
+void CannedQueryImpl::set_data(Variant const& value)
+{
+    data_.reset(new Variant(value));
+}
+
+bool CannedQueryImpl::has_data() const
+{
+    return data_ != nullptr;
+}
+
+Variant CannedQueryImpl::data() const
+{
+    if (data_)
+    {
+        return *data_;
+    }
+    throw unity::LogicException("CannedQuery::data(): data is not set for this query");
+}
+
 VariantMap CannedQueryImpl::serialize() const
 {
     VariantMap vm;
@@ -131,6 +168,10 @@ VariantMap CannedQueryImpl::serialize() const
     vm["query_string"] = query_string_;
     vm["department_id"] = department_id_;
     vm["filter_state"] = filter_state_.serialize();
+    if (data_)
+    {
+        vm["data"] = *data_;
+    }
     return vm;
 }
 
@@ -151,6 +192,11 @@ std::string CannedQueryImpl::to_uri() const
         Variant const var(filters_var);
         internal::JsonCppNode const jstr(var);
         s << "&filters=" << to_percent_encoding(jstr.to_json_string());
+    }
+    if (data_)
+    {
+        internal::JsonCppNode const jstr(*(data_));
+        s << "&data=" << to_percent_encoding(jstr.to_json_string());
     }
     return s.str();
 }
@@ -231,7 +277,14 @@ CannedQuery CannedQueryImpl::from_uri(std::string const& uri)
                         s << "CannedQuery::from_uri(): invalid filters data for uri: '" << uri << "'";
                         throw InvalidArgumentException(s.str());
                     }
-                } // else - unknown keys are ignored
+                }
+                else if (key == "data")
+                {
+                    auto const hints_json = decode_or_throw(val, key, uri);
+                    internal::JsonCppNode const node(hints_json);
+                    q.set_data(node.to_variant());
+                }
+                // else - unknown keys are ignored
             } // else - the string with no '=' is ignored
         }
     }

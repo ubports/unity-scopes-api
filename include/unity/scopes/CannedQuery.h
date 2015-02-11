@@ -133,6 +133,28 @@ public:
     */
     static CannedQuery from_uri(std::string const& uri);
 
+    /**
+    \brief Attach arbitrary data.
+
+    \param value Data to attach to this canned query
+    */
+    void set_data(Variant const& value);
+
+    /**
+    \brief Checks if data has been attached to this query.
+
+    \return true if data is available.
+    */
+    bool has_data() const;
+
+    /**
+    \brief Get data attached to this query.
+
+    \return Data variant
+    \throws unity::NotFoundException if no data is available.
+    */
+    Variant data() const;
+
 private:
     CannedQuery(internal::CannedQueryImpl *impl);
     std::unique_ptr<internal::CannedQueryImpl> p;
