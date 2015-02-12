@@ -280,8 +280,8 @@ CannedQuery CannedQueryImpl::from_uri(std::string const& uri)
                 }
                 else if (key == "data")
                 {
-                    auto const hints_json = decode_or_throw(val, key, uri);
-                    internal::JsonCppNode const node(hints_json);
+                    auto const data_json = decode_or_throw(val, key, uri);
+                    internal::JsonCppNode const node(data_json);
                     q.set_data(node.to_variant());
                 }
                 // else - unknown keys are ignored

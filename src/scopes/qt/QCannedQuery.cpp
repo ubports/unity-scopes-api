@@ -116,3 +116,13 @@ QCannedQuery QCannedQuery::from_uri(QString const& uri)
 {
     return internal::QCannedQueryImpl::from_uri(uri);
 }
+
+bool QCannedQuery::has_data() const
+{
+    return p->has_data();
+}
+
+QVariant QCannedQuery::data() const
+{
+    return p->data();
+}

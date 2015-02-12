@@ -151,7 +151,7 @@ public:
     \brief Get data attached to this query.
 
     \return Data variant
-    \throws unity::NotFoundException if no data is available.
+    \throws unity::LogicException if data is not available.
     */
     Variant data() const;
 

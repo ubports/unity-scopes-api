@@ -81,6 +81,16 @@ FilterState QCannedQueryImpl::filter_state() const
     return api_query_->filter_state();
 }
 
+bool QCannedQueryImpl::has_data() const
+{
+    return api_query_->has_data();
+}
+
+QVariant QCannedQueryImpl::data() const
+{
+    return scopeVariantToQVariant(api_query_->data());
+}
+
 QVariantMap QCannedQueryImpl::serialize() const
 {
     return scopeVariantMapToQVariantMap(api_query_->serialize());
