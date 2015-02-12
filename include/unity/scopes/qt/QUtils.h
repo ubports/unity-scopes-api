@@ -36,10 +36,10 @@ namespace qt
 {
 
 ///@cond
-EXPORT QVariant scopeVariantToQVariant(unity::scopes::Variant const& variant);
-EXPORT unity::scopes::Variant qVariantToScopeVariant(QVariant const& variant);
-EXPORT QVariantMap scopeVariantMapToQVariantMap(unity::scopes::VariantMap const& variant);
-EXPORT VariantMap qVariantMapToScopeVariantMap(QVariantMap const& variant);
+EXPORT QVariant variant_to_qvariant(unity::scopes::Variant const& variant);
+EXPORT unity::scopes::Variant qvariant_to_variant(QVariant const& variant);
+EXPORT QVariantMap variantmap_to_qvariantmap(unity::scopes::VariantMap const& variant);
+EXPORT VariantMap qvariantmap_to_variantmap(QVariantMap const& variant);
 ///@endcond
 
 }  // namespace qt

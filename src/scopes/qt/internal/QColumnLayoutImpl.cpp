@@ -88,7 +88,7 @@ QVector<QString> QColumnLayoutImpl::column(int index) const
 
 QVariantMap QColumnLayoutImpl::serialize() const
 {
-    return scopeVariantMapToQVariantMap(api_layout_->serialize());
+    return variantmap_to_qvariantmap(api_layout_->serialize());
 }
 
 QColumnLayoutImpl::QColumnLayoutImpl(ColumnLayout* api_layout)

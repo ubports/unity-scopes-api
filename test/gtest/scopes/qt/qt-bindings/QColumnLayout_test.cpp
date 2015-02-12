@@ -63,10 +63,10 @@ TEST(QColumnLayout, bindings)
         EXPECT_EQ(api_widgets[i], retrieved_widget_ids[i].toStdString());
     }
 
-    EXPECT_EQ(scopeVariantMapToQVariantMap(api_layout->serialize()), layout.serialize());
+    EXPECT_EQ(variantmap_to_qvariantmap(api_layout->serialize()), layout.serialize());
 
     QColumnLayout layout2(2);
     layout2.add_column(qt_widget_ids);
     layout2.add_column(qt_widget_ids2);
-    EXPECT_EQ(scopeVariantMapToQVariantMap(api_layout->serialize()), layout2.serialize());
+    EXPECT_EQ(variantmap_to_qvariantmap(api_layout->serialize()), layout2.serialize());
 }

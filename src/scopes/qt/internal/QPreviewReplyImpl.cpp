@@ -55,7 +55,7 @@ bool QPreviewReplyImpl::push(QPreviewWidgetList const& widget_list)
 
 bool QPreviewReplyImpl::push(QString const& key, QVariant const& value)
 {
-    return api_reply_->push(key.toUtf8().data(), qVariantToScopeVariant(value));
+    return api_reply_->push(key.toUtf8().data(), qvariant_to_variant(value));
 }
 
 QPreviewReplyImpl::~QPreviewReplyImpl() = default;
