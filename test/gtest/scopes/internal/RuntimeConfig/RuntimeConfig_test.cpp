@@ -238,8 +238,7 @@ TEST(RuntimeConfig, exceptions)
         boost::regex r("unity::scopes::ConfigException: \".+/NoLogDir.ini\": "
                        "No LogDir configured and failed to get default:\\n"
                        "    unity::ResourceException: RuntimeConfig::default_log_directory\\(\\): \\$HOME not set:\\n"
-                       "        unity::LogicException: Could not get string value \\(.+/NoLogDir.ini, "
-                       "group: Runtime\\): Key file does not have key 'LogDir' in group 'Runtime'");
+                       "        unity::LogicException: Could not get string value \\(.+/NoLogDir.ini, .*");
         EXPECT_TRUE(boost::regex_match(e.what(), r)) << e.what();
     }
 

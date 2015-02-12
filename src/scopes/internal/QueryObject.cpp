@@ -124,19 +124,25 @@ void QueryObject::run(MWReplyProxy const& reply, InvokeInfo const& info) noexcep
     }
     catch (std::exception const& e)
     {
-        pushable_ = false;
-        BOOST_LOG(info.mw->runtime()->logger()) << "ScopeBase::run(): " << e.what();
-        reply_->finished(CompletionDetails(CompletionDetails::Error, e.what()));  // Oneway, can't block
+        {
+            lock_guard<mutex> lock(mutex_);
+            pushable_ = false;
+        }
+        BOOST_LOG(info.mw->runtime()->logger()) << "QueryBase::run(): " << e.what();
+        reply_->finished(CompletionDetails(CompletionDetails::Error, string("QueryBase::run(): ") + e.what()));
     }
     catch (...)
     {
-        pushable_ = false;
-        BOOST_LOG(info.mw->runtime()->logger()) << "ScopeBase::run(): unknown exception";
-        reply_->finished(CompletionDetails(CompletionDetails::Error, "unknown exception"));  // Oneway, can't block
+        {
+            lock_guard<mutex> lock(mutex_);
+            pushable_ = false;
+        }
+        BOOST_LOG(info.mw->runtime()->logger()) << "QueryBase::run(): unknown exception";
+        reply_->finished(CompletionDetails(CompletionDetails::Error, "QueryBase::run(): unknown exception"));
     }
 }
 
-void QueryObject::cancel(InvokeInfo const& /* info */)
+void QueryObject::cancel(InvokeInfo const& info)
 {
     {
         lock_guard<mutex> lock(mutex_);
@@ -146,6 +152,13 @@ void QueryObject::cancel(InvokeInfo const& /* info */)
             return;
         }
         pushable_ = false;
+    }  // Release lock
+
+    try
+    {
+        // Forward the cancellation to the query base (which in turn will forward it to any subqueries).
+        // The query base also calls the cancelled() callback to inform the application code.
+        query_base_->cancel();
 
         auto rp = reply_proxy_.lock();
         if (rp)
@@ -155,11 +168,24 @@ void QueryObject::cancel(InvokeInfo const& /* info */)
             // a CompletionDetails::CompletionStatus (whereas the public ReplyProxy does not).
             reply_->finished(CompletionDetails(CompletionDetails::Cancelled));  // Oneway, can't block
         }
-    }  // Release lock
-
-    // Forward the cancellation to the query base (which in turn will forward it to any subqueries).
-    // The query base also calls the cancelled() callback to inform the application code.
-    query_base_->cancel();
+    }
+    catch (std::exception const& e)
+    {
+        BOOST_LOG(info.mw->runtime()->logger()) << "QueryBase::cancelled(): " << e.what();
+        // Deliberately no error completion here. On the client side, we short-cut the cancelled()
+        // callback locally, which unregisters the servant for the cancel message and assumes that
+        // cancellation will work, passing a Cancelled status, even if cancellation throws in the scope.
+        // But, removing the servant may be slow, allowing the finished message below to occasionally
+        // reach the client. If it does, we want the same completion status that we get if the
+        // local short-cut call hasn't done the job yet.
+        reply_->finished(CompletionDetails(CompletionDetails::Cancelled, ""));
+    }
+    catch (...)
+    {
+        BOOST_LOG(info.mw->runtime()->logger()) << "QueryBase::cancelled(): unknown exception";
+        // Same caveat as for std::exception here.
+        reply_->finished(CompletionDetails(CompletionDetails::Cancelled, ""));
+    }
 }
 
 bool QueryObject::pushable(InvokeInfo const& /* info */) const noexcept
