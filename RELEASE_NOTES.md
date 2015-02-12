@@ -1,6 +1,10 @@
 Release notes
 =============
 
+Changes in version 0.6.14
+=========================
+  - Added support for attaching arbitrary data to CannedQuery.
+
 Changes in version 0.6.13
 =========================
   - Return keywords as a set rather than a vector.
