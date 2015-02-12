@@ -69,7 +69,7 @@ def collect_click_info(report, inifile):
         elif 'Canonical Content Partners' in manifest['maintainer'] and 'canonical' in name:
             lp_project = 'savilerow'
         if lp_project:
-            report['CrashDB'] = '{"impl": "launchpad", "project": "' + lp_project + '", bugpatterns/bugpatterns.xml"}'
+            report['CrashDB'] = '{"impl": "launchpad", "project": "' + lp_project + '", "bug_pattern_url": "http://people.canonical.com/~ubuntu-archive/bugpatterns/bugpatterns.xml"}'
     except:
         pass
 
