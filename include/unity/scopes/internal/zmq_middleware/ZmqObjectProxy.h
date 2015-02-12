@@ -56,11 +56,11 @@ public:
                    int64_t timeout = -1);
     virtual ~ZmqObjectProxy();
 
-    virtual ZmqMiddleware* mw_base() const noexcept;
+    virtual ZmqMiddleware* mw_base() const noexcept override;
 
     virtual std::string endpoint() const override;
     virtual std::string identity() const override;
-    std::string target_category() const;
+    std::string target_category() const override;
     RequestMode mode() const;
     virtual int64_t timeout() const noexcept override;
 

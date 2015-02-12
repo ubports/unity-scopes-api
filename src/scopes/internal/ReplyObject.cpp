@@ -40,19 +40,20 @@ namespace scopes
 namespace internal
 {
 
-ReplyObject::ReplyObject(ListenerBase::SPtr const& receiver_base, RuntimeImpl const* runtime,
-                         std::string const& scope_proxy, bool dont_reap) :
-    runtime_(runtime),
-    listener_base_(receiver_base),
-    finished_(false),
-    origin_proxy_(scope_proxy),
-    num_push_(0),
-    info_occurred_(false)
+ReplyObject::ReplyObject(ListenerBase::SPtr const& receiver_base,
+                         RuntimeImpl const* runtime,
+                         std::string const& scope_proxy,
+                         bool dont_reap)
+    : runtime_(runtime)
+    , listener_base_(receiver_base)
+    , finished_(false)
+    , origin_proxy_(scope_proxy)
+    , num_push_(0)
 {
     assert(receiver_base);
     assert(runtime);
 
-    if (dont_reap == false)
+    if (!dont_reap)
     {
         unique_lock<mutex> lock(mutex_);  // Make sure that when lambda fires, it sees current values.
         reap_item_ = runtime->reply_reaper()->add([this] {
@@ -134,12 +135,11 @@ void ReplyObject::push(VariantMap const& result) noexcept
     // Safe to call finished now if something went wrong or cardinality was exceeded.
     if (!error.empty())
     {
-        // TODO: log error
+        BOOST_LOG(runtime_->logger()) << "ReplyObject::push(): " << error;
         finished(CompletionDetails(CompletionDetails::Error, error));
     }
     else if (stop)
     {
-        // TODO: log error
         finished(CompletionDetails(CompletionDetails::OK));
     }
 }
@@ -171,7 +171,6 @@ void ReplyObject::finished(CompletionDetails const& details) noexcept
     unique_lock<mutex> lock(mutex_);
     assert(num_push_ >= 0);
     idle_.wait(lock, [this] { return num_push_ == 0; });
-    lock.unlock(); // Inform the application code that the query is complete outside synchronization.
     try
     {
         CompletionDetails details_with_info(details);
@@ -179,6 +178,7 @@ void ReplyObject::finished(CompletionDetails const& details) noexcept
         {
             details_with_info.add_info(info);
         }
+        lock.unlock(); // Inform the application code that the query is complete outside synchronization.
         listener_base_->finished(details_with_info);
     }
     catch (std::exception const& e)
@@ -208,11 +208,13 @@ void ReplyObject::info(OperationInfo const& op_info) noexcept
     {
         reap_item_->refresh();
     }
-    info_occurred_.exchange(true);
 
     try
     {
-        info_list_.push_back(op_info);
+        {
+            unique_lock<mutex> lock(mutex_);
+            info_list_.push_back(op_info);
+        }
         listener_base_->info(op_info);
     }
     catch (std::exception const& e)

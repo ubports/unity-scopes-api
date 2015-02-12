@@ -61,7 +61,9 @@ public:
                     throw unity::ResourceException("Write pipe duplication failed");
                 }
 
-                execl(server_path.c_str(), server_path.c_str(), arg.c_str(), NULL);
+                // execle() instead of execl(). Otherwise, valgrind complains about
+                // an invalid envp being passed from execl() to execle().
+                execle(server_path.c_str(), server_path.c_str(), arg.c_str(), nullptr, nullptr);
                 throw unity::ResourceException("Failed to execute fake server script");
             default: // parent
                 close(pipefd[1]);       // close write

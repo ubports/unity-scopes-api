@@ -1,0 +1,4 @@
+[ScopeConfig]
+DisplayName = ThrowingScope
+Description = Test scope that throws from various methods.
+Author = Michi

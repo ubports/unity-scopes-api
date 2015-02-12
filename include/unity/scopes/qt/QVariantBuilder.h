@@ -20,7 +20,10 @@
 
 #include <QtCore/QPair>
 #include <QtCore/QString>
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
 #include <QtCore/QVariant>
+#pragma GCC diagnostic pop
 #include <QtCore/QVector>
 
 #include <memory>

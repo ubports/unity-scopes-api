@@ -154,7 +154,7 @@ The following keys are recognized:
 
   The maximum size in bytes of the sum of sizes of all log files in the log directory
   before they are deleted. The value must be greater than Log.MaxFileSize.
-  The default value is 10 MB.
+  The default value is 2 MB.
 
 - Log.TraceChannels
 

@@ -43,20 +43,7 @@ QueryBase::~QueryBase()
 void QueryBase::cancel()
 {
     p->cancel();    // Forward cancel to subqueries
-    try
-    {
-        cancelled();    // Inform this query that it was cancelled
-    }
-    catch (std::exception const& e)
-    {
-        cerr << "QueryBase::cancel(): exception from cancelled(): " << e.what() << endl;
-        // TODO: log error
-    }
-    catch (...)
-    {
-        cerr << "QueryBase::cancel(): unknown exception from cancelled()" << endl;
-        // TODO: log error
-    }
+    cancelled();
 }
 /// @endcond
 

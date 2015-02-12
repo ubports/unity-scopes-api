@@ -18,7 +18,10 @@
 
 #pragma once
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
 #include <QtCore/QVariantMap>
+#pragma GCC diagnostic pop
 #include <QtCore/QString>
 
 namespace unity

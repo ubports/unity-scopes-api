@@ -1,3 +1,26 @@
+unity-scopes-api (0.6.13+15.04.20150211-0ubuntu1) vivid; urgency=medium
+
+  [ Ubuntu daily release ]
+  * debian/libunity-scopes3.symbols: auto-update to released version
+
+  [ Michi Henning ]
+  * Fixed a bunch of warnings caused by QVariant headers. Restored
+    spelling of Thomas Voß's surname. Fixed test failure in
+    RuntimeConfig caused by a change in the glib .ini parser from Utopic
+    to Vidid. This allows the test to pass on both Utopic and Vivid.
+    Fixed a few clang warnings.
+  * Reduced log history to 2 MB per scope.
+  * Fixed core dump in the run time when a scope threw an exception from
+    PreviewQueryBase::run().
+  * Added tests for exceptions thrown from client-side callbacks.
+  * Suppressed warning for arm build and updated comment regarding
+    alignment.
+  * Added valgrind suppression for leak in net-cpp. Added work-around
+    for valgrind complaint about invalid envp being passed when calling
+    execl().
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Wed, 11 Feb 2015 08:31:34 +0000
+
 unity-scopes-api (0.6.13+15.04.20150205.1-0ubuntu1) vivid; urgency=medium
 
   [ Ubuntu daily release ]

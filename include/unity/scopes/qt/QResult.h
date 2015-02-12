@@ -23,7 +23,10 @@
 #include <unity/scopes/ScopeProxyFwd.h>
 
 #include <QtCore/QString>
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
 #include <QtCore/QVariant>
+#pragma GCC diagnostic pop
 
 namespace unity
 {
