@@ -10,6 +10,9 @@ unity-scopes-api (0.6.14-0ubuntu1) UNRELEASED; urgency=medium
     Note: This is change is ABI compatible with gcc and clang despite the addition 
           a new virtual function.
 
+  [ CI Train Bot ]
+  * debian/libunity-scopes3.symbols: auto-update to released version
+
  -- Michi Henning <michi.henning@canonical.com>  Fri, 13 Feb 2015 20:28:00 +1000
 
 unity-scopes-api (0.6.13+15.04.20150211-0ubuntu1) vivid; urgency=medium
