@@ -28,36 +28,31 @@
 using namespace unity::scopes::qt::internal;
 using namespace unity::scopes::qt;
 using namespace unity::scopes;
-using namespace std;
 
 TEST(QVariantBuilder, constructors)
 {
-    {
-        QVariantBuilder b;
-        b.add_tuple({{"int", QVariant(5)}});
-        QVariantBuilder b2(b);
-        auto v = b.end();
-        auto v2 = b2.end();
-        EXPECT_EQ(5, v.toList().at(0).toMap().value("int").toInt());
-        EXPECT_EQ(v, v2);
-    }
+    QVariantBuilder b;
+    b.add_tuple({{"int", QVariant(5)}});
+    QVariantBuilder b2(b);
+    auto v = b.end();
+    auto v2 = b2.end();
+    EXPECT_EQ(5, v.toList().at(0).toMap().value("int").toInt());
+    EXPECT_EQ(v, v2);
 }
 
 TEST(QVariantBuilder, assignment)
 {
-    {
-        QVector<QPair<QString, QVariant>> vec;
-        QPair<QString, QVariant> p{"int", QVariant(5)};
-        vec.push_back({"int", QVariant(5)});
-        QVariantBuilder b;
-        b.add_tuple(vec);
-        QVariantBuilder b2;
-        b2 = b;
-        auto v = b.end();
-        auto v2 = b2.end();
-        EXPECT_EQ(5, v.toList().at(0).toMap().value("int").toInt());
-        EXPECT_EQ(v, v2);
-    }
+    QVector<QPair<QString, QVariant>> vec;
+    QPair<QString, QVariant> p{"int", QVariant(5)};
+    vec.push_back({"int", QVariant(5)});
+    QVariantBuilder b;
+    b.add_tuple(vec);
+    QVariantBuilder b2;
+    b2 = b;
+    auto v = b.end();
+    auto v2 = b2.end();
+    EXPECT_EQ(5, v.toList().at(0).toMap().value("int").toInt());
+    EXPECT_EQ(v, v2);
 }
 
 TEST(QVariantBuilder, bindings)

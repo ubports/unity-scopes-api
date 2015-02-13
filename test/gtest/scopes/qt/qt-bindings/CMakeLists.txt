@@ -149,6 +149,25 @@ add_test(QPreviewQueryBaseAPI QPreviewQueryBaseAPI_test)
 ###################################################
 
 add_executable(
+  QUtils_test
+  QUtils_test.cpp)
+
+target_link_libraries(
+    QUtils_test
+    ${LIBGTEST}
+    ${TESTLIBS_QT}
+    ${TESTLIBS})
+
+find_package(Qt5Core REQUIRED)
+include_directories(${Qt5Core_INCLUDE_DIRS})
+
+qt5_use_modules(QUtils_test Core)
+
+add_test(QUtils QUtils_test)
+
+###################################################
+
+add_executable(
   QVariantBuilder_test
   QVariantBuilder_test.cpp)
 

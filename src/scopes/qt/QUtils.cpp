@@ -18,9 +18,12 @@
 
 #include <unity/scopes/qt/QUtils.h>
 
+#include <unity/UnityExceptions.h>
+
 #include <cassert>
 
 using namespace unity::scopes::qt;
+using namespace std;
 
 namespace sc = unity::scopes;
 namespace qt = unity::scopes::qt;
@@ -70,7 +73,7 @@ QVariant scopeVariantToQVariant(sc::Variant const& variant)
         }
         default:
         {
-            assert(false);
+            assert(false);  // LCOV_EXCL_LINE
             return QVariant();
         }
     }
@@ -115,9 +118,8 @@ sc::Variant qVariantToScopeVariant(QVariant const& variant)
         }
         default:
         {
-            // TODO: better to throw than to return an invalid value?
-            qWarning("Unhandled QVariant type: %s", variant.typeName());
-            return sc::Variant();
+            throw unity::InvalidArgumentException(string("qVariantToScopeVariant(): invalid source type: ")
+                                                  + variant.typeName());
         }
     }
 }
@@ -139,6 +141,7 @@ VariantMap qVariantMapToScopeVariantMap(QVariantMap const& variant)
     QMapIterator<QString, QVariant> it(variant);
     while (it.hasNext())
     {
+        it.next();
         ret_map[it.key().toUtf8().data()] = qt::qVariantToScopeVariant(it.value());
     }
 
