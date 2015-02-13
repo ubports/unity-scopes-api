@@ -208,6 +208,10 @@ struct DevNullSearchReply : public unity::scopes::SearchReply, public WaitableRe
     {
         return true;
     }
+
+    void push_surfacing_results_from_cache() override
+    {
+    }
 };
 
 typedef std::chrono::high_resolution_clock Clock;

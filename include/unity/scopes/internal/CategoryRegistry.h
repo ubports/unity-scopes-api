@@ -71,9 +71,16 @@ public:
     */
     void register_category(Category::SCPtr category);
 
+    /**
+    \brief Serializes all categories in the registry.
+    \return VariantArray containing all categories.
+    */
+    VariantArray serialize() const;
+
 private:
     mutable std::mutex mutex_;
-    std::map<std::string, Category::SCPtr> categories_;
+    typedef std::pair<std::string, Category::SCPtr> CatPair;
+    std::vector<CatPair> categories_;                         // vector instead of map, so we preserve order
 };
 
 } // namespace internal

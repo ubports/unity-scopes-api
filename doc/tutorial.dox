@@ -229,6 +229,19 @@ to show in surfacing mode. In the interests of a good user experience, it is imp
 here (if at all possible), so the user gets to see at least some results (instead of being confronted with
 a blank screen).
 
+The runtime automatically saves the results of the most recent surfacing query. If a scope cannot produce
+a result for a surfacing query (presumably, due to connectivity problems), calling
+\link unity::scopes::SearchReply::push_surfacing_results_from_cache() push_surfacing_results_from_cache()\endlink
+pushes the results that were produced by the most recent successful
+surfacing query from the cache. If your scope cannot produce surfacing results, you can call this
+method to "replay" the results of the previous surfacing query. In turn, this avoids the user
+being presented with an empty screen if he/she swipes to the scope while the device does not have connectivity.
+
+`push_surfacing_results_from_cache()` has an effect only if called for a surfacing query (that is, a query with an empty query string). If called for a non-empty query, it does nothing.
+
+You must call this method before calling \link unity::scopes::Reply::finished finished()\endlink,
+otherwise no cached results will be pushed. (`push_surfacing_results_from_cache() implicitly calls `finished()`);
+
 \paragraph querybase Implementing QueryBase
 
 You must implement a class that derives from \link unity::scopes::SearchQueryBase SearchQueryBase\endlink and return

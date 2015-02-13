@@ -207,6 +207,7 @@ void SSQueryObject::run_query(SSQuery::SPtr query, MWReplyProxy const& reply)
     q_reply_proxy = make_shared<SearchReplyImpl>(reply,
                                                  shared_from_this(),
                                                  query->q_cardinality,
+                                                 q_base->query().query_string(),
                                                  q_base->department_id());
     assert(q_reply_proxy);
     query->q_reply_proxy = q_reply_proxy;

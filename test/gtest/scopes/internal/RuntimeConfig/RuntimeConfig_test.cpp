@@ -24,7 +24,6 @@
 #include <unity/UnityExceptions.h>
 
 #include <boost/regex.hpp>  // Use Boost implementation until http://gcc.gnu.org/bugzilla/show_bug.cgi?id=53631 is fixed.
-
 #include <gtest/gtest.h>
 
 using namespace std;
@@ -252,9 +251,9 @@ TEST(RuntimeConfig, exceptions)
     }
     catch (ConfigException const& e)
     {
-        EXPECT_STREQ( "unity::scopes::ConfigException: \"" TEST_SRC_DIR "/NoAppDir.ini\": "
-                      "No AppDir configured and failed to get default:\n"
-                      "    unity::ResourceException: RuntimeConfig::default_app_directory(): $HOME not set",
+        EXPECT_STREQ("unity::scopes::ConfigException: \"" TEST_SRC_DIR "/NoAppDir.ini\": "
+                     "No AppDir configured and failed to get default:\n"
+                     "    unity::ResourceException: RuntimeConfig::default_app_directory(): $HOME not set",
                      e.what());
     }
 

@@ -1,6 +1,17 @@
 Release notes
 =============
 
+Changes in version 0.6.14
+=========================
+  - Added push_surfacing_results_from_cache() to Reply proxy. This allows a scope
+    to reply the results of the last succesful surfacing query from an on-disk cache.
+    This is useful to prevent the user being presented with an empty screen when
+    swiping to the scope while the device has no network access, or the scope's
+    data source is off-line.
+
+    Note: This is change is ABI compatible with gcc and clang despite the addition 
+          a new virtual function.
+
 Changes in version 0.6.13
 =========================
   - Return keywords as a set rather than a vector.

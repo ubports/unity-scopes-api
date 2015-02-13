@@ -31,6 +31,7 @@ namespace internal
 {
     class CategorisedResultImpl;
     class ResultReplyObject;
+    class SearchReplyImpl;
 }
 
 /**
@@ -80,6 +81,7 @@ private:
 
     friend class internal::CategorisedResultImpl;
     friend class internal::ResultReplyObject;
+    friend class internal::SearchReplyImpl;
 };
 
 } // namespace scopes
