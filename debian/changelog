@@ -1,4 +1,4 @@
-unity-scopes-api (0.6.14-0ubuntu1) UNRELEASED; urgency=medium
+unity-scopes-api (0.6.14+15.04.20150213-0ubuntu1) vivid; urgency=medium
 
   [ Michi Henning ]
   * Added push_surfacing_results_from_cache() to Reply proxy. This allows a scope
@@ -9,11 +9,14 @@ unity-scopes-api (0.6.14-0ubuntu1) UNRELEASED; urgency=medium
 
     Note: This is change is ABI compatible with gcc and clang despite the addition 
           a new virtual function.
+  * Fixed sporadic failure in JsonAsyncReader test caused by slow DNS.
+    Improved tests to report exception details if an exception other
+    than the expected one is thrown.
 
   [ CI Train Bot ]
   * debian/libunity-scopes3.symbols: auto-update to released version
 
- -- Michi Henning <michi.henning@canonical.com>  Fri, 13 Feb 2015 20:28:00 +1000
+ -- CI Train Bot <ci-train-bot@canonical.com>  Fri, 13 Feb 2015 10:36:27 +0000
 
 unity-scopes-api (0.6.13+15.04.20150211-0ubuntu1) vivid; urgency=medium
 
