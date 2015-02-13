@@ -18,6 +18,8 @@
 
 #include <unity/scopes/qt/QUtils.h>
 
+#include <cassert>
+
 using namespace unity::scopes::qt;
 
 namespace sc = unity::scopes;
@@ -67,8 +69,10 @@ QVariant scopeVariantToQVariant(sc::Variant const& variant)
             return result_list;
         }
         default:
-            qWarning("Unhandled Variant type");
+        {
+            assert(false);
             return QVariant();
+        }
     }
 }
 
@@ -110,8 +114,11 @@ sc::Variant qVariantToScopeVariant(QVariant const& variant)
             return sc::Variant(arr);
         }
         default:
+        {
+            // TODO: better to throw than to return an invalid value?
             qWarning("Unhandled QVariant type: %s", variant.typeName());
             return sc::Variant();
+        }
     }
 }
 

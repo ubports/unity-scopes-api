@@ -32,11 +32,8 @@ QVariantBuilderImpl::QVariantBuilderImpl()
 }
 
 QVariantBuilderImpl::QVariantBuilderImpl(QVariantBuilderImpl const& other)
+    : api_builder_(new VariantBuilder(*(other.api_builder_)))
 {
-    if (other.api_builder_ && &other != this)
-    {
-        api_builder_.reset(new VariantBuilder(*(other.api_builder_)));
-    }
 }
 
 void QVariantBuilderImpl::add_tuple(std::initializer_list<QPair<QString, QVariant>> const& tuple)
