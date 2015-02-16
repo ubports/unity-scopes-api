@@ -118,7 +118,10 @@ bool QSearchQueryBaseAPI::event(QEvent* e)
             // initialize the query object
             qtquery_ = qtscope_.search(SearchQueryBase::query(), SearchQueryBase::search_metadata());
             qtquery_->init(this);
-            connect(this, SIGNAL(run_signal(QSearchReplyProxy const&)), qtquery_.get(), SLOT(run(QSearchReplyProxy const&)));
+            connect(this,
+                    SIGNAL(run_signal(QSearchReplyProxy const&)),
+                    qtquery_.get(),
+                    SLOT(run(QSearchReplyProxy const&)));
             break;
         case Run:
             assert(qtquery_);

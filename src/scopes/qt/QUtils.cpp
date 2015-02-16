@@ -118,8 +118,8 @@ sc::Variant qVariantToScopeVariant(QVariant const& variant)
         }
         default:
         {
-            throw unity::InvalidArgumentException(string("qVariantToScopeVariant(): invalid source type: ")
-                                                  + variant.typeName());
+            throw unity::InvalidArgumentException(string("qVariantToScopeVariant(): invalid source type: ") +
+                                                  variant.typeName());
         }
     }
 }
