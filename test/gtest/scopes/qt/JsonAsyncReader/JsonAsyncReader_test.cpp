@@ -51,8 +51,6 @@ protected:
     std::string fake_server_host;
 };
 
-// std::string fake_server_uri = getServerAddress();
-
 struct Client
 {
 public:
@@ -136,7 +134,6 @@ TEST(BadUrlException, state)
     }
 }
 
-//
 TEST_F(ExceptionsTest, user_results_ok)
 {
     JsonReader reader;

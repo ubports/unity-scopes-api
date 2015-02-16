@@ -35,6 +35,7 @@ namespace scopes
 namespace qt
 {
 
+// TODO: These are in the public API, so they need documentation.
 ///@cond
 EXPORT QVariant scopeVariantToQVariant(unity::scopes::Variant const& variant);
 EXPORT unity::scopes::Variant qVariantToScopeVariant(QVariant const& variant);
