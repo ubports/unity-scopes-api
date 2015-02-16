@@ -35,11 +35,11 @@ TEST(QDepartment, bindings)
     QCannedQuery query2("scopeA", "foo2", "dep2");
     QCannedQuery query3("scopeA", "foo3", "dep3");
 
-    internal::QDepartmentImpl *impl = new internal::QDepartmentImpl(query, "label");
+    internal::QDepartmentImpl* impl = new internal::QDepartmentImpl(query, "label");
     QDepartment dep = internal::QDepartmentImpl::create(impl);
 
     // get the internal api layout
-    unity::scopes::Department * api_dep = impl->get_api();
+    unity::scopes::Department* api_dep = impl->get_api();
 
     dep.set_alternate_label("alternate_label");
     EXPECT_EQ(api_dep->alternate_label(), dep.alternate_label().toStdString());
@@ -58,19 +58,19 @@ TEST(QDepartment, bindings)
     EXPECT_EQ(qt_list.size(), api_list.size());
 
     std::vector<std::string> dep_ids;
-    for(auto item: api_list)
+    for (auto item : api_list)
     {
         dep_ids.push_back(item->id());
     }
 
     std::vector<std::string> qt_dep_ids;
     QListIterator<QSharedPointer<QDepartment const>> it(qt_list);
-    while(it.hasNext())
+    while (it.hasNext())
     {
         qt_dep_ids.push_back(it.next()->id().toStdString());
     }
 
-    for(uint i=0; i < qt_dep_ids.size(); ++i)
+    for (uint i = 0; i < qt_dep_ids.size(); ++i)
     {
         EXPECT_EQ(qt_dep_ids[i], dep_ids[i]);
     }

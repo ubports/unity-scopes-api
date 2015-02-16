@@ -57,7 +57,7 @@ TEST(QVariantBuilder, assignment)
 
 TEST(QVariantBuilder, bindings)
 {
-    QVariantBuilderImpl *impl = new QVariantBuilderImpl();
+    QVariantBuilderImpl* impl = new QVariantBuilderImpl();
     EXPECT_NE(nullptr, impl->get_api());
     QVariantBuilder builder = QVariantBuilderImpl::create(impl);
 

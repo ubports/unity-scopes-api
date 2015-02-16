@@ -37,23 +37,22 @@ TEST(TestSetup, bindings)
 {
     QScopeMock scope;
 
-    //construct the QSearchQueryBaseAPIMock
+    // construct the QSearchQueryBaseAPIMock
     QScopeBaseAPIMock api_scope(scope);
 
     // verify that the event method is called for start event
     EXPECT_CALL(scope, start(_)).Times(Exactly(1));
     api_scope.start("test_scope");
 
-    QThread *qt_thread = api_scope.getQtAppThread();
+    QThread* qt_thread = api_scope.getQtAppThread();
     scope.setQtThread(qt_thread);
 
-    auto CheckThread =
-            [qt_thread]() -> void
-        {
-            EXPECT_EQ(qt_thread, QThread::currentThread());
-        };
+    auto CheckThread = [qt_thread]() -> void
+    {
+        EXPECT_EQ(qt_thread, QThread::currentThread());
+    };
 
-    unity::scopes::internal::ResultImpl *resultImpl = new unity::scopes::internal::ResultImpl();
+    unity::scopes::internal::ResultImpl* resultImpl = new unity::scopes::internal::ResultImpl();
     resultImpl->set_uri("test_uri");
 
     unity::scopes::Result result = unity::scopes::internal::ResultImpl::create_result(resultImpl->serialize());
@@ -65,5 +64,4 @@ TEST(TestSetup, bindings)
     // that the thread is the Qt thread
     EXPECT_CALL(scope, stop()).Times(Exactly(1)).WillOnce(Invoke(CheckThread));
     api_scope.stop();
-
 }

@@ -51,7 +51,7 @@ TEST(QCategorisedResult, bindings)
     QCategorisedResult result(qCategory);
 
     result.set_uri("test_uri");
-    EXPECT_EQ(result.uri(),"test_uri");
+    EXPECT_EQ(result.uri(), "test_uri");
 
     // test the [] operator
     EXPECT_EQ(result["uri"].toString(), "test_uri");
@@ -66,7 +66,6 @@ TEST(QCategorisedResult, bindings)
     EXPECT_EQ(result.category()->icon(), qCategory->icon());
     EXPECT_EQ(result.category()->serialize(), qCategory->serialize());
 
-
     // check the copy
     result["test_attr"] = "test_value3";
     QCategorisedResult result2(result);
@@ -75,7 +74,7 @@ TEST(QCategorisedResult, bindings)
     EXPECT_EQ(result2.category()->icon(), qCategory->icon());
     EXPECT_EQ(result2.category()->serialize(), qCategory->serialize());
     EXPECT_EQ(result2["test_attr"], "test_value3");
-    EXPECT_EQ(result2.uri(),"test_uri");
+    EXPECT_EQ(result2.uri(), "test_uri");
 
     result = result2;
     EXPECT_EQ(result.category()->id(), qCategory->id());
@@ -83,5 +82,5 @@ TEST(QCategorisedResult, bindings)
     EXPECT_EQ(result.category()->icon(), qCategory->icon());
     EXPECT_EQ(result.category()->serialize(), qCategory->serialize());
     EXPECT_EQ(result["test_attr"], "test_value3");
-    EXPECT_EQ(result.uri(),"test_uri");
+    EXPECT_EQ(result.uri(), "test_uri");
 }

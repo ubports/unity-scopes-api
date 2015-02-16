@@ -25,7 +25,6 @@
 
 #include <unity/scopes/qt/QSearchQueryBaseAPI.h>
 
-
 #include <chrono>
 
 using namespace testing;
@@ -39,8 +38,8 @@ public:
                             QScopeBase& qtscope,
                             unity::scopes::CannedQuery const& query,
                             unity::scopes::SearchMetadata const& metadata,
-                            QObject *parent=0)
-                            : QSearchQueryBaseAPI(qtapp,qtscope,query, metadata,parent)
+                            QObject* parent = 0)
+        : QSearchQueryBaseAPI(qtapp, qtscope, query, metadata, parent)
     {
     }
 
@@ -64,19 +63,19 @@ public:
 };
 
 // For type numbers refer to QSearchQueryBaseAPI.cpp
-Matcher<QEvent *> CheckCancelledEventType(void *thread_id)
+Matcher<QEvent*> CheckCancelledEventType(void* thread_id)
 {
     return MakeMatcher(new QEventTypeMatcher(1002, thread_id));
 }
 
 // For type numbers refer to QSearchQueryBaseAPI.cpp
-Matcher<QEvent *> CheckInitializeEventType(void *thread_id)
+Matcher<QEvent*> CheckInitializeEventType(void* thread_id)
 {
     return MakeMatcher(new QEventTypeMatcher(1000, thread_id));
 }
 
 // For type numbers refer to QSearchQueryBaseAPI.cpp
-Matcher<QEvent *> CheckRunEventType(void *thread_id)
+Matcher<QEvent*> CheckRunEventType(void* thread_id)
 {
     return MakeMatcher(new QEventTypeMatcher(1001, thread_id));
 }
@@ -87,12 +86,12 @@ TEST_F(TestSetup, bindings)
     unity::scopes::CannedQuery query("scopeA", "query", "department");
     unity::scopes::SearchMetadata metadata("en", "phone");
 
-    //construct the QSearchQueryBaseAPIMock
+    // construct the QSearchQueryBaseAPIMock
     QSearchQueryBaseAPIMock api_query(qtapp_, scope, query, metadata);
 
     // give some time to process the events posted in the constructor
     std::chrono::milliseconds dura(500);
-    std::this_thread::sleep_for( dura );
+    std::this_thread::sleep_for(dura);
 
     // verify that the event method is called for cancel event and
     // from the same thread id (The Qt thread)

@@ -30,18 +30,18 @@ using namespace unity::scopes::qt;
 
 TEST(QColumnLayout, bindings)
 {
-    internal::QColumnLayoutImpl *impl = new internal::QColumnLayoutImpl(2);
+    internal::QColumnLayoutImpl* impl = new internal::QColumnLayoutImpl(2);
     QColumnLayout layout = internal::QColumnLayoutImpl::create(impl);
 
     // get the internal api layout
-    unity::scopes::ColumnLayout * api_layout = impl->get_api();
+    unity::scopes::ColumnLayout* api_layout = impl->get_api();
 
     // start checking that the internal class has the right attributes
     EXPECT_EQ(api_layout->number_of_columns(), 2);
     EXPECT_EQ(api_layout->number_of_columns(), layout.number_of_columns());
 
-    QVector<QString> qt_widget_ids {"widget1", "widget2"};
-    QVector<QString> qt_widget_ids2 {"widget3", "widget4"};
+    QVector<QString> qt_widget_ids{"widget1", "widget2"};
+    QVector<QString> qt_widget_ids2{"widget3", "widget4"};
     layout.add_column(qt_widget_ids);
     layout.add_column(qt_widget_ids2);
     QVector<QString> retrieved_widget_ids = layout.column(0);
@@ -49,7 +49,7 @@ TEST(QColumnLayout, bindings)
     std::vector<std::string> api_widgets = api_layout->column(0);
     EXPECT_EQ(api_widgets.size(), retrieved_widget_ids.size());
     EXPECT_TRUE(api_widgets.size() != 0);
-    for(uint i = 0; i < api_widgets.size(); ++i)
+    for (uint i = 0; i < api_widgets.size(); ++i)
     {
         EXPECT_EQ(api_widgets[i], retrieved_widget_ids[i].toStdString());
     }
@@ -58,7 +58,7 @@ TEST(QColumnLayout, bindings)
     api_widgets = api_layout->column(1);
     EXPECT_EQ(api_widgets.size(), retrieved_widget_ids.size());
     EXPECT_TRUE(api_widgets.size() != 0);
-    for(uint i = 0; i < api_widgets.size(); ++i)
+    for (uint i = 0; i < api_widgets.size(); ++i)
     {
         EXPECT_EQ(api_widgets[i], retrieved_widget_ids[i].toStdString());
     }
