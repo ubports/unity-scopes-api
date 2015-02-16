@@ -28,7 +28,6 @@
 #include <unity/scopes/internal/ResultImpl.h>
 #include <unity/scopes/ActionMetadata.h>
 
-
 #include <chrono>
 
 using namespace testing;
@@ -39,11 +38,11 @@ class QPreviewQueryBaseAPIMock : public QPreviewQueryBaseAPI
 {
 public:
     QPreviewQueryBaseAPIMock(std::shared_ptr<QCoreApplication> qtapp,
-                            QScopeBase& qtscope,
-                            unity::scopes::Result const& result,
-                            unity::scopes::ActionMetadata const& metadata,
-                            QObject *parent=0)
-                            : QPreviewQueryBaseAPI(qtapp,qtscope,result, metadata,parent)
+                             QScopeBase& qtscope,
+                             unity::scopes::Result const& result,
+                             unity::scopes::ActionMetadata const& metadata,
+                             QObject* parent = nullptr)
+        : QPreviewQueryBaseAPI(qtapp, qtscope, result, metadata, parent)
     {
     }
 
@@ -67,19 +66,13 @@ public:
 };
 
 // For type numbers refer to QSearchQueryBaseAPI.cpp
-Matcher<QEvent *> CheckCancelledEventType(void *thread_id)
+Matcher<QEvent*> CheckCancelledEventType(void* thread_id)
 {
     return MakeMatcher(new QEventTypeMatcher(1002, thread_id));
 }
 
 // For type numbers refer to QSearchQueryBaseAPI.cpp
-Matcher<QEvent *> CheckInitializeEventType(void *thread_id)
-{
-    return MakeMatcher(new QEventTypeMatcher(1000, thread_id));
-}
-
-// For type numbers refer to QSearchQueryBaseAPI.cpp
-Matcher<QEvent *> CheckRunEventType(void *thread_id)
+Matcher<QEvent*> CheckRunEventType(void* thread_id)
 {
     return MakeMatcher(new QEventTypeMatcher(1001, thread_id));
 }
@@ -88,7 +81,7 @@ TEST_F(TestSetup, bindings)
 {
     QScope scope;
 
-    unity::scopes::internal::ResultImpl *resultImpl = new unity::scopes::internal::ResultImpl();
+    unity::scopes::internal::ResultImpl* resultImpl = new unity::scopes::internal::ResultImpl();
     resultImpl->set_uri("test_uri");
 
     unity::scopes::Result result = unity::scopes::internal::ResultImpl::create_result(resultImpl->serialize());
@@ -96,19 +89,19 @@ TEST_F(TestSetup, bindings)
     unity::scopes::CannedQuery query("scopeA", "query", "department");
     unity::scopes::ActionMetadata metadata("en", "phone");
 
-    //construct the QSearchQueryBaseAPIMock
+    // construct the QSearchQueryBaseAPIMock
     QPreviewQueryBaseAPIMock api_query(qtapp_, scope, result, metadata);
 
     // give some time to process the events posted in the constructor
-    std::chrono::milliseconds dura(500);
-    std::this_thread::sleep_for( dura );
+    std::chrono::milliseconds dura(1000);
+    std::this_thread::sleep_for(dura);
 
     // verify that the event method is called for cancel event and
     // from the same thread id (The Qt thread)
     EXPECT_CALL(api_query, event(CheckCancelledEventType(thread_id_))).Times(Exactly(1));
     api_query.callCancel();
 
-    // verify that the event method is called for cancel event and
+    // verify that the event method is called for run event and
     // from the same thread id (The Qt thread)
     EXPECT_CALL(api_query, event(CheckRunEventType(thread_id_))).Times(Exactly(1));
     api_query.callRun();
