@@ -19,6 +19,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
+#include "BasicEventsChecker.h"
 #include "TestSetup.h"
 #include "FakeScope.h"
 #include "QEventTypeMatcher.h"
@@ -28,14 +29,26 @@
 #include <unity/scopes/internal/ResultImpl.h>
 #include <unity/scopes/ActionMetadata.h>
 
-
 #include <chrono>
 
 using namespace testing;
 
 using namespace unity::scopes::qt;
 
-class QPreviewQueryBaseAPIMock : public QPreviewQueryBaseAPI
+// For type numbers refer to QSearchQueryBaseAPI.cpp
+const int INITIALIZE_EVENT = 1000;
+const int RUN_EVENT = 1001;
+const int CANCEL_EVENT = 1002;
+
+// in milliseconds
+// 5 seconds should be more than enough
+// If we don't receive an event in 5 seconds something
+// is going very wrong.
+const int DEFAULT_TIME_TO_WAIT = 5000;
+
+
+class QPreviewQueryBaseAPIMock : public QPreviewQueryBaseAPI,
+                                 public BasicEventsChecker
 {
 public:
     QPreviewQueryBaseAPIMock(std::shared_ptr<QCoreApplication> qtapp,
@@ -43,7 +56,8 @@ public:
                             unity::scopes::Result const& result,
                             unity::scopes::ActionMetadata const& metadata,
                             QObject *parent=0)
-                            : QPreviewQueryBaseAPI(qtapp,qtscope,result, metadata,parent)
+                            : QPreviewQueryBaseAPI(qtapp,qtscope,result, metadata,parent),
+                              BasicEventsChecker()
     {
     }
 
@@ -62,26 +76,42 @@ public:
         run(reply);
     }
 
-    // mock event method
-    MOCK_METHOD1(event, bool(QEvent*));
+    // override the method to implement the checks
+    bool event(QEvent* e) override
+    {
+        return this->check_event(e);
+    }
 };
 
 // For type numbers refer to QSearchQueryBaseAPI.cpp
 Matcher<QEvent *> CheckCancelledEventType(void *thread_id)
 {
-    return MakeMatcher(new QEventTypeMatcher(1002, thread_id));
+    return MakeMatcher(new QEventTypeMatcher(CANCEL_EVENT, thread_id));
 }
 
 // For type numbers refer to QSearchQueryBaseAPI.cpp
 Matcher<QEvent *> CheckInitializeEventType(void *thread_id)
 {
-    return MakeMatcher(new QEventTypeMatcher(1000, thread_id));
+    return MakeMatcher(new QEventTypeMatcher(INITIALIZE_EVENT, thread_id));
 }
 
 // For type numbers refer to QSearchQueryBaseAPI.cpp
 Matcher<QEvent *> CheckRunEventType(void *thread_id)
 {
-    return MakeMatcher(new QEventTypeMatcher(1001, thread_id));
+    return MakeMatcher(new QEventTypeMatcher(RUN_EVENT, thread_id));
+}
+
+void verifyEvent(QPreviewQueryBaseAPIMock &api_query, int event, int timeout)
+{
+    if(!api_query.nbEventCalls(event))
+    {
+        EXPECT_TRUE(api_query.waitForEvent(event,timeout));
+        EXPECT_EQ(1, api_query.nbEventCalls(event));
+    }
+    else
+    {
+        EXPECT_EQ(1, api_query.nbEventCalls(event));
+    }
 }
 
 TEST_F(TestSetup, bindings)
@@ -98,20 +128,25 @@ TEST_F(TestSetup, bindings)
 
     //construct the QSearchQueryBaseAPIMock
     QPreviewQueryBaseAPIMock api_query(qtapp_, scope, result, metadata);
+    api_query.setThreadId(thread_id_);
 
-    // give some time to process the events posted in the constructor
-    std::chrono::milliseconds dura(500);
-    std::this_thread::sleep_for( dura );
+    verifyEvent(api_query, INITIALIZE_EVENT, DEFAULT_TIME_TO_WAIT);
 
-    // verify that the event method is called for cancel event and
-    // from the same thread id (The Qt thread)
-    EXPECT_CALL(api_query, event(CheckCancelledEventType(thread_id_))).Times(Exactly(1));
-    api_query.callCancel();
-
-    // verify that the event method is called for cancel event and
-    // from the same thread id (The Qt thread)
-    EXPECT_CALL(api_query, event(CheckRunEventType(thread_id_))).Times(Exactly(1));
+    // verify run event.
+    EXPECT_EQ(0, api_query.nbEventCalls(RUN_EVENT));
     api_query.callRun();
+    verifyEvent(api_query, RUN_EVENT, DEFAULT_TIME_TO_WAIT);
 
-    std::this_thread::sleep_for(dura);
+    // verify cancel
+    EXPECT_EQ(0, api_query.nbEventCalls(CANCEL_EVENT));
+    api_query.callCancel();
+    verifyEvent(api_query, CANCEL_EVENT, DEFAULT_TIME_TO_WAIT);
+
+    // final verification
+    EXPECT_EQ(1, api_query.nbEventCalls(INITIALIZE_EVENT));
+    EXPECT_EQ(1, api_query.nbEventCalls(RUN_EVENT));
+    EXPECT_EQ(1, api_query.nbEventCalls(CANCEL_EVENT));
+
+    // Now we can exit without any sleep as we know that no other event
+    // is going to be sent
 }
