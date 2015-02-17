@@ -63,7 +63,7 @@ QVariantMap QCategoryImpl::serialize() const
     QVariantMap ret_map;
     for (auto items : api_category_->serialize())
     {
-        ret_map[QString::fromStdString(items.first)] = scopeVariantToQVariant(items.second);
+        ret_map[QString::fromStdString(items.first)] = variant_to_qvariant(items.second);
     }
     return ret_map;
 }

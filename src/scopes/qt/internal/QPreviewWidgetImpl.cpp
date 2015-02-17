@@ -59,7 +59,7 @@ QPreviewWidgetImpl& QPreviewWidgetImpl::operator=(QPreviewWidgetImpl&& other) = 
 
 void QPreviewWidgetImpl::add_attribute_value(QString const& key, QVariant const& value)
 {
-    api_widget_->add_attribute_value(key.toUtf8().data(), qVariantToScopeVariant(value));
+    api_widget_->add_attribute_value(key.toUtf8().data(), qvariant_to_variant(value));
 }
 
 void QPreviewWidgetImpl::add_attribute_mapping(QString const& key, QString const& field_name)
@@ -94,7 +94,7 @@ QMap<QString, QString> QPreviewWidgetImpl::attribute_mappings() const
 
 QVariantMap QPreviewWidgetImpl::attribute_values() const
 {
-    return scopeVariantMapToQVariantMap(api_widget_->attribute_values());
+    return variantmap_to_qvariantmap(api_widget_->attribute_values());
 }
 
 QPreviewWidgetList QPreviewWidgetImpl::widgets() const
@@ -114,7 +114,7 @@ QString QPreviewWidgetImpl::data() const
 
 QVariantMap QPreviewWidgetImpl::serialize() const
 {
-    return scopeVariantMapToQVariantMap(api_widget_->serialize());
+    return variantmap_to_qvariantmap(api_widget_->serialize());
 }
 
 QPreviewWidgetImpl::QPreviewWidgetImpl(PreviewWidget const& api_widget)

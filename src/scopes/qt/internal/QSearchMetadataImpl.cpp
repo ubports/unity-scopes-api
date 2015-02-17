@@ -86,13 +86,13 @@ bool QSearchMetadataImpl::has_location() const
 
 void QSearchMetadataImpl::set_hint(QString const& key, QVariant const& value)
 {
-    api_search_metadata_->set_hint(key.toUtf8().data(), qVariantToScopeVariant(value));
+    api_search_metadata_->set_hint(key.toUtf8().data(), qvariant_to_variant(value));
 }
 
 QVariantMap QSearchMetadataImpl::hints() const
 {
     sync_values();
-    return scopeVariantMapToQVariantMap(api_search_metadata_->hints());
+    return variantmap_to_qvariantmap(api_search_metadata_->hints());
 }
 
 bool QSearchMetadataImpl::contains_hint(QString const& key) const

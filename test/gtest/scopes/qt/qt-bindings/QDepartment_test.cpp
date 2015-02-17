@@ -75,5 +75,5 @@ TEST(QDepartment, bindings)
         EXPECT_EQ(qt_dep_ids[i], dep_ids[i]);
     }
 
-    EXPECT_EQ(scopeVariantMapToQVariantMap(api_dep->serialize()), dep.serialize());
+    EXPECT_EQ(variantmap_to_qvariantmap(api_dep->serialize()), dep.serialize());
 }

@@ -83,7 +83,7 @@ FilterState QCannedQueryImpl::filter_state() const
 
 QVariantMap QCannedQueryImpl::serialize() const
 {
-    return scopeVariantMapToQVariantMap(api_query_->serialize());
+    return variantmap_to_qvariantmap(api_query_->serialize());
 }
 
 QString QCannedQueryImpl::to_uri() const

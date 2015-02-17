@@ -73,8 +73,8 @@ TEST(QVariantBuilder, bindings)
     Variant val3 = builder3.end();
 
     // check that the result using the Qt inter
-    EXPECT_EQ(scopeVariantToQVariant(val3), val);
-    EXPECT_EQ(val3, qVariantToScopeVariant(val));
+    EXPECT_EQ(variant_to_qvariant(val3), val);
+    EXPECT_EQ(val3, qvariant_to_variant(val));
 }
 
 TEST(QVariantBuilder, exceptions)

@@ -60,7 +60,7 @@ public:
     APIResult& operator=(APIResult&&) = default;
 
     APIResult(const QVariantMap& variant_map)
-        : Result(qVariantMapToScopeVariantMap(variant_map)){};
+        : Result(qvariantmap_to_variantmap(variant_map)){};
 
     static VariantMap getValidEmptyMap()
     {
@@ -124,7 +124,7 @@ bool QResultImpl::has_stored_result() const
 
 QResult QResultImpl::retrieve() const
 {
-    return QResult(scopeVariantMapToQVariantMap(api_result_->retrieve().serialize()));
+    return QResult(variantmap_to_qvariantmap(api_result_->retrieve().serialize()));
 }
 
 void QResultImpl::set_uri(QString const& uri)
@@ -233,7 +233,7 @@ QVariant const& QResultImpl::value(QString const& key) const
 QVariantMap QResultImpl::serialize() const
 {
     sync_values();
-    return scopeVariantMapToQVariantMap(api_result_->serialize());
+    return variantmap_to_qvariantmap(api_result_->serialize());
 }
 
 void QResultImpl::sync_values() const

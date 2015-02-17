@@ -29,31 +29,31 @@ TEST(QUtils, variant_to_qvariant)
 {
     {
         Variant v;
-        QVariant qv = scopeVariantToQVariant(v);
+        QVariant qv = variant_to_qvariant(v);
         EXPECT_FALSE(qv.isValid());
     }
 
     {
         Variant v(42);
-        QVariant qv = scopeVariantToQVariant(v);
+        QVariant qv = variant_to_qvariant(v);
         EXPECT_EQ(42, qv.toInt());
     }
 
     {
         Variant v(true);
-        QVariant qv = scopeVariantToQVariant(v);
+        QVariant qv = variant_to_qvariant(v);
         EXPECT_TRUE(qv.toBool());
     }
 
     {
         Variant v("Hello");
-        QVariant qv = scopeVariantToQVariant(v);
+        QVariant qv = variant_to_qvariant(v);
         EXPECT_EQ("Hello", qv.toString());
     }
 
     {
         Variant v(3.14);
-        QVariant qv = scopeVariantToQVariant(v);
+        QVariant qv = variant_to_qvariant(v);
         EXPECT_EQ(3.14, qv.toDouble());
     }
 
@@ -61,7 +61,7 @@ TEST(QUtils, variant_to_qvariant)
         VariantMap vm;
         vm["key"] = "val";
         Variant v(vm);
-        QVariant qv = scopeVariantToQVariant(v);
+        QVariant qv = variant_to_qvariant(v);
         EXPECT_EQ("val", qv.toMap().value("key").toString());
     }
 
@@ -70,7 +70,7 @@ TEST(QUtils, variant_to_qvariant)
         va.push_back(Variant(42));
         va.push_back(Variant("Hello"));
         Variant v(va);
-        QVariant qv = scopeVariantToQVariant(v);
+        QVariant qv = variant_to_qvariant(v);
         ASSERT_EQ(2, qv.toList().size());
         EXPECT_EQ(42, qv.toList().at(0).toInt());
         EXPECT_EQ("Hello", qv.toList().at(1).toString());
@@ -81,45 +81,45 @@ TEST(QUtils, qvariant_to_variant)
 {
     {
         QVariant qv;
-        Variant v = qVariantToScopeVariant(qv);
+        Variant v = qvariant_to_variant(qv);
         EXPECT_TRUE(v.is_null());
     }
 
     {
         QVariant qv(true);
-        Variant v = qVariantToScopeVariant(qv);
+        Variant v = qvariant_to_variant(qv);
         EXPECT_TRUE(v.get_bool());
     }
 
     {
         QVariant qv(42);
-        Variant v = qVariantToScopeVariant(qv);
+        Variant v = qvariant_to_variant(qv);
         EXPECT_EQ(42, v.get_int());
     }
 
     {
         QVariant qv(3.14);
-        Variant v = qVariantToScopeVariant(qv);
+        Variant v = qvariant_to_variant(qv);
         EXPECT_EQ(3.14, v.get_double());
     }
 
     {
         QVariant qv("sss");
-        Variant v = qVariantToScopeVariant(qv);
+        Variant v = qvariant_to_variant(qv);
         EXPECT_EQ("sss", v.get_string());
     }
 
     {
         QVariantMap qvm;
         qvm["key"] = QVariant("val");
-        Variant v = qVariantToScopeVariant(QVariant(qvm));
+        Variant v = qvariant_to_variant(QVariant(qvm));
         EXPECT_EQ("val", v.get_dict()["key"].get_string());
     }
 
     {
         QVariantList qvl;
         qvl.push_back(QVariant(3.14));
-        Variant v = qVariantToScopeVariant(QVariant(qvl));
+        Variant v = qvariant_to_variant(QVariant(qvl));
         EXPECT_EQ(3.14, v.get_array()[0].get_double());
     }
 
@@ -127,12 +127,12 @@ TEST(QUtils, qvariant_to_variant)
         QVariant qv(QChar('a'));
         try
         {
-            Variant v = qVariantToScopeVariant(qv);
+            Variant v = qvariant_to_variant(qv);
             FAIL();
         }
         catch (unity::InvalidArgumentException const& e)
         {
-            EXPECT_STREQ("unity::InvalidArgumentException: qVariantToScopeVariant(): invalid source type: QChar",
+            EXPECT_STREQ("unity::InvalidArgumentException: qvariant_to_variant(): invalid source type: QChar",
                          e.what());
         }
         catch (std::exception const& e)
@@ -148,7 +148,7 @@ TEST(QUtils, variantmap_to_qvariantmap)
     vm["int"] = 42;
     vm["string"] = "Hello";
 
-    QVariantMap qvm = scopeVariantMapToQVariantMap(vm);
+    QVariantMap qvm = variantmap_to_qvariantmap(vm);
     ASSERT_EQ(2, qvm.count());
     EXPECT_EQ(42, qvm.value("int").toInt());
     EXPECT_EQ("Hello", qvm.value("string").toString());
@@ -160,7 +160,7 @@ TEST(QUtils, qvariantmap_to_variantmap)
     qvm["int"] = 42;
     qvm["string"] = "Hello";
 
-    VariantMap vm = qVariantMapToScopeVariantMap(qvm);
+    VariantMap vm = qvariantmap_to_variantmap(qvm);
     ASSERT_EQ(2, vm.size());
     EXPECT_EQ(42, vm["int"].get_int());
     EXPECT_EQ("Hello", vm["string"].get_string());

@@ -64,6 +64,7 @@ VariantBuilder builder;
 builder.add_tuple({{"rating", QVariant()}, {"review", QVariant()}, {"author", QVariant()}});
 \endcode
 */
+
 class QVariantBuilder final
 {
 public:

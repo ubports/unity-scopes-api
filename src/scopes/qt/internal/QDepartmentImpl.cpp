@@ -111,7 +111,7 @@ QDepartmentList QDepartmentImpl::subdepartments() const
 
 QVariantMap QDepartmentImpl::serialize() const
 {
-    return scopeVariantMapToQVariantMap(api_department_->serialize());
+    return variantmap_to_qvariantmap(api_department_->serialize());
 }
 
 // added for testing purposes

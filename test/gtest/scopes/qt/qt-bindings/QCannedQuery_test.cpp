@@ -46,7 +46,7 @@ TEST(QCannedQuery, bindings)
     QVariantMap qt_map = query.serialize();
     EXPECT_EQ(api_map.size(), qt_map.size());
     EXPECT_TRUE(qt_map.size() != 0);
-    EXPECT_EQ(scopeVariantMapToQVariantMap(api_map), qt_map);
+    EXPECT_EQ(variantmap_to_qvariantmap(api_map), qt_map);
 
     unity::scopes::FilterState fstate;
     {
@@ -63,7 +63,7 @@ TEST(QCannedQuery, bindings)
     // build a query with the normal qt interface
     // and check that it has the same data
     QCannedQuery query2("scopeA", "foo", "dep1");
-    EXPECT_EQ(scopeVariantMapToQVariantMap(api_map), query2.serialize());
+    EXPECT_EQ(variantmap_to_qvariantmap(api_map), query2.serialize());
 
     // change a value using the qt interface
     query.set_department_id("new_department");
@@ -71,5 +71,5 @@ TEST(QCannedQuery, bindings)
     // check that the value is the same in the internal instance
     EXPECT_EQ(api_query->department_id(), "new_department");
     EXPECT_EQ(api_query->query_string(), "new_query");
-    EXPECT_EQ(scopeVariantMapToQVariantMap(api_query->serialize()), query.serialize());
+    EXPECT_EQ(variantmap_to_qvariantmap(api_query->serialize()), query.serialize());
 }
