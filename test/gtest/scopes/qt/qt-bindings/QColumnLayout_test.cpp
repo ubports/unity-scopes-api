@@ -32,6 +32,7 @@ TEST(QColumnLayout, bindings)
 {
     internal::QColumnLayoutImpl* impl = new internal::QColumnLayoutImpl(2);
     QColumnLayout layout = internal::QColumnLayoutImpl::create(impl);
+    EXPECT_EQ(0, layout.size());
 
     // get the internal api layout
     unity::scopes::ColumnLayout* api_layout = impl->get_api();
@@ -44,6 +45,7 @@ TEST(QColumnLayout, bindings)
     QVector<QString> qt_widget_ids2{"widget3", "widget4"};
     layout.add_column(qt_widget_ids);
     layout.add_column(qt_widget_ids2);
+    EXPECT_EQ(2, layout.size());
     QVector<QString> retrieved_widget_ids = layout.column(0);
 
     std::vector<std::string> api_widgets = api_layout->column(0);
@@ -69,4 +71,30 @@ TEST(QColumnLayout, bindings)
     layout2.add_column(qt_widget_ids);
     layout2.add_column(qt_widget_ids2);
     EXPECT_EQ(variantmap_to_qvariantmap(api_layout->serialize()), layout2.serialize());
+
+    {
+        // Coverage for copy constructor and assignment operator
+        QColumnLayout l2(layout);
+        EXPECT_EQ(2, l2.size());
+
+        l2 = l2;
+        EXPECT_EQ(2, l2.size());
+
+        QColumnLayout l3(2);
+        l3 = layout;
+        EXPECT_EQ(2, l3.size());
+    }
+
+    {
+        // Coverage for impl copy constructor and assignment operator
+        internal::QColumnLayoutImpl i2(*impl);
+        EXPECT_EQ(2, i2.size());
+        
+        i2 = i2;
+        EXPECT_EQ(2, i2.size());
+
+        internal::QColumnLayoutImpl i3(2);
+        i3 = *impl;
+        EXPECT_EQ(2, i3.size());
+    }
 }
