@@ -88,7 +88,7 @@ Location SearchMetadataImpl::location() const
 
 bool SearchMetadataImpl::has_location() const
 {
-    return location_;
+    return bool(location_);
 }
 
 std::string SearchMetadataImpl::metadata_type() const

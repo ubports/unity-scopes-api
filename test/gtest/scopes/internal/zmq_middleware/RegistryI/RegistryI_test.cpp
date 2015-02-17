@@ -33,11 +33,20 @@
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
+
+#if BOOST_VERSION % 100000 >= 1
+#    if ((BOOST_VERSION / 100) % 1000) >= 57
+#        define BOOST_RANGE_ENABLE_CONCEPT_ASSERT 0  // Needed when compiling with boost >= 1.57
+#    endif
+# endif
+
 #include <boost/algorithm/string.hpp>
 #include <boost/range/adaptor/filtered.hpp>
 #include <boost/range/algorithm/copy.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/path.hpp>
+
+#undef BOOST_RANGE_ENABLE_CONCEPT_ASSERT
 
 #include <gtest/gtest.h>
 
