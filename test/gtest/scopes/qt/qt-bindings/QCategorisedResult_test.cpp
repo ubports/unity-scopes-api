@@ -65,6 +65,8 @@ TEST(QCategorisedResult, bindings)
     EXPECT_EQ(result.category()->id(), qCategory->id());
     EXPECT_EQ(result.category()->title(), qCategory->title());
     EXPECT_EQ(result.category()->icon(), qCategory->icon());
+    EXPECT_EQ(result.category()->query(), qCategory->query());
+    EXPECT_EQ(result.category()->renderer_template(), qCategory->renderer_template());
     EXPECT_EQ(result.category()->serialize(), qCategory->serialize());
 
     // change category and check
