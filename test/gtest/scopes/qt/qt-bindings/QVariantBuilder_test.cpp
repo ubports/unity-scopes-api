@@ -31,6 +31,20 @@ using namespace unity::scopes::qt::internal;
 using namespace unity::scopes::qt;
 using namespace unity::scopes;
 
+TEST(QVariantBuilder, copy_assign)
+{
+    {
+        QVariantBuilder b;
+        QVariantBuilder b2(b);
+    }
+
+    {
+        QVariantBuilder b;
+        b.add_tuple({{"a", QVariant(1)}, {"b", QVariant(2)}});
+        b.add_tuple({{"rating", QVariant::null())}, {"review", QVariant::null()}, {"author", QVariant::null()}});
+    }
+}
+
 TEST(QVariantBuilder, bindings)
 {
     QVariantBuilderImpl *impl = new QVariantBuilderImpl();

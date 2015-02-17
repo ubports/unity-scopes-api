@@ -60,10 +60,11 @@ For example, the value of the "rating" key of the following JSON template
 can be created with QVariantBuilder as follows:
 
 \code
-VariantBuilder builder;
-builder.add_tuple({{"rating", Variant::null())}, {"review", Variant::null()}, {"author", Variant::null()}});
+QVariantBuilder builder;
+builder.add_tuple({{"rating", QVariant::null())}, {"review", QVariant::null()}, {"author", QVariant::null()}});
 \endcode
 */
+
 class QVariantBuilder final
 {
 public:
@@ -91,16 +92,15 @@ public:
     can be created with:
     \code
     QVariantBuilder builder;
-    builder.add_tuple({{"a", Variant(1)}, {"b", Variant(2)}});
-    builder.add_tuple({{"c", Variant(2)}, {"d", Variant(3)}});
+    builder.add_tuple({{"a", QVariant(1)}, {"b", QVariant(2)}});
+    builder.add_tuple({{"c", QVariant(2)}, {"d", QVariant(3)}});
     \endcode
     */
-    //    void add_tuple(std::initializer_list<QPair<QString, QVariant>> const& tuple);
 
     /**
     \brief Adds a tuple of key-value pairs to an array.
 
-    This is an overloaded version of add_tuple that accepts `std::vector` instead of
+    This is an overloaded version of add_tuple() that accepts `QVector` instead of
     `std::initializer_list`, making it more convenient for language bindings.
     */
     void add_tuple(QVector<QPair<QString, QVariant>> const& tuple);
