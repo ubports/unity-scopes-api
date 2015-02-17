@@ -35,7 +35,7 @@
 
 #pragma push_macro("BOOST_RANGE_ENABLE_CONCEPT_ASSERT")
 
-#if BOOST_VERSION % 100000 >= 1
+#if BOOST_VERSION % 100000 == 1
 #    if ((BOOST_VERSION / 100) % 1000) == 57
 #        define BOOST_RANGE_ENABLE_CONCEPT_ASSERT 0  // Iterator requirements are too strict with boost 1.57.
 #    endif
