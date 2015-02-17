@@ -21,6 +21,7 @@
 #include <unity/scopes/qt/QCategorisedResult.h>
 #include <unity/scopes/qt/QCategory.h>
 
+#include <unity/scopes/qt/internal/QCategorisedResultImpl.h>
 #include <unity/scopes/qt/internal/QCategoryImpl.h>
 
 #include <unity/scopes/Category.h>
@@ -34,11 +35,11 @@ using namespace unity::scopes::qt;
 class QCategorisedResult_test
 {
 public:
-    static std::shared_ptr<QCategory> createCategory()
+    static std::shared_ptr<QCategory> create_category(std::string const& id)
     {
         CategoryRegistry reg;
         CategoryRenderer rdr;
-        auto cat = reg.register_category("1", "title", "icon", nullptr, rdr);
+        auto cat = reg.register_category(id, "title", "icon", nullptr, rdr);
 
         return unity::scopes::qt::internal::QCategoryImpl::create(cat);
     }
@@ -46,7 +47,7 @@ public:
 
 TEST(QCategorisedResult, bindings)
 {
-    std::shared_ptr<QCategory const> qCategory = QCategorisedResult_test::createCategory();
+    std::shared_ptr<QCategory const> qCategory = QCategorisedResult_test::create_category("1");
 
     QCategorisedResult result(qCategory);
 
@@ -66,6 +67,13 @@ TEST(QCategorisedResult, bindings)
     EXPECT_EQ(result.category()->icon(), qCategory->icon());
     EXPECT_EQ(result.category()->serialize(), qCategory->serialize());
 
+    // change category and check
+    auto c2 = QCategorisedResult_test::create_category("2");
+    result.set_category(c2);
+    EXPECT_EQ("2", result.category()->id());
+    result.set_category(qCategory);
+    EXPECT_EQ("1", result.category()->id());
+
     // check the copy
     result["test_attr"] = "test_value3";
     QCategorisedResult result2(result);
@@ -83,4 +91,16 @@ TEST(QCategorisedResult, bindings)
     EXPECT_EQ(result.category()->serialize(), qCategory->serialize());
     EXPECT_EQ(result["test_attr"], "test_value3");
     EXPECT_EQ(result.uri(), "test_uri");
+
+    {
+        // Impl assignment coverage
+        std::shared_ptr<QCategory const> cat1 = QCategorisedResult_test::create_category("1");
+        unity::scopes::qt::internal::QCategorisedResultImpl ri1(cat1);
+
+        std::shared_ptr<QCategory const> cat2 = QCategorisedResult_test::create_category("2");
+        unity::scopes::qt::internal::QCategorisedResultImpl ri2(cat2);
+
+        ri1 = ri2;
+        EXPECT_EQ("2", ri1.category()->id());
+    }
 }
