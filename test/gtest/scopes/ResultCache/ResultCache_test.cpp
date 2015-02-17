@@ -192,7 +192,7 @@ TEST_F(CacheScopeTest, surfacing_query)
     system("cat " TEST_RUNTIME_PATH "/unconfined/CacheScope/.surfacing_cache");
 }
 
-#pragma GCC diagnostic push
+#pragma GCC diagnostic pop
 
 // Run another non-surfacing query before checking that the cache contains the
 // results of the last surfacing query.
