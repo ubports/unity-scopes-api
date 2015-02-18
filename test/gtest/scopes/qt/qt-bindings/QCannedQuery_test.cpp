@@ -42,6 +42,11 @@ TEST(QCannedQuery, bindings)
     EXPECT_EQ(api_query->department_id(), "dep1");
     EXPECT_EQ(api_query->to_uri(), query.to_uri().toStdString());
 
+    EXPECT_EQ("scopeA", query.scope_id());
+    EXPECT_EQ("foo", query.query_string());
+    EXPECT_EQ("dep1", query.department_id());
+    //EXPECT_EQ(query, QCannedQuery::from_uri(query.to_uri()));
+
     unity::scopes::VariantMap api_map = api_query->serialize();
     QVariantMap qt_map = query.serialize();
     EXPECT_EQ(api_map.size(), qt_map.size());
@@ -59,6 +64,13 @@ TEST(QCannedQuery, bindings)
     // filters is {"f1":["o1"]}
     EXPECT_EQ("scope://scopeA?q=foo&dep=dep1&filters=%7B%22f1%22%3A%5B%22o1%22%5D%7D%0A", query.to_uri());
     EXPECT_EQ("scope://scopeA?q=foo&dep=dep1&filters=%7B%22f1%22%3A%5B%22o1%22%5D%7D%0A", api_query->to_uri());
+    auto fs = query.filter_state();
+    EXPECT_TRUE(fs.has_filter("f1"));
+
+    auto q = QCannedQuery::from_uri("scope://scopeX?q=bar&dep=dep2&filters=%7B%22f1%22%3A%5B%22o1%22%5D%7D%0A");
+    EXPECT_EQ("scopeX", q.scope_id());
+    EXPECT_EQ("bar", q.query_string());
+    EXPECT_EQ("dep2", q.department_id());
 
     // build a query with the normal qt interface
     // and check that it has the same data
@@ -72,4 +84,19 @@ TEST(QCannedQuery, bindings)
     EXPECT_EQ(api_query->department_id(), "new_department");
     EXPECT_EQ(api_query->query_string(), "new_query");
     EXPECT_EQ(variantmap_to_qvariantmap(api_query->serialize()), query.serialize());
+
+    // check remaining members
+}
+
+TEST(QCannedQuery, construct_assign)
+{
+    QCannedQuery q("scope_id");
+    EXPECT_EQ("scope_id", q.scope_id());
+
+    QCannedQuery q2(q);
+    EXPECT_EQ("scope_id", q2.scope_id());
+
+    QCannedQuery q3("blah");
+    q3 = q2;
+    EXPECT_EQ("scope_id", q3.scope_id());
 }

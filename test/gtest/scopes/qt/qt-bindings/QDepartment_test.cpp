@@ -37,6 +37,13 @@ TEST(QDepartment, bindings)
 
     internal::QDepartmentImpl* impl = new internal::QDepartmentImpl(query, "label");
     QDepartment dep = internal::QDepartmentImpl::create(impl);
+    EXPECT_EQ("label", dep.label());
+    EXPECT_EQ("foo", dep.query().query_string());
+    EXPECT_FALSE(dep.has_subdepartments());
+    dep.set_has_subdepartments(false);
+    EXPECT_FALSE(dep.has_subdepartments());
+    dep.set_has_subdepartments(true);
+    EXPECT_TRUE(dep.has_subdepartments());
 
     // get the internal api layout
     unity::scopes::Department* api_dep = impl->get_api();
@@ -47,7 +54,7 @@ TEST(QDepartment, bindings)
 
     // add subdepartments
     std::shared_ptr<QDepartment const> dep2(QDepartment::create(query2, "label2"));
-    std::shared_ptr<QDepartment const> dep3(QDepartment::create(query2, "label2"));
+    std::shared_ptr<QDepartment const> dep3(QDepartment::create(query2, "label3"));
     dep.add_subdepartment(dep2);
     dep.add_subdepartment(dep3);
 
@@ -76,4 +83,28 @@ TEST(QDepartment, bindings)
     }
 
     EXPECT_EQ(variantmap_to_qvariantmap(api_dep->serialize()), dep.serialize());
+
+    // TODO: need coverage for set_subdepartments() once we work out the correct
+    // typedef for QDepartmentList.
+}
+
+TEST(QDepartment, construct_assign)
+{
+    QCannedQuery query("scopeA", "foo", "dep1");
+    internal::QDepartmentImpl* impl = new internal::QDepartmentImpl(query, "label");
+    QDepartment dep = internal::QDepartmentImpl::create(impl);
+
+    QDepartment dep2(dep);
+    EXPECT_EQ("label", dep2.label());
+
+    internal::QDepartmentImpl* impl3 = new internal::QDepartmentImpl(query, "label3");
+    QDepartment dep3 = internal::QDepartmentImpl::create(impl3);
+    EXPECT_EQ("label3", dep3.label());
+
+    dep3 = dep2;
+    EXPECT_EQ("label", dep3.label());
+
+    auto dep4 = QDepartment::create("id", query, "l");
+    EXPECT_EQ("id", dep4->id());
+    EXPECT_EQ("l", dep4->label());
 }
