@@ -97,9 +97,6 @@ QSearchQueryBaseAPI::QSearchQueryBaseAPI(std::shared_ptr<QCoreApplication> app,
 {
     // move the object to the Qt thread
     this->moveToThread(app->thread());
-
-    // Post event to initialize the object in the Qt thread
-    app->postEvent(this, new InitializeEvent());
 }
 
 QSearchQueryBaseAPI::~QSearchQueryBaseAPI()
@@ -151,5 +148,11 @@ void QSearchQueryBaseAPI::cancelled()
     // we are called fron a non Qt thread, so now we push a new Qt event to the
     // Qt event loop
     qtapp_->postEvent(this, new CancelledEvent());
+}
+
+void QSearchQueryBaseAPI::init()
+{
+    // Post event to initialize the object in the Qt thread
+    qtapp_->postEvent(this, new InitializeEvent());
 }
 /// @endcond

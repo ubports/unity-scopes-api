@@ -101,9 +101,6 @@ QPreviewQueryBaseAPI::QPreviewQueryBaseAPI(std::shared_ptr<QCoreApplication> qta
 {
     // move the object to the Qt thread
     this->moveToThread(qtapp_->thread());
-
-    // Post event to initialize the object in the Qt thread
-    qtapp_->postEvent(this, new InitializeEvent());
 }
 
 QPreviewQueryBaseAPI::~QPreviewQueryBaseAPI()
@@ -155,5 +152,11 @@ void QPreviewQueryBaseAPI::cancelled()
     // we are called fron a non Qt thread, so now we push a new Qt event to the
     // Qt event loop
     qtapp_->postEvent(this, new CancelledEvent());
+}
+
+void QPreviewQueryBaseAPI::init()
+{
+    // Post event to initialize the object in the Qt thread
+    qtapp_->postEvent(this, new InitializeEvent());
 }
 /// @endcond

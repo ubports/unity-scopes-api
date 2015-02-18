@@ -28,11 +28,10 @@ class QScopeMock : public QScope
 {
 public:
     QScopeMock()
-        : QScope(),
-          qt_thread(nullptr)
-    {};
+        : QScope()
+        , qt_thread(nullptr){};
 
-    void setQtThread(QThread *thread)
+    void setQtThread(QThread* thread)
     {
         qt_thread = thread;
     }
@@ -42,17 +41,17 @@ public:
     virtual unity::scopes::qt::QPreviewQueryBase::UPtr preview(const unity::scopes::qt::QResult&,
                                                                const unity::scopes::qt::QActionMetadata&) override
     {
-        EXPECT_EQ(QThread::currentThread(),qt_thread);
+        EXPECT_EQ(QThread::currentThread(), qt_thread);
         return unity::scopes::qt::QPreviewQueryBase::UPtr(new QPreview());
     }
 
     virtual unity::scopes::qt::QSearchQueryBase::UPtr search(unity::scopes::CannedQuery const&,
-                                          unity::scopes::SearchMetadata const&) override
+                                                             unity::scopes::SearchMetadata const&) override
     {
-        EXPECT_EQ(QThread::currentThread(),qt_thread);
+        EXPECT_EQ(QThread::currentThread(), qt_thread);
         return unity::scopes::qt::QSearchQueryBase::UPtr(new QQuery());
     }
 
 protected:
-    QThread *qt_thread;
+    QThread* qt_thread;
 };

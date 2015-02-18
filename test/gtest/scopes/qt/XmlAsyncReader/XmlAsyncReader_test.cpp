@@ -16,9 +16,6 @@
  * Authored by: Xavi Garcia <xavi.garcia.mena@canonical.com>
  */
 
-// allow experimental headers
-#define _ENABLE_QT_EXPERIMENTAL_
-
 #include <unity/scopes/qt/XmlAsyncReader.h>
 #include <unity/scopes/qt/XmlReader.h>
 #include <unity/scopes/ScopeExceptions.h>

@@ -55,10 +55,10 @@ void QDepartmentImpl::set_has_subdepartments(bool subdepartments)
 void QDepartmentImpl::set_subdepartments(QDepartmentList const& departments)
 {
     DepartmentList api_list;
-    QListIterator<QSharedPointer<QDepartment const>> it(departments);
+    QListIterator<std::shared_ptr<QDepartment const>> it(departments);
     while (it.hasNext())
     {
-        api_list.push_back(it.next().data()->p->api_department_);
+        api_list.push_back(it.next().get()->p->api_department_);
     }
     api_department_->set_subdepartments(api_list);
 }
@@ -103,7 +103,7 @@ QDepartmentList QDepartmentImpl::subdepartments() const
     QDepartmentList ret_list;
     for (auto item : api_department_->subdepartments())
     {
-        QSharedPointer<QDepartment> qdepartment(new QDepartment(new QDepartmentImpl(*item)));
+        std::shared_ptr<QDepartment> qdepartment(new QDepartment(new QDepartmentImpl(*item)));
         ret_list.push_back(qdepartment);
     }
     return ret_list;

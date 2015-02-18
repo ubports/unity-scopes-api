@@ -33,7 +33,7 @@ using namespace unity::scopes;
 
 TEST(QVariantBuilder, bindings)
 {
-    QVariantBuilderImpl *impl = new QVariantBuilderImpl();
+    QVariantBuilderImpl* impl = new QVariantBuilderImpl();
     QVariantBuilder builder = QVariantBuilderImpl::create(impl);
 
     builder.add_tuple({{"value", QVariant("attribute 1")}});

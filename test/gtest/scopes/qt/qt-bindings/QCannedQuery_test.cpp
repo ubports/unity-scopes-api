@@ -30,11 +30,11 @@ using namespace unity::scopes::qt;
 
 TEST(QCannedQuery, bindings)
 {
-    internal::QCannedQueryImpl *impl = new internal::QCannedQueryImpl("scopeA", "foo", "dep1");
+    internal::QCannedQueryImpl* impl = new internal::QCannedQueryImpl("scopeA", "foo", "dep1");
     QCannedQuery query = internal::QCannedQueryImpl::create(impl);
 
     // get the internal api query
-    unity::scopes::CannedQuery * api_query = impl->get_api_query();
+    unity::scopes::CannedQuery* api_query = impl->get_api_query();
 
     // start checking that the internal class has the right attributes
     EXPECT_EQ(api_query->scope_id(), "scopeA");
@@ -72,5 +72,4 @@ TEST(QCannedQuery, bindings)
     EXPECT_EQ(api_query->department_id(), "new_department");
     EXPECT_EQ(api_query->query_string(), "new_query");
     EXPECT_EQ(scopeVariantMapToQVariantMap(api_query->serialize()), query.serialize());
-
 }

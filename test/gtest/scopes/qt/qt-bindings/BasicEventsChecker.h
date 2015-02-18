@@ -33,26 +33,27 @@
 class BasicEventsChecker
 {
 public:
-    BasicEventsChecker() : wait_for_event_(-1),
-                           event_found_(false),
-                           thread_id_(nullptr)
+    BasicEventsChecker()
+        : wait_for_event_(-1)
+        , event_found_(false)
+        , thread_id_(nullptr)
     {
     }
 
     virtual ~BasicEventsChecker() = default;
 
-    void setThreadId(void *thread_id)
+    void set_thread_id(void* thread_id)
     {
         thread_id_ = thread_id;
     }
 
     bool check_event(QEvent* e)
     {
+        std::unique_lock<std::mutex> lock(mutex_);
         // This method is executed always in the Qt thread
         int iEventType = static_cast<int>(e->type());
         {
-            std::unique_lock<std::mutex> lock(mutex_);
-            if(event_counter_map_.find(iEventType) == event_counter_map_.end())
+            if (event_counter_map_.find(iEventType) == event_counter_map_.end())
             {
                 event_counter_map_[iEventType] = 1;
             }
@@ -63,9 +64,9 @@ public:
         }
 
         // verify if we were actively waiting for an event
-        if(wait_for_event_!=-1)
+        if (wait_for_event_ != -1)
         {
-            if(wait_for_event_ == iEventType)
+            if (wait_for_event_ == iEventType)
             {
                 // we were waiting for this event
                 event_found_ = true;
@@ -74,17 +75,17 @@ public:
         }
 
         // finally verify the thread
-        if(thread_id_)
+        if (thread_id_)
         {
             EXPECT_EQ(thread_id_, QThread::currentThreadId());
         }
         return true;
     }
 
-    int nbEventCalls(int event)
+    int nb_event_calls(int event)
     {
         std::unique_lock<std::mutex> lock(mutex_);
-        if(event_counter_map_.find(event)==event_counter_map_.end())
+        if (event_counter_map_.find(event) == event_counter_map_.end())
         {
             return 0;
         }
@@ -94,18 +95,18 @@ public:
         }
     }
 
-    bool waitForEvent(int event, int timeout)
+    bool wait_for_event(int event, int timeout)
     {
         int INTERVAL_WAIT = 10;
         std::chrono::milliseconds dura(INTERVAL_WAIT);
         wait_for_event_ = event;
         event_found_ = false;
-        while(!event_found_ && timeout > 0)
+        while (!event_found_ && timeout > 0)
         {
             std::this_thread::sleep_for(dura);
             timeout -= INTERVAL_WAIT;
         }
-        if(event_found_)
+        if (event_found_)
         {
             // we received the expected event
             wait_for_event_ = -1;
@@ -120,9 +121,9 @@ public:
 
     std::atomic<int> wait_for_event_;
     std::atomic<bool> event_found_;
-    std::atomic<void *> thread_id_;
+    std::atomic<void*> thread_id_;
 
-    QMap<int,int> event_counter_map_;
+    QMap<int, int> event_counter_map_;
     // mutex to control the accesses to the map
     std::mutex mutex_;
 };
