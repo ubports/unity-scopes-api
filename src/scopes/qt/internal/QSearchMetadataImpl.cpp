@@ -81,7 +81,7 @@ Location QSearchMetadataImpl::location() const
 
 bool QSearchMetadataImpl::has_location() const
 {
-    return api_search_metadata_->cardinality();
+    return api_search_metadata_->has_location();
 }
 
 void QSearchMetadataImpl::set_hint(QString const& key, QVariant const& value)

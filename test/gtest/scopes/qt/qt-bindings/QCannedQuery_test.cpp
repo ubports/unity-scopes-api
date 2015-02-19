@@ -45,7 +45,6 @@ TEST(QCannedQuery, bindings)
     EXPECT_EQ("scopeA", query.scope_id());
     EXPECT_EQ("foo", query.query_string());
     EXPECT_EQ("dep1", query.department_id());
-    //EXPECT_EQ(query, QCannedQuery::from_uri(query.to_uri()));
 
     unity::scopes::VariantMap api_map = api_query->serialize();
     QVariantMap qt_map = query.serialize();
@@ -84,8 +83,6 @@ TEST(QCannedQuery, bindings)
     EXPECT_EQ(api_query->department_id(), "new_department");
     EXPECT_EQ(api_query->query_string(), "new_query");
     EXPECT_EQ(variantmap_to_qvariantmap(api_query->serialize()), query.serialize());
-
-    // check remaining members
 }
 
 TEST(QCannedQuery, construct_assign)
