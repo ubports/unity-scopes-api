@@ -49,6 +49,31 @@ To run the tests with valgrind:
 
     $ make valgrind
 
+It doesn't make sense for some tests to run them with valgrind. For
+example, the header compilation tests don't need valgrind because
+we'd just be testing that Python doesn't leak. There are also some
+tests that run too slow and time out under valgrind and, occasionally,
+valgrind crashes for a particular test.
+
+There are two ways to suppress tests:
+
+You can add a test name to CTestCustom.cmake.in to suppress that
+test completely. That makes sense for the header compilation tests,
+for example.
+
+If a specific test case in a test program causes a valgrind problem,
+you can selectively disable a section of code like this:
+
+    #include <valgrind/valgrind.h>
+
+    if (!RUNNING_ON_VALGRIND)
+    {
+        // Code here crashes valgrind...
+    }
+
+That way, the test will still be run as part of the normal "make test"
+target, but will be ommitted when running "make valgrind".
+
 Coverage
 --------
 
@@ -142,6 +167,17 @@ run the tests (from the build directory) with these suppressions
 enabled, use:
 
     $ TSAN_OPTIONS="suppressions=../tsan-suppress" make test
+
+If a test runs too slowly under address sanitizer, you can
+hide a section of code from address sanitzer with:
+
+#if defined(__has_feature)
+    #if !__has_feature(address_sanitizer)
+
+    // Code here takes forever under address sanitizer...
+
+    #endif
+#endif
 
 Updating symbols file
 ---------------------
