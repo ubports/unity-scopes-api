@@ -138,10 +138,10 @@ TEST_F(TestSetup, bindings)
 {
     QScope scope;
 
-    unity::scopes::internal::ResultImpl* resultImpl = new unity::scopes::internal::ResultImpl();
-    resultImpl->set_uri("test_uri");
+    unity::scopes::internal::ResultImpl resultImpl;
+    resultImpl.set_uri("test_uri");
 
-    unity::scopes::Result result = unity::scopes::internal::ResultImpl::create_result(resultImpl->serialize());
+    unity::scopes::Result result = unity::scopes::internal::ResultImpl::create_result(resultImpl.serialize());
 
     unity::scopes::CannedQuery query("scopeA", "query", "department");
     unity::scopes::ActionMetadata metadata("en", "phone");
