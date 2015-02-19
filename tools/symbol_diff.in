@@ -21,10 +21,7 @@
 import re
 import subprocess
 
-OLD_FILE = './debian/lib@UNITY_SCOPES_LIB@@UNITY_SCOPES_SOVERSION@.symbols'
-NEW_FILE = './debian/lib@UNITY_SCOPES_LIB@@UNITY_SCOPES_SOVERSION@/DEBIAN/symbols'
-
-def run():
+def compare_syms(old_file, new_file):
     # Following the first line, lines in the original symbol file look
     # like this (note leading single space in each line):
     #
@@ -46,14 +43,14 @@ def run():
     old_regex = re.compile(r'^ (\(.*\))"(.*)" (.*)$')
 
     old_syms = {}                                   # Dictionary containing symbol -> ( tag, version )
-    with open(OLD_FILE, encoding='utf=8') as file:
+    with open(old_file, encoding='utf=8') as file:
         file.readline()                             # Skip first line, which is the library name and version
         for line in file:
             mo = old_regex.match(line)
             if mo:
                 old_syms[mo.group(2)] = ( mo.group(1), mo.group(3) )
             else:
-                raise Exception('Invalid input line in ' + OLD_FILE + ': ' + line)
+                raise Exception('Invalid input line in ' + old_file + ': ' + line)
 
     # Following the first line, lines in the symbol file created by dpkg-buildpkg look
     # like this (note leading single whitespace in each line):
@@ -74,7 +71,7 @@ def run():
 
     # Run the new symbols file through "c++filt | sort | uniq". We need
     # the sort | uniq because, otherwise, we end up with duplicate demangled symbols.
-    with open(NEW_FILE) as infile, open('new_symbols', 'w') as outfile:
+    with open(new_file) as infile, open('new_symbols', 'w') as outfile:
         p = subprocess.Popen(['c++filt | sort | uniq'], shell=True, stdin=infile, stdout=subprocess.PIPE)
 
         # For each symbol, if it is in the old dictionary, output the tags from the original
@@ -96,8 +93,20 @@ def run():
                 raise Exception('Cannot parse demangled line: ' + line)
 
     # Write the diff into /tmp/symbols.diff
-    with open('/tmp/symbols.diff', 'w') as outfile:
-        subprocess.call(['diff', '-u', OLD_FILE, 'new_symbols'], stdout=outfile)
+    with open('/tmp/symbols.diff', 'a') as outfile:
+        subprocess.call(['diff', '-u', old_file, 'new_symbols'], stdout=outfile)
+
+FILES = [
+            ('./debian/lib@UNITY_SCOPES_LIB@@UNITY_SCOPES_SOVERSION@.symbols',
+             './debian/lib@UNITY_SCOPES_LIB@@UNITY_SCOPES_SOVERSION@/DEBIAN/symbols'),
+            ('./debian/libunity-scopes-qt.symbols',
+             './debian/libunity-scopes-qt/DEBIAN/symbols')
+        ]
+
+def run():
+    os.remove('/tmp/symbols.diff')
+    for old_file, new_file in FILES:
+        compare_syms(old_file, new_file)
 
 if __name__ == '__main__':
     run()
