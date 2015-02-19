@@ -160,7 +160,9 @@ void QScopeBaseAPIImpl::stop()
 sc::PreviewQueryBase::UPtr QScopeBaseAPIImpl::preview(const sc::Result& result, const sc::ActionMetadata& metadata)
 {
     // Boilerplate construction of Preview
-    return sc::PreviewQueryBase::UPtr(new QPreviewQueryBaseAPI(qtapp_, *qtscope_impl_, result, metadata));
+    QPreviewQueryBaseAPI * preview_api = new QPreviewQueryBaseAPI(qtapp_, *qtscope_impl_, result, metadata);
+    preview_api->init();
+    return sc::PreviewQueryBase::UPtr(preview_api);
 }
 
 /**
@@ -169,7 +171,9 @@ sc::PreviewQueryBase::UPtr QScopeBaseAPIImpl::preview(const sc::Result& result, 
 sc::SearchQueryBase::UPtr QScopeBaseAPIImpl::search(sc::CannedQuery const& query, sc::SearchMetadata const& metadata)
 {
     // Boilerplate construction of Query
-    return sc::SearchQueryBase::UPtr(new QSearchQueryBaseAPI(qtapp_, *qtscope_impl_, query, metadata));
+    QSearchQueryBaseAPI* query_api = new QSearchQueryBaseAPI(qtapp_, *qtscope_impl_, query, metadata);
+    query_api->init();
+    return sc::SearchQueryBase::UPtr(query_api);
 }
 
 void QScopeBaseAPIImpl::startQtThread()

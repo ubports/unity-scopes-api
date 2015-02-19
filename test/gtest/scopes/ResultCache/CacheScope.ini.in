@@ -1,0 +1,4 @@
+[ScopeConfig]
+DisplayName = CacheScope
+Description = Scope that pushes cached results for surfacing query
+Author = Michi

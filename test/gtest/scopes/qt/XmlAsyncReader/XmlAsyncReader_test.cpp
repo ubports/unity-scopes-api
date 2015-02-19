@@ -16,9 +16,6 @@
  * Authored by: Xavi Garcia <xavi.garcia.mena@canonical.com>
  */
 
-// allow experimental headers
-#define _ENABLE_QT_EXPERIMENTAL_
-
 #include <unity/scopes/qt/XmlAsyncReader.h>
 #include <unity/scopes/qt/XmlReader.h>
 #include <unity/scopes/ScopeExceptions.h>
@@ -117,14 +114,14 @@ TEST(BadUrlException, state)
         auto items = HttpAsyncReader::get_or_throw(reader_future);
         FAIL();
     }
-    catch (unity::LogicException& e)
+    catch (unity::LogicException const& e)
     {
         std::string error_msg = e.what();
         EXPECT_EQ(error_msg.find("Couldn't resolve host name") != std::string::npos, true);
     }
-    catch (...)
+    catch (std::exception const& e)
     {
-        FAIL();
+        FAIL() << e.what();
     }
 }
 
@@ -205,7 +202,7 @@ TEST_F(ExceptionsTest, check_xml_bad_formed_exception)
         auto reader_future = reader.async_get<Client::Result>(fake_server_host.c_str(), parameters, "track");
         auto items = HttpAsyncReader::get_or_throw(reader_future, 10);
     }
-    catch (unity::LogicException& e)
+    catch (unity::LogicException const& e)
     {
         EXPECT_STREQ(e.what(),
                      "unity::LogicException: AsyncReader::async_get: error parsing data: get_results: ERROR: Opening "

@@ -529,6 +529,16 @@ string RuntimeImpl::proxy_to_string(ObjectProxy const& proxy) const
     }
 }
 
+string RuntimeImpl::cache_directory() const
+{
+    return find_cache_dir();
+}
+
+string RuntimeImpl::tmp_directory() const
+{
+    return find_tmp_dir();
+}
+
 string RuntimeImpl::demangled_id(string const& scope_id) const
 {
     // For scopes that are in a click package together with an app,

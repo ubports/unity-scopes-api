@@ -24,34 +24,37 @@
 // class to match QEvent *
 // It verifies that the event has the expected type and that
 // it's been called in the expected thread
-class QEventTypeMatcher : public testing::MatcherInterface<QEvent *>
+class QEventTypeMatcher : public testing::MatcherInterface<QEvent*>
 {
 public:
-    QEventTypeMatcher(int type_to_check, void *thread_id)
-        : type_to_check_(type_to_check), thread_id_(thread_id)
+    QEventTypeMatcher(int type_to_check, void* thread_id)
+        : type_to_check_(type_to_check)
+        , thread_id_(thread_id)
     {
     }
 
-    virtual bool MatchAndExplain(QEvent * e, testing::MatchResultListener*) const
+    virtual bool MatchAndExplain(QEvent* e, testing::MatchResultListener*) const
     {
         std::cout << "Type is: " << e->type() << std::endl;
         std::cout << "Thread id when matching is: " << QThread::currentThreadId() << std::endl;
         bool sameThread = true;
-        if(thread_id_)
+        if (thread_id_)
         {
             sameThread = thread_id_ == QThread::currentThreadId();
         }
         return ((e->type() == type_to_check_ || e->type() < 1000) && sameThread);
     }
 
-    virtual void DescribeTo(::std::ostream* os) const {
+    virtual void DescribeTo(::std::ostream* os) const
+    {
         *os << "is an event of type " << type_to_check_;
     }
 
-    virtual void DescribeNegationTo(::std::ostream* os) const {
+    virtual void DescribeNegationTo(::std::ostream* os) const
+    {
         *os << "is NOT an event of type " << type_to_check_;
     }
 
     int type_to_check_;
-    void *thread_id_;
+    void* thread_id_;
 };

@@ -58,8 +58,8 @@ TEST(QVariantBuilder, assignment)
 TEST(QVariantBuilder, bindings)
 {
     QVariantBuilderImpl* impl = new QVariantBuilderImpl();
-    EXPECT_NE(nullptr, impl->get_api());
     QVariantBuilder builder = QVariantBuilderImpl::create(impl);
+    EXPECT_NE(nullptr, impl->get_api());
 
     builder.add_tuple({{"value", QVariant("attribute 1")}});
     builder.add_tuple({{"value", QVariant("attribute 2")}});

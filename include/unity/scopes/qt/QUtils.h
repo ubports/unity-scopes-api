@@ -18,6 +18,10 @@
 
 #pragma once
 
+#ifndef _ENABLE_QT_EXPERIMENTAL_
+#error You should define _ENABLE_QT_EXPERIMENTAL_ in order to use this experimental header file.
+#endif
+
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
 #include <QtCore/QVariant>

@@ -89,7 +89,7 @@ TEST(QColumnLayout, bindings)
         // Coverage for impl copy constructor and assignment operator
         internal::QColumnLayoutImpl i2(*impl);
         EXPECT_EQ(2, i2.size());
-        
+
         i2 = i2;
         EXPECT_EQ(2, i2.size());
 

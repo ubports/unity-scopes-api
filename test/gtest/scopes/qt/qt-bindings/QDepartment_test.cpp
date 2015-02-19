@@ -71,7 +71,7 @@ TEST(QDepartment, bindings)
     }
 
     std::vector<std::string> qt_dep_ids;
-    QListIterator<QSharedPointer<QDepartment const>> it(qt_list);
+    QListIterator<std::shared_ptr<QDepartment const>> it(qt_list);
     while (it.hasNext())
     {
         qt_dep_ids.push_back(it.next()->id().toStdString());
@@ -86,6 +86,20 @@ TEST(QDepartment, bindings)
 
     // TODO: need coverage for set_subdepartments() once we work out the correct
     // typedef for QDepartmentList.
+
+    std::shared_ptr<QDepartment const> dep4(QDepartment::create(query2, "label4"));
+    std::shared_ptr<QDepartment const> dep5(QDepartment::create(query2, "label5"));
+    QDepartmentList l;
+    l.append(dep4);
+    l.append(dep5);
+    dep.set_subdepartments(l);
+    auto l2 = dep.subdepartments();
+    ASSERT_EQ(2, l2.size());
+    it = l2;
+    auto d = it.next();
+    EXPECT_EQ("label4", d->label());
+    d = it.next();
+    EXPECT_EQ("label5", d->label());
 }
 
 TEST(QDepartment, construct_assign)

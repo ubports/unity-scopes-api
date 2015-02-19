@@ -62,6 +62,9 @@ public:
     ObjectProxy string_to_proxy(std::string const& s) const;
     std::string proxy_to_string(ObjectProxy const& proxy) const;
 
+    std::string cache_directory() const;
+    std::string tmp_directory() const;
+
     ~RuntimeImpl();
 
 private:
@@ -91,7 +94,6 @@ private:
     std::string app_dir_;
     std::string log_dir_;
     std::string config_dir_;
-    std::string tmp_dir_;
     Logger::UPtr logger_;
     mutable Reaper::SPtr reply_reaper_;
     mutable ThreadPool::SPtr async_pool_;  // Pool of invocation threads for async query creation
