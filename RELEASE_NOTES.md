@@ -4,7 +4,7 @@ Release notes
 Changes in version 0.6.15
 =========================
   - Added _ENABLE_QT_EXPERIMENTAL_ guard to qt headers until that library
-    is finalized. Further hanges in the unity::scopes::qt namespace are
+    is finalized. Further changes in the unity::scopes::qt namespace are
     expected at this point.
 
 Changes in version 0.6.14

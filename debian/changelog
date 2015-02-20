@@ -1,8 +1,8 @@
 unity-scopes-api (0.6.15+15.04.20150213-0ubuntu2) UNRELEASED; urgency=medium
 
   * Added _ENABLE_QT_EXPERIMENTAL_ guard to qt headers until that library
-    is finalized. Changes in the unity::scopes::qt namespace are expected
-    at this point.
+    is finalized. Further changes in the unity::scopes::qt namespace are
+    expected at this point.
 
  -- Michi Henning <michi.henning@canonical.com>  Thu, 19 Feb 2015 11:48:04 +1000
 
