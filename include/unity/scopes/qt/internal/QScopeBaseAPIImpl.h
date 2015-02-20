@@ -110,6 +110,7 @@ protected:
     std::shared_ptr<QCoreApplication> qtapp_;
     std::unique_ptr<std::thread> qtthread_;
     std::atomic<bool> qtapp_ready_;
+    std::atomic<bool> qtapp_stopped_;
 
     QScopeBase* qtscope_impl_;
 

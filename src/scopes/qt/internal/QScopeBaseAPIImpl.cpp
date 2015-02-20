@@ -81,6 +81,7 @@ public:
 QScopeBaseAPIImpl::QScopeBaseAPIImpl(QScopeBase& qtscope, QObject* parent)
     : QObject(parent)
     , qtapp_ready_(false)
+    , qtapp_stopped_(false)
     , qtscope_impl_(&qtscope)
 {
 }
@@ -88,6 +89,7 @@ QScopeBaseAPIImpl::QScopeBaseAPIImpl(QScopeBase& qtscope, QObject* parent)
 QScopeBaseAPIImpl::QScopeBaseAPIImpl(FactoryFunc const& creator, QObject* parent)
     : QObject(parent)
     , qtapp_ready_(false)
+    , qtapp_stopped_(false)
     , qtscope_impl_(nullptr)
     , qtscope_creator_(creator)
 {
@@ -153,7 +155,7 @@ void QScopeBaseAPIImpl::start(std::string const& scope_id)
 
 void QScopeBaseAPIImpl::stop()
 {
-    // Post event to initialize the object in the Qt thread
+    // Post event to stop the object in the Qt thread
     qtapp_->postEvent(this, new StopEvent());
 }
 
@@ -187,5 +189,6 @@ void QScopeBaseAPIImpl::startQtThread()
         qtapp_->exec();
         // delete QtCoreApplication in the same thread it was created
         qtapp_.reset();
+        qtapp_stopped_ = true;
     }
 }
