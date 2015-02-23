@@ -562,13 +562,18 @@ bool RuntimeImpl::confined() const
 {
     auto is_confined = []
     {
-        // Find out whether we are confined. aa_getcon() returns -1 in that case.
+        // Find out whether we are confined. aa_getcon() returns -1 with EACCESS in that case.
         char* con = nullptr;
         char* mode;
         int rc = aa_getcon(&con, &mode);
+        int error = errno;
+        if (rc == -1)
+        {
+            cerr << "aa_getcon failed, errno = " << error << endl;
+        }
         // Only con (not mode) must be deallocated
         free(con);
-        return rc == -1;
+        return rc == -1 && error == EACCES;
     };
     static bool confined = is_confined();
     return confined;
