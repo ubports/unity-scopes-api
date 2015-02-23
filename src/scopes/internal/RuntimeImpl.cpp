@@ -567,6 +567,10 @@ bool RuntimeImpl::confined() const
         char* mode;
         int rc = aa_getcon(&con, &mode);
         int error = errno;
+        if (rc == -1)
+        {
+            cerr << "aa_getcon failed, errno = " << error << endl;
+        }
         // Only con (not mode) must be deallocated
         free(con);
         return rc == -1 && error == EACCES;
