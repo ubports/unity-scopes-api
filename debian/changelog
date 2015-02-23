@@ -1,3 +1,15 @@
+unity-scopes-api (0.6.14+15.04.20150223-0ubuntu1) vivid; urgency=medium
+
+  [ Pawel Stolowski ]
+  * Set CrashDB attribute to point at savilerow project for click scopes
+    which has 'Canonical' as the maintainer.
+
+  [ Michi Henning ]
+  * Fixed compilation problems when compiling with boost 1.56 and 1.57.
+  * Fixed a bunch of copyright headers.
+
+ -- CI Train Bot <ci-train-bot@canonical.com>  Mon, 23 Feb 2015 14:48:28 +0000
+
 unity-scopes-api (0.6.14+15.04.20150213-0ubuntu1) vivid; urgency=medium
 
   [ Michi Henning ]
