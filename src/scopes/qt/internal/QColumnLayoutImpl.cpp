@@ -17,8 +17,7 @@
  */
 
 #include <unity/scopes/qt/internal/QColumnLayoutImpl.h>
-
-#include <unity/scopes/qt/QUtils.h>
+#include <unity/scopes/qt/internal/QUtils.h>
 
 #include <unity/scopes/ColumnLayout.h>
 

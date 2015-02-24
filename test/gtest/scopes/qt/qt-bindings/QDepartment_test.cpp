@@ -20,14 +20,15 @@
 
 #include <unity/scopes/qt/QCannedQuery.h>
 #include <unity/scopes/qt/QDepartment.h>
-#include <unity/scopes/qt/QUtils.h>
 #include <unity/scopes/qt/internal/QDepartmentImpl.h>
+#include <unity/scopes/qt/internal/QUtils.h>
 
 #include <unity/scopes/Department.h>
 
 #include <iostream>
 
 using namespace unity::scopes::qt;
+using namespace unity::scopes::qt::internal;
 
 TEST(QDepartment, bindings)
 {

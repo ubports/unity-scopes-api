@@ -20,9 +20,9 @@
 #include <gtest/gtest.h>
 
 #include <unity/scopes/qt/QScopeBaseAPI.h>
-#include <unity/scopes/qt/QUtils.h>
 
 #include <unity/scopes/qt/internal/QScopeBaseAPIImpl.h>
+#include <unity/scopes/qt/internal/QUtils.h>
 
 #include <QtCore/QThread>
 #include <QtCore/QCoreApplication>

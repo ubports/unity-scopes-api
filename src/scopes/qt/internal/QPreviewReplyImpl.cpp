@@ -19,8 +19,7 @@
 #include <unity/scopes/qt/internal/QPreviewReplyImpl.h>
 #include <unity/scopes/qt/internal/QColumnLayoutImpl.h>
 #include <unity/scopes/qt/internal/QPreviewWidgetImpl.h>
-
-#include <unity/scopes/qt/QUtils.h>
+#include <unity/scopes/qt/internal/QUtils.h>
 
 #include <unity/scopes/ColumnLayout.h>
 #include <unity/scopes/PreviewReply.h>

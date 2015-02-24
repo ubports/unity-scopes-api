@@ -19,14 +19,15 @@
 #include <gtest/gtest.h>
 
 #include <unity/scopes/qt/QCannedQuery.h>
-#include <unity/scopes/qt/QUtils.h>
 #include <unity/scopes/qt/internal/QCannedQueryImpl.h>
+#include <unity/scopes/qt/internal/QUtils.h>
 
 #include <unity/scopes/CannedQuery.h>
 #include <unity/scopes/FilterState.h>
 #include <unity/scopes/OptionSelectorFilter.h>
 
 using namespace unity::scopes::qt;
+using namespace unity::scopes::qt::internal;
 
 TEST(QCannedQuery, bindings)
 {

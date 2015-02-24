@@ -17,8 +17,8 @@
  */
 
 #include <unity/scopes/qt/internal/QCategoryImpl.h>
+#include <unity/scopes/qt/internal/QUtils.h>
 #include <unity/scopes/qt/QCategory.h>
-#include <unity/scopes/qt/QUtils.h>
 
 using namespace unity::scopes;
 using namespace unity::scopes::qt;

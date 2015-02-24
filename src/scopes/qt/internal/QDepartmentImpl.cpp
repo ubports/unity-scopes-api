@@ -18,7 +18,7 @@
 
 #include <unity/scopes/qt/internal/QDepartmentImpl.h>
 #include <unity/scopes/qt/internal/QCannedQueryImpl.h>
-#include <unity/scopes/qt/QUtils.h>
+#include <unity/scopes/qt/internal/QUtils.h>
 
 #include <unity/scopes/Department.h>
 #include <unity/scopes/CannedQuery.h>

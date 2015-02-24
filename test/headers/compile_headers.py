@@ -83,8 +83,7 @@ def run_compiler(hdr, compiler, copts, verbose, hdr_dir):
 
         # add the experimental flags at the beginning of the temporary file
         for flag in experimental_flags:
-            if flag in open(hdr_dir + "/" + hdr, encoding='utf-8').read():
-                src.write(bytes("#define " + flag + "" + "\n", 'UTF-8'))
+            src.write(bytes("#define " + flag + "" + "\n", 'UTF-8'))
 
         src.write(bytes("#include <" + hdr + ">" + "\n", 'UTF-8'))
         src.flush()                                                 # Need this to make the file visible

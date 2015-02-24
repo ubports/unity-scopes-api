@@ -17,10 +17,10 @@
  */
 
 #include <unity/scopes/qt/internal/QCannedQueryImpl.h>
+#include <unity/scopes/qt/internal/QUtils.h>
 
 #include <unity/scopes/CannedQuery.h>
 
-#include <unity/scopes/qt/QUtils.h>
 
 using namespace unity::scopes;
 using namespace unity::scopes::qt;
