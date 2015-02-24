@@ -291,8 +291,11 @@ It is possible to hide each widget as well as to require them to be filled in.
 When a user presses the "Send" button, the scope receives a preview
 action activation with the id \c "rated".  The actual rating and/or
 review can be accessed via unity::scopes::ActionMetadata::scope_data.
-The scope data will be a VariantMap with keys \c "rating" (a double)
-and \c "review" (a string).
+The scope data will be a VariantMap with the following keys:
+
+  - \c "rating" - a double holding the number of stars the user
+    selected (1 to 5)
+  - \c "review" - a string holding the free text review
 
 List of attributes:
 
