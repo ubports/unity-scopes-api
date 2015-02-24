@@ -288,7 +288,11 @@ The rating-input widget allows users to rate content. It consists of two types o
 a star-based rating and an input field for the user to enter his/her review.
 It is possible to hide each widget as well as to require them to be filled in.
 
-When a user presses the "Send" button, the scope receives a preview action activation with the id \c "rated".
+When a user presses the "Send" button, the scope receives a preview
+action activation with the id \c "rated".  The actual rating and/or
+review can be accessed via unity::scopes::ActionMetadata::scope_data.
+The scope data will be a VariantMap with keys \c "rating" and \c
+"review".
 
 List of attributes:
 
