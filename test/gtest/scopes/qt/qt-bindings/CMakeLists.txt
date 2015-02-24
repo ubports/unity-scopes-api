@@ -222,3 +222,22 @@ include_directories(${Qt5Core_INCLUDE_DIRS})
 qt5_use_modules(QScopeCreation_test Core)
 
 add_test(QScopeCreation QScopeCreation_test)
+
+###################################################
+
+add_executable(
+  QPreviewWidget_test
+  QPreviewWidget_test.cpp)
+
+target_link_libraries(
+    QPreviewWidget_test
+    ${LIBGTEST}
+    ${TESTLIBS_QT}
+    ${TESTLIBS})
+
+find_package(Qt5Core REQUIRED)
+include_directories(${Qt5Core_INCLUDE_DIRS})
+
+qt5_use_modules(QPreviewWidget_test Core)
+
+add_test(QPreviewWidget QPreviewWidget_test)
