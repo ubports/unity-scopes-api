@@ -18,10 +18,6 @@
 
 #pragma once
 
-#ifndef _ENABLE_QT_EXPERIMENTAL_
-#error You should define _ENABLE_QT_EXPERIMENTAL_ in order to use this experimental header file.
-#endif
-
 #include <unity/util/DefinesPtrs.h>
 #include <unity/util/NonCopyable.h>
 
@@ -62,8 +58,7 @@ public:
     NONCOPYABLE(QScopeBaseAPIImpl);
     UNITY_DEFINES_PTRS(QScopeBaseAPIImpl);
 
-    QScopeBaseAPIImpl(QScopeBase& qtscope, QObject* parent = 0);
-    QScopeBaseAPIImpl(FactoryFunc const& creator, QObject* parent = 0);
+    QScopeBaseAPIImpl(FactoryFunc const& creator);
     virtual ~QScopeBaseAPIImpl();
 
     bool event(QEvent* e) override;
@@ -105,14 +100,13 @@ public:
                                                 unity::scopes::SearchMetadata const&);
 
 protected:
-    void startQtThread();
+    void start_qt_thread();
 
     std::shared_ptr<QCoreApplication> qtapp_;
     std::unique_ptr<std::thread> qtthread_;
     std::atomic<bool> qtapp_ready_;
     std::atomic<bool> qtapp_stopped_;
-
-    QScopeBase* qtscope_impl_;
+    std::unique_ptr<QScopeBase> qtscope_impl_;
 
     FactoryFunc qtscope_creator_;
 };

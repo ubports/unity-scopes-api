@@ -35,19 +35,19 @@ using namespace unity::scopes::qt::internal;
 
 TEST(TestSetup, bindings)
 {
-    QScopeMock scope;
+    QScopeMock* scope = new QScopeMock;
 
     // construct the QSearchQueryBaseAPIMock
-    QScopeBaseAPIMock api_scope(scope);
+    QScopeBaseAPIMock api_scope([scope]{ return scope; });
 
     // verify that the event method is called for start event
-    EXPECT_CALL(scope, start(_)).Times(Exactly(1));
+    EXPECT_CALL(*scope, start(_)).Times(Exactly(1));
     api_scope.start("test_scope");
 
-    QThread* qt_thread = api_scope.getQtAppThread();
-    scope.setQtThread(qt_thread);
+    QThread* qt_thread = api_scope.get_qt_app_thread();
+    scope->set_qt_thread(qt_thread);
 
-    auto CheckThread = [qt_thread]() -> void
+    auto check_thread = [qt_thread]() -> void
     {
         EXPECT_EQ(qt_thread, QThread::currentThread());
     };
@@ -62,6 +62,6 @@ TEST(TestSetup, bindings)
 
     // verify that the event method is called for stop event and
     // that the thread is the Qt thread
-    EXPECT_CALL(scope, stop()).Times(Exactly(1)).WillOnce(Invoke(CheckThread));
+    EXPECT_CALL(*scope, stop()).Times(Exactly(1)).WillOnce(Invoke(check_thread));
     api_scope.stop();
 }

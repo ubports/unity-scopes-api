@@ -52,10 +52,6 @@ class QScopeBaseAPIImpl;
 /**
  * Defines the lifecycle of scope plugin, and acts as a factory
  * for Query and Preview objects.
- *
- * Note that the #preview and #search methods are each called on
- * different threads, so some form of interlocking is required
- * if shared data structures are used.
  */
 class QScopeBaseAPI : public unity::scopes::ScopeBase
 {

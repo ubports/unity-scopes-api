@@ -18,10 +18,6 @@
 
 #pragma once
 
-#ifndef _ENABLE_QT_EXPERIMENTAL_
-#error You should define _ENABLE_QT_EXPERIMENTAL_ in order to use this experimental header file.
-#endif
-
 #include <unity/scopes/qt/QSearchQueryBase.h>
 
 #include <unity/util/DefinesPtrs.h>
@@ -48,15 +44,8 @@ public:
 
     QScopeBaseImpl() = default;
     virtual ~QScopeBaseImpl() = default;
-    /// @endcond
-    /**
-     * Called once at startup
-     */
-    virtual void start(std::string const&);
 
-    /**
-     * Called at shutdown
-     */
+    virtual void start(std::string const&);
     virtual void stop();
 };
 

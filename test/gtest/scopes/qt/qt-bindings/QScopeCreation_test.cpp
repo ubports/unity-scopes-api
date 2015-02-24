@@ -43,14 +43,9 @@ std::atomic<bool> scope_created(false);
 class QScopeBaseAPIImplTest : public QScopeBaseAPIImpl
 {
 public:
-    QScopeBaseAPIImplTest(FactoryFunc const& creator, QObject* parent = 0)
-        : QScopeBaseAPIImpl(creator, parent)
+    QScopeBaseAPIImplTest(FactoryFunc const& creator)
+        : QScopeBaseAPIImpl(creator)
     {
-    }
-
-    ~QScopeBaseAPIImplTest()
-    {
-        delete qtscope_impl_;
     }
 
     QThread* getQtAppThread()
