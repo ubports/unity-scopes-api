@@ -59,8 +59,8 @@ TEST(ScopeConfig, basic)
 
         auto keywords = cfg.keywords();
         EXPECT_EQ(2u, keywords.size());
-        EXPECT_EQ("foo", keywords[0]);
-        EXPECT_EQ("bar", keywords[1]);
+        EXPECT_NE(keywords.end(), keywords.find("foo"));
+        EXPECT_NE(keywords.end(), keywords.find("bar"));
 
         EXPECT_TRUE(cfg.is_aggregator());
 

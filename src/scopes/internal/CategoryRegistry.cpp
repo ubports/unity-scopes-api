@@ -18,6 +18,8 @@
 
 #include <unity/scopes/internal/CategoryRegistry.h>
 #include <unity/UnityExceptions.h>
+
+#include <algorithm>
 #include <sstream>
 
 namespace unity
@@ -32,13 +34,13 @@ namespace internal
 void CategoryRegistry::register_category(Category::SCPtr category)
 {
     std::lock_guard<decltype(mutex_)> lock(mutex_);
-    if (categories_.find(category->id()) != categories_.end())
+    auto id = category->id();
+    auto it = find_if(categories_.begin(), categories_.end(), [id](const CatPair& p) { return p.first == id; });
+    if (it != categories_.end())
     {
-        std::ostringstream s;
-        s << "Category " << category->id() << " already defined";
-        throw InvalidArgumentException(s.str());
+        throw InvalidArgumentException("register_category(): duplicate category: " + id);
     }
-    categories_[category->id()] = category;
+    categories_.push_back(make_pair(category->id(), category));
 }
 
 Category::SCPtr CategoryRegistry::register_category(VariantMap const& variant_map)
@@ -58,12 +60,23 @@ Category::SCPtr CategoryRegistry::register_category(std::string const& id, std::
 Category::SCPtr CategoryRegistry::lookup_category(std::string const& id) const
 {
     std::lock_guard<decltype(mutex_)> lock(mutex_);
-    auto it = categories_.find(id);
+    auto it = find_if(categories_.begin(), categories_.end(), [id](const CatPair& p) { return p.first == id; });
     if (it != categories_.end())
     {
         return it->second;
     }
     return nullptr;
+}
+
+VariantArray CategoryRegistry::serialize() const
+{
+    std::lock_guard<decltype(mutex_)> lock(mutex_);
+    VariantArray va;
+    for (auto&& p : categories_)
+    {
+        va.push_back(Variant(p.second->serialize()));
+    }
+    return va;
 }
 
 } // namespace internal

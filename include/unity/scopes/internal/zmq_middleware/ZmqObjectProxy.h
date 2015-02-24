@@ -56,11 +56,11 @@ public:
                    int64_t timeout = -1);
     virtual ~ZmqObjectProxy();
 
-    virtual ZmqMiddleware* mw_base() const noexcept;
+    virtual ZmqMiddleware* mw_base() const noexcept override;
 
     virtual std::string endpoint() const override;
     virtual std::string identity() const override;
-    std::string target_category() const;
+    std::string target_category() const override;
     RequestMode mode() const;
     virtual int64_t timeout() const noexcept override;
 
@@ -72,7 +72,7 @@ public:
 protected:
     capnproto::Request::Builder make_request_(capnp::MessageBuilder& b, std::string const& operation_name) const;
 
-    void invoke_oneway_(capnp::MessageBuilder& out_params);
+    void invoke_oneway_(capnp::MessageBuilder& in_params);
 
     // Holds both the receiver for the unmarshaling buffer (which allocates memory)
     // and the reader that decodes the memory from the unmarshaling buffer.
@@ -89,13 +89,19 @@ protected:
         std::unique_ptr<capnp::SegmentArrayMessageReader> reader;
     };
 
-    TwowayOutParams invoke_twoway_(capnp::MessageBuilder& in_params);
-    TwowayOutParams invoke_twoway_(capnp::MessageBuilder& in_params,
+    TwowayOutParams invoke_twoway_(capnp::MessageBuilder& request);
+    TwowayOutParams invoke_twoway_(capnp::MessageBuilder& request,
                                    int64_t twoway_timeout,
                                    int64_t locate_timeout = -1);
 
 private:
-    TwowayOutParams invoke_twoway__(capnp::MessageBuilder& in_params, int64_t timeout);
+    TwowayOutParams invoke_twoway__(capnp::MessageBuilder& request, int64_t timeout);
+
+    std::string decode_request_(capnp::MessageBuilder& request);
+    void trace_request_(capnp::MessageBuilder& request);
+
+    std::string decode_reply_(capnp::MessageBuilder& request, capnp::MessageReader& reply);
+    void trace_reply_(capnp::MessageBuilder& request, capnp::MessageReader& reply);
 
     std::string endpoint_;
     std::string identity_;

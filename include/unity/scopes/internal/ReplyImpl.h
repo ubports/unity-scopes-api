@@ -41,9 +41,7 @@ class QueryObjectBase;
 class ReplyImpl : public virtual unity::scopes::Reply, public virtual ObjectImpl
 {
 public:
-    ReplyImpl(MWReplyProxy const& mw_proxy,
-              std::shared_ptr<QueryObjectBase>const & qo,
-              boost::log::sources::severity_channel_logger_mt<>& logger);
+    ReplyImpl(MWReplyProxy const& mw_proxy, std::shared_ptr<QueryObjectBase>const & qo);
     virtual ~ReplyImpl();
 
     virtual void finished() override;

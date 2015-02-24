@@ -71,13 +71,15 @@ kj::ArrayPtr<kj::ArrayPtr<capnp::word const> const> ZmqReceiver::receive()
         if (reinterpret_cast<uintptr_t>(buf) % sizeof(capnp::word) == 0)
         {
             // String buffer is word-aligned, point directly at the start of the string.
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-align"
             segments_.push_back(kj::ArrayPtr<capnp::word const>(reinterpret_cast<capnp::word const*>(buf), num_words));
+#pragma GCC diagnostic pop
         }
         else
         {
-            // No coverage here because std::string appears to always have its buffer word-aligned.
-            // Because the standard doesn't guarantee this though, and it might change in the future,
-            // the code below remains enabled.
+            // No coverage here because, on amd64, std::string has its buffer word-aligned but,
+            // on armhf, capnp::word is 8-byte aligned and the string buffer is 4-byte aligned.
             //
             // String buffer is not word-aligned, make a copy and point at that.
             unique_ptr<capnp::word[]> words(new capnp::word[num_words]);                    // LCOV_EXCL_LINE

@@ -2,7 +2,7 @@
  * Copyright (C) 2013 Canonical Ltd
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the Lesser GNU General Public License version 3 as
+ * it under the terms of the GNU Lesser General Public License version 3 as
  * published by the Free Software Foundation.
  *
  * This program is distributed in the hope that it will be useful,
@@ -97,7 +97,7 @@ public:
     ScopeMetadataBuilder& location_data_needed(Optional<bool> const& value);
     ScopeMetadataBuilder& child_scope_ids(Optional<std::vector<std::string>> const& value);
     ScopeMetadataBuilder& version(Optional<int> const& value);
-    ScopeMetadataBuilder& keywords(Optional<std::vector<std::string>> const& value);
+    ScopeMetadataBuilder& keywords(Optional<std::set<std::string>> const& value);
     ScopeMetadataBuilder& is_aggregator(Optional<bool> const& value);
 
     ScopeMetadata operator()() const;

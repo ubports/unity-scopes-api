@@ -33,9 +33,21 @@
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
+#pragma push_macro("BOOST_RANGE_ENABLE_CONCEPT_ASSERT")
+
+#if BOOST_VERSION / 100000 == 1
+#    if ((BOOST_VERSION / 100) % 1000) == 57
+#        define BOOST_RANGE_ENABLE_CONCEPT_ASSERT 0  // Iterator requirements are too strict with boost 1.57.
+#    endif
+# endif
+
+#include <boost/algorithm/string.hpp>
 #include <boost/range/adaptor/filtered.hpp>
 #include <boost/range/algorithm/copy.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/filesystem/path.hpp>
+
+#pragma pop_macro("BOOST_RANGE_ENABLE_CONCEPT_ASSERT")
 
 #include <gtest/gtest.h>
 
@@ -50,6 +62,8 @@ using namespace unity;
 using namespace unity::scopes;
 using namespace unity::scopes::internal;
 using namespace unity::scopes::internal::zmq_middleware;
+
+namespace fs = boost::filesystem;
 
 string const runtime_ini = TEST_DIR "/Runtime.ini";
 
@@ -89,7 +103,7 @@ ScopeMetadata make_meta(const string& scope_id, MWScopeProxy const& proxy, Middl
     mi->set_search_hint("search hint " + scope_id);
     mi->set_hot_key("hot key " + scope_id);
     mi->set_scope_directory("/foo");
-    ScopeProxy p = ScopeImpl::create(proxy, mw->runtime(), scope_id);
+    ScopeProxy p = ScopeImpl::create(proxy, scope_id);
     mi->set_proxy(p);
     return ScopeMetadataImpl::create(move(mi));
 }
@@ -403,7 +417,7 @@ public:
         scope_ids = { {"scope-A", "scope-B", "scope-C", "scope-D", "scope-N", "scope-S"} };
         for (auto& scope_id : scope_ids)
         {
-            proxies[scope_id] = ScopeImpl::create(mw->create_scope_proxy(scope_id), mw->runtime(), scope_id);
+            proxies[scope_id] = ScopeImpl::create(mw->create_scope_proxy(scope_id), scope_id);
 
             unique_ptr<ScopeMetadataImpl> mi(new ScopeMetadataImpl(mw.get()));
             mi->set_scope_id(scope_id);
@@ -451,12 +465,48 @@ public:
         return count_child_procs() - start_process_count;
     }
 
+    string convert_custom_exec(fs::path const& scope_dir, string const& custom_exec)
+    {
+        string result;
+
+        vector<string> split;
+        boost::split(split, custom_exec, boost::is_space());
+        fs::path program(split.front());
+        if (program.is_relative())
+        {
+            // First look inside the arch-specific directory
+            if (fs::exists(scope_dir / DEB_HOST_MULTIARCH / program))
+            {
+                // Join the full command, not just the program path
+                result = (scope_dir / DEB_HOST_MULTIARCH / custom_exec).native();
+            }
+            // Next try in the non arch-aware directory
+            else if (fs::exists(scope_dir / program))
+            {
+                // Join the full command, not just the program path
+                result = (scope_dir / custom_exec).native();
+            }
+            else
+            {
+                throw unity::InvalidArgumentException(
+                        "Nonexistent scope runner '" + custom_exec
+                                + "' executable for scope");
+            }
+        }
+        else
+        {
+            result = custom_exec;
+        }
+
+        return result;
+    }
+
     ScopeProxy start_testscopeB()
     {
         std::string test_scope_id = "testscopeB";
         std::string test_scope_config = REGISTRY_TEST_DIR "/scopes/testscopeB/testscopeB.ini";
         ScopeConfig sc(test_scope_config);
-        ScopeProxy test_proxy = ScopeImpl::create(mw->create_scope_proxy(test_scope_id), mw->runtime(), test_scope_id);
+        ScopeProxy test_proxy = ScopeImpl::create(mw->create_scope_proxy(test_scope_id), test_scope_id);
 
         unique_ptr<ScopeMetadataImpl> mi(new ScopeMetadataImpl(mw.get()));
         mi->set_scope_id(test_scope_id);
@@ -469,7 +519,7 @@ public:
 
         RegistryObject::ScopeExecData exec_data;
         exec_data.scope_id = test_scope_id;
-        exec_data.custom_exec = sc.scope_runner();
+        exec_data.custom_exec = convert_custom_exec(REGISTRY_TEST_DIR "/scopes/testscopeB", sc.scope_runner());
         exec_data.runtime_config = runtime_ini;
         exec_data.scope_config = test_scope_config;
         exec_data.timeout_ms = process_timeout;

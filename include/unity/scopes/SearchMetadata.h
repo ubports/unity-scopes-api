@@ -31,8 +31,9 @@ namespace scopes
 
 namespace internal
 {
+
 class SearchMetadataImpl;
-class ScopeObject;
+
 }
 
 /**
