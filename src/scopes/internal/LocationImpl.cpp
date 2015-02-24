@@ -2,7 +2,7 @@
  * Copyright (C) 2014 Canonical Ltd
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the Lesser GNU General Public License version 3 as
+ * it under the terms of the GNU Lesser General Public License version 3 as
  * published by the Free Software Foundation.
  *
  * This program is distributed in the hope that it will be useful,
@@ -10,7 +10,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the Lesser GNU General Public License
+ * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Authored by: Pete Woods <pete.woods@canonical.com>
@@ -189,52 +189,52 @@ std::string LocationImpl::zip_postal_code() const
 
 bool LocationImpl::has_altitude() const
 {
-    return altitude_;
+    return bool(altitude_);
 }
 
 bool LocationImpl::has_area_code() const
 {
-    return area_code_;
+    return bool(area_code_);
 }
 
 bool LocationImpl::has_city() const
 {
-    return city_;
+    return bool(city_);
 }
 
 bool LocationImpl::has_country_code() const
 {
-    return country_code_;
+    return bool(country_code_);
 }
 
 bool LocationImpl::has_country_name() const
 {
-    return country_name_;
+    return bool(country_name_);
 }
 
 bool LocationImpl::has_horizontal_accuracy() const
 {
-    return horizontal_accuracy_;
+    return bool(horizontal_accuracy_);
 }
 
 bool LocationImpl::has_region_code() const
 {
-    return region_code_;
+    return bool(region_code_);
 }
 
 bool LocationImpl::has_region_name() const
 {
-    return region_name_;
+    return bool(region_name_);
 }
 
 bool LocationImpl::has_vertical_accuracy() const
 {
-    return vertical_accuracy_;
+    return bool(vertical_accuracy_);
 }
 
 bool LocationImpl::has_zip_postal_code() const
 {
-    return zip_postal_code_;
+    return bool(zip_postal_code_);
 }
 
 void LocationImpl::set_altitude(double altitude)

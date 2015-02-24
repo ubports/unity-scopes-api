@@ -167,6 +167,11 @@ TEST_F(CacheScopeTest, non_surfacing_query)
     EXPECT_FALSE(boost::filesystem::exists(TEST_RUNTIME_PATH "/unconfined/CacheScope/.surfacing_cache", ec));
 }
 
+// Stop warnings about unused return value from system()
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-result"
+
 TEST_F(CacheScopeTest, surfacing_query)
 {
     ::unlink(TEST_RUNTIME_PATH "/unconfined/CacheScope/.surfacing_cache");
@@ -186,6 +191,8 @@ TEST_F(CacheScopeTest, surfacing_query)
     EXPECT_TRUE(boost::filesystem::exists(TEST_RUNTIME_PATH "/unconfined/CacheScope/.surfacing_cache", ec));
     system("cat " TEST_RUNTIME_PATH "/unconfined/CacheScope/.surfacing_cache");
 }
+
+#pragma GCC diagnostic pop
 
 // Run another non-surfacing query before checking that the cache contains the
 // results of the last surfacing query.
