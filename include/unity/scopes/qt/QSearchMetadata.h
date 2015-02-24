@@ -164,7 +164,6 @@ public:
 private:
     /// @cond
     std::unique_ptr<internal::QSearchMetadataImpl> p;
-    friend class internal::QSearchMetadataImpl;
     /// @endcond
 };
 

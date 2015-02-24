@@ -147,7 +147,6 @@ public:
 
 private:
     std::unique_ptr<internal::QScopeBaseImpl> p;
-    friend class internal::QScopeBaseImpl;
 };
 
 }  // namespace qt

@@ -156,7 +156,6 @@ private:
     void init(QSearchQueryBaseAPI* query_api);
 
     std::unique_ptr<internal::QSearchQueryBaseImpl> p;
-    friend class internal::QSearchQueryBaseImpl;
     friend class QSearchQueryBaseAPI;
     ///@endcond
 };

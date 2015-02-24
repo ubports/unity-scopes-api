@@ -105,7 +105,6 @@ public:
 private:
     /// @cond
     std::unique_ptr<internal::QScopeBaseAPIImpl> p;
-    friend class internal::QScopeBaseAPIImpl;
     /// @endcond
 };
 
