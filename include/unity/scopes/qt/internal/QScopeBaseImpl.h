@@ -38,7 +38,6 @@ namespace internal
 class QScopeBaseImpl
 {
 public:
-    /// @cond
     NONCOPYABLE(QScopeBaseImpl);
     UNITY_DEFINES_PTRS(QScopeBaseImpl);
 

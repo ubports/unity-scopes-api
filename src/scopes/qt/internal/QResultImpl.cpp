@@ -28,61 +28,18 @@ using namespace unity::scopes;
 using namespace unity::scopes::qt;
 using namespace unity::scopes::qt::internal;
 
-namespace unity
-{
-
-namespace scopes
-{
-
-namespace qt
-{
-
-namespace internal
-{
+namespace {
 
 class APIResult : public Result
 {
 public:
-    APIResult(APIResult const& other)
-        : Result(other){};
-
-    APIResult(APIResult&&) = default;
-
-    APIResult& operator=(APIResult const& other)
-    {
-        if (this != &other)
-        {
-            *this = other;
-        }
-        return *this;
-    }
-
-    APIResult& operator=(APIResult&&) = default;
-
     APIResult(const QVariantMap& variant_map)
-        : Result(qvariantmap_to_variantmap(variant_map)){};
-
-    static VariantMap getValidEmptyMap()
+        : Result(qvariantmap_to_variantmap(variant_map))
     {
-        VariantMap retMap;
-        VariantMap emptyMap;
-        VariantMap attrsMap;
-
-        attrsMap["uri"] = Variant(std::string());
-        retMap["internal"] = emptyMap;
-        retMap["attrs"] = attrsMap;
-
-        return retMap;
     }
 };
 
-}  // namespace internal
-
-}  // namespace qt
-
-}  // namespace scopes
-
-}  // namespace unity
+}  // namespace
 
 QResultImpl::QResultImpl(unity::scopes::Result* api_result)
     : api_result_(api_result)

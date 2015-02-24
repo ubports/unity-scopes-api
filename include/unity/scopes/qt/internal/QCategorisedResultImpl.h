@@ -48,37 +48,16 @@ namespace internal
 class QCategorisedResultImpl : public QResultImpl
 {
 public:
-    /// @cond
     UNITY_DEFINES_PTRS(QCategorisedResultImpl);
-    /// @endcond
-    /**
-    \brief Creates a CategorisedResult with given category,
-    with all base attributes initially empty.
-    \param category The category for the result.
-    */
+
     explicit QCategorisedResultImpl(QCategory::SCPtr category);
 
-    /**@name Copy and assignment
-    Copy and assignment operators (move and non-move versions) have the usual value semantics.
-    */
-    //{@
     QCategorisedResultImpl(QCategorisedResultImpl const& other);
     QCategorisedResultImpl& operator=(QCategorisedResultImpl const& other);
     QCategorisedResultImpl(QCategorisedResultImpl&&);
     QCategorisedResultImpl& operator=(QCategorisedResultImpl&&);
-    //@}
 
-    /**
-    \brief Updates the category of this result.
-    \param category The category for the result.
-    */
     void set_category(QCategory::SCPtr category);
-
-    /**
-    \brief Return category of this result.
-    Get the category instance this result belongs to.
-    \return The category instance.
-    */
     QCategory::SCPtr category() const;
 
 private:

@@ -52,7 +52,6 @@ class QScopeBaseAPIImpl : public QObject
 {
     Q_OBJECT
 public:
-    /// @cond
     using FactoryFunc = std::function<QScopeBase*()>;
 
     NONCOPYABLE(QScopeBaseAPIImpl);
@@ -62,40 +61,9 @@ public:
     virtual ~QScopeBaseAPIImpl();
 
     bool event(QEvent* e) override;
-    /// @endcond
-
-    /**
-    \brief Called by the scopes run time after the create function completes.
-
-    If start() throws an exception, stop() will _not_ be called.
-
-    The call to start() is made by the same thread that calls the create function.
-
-    \param scope_id The name of the scope as defined by the scope's configuration file.
-    */
     void start(std::string const& scope_id);
-
-    /**
-    \brief Called by the scopes run time when the scope should shut down.
-
-    A scope should deallocate as many resources as possible when stop() is called, for example,
-    deallocate any caches and close network connections. In addition, if the scope implements run()
-    and did not return from run(), it must return from run() in response to the call to stop().
-
-    Exceptions from stop() are ignored.
-
-    The call to stop() is made by the same thread that calls the create function and start().
-    */
     void stop();
-
-    /**
-     * Called each time a new preview is requested
-     */
     unity::scopes::PreviewQueryBase::UPtr preview(const unity::scopes::Result&, const unity::scopes::ActionMetadata&);
-
-    /**
-     * Called each time a new query is requested
-     */
     unity::scopes::SearchQueryBase::UPtr search(unity::scopes::CannedQuery const& q,
                                                 unity::scopes::SearchMetadata const&);
 

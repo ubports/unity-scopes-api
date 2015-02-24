@@ -24,11 +24,6 @@ using namespace unity::scopes;
 using namespace unity::scopes::qt;
 
 /// @cond
-QResult::QResult()
-    : p(new internal::QResultImpl(QVariantMap()))
-{
-}
-
 QResult::QResult(internal::QResultImpl* impl)
     : p(impl)
 {
