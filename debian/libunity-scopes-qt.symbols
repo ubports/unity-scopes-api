@@ -282,11 +282,7 @@ libunity-scopes-qt.so.01 libunity-scopes-qt #MINVER#
  (c++)"unity::scopes::qt::QVariantBuilder::QVariantBuilder(unity::scopes::qt::internal::QVariantBuilderImpl*)@Base" 0.6.13+15.04.20150205.1
  (c++)"unity::scopes::qt::QVariantBuilder::QVariantBuilder(unity::scopes::qt::QVariantBuilder&&)@Base" 0.6.13+15.04.20150205.1
  (c++)"unity::scopes::qt::QVariantBuilder::QVariantBuilder(unity::scopes::qt::QVariantBuilder const&)@Base" 0.6.13+15.04.20150205.1
- (c++)"unity::scopes::qt::qvariantmap_to_variantmap(QMap<QString, QVariant> const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::qvariant_to_variant(QVariant const&)@Base" 0replaceme
  (c++)"unity::scopes::qt::RunEvent::~RunEvent()@Base" 0.6.13+15.04.20150205.1
- (c++)"unity::scopes::qt::variantmap_to_qvariantmap(std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unity::scopes::Variant> > > const&)@Base" 0replaceme
- (c++)"unity::scopes::qt::variant_to_qvariant(unity::scopes::Variant const&)@Base" 0replaceme
  (c++)"unity::scopes::qt::XmlAsyncReader::async_get_parser(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0.6.13+15.04.20150205.1
  (c++)"unity::scopes::qt::XmlAsyncReader::async_get_parser(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::vector<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > > const&) const@Base" 0.6.13+15.04.20150205.1
  (c++)"unity::scopes::qt::XmlAsyncReader::create_parser_with_data(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> >&)@Base" 0.6.13+15.04.20150205.1
