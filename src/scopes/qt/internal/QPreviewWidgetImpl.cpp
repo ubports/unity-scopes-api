@@ -17,8 +17,8 @@
  */
 
 #include <unity/scopes/qt/internal/QPreviewWidgetImpl.h>
+#include <unity/scopes/qt/internal/QUtils.h>
 
-#include <unity/scopes/qt/QUtils.h>
 #include <unity/scopes/qt/QPreviewWidget.h>
 
 #include <unity/scopes/PreviewWidget.h>

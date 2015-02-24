@@ -18,11 +18,11 @@
 
 #include <gtest/gtest.h>
 
-#include <unity/scopes/qt/QUtils.h>
+#include <unity/scopes/qt/internal/QUtils.h>
 
 #include <unity/UnityExceptions.h>
 
-using namespace unity::scopes::qt;
+using namespace unity::scopes::qt::internal;
 using namespace unity::scopes;
 
 TEST(QUtils, variant_to_qvariant)

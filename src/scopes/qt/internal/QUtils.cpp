@@ -16,7 +16,7 @@
  * Authored by: Xavi Garcia <xavi.garcia.mena@canonical.com>
  */
 
-#include <unity/scopes/qt/QUtils.h>
+#include <unity/scopes/qt/internal/QUtils.h>
 
 #include <unity/UnityExceptions.h>
 
@@ -26,7 +26,7 @@ using namespace unity::scopes::qt;
 using namespace std;
 
 namespace sc = unity::scopes;
-namespace qt = unity::scopes::qt;
+namespace qti = unity::scopes::qt::internal;
 
 namespace unity
 {
@@ -35,6 +35,9 @@ namespace scopes
 {
 
 namespace qt
+{
+
+namespace internal
 {
 
 QVariant variant_to_qvariant(sc::Variant const& variant)
@@ -57,7 +60,7 @@ QVariant variant_to_qvariant(sc::Variant const& variant)
             QVariantMap result_dict;
             for (auto it = dict.begin(); it != dict.end(); ++it)
             {
-                result_dict.insert(QString::fromStdString(it->first), qt::variant_to_qvariant(it->second));
+                result_dict.insert(QString::fromStdString(it->first), qti::variant_to_qvariant(it->second));
             }
             return result_dict;
         }
@@ -67,7 +70,7 @@ QVariant variant_to_qvariant(sc::Variant const& variant)
             QVariantList result_list;
             for (unsigned i = 0; i < arr.size(); i++)
             {
-                result_list.append(qt::variant_to_qvariant(arr[i]));
+                result_list.append(qti::variant_to_qvariant(arr[i]));
             }
             return result_list;
         }
@@ -102,7 +105,7 @@ sc::Variant qvariant_to_variant(QVariant const& variant)
             QVariantMap m(variant.toMap());
             for (auto it = m.begin(); it != m.end(); ++it)
             {
-                vm[it.key().toStdString()] = qt::qvariant_to_variant(it.value());
+                vm[it.key().toStdString()] = qti::qvariant_to_variant(it.value());
             }
             return sc::Variant(vm);
         }
@@ -112,7 +115,7 @@ sc::Variant qvariant_to_variant(QVariant const& variant)
             sc::VariantArray arr;
             for (int i = 0; i < l.size(); i++)
             {
-                arr.push_back(qt::qvariant_to_variant(l[i]));
+                arr.push_back(qti::qvariant_to_variant(l[i]));
             }
             return sc::Variant(arr);
         }
@@ -129,7 +132,7 @@ QVariantMap variantmap_to_qvariantmap(unity::scopes::VariantMap const& variant)
     QVariantMap ret_map;
     for (auto item : variant)
     {
-        ret_map[QString::fromUtf8(item.first.c_str())] = qt::variant_to_qvariant(item.second);
+        ret_map[QString::fromUtf8(item.first.c_str())] = qti::variant_to_qvariant(item.second);
     }
 
     return ret_map;
@@ -142,11 +145,13 @@ VariantMap qvariantmap_to_variantmap(QVariantMap const& variant)
     while (it.hasNext())
     {
         it.next();
-        ret_map[it.key().toUtf8().data()] = qt::qvariant_to_variant(it.value());
+        ret_map[it.key().toUtf8().data()] = qti::qvariant_to_variant(it.value());
     }
 
     return ret_map;
 }
+
+}  // namespace internal
 
 }  // namespace qt
 

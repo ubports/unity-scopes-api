@@ -19,14 +19,15 @@
 #include <gtest/gtest.h>
 
 #include <unity/scopes/qt/QColumnLayout.h>
-#include <unity/scopes/qt/QUtils.h>
 #include <unity/scopes/qt/internal/QColumnLayoutImpl.h>
+#include <unity/scopes/qt/internal/QUtils.h>
 
 #include <unity/scopes/ColumnLayout.h>
 
 #include <iostream>
 
 using namespace unity::scopes::qt;
+using namespace unity::scopes::qt::internal;
 
 TEST(QColumnLayout, bindings)
 {

@@ -20,7 +20,7 @@
 
 #include <unity/scopes/qt/QVariantBuilder.h>
 #include <unity/scopes/qt/internal/QVariantBuilderImpl.h>
-#include <unity/scopes/qt/QUtils.h>
+#include <unity/scopes/qt/internal/QUtils.h>
 
 #include <unity/scopes/VariantBuilder.h>
 #include <unity/UnityExceptions.h>
