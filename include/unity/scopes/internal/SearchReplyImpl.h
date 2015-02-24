@@ -53,6 +53,7 @@ public:
     SearchReplyImpl(MWReplyProxy const& mw_proxy,
                     std::shared_ptr<QueryObjectBase>const & qo,
                     int cardinality,
+                    std::string const& query_string,
                     std::string const& current_department_id);
     virtual ~SearchReplyImpl();
 
@@ -75,14 +76,27 @@ public:
     virtual bool push(unity::scopes::CategorisedResult const& result) override;
     virtual bool push(unity::scopes::Filters const& filters, unity::scopes::FilterState const& filter_state) override;
 
+    virtual void finished() override;
+
+    virtual void push_surfacing_results_from_cache() noexcept;
+
 private:
     bool push(Category::SCPtr category);
+    void write_cached_results() noexcept;
 
     std::shared_ptr<CategoryRegistry> cat_registry_;
 
     std::atomic_int cardinality_;
     std::atomic_int num_pushes_;
+    std::atomic_bool finished_;
+    std::string query_string_;
     std::string current_department_;
+
+    Department::SCPtr cached_departments_;
+    unity::scopes::Filters cached_filters_;
+    unity::scopes::FilterState cached_filter_state_;
+    std::vector<unity::scopes::CategorisedResult> cached_results_;
+    std::mutex mutex_;
 };
 
 } // namespace internal

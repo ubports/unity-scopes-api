@@ -529,6 +529,16 @@ string RuntimeImpl::proxy_to_string(ObjectProxy const& proxy) const
     }
 }
 
+string RuntimeImpl::cache_directory() const
+{
+    return find_cache_dir();
+}
+
+string RuntimeImpl::tmp_directory() const
+{
+    return find_tmp_dir();
+}
+
 string RuntimeImpl::demangled_id(string const& scope_id) const
 {
     // For scopes that are in a click package together with an app,
@@ -552,13 +562,18 @@ bool RuntimeImpl::confined() const
 {
     auto is_confined = []
     {
-        // Find out whether we are confined. aa_getcon() returns -1 in that case.
+        // Find out whether we are confined. aa_getcon() returns -1 with EACCESS in that case.
         char* con = nullptr;
         char* mode;
         int rc = aa_getcon(&con, &mode);
+        int error = errno;
+        if (rc == -1)
+        {
+            cerr << "aa_getcon failed, errno = " << error << endl;
+        }
         // Only con (not mode) must be deallocated
         free(con);
-        return rc == -1;
+        return rc == -1 && error == EACCES;
     };
     static bool confined = is_confined();
     return confined;

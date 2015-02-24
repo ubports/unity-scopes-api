@@ -165,6 +165,27 @@ public:
                                               CannedQuery const& query,
                                               CategoryRenderer const& renderer_template = CategoryRenderer()) = 0;
 
+    /**
+    \brief Push the results that were produced by the most recent surfacing query.
+
+    The runtime automatically saves the results of the most recent surfacing query.
+    If a scope cannot produce a result for a surfacing query (presumably, due to
+    connectivity problems), calling push_surfacing_results_from_cache() pushes
+    the results that were produced by the most recent successful surfacing query
+    from the cache. If a scope cannot produce surfacing results, it can call this
+    method to "replay" the previous results. In turn, this avoids the user being
+    presented with an empty screen if he/she swipes to the scope while the device
+    does not have connectivity.
+
+    This method has an effect only if called for a surfacing query (that is, a
+    query with an empty query string). If called for a non-empty query, it does
+    nothing.
+
+    You must call this method before calling finished(), otherwise no cached results
+    will be pushed (push_surfacing_results_from_cache() implicitly calls finished()).
+    */
+    virtual void push_surfacing_results_from_cache() = 0;
+
 protected:
     /// @cond
     SearchReply();

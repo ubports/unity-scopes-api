@@ -35,8 +35,7 @@ using namespace unity::scopes::qt;
 
 class ExceptionsTest : public ::testing::Test
 {
-protected:
-    virtual void SetUp()
+protected: virtual void SetUp()
     {
         fake_server_ = posix::exec(FAKE_SERVER, {}, {}, posix::StandardStream::stdout);
 
@@ -104,14 +103,14 @@ TEST_F(ExceptionsTest, bad_url_test)
         auto items = HttpAsyncReader::get_or_throw(reader_future);
         FAIL();
     }
-    catch (unity::LogicException& e)
+    catch (unity::LogicException const& e)
     {
         std::string error_msg = e.what();
         EXPECT_EQ(error_msg.find("<title>404 Not Found</title>") != std::string::npos, true);
     }
-    catch (...)
+    catch (std::exception const& e)
     {
-        FAIL();
+        FAIL() << e.what();
     }
 }
 TEST(BadUrlException, state)
@@ -125,14 +124,18 @@ TEST(BadUrlException, state)
         auto items = HttpAsyncReader::get_or_throw(reader_future);
         FAIL();
     }
-    catch (unity::LogicException& e)
+    catch (unity::LogicException const& e)
     {
         std::string error_msg = e.what();
         EXPECT_EQ(error_msg.find("Couldn't resolve host name") != std::string::npos, true);
     }
-    catch (...)
+    catch (unity::scopes::TimeoutException const&)
     {
-        FAIL();
+        // This can happen occasionally when DNS is slow
+    }
+    catch (std::exception const& e)
+    {
+        FAIL() << e.what();
     }
 }
 
@@ -179,15 +182,15 @@ TEST_F(ExceptionsTest, check_xml_bad_formed)
         JsonReader::QJsonDocumentSptr doc = reader.read(QString(fake_server_host.c_str()), parameters);
         FAIL();
     }
-    catch (unity::LogicException& e)
+    catch (unity::LogicException const& e)
     {
         std::string error_msg = e.what();
         EXPECT_EQ(error_msg.find("error obtaining parser: JsonAsyncReader::create_parser_with_data: illegal value") !=
                       std::string::npos,
                   true);
     }
-    catch (...)
+    catch (std::exception const& e)
     {
-        FAIL();
+        FAIL() << e.what();
     }
 }
