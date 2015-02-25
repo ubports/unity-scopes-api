@@ -15,7 +15,12 @@
  *
  * Authored by: Xavi Garcia <xavi.garcia.mena@canonical.com>
  */
+
 #pragma once
+
+#ifndef _ENABLE_QT_EXPERIMENTAL_
+#error You should define _ENABLE_QT_EXPERIMENTAL_ in order to use this experimental header file.
+#endif
 
 #include <unity/util/DefinesPtrs.h>
 

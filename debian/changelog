@@ -1,6 +1,9 @@
 unity-scopes-api (0.6.15-0ubuntu1) UNRELEASED; urgency=medium
 
   * Added support for attaching arbitrary data to CannedQuery.
+  * Added _ENABLE_QT_EXPERIMENTAL_ guard to qt headers until that library
+    is finalized. Further changes in the unity::scopes::qt namespace are
+    expected at this point.
 
  -- Pawel Stolowski <pawel.stolowski@canonical.com>  Tue, 24 Feb 2015 13:27:37 +0100
 

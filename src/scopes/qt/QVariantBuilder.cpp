@@ -50,6 +50,11 @@ QVariantBuilder& QVariantBuilder::operator=(QVariantBuilder const& other)
 
 QVariantBuilder& QVariantBuilder::operator=(QVariantBuilder&& other) = default;
 
+void QVariantBuilder::add_tuple(std::initializer_list<QPair<QString, QVariant>> const& tuple)
+{
+    p->add_tuple(tuple);
+}
+
 void QVariantBuilder::add_tuple(QVector<QPair<QString, QVariant>> const& tuple)
 {
     p->add_tuple(tuple);

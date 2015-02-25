@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Canonical Ltd
+ * Copyright (C) 2014 Canonical Ltd
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License version 3 as
@@ -15,9 +15,6 @@
  *
  * Authored by: Xavi Garcia <xavi.garcia.mena@canonical.com>
  */
-
-// allow experimental headers
-#define _ENABLE_QT_EXPERIMENTAL_
 
 #include <unity/scopes/qt/XmlAsyncReader.h>
 #include <unity/scopes/qt/XmlReader.h>

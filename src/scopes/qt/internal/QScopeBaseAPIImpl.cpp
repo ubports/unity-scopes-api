@@ -54,8 +54,8 @@ class StartEvent : public QEvent
 {
 public:
     StartEvent(QString const& scope_id)
-        : QEvent(static_cast<QEvent::Type>(Start)),
-          scope_id_(scope_id)
+        : QEvent(static_cast<QEvent::Type>(Start))
+        , scope_id_(scope_id)
     {
     }
     QString scope_id_;
@@ -78,18 +78,18 @@ public:
 
 }  // namespace unity
 
-QScopeBaseAPIImpl::QScopeBaseAPIImpl(QScopeBase& qtscope, QObject *parent)
-    : QObject(parent),
-      qtapp_ready_(false),
-      qtscope_impl_(&qtscope)
+QScopeBaseAPIImpl::QScopeBaseAPIImpl(QScopeBase& qtscope, QObject* parent)
+    : QObject(parent)
+    , qtapp_ready_(false)
+    , qtscope_impl_(&qtscope)
 {
 }
 
-QScopeBaseAPIImpl::QScopeBaseAPIImpl(FactoryFunc const& creator, QObject *parent)
-    : QObject(parent),
-      qtapp_ready_(false),
-      qtscope_impl_(nullptr),
-      qtscope_creator_(creator)
+QScopeBaseAPIImpl::QScopeBaseAPIImpl(FactoryFunc const& creator, QObject* parent)
+    : QObject(parent)
+    , qtapp_ready_(false)
+    , qtscope_impl_(nullptr)
+    , qtscope_creator_(creator)
 {
 }
 
@@ -109,7 +109,7 @@ bool QScopeBaseAPIImpl::event(QEvent* e)
         case Start:
             // create the client's scope in the
             // Qt main thread
-            if(!qtscope_impl_)
+            if (!qtscope_impl_)
             {
                 qtscope_impl_ = qtscope_creator_();
                 assert(qtscope_impl_);
@@ -137,7 +137,7 @@ void QScopeBaseAPIImpl::start(std::string const& scope_id)
     // start the QT thread
     // TODO change to make_unique when using C++14
     qtthread_ = std::unique_ptr<std::thread>(new std::thread(&QScopeBaseAPIImpl::startQtThread, this));
-    while(!qtapp_ready_)
+    while (!qtapp_ready_)
     {
         std::chrono::milliseconds dura(10);
         std::this_thread::sleep_for(dura);
@@ -160,7 +160,9 @@ void QScopeBaseAPIImpl::stop()
 sc::PreviewQueryBase::UPtr QScopeBaseAPIImpl::preview(const sc::Result& result, const sc::ActionMetadata& metadata)
 {
     // Boilerplate construction of Preview
-    return sc::PreviewQueryBase::UPtr(new QPreviewQueryBaseAPI(qtapp_, *qtscope_impl_, result, metadata));
+    QPreviewQueryBaseAPI * preview_api = new QPreviewQueryBaseAPI(qtapp_, *qtscope_impl_, result, metadata);
+    preview_api->init();
+    return sc::PreviewQueryBase::UPtr(preview_api);
 }
 
 /**
@@ -169,7 +171,9 @@ sc::PreviewQueryBase::UPtr QScopeBaseAPIImpl::preview(const sc::Result& result, 
 sc::SearchQueryBase::UPtr QScopeBaseAPIImpl::search(sc::CannedQuery const& query, sc::SearchMetadata const& metadata)
 {
     // Boilerplate construction of Query
-    return sc::SearchQueryBase::UPtr(new QSearchQueryBaseAPI(qtapp_, *qtscope_impl_, query, metadata));
+    QSearchQueryBaseAPI* query_api = new QSearchQueryBaseAPI(qtapp_, *qtscope_impl_, query, metadata);
+    query_api->init();
+    return sc::SearchQueryBase::UPtr(query_api);
 }
 
 void QScopeBaseAPIImpl::startQtThread()
@@ -179,7 +183,7 @@ void QScopeBaseAPIImpl::startQtThread()
         int argc = 0;
         char* argv = NULL;
         qtapp_ = std::make_shared<QCoreApplication>(argc, &argv);
-        qtapp_ready_=true;
+        qtapp_ready_ = true;
         qtapp_->exec();
         // delete QtCoreApplication in the same thread it was created
         qtapp_.reset();

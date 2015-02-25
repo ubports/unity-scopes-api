@@ -18,6 +18,10 @@
 
 #pragma once
 
+#ifndef _ENABLE_QT_EXPERIMENTAL_
+#error You should define _ENABLE_QT_EXPERIMENTAL_ in order to use this experimental header file.
+#endif
+
 #include <unity/scopes/ScopeBase.h>
 #include <unity/scopes/QueryBase.h>
 #include <unity/scopes/ReplyProxyFwd.h>

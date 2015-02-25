@@ -29,14 +29,14 @@
 class QScopeBaseAPIMock : public unity::scopes::qt::internal::QScopeBaseAPIImpl
 {
 public:
-    QScopeBaseAPIMock(unity::scopes::qt::QScopeBase& qtscope, QObject *parent=0)
-                            : unity::scopes::qt::internal::QScopeBaseAPIImpl(qtscope, parent)
+    QScopeBaseAPIMock(unity::scopes::qt::QScopeBase& qtscope, QObject* parent = 0)
+        : unity::scopes::qt::internal::QScopeBaseAPIImpl(qtscope, parent)
     {
     }
 
     virtual ~QScopeBaseAPIMock() = default;
 
-    QThread *getQtAppThread()
+    QThread* getQtAppThread()
     {
         return qtapp_->thread();
     }

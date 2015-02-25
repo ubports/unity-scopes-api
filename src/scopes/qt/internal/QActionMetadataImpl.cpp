@@ -18,8 +18,7 @@
 
 #include <unity/scopes/qt/internal/QActionMetadataImpl.h>
 #include <unity/scopes/qt/internal/QScopeVariant.h>
-
-#include <unity/scopes/qt/QUtils.h>
+#include <unity/scopes/qt/internal/QUtils.h>
 
 #include <unity/scopes/ActionMetadata.h>
 
@@ -44,12 +43,12 @@ QActionMetadataImpl::QActionMetadataImpl(ActionMetadata const& api_metadata)
 
 void QActionMetadataImpl::set_scope_data(QVariant const& data)
 {
-    api_metadata_->set_scope_data(qVariantToScopeVariant(data));
+    api_metadata_->set_scope_data(qvariant_to_variant(data));
 }
 
 QVariant QActionMetadataImpl::scope_data() const
 {
-    return scopeVariantToQVariant(api_metadata_->scope_data());
+    return variant_to_qvariant(api_metadata_->scope_data());
 }
 
 QActionMetadataImpl::QActionMetadataImpl(QActionMetadataImpl const& other)
@@ -75,13 +74,13 @@ QActionMetadataImpl& QActionMetadataImpl::operator=(QActionMetadataImpl&&) = def
 
 void QActionMetadataImpl::set_hint(QString const& key, QVariant const& value)
 {
-    api_metadata_->set_hint(key.toUtf8().data(), qVariantToScopeVariant(value));
+    api_metadata_->set_hint(key.toUtf8().data(), qvariant_to_variant(value));
 }
 
 QVariantMap QActionMetadataImpl::hints() const
 {
     sync_values();
-    return (scopeVariantMapToQVariantMap(api_metadata_->hints()));
+    return (variantmap_to_qvariantmap(api_metadata_->hints()));
 }
 
 bool QActionMetadataImpl::contains_hint(QString const& key) const

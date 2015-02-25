@@ -17,10 +17,10 @@
  */
 
 #include <unity/scopes/qt/internal/QCannedQueryImpl.h>
+#include <unity/scopes/qt/internal/QUtils.h>
 
 #include <unity/scopes/CannedQuery.h>
 
-#include <unity/scopes/qt/QUtils.h>
 
 using namespace unity::scopes;
 using namespace unity::scopes::qt;
@@ -93,7 +93,7 @@ QVariant QCannedQueryImpl::data() const
 
 QVariantMap QCannedQueryImpl::serialize() const
 {
-    return scopeVariantMapToQVariantMap(api_query_->serialize());
+    return variantmap_to_qvariantmap(api_query_->serialize());
 }
 
 QString QCannedQueryImpl::to_uri() const
