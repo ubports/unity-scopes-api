@@ -114,7 +114,7 @@ Logger::~Logger()
     }
 }
 
-Logger::operator src::severity_channel_logger_mt<>&()
+Logger::operator boost::log::sources::severity_channel_logger_mt<>&()
 {
     return logger_;
 }

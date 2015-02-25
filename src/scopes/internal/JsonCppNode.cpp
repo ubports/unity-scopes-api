@@ -276,7 +276,7 @@ JsonNodeInterface::SPtr JsonCppNode::get_node(std::string const& node_name) cons
     return std::make_shared<JsonCppNode>(value_node);
 }
 
-JsonNodeInterface::SPtr JsonCppNode::get_node(uint node_index) const
+JsonNodeInterface::SPtr JsonCppNode::get_node(unsigned int node_index) const
 {
     if (root_.type() != Json::arrayValue)
     {
