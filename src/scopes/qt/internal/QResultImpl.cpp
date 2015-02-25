@@ -28,7 +28,8 @@ using namespace unity::scopes;
 using namespace unity::scopes::qt;
 using namespace unity::scopes::qt::internal;
 
-namespace {
+namespace
+{
 
 class APIResult : public Result
 {
@@ -52,8 +53,9 @@ QResultImpl::QResultImpl(const QVariantMap& variant_map)
 }
 
 QResultImpl::QResultImpl(internal::QResultImpl* impl)
-    : api_result_(impl->api_result_.get())
 {
+    impl->sync_values();
+    api_result_.reset(new Result(*(impl->api_result_)));
 }
 
 QResultImpl::QResultImpl(QResultImpl const& other)
