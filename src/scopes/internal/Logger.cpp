@@ -26,14 +26,12 @@
 #include <boost/log/trivial.hpp>
 #include <boost/phoenix/bind.hpp>
 
-#if BOOST_VERSION / 100000 == 1
-#if ((BOOST_VERSION / 100) % 1000) < 56
+#if (BOOST_VERSION / 100000 == 1) && (((BOOST_VERSION / 100) % 1000) < 56)
 #include <boost/utility/empty_deleter.hpp>
 typedef boost::empty_deleter NullDeleter;
 #else
 #include <boost/core/null_deleter.hpp>
 typedef boost::null_deleter NullDeleter;
-#endif
 #endif
 
 #include <unity/UnityExceptions.h>
