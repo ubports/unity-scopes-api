@@ -2,7 +2,7 @@
  * Copyright (C) 2013 Canonical Ltd
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the Lesser GNU General Public License version 3 as
+ * it under the terms of the GNU Lesser General Public License version 3 as
  * published by the Free Software Foundation.
  *
  * This program is distributed in the hope that it will be useful,
@@ -10,7 +10,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the Lesser GNU General Public License
+ * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Authored by: Michi Henning <michi.henning@canonical.com>
@@ -246,7 +246,7 @@ int ScopeMetadataImpl::version() const
     return version_;
 }
 
-std::vector<std::string> ScopeMetadataImpl::keywords() const
+std::set<std::string> ScopeMetadataImpl::keywords() const
 {
     return keywords_;
 }
@@ -354,7 +354,7 @@ void ScopeMetadataImpl::set_version(int v)
     version_ = v;
 }
 
-void ScopeMetadataImpl::set_keywords(std::vector<std::string> const& keywords)
+void ScopeMetadataImpl::set_keywords(std::set<std::string> const& keywords)
 {
     keywords_ = keywords;
 }
@@ -499,7 +499,7 @@ void ScopeMetadataImpl::deserialize(VariantMap const& var)
     auto endpoint = it2->second.get_string();
     throw_on_empty("proxy.endpoint", endpoint);
     auto mw_proxy = mw_->create_scope_proxy(identity, endpoint);
-    proxy_ = ScopeImpl::create(mw_proxy, mw_->runtime(), scope_id_);
+    proxy_ = ScopeImpl::create(mw_proxy, scope_id_);
 
     it = find_or_throw(var, "display_name");
     display_name_ = it->second.get_string();
@@ -608,7 +608,7 @@ void ScopeMetadataImpl::deserialize(VariantMap const& var)
     {
         for (auto const& v: it->second.get_array())
         {
-            keywords_.push_back(v.get_string());
+            keywords_.emplace(v.get_string());
         }
     }
 

@@ -2,7 +2,7 @@
  * Copyright (C) 2013 Canonical Ltd
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the Lesser GNU General Public License version 3 as
+ * it under the terms of the GNU Lesser General Public License version 3 as
  * published by the Free Software Foundation.
  *
  * This program is distributed in the hope that it will be useful,
@@ -10,7 +10,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the Lesser GNU General Public License
+ * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Authored by: Thomas Voß <thomas.voss@canonical.com>
@@ -48,7 +48,7 @@ struct testing::ScopeMetadataBuilder::Private
     Optional<bool> location_data_needed;
     Optional<std::vector<std::string>> child_scope_ids;
     Optional<int> version;
-    Optional<std::vector<std::string>> keywords;
+    Optional<std::set<std::string>> keywords;
     Optional<bool> is_aggregator;
 };
 
@@ -162,7 +162,7 @@ testing::ScopeMetadataBuilder& testing::ScopeMetadataBuilder::version(Optional<i
     return *this;
 }
 
-testing::ScopeMetadataBuilder& testing::ScopeMetadataBuilder::keywords(Optional<std::vector<std::string>> const& value)
+testing::ScopeMetadataBuilder& testing::ScopeMetadataBuilder::keywords(Optional<std::set<std::string>> const& value)
 {
     p->keywords = value;
     return *this;

@@ -116,7 +116,7 @@ int main(int argc, char* argv[])
         std::string ss_scope_id = ss_config.scope_identity();
 
         // Instantiate the run time
-        RuntimeImpl::UPtr rt = RuntimeImpl::create(ss_reg_id, config_file);
+        RuntimeImpl::SPtr rt = RuntimeImpl::create(ss_reg_id, config_file);
 
         // Get registry config
         RegistryConfig reg_conf(ss_reg_id, rt->registry_configfile());
@@ -125,10 +125,12 @@ int main(int argc, char* argv[])
         // Get middleware handle from runtime
         MiddlewareBase::SPtr mw = rt->factory()->find(ss_reg_id, mw_kind);
 
-        signal_handler.signal_raised().connect([mw](core::posix::Signal)
+        signal_handler.signal_raised().connect([rt](core::posix::Signal)
         {
-            mw->stop();
+            rt->destroy();
         });
+
+        MiddlewareBase::SPtr middleware = rt->factory()->find(ss_reg_id, mw_kind);
 
         // Instantiate a SS registry object
         SSRegistryObject::SPtr reg(new SSRegistryObject(mw, ss_config, mw->get_scope_endpoint()));

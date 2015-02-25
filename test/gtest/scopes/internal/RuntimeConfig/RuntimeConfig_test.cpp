@@ -21,6 +21,9 @@
 #include <unity/scopes/internal/DfltConfig.h>
 #include <unity/scopes/ScopeExceptions.h>
 
+#include <unity/UnityExceptions.h>
+
+#include <boost/regex.hpp>  // Use Boost implementation until http://gcc.gnu.org/bugzilla/show_bug.cgi?id=53631 is fixed.
 #include <gtest/gtest.h>
 
 using namespace std;
@@ -40,6 +43,29 @@ TEST(RuntimeConfig, basic)
     EXPECT_EQ(DFLT_MIDDLEWARE_INI, c.default_middleware_configfile());
     EXPECT_EQ(DFLT_REAP_EXPIRY, c.reap_expiry());
     EXPECT_EQ(DFLT_REAP_INTERVAL, c.reap_interval());
+    EXPECT_EQ(DFLT_MAX_LOG_FILE_SIZE, c.max_log_file_size());
+    EXPECT_EQ(DFLT_MAX_LOG_DIR_SIZE, c.max_log_dir_size());
+    EXPECT_TRUE(c.trace_channels().empty());
+}
+
+TEST(RuntimeConfig, complete)
+{
+    RuntimeConfig c(TEST_SRC_DIR "/Complete.ini");
+    EXPECT_EQ("R.Id", c.registry_identity());
+    EXPECT_EQ("R.Config", c.registry_configfile());
+    EXPECT_EQ("SS.R.Id", c.ss_registry_identity());
+    EXPECT_EQ("SS.Config", c.ss_configfile());
+    EXPECT_EQ("Zmq", c.default_middleware());
+    EXPECT_EQ("Z.Config", c.default_middleware_configfile());
+    EXPECT_EQ(500, c.reap_expiry());
+    EXPECT_EQ(100, c.reap_interval());
+    EXPECT_EQ("CacheD", c.cache_directory());
+    EXPECT_EQ("AppD", c.app_directory());
+    EXPECT_EQ("ConfigD", c.config_directory());
+    EXPECT_EQ("LogD", c.log_directory());
+    EXPECT_EQ(10000, c.max_log_file_size());
+    EXPECT_EQ(20000, c.max_log_dir_size());
+    EXPECT_EQ(vector<string>{ "IPC" }, c.trace_channels());
 }
 
 TEST(RuntimeConfig, _default_cache_dir)
@@ -98,6 +124,36 @@ TEST(RuntimeConfig, overridden_config_dir_with_home_dir)
     EXPECT_EQ("configdir", c.config_directory());
 }
 
+TEST(RuntimeConfig, overridden_log_dir)
+{
+    unsetenv("HOME");
+
+    RuntimeConfig c(TEST_SRC_DIR "/LogDir.ini");
+    EXPECT_EQ("logdir", c.log_directory());
+}
+
+TEST(RuntimeConfig, overridden_log_dir_with_home_dir)
+{
+    RuntimeConfig c(TEST_SRC_DIR "/LogDir.ini");
+    EXPECT_EQ("logdir", c.log_directory());
+}
+
+TEST(RuntimeConfig, log_dir_env_var_override)
+{
+    setenv("UNITY_SCOPES_LOGDIR", "otherdir", 1);
+
+    RuntimeConfig c(TEST_SRC_DIR "/LogDir.ini");
+    EXPECT_EQ("otherdir", c.log_directory());
+}
+
+TEST(RuntimeConfig, trace_channels_env_var_override)
+{
+    setenv("UNITY_SCOPES_LOG_TRACECHANNELS", "ABC;XYZ;;DEF", 1);
+
+    RuntimeConfig c(TEST_SRC_DIR "/Complete.ini");
+    EXPECT_EQ((vector<string>{ "ABC", "XYZ", "DEF"}), c.trace_channels());
+}
+
 TEST(RuntimeConfig, exceptions)
 {
     try
@@ -142,7 +198,6 @@ TEST(RuntimeConfig, exceptions)
 
         RuntimeConfig c(TEST_SRC_DIR "/NoCacheDir.ini");
         FAIL();
-        EXPECT_EQ("cachedir", c.cache_directory());
     }
     catch (ConfigException const& e)
     {
@@ -158,13 +213,71 @@ TEST(RuntimeConfig, exceptions)
 
         RuntimeConfig c(TEST_SRC_DIR "/NoConfigDir.ini");
         FAIL();
-        EXPECT_EQ("cachedir", c.cache_directory());
     }
     catch (ConfigException const& e)
     {
         EXPECT_STREQ("unity::scopes::ConfigException: \"" TEST_SRC_DIR "/NoConfigDir.ini\": No ConfigDir configured and "
                      "failed to get default:\n    unity::ResourceException: RuntimeConfig::default_config_directory(): "
                      "$HOME not set",
+                     e.what());
+    }
+
+    try
+    {
+        unsetenv("HOME");
+
+        RuntimeConfig c(TEST_SRC_DIR "/NoLogDir.ini");
+        FAIL();
+    }
+    catch (ConfigException const& e)
+    {
+        // Using regex here because error message returned by glib changed from Utopic to Vivid.
+        // The final .* takes care of the difference. Note that, instead of using TEST_SRC_DIR, we
+        // use .+. That's because, when building with bzr bd, we end up with a '+' in the path,
+        // and that is a regex metacharacter, causing the match to fail.
+        boost::regex r("unity::scopes::ConfigException: \".+/NoLogDir.ini\": "
+                       "No LogDir configured and failed to get default:\\n"
+                       "    unity::ResourceException: RuntimeConfig::default_log_directory\\(\\): \\$HOME not set:\\n"
+                       "        unity::LogicException: Could not get string value \\(.+/NoLogDir.ini, .*");
+        EXPECT_TRUE(boost::regex_match(e.what(), r)) << e.what();
+    }
+
+    try
+    {
+        unsetenv("HOME");
+
+        RuntimeConfig c(TEST_SRC_DIR "/NoAppDir.ini");
+        FAIL();
+    }
+    catch (ConfigException const& e)
+    {
+        EXPECT_STREQ("unity::scopes::ConfigException: \"" TEST_SRC_DIR "/NoAppDir.ini\": "
+                     "No AppDir configured and failed to get default:\n"
+                     "    unity::ResourceException: RuntimeConfig::default_app_directory(): $HOME not set",
+                     e.what());
+    }
+
+    try
+    {
+        RuntimeConfig c(TEST_SRC_DIR "/BadLogFileSize.ini");
+        FAIL();
+    }
+    catch (ConfigException const& e)
+    {
+        EXPECT_STREQ("unity::scopes::ConfigException: \"" TEST_SRC_DIR "/BadLogFileSize.ini\": "
+                     "Illegal value (999) for Log.MaxFileSize: value must be > 1024",
+                     e.what());
+    }
+
+    try
+    {
+        RuntimeConfig c(TEST_SRC_DIR "/BadLogDirSize.ini");
+        FAIL();
+    }
+    catch (ConfigException const& e)
+    {
+        EXPECT_STREQ("unity::scopes::ConfigException: \"" TEST_SRC_DIR "/BadLogDirSize.ini\": "
+                     "Illegal value (1024) for Log.MaxDirSize: value must be > Log.MaxFileSize (2048)",
                      e.what());
     }
 }

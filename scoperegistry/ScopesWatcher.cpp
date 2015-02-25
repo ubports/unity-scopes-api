@@ -60,7 +60,7 @@ void ScopesWatcher::add_install_dir(std::string const& dir)
         catch (unity::LogicException const&) {} // Ignore already exists exception
         catch (unity::SyscallException const& e)
         {
-            BOOST_LOG_SEV(logger_, Logger::Error) << "ScopesWatcher::add_install_dir(): parent dir watch: " << e.what();
+            BOOST_LOG(logger_) << "ScopesWatcher::add_install_dir(): parent dir watch: " << e.what();
         }
 
         // Create a new entry for this install dir into idir_to_sdirs_map_
@@ -101,11 +101,11 @@ void ScopesWatcher::add_install_dir(std::string const& dir)
     }
     catch (unity::ResourceException const& e)
     {
-        BOOST_LOG_SEV(logger_, Logger::Error) << "ScopesWatcher::add_install_dir(): install dir watch: " << e.what();
+        BOOST_LOG(logger_) << "ScopesWatcher::add_install_dir(): install dir watch: " << e.what();
     }
     catch (unity::SyscallException const& e)
     {
-        BOOST_LOG_SEV(logger_, Logger::Error) << "ScopesWatcher::add_install_dir(): install dir watch: " << e.what();
+        BOOST_LOG(logger_) << "ScopesWatcher::add_install_dir(): install dir watch: " << e.what();
     }
 }
 
@@ -166,7 +166,10 @@ void ScopesWatcher::add_scope_dir(std::string const& dir)
         // Add a watch for this directory (ignore exception if already exists)
         try
         {
-            add_watch(dir);
+            if (filesystem::is_directory(dir))
+            {
+                add_watch(dir);  // Avoid noise if someone drops a file in here
+            }
         }
         catch (unity::LogicException const&) {}
 
@@ -199,7 +202,7 @@ void ScopesWatcher::add_scope_dir(std::string const& dir)
     }
     catch (std::exception const& e)
     {
-        BOOST_LOG_SEV(logger_, Logger::Error) << "scoperegistry: add_scope_dir(): " << e.what();
+        BOOST_LOG(logger_) << "scoperegistry: add_scope_dir(): " << e.what();
     }
 }
 

@@ -20,9 +20,9 @@
 
 #include <unity/scopes/FilterBase.h>
 #include <unity/scopes/FilterState.h>
-#include <unity/scopes/internal/smartscopes/HttpClientInterface.h>
 #include <unity/scopes/internal/JsonNodeInterface.h>
 #include <unity/scopes/internal/Logger.h>
+#include <unity/scopes/internal/smartscopes/HttpClientInterface.h>
 #include <unity/scopes/internal/UniqueID.h>
 
 #include <unity/util/NonCopyable.h>
@@ -43,6 +43,8 @@ namespace scopes
 namespace internal
 {
 
+class RuntimeImpl;
+
 namespace smartscopes
 {
 
@@ -62,7 +64,7 @@ struct RemoteScope
     std::shared_ptr<bool> needs_location_data;  // optional
     bool invisible = false;
     int version;
-    std::vector<std::string> keywords;          // optional
+    std::set<std::string> keywords;             // optional
 };
 
 struct SearchCategory
@@ -166,7 +168,7 @@ public:
 
     SmartScopesClient(HttpClientInterface::SPtr http_client,
                       JsonNodeInterface::SPtr json_node,
-                      boost::log::sources::severity_channel_logger_mt<>& logger_,
+                      RuntimeImpl* runtime,
                       std::string const& url = "", // detect url
                       std::string const& partner_id_path = "");
 

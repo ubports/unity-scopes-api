@@ -46,6 +46,8 @@ public:
     /// @cond
     NONCOPYABLE(BufferedResultForwarder);
     UNITY_DEFINES_PTRS(BufferedResultForwarder);
+
+    virtual ~BufferedResultForwarder();
     /// @endcond
 
     /**
@@ -56,8 +58,8 @@ public:
     \param next_forwarder The forwarder that becomes ready once this forwarder calls set_ready().
     \throws unity::LogicException when passed next_forwarder that has already been linked to another BufferedResultForwarder.
     */
-    BufferedResultForwarder(unity::scopes::SearchReplyProxy const& upstream, BufferedResultForwarder::SPtr const& next_forwarder =
-            BufferedResultForwarder::SPtr());
+    BufferedResultForwarder(unity::scopes::SearchReplyProxy const& upstream,
+                            BufferedResultForwarder::SPtr const& next_forwarder = BufferedResultForwarder::SPtr());
 
     /**
     \brief Forwards a single result before calling `set_ready()`.
@@ -104,7 +106,7 @@ protected:
 private:
     friend class internal::BufferedResultForwarderImpl;
 
-    internal::BufferedResultForwarderImpl *p;
+    std::unique_ptr<internal::BufferedResultForwarderImpl> p;
 };
 
 } // namespace utility

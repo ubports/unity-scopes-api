@@ -67,9 +67,30 @@ pkg_check_modules(APPARMOR REQUIRED libapparmor REQUIRED)
 pkg_check_modules(LTTNG_UST lttng-ust REQUIRED)
 pkg_check_modules(LIBURCU_BP liburcu-bp REQUIRED)
 pkg_check_modules(JSONCPP jsoncpp REQUIRED)
-pkg_check_modules(LIBACCOUNTS REQUIRED libaccounts-glib)
-pkg_check_modules(LIBSIGNON REQUIRED libsignon-glib)
+pkg_check_modules(LIBACCOUNTS libaccounts-glib REQUIRED)
+pkg_check_modules(LIBSIGNON libsignon-glib REQUIRED)
 pkg_check_modules(ZMQLIB libzmq REQUIRED)
+pkg_check_modules(NET_CPP net-cpp REQUIRED)
+
+find_library(ZMQPPLIB zmqpp)
+if(NOT ZMQPPLIB)
+  message(FATAL_ERROR "libzmqpp-dev not found.")
+endif()
+
+find_library(CAPNPLIB capnp)
+if(NOT CAPNPLIB)
+  message(FATAL_ERROR "libcapnp-dev not found.")
+endif()
+
+find_library(KJLIB kj)
+if(NOT KJLIB)
+  message(FATAL_ERROR "capnproto not found.")
+endif()
+
+find_library(DLLIB dl)
+if(NOT DLLIB)
+  message(FATAL_ERROR "dl lib not found.")
+endif()
 
 find_program(LTTNG_EXECUTABLE lttng)
 if (NOT LTTNG_EXECUTABLE)
@@ -118,8 +139,10 @@ add_definitions(
 
 set(OTHER_INCLUDE_DIRS ${OTHER_INCLUDE_DIRS} ${UNITY_API_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS}
                        ${JSONCPP_INCLUDE_DIRS} ${PROCESS_CPP_INCLUDE_DIRS} ${APPARMOR_INCLUDE_DIRS}
-                       ${LIBACCOUNTS_INCLUDE_DIRS} ${LIBSIGNON_INCLUDE_DIRS})
-set(OTHER_LIBS ${OTHER_LIBS} ${UNITY_API_LDFLAGS} ${APPARMOR_LDFLAGS} ${LIBACCOUNTS_LIBRARIES} ${LIBSIGNON_LIBRARIES})
+                       ${LIBACCOUNTS_INCLUDE_DIRS} ${LIBSIGNON_INCLUDE_DIRS} ${NET_CPP_INCLUDE_DIRS})
+set(OTHER_LIBS ${OTHER_LIBS} ${UNITY_API_LDFLAGS} ${APPARMOR_LDFLAGS} ${LIBACCOUNTS_LIBRARIES}
+               ${LIBSIGNON_LIBRARIES} ${Boost_LIBRARIES} ${JSONCPP_LDFLAGS} ${PROCESS_CPP_LDFLAGS}
+               ${ZMQPPLIB} ${ZMQLIB_LDFLAGS} ${CAPNPLIB} ${KJLIB} ${DLLIB} ${NET_CPP_LDFLAGS} pthread)
 
 # Standard install paths
 include(GNUInstallDirs)
@@ -147,15 +170,18 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -pedantic -Wno-variadic-macros -Wextra
 # setting of LINK_FLAGS below).
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=default")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pedantic -Wall -Wextra")
+set(C_AND_CXX_WARNINGS "-pedantic -Wall -Wextra")
 
 # Some additional warnings not included by the general flags set above.
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wformat -Wold-style-cast -Wredundant-decls -Wswitch-default")
+set(EXTRA_C_WARNINGS "-Wcast-align -Wcast-qual -Wformat -Wredundant-decls -Wswitch-default")
+set(EXTRA_CXX_WARNINGS "-Wnon-virtual-dtor -Wctor-dtor-privacy -Wold-style-cast")
 
-# TODO: Once AbstractScopeBase gets its virtual destructor, turn on the line below (bug #1360266).
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wnon-virtual-dtor")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${C_AND_CXX_WARNINGS}")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${EXTRA_C_WARNINGS}")
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic -Wall -Wextra") # Can't use -std=c++11 with C compiler
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 ${C_AND_CXX_WARNINGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EXTRA_C_WARNINGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EXTRA_CXX_WARNINGS}")
 
 # -fno-permissive causes warnings with clang, so we only enable it for gcc
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
@@ -193,12 +219,6 @@ else()
     message(FATAL_ERROR "Invalid SANITIZER setting: ${SANITIZER}")
 endif()
 
-option(IPC_MONITORING "Enable IPC traffic monitoring")
-
-if(IPC_MONITORING)
-    add_definitions(-DENABLE_IPC_MONITOR)
-endif()
-
 # Scopes library name. Also used as a prefix in various places, and as a subdirectory
 # name for installed files. Changing this will also require corresponding changes
 # to the debian files.
@@ -207,54 +227,11 @@ set(UNITY_SCOPES_LIB unity-scopes)
 # API version
 set(UNITY_SCOPES_MAJOR 0)
 set(UNITY_SCOPES_MINOR 6)
-set(UNITY_SCOPES_MICRO 9)
+set(UNITY_SCOPES_MICRO 14)
 set(UNITY_SCOPES_SOVERSION 3)
 
 # Version for testing, with all symbols visible
 set(UNITY_SCOPES_TEST_LIB ${UNITY_SCOPES_LIB}-test)
-
-find_library(ZMQPPLIB zmqpp)
-if(NOT ZMQPPLIB)
-  message(FATAL_ERROR "Zmqpp lib not found.")
-endif()
-
-find_library(CAPNPLIB capnp)
-if(NOT CAPNPLIB)
-  message(FATAL_ERROR "Cap'n Proto lib not found.")
-endif()
-
-find_library(KJLIB kj)
-if(NOT KJLIB)
-  message(FATAL_ERROR "Kj lib not found.")
-endif()
-
-find_library(DLLIB dl)
-if(NOT DLLIB)
-  message(FATAL_ERROR "Dl lib not found.")
-endif()
-
-
-# Stop complaints during the generation phase about executables depending
-# on Qt5::Core and Qt5::Network. They are bogus because only
-# only smartscopes uses these.
-if(POLICY CMP0028)
-    cmake_policy(SET CMP0028 OLD)
-endif()
-
-# Other libraries we depend on
-set(OTHER_LIBS
-    ${OTHER_LIBS}
-    ${Boost_LIBRARIES}
-    ${JSONCPP_LDFLAGS}
-    ${PROCESS_CPP_LDFLAGS}
-    ${ZMQPPLIB}
-    ${ZMQLIB_LDFLAGS}
-    ${CAPNPLIB}
-    ${KJLIB}
-    ${DLLIB}
-    pthread
-    smartscopes
-)
 
 # All the libraries we need to link a normal executable that uses Unity scopes
 set(LIBS ${UNITY_SCOPES_LIB})
@@ -374,7 +351,7 @@ install(TARGETS ${UNITY_SCOPES_LIB} LIBRARY DESTINATION ${LIB_INSTALL_PREFIX})
 # Enable coverage testing
 
 if (cmake_build_type_lower MATCHES coverage)
-  ENABLE_COVERAGE_REPORT(TARGETS ${UNITY_SCOPES_LIB} smartscopes
+  ENABLE_COVERAGE_REPORT(TARGETS ${UNITY_SCOPES_LIB}
                          FILTER /usr/include
                                 ${CMAKE_SOURCE_DIR}/test/*
                                 ${CMAKE_SOURCE_DIR}/debian/tests/*

@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <unity/scopes/ChildScope.h>
 #include <unity/scopes/RegistryProxyFwd.h>
 #include <unity/scopes/Variant.h>
 
@@ -33,6 +34,7 @@ namespace scopes
 namespace internal
 {
 
+class ChildScopesRepository;
 class SettingsDB;
 
 class ScopeBaseImpl final
@@ -60,6 +62,12 @@ public:
     void set_settings_db(std::shared_ptr<unity::scopes::internal::SettingsDB> const& db);
     unity::scopes::VariantMap settings() const;
 
+    void set_child_scopes_repo(std::shared_ptr<ChildScopesRepository> const& child_scopes_repo);
+
+    ChildScopeList child_scopes() const;
+    ChildScopeList child_scopes_ordered(ChildScopeList const& unordered_child_scopes) const;
+    bool set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered);
+
 private:
     std::string scope_directory_;
     bool scope_dir_initialized_;
@@ -78,6 +86,9 @@ private:
 
     std::shared_ptr<unity::scopes::internal::SettingsDB> db_;
     bool settings_db_initialized_;
+
+    std::shared_ptr<ChildScopesRepository> child_scopes_repo_;
+    bool child_scopes_repo_initialized_;
 
     mutable std::mutex mutex_;
 };

@@ -67,35 +67,35 @@ filesystem::path relative_scope_path_to_abs_path(filesystem::path const& path, f
 // throwing an exception without joining with a thread is a bad, bad thing to do, so let's RAII to avoid doing it
 struct SignalThreadWrapper
 {
-    std::shared_ptr<core::posix::SignalTrap> termination_trap;
-    std::shared_ptr<core::posix::SignalTrap> child_trap;
-    std::unique_ptr<core::posix::ChildProcess::DeathObserver> death_observer;
+    std::shared_ptr<::core::posix::SignalTrap> termination_trap;
+    std::shared_ptr<::core::posix::SignalTrap> child_trap;
+    std::unique_ptr<::core::posix::ChildProcess::DeathObserver> death_observer;
     std::thread termination_trap_worker;
     std::thread child_trap_worker;
 
     SignalThreadWrapper() :
         // We shutdown the runtime whenever these signals happen.
-        termination_trap(core::posix::trap_signals_for_all_subsequent_threads(
+        termination_trap(::core::posix::trap_signals_for_all_subsequent_threads(
             {
-                core::posix::Signal::sig_int,
-                core::posix::Signal::sig_hup,
-                core::posix::Signal::sig_term
+                ::core::posix::Signal::sig_int,
+                ::core::posix::Signal::sig_hup,
+                ::core::posix::Signal::sig_term
             })),
         // And we maintain our list of processes with the help of sig_chld.
-        child_trap(core::posix::trap_signals_for_all_subsequent_threads(
+        child_trap(::core::posix::trap_signals_for_all_subsequent_threads(
             {
-                core::posix::Signal::sig_chld
+                ::core::posix::Signal::sig_chld
             })),
         // The death observer is required to make sure that we reap all child processes
         // whenever multiple sigchld's are compressed together.
-        death_observer(core::posix::ChildProcess::DeathObserver::create_once_with_signal_trap(child_trap)),
+        death_observer(::core::posix::ChildProcess::DeathObserver::create_once_with_signal_trap(child_trap)),
         // Starting up both traps.
         termination_trap_worker([&]() { termination_trap->run(); }),
         child_trap_worker([&]() { child_trap->run(); })
     {
     }
 
-    core::Signal<core::posix::Signal>& signal_raised()
+    ::core::Signal<::core::posix::Signal>& signal_raised()
     {
         return termination_trap->signal_raised();
     }
@@ -408,7 +408,7 @@ void add_local_scope(RegistryObject::SPtr const& registry,
     {
     }
 
-    ScopeProxy proxy = ScopeImpl::create(mw->create_scope_proxy(scope.first), mw->runtime(), scope.first);
+    ScopeProxy proxy = ScopeImpl::create(mw->create_scope_proxy(scope.first), scope.first);
     mi->set_proxy(proxy);
     auto meta = ScopeMetadataImpl::create(std::move(mi));
 
@@ -527,7 +527,7 @@ int main(int argc, char* argv[])
         // And finally creating our runtime.
         string identity;
         string ss_reg_id;
-        RuntimeImpl::UPtr runtime;
+        RuntimeImpl::SPtr runtime;
         {
             RuntimeConfig rt_config(config_file);
             runtime = RuntimeImpl::create(rt_config.registry_identity(), config_file);
@@ -576,18 +576,16 @@ int main(int argc, char* argv[])
             process_timeout = c.process_timeout();
         } // Release memory for config parser
 
-        MiddlewareBase::SPtr middleware = runtime->factory()->find(identity, mw_kind);
-
-        // Inform the signal thread that it should shutdown the middleware
+        // Inform the signal thread that it should shutdown the runtime
         // if we get a termination signal.
-        signal_handler_wrapper.signal_raised().connect([middleware](core::posix::Signal signal)
+        signal_handler_wrapper.signal_raised().connect([runtime](::core::posix::Signal signal)
         {
             switch(signal)
             {
-            case core::posix::Signal::sig_int:
-            case core::posix::Signal::sig_hup:
-            case core::posix::Signal::sig_term:
-                middleware->stop();
+            case ::core::posix::Signal::sig_int:
+            case ::core::posix::Signal::sig_hup:
+            case ::core::posix::Signal::sig_term:
+                runtime->destroy();
                 break;
             default:
                 break;
@@ -595,6 +593,7 @@ int main(int argc, char* argv[])
         });
 
         // The registry object stores the local and remote scopes
+        MiddlewareBase::SPtr middleware = runtime->factory()->find(identity, mw_kind);
         Executor::SPtr executor = std::make_shared<Executor>();
         RegistryObject::SPtr registry(new RegistryObject(*signal_handler_wrapper.death_observer, executor, middleware, true));
 

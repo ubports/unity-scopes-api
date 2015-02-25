@@ -224,7 +224,8 @@ ScopeConfig::ScopeConfig(string const& configfile) :
 
     try
     {
-        keywords_ = parser()->get_string_array(scope_config_group, keywords_key);
+        auto keywords_vec = parser()->get_string_array(scope_config_group, keywords_key);
+        keywords_ = set<string>(keywords_vec.begin(), keywords_vec.end());
     }
     catch (LogicException const&)
     {
@@ -472,7 +473,7 @@ int ScopeConfig::version() const
     return version_;
 }
 
-std::vector<std::string> ScopeConfig::keywords() const
+std::set<std::string> ScopeConfig::keywords() const
 {
     return keywords_;
 }

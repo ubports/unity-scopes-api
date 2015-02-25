@@ -1,10 +1,12 @@
 add_subdirectory(utility)
 add_subdirectory(internal)
 add_subdirectory(testing)
+add_subdirectory(qt)
 
 set(CAPNPROTO_FILES ${CAPNPROTO_FILES} PARENT_SCOPE)
 
 set(SRC
+    ${CMAKE_CURRENT_SOURCE_DIR}/AbstractScopeBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ActionMetadata.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ActivationListenerBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ActivationQueryBase.cpp

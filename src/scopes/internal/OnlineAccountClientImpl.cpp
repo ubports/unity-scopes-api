@@ -163,8 +163,24 @@ static void service_update_cb(AgAccountService* account_service, gboolean enable
         }
 
         // Get authorization parameters then attempt to signon
+        GVariantBuilder builder;
+        g_variant_builder_init(&builder, G_VARIANT_TYPE_VARDICT);
+
+        if (getenv("UNITY_SCOPES_OA_UI_POLICY"))
+        {
+            g_variant_builder_add(&builder, "{sv}",
+                                  SIGNON_SESSION_DATA_UI_POLICY,
+                                  g_variant_new_int32(SIGNON_POLICY_DEFAULT));  // LCOV_EXCL_LINE
+        }
+        else
+        {
+            g_variant_builder_add(&builder, "{sv}",
+                                  SIGNON_SESSION_DATA_UI_POLICY,
+                                  g_variant_new_int32(SIGNON_POLICY_NO_USER_INTERACTION));
+        }
+
         info->auth_params.reset(
-            g_variant_ref_sink(ag_auth_data_get_login_parameters(auth_data.get(), nullptr)), free_variant);
+            g_variant_ref_sink(ag_auth_data_get_login_parameters(auth_data.get(), g_variant_builder_end(&builder))), free_variant);
 
         // Start signon process
         signon_auth_session_process_async(info->session.get(),
@@ -438,6 +454,7 @@ void OnlineAccountClientImpl::register_account_login_item(Result& result,
     }
 
     VariantMap account_details_map;
+    account_details_map["scope_id"] = query.scope_id();
     account_details_map["service_name"] = service_name_;
     account_details_map["service_type"] = service_type_;
     account_details_map["provider_name"] = provider_name_;
@@ -452,6 +469,7 @@ void OnlineAccountClientImpl::register_account_login_item(PreviewWidget& widget,
                                                           OnlineAccountClient::PostLoginAction login_failed_action)
 {
     VariantMap account_details_map;
+    account_details_map["scope_id"] = "";
     account_details_map["service_name"] = service_name_;
     account_details_map["service_type"] = service_type_;
     account_details_map["provider_name"] = provider_name_;

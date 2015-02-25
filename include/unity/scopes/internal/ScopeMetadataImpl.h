@@ -2,7 +2,7 @@
  * Copyright (C) 2013 Canonical Ltd
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the Lesser GNU General Public License version 3 as
+ * it under the terms of the GNU Lesser General Public License version 3 as
  * published by the Free Software Foundation.
  *
  * This program is distributed in the hope that it will be useful,
@@ -10,7 +10,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the Lesser GNU General Public License
+ * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Authored by: Michi Henning <michi.henning@canonical.com>
@@ -59,7 +59,7 @@ public:
     bool location_data_needed() const;                           // optional (default: false)
     std::vector<std::string> child_scope_ids() const;            // optional (default: empty array)
     int version() const;                                         // optional (default: 0)
-    std::vector<std::string> keywords() const;                   // optional (default: empty array)
+    std::set<std::string> keywords() const;                      // optional (default: empty set)
     bool is_aggregator() const;                                  // optional (default: false)
 
     void set_scope_id(std::string const& scope_id);
@@ -79,7 +79,7 @@ public:
     void set_location_data_needed(bool location_data_needed);
     void set_child_scope_ids(std::vector<std::string> const& ids);
     void set_version(int v);
-    void set_keywords(std::vector<std::string> const& keywords);
+    void set_keywords(std::set<std::string> const& keywords);
     void set_is_aggregator(bool is_aggregator);
 
     VariantMap serialize() const;
@@ -107,7 +107,7 @@ private:
     std::unique_ptr<bool> location_data_needed_;          // Optional, hence a pointer
     std::vector<std::string> child_scope_ids_;
     int version_;
-    std::vector<std::string> keywords_;
+    std::set<std::string> keywords_;
     std::unique_ptr<bool> is_aggregator_;                 // Optional, hence a pointer
 };
 

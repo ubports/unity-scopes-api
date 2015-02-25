@@ -35,6 +35,7 @@ namespace scopes
 namespace internal
 {
 
+struct InvokeInfo;
 class RuntimeImpl;
 
 // A ReplyObject sits in between the incoming requests from the middleware layer and the
@@ -68,7 +69,6 @@ private:
     std::condition_variable idle_;
     std::string origin_proxy_;
     int num_push_;
-    std::atomic_bool info_occurred_;
     std::vector<OperationInfo> info_list_;
 };
 

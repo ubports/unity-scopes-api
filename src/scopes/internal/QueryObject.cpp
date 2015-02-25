@@ -22,9 +22,10 @@
 #include <unity/scopes/ActivationQueryBase.h>
 #include <unity/scopes/internal/MWQueryCtrl.h>
 #include <unity/scopes/internal/MWReply.h>
-#include <unity/scopes/internal/QueryCtrlObject.h>
-#include <unity/scopes/internal/SearchReplyImpl.h>
 #include <unity/scopes/internal/QueryBaseImpl.h>
+#include <unity/scopes/internal/QueryCtrlObject.h>
+#include <unity/scopes/internal/RuntimeImpl.h>
+#include <unity/scopes/internal/SearchReplyImpl.h>
 #include <unity/scopes/PreviewQueryBase.h>
 #include <unity/scopes/QueryBase.h>
 #include <unity/scopes/SearchQueryBase.h>
@@ -45,23 +46,20 @@ namespace internal
 
 QueryObject::QueryObject(std::shared_ptr<QueryBase> const& query_base,
                          MWReplyProxy const& reply,
-                         MWQueryCtrlProxy const& ctrl,
-                         boost::log::sources::severity_channel_logger_mt<>& logger)
-    : QueryObject(query_base, 0, reply, ctrl, logger)
+                         MWQueryCtrlProxy const& ctrl)
+    : QueryObject(query_base, 0, reply, ctrl)
 {
 }
 
 QueryObject::QueryObject(std::shared_ptr<QueryBase> const& query_base,
                          int cardinality,
                          MWReplyProxy const& reply,
-                         MWQueryCtrlProxy const& ctrl,
-                         boost::log::sources::severity_channel_logger_mt<>& logger)
+                         MWQueryCtrlProxy const& ctrl)
     : query_base_(query_base)
     , reply_(reply)
     , ctrl_(ctrl)
     , pushable_(true)
     , cardinality_(cardinality)
-    , logger_(logger)
 {
 }
 
@@ -78,7 +76,7 @@ QueryObject::~QueryObject()
     }
 }
 
-void QueryObject::run(MWReplyProxy const& reply, InvokeInfo const& /* info */) noexcept
+void QueryObject::run(MWReplyProxy const& reply, InvokeInfo const& info) noexcept
 {
     unique_lock<mutex> lock(mutex_);
 
@@ -103,7 +101,11 @@ void QueryObject::run(MWReplyProxy const& reply, InvokeInfo const& /* info */) n
     // Create the reply proxy to pass to query_base_ and keep a weak_ptr, which we will need
     // if cancel() is called later.
     assert(self_);
-    auto reply_proxy = make_shared<SearchReplyImpl>(reply, self_, cardinality_, search_query->department_id(), logger_);
+    auto reply_proxy = make_shared<SearchReplyImpl>(reply,
+                                                    self_,
+                                                    cardinality_,
+                                                    search_query->query().query_string(),
+                                                    search_query->department_id());
     assert(reply_proxy);
     reply_proxy_ = reply_proxy;
 
@@ -122,19 +124,25 @@ void QueryObject::run(MWReplyProxy const& reply, InvokeInfo const& /* info */) n
     }
     catch (std::exception const& e)
     {
-        pushable_ = false;
-        BOOST_LOG_SEV(logger_, Logger::Error) << "ScopeBase::run(): " << e.what();
-        reply_->finished(CompletionDetails(CompletionDetails::Error, e.what()));  // Oneway, can't block
+        {
+            lock_guard<mutex> lock(mutex_);
+            pushable_ = false;
+        }
+        BOOST_LOG(info.mw->runtime()->logger()) << "QueryBase::run(): " << e.what();
+        reply_->finished(CompletionDetails(CompletionDetails::Error, string("QueryBase::run(): ") + e.what()));
     }
     catch (...)
     {
-        pushable_ = false;
-        BOOST_LOG_SEV(logger_, Logger::Error) << "ScopeBase::run(): unknown exception";
-        reply_->finished(CompletionDetails(CompletionDetails::Error, "unknown exception"));  // Oneway, can't block
+        {
+            lock_guard<mutex> lock(mutex_);
+            pushable_ = false;
+        }
+        BOOST_LOG(info.mw->runtime()->logger()) << "QueryBase::run(): unknown exception";
+        reply_->finished(CompletionDetails(CompletionDetails::Error, "QueryBase::run(): unknown exception"));
     }
 }
 
-void QueryObject::cancel(InvokeInfo const& /* info */)
+void QueryObject::cancel(InvokeInfo const& info)
 {
     {
         lock_guard<mutex> lock(mutex_);
@@ -144,6 +152,13 @@ void QueryObject::cancel(InvokeInfo const& /* info */)
             return;
         }
         pushable_ = false;
+    }  // Release lock
+
+    try
+    {
+        // Forward the cancellation to the query base (which in turn will forward it to any subqueries).
+        // The query base also calls the cancelled() callback to inform the application code.
+        query_base_->cancel();
 
         auto rp = reply_proxy_.lock();
         if (rp)
@@ -153,11 +168,24 @@ void QueryObject::cancel(InvokeInfo const& /* info */)
             // a CompletionDetails::CompletionStatus (whereas the public ReplyProxy does not).
             reply_->finished(CompletionDetails(CompletionDetails::Cancelled));  // Oneway, can't block
         }
-    }  // Release lock
-
-    // Forward the cancellation to the query base (which in turn will forward it to any subqueries).
-    // The query base also calls the cancelled() callback to inform the application code.
-    query_base_->cancel();
+    }
+    catch (std::exception const& e)
+    {
+        BOOST_LOG(info.mw->runtime()->logger()) << "QueryBase::cancelled(): " << e.what();
+        // Deliberately no error completion here. On the client side, we short-cut the cancelled()
+        // callback locally, which unregisters the servant for the cancel message and assumes that
+        // cancellation will work, passing a Cancelled status, even if cancellation throws in the scope.
+        // But, removing the servant may be slow, allowing the finished message below to occasionally
+        // reach the client. If it does, we want the same completion status that we get if the
+        // local short-cut call hasn't done the job yet.
+        reply_->finished(CompletionDetails(CompletionDetails::Cancelled, ""));
+    }
+    catch (...)
+    {
+        BOOST_LOG(info.mw->runtime()->logger()) << "QueryBase::cancelled(): unknown exception";
+        // Same caveat as for std::exception here.
+        reply_->finished(CompletionDetails(CompletionDetails::Cancelled, ""));
+    }
 }
 
 bool QueryObject::pushable(InvokeInfo const& /* info */) const noexcept

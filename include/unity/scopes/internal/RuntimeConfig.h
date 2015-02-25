@@ -47,9 +47,15 @@ public:
     std::string cache_directory() const;
     std::string app_directory() const;
     std::string config_directory() const;
+    std::string log_directory() const;
+    int max_log_file_size() const;
+    int max_log_dir_size() const;
+    std::vector<std::string> trace_channels() const;
+
     static std::string default_cache_directory();
     static std::string default_app_directory();
     static std::string default_config_directory();
+    static std::string default_log_directory();
 
 private:
     std::string registry_identity_;
@@ -63,6 +69,10 @@ private:
     std::string cache_directory_;
     std::string app_directory_;
     std::string config_directory_;
+    std::string log_directory_;
+    int max_log_file_size_;
+    int max_log_dir_size_;
+    std::vector<std::string> trace_channels_;
 };
 
 } // namespace internal

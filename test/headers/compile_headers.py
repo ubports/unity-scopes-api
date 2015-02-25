@@ -54,6 +54,12 @@ import subprocess
 import sys
 import tempfile
 import concurrent.futures, multiprocessing
+
+#define the possible experimental flags to find in
+# the includes.
+# If we find any of the strings defined we add the define in
+# the compiled file
+experimental_flags=["_ENABLE_QT_EXPERIMENTAL_"]
 #
 # Write the supplied message to stderr, preceded by the program name.
 #
@@ -71,9 +77,15 @@ def message(msg):
 # and check exit status from the compiler. Throw if the compile command itself fails,
 # return False if the compile command worked but reported errors, True if the compile succeeded.
 #
-def run_compiler(hdr, compiler, copts, verbose):
+def run_compiler(hdr, compiler, copts, verbose, hdr_dir):
     try:
         src = tempfile.NamedTemporaryFile(suffix='.cpp', dir='.')
+
+        # add the experimental flags at the beginning of the temporary file
+        for flag in experimental_flags:
+            if flag in open(hdr_dir + "/" + hdr, encoding='utf-8').read():
+                src.write(bytes("#define " + flag + "" + "\n", 'UTF-8'))
+
         src.write(bytes("#include <" + hdr + ">" + "\n", 'UTF-8'))
         src.flush()                                                 # Need this to make the file visible
         src_name = os.path.join('.', src.name)
@@ -108,10 +120,10 @@ def run_compiler(hdr, compiler, copts, verbose):
 # and then try to compile the header. Returns normally if all files could be compiled successfully and
 # throws, otherwise.
 #
-def test_files(hdrs, compiler, copts, verbose):
+def test_files(hdrs, compiler, copts, verbose, hdr_dir):
     num_errs = 0
     executor = concurrent.futures.ThreadPoolExecutor(max_workers=multiprocessing.cpu_count())
-    futures = [executor.submit(run_compiler, h, compiler, copts, verbose) for h in hdrs]
+    futures = [executor.submit(run_compiler, h, compiler, copts, verbose, hdr_dir) for h in hdrs]
     for f in futures:
         try:
             if not f.result():
@@ -152,7 +164,7 @@ def run():
     hdrs = [hdr for hdr in files if hdr.endswith('.h')]
 
     try:
-        test_files(hdrs, args.compiler[0], args.copts, args.verbose)
+        test_files(hdrs, args.compiler[0], args.copts, args.verbose, hdr_dir)
     except OSError:
         sys.exit(1)    # Errors were written earlier
 
