@@ -88,7 +88,7 @@ bool QCannedQueryImpl::has_data() const
 
 QVariant QCannedQueryImpl::data() const
 {
-    return scopeVariantToQVariant(api_query_->data());
+    return variant_to_qvariant(api_query_->data());
 }
 
 QVariantMap QCannedQueryImpl::serialize() const
