@@ -61,7 +61,7 @@ QueryCtrlProxy SearchQueryBase::subsearch(ScopeProxy const& scope,
                                           string const& query_string,
                                           SearchListenerBase::SPtr const& reply)
 {
-    return subsearch(scope, query_string, "", FilterState(), fwd()->search_metadata(), reply);
+    return fwd()->subsearch(scope, query_string, "", FilterState(), nullptr, fwd()->search_metadata(), reply);
 }
 
 QueryCtrlProxy SearchQueryBase::subsearch(ScopeProxy const& scope,
@@ -69,7 +69,7 @@ QueryCtrlProxy SearchQueryBase::subsearch(ScopeProxy const& scope,
                                           FilterState const& filter_state,
                                           SearchListenerBase::SPtr const& reply)
 {
-    return subsearch(scope, query_string, "", filter_state, fwd()->search_metadata(), reply);
+    return fwd()->subsearch(scope, query_string, "", filter_state, nullptr, fwd()->search_metadata(), reply);
 }
 
 QueryCtrlProxy SearchQueryBase::subsearch(ScopeProxy const& scope,
@@ -78,7 +78,7 @@ QueryCtrlProxy SearchQueryBase::subsearch(ScopeProxy const& scope,
                                           FilterState const& filter_state,
                                           SearchListenerBase::SPtr const& reply)
 {
-    return subsearch(scope, query_string, department_id, filter_state, fwd()->search_metadata(), reply);
+    return fwd()->subsearch(scope, query_string, department_id, filter_state, nullptr, fwd()->search_metadata(), reply);
 }
 
 QueryCtrlProxy SearchQueryBase::subsearch(ScopeProxy const& scope,
@@ -88,7 +88,18 @@ QueryCtrlProxy SearchQueryBase::subsearch(ScopeProxy const& scope,
                                           SearchMetadata const& hints,
                                           SearchListenerBase::SPtr const& reply)
 {
-    return fwd()->subsearch(scope, query_string, department_id, filter_state, hints, reply);
+    return fwd()->subsearch(scope, query_string, department_id, filter_state, nullptr, hints, reply);
+}
+
+QueryCtrlProxy SearchQueryBase::subsearch(ScopeProxy const& scope,
+                                   std::string const& query_string,
+                                   std::string const& department_id,
+                                   FilterState const& filter_state,
+                                   Variant const& query_data,
+                                   SearchMetadata const& hints,
+                                   SearchListenerBase::SPtr const& reply)
+{
+    return fwd()->subsearch(scope, query_string, department_id, filter_state, std::unique_ptr<Variant>(new Variant(query_data)), hints, reply);
 }
 
 void SearchQueryBase::set_department_id(std::string const& department_id)

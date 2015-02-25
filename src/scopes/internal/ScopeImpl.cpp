@@ -92,12 +92,17 @@ QueryCtrlProxy ScopeImpl::search(string const& query_string,
 QueryCtrlProxy ScopeImpl::search(std::string const& query_string,
                                  std::string const& department_id,
                                  FilterState const& filter_state,
+                                 std::unique_ptr<Variant> query_data,
                                  SearchMetadata const& metadata,
                                  SearchQueryBaseImpl::History const& history,
                                  SearchListenerBase::SPtr const& reply)
 {
     CannedQuery query(scope_id_, query_string, department_id);
     query.set_filter_state(filter_state);
+    if (query_data)
+    {
+        query.set_data(*query_data);
+    }
     return search(query, metadata, history, reply);
 }
 

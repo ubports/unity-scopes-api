@@ -76,6 +76,7 @@ public:
     QueryCtrlProxy search(std::string const& query_string,
                           std::string const& department_id,
                           FilterState const& filter_state,
+                          std::unique_ptr<Variant> query_data,
                           SearchMetadata const& metadata,
                           SearchQueryBaseImpl::History const& history,
                           SearchListenerBase::SPtr const& reply);       // Not remote, hence not override

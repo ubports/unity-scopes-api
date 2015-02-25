@@ -117,6 +117,13 @@ public:
                                    FilterState const& filter_state,
                                    SearchMetadata const& hints,
                                    SearchListenerBase::SPtr const& reply);
+    QueryCtrlProxy subsearch(ScopeProxy const& scope,
+                                   std::string const& query_string,
+                                   std::string const& department_id,
+                                   FilterState const& filter_state,
+                                   Variant const& query_data,
+                                   SearchMetadata const& hints,
+                                   SearchListenerBase::SPtr const& reply);
     //@}
 
     /**
