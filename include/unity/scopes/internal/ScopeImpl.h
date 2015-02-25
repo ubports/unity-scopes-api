@@ -66,6 +66,13 @@ public:
                                   SearchMetadata const& metadata,
                                   SearchListenerBase::SPtr const& reply) override;
 
+    virtual QueryCtrlProxy search(std::string const& query_string,
+                                  std::string const& department_id,
+                                  FilterState const& filter_state,
+                                  Variant const& query_data,
+                                  SearchMetadata const& metadata,
+                                  SearchListenerBase::SPtr const& reply) override;
+
     QueryCtrlProxy search(std::string const& query_string,
                           std::string const& department_id,
                           FilterState const& filter_state,
