@@ -177,7 +177,7 @@ TEST(QCategorisedResult, QResult)
         c = c;
         EXPECT_EQ("title2", c.title());
     }
-        
+
     {
         CategoryRegistry reg;
         CategoryRenderer rdr;
