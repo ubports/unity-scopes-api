@@ -206,6 +206,10 @@ TEST(CannedQuery, from_uri)
                     e.what());
         }
     }
+    // wrong filters type
+    {
+        EXPECT_THROW(CannedQuery::from_uri("scope://foo?q=&filters=0"), unity::InvalidArgumentException);
+    }
     {
         auto q = CannedQuery::from_uri("scope://foo");
         EXPECT_EQ("foo", q.scope_id());
@@ -306,6 +310,7 @@ TEST(CannedQuery, deserialize)
 TEST(CannedQuery, exceptions)
 {
     EXPECT_THROW(CannedQuery(""), unity::InvalidArgumentException);
+    EXPECT_THROW(CannedQuery("", "", ""), unity::InvalidArgumentException);
     {
         VariantMap vm;
         try
@@ -341,7 +346,6 @@ TEST(CannedQuery, exceptions)
             FAIL();
         }
     }
-
     // no data
     {
         CannedQuery q("fooscope");
