@@ -113,19 +113,19 @@ CannedQuery CannedQuery::from_uri(std::string const& uri)
     return internal::CannedQueryImpl::from_uri(uri);
 }
 
-void CannedQuery::set_data(Variant const& value)
+void CannedQuery::set_user_data(Variant const& value)
 {
-    p->set_data(value);
+    p->set_user_data(value);
 }
 
-bool CannedQuery::has_data() const
+bool CannedQuery::has_user_data() const
 {
-    return p->has_data();
+    return p->has_user_data();
 }
 
-Variant CannedQuery::data() const
+Variant CannedQuery::user_data() const
 {
-    return p->data();
+    return p->user_data();
 }
 
 } // namespace scopes

@@ -159,12 +159,12 @@ public:
     /**
     \brief Initiates a search query (overloaded method).
 
-    This method has same synopsis as previous search method, but it takes additional query_data argument.
+    This method has same synopsis as previous search method, but it takes additional user_data argument.
 
     \param query_string search string
     \param department_id identifier of a department to search
     \param filter_state state of filters
-    \param query_data arbitrary data
+    \param user_data arbitrary data
     \param metadata additional data to pass to scope
     \param reply The callback object to receive replies
     \return query handler
@@ -172,7 +172,7 @@ public:
     virtual QueryCtrlProxy search(std::string const& query_string,
                                   std::string const& department_id,
                                   FilterState const& filter_state,
-                                  Variant const& query_data,
+                                  Variant const& user_data,
                                   SearchMetadata const& metadata,
                                   SearchListenerBase::SPtr const& reply) = 0;
 

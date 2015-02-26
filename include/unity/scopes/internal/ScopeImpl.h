@@ -69,14 +69,14 @@ public:
     virtual QueryCtrlProxy search(std::string const& query_string,
                                   std::string const& department_id,
                                   FilterState const& filter_state,
-                                  Variant const& query_data,
+                                  Variant const& user_data,
                                   SearchMetadata const& metadata,
                                   SearchListenerBase::SPtr const& reply) override;
 
     QueryCtrlProxy search(std::string const& query_string,
                           std::string const& department_id,
                           FilterState const& filter_state,
-                          std::unique_ptr<Variant> query_data,
+                          std::unique_ptr<Variant> user_data,
                           SearchMetadata const& metadata,
                           SearchQueryBaseImpl::History const& history,
                           SearchListenerBase::SPtr const& reply);       // Not remote, hence not override

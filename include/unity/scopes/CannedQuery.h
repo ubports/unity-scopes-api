@@ -138,22 +138,22 @@ public:
 
     \param value Data to attach to this canned query
     */
-    void set_data(Variant const& value);
+    void set_user_data(Variant const& value);
 
     /**
-    \brief Checks if data has been attached to this query.
+    \brief Checks if user data has been attached to this query.
 
     \return true if data is available.
     */
-    bool has_data() const;
+    bool has_user_data() const;
 
     /**
-    \brief Get data attached to this query.
+    \brief Get user data attached to this query.
 
     \return Data variant
-    \throws unity::LogicException if data is not available.
+    \throws unity::LogicException if user data is not available.
     */
-    Variant data() const;
+    Variant user_data() const;
 
 private:
     CannedQuery(internal::CannedQueryImpl *impl);

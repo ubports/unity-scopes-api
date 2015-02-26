@@ -40,12 +40,12 @@ TEST(CannedQuery, basic)
         q.set_query_string("foo");
         q.set_department_id("dep1");
         VariantArray va({Variant(10), Variant(20)});
-        q.set_data(Variant(va));
+        q.set_user_data(Variant(va));
         EXPECT_EQ("scope-A", q.scope_id());
         EXPECT_EQ("foo", q.query_string());
         EXPECT_EQ("dep1", q.department_id());
-        EXPECT_EQ(10, q.data().get_array()[0].get_int());
-        EXPECT_EQ(20, q.data().get_array()[1].get_int());
+        EXPECT_EQ(10, q.user_data().get_array()[0].get_int());
+        EXPECT_EQ(20, q.user_data().get_array()[1].get_int());
     }
 }
 
@@ -92,7 +92,7 @@ TEST(CannedQuery, to_uri)
         CannedQuery q("scope-A");
         q.set_query_string("foo");
         q.set_department_id("dep1");
-        q.set_data(Variant(123));
+        q.set_user_data(Variant(123));
         EXPECT_EQ("scope://scope-A?q=foo&dep=dep1&data=123%0A", q.to_uri());
     }
     {
@@ -223,7 +223,7 @@ TEST(CannedQuery, from_uri)
         auto q = CannedQuery::from_uri("scope://foo?q=Foo&data=%22bar%22%0A");
         EXPECT_EQ("foo", q.scope_id());
         EXPECT_EQ("Foo", q.query_string());
-        EXPECT_EQ("bar", q.data().get_string());
+        EXPECT_EQ("bar", q.user_data().get_string());
     }
 
     // percent-encoded host supported for backwards compatibility
@@ -330,6 +330,6 @@ TEST(CannedQuery, exceptions)
     // no data
     {
         CannedQuery q("fooscope");
-        EXPECT_THROW(q.data(), unity::LogicException);
+        EXPECT_THROW(q.user_data(), unity::LogicException);
     }
 }

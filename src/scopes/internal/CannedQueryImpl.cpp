@@ -62,9 +62,9 @@ CannedQueryImpl::CannedQueryImpl(CannedQueryImpl const &other)
     query_string_ = other.query_string_;
     department_id_ = other.department_id_;
     filter_state_ = other.filter_state_;
-    if (other.data_ != nullptr)
+    if (other.user_data_ != nullptr)
     {
-        data_.reset(new Variant(*other.data_));
+        user_data_.reset(new Variant(*other.user_data_));
     }
 }
 
@@ -103,8 +103,28 @@ CannedQueryImpl::CannedQueryImpl(VariantMap const& variant)
     it = variant.find("data");
     if (it != variant.end())
     {
-        set_data(it->second);
+        set_user_data(it->second);
     }
+}
+
+CannedQueryImpl& CannedQueryImpl::operator=(CannedQueryImpl const &other)
+{
+    if (this != &other)
+    {
+        scope_id_ = other.scope_id_;
+        query_string_ = other.query_string_;
+        department_id_ = other.department_id_;
+        filter_state_ = other.filter_state_;
+        if (other.user_data_ != nullptr)
+        {
+            user_data_.reset(new Variant(*other.user_data_));
+        }
+        else
+        {
+            user_data_.reset(nullptr);
+        }
+    }
+    return *this;
 }
 
 void CannedQueryImpl::set_department_id(std::string const& dep_id)
@@ -142,21 +162,21 @@ FilterState CannedQueryImpl::filter_state() const
     return filter_state_;
 }
 
-void CannedQueryImpl::set_data(Variant const& value)
+void CannedQueryImpl::set_user_data(Variant const& value)
 {
-    data_.reset(new Variant(value));
+    user_data_.reset(new Variant(value));
 }
 
-bool CannedQueryImpl::has_data() const
+bool CannedQueryImpl::has_user_data() const
 {
-    return data_ != nullptr;
+    return user_data_ != nullptr;
 }
 
-Variant CannedQueryImpl::data() const
+Variant CannedQueryImpl::user_data() const
 {
-    if (data_)
+    if (user_data_)
     {
-        return *data_;
+        return *user_data_;
     }
     throw unity::LogicException("CannedQuery::data(): data is not set for this query");
 }
@@ -168,9 +188,9 @@ VariantMap CannedQueryImpl::serialize() const
     vm["query_string"] = query_string_;
     vm["department_id"] = department_id_;
     vm["filter_state"] = filter_state_.serialize();
-    if (data_)
+    if (user_data_)
     {
-        vm["data"] = *data_;
+        vm["user_data"] = *user_data_;
     }
     return vm;
 }
@@ -193,9 +213,9 @@ std::string CannedQueryImpl::to_uri() const
         internal::JsonCppNode const jstr(var);
         s << "&filters=" << to_percent_encoding(jstr.to_json_string());
     }
-    if (data_)
+    if (user_data_)
     {
-        internal::JsonCppNode const jstr(*(data_));
+        internal::JsonCppNode const jstr(*(user_data_));
         s << "&data=" << to_percent_encoding(jstr.to_json_string());
     }
     return s.str();
@@ -282,7 +302,7 @@ CannedQuery CannedQueryImpl::from_uri(std::string const& uri)
                 {
                     auto const data_json = decode_or_throw(val, key, uri);
                     internal::JsonCppNode const node(data_json);
-                    q.set_data(node.to_variant());
+                    q.set_user_data(node.to_variant());
                 }
                 // else - unknown keys are ignored
             } // else - the string with no '=' is ignored
