@@ -90,6 +90,31 @@ TEST(CannedQuery, copy)
     }
 }
 
+TEST(CannedQuery, move)
+{
+    {
+        CannedQuery a("scope-A", "foo", "dep1");
+        a.set_user_data(Variant(1));
+
+        CannedQuery b(std::move(a));
+        EXPECT_EQ("scope-A", b.scope_id());
+        EXPECT_EQ("foo", b.query_string());
+        EXPECT_EQ("dep1", b.department_id());
+        EXPECT_EQ(1, b.user_data().get_int());
+    }
+
+    {
+        CannedQuery a("scope-A", "foo", "dep1");
+        a.set_user_data(Variant(1));
+
+        CannedQuery b = std::move(a);
+        EXPECT_EQ("scope-A", b.scope_id());
+        EXPECT_EQ("foo", b.query_string());
+        EXPECT_EQ("dep1", b.department_id());
+        EXPECT_EQ(1, b.user_data().get_int());
+    }
+}
+
 // test of serialization into a canned query string
 TEST(CannedQuery, to_uri)
 {
