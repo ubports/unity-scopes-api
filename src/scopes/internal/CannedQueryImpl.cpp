@@ -100,7 +100,7 @@ CannedQueryImpl::CannedQueryImpl(VariantMap const& variant)
         query_string_ = it->second.get_string();
     }
 
-    it = variant.find("data");
+    it = variant.find("user_data");
     if (it != variant.end())
     {
         set_user_data(it->second);
