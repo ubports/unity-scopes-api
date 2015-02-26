@@ -142,11 +142,10 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::CannedQuery::CannedQuery(unity::scopes::CannedQuery&&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::CannedQuery::CannedQuery(unity::scopes::CannedQuery const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::CannedQuery::CannedQuery(unity::scopes::internal::CannedQueryImpl*)@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::CannedQuery::data() const@Base" 0replaceme
  (c++)"unity::scopes::CannedQuery::department_id() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::CannedQuery::filter_state() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::CannedQuery::from_uri(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.3+14.10.20140428
- (c++)"unity::scopes::CannedQuery::has_data() const@Base" 0replaceme
+ (c++)"unity::scopes::CannedQuery::has_user_data() const@Base" 0replaceme
  (c++)"unity::scopes::CannedQuery::operator=(unity::scopes::CannedQuery&&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::CannedQuery::operator=(unity::scopes::CannedQuery const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::CannedQuery::query_string() const@Base" 0.4.0+14.04.20140312.1
@@ -157,6 +156,7 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::CannedQuery::set_filter_state(unity::scopes::FilterState const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::CannedQuery::set_query_string(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::CannedQuery::to_uri() const@Base" 0.4.3+14.10.20140428
+ (c++)"unity::scopes::CannedQuery::user_data() const@Base" 0replaceme
  (c++)"unity::scopes::CategorisedResult::~CategorisedResult()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::CategorisedResult::CategorisedResult(std::shared_ptr<unity::scopes::Category const>)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::CategorisedResult::CategorisedResult(unity::scopes::CategorisedResult&&)@Base" 0.4.0+14.04.20140312.1
