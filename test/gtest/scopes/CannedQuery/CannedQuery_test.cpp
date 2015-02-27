@@ -74,7 +74,8 @@ TEST(CannedQuery, copy)
     {
         CannedQuery a("scope-A", "foo", "dep1");
         a.set_user_data(Variant(1));
-        CannedQuery b = a;
+        CannedQuery b("scope-B");
+        b = a;
 
         EXPECT_EQ(a.scope_id(), b.scope_id());
         EXPECT_EQ(a.department_id(), b.department_id());
@@ -105,9 +106,10 @@ TEST(CannedQuery, move)
 
     {
         CannedQuery a("scope-A", "foo", "dep1");
+        CannedQuery b("scope-B");
         a.set_user_data(Variant(1));
 
-        CannedQuery b = std::move(a);
+        b = std::move(a);
         EXPECT_EQ("scope-A", b.scope_id());
         EXPECT_EQ("foo", b.query_string());
         EXPECT_EQ("dep1", b.department_id());
