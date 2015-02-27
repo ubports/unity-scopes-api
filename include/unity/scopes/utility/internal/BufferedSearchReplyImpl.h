@@ -63,7 +63,7 @@ public:
     bool push(unity::scopes::CategorisedResult const& result) override;
     bool push(unity::scopes::Filters const& filters, unity::scopes::FilterState const& filter_state) override;
 
-    void push_surfacing_results_from_cache() override;
+    void push_surfacing_results_from_cache() noexcept override;
 
     // Reply interface
     void finished() override;
