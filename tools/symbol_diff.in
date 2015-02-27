@@ -96,7 +96,7 @@ def compare_syms(old_file, new_file):
     except FileNotFoundError:
         # One or more of the new files may not exist. dpkg-buildpackage
         # leaves a symbol file behind only if it found a difference.
-        return 
+        return
 
     # Write the diff into /tmp/symbols.diff
     with open('/tmp/symbols.diff', 'a') as outfile:
