@@ -72,26 +72,31 @@ def compare_syms(old_file, new_file):
 
     # Run the new symbols file through "c++filt | sort | uniq". We need
     # the sort | uniq because, otherwise, we end up with duplicate demangled symbols.
-    with open(new_file) as infile, open('new_symbols', 'w') as outfile:
-        p = subprocess.Popen(['c++filt | sort | uniq'], shell=True, stdin=infile, stdout=subprocess.PIPE)
+    try:
+        with open(new_file) as infile, open('new_symbols', 'w') as outfile:
+            p = subprocess.Popen(['c++filt | sort | uniq'], shell=True, stdin=infile, stdout=subprocess.PIPE)
 
-        # For each symbol, if it is in the old dictionary, output the tags from the original
-        # symbol file, followed by the symbol and version. Otherwise, use "(c++)" as the tag
-        # and add " 0replaceme", so the new symbol will be accepted.
-        line = p.stdout.readline().decode('utf-8')
-        outfile.write(line)                         # Write library name and version
-        for line in p.stdout:
-            mo = new_regex.match(line.decode('utf-8'))
-            if (mo):
-                sym = mo.group(1)
-                try:
-                    tag, version = old_syms[sym]
-                except KeyError:
-                    tag = '(c++)'
-                    version = '0replaceme'
-                outfile.write(' {}"{}" {}\n'.format(tag, sym, version))
-            else:
-                raise Exception('Cannot parse demangled line: ' + line)
+            # For each symbol, if it is in the old dictionary, output the tags from the original
+            # symbol file, followed by the symbol and version. Otherwise, use "(c++)" as the tag
+            # and add " 0replaceme", so the new symbol will be accepted.
+            line = p.stdout.readline().decode('utf-8')
+            outfile.write(line)                         # Write library name and version
+            for line in p.stdout:
+                mo = new_regex.match(line.decode('utf-8'))
+                if (mo):
+                    sym = mo.group(1)
+                    try:
+                        tag, version = old_syms[sym]
+                    except KeyError:
+                        tag = '(c++)'
+                        version = '0replaceme'
+                    outfile.write(' {}"{}" {}\n'.format(tag, sym, version))
+                else:
+                    raise Exception('Cannot parse demangled line: ' + line.decode("utf-8"))
+    except FileNotFoundError:
+        # One or more of the new files may not exist. dpkg-buildpackage
+        # leaves a symbol file behind only if it found a difference.
+        return
 
     # Write the diff into /tmp/symbols.diff
     with open('/tmp/symbols.diff', 'a') as outfile:
@@ -105,7 +110,10 @@ FILES = [
         ]
 
 def run():
-    os.remove('/tmp/symbols.diff')
+    try:
+        os.unlink('/tmp/symbols.diff')
+    except FileNotFoundError:
+        pass
     for old_file, new_file in FILES:
         compare_syms(old_file, new_file)
 
