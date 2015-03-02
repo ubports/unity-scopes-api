@@ -128,7 +128,6 @@ private:
     void init(QPreviewQueryBaseAPI* query_api);
 
     std::unique_ptr<internal::QPreviewQueryBaseImpl> p;
-    friend class internal::QPreviewQueryBaseImpl;
     friend class QPreviewQueryBaseAPI;
     /// @endcond
 };

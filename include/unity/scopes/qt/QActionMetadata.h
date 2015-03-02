@@ -140,7 +140,6 @@ private:
     QActionMetadata(internal::QActionMetadataImpl* impl);
 
     std::unique_ptr<internal::QActionMetadataImpl> p;
-    friend class internal::QActionMetadataImpl;
     friend class internal::QPreviewQueryBaseImpl;
     friend class QPreviewQueryBaseAPI;
     /// @endcond

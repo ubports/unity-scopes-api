@@ -157,7 +157,6 @@ private:
     QSearchReply(unity::scopes::SearchReplyProxy& reply, QObject* parent = 0);
 
     std::unique_ptr<internal::QSearchReplyImpl> p;
-    friend class internal::QSearchReplyImpl;
     friend class QSearchQueryBaseAPI;
 };
 

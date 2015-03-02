@@ -98,7 +98,6 @@ protected:
 
 private:
     std::unique_ptr<internal::QPreviewReplyImpl> p;
-    friend class internal::QPreviewReplyImpl;
     friend class QPreviewQueryBaseAPI;
     /// @endcond
 };

@@ -38,21 +38,13 @@ namespace internal
 class QScopeBaseImpl
 {
 public:
-    /// @cond
     NONCOPYABLE(QScopeBaseImpl);
     UNITY_DEFINES_PTRS(QScopeBaseImpl);
 
     QScopeBaseImpl() = default;
     virtual ~QScopeBaseImpl() = default;
-    /// @endcond
-    /**
-     * Called once at startup
-     */
-    virtual void start(std::string const&);
 
-    /**
-     * Called at shutdown
-     */
+    virtual void start(std::string const&);
     virtual void stop();
 };
 

@@ -78,16 +78,10 @@ public:
 
 }  // namespace unity
 
-QScopeBaseAPIImpl::QScopeBaseAPIImpl(QScopeBase& qtscope, QObject* parent)
-    : QObject(parent)
+QScopeBaseAPIImpl::QScopeBaseAPIImpl(FactoryFunc const& creator)
+    : QObject(nullptr)
     , qtapp_ready_(false)
-    , qtscope_impl_(&qtscope)
-{
-}
-
-QScopeBaseAPIImpl::QScopeBaseAPIImpl(FactoryFunc const& creator, QObject* parent)
-    : QObject(parent)
-    , qtapp_ready_(false)
+    , qtapp_stopped_(false)
     , qtscope_impl_(nullptr)
     , qtscope_creator_(creator)
 {
@@ -109,11 +103,8 @@ bool QScopeBaseAPIImpl::event(QEvent* e)
         case Start:
             // create the client's scope in the
             // Qt main thread
-            if (!qtscope_impl_)
-            {
-                qtscope_impl_ = qtscope_creator_();
-                assert(qtscope_impl_);
-            }
+            qtscope_impl_.reset(qtscope_creator_());
+            assert(qtscope_impl_);
             // Move the user's scope to the Qt main thread
             qtscope_impl_->moveToThread(qtapp_->thread());
 
@@ -132,15 +123,14 @@ bool QScopeBaseAPIImpl::event(QEvent* e)
     return true;
 }
 
-void QScopeBaseAPIImpl::start(std::string const& scope_id)
+void QScopeBaseAPIImpl::start(string const& scope_id)
 {
     // start the QT thread
     // TODO change to make_unique when using C++14
-    qtthread_ = std::unique_ptr<std::thread>(new std::thread(&QScopeBaseAPIImpl::startQtThread, this));
+    qtthread_ = unique_ptr<std::thread>(new std::thread(&QScopeBaseAPIImpl::start_qt_thread, this));
     while (!qtapp_ready_)
     {
-        std::chrono::milliseconds dura(10);
-        std::this_thread::sleep_for(dura);
+        this_thread::sleep_for(chrono::milliseconds(10));
     }
 
     // Move this class to the Qt main thread
@@ -153,7 +143,7 @@ void QScopeBaseAPIImpl::start(std::string const& scope_id)
 
 void QScopeBaseAPIImpl::stop()
 {
-    // Post event to initialize the object in the Qt thread
+    // Post event to stop the object in the Qt thread
     qtapp_->postEvent(this, new StopEvent());
 }
 
@@ -176,16 +166,17 @@ sc::SearchQueryBase::UPtr QScopeBaseAPIImpl::search(sc::CannedQuery const& query
     return sc::SearchQueryBase::UPtr(query_api);
 }
 
-void QScopeBaseAPIImpl::startQtThread()
+void QScopeBaseAPIImpl::start_qt_thread()
 {
     if (!QCoreApplication::instance())
     {
         int argc = 0;
         char* argv = NULL;
-        qtapp_ = std::make_shared<QCoreApplication>(argc, &argv);
+        qtapp_ = make_shared<QCoreApplication>(argc, &argv);
         qtapp_ready_ = true;
         qtapp_->exec();
         // delete QtCoreApplication in the same thread it was created
         qtapp_.reset();
+        qtapp_stopped_ = true;
     }
 }

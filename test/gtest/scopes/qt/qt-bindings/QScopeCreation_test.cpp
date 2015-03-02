@@ -43,14 +43,19 @@ std::atomic<bool> scope_created(false);
 class QScopeBaseAPIImplTest : public QScopeBaseAPIImpl
 {
 public:
-    QScopeBaseAPIImplTest(FactoryFunc const& creator, QObject* parent = 0)
-        : QScopeBaseAPIImpl(creator, parent)
+    QScopeBaseAPIImplTest(FactoryFunc const& creator)
+        : QScopeBaseAPIImpl(creator)
     {
     }
 
     QThread* getQtAppThread()
     {
         return qtapp_->thread();
+    }
+
+    bool qtapp_stopped()
+    {
+        return qtapp_stopped_;
     }
 };
 
@@ -85,4 +90,9 @@ TEST(CreationTest, bindings)
 
     // stop the Qt application
     impl.stop();
+
+    while (!impl.qtapp_stopped())
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
 }

@@ -24,11 +24,6 @@ using namespace unity::scopes;
 using namespace unity::scopes::qt;
 
 /// @cond
-QResult::QResult()
-    : p(new internal::QResultImpl(QVariantMap()))
-{
-}
-
 QResult::QResult(internal::QResultImpl* impl)
     : p(impl)
 {
@@ -123,7 +118,7 @@ QVariant& QResult::operator[](QString const& key)
 
 QVariant const& QResult::operator[](QString const& key) const
 {
-    return p->value(key);
+    return (*static_cast<internal::QResultImpl const*>(p.get()))[key];
 }
 
 QString QResult::uri() const noexcept

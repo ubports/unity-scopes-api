@@ -54,7 +54,7 @@ class QScopeBaseImpl;
 \brief Base class for a scope implementation.
 
 Scopes are accessed by the scopes run time as a shared library (one library per scope).
-Each scope must implement a class that derives from ScopeBase, for example:
+Each scope must implement a class that derives from QScopeBase, for example:
 
 ~~~
 #include <unity/scopes/qt/QScopeBase.h>
@@ -65,9 +65,8 @@ public:
     MyScope();
     virtual ~MyScope();
 
-    virtual void start(QString const& scope_id);   // Optional
+    virtual void start(QString const& scope_id);       // Optional
     virtual void stop();                               // Optional
-    virtual void run();                                // Optional
     // ...
 };
 ~~~
@@ -76,8 +75,6 @@ In addition, the library must provide two functions with "C" linkage:
  - a create function that must return a pointer to the derived instance
  - a destroy function that is passed the pointer returned by the create function
 
-Typically, the create and destroy functions will simply call `new` and `delete`, respectively. (However,
-there is no requirement that the derived class instance must be heap-allocated.)
 If the create function throws an exception, the destroy function will not be called. If the create function returns
 NULL, the destroy function _will_ be called with NULL as its argument.
 
@@ -86,8 +83,9 @@ UNITY_SCOPE_DESTROY_FUNCTION macros, for example:
 
 ~~~
 
-// You must provide a function that creates your own scope
-// That function must have no parameters and return a pointer to QScopeBase
+// You must provide a function that creates your scope on the heap and
+// pass this function to the QScopeBaseAPI constructor.
+
 unity::scopes::qt::QScopeBase *create_my_scope()
 {
     return new MyScope();
@@ -96,23 +94,23 @@ unity::scopes::qt::QScopeBase *create_my_scope()
 unity::scopes::ScopeBase*
 UNITY_SCOPE_CREATE_FUNCTION()
 {
-    // Initialize scope. This line is mandatory, you should pass your creation scope function to
-    // the class QScopeBaseAPI, which will instantiate your class in the correct Qt Thread.
+    // You must return a dynamically allocated QScopeBaseAPI instance here.
+    // In turn, that instance calls your creation function to instantiate
+    // your scope in the correct Qt thread.
     return new QScopeBaseAPI(create_my_scope);
 }
+
+// The runtime, once it has stopped your scope, calls the destroy function.
 
 void
 UNITY_SCOPE_DESTROY_FUNCTION(unity::scopes::ScopeBase* scope)
 {
+    delete scope;
 }
 ~~~
 
 After the scopes run time has obtained a pointer to the class instance from the create function, it calls start(),
-which allows the scope to initialize itself. This is followed by a call to run().
-All calls to the methods of this class will be done from the main QThread.
-
-The scope implementation, if it does not return from run(), is expected to return from run() in response to a
-call to stop() in a timely manner.
+which allows the scope to initialize itself.
 */
 class QScopeBase : public QObject
 {
@@ -149,7 +147,6 @@ public:
 
 private:
     std::unique_ptr<internal::QScopeBaseImpl> p;
-    friend class internal::QScopeBaseImpl;
 };
 
 }  // namespace qt

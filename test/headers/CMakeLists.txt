@@ -5,7 +5,7 @@
 set(root_inc_dir ${CMAKE_SOURCE_DIR}/include)
 
 set(subdirs
-    unity/scopes/
+    unity/scopes
     unity/scopes/qt
     unity/scopes/testing
     unity/scopes/utility
@@ -56,4 +56,4 @@ endforeach()
 
 add_test(cleanincludes ${CMAKE_CURRENT_SOURCE_DIR}/includechecker.py ${CMAKE_SOURCE_DIR}/include)
 add_test(noglobalincludes ${CMAKE_CURRENT_SOURCE_DIR}/check_global_usage.py
-${CMAKE_SOURCE_DIR}/include ${CMAKE_BINARY_DIR}/include)
+         ${CMAKE_SOURCE_DIR}/include ${CMAKE_BINARY_DIR}/include)

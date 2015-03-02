@@ -67,7 +67,6 @@ public:
     UNITY_DEFINES_PTRS(QResult);
     /// @endcond
 
-    QResult();
     /**@name Copy and assignment
     Copy and assignment (move and non-move versions) have the usual value semantics.
     */
