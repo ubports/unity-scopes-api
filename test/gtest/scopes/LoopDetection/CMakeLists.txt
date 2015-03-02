@@ -18,7 +18,7 @@ set(SCOPE_DIR "${CMAKE_CURRENT_BINARY_DIR}/scopes")
 foreach (scope A B C D)
     file(MAKE_DIRECTORY "${SCOPE_DIR}/${scope}")
     configure_file(LoopScope.ini.in ${SCOPE_DIR}/${scope}/${scope}.ini)
-    add_library(${scope} MODULE LoopScope.cpp)
+    add_library(${scope} MODULE SHARED LoopScope.cpp)
     set_target_properties(${scope}
       PROPERTIES
         LIBRARY_OUTPUT_DIRECTORY "${SCOPE_DIR}/${scope}/"

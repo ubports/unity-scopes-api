@@ -93,7 +93,7 @@ bool SearchMetadataImpl::has_location() const
 
 void SearchMetadataImpl::remove_location()
 {
-    location_ = boost::optional<Location>();
+    location_ = boost::none;
 }
 
 std::string SearchMetadataImpl::metadata_type() const
