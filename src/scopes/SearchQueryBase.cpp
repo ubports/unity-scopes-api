@@ -95,11 +95,11 @@ QueryCtrlProxy SearchQueryBase::subsearch(ScopeProxy const& scope,
                                    std::string const& query_string,
                                    std::string const& department_id,
                                    FilterState const& filter_state,
-                                   Variant const& query_data,
+                                   Variant const& user_data,
                                    SearchMetadata const& hints,
                                    SearchListenerBase::SPtr const& reply)
 {
-    return fwd()->subsearch(scope, query_string, department_id, filter_state, std::unique_ptr<Variant>(new Variant(query_data)), hints, reply);
+    return fwd()->subsearch(scope, query_string, department_id, filter_state, std::unique_ptr<Variant>(new Variant(user_data)), hints, reply);
 }
 
 void SearchQueryBase::set_department_id(std::string const& department_id)

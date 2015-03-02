@@ -56,7 +56,7 @@ public:
                                    std::string const& query_string,
                                    std::string const& department_id,
                                    FilterState const& filter_state,
-                                   std::unique_ptr<Variant> query_data,
+                                   std::unique_ptr<Variant> user_data,
                                    SearchMetadata const& metadata,
                                    SearchListenerBase::SPtr const& reply);
 

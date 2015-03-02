@@ -121,7 +121,7 @@ public:
                                    std::string const& query_string,
                                    std::string const& department_id,
                                    FilterState const& filter_state,
-                                   Variant const& query_data,
+                                   Variant const& user_data,
                                    SearchMetadata const& hints,
                                    SearchListenerBase::SPtr const& reply);
     //@}
