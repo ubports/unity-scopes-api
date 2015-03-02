@@ -25,7 +25,15 @@
 #include <boost/log/support/date_time.hpp>
 #include <boost/log/trivial.hpp>
 #include <boost/phoenix/bind.hpp>
+
+#if (BOOST_VERSION / 100000 == 1) && (((BOOST_VERSION / 100) % 1000) < 56)
 #include <boost/utility/empty_deleter.hpp>
+typedef boost::empty_deleter NullDeleter;
+#else
+#include <boost/core/null_deleter.hpp>
+typedef boost::null_deleter NullDeleter;
+#endif
+
 #include <unity/UnityExceptions.h>
 
 using namespace std;
@@ -49,14 +57,11 @@ namespace internal
 namespace
 {
 
-static array<string, Logger::LastChannelEnum_> const channel_names =
-    {
-        { "IPC" }
-    };
+static array<string, Logger::LastChannelEnum_> const channel_names = {{"IPC"}};
 
 string const& to_severity(int s)
 {
-    static array<string, 5> const severities = { { "INFO", "WARNING", "ERROR", "FATAL", "TRACE" } };
+    static array<string, 5> const severities = {{"INFO", "WARNING", "ERROR", "FATAL", "TRACE"}};
     static string const unknown = "UNKNOWN";
 
     if (s < 0 || s >= static_cast<int>(severities.size()))
@@ -65,7 +70,6 @@ string const& to_severity(int s)
     }
     return severities[s];
 }
-
 }
 
 // Instantiate a logger for the scope/client with the given ID.
@@ -93,7 +97,7 @@ Logger::Logger(string const& scope_id)
     // Set up sink that logs to std::clog.
     clog_sink_ = boost::make_shared<ClogSinkT>();
     clog_sink_->set_formatter(bind(&Logger::formatter, this, ph::_1, ph::_2));
-    boost::shared_ptr<std::ostream> console_stream(&std::clog, boost::empty_deleter());
+    boost::shared_ptr<std::ostream> console_stream(&std::clog, NullDeleter());
     clog_sink_->locked_backend()->add_stream(console_stream);
     clog_sink_->locked_backend()->auto_flush(true);
     logging::core::get()->add_sink(clog_sink_);
@@ -173,27 +177,26 @@ void Logger::set_log_file(string const& path, int rotation_size, int dir_size)
 {
     namespace ph = std::placeholders;
 
-    FileSinkPtr s = boost::make_shared<FileSinkT>(
-                        keywords::file_name = path + "-%N.log",
-                        keywords::rotation_size = rotation_size);
+    FileSinkPtr s =
+        boost::make_shared<FileSinkT>(keywords::file_name = path + "-%N.log", keywords::rotation_size = rotation_size);
 
     string parent = boost::filesystem::path(path).parent_path().native();
-    s->locked_backend()->set_file_collector(sinks::file::make_collector(keywords::target = parent,
-                                                                        keywords::max_size = dir_size));
+    s->locked_backend()->set_file_collector(sinks::file::make_collector(
+        keywords::target = parent, keywords::max_size = dir_size, keywords::min_free_space = 1024 * 1024 * 5));
     try
     {
         s->locked_backend()->scan_for_files();
     }
     catch (std::exception const& e)
     {
-        BOOST_LOG_SEV(logger_, Warning)
-            << "RuntimeImpl::Logger(): log rotation failed (path = " << parent << "): " << e.what();
+        BOOST_LOG_SEV(logger_, Warning) << "RuntimeImpl::Logger(): log rotation failed (path = " << parent
+                                        << "): " << e.what();
         return;
     }
     catch (...)
     {
-        BOOST_LOG_SEV(logger_, Warning)
-            << "RuntimeImpl::Logger(): log rotation failed (path = " << parent << "): unknown exception";
+        BOOST_LOG_SEV(logger_, Warning) << "RuntimeImpl::Logger(): log rotation failed (path = " << parent
+                                        << "): unknown exception";
         return;
     }
 
@@ -254,21 +257,18 @@ bool Logger::filter(logging::value_ref<int, tag::severity> const& level,
     return it->second.second;
 }
 
-void Logger::formatter(logging::record_view const& rec,
-                       logging::formatting_ostream& strm)
+void Logger::formatter(logging::record_view const& rec, logging::formatting_ostream& strm)
 {
     string channel = expr::attr<string>("Channel")(rec).get();
 
     string prefix = channel.empty() ? to_severity(expr::attr<int>("Severity")(rec).get()) : channel;
 
     strm << "[" << expr::format_date_time<boost::posix_time::ptime>("TimeStamp", "%Y-%m-%d %H:%M:%S.%f")(rec) << "] "
-         << prefix << ": "
-         << scope_id_ << ": "
-         << rec[expr::smessage];
+         << prefix << ": " << scope_id_ << ": " << rec[expr::smessage];
 }
 
-} // namespace internal
+}  // namespace internal
 
-} // namespace scopes
+}  // namespace scopes
 
-} // namespace uannelity
+}  // namespace unity
