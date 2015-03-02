@@ -63,6 +63,7 @@ QueryCtrlProxy SearchQueryBaseImpl::subsearch(ScopeProxy const& scope,
                                               std::string const& query_string,
                                               std::string const& department_id,
                                               FilterState const& filter_state,
+                                              std::unique_ptr<Variant> user_data,
                                               SearchMetadata const& metadata,
                                               SearchListenerBase::SPtr const& reply)
 {
@@ -87,11 +88,12 @@ QueryCtrlProxy SearchQueryBaseImpl::subsearch(ScopeProxy const& scope,
     auto scope_impl = dynamic_pointer_cast<ScopeImpl>(scope);
     if (scope_impl)
     {
-        query_ctrl = scope_impl->search(query_string, department_id, filter_state, metadata, history_, reply);
+        query_ctrl = scope_impl->search(query_string, department_id, filter_state, std::move(user_data), metadata, history_, reply);
     }
     else
     {
-        query_ctrl = scope->search(query_string, department_id, filter_state, metadata, reply);
+        query_ctrl = user_data ? scope->search(query_string, department_id, filter_state, *user_data, metadata, reply) :
+            scope->search(query_string, department_id, filter_state, metadata, reply);
     }
 
     lock_guard<mutex> lock(mutex_);

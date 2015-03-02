@@ -3,6 +3,7 @@ Release notes
 
 Changes in version 0.6.15
 =========================
+  - Added support for attaching arbitrary data to CannedQuery.
   - Added _ENABLE_QT_EXPERIMENTAL_ guard to qt headers until that library
     is finalized. Further changes in the unity::scopes::qt namespace are
     expected at this point.

@@ -146,6 +146,21 @@ public:
     */
     static QCannedQuery from_uri(QString const& uri);
 
+    /**
+    \brief Checks if user data has been attached to this query.
+
+    \return true if data is available.
+    */
+    bool has_user_data() const;
+
+    /**
+    \brief Get user data attached to this query.
+
+    \return Data variant
+    \throws unity::LogicException if data is not available.
+    */
+    QVariant user_data() const;
+
 private:
     QCannedQuery(internal::QCannedQueryImpl* impl);
     QCannedQuery(CannedQuery const& api_query);
