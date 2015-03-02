@@ -16,12 +16,17 @@
  * Authored by: Xavi Garcia <xavi.garcia.mena@canonical.com>
  */
 
-#include <unity/scopes/qt/QUtils.h>
+#include <unity/scopes/qt/internal/QUtils.h>
+
+#include <unity/UnityExceptions.h>
+
+#include <cassert>
 
 using namespace unity::scopes::qt;
+using namespace std;
 
 namespace sc = unity::scopes;
-namespace qt = unity::scopes::qt;
+namespace qti = unity::scopes::qt::internal;
 
 namespace unity
 {
@@ -32,7 +37,10 @@ namespace scopes
 namespace qt
 {
 
-QVariant scopeVariantToQVariant(sc::Variant const& variant)
+namespace internal
+{
+
+QVariant variant_to_qvariant(sc::Variant const& variant)
 {
     switch (variant.which())
     {
@@ -52,7 +60,7 @@ QVariant scopeVariantToQVariant(sc::Variant const& variant)
             QVariantMap result_dict;
             for (auto it = dict.begin(); it != dict.end(); ++it)
             {
-                result_dict.insert(QString::fromStdString(it->first), qt::scopeVariantToQVariant(it->second));
+                result_dict.insert(QString::fromStdString(it->first), qti::variant_to_qvariant(it->second));
             }
             return result_dict;
         }
@@ -62,17 +70,19 @@ QVariant scopeVariantToQVariant(sc::Variant const& variant)
             QVariantList result_list;
             for (unsigned i = 0; i < arr.size(); i++)
             {
-                result_list.append(qt::scopeVariantToQVariant(arr[i]));
+                result_list.append(qti::variant_to_qvariant(arr[i]));
             }
             return result_list;
         }
         default:
-            qWarning("Unhandled Variant type");
+        {
+            assert(false);  // LCOV_EXCL_LINE
             return QVariant();
+        }
     }
 }
 
-sc::Variant qVariantToScopeVariant(QVariant const& variant)
+sc::Variant qvariant_to_variant(QVariant const& variant)
 {
     if (variant.isNull())
     {
@@ -95,7 +105,7 @@ sc::Variant qVariantToScopeVariant(QVariant const& variant)
             QVariantMap m(variant.toMap());
             for (auto it = m.begin(); it != m.end(); ++it)
             {
-                vm[it.key().toStdString()] = qt::qVariantToScopeVariant(it.value());
+                vm[it.key().toStdString()] = qti::qvariant_to_variant(it.value());
             }
             return sc::Variant(vm);
         }
@@ -105,38 +115,43 @@ sc::Variant qVariantToScopeVariant(QVariant const& variant)
             sc::VariantArray arr;
             for (int i = 0; i < l.size(); i++)
             {
-                arr.push_back(qt::qVariantToScopeVariant(l[i]));
+                arr.push_back(qti::qvariant_to_variant(l[i]));
             }
             return sc::Variant(arr);
         }
         default:
-            qWarning("Unhandled QVariant type: %s", variant.typeName());
-            return sc::Variant();
+        {
+            throw unity::InvalidArgumentException(string("qvariant_to_variant(): invalid source type: ") +
+                                                  variant.typeName());
+        }
     }
 }
 
-QVariantMap scopeVariantMapToQVariantMap(unity::scopes::VariantMap const& variant)
+QVariantMap variantmap_to_qvariantmap(unity::scopes::VariantMap const& variant)
 {
     QVariantMap ret_map;
     for (auto item : variant)
     {
-        ret_map[QString::fromUtf8(item.first.c_str())] = qt::scopeVariantToQVariant(item.second);
+        ret_map[QString::fromUtf8(item.first.c_str())] = qti::variant_to_qvariant(item.second);
     }
 
     return ret_map;
 }
 
-VariantMap qVariantMapToScopeVariantMap(QVariantMap const& variant)
+VariantMap qvariantmap_to_variantmap(QVariantMap const& variant)
 {
     VariantMap ret_map;
     QMapIterator<QString, QVariant> it(variant);
     while (it.hasNext())
     {
-        ret_map[it.key().toUtf8().data()] = qt::qVariantToScopeVariant(it.value());
+        it.next();
+        ret_map[it.key().toUtf8().data()] = qti::qvariant_to_variant(it.value());
     }
 
     return ret_map;
 }
+
+}  // namespace internal
 
 }  // namespace qt
 

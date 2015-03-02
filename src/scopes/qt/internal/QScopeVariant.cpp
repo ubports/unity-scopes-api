@@ -17,7 +17,7 @@
  */
 
 #include <unity/scopes/qt/internal/QScopeVariant.h>
-#include <unity/scopes/qt/QUtils.h>
+#include <unity/scopes/qt/internal/QUtils.h>
 
 #include <unity/scopes/Variant.h>
 
@@ -33,14 +33,14 @@ using namespace unity::scopes::qt::internal;
 //{
 //}
 
-QScopeVariant::QScopeVariant(Variant* val) noexcept : QVariant(scopeVariantToQVariant(*val)), internal_variant_(val)
+QScopeVariant::QScopeVariant(Variant* val) noexcept : QVariant(variant_to_qvariant(*val)), internal_variant_(val)
 {
 }
 
 QScopeVariant::~QScopeVariant() = default;
 
 QScopeVariant::QScopeVariant(QScopeVariant const& other)
-    : QVariant(scopeVariantToQVariant(*other.internal_variant_))
+    : QVariant(variant_to_qvariant(*other.internal_variant_))
     , internal_variant_(other.internal_variant_)
 {
 }
@@ -107,7 +107,7 @@ QScopeVariant& QScopeVariant::operator=(QVariantMap const& val)
     QMapIterator<QString, QVariant> it(val);
     while (it.hasNext())
     {
-        internal_val[it.key().toUtf8().data()] = qVariantToScopeVariant(it.value());
+        internal_val[it.key().toUtf8().data()] = qvariant_to_variant(it.value());
     }
     *internal_variant_ = internal_val;
     return *this;
@@ -115,7 +115,7 @@ QScopeVariant& QScopeVariant::operator=(QVariantMap const& val)
 
 QScopeVariant& QScopeVariant::operator=(QVariant const& val)
 {
-    Variant internal_val = qVariantToScopeVariant(val);
+    Variant internal_val = qvariant_to_variant(val);
     *internal_variant_ = internal_val;
     return *this;
 }
@@ -128,6 +128,6 @@ std::string QScopeVariant::get_string() const
 
 void QScopeVariant::sync()
 {
-    *internal_variant_ = qVariantToScopeVariant(*this);
+    *internal_variant_ = qvariant_to_variant(*this);
 }
 /// @endcond

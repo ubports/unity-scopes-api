@@ -15,7 +15,6 @@
 *
 * Author: Xavi Garcia <xavi.garcia.mena@canonical.com>
 */
-#define _ENABLE_QT_EXPERIMENTAL_
 
 #include <unity/scopes/qt/JsonAsyncReader.h>
 

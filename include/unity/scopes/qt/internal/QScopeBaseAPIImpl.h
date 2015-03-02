@@ -58,8 +58,8 @@ public:
     NONCOPYABLE(QScopeBaseAPIImpl);
     UNITY_DEFINES_PTRS(QScopeBaseAPIImpl);
 
-    QScopeBaseAPIImpl(QScopeBase& qtscope, QObject *parent=0);
-    QScopeBaseAPIImpl(FactoryFunc const& creator, QObject *parent=0);
+    QScopeBaseAPIImpl(QScopeBase& qtscope, QObject* parent = 0);
+    QScopeBaseAPIImpl(FactoryFunc const& creator, QObject* parent = 0);
     virtual ~QScopeBaseAPIImpl();
 
     bool event(QEvent* e) override;

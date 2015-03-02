@@ -24,7 +24,7 @@ using namespace unity::scopes::qt;
 
 TEST(QActionMetadata, bindings)
 {
-    QActionMetadata *metadata = new QActionMetadata("en", "phone");
+    QActionMetadata* metadata = new QActionMetadata("en", "phone");
 
     QVariant data(1999);
 
@@ -50,7 +50,7 @@ TEST(QActionMetadata, bindings)
 
     (*metadata)["test_key3"] = QVariant("test_value3");
     QVariantMap map_hints = metadata->hints();
-    EXPECT_EQ(map_hints.size(),3);
+    EXPECT_EQ(map_hints.size(), 3);
 
     EXPECT_EQ(map_hints["test_key"].toString(), "test_value");
     EXPECT_EQ(map_hints["test_key2"].toString(), "test_value2");
@@ -67,7 +67,7 @@ TEST(QActionMetadata, bindings)
     EXPECT_TRUE(metadata2["test_key2"].toString() == "test_value22");
 
     map_hints = metadata2.hints();
-    EXPECT_EQ(map_hints.size(),3);
+    EXPECT_EQ(map_hints.size(), 3);
 
     EXPECT_EQ(map_hints["test_key"].toString(), "test_value");
     EXPECT_EQ(map_hints["test_key2"].toString(), "test_value22");
