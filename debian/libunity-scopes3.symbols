@@ -424,6 +424,7 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::internal::RuntimeConfig::trace_channels() const@Base" 0.6.11+15.04.20150119
  (c++)"unity::scopes::internal::RuntimeImpl::async_pool() const@Base" 0.4.3+14.10.20140428
  (c++)"unity::scopes::internal::RuntimeImpl::cache_directory() const@Base" 0.6.14+15.04.20150213
+ (c++)"unity::scopes::internal::RuntimeImpl::config_directory() const@Base" 0replaceme
  (c++)"unity::scopes::internal::RuntimeImpl::confined() const@Base" 0.6.8+15.04.20141119
  (c++)"unity::scopes::internal::RuntimeImpl::confinement_type() const@Base" 0.6.8+15.04.20141119
  (c++)"unity::scopes::internal::RuntimeImpl::create(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
@@ -836,6 +837,7 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::SearchMetadata::operator[](std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::SearchMetadata::operator=(unity::scopes::SearchMetadata&&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::SearchMetadata::operator=(unity::scopes::SearchMetadata const&)@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::SearchMetadata::remove_location()@Base" 0replaceme
  (c++)"unity::scopes::SearchMetadata::~SearchMetadata()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::SearchMetadata::SearchMetadata(int, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::SearchMetadata::SearchMetadata(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
