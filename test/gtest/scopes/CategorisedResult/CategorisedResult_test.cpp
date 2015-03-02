@@ -365,10 +365,10 @@ TEST(CategorisedResult, store)
     auto outcat = output_reg.register_category("2", "title", "icon", nullptr, rdr);
 
     CategorisedResult outresult(outcat);
-    outresult.set_uri("uri1");
-    outresult.set_title("title1");
-    outresult.set_art("icon1");
-    outresult.set_dnd_uri("dnduri1");
+    outresult.set_uri("uri2");
+    outresult.set_title("title2");
+    outresult.set_art("icon2");
+    outresult.set_dnd_uri("dnduri2");
 
     EXPECT_THROW(outresult.store(outresult), unity::InvalidArgumentException); // cannot store self
     EXPECT_FALSE(outresult.has_stored_result());
@@ -384,10 +384,10 @@ TEST(CategorisedResult, store)
 
     EXPECT_TRUE(outresult.has_stored_result());
 
-    EXPECT_EQ("uri1", outresult.uri());
-    EXPECT_EQ("title1", outresult.title());
-    EXPECT_EQ("icon1", outresult.art());
-    EXPECT_EQ("dnduri1", outresult.dnd_uri());
+    EXPECT_EQ("uri2", outresult.uri());
+    EXPECT_EQ("title2", outresult.title());
+    EXPECT_EQ("icon2", outresult.art());
+    EXPECT_EQ("dnduri2", outresult.dnd_uri());
     EXPECT_EQ("2", outresult.category()->id());
 
     auto inresult = outresult.retrieve();

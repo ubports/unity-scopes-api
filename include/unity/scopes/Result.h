@@ -229,11 +229,10 @@ public:
     */
     VariantMap serialize() const;
 
-protected:
     /// @cond
+protected:
     explicit Result(const VariantMap &variant_map);
     explicit Result(internal::ResultImpl* impl);
-    /// @endcond
 
 private:
     std::unique_ptr<internal::ResultImpl> p;
@@ -241,6 +240,7 @@ private:
     friend class internal::ResultImpl;
     friend class internal::ScopeImpl;
     friend class CategorisedResult;
+    /// @endcond
 };
 
 } // namespace scopes
