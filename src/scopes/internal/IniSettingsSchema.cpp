@@ -18,9 +18,10 @@
 
 #include <unity/scopes/internal/IniSettingsSchema.h>
 
-#include <unity/UnityExceptions.h>
+#include <unity/scopes/internal/DfltConfig.h>
 
 #include <boost/algorithm/string/predicate.hpp>
+#include <unity/UnityExceptions.h>
 
 #include <cassert>
 
@@ -302,7 +303,7 @@ void IniSettingsSchema::add_location_setting()
     //             Realistically, the shell should not store this user-preference
     //             in the scope's settings database, and should only pay attention to the scope's
     //             LocationDataNeeded metadata attribute.
-    Setting s("internal.location", "boolean", "Enable location data", VariantArray(), Variant(true));
+    Setting s("internal.location", "boolean", "Enable location data", VariantArray(), Variant(DFLT_LOCATION_PERMITTED));
     definitions_.push_back(s.to_schema_definition());
 }
 

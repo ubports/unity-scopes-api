@@ -154,7 +154,6 @@ SettingsDB::SettingsDB(string const& db_path,
     process_all_docs();
 }
 
-
 SettingsDB::~SettingsDB()
 {
     // Tell the thread to stop politely

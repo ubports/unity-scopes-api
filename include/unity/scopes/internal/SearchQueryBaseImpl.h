@@ -63,6 +63,8 @@ public:
     bool valid() const override;
 
 private:
+    static SearchMetadata filter_metadata(ScopeProxy const& scope, SearchMetadata const& metdata);
+
     CannedQuery const canned_query_;
     SearchMetadata const search_metadata_;
 
