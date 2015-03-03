@@ -78,7 +78,7 @@ public:
 
     virtual void finished() override;
 
-    virtual void push_surfacing_results_from_cache() noexcept;
+    virtual void push_surfacing_results_from_cache() noexcept override;
 
 private:
     bool push(Category::SCPtr category);
