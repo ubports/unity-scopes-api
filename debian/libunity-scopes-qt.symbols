@@ -73,7 +73,6 @@ libunity-scopes-qt.so.01 libunity-scopes-qt #MINVER#
  (c++)"unity::scopes::qt::QCannedQuery::has_user_data() const@Base" 0replaceme
  (c++)"unity::scopes::qt::QCannedQuery::operator=(unity::scopes::qt::QCannedQuery&&)@Base" 0.6.13+15.04.20150205.1
  (c++)"unity::scopes::qt::QCannedQuery::operator=(unity::scopes::qt::QCannedQuery const&)@Base" 0.6.13+15.04.20150205.1
- (c++)"unity::scopes::qt::QCannedQuery::user_data() const@Base" 0replaceme
  (c++)"unity::scopes::qt::QCannedQuery::~QCannedQuery()@Base" 0.6.13+15.04.20150205.1
  (c++)"unity::scopes::qt::QCannedQuery::QCannedQuery(QString const&)@Base" 0.6.13+15.04.20150205.1
  (c++)"unity::scopes::qt::QCannedQuery::QCannedQuery(QString const&, QString const&, QString const&)@Base" 0.6.13+15.04.20150205.1
@@ -88,6 +87,7 @@ libunity-scopes-qt.so.01 libunity-scopes-qt #MINVER#
  (c++)"unity::scopes::qt::QCannedQuery::set_filter_state(unity::scopes::FilterState const&)@Base" 0.6.13+15.04.20150205.1
  (c++)"unity::scopes::qt::QCannedQuery::set_query_string(QString const&)@Base" 0.6.13+15.04.20150205.1
  (c++)"unity::scopes::qt::QCannedQuery::to_uri() const@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QCannedQuery::user_data() const@Base" 0replaceme
  (c++)"unity::scopes::qt::QCategorisedResult::category() const@Base" 0.6.13+15.04.20150205.1
  (c++)"unity::scopes::qt::QCategorisedResult::fwd() const@Base" 0.6.13+15.04.20150205.1
  (c++)"unity::scopes::qt::QCategorisedResult::operator=(unity::scopes::qt::QCategorisedResult&&)@Base" 0.6.13+15.04.20150205.1
@@ -236,6 +236,7 @@ libunity-scopes-qt.so.01 libunity-scopes-qt #MINVER#
  (c++)"unity::scopes::qt::QSearchMetadata::QSearchMetadata(QString const&, QString const&)@Base" 0.6.13+15.04.20150205.1
  (c++)"unity::scopes::qt::QSearchMetadata::QSearchMetadata(unity::scopes::qt::QSearchMetadata&&)@Base" 0.6.13+15.04.20150205.1
  (c++)"unity::scopes::qt::QSearchMetadata::QSearchMetadata(unity::scopes::qt::QSearchMetadata const&)@Base" 0.6.13+15.04.20150205.1
+ (c++)"unity::scopes::qt::QSearchMetadata::remove_location()@Base" 0replaceme
  (c++)"unity::scopes::qt::QSearchMetadata::set_cardinality(int)@Base" 0.6.13+15.04.20150205.1
  (c++)"unity::scopes::qt::QSearchMetadata::set_hint(QString const&, QVariant const&)@Base" 0.6.13+15.04.20150205.1
  (c++)"unity::scopes::qt::QSearchMetadata::set_location(unity::scopes::Location const&)@Base" 0.6.13+15.04.20150205.1
