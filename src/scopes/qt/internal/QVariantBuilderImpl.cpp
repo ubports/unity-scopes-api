@@ -17,8 +17,7 @@
  */
 
 #include <unity/scopes/qt/internal/QVariantBuilderImpl.h>
-
-#include <unity/scopes/qt/QUtils.h>
+#include <unity/scopes/qt/internal/QUtils.h>
 
 #include <unity/scopes/VariantBuilder.h>
 
@@ -32,11 +31,8 @@ QVariantBuilderImpl::QVariantBuilderImpl()
 }
 
 QVariantBuilderImpl::QVariantBuilderImpl(QVariantBuilderImpl const& other)
+    : api_builder_(new VariantBuilder(*(other.api_builder_)))
 {
-    if (other.api_builder_ && &other != this)
-    {
-        api_builder_.reset(new VariantBuilder(*(other.api_builder_)));
-    }
 }
 
 void QVariantBuilderImpl::add_tuple(std::initializer_list<QPair<QString, QVariant>> const& tuple)
@@ -45,7 +41,7 @@ void QVariantBuilderImpl::add_tuple(std::initializer_list<QPair<QString, QVarian
     for (auto item : tuple)
     {
         // convert every item to std...
-        aux_vector.push_back(std::make_pair(item.first.toUtf8().data(), qVariantToScopeVariant(item.second)));
+        aux_vector.push_back(std::make_pair(item.first.toUtf8().data(), qvariant_to_variant(item.second)));
     }
     api_builder_->add_tuple(aux_vector);
 }
@@ -56,14 +52,14 @@ void QVariantBuilderImpl::add_tuple(QVector<QPair<QString, QVariant>> const& tup
     for (auto item : tuple)
     {
         // convert every item to std...
-        aux_vector.push_back(std::make_pair(item.first.toUtf8().data(), qVariantToScopeVariant(item.second)));
+        aux_vector.push_back(std::make_pair(item.first.toUtf8().data(), qvariant_to_variant(item.second)));
     }
     api_builder_->add_tuple(aux_vector);
 }
 
 QVariant QVariantBuilderImpl::end()
 {
-    return scopeVariantToQVariant(api_builder_->end());
+    return variant_to_qvariant(api_builder_->end());
 }
 
 QVariantBuilder QVariantBuilderImpl::create(QVariantBuilderImpl* internal)

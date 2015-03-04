@@ -18,6 +18,10 @@
 
 #pragma once
 
+#ifndef _ENABLE_QT_EXPERIMENTAL_
+#error You should define _ENABLE_QT_EXPERIMENTAL_ in order to use this experimental header file.
+#endif
+
 #include <unity/util/DefinesPtrs.h>
 #include <unity/scopes/Location.h>
 
@@ -160,7 +164,6 @@ public:
 private:
     /// @cond
     std::unique_ptr<internal::QSearchMetadataImpl> p;
-    friend class internal::QSearchMetadataImpl;
     /// @endcond
 };
 

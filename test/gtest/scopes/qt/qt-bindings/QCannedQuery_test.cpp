@@ -19,22 +19,23 @@
 #include <gtest/gtest.h>
 
 #include <unity/scopes/qt/QCannedQuery.h>
-#include <unity/scopes/qt/QUtils.h>
 #include <unity/scopes/qt/internal/QCannedQueryImpl.h>
+#include <unity/scopes/qt/internal/QUtils.h>
 
 #include <unity/scopes/CannedQuery.h>
 #include <unity/scopes/FilterState.h>
 #include <unity/scopes/OptionSelectorFilter.h>
 
 using namespace unity::scopes::qt;
+using namespace unity::scopes::qt::internal;
 
 TEST(QCannedQuery, bindings)
 {
-    internal::QCannedQueryImpl *impl = new internal::QCannedQueryImpl("scopeA", "foo", "dep1");
+    internal::QCannedQueryImpl* impl = new internal::QCannedQueryImpl("scopeA", "foo", "dep1");
     QCannedQuery query = internal::QCannedQueryImpl::create(impl);
 
     // get the internal api query
-    unity::scopes::CannedQuery * api_query = impl->get_api_query();
+    unity::scopes::CannedQuery* api_query = impl->get_api_query();
 
     // start checking that the internal class has the right attributes
     EXPECT_EQ(api_query->scope_id(), "scopeA");
@@ -42,11 +43,15 @@ TEST(QCannedQuery, bindings)
     EXPECT_EQ(api_query->department_id(), "dep1");
     EXPECT_EQ(api_query->to_uri(), query.to_uri().toStdString());
 
+    EXPECT_EQ("scopeA", query.scope_id());
+    EXPECT_EQ("foo", query.query_string());
+    EXPECT_EQ("dep1", query.department_id());
+
     unity::scopes::VariantMap api_map = api_query->serialize();
     QVariantMap qt_map = query.serialize();
     EXPECT_EQ(api_map.size(), qt_map.size());
     EXPECT_TRUE(qt_map.size() != 0);
-    EXPECT_EQ(scopeVariantMapToQVariantMap(api_map), qt_map);
+    EXPECT_EQ(variantmap_to_qvariantmap(api_map), qt_map);
 
     unity::scopes::FilterState fstate;
     {
@@ -59,11 +64,18 @@ TEST(QCannedQuery, bindings)
     // filters is {"f1":["o1"]}
     EXPECT_EQ("scope://scopeA?q=foo&dep=dep1&filters=%7B%22f1%22%3A%5B%22o1%22%5D%7D%0A", query.to_uri());
     EXPECT_EQ("scope://scopeA?q=foo&dep=dep1&filters=%7B%22f1%22%3A%5B%22o1%22%5D%7D%0A", api_query->to_uri());
+    auto fs = query.filter_state();
+    EXPECT_TRUE(fs.has_filter("f1"));
+
+    auto q = QCannedQuery::from_uri("scope://scopeX?q=bar&dep=dep2&filters=%7B%22f1%22%3A%5B%22o1%22%5D%7D%0A");
+    EXPECT_EQ("scopeX", q.scope_id());
+    EXPECT_EQ("bar", q.query_string());
+    EXPECT_EQ("dep2", q.department_id());
 
     // build a query with the normal qt interface
     // and check that it has the same data
     QCannedQuery query2("scopeA", "foo", "dep1");
-    EXPECT_EQ(scopeVariantMapToQVariantMap(api_map), query2.serialize());
+    EXPECT_EQ(variantmap_to_qvariantmap(api_map), query2.serialize());
 
     // change a value using the qt interface
     query.set_department_id("new_department");
@@ -71,6 +83,18 @@ TEST(QCannedQuery, bindings)
     // check that the value is the same in the internal instance
     EXPECT_EQ(api_query->department_id(), "new_department");
     EXPECT_EQ(api_query->query_string(), "new_query");
-    EXPECT_EQ(scopeVariantMapToQVariantMap(api_query->serialize()), query.serialize());
+    EXPECT_EQ(variantmap_to_qvariantmap(api_query->serialize()), query.serialize());
+}
 
+TEST(QCannedQuery, construct_assign)
+{
+    QCannedQuery q("scope_id");
+    EXPECT_EQ("scope_id", q.scope_id());
+
+    QCannedQuery q2(q);
+    EXPECT_EQ("scope_id", q2.scope_id());
+
+    QCannedQuery q3("blah");
+    q3 = q2;
+    EXPECT_EQ("scope_id", q3.scope_id());
 }

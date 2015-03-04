@@ -12,8 +12,14 @@ SET(CTEST_CUSTOM_MEMCHECK_IGNORE
     stand-alone-unity-scopes-headers
     stand-alone-unity-scopes-internal-headers
     stand-alone-unity-scopes-testing-headers
+    stand-alone-unity-scopes-utility-headers
+    stand-alone-unity-scopes-utility-internal-headers
+    stand-alone-unity-scopes-qt-headers
+    stand-alone-unity-scopes-qt-internal-headers
     clean-public-unity-scopes-headers
     clean-public-unity-scopes-testing-headers
+    clean-public-unity-scopes-utility-headers
+    clean-public-unity-scopes-qt-headers
     IsolatedScopeBenchmark                      # Runs too slowly and crashes valgrind 3.10.0 with g++-4.9
     copyright
     whitespace)

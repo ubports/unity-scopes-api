@@ -18,6 +18,10 @@
 
 #pragma once
 
+#ifndef _ENABLE_QT_EXPERIMENTAL_
+#error You should define _ENABLE_QT_EXPERIMENTAL_ in order to use this experimental header file.
+#endif
+
 #include <unity/util/DefinesPtrs.h>
 #include <unity/util/NonCopyable.h>
 #include <unity/scopes/SearchReply.h>
@@ -153,7 +157,6 @@ private:
     QSearchReply(unity::scopes::SearchReplyProxy& reply, QObject* parent = 0);
 
     std::unique_ptr<internal::QSearchReplyImpl> p;
-    friend class internal::QSearchReplyImpl;
     friend class QSearchQueryBaseAPI;
 };
 

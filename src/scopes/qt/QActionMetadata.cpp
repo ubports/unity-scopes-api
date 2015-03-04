@@ -32,7 +32,7 @@ QActionMetadata::QActionMetadata(QString const& locale, QString const& form_fact
 }
 
 QActionMetadata::QActionMetadata(internal::QActionMetadataImpl* impl)
-    : p(new internal::QActionMetadataImpl(*impl))
+    : p(impl)
 {
 }
 

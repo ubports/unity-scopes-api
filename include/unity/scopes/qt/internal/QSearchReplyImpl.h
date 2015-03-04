@@ -52,96 +52,17 @@ class QSearchReplyImpl
     friend class unity::scopes::qt::QSearchReply;
 
 public:
-    /// @cond
     NONCOPYABLE(QSearchReplyImpl);
     UNITY_DEFINES_PTRS(QSearchReplyImpl);
-    /// @endcond
-    /**
-    \brief Destroys a QSearchReplyImpl.
-    */
+
     virtual ~QSearchReplyImpl();
-
-    /**
-     \brief Register departments for the current search reply and provide the current department.
-
-     Departments are optional. If scope supports departments, it is expected to register departments on every search as
-     follows:
-
-      <ul>
-      <li>create a Department node for current department and attach to it a list of its subdepartments (unless current
-     department is a leaf department) using
-      unity::scopes::Department::set_subdepartments() method. For every subdepartment on the list set
-     "has_subdepartments" flag if applicable.
-      <li>provide an alternate label for current department with unity::scopes::Department::set_alternate_label().
-      <li>create a Department node for parent of current department (if applicable - not when in root department), and
-     attach current Department node to it with
-      unity::scopes::Department::set_subdepartments() method.
-      <li>register the parent department with unity::scopes::SearchReply::register_departments().
-      </ul>
-
-     For example, assuming the user is visiting a "History" department in "Books", and "History" has sub-departments
-     such as "World War Two" and "Ancient", the code
-     that registers departments for current search in "History" may look like this:
-     \code{.cpp}
-     unity::scopes::Department::SPtr books = move(unity::scopes::Department::create("books", query, "Books")); // the
-     parent of "History"
-     unity::scopes::Department::SPtr history = move(unity::scopes::Department::create("history", query, "History"));
-     unity::scopes::DepartmentList history_depts({
-                                                 move(unity::scopes::Department::create("ww2", query, "World War Two")),
-                                                 move(unity::scopes::Department::create("ancient", query, "Ancient"))});
-     history->set_subdepartments(history_depts);
-     books->set_subdepartments({history});
-     reply->register_departments(books);
-     \endcode
-
-     Current department should be the department returned by unity::scopes::CannedQuery::department_id(). Empty
-     department id denotes
-     the root deparment.
-
-     \param parent The parent department of current department, or current one if visiting root department.
-     \throws unity::LogicException if departments are invalid (nullptr passed, current department not present in the
-     parent's tree, duplicated department ids present in the tree).
-     */
     virtual void register_departments(QDepartment::SCPtr const& parent);
-
-    /**
-    \brief Register new category and send it to the source of the query.
-
-    \param id The identifier of the category
-    \param title The title of the category
-    \param icon The icon of the category
-    \param renderer_template The renderer template to be used for results in this category
-
-    \return The category instance
-    \throws unity::scopes::InvalidArgumentException if category with that id has already been registered.
-    */
     QCategory::SCPtr register_category(
         QString const& id,
         QString const& title,
         QString const& icon,
         unity::scopes::CategoryRenderer const& renderer_template = unity::scopes::CategoryRenderer());
-
-    /**
-    \brief Sends a single result to the source of a query.
-
-    Any calls to push() after finished() was called are ignored.
-    \return The return value is true if the result was accepted, false otherwise.
-    A false return value can be due to finished() having been called earlier,
-    or the client that sent the query having cancelled that query. The return
-    value is false also if the query has a cardinality limit and is reached
-    or exceeded. (The return value is false for the last valid push and
-    subsequent pushes.)
-    */
     bool push(QCategorisedResult const& result);
-
-    /**
-    \brief Informs the source of a query that the query was terminated due to an error.
-
-    Multiple calls to error() and calls to finished() after error() was called are ignored.
-    \param ex An exception_ptr indicating the cause of the error. If ex is a `std::exception`,
-              the return value of `what()` is made available to the query source. Otherwise,
-              the query source receives `"unknown exception"`.
-    */
     void error(std::exception_ptr ex);
 
 protected:

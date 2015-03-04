@@ -70,6 +70,8 @@ public:
     FilterState filter_state() const;
     QVariantMap serialize() const;
     QString to_uri() const;
+    bool has_user_data() const;
+    QVariant user_data() const;
     static QCannedQuery from_uri(QString const& uri);
 
     // added for testing purposes

@@ -24,17 +24,19 @@
 
 #include <QtCore/QThread>
 
+#include <mutex>
+
 class QScopeMock : public QScope
 {
 public:
     QScopeMock()
-        : QScope(),
-          qt_thread(nullptr)
-    {};
+        : QScope()
+        , qt_thread_(nullptr){};
 
-    void setQtThread(QThread *thread)
+    void set_qt_thread(QThread* thread)
     {
-        qt_thread = thread;
+        std::lock_guard<std::mutex> lock(mutex_);
+        qt_thread_ = thread;
     }
 
     MOCK_METHOD1(start, void(QString const&));
@@ -42,17 +44,20 @@ public:
     virtual unity::scopes::qt::QPreviewQueryBase::UPtr preview(const unity::scopes::qt::QResult&,
                                                                const unity::scopes::qt::QActionMetadata&) override
     {
-        EXPECT_EQ(QThread::currentThread(),qt_thread);
+        std::lock_guard<std::mutex> lock(mutex_);
+        EXPECT_EQ(QThread::currentThread(), qt_thread_);
         return unity::scopes::qt::QPreviewQueryBase::UPtr(new QPreview());
     }
 
     virtual unity::scopes::qt::QSearchQueryBase::UPtr search(unity::scopes::CannedQuery const&,
-                                          unity::scopes::SearchMetadata const&) override
+                                                             unity::scopes::SearchMetadata const&) override
     {
-        EXPECT_EQ(QThread::currentThread(),qt_thread);
+        std::lock_guard<std::mutex> lock(mutex_);
+        EXPECT_EQ(QThread::currentThread(), qt_thread_);
         return unity::scopes::qt::QSearchQueryBase::UPtr(new QQuery());
     }
 
 protected:
-    QThread *qt_thread;
+    QThread* qt_thread_;
+    std::mutex mutex_;
 };

@@ -48,49 +48,20 @@ class QPreviewReply;
 namespace internal
 {
 
-/**
-\brief Allows the results of a preview to be sent to the preview requester.
-*/
-
 class QPreviewReplyImpl
 {
 public:
-    /// @cond
     NONCOPYABLE(QPreviewReplyImpl);
     UNITY_DEFINES_PTRS(QPreviewReplyImpl);
-    /// @endcond
-    /**
-    \brief Registers a list of column layouts for the current preview.
 
-    Layouts must be registered before pushing a unity::scopes::PreviewWidgetList, and must be
-    registered only once.
-    \return True if the query is still alive, false if the query failed or was cancelled.
-    \throws unity::LogicException register_layout() is called more than once.
-    */
+    virtual ~QPreviewReplyImpl();
+
     bool register_layout(QColumnLayoutList const& layouts);
-
-    /**
-    \brief Sends widget definitions to the sender of the preview query.
-
-    This method can be called mutiple times to send widgets in stages.
-    \return True if the query is still alive, false if the query failed or was cancelled.
-    */
     bool push(QPreviewWidgetList const& widget_list);
-
-    /**
-    \brief Sends data for a preview widget attribute.
-    \return True if the query is still alive, false if the query failed or was cancelled.
-    */
     bool push(QString const& key, QVariant const& value);
 
-    /// @cond
-    virtual ~QPreviewReplyImpl();
-    /// @endcond
-
 protected:
-    /// @cond
     QPreviewReplyImpl(unity::scopes::PreviewReplyProxy& reply);
-    /// @endcond
 
 private:
     PreviewReplyProxy api_reply_;
