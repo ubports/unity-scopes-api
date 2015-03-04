@@ -62,6 +62,7 @@ public:
     void set_location(Location const& location);
     Location location() const;
     bool has_location() const;
+    void remove_location();
     void set_hint(QString const& key, QVariant const& value);
     QVariantMap hints() const;
     bool contains_hint(QString const& key) const;

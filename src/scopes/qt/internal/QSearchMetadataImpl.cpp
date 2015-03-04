@@ -80,7 +80,14 @@ Location QSearchMetadataImpl::location() const
 
 bool QSearchMetadataImpl::has_location() const
 {
+    sync_values();
     return api_search_metadata_->has_location();
+}
+
+void QSearchMetadataImpl::remove_location()
+{
+    sync_values();
+    api_search_metadata_->remove_location();
 }
 
 void QSearchMetadataImpl::set_hint(QString const& key, QVariant const& value)
