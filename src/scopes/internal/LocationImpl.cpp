@@ -46,6 +46,7 @@ LocationImpl::LocationImpl(const VariantMap& variant_map)
 
 LocationImpl::LocationImpl(LocationImpl const& other)
     : altitude_(other.altitude_)
+    , area_code_(other.area_code_)
     , city_(other.city_)
     , country_code_(other.country_code_)
     , country_name_(other.country_name_)
