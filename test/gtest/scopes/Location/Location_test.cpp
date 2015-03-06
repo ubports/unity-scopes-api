@@ -212,6 +212,21 @@ TEST_F(LocationTest, test_assignment)
     EXPECT_EQ("region name", loc2.region_name());
     EXPECT_DOUBLE_EQ(4.0, loc2.vertical_accuracy());
     EXPECT_EQ("zip postal code", loc2.zip_postal_code());
+
+    Location loc3(5.0, 6.0);
+    loc3 = loc;
+    EXPECT_DOUBLE_EQ(5.0, loc3.latitude());
+    EXPECT_DOUBLE_EQ(6.0, loc3.longitude());
+    EXPECT_DOUBLE_EQ(20.0, loc3.altitude());
+    EXPECT_EQ("area code", loc3.area_code());
+    EXPECT_EQ("city", loc3.city());
+    EXPECT_EQ("country code", loc3.country_code());
+    EXPECT_EQ("country name", loc3.country_name());
+    EXPECT_DOUBLE_EQ(25.0, loc3.horizontal_accuracy());
+    EXPECT_EQ("region code", loc3.region_code());
+    EXPECT_EQ("region name", loc3.region_name());
+    EXPECT_DOUBLE_EQ(4.0, loc3.vertical_accuracy());
+    EXPECT_EQ("zip postal code", loc3.zip_postal_code());
 }
 
 }
