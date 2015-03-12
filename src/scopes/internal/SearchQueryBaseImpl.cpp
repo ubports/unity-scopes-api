@@ -85,24 +85,24 @@ QueryCtrlProxy SearchQueryBaseImpl::subsearch(ScopeProxy const& scope,
         return query_ctrl;  // Loop was detected, return dummy QueryCtrlProxy.
     }
 
-    // TODO: HACK: Strip location info from metadata if the child isn't allowed to see it.
-    //             We need to remove this once a scope is able to do this itself.
-    SearchMetadata clean_metadata = filter_metadata(scope, metadata);
-
-    // scope_impl can be nullptr if we use a mock scope: TypedScopeFixture<testing::Scope>
+    // scope_impl can be nullptr if we use a mock scope: TypedScopeFixture<testing::Scope>.
     // If so, we call the normal search without passing the history through because
     // we don't need loop detection for mock scopes.
     auto scope_impl = dynamic_pointer_cast<ScopeImpl>(scope);
     if (scope_impl)
     {
+        // TODO: HACK: Strip location info from metadata if the child isn't allowed to see it.
+        //             We need to remove this once a scope is able to do this itself.
+        SearchMetadata clean_metadata = filter_metadata(scope_impl, metadata);
+
         query_ctrl = scope_impl->search(query_string, department_id, filter_state, std::move(user_data), clean_metadata,
                                         history_, reply);
     }
     else
     {
         query_ctrl = user_data ?
-                         scope->search(query_string, department_id, filter_state, *user_data, clean_metadata, reply) :
-                         scope->search(query_string, department_id, filter_state, clean_metadata, reply);
+                         scope->search(query_string, department_id, filter_state, *user_data, metadata, reply) :
+                         scope->search(query_string, department_id, filter_state, metadata, reply);
     }
 
     lock_guard<mutex> lock(mutex_);
@@ -223,8 +223,10 @@ SearchMetadata strip_location(SearchMetadata const& metadata)
 // Return a copy of the metadata without location information if the scope isn't alloweed
 // to get location data. Otherwise, return the metadata unchanged.
 
-SearchMetadata SearchQueryBaseImpl::filter_metadata(ScopeProxy const& scope, SearchMetadata const& metadata)
+SearchMetadata SearchQueryBaseImpl::filter_metadata(shared_ptr<ScopeImpl>const& scope, SearchMetadata const& metadata)
 {
+    assert(scope);
+
     namespace fs = boost::filesystem;
 
     if (!metadata.has_location())
@@ -232,7 +234,7 @@ SearchMetadata SearchQueryBaseImpl::filter_metadata(ScopeProxy const& scope, Sea
         return metadata;  // Nothing to strip in the first place.
     }
 
-    static string config_dir(dynamic_pointer_cast<ScopeImpl>(scope)->runtime()->config_directory());
+    static string config_dir(scope->runtime()->config_directory());
 
     // We cache the write time and the setting for each scope,
     // so we re-parse the settings file only if it has changed.
