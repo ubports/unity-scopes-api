@@ -91,6 +91,11 @@ bool SearchMetadataImpl::has_location() const
     return bool(location_);
 }
 
+void SearchMetadataImpl::remove_location()
+{
+    location_ = boost::none;
+}
+
 std::string SearchMetadataImpl::metadata_type() const
 {
     static const std::string t("search_metadata");

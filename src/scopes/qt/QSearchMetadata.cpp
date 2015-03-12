@@ -69,6 +69,11 @@ bool QSearchMetadata::has_location() const
     return p->has_location();
 }
 
+void QSearchMetadata::remove_location()
+{
+    p->remove_location();
+}
+
 void QSearchMetadata::set_hint(QString const& key, QVariant const& value)
 {
     p->set_hint(key, value);
