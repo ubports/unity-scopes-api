@@ -94,7 +94,7 @@ def compare_syms(old_file, new_file):
     # the sort | uniq because, otherwise, we end up with duplicate demangled symbols.
     try:
         with open(new_file) as infile, open('new_symbols', 'w') as outfile:
-            p = subprocess.Popen(['LC_ALL=en-US c++filt | sort | uniq'], shell=True, stdin=infile, stdout=subprocess.PIPE)
+            p = subprocess.Popen(['c++filt | LC_ALL=en_US.UTF-8 sort | uniq'], shell=True, stdin=infile, stdout=subprocess.PIPE)
 
             # For each symbol, if it is in the old dictionary, output the tags from the original
             # symbol file, followed by the symbol and version. Otherwise, use "(c++)" as the tag
