@@ -43,8 +43,8 @@ public:
     ChildScopesRepository(std::string const& repo_file_path,
                           boost::log::sources::severity_channel_logger_mt<>& logger);
 
-    ChildScopeList child_scopes_ordered(ChildScopeList const& child_scopes_unordered);
-    bool set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered);
+    ChildScopeList child_scopes(ChildScopeList const& child_scopes_unordered);
+    bool set_child_scopes(ChildScopeList const& child_scopes);
 
 private:
     bool write_repo(ChildScopeList const& child_scopes_list);

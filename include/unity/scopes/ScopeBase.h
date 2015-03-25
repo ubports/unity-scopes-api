@@ -331,13 +331,16 @@ public:
     virtual VariantMap settings() const final;
 
     /**
-    \brief Returns a list of child scopes aggregated by this scope.
+    \brief Returns a defaulted list of child scopes aggregated by this scope.
 
     The scope author must ensure that the list returned by this method contains all scopes
-    that this aggregator may collect results from.
+    that this aggregator may collect results from. The "enabled" state for each child
+    returned should be set to a default value (i.e. whether the child is enabled or
+    disabled by default when newly discovered).
 
     The default behaviour of this method is to simply return all available scopes on the
-    system. This translates to: "Any scope may potentially be aggregated by this scope".
+    system in disabled state. This translates to: "Any scope may potentially be aggregated
+    by this scope".
 
     \note Only aggregator scopes should implement this method.
 
@@ -346,15 +349,14 @@ public:
     virtual ChildScopeList find_child_scopes() const;
 
     /**
-    \brief Returns a list of child scopes aggregated by this scope in user-defined order.
+    \brief Returns the current list of child scopes aggregated by this scope.
 
-    An aggregator scope must push its results in the order specified by this method's
-    return value. The aggregator should also respect the "enabled" states of each child
-    scope, returning results only for the child scopes that are enabled.
+    An aggregator should respect the "enabled" states of each child scope, returning
+    results only for the child scopes that are enabled.
 
-    \return The list of child scopes aggregated by this scope in user-defined order.
+    \return The list of child scopes aggregated by this scope.
     */
-    virtual ChildScopeList child_scopes_ordered() const final;
+    virtual ChildScopeList child_scopes() const final;
 
 protected:
     /// @cond

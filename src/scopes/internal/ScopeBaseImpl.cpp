@@ -201,24 +201,24 @@ ChildScopeList ScopeBaseImpl::find_child_scopes() const
     return return_list;
 }
 
-ChildScopeList ScopeBaseImpl::child_scopes_ordered(ChildScopeList const& child_scopes_unordered) const
+ChildScopeList ScopeBaseImpl::child_scopes(ChildScopeList const& child_scopes_unordered) const
 {
     lock_guard<mutex> lock(mutex_);
     if (!child_scopes_repo_initialized_)
     {
-        throw LogicException("ScopeBase::child_scopes_ordered() cannot be called from constructor");
+        throw LogicException("ScopeBase::child_scopes() cannot be called from constructor");
     }
-    return child_scopes_repo_ ? child_scopes_repo_->child_scopes_ordered(child_scopes_unordered) : ChildScopeList();
+    return child_scopes_repo_ ? child_scopes_repo_->child_scopes(child_scopes_unordered) : ChildScopeList();
 }
 
-bool ScopeBaseImpl::set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered)
+bool ScopeBaseImpl::set_child_scopes(ChildScopeList const& child_scopes)
 {
     lock_guard<mutex> lock(mutex_);
     if (!child_scopes_repo_initialized_)
     {
-        throw LogicException("ScopeBase::set_child_scopes_ordered() cannot be called from constructor");
+        throw LogicException("ScopeBase::set_child_scopes() cannot be called from constructor");
     }
-    return child_scopes_repo_ ? child_scopes_repo_->set_child_scopes_ordered(child_scopes_ordered) : false;
+    return child_scopes_repo_ ? child_scopes_repo_->set_child_scopes(child_scopes) : false;
 }
 
 } // namespace internal

@@ -107,9 +107,9 @@ ChildScopeList ScopeBase::find_child_scopes() const
     return p->find_child_scopes();
 }
 
-ChildScopeList ScopeBase::child_scopes_ordered() const
+ChildScopeList ScopeBase::child_scopes() const
 {
-    return p->child_scopes_ordered(find_child_scopes());
+    return p->child_scopes(find_child_scopes());
 }
 
 } // namespace scopes

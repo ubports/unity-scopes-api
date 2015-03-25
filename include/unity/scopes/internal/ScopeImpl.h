@@ -92,8 +92,8 @@ public:
                                    ActionMetadata const& hints,
                                    PreviewListenerBase::SPtr const& reply) override;
 
-    virtual ChildScopeList child_scopes_ordered() override;
-    virtual bool set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered) override;
+    virtual ChildScopeList child_scopes() override;
+    virtual bool set_child_scopes(ChildScopeList const& child_scopes) override;
 
     static ScopeProxy create(MWScopeProxy const& mw_proxy, std::string const& scope_id);
 

@@ -257,14 +257,14 @@ MWQueryCtrlProxy ScopeObject::preview(Result const& result,
     );
 }
 
-ChildScopeList ScopeObject::child_scopes_ordered() const
+ChildScopeList ScopeObject::child_scopes() const
 {
-    return scope_base_->child_scopes_ordered();
+    return scope_base_->child_scopes();
 }
 
-bool ScopeObject::set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered)
+bool ScopeObject::set_child_scopes(ChildScopeList const& child_scopes)
 {
-    return scope_base_->p->set_child_scopes_ordered(child_scopes_ordered);
+    return scope_base_->p->set_child_scopes(child_scopes);
 }
 
 bool ScopeObject::debug_mode() const
