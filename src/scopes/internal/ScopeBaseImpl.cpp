@@ -181,7 +181,7 @@ void ScopeBaseImpl::set_child_scopes_repo(std::shared_ptr<ChildScopesRepository>
     child_scopes_repo_initialized_ = true;
 }
 
-ChildScopeList ScopeBaseImpl::child_scopes() const
+ChildScopeList ScopeBaseImpl::find_child_scopes() const
 {
     // Get a copy of the registry proxy
     RegistryProxy reg = registry();

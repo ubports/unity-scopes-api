@@ -142,7 +142,7 @@ TEST_F(ChildScopesTest, get_set_ordered_list)
     // Start TestScope
     start_test_scope();
 
-    // 1st TestScope::child_scopes() returns: "A,B,C"
+    // 1st TestScope::find_child_scopes() returns: "A,B,C"
     // No order has been set yet, so we should just get: "A,B,C"
     ChildScopeList return_list = test_scope->child_scopes_ordered();
     EXPECT_EQ(3, return_list.size());
@@ -162,7 +162,7 @@ TEST_F(ChildScopesTest, get_set_ordered_list)
     list.push_back({"ScopeA", true});
     EXPECT_TRUE(test_scope->set_child_scopes_ordered(list));
 
-    // 2nd TestScope::child_scopes() returns: "D,A,B,C,E"
+    // 2nd TestScope::find_child_scopes() returns: "D,A,B,C,E"
     // with order: "B,E,A", we should get: "B,E,A,D,C"
     return_list = test_scope->child_scopes_ordered();
     EXPECT_EQ(5, return_list.size());
@@ -181,7 +181,7 @@ TEST_F(ChildScopesTest, get_set_ordered_list)
     EXPECT_EQ("ScopeC", return_list.front().id);
     EXPECT_TRUE(return_list.front().enabled);
 
-    // 3rd+ TestScope::child_scopes() returns: "D,A,B"
+    // 3rd+ TestScope::find_child_scopes() returns: "D,A,B"
     // with order: "B,E,A,D,C", we should get: "B,A,D"
     return_list = test_scope->child_scopes_ordered();
     EXPECT_EQ(3, return_list.size());
@@ -202,7 +202,7 @@ TEST_F(ChildScopesTest, get_set_ordered_list)
     list.push_back({"ScopeA", false});
     EXPECT_TRUE(test_scope->set_child_scopes_ordered(list));
 
-    // 3rd+ TestScope::child_scopes() returns: "D,A,B"
+    // 3rd+ TestScope::find_child_scopes() returns: "D,A,B"
     // with order: "B,D,X,A", we should get: "B,D,A"
     return_list = test_scope->child_scopes_ordered();
     return_list = test_scope->child_scopes_ordered();
@@ -223,7 +223,7 @@ TEST_F(ChildScopesTest, existing_config)
     // Start TestScope
     start_test_scope();
 
-    // 1st TestScope::child_scopes() returns: "A,B,C"
+    // 1st TestScope::find_child_scopes() returns: "A,B,C"
     // with order: "B,D,A" (from previous test), we should get: "B,A,C"
     ChildScopeList return_list = test_scope->child_scopes_ordered();
     EXPECT_EQ(3, return_list.size());
@@ -252,7 +252,7 @@ TEST_F(ChildScopesTest, no_config_dir)
     list.push_back({"ScopeC", true});
     EXPECT_FALSE(test_scope->set_child_scopes_ordered(list));
 
-    // 1st TestScope::child_scopes() returns: "A,B,C"
+    // 1st TestScope::find_child_scopes() returns: "A,B,C"
     // No order was set, so we should just get: "A,B,C"
     ChildScopeList return_list = test_scope->child_scopes_ordered();
     EXPECT_EQ(3, return_list.size());
@@ -276,7 +276,7 @@ TEST_F(ChildScopesTest, corrupted_config)
     write_partially_corrupt_config();
     start_test_scope();
 
-    // 1st TestScope::child_scopes() returns: "A,B,C"
+    // 1st TestScope::find_child_scopes() returns: "A,B,C"
     // with partial order: "B", we should get: "B,A,C"
     ChildScopeList return_list = test_scope->child_scopes_ordered();
     EXPECT_EQ(3, return_list.size());

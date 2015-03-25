@@ -334,8 +334,7 @@ public:
     \brief Returns a list of child scopes aggregated by this scope.
 
     The scope author must ensure that the list returned by this method contains all scopes
-    that this aggregator may collect results from. This list may contain scopes that are
-    not currently installed and are optional for proper functioning of this scope.
+    that this aggregator may collect results from.
 
     The default behaviour of this method is to simply return all available scopes on the
     system. This translates to: "Any scope may potentially be aggregated by this scope".
@@ -344,7 +343,7 @@ public:
 
     \return The list of child scopes aggregated by this scope.
     */
-    virtual ChildScopeList child_scopes() const;
+    virtual ChildScopeList find_child_scopes() const;
 
     /**
     \brief Returns a list of child scopes aggregated by this scope in user-defined order.

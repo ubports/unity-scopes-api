@@ -39,9 +39,9 @@ public:
         return nullptr;
     }
 
-    ChildScopeList child_scopes() const override
+    ChildScopeList find_child_scopes() const override
     {
-        // 1st TestScope::child_scopes() returns: "A,B,C"
+        // 1st TestScope::find_child_scopes() returns: "A,B,C"
         if (i == 0)
         {
             ChildScopeList list;
@@ -51,7 +51,7 @@ public:
             ++i;
             return list;
         }
-        // 2nd TestScope::child_scopes() returns: "D,A,B,C,E"
+        // 2nd TestScope::find_child_scopes() returns: "D,A,B,C,E"
         else if (i == 1)
         {
             ChildScopeList list;
@@ -63,7 +63,7 @@ public:
             ++i;
             return list;
         }
-        // 3rd+ TestScope::child_scopes() returns: D,A,B
+        // 3rd+ TestScope::find_child_scopes() returns: D,A,B
         else
         {
             ChildScopeList list;

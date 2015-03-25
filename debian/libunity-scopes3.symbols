@@ -780,7 +780,7 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::ScopeBase::activate(unity::scopes::Result const&, unity::scopes::ActionMetadata const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ScopeBase::app_directory() const@Base" 0.6.9+15.04.20141129
  (c++)"unity::scopes::ScopeBase::cache_directory() const@Base" 0.6.0+14.10.20140804.1
- (c++)"unity::scopes::ScopeBase::child_scopes() const@Base" 0.6.12+15.04.20150127.2
+ (c++)"unity::scopes::ScopeBase::find_child_scopes() const@Base" 0.6.12+15.04.20150127.2
  (c++)"unity::scopes::ScopeBase::child_scopes_ordered() const@Base" 0.6.12+15.04.20150127.2
  (c++)"unity::scopes::ScopeBase::perform_action(unity::scopes::Result const&, unity::scopes::ActionMetadata const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ScopeBase::registry() const@Base" 0.6.0+14.10.20140804.1
