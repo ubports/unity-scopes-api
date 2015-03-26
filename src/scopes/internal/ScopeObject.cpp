@@ -158,6 +158,7 @@ MWQueryCtrlProxy ScopeObject::search(CannedQuery const& q,
                  info.mw,
                  "search",
                  [&q, &hints, &context, this]() -> SearchQueryBase::UPtr {
+                      ///! call child_scopes and insert keyword info into hints here
                       auto search_query = this->scope_base_->search(q, hints);
                       search_query->set_department_id(q.department_id());
 

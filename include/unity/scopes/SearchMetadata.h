@@ -109,6 +109,18 @@ public:
     bool has_location() const;
 
     /**
+    \brief Check if this search request originated from an aggregator scope.
+    \return True if this search request originated from an aggregator scope.
+    */
+    bool is_aggregated() const;
+
+    /**
+    \brief Get a list of scope keywords used to initiate this search request.
+    \return A list of scope keywords used to initiate this search request.
+    */
+    std::vector<std::string> aggregated_keywords() const;
+
+    /**
     \brief Sets a hint.
 
     \param key The name of the hint.

@@ -91,6 +91,16 @@ bool SearchMetadataImpl::has_location() const
     return bool(location_);
 }
 
+bool SearchMetadataImpl::is_aggregated() const
+{
+    return false;///!
+}
+
+std::vector<std::string> SearchMetadataImpl::aggregated_keywords() const
+{
+    return std::vector<std::string>();///!
+}
+
 std::string SearchMetadataImpl::metadata_type() const
 {
     static const std::string t("search_metadata");

@@ -54,6 +54,9 @@ public:
     Location location() const;
     bool has_location() const;
 
+    bool is_aggregated() const;
+    std::vector<std::string> aggregated_keywords() const;
+
     virtual VariantMap serialize() const override;
 
     static SearchMetadata create(VariantMap const& var);
