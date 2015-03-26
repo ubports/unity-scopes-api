@@ -145,15 +145,13 @@ TEST_F(ChildScopesTest, get_set_ordered_list)
     // 1st TestScope::find_child_scopes() returns: "A,B,C"
     // No order has been set yet, so we should just get: "A,B,C"
     ChildScopeList return_list = test_scope->child_scopes();
-    EXPECT_EQ(3, return_list.size());
-    EXPECT_EQ("ScopeA", return_list.front().id);
-    EXPECT_FALSE(return_list.front().enabled);
-    return_list.pop_front();
-    EXPECT_EQ("ScopeB", return_list.front().id);
-    EXPECT_FALSE(return_list.front().enabled);
-    return_list.pop_front();
-    EXPECT_EQ("ScopeC", return_list.front().id);
-    EXPECT_TRUE(return_list.front().enabled);
+    ASSERT_EQ(3, return_list.size());
+    EXPECT_EQ("ScopeA", return_list[0].id);
+    EXPECT_FALSE(return_list[0].enabled);
+    EXPECT_EQ("ScopeB", return_list[1].id);
+    EXPECT_FALSE(return_list[1].enabled);
+    EXPECT_EQ("ScopeC", return_list[2].id);
+    EXPECT_TRUE(return_list[2].enabled);
 
     // Set order to: "B,E,A"
     ChildScopeList list;
@@ -165,34 +163,28 @@ TEST_F(ChildScopesTest, get_set_ordered_list)
     // 2nd TestScope::find_child_scopes() returns: "D,A,B,C,E"
     // with order: "B,E,A", we should get: "B,E,A,D,C"
     return_list = test_scope->child_scopes();
-    EXPECT_EQ(5, return_list.size());
-    EXPECT_EQ("ScopeB", return_list.front().id);
-    EXPECT_FALSE(return_list.front().enabled);
-    return_list.pop_front();
-    EXPECT_EQ("ScopeE", return_list.front().id);
-    EXPECT_FALSE(return_list.front().enabled);
-    return_list.pop_front();
-    EXPECT_EQ("ScopeA", return_list.front().id);
-    EXPECT_TRUE(return_list.front().enabled);
-    return_list.pop_front();
-    EXPECT_EQ("ScopeD", return_list.front().id);
-    EXPECT_FALSE(return_list.front().enabled);
-    return_list.pop_front();
-    EXPECT_EQ("ScopeC", return_list.front().id);
-    EXPECT_TRUE(return_list.front().enabled);
+    ASSERT_EQ(5, return_list.size());
+    EXPECT_EQ("ScopeB", return_list[0].id);
+    EXPECT_FALSE(return_list[0].enabled);
+    EXPECT_EQ("ScopeE", return_list[1].id);
+    EXPECT_FALSE(return_list[1].enabled);
+    EXPECT_EQ("ScopeA", return_list[2].id);
+    EXPECT_TRUE(return_list[2].enabled);
+    EXPECT_EQ("ScopeD", return_list[3].id);
+    EXPECT_FALSE(return_list[3].enabled);
+    EXPECT_EQ("ScopeC", return_list[4].id);
+    EXPECT_TRUE(return_list[4].enabled);
 
     // 3rd+ TestScope::find_child_scopes() returns: "D,A,B"
     // with order: "B,E,A,D,C", we should get: "B,A,D"
     return_list = test_scope->child_scopes();
-    EXPECT_EQ(3, return_list.size());
-    EXPECT_EQ("ScopeB", return_list.front().id);
-    EXPECT_FALSE(return_list.front().enabled);
-    return_list.pop_front();
-    EXPECT_EQ("ScopeA", return_list.front().id);
-    EXPECT_TRUE(return_list.front().enabled);
-    return_list.pop_front();
-    EXPECT_EQ("ScopeD", return_list.front().id);
-    EXPECT_FALSE(return_list.front().enabled);
+    ASSERT_EQ(3, return_list.size());
+    EXPECT_EQ("ScopeB", return_list[0].id);
+    EXPECT_FALSE(return_list[0].enabled);
+    EXPECT_EQ("ScopeA", return_list[1].id);
+    EXPECT_TRUE(return_list[1].enabled);
+    EXPECT_EQ("ScopeD", return_list[2].id);
+    EXPECT_FALSE(return_list[2].enabled);
 
     // Set order to: "B,D,X,A"
     list.clear();
@@ -206,15 +198,13 @@ TEST_F(ChildScopesTest, get_set_ordered_list)
     // with order: "B,D,X,A", we should get: "B,D,A"
     return_list = test_scope->child_scopes();
     return_list = test_scope->child_scopes();
-    EXPECT_EQ(3, return_list.size());
-    EXPECT_EQ("ScopeB", return_list.front().id);
-    EXPECT_FALSE(return_list.front().enabled);
-    return_list.pop_front();
-    EXPECT_EQ("ScopeD", return_list.front().id);
-    EXPECT_TRUE(return_list.front().enabled);
-    return_list.pop_front();
-    EXPECT_EQ("ScopeA", return_list.front().id);
-    EXPECT_FALSE(return_list.front().enabled);
+    ASSERT_EQ(3, return_list.size());
+    EXPECT_EQ("ScopeB", return_list[0].id);
+    EXPECT_FALSE(return_list[0].enabled);
+    EXPECT_EQ("ScopeD", return_list[1].id);
+    EXPECT_TRUE(return_list[1].enabled);
+    EXPECT_EQ("ScopeA", return_list[2].id);
+    EXPECT_FALSE(return_list[2].enabled);
 }
 
 TEST_F(ChildScopesTest, existing_config)
@@ -226,15 +216,13 @@ TEST_F(ChildScopesTest, existing_config)
     // 1st TestScope::find_child_scopes() returns: "A,B,C"
     // with order: "B,D,A" (from previous test), we should get: "B,A,C"
     ChildScopeList return_list = test_scope->child_scopes();
-    EXPECT_EQ(3, return_list.size());
-    EXPECT_EQ("ScopeB", return_list.front().id);
-    EXPECT_FALSE(return_list.front().enabled);
-    return_list.pop_front();
-    EXPECT_EQ("ScopeA", return_list.front().id);
-    EXPECT_FALSE(return_list.front().enabled);
-    return_list.pop_front();
-    EXPECT_EQ("ScopeC", return_list.front().id);
-    EXPECT_TRUE(return_list.front().enabled);
+    ASSERT_EQ(3, return_list.size());
+    EXPECT_EQ("ScopeB", return_list[0].id);
+    EXPECT_FALSE(return_list[0].enabled);
+    EXPECT_EQ("ScopeA", return_list[1].id);
+    EXPECT_FALSE(return_list[1].enabled);
+    EXPECT_EQ("ScopeC", return_list[2].id);
+    EXPECT_TRUE(return_list[2].enabled);
 }
 
 TEST_F(ChildScopesTest, no_config_dir)
@@ -255,15 +243,13 @@ TEST_F(ChildScopesTest, no_config_dir)
     // 1st TestScope::find_child_scopes() returns: "A,B,C"
     // No order was set, so we should just get: "A,B,C"
     ChildScopeList return_list = test_scope->child_scopes();
-    EXPECT_EQ(3, return_list.size());
-    EXPECT_EQ("ScopeA", return_list.front().id);
-    EXPECT_FALSE(return_list.front().enabled);
-    return_list.pop_front();
-    EXPECT_EQ("ScopeB", return_list.front().id);
-    EXPECT_FALSE(return_list.front().enabled);
-    return_list.pop_front();
-    EXPECT_EQ("ScopeC", return_list.front().id);
-    EXPECT_TRUE(return_list.front().enabled);
+    ASSERT_EQ(3, return_list.size());
+    EXPECT_EQ("ScopeA", return_list[0].id);
+    EXPECT_FALSE(return_list[0].enabled);
+    EXPECT_EQ("ScopeB", return_list[1].id);
+    EXPECT_FALSE(return_list[1].enabled);
+    EXPECT_EQ("ScopeC", return_list[2].id);
+    EXPECT_TRUE(return_list[2].enabled);
 }
 
 TEST_F(ChildScopesTest, corrupted_config)
@@ -279,15 +265,13 @@ TEST_F(ChildScopesTest, corrupted_config)
     // 1st TestScope::find_child_scopes() returns: "A,B,C"
     // with partial order: "B", we should get: "B,A,C"
     ChildScopeList return_list = test_scope->child_scopes();
-    EXPECT_EQ(3, return_list.size());
-    EXPECT_EQ("ScopeB", return_list.front().id);
-    EXPECT_TRUE(return_list.front().enabled);
-    return_list.pop_front();
-    EXPECT_EQ("ScopeA", return_list.front().id);
-    EXPECT_FALSE(return_list.front().enabled);
-    return_list.pop_front();
-    EXPECT_EQ("ScopeC", return_list.front().id);
-    EXPECT_TRUE(return_list.front().enabled);
+    ASSERT_EQ(3, return_list.size());
+    EXPECT_EQ("ScopeB", return_list[0].id);
+    EXPECT_TRUE(return_list[0].enabled);
+    EXPECT_EQ("ScopeA", return_list[1].id);
+    EXPECT_FALSE(return_list[1].enabled);
+    EXPECT_EQ("ScopeC", return_list[2].id);
+    EXPECT_TRUE(return_list[2].enabled);
 
     // Empty config
     write_empty_config();
@@ -296,15 +280,13 @@ TEST_F(ChildScopesTest, corrupted_config)
 
     // Check that nothing crashes and we simply get the list from the scope as is
     return_list = test_scope->child_scopes();
-    EXPECT_EQ(3, return_list.size());
-    EXPECT_EQ("ScopeA", return_list.front().id);
-    EXPECT_FALSE(return_list.front().enabled);
-    return_list.pop_front();
-    EXPECT_EQ("ScopeB", return_list.front().id);
-    EXPECT_FALSE(return_list.front().enabled);
-    return_list.pop_front();
-    EXPECT_EQ("ScopeC", return_list.front().id);
-    EXPECT_TRUE(return_list.front().enabled);
+    ASSERT_EQ(3, return_list.size());
+    EXPECT_EQ("ScopeA", return_list[0].id);
+    EXPECT_FALSE(return_list[0].enabled);
+    EXPECT_EQ("ScopeB", return_list[1].id);
+    EXPECT_FALSE(return_list[1].enabled);
+    EXPECT_EQ("ScopeC", return_list[2].id);
+    EXPECT_TRUE(return_list[2].enabled);
 
     // Corrupt config
     write_corrupt_config();
@@ -313,13 +295,11 @@ TEST_F(ChildScopesTest, corrupted_config)
 
     // Check that nothing crashes and we simply get the list from the scope as is
     return_list = test_scope->child_scopes();
-    EXPECT_EQ(3, return_list.size());
-    EXPECT_EQ("ScopeA", return_list.front().id);
-    EXPECT_FALSE(return_list.front().enabled);
-    return_list.pop_front();
-    EXPECT_EQ("ScopeB", return_list.front().id);
-    EXPECT_FALSE(return_list.front().enabled);
-    return_list.pop_front();
-    EXPECT_EQ("ScopeC", return_list.front().id);
-    EXPECT_TRUE(return_list.front().enabled);
+    ASSERT_EQ(3, return_list.size());
+    EXPECT_EQ("ScopeA", return_list[0].id);
+    EXPECT_FALSE(return_list[0].enabled);
+    EXPECT_EQ("ScopeB", return_list[1].id);
+    EXPECT_FALSE(return_list[1].enabled);
+    EXPECT_EQ("ScopeC", return_list[2].id);
+    EXPECT_TRUE(return_list[2].enabled);
 }

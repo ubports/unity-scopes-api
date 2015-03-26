@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include <list>
 #include <string>
+#include <vector>
 
 namespace unity
 {
@@ -33,7 +33,7 @@ struct ChildScope;
  \brief A list of child scopes.
 */
 
-typedef std::list<ChildScope> ChildScopeList;
+typedef std::vector<ChildScope> ChildScopeList;
 
 /**
  \brief A container for details about an aggregator's child scope.
@@ -41,8 +41,16 @@ typedef std::list<ChildScope> ChildScopeList;
 
 struct ChildScope
 {
-    std::string id; ///< The scope id of this child scope.
-    bool enabled;   ///< Holds whether this child scope is aggregated.
+    ChildScope(std::string const& id,
+               bool enabled,
+               std::vector<std::string> keywords = {})
+        : id(id)
+        , enabled(enabled)
+        , keywords(keywords) {}
+
+    std::string id;                    ///< The scope id of this child scope.
+    bool enabled;                      ///< Holds whether this child scope is aggregated.
+    std::vector<std::string> keywords; ///< A list of keywords used to aggregate this scope.
 };
 
 } // namespace scopes
