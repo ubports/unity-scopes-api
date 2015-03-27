@@ -81,6 +81,7 @@ QueryCtrlProxy SearchQueryBaseImpl::subsearch(ScopeProxy const& scope,
         return query_ctrl;  // Loop was detected, return dummy QueryCtrlProxy.
     }
 
+    // Insert the keywords used to aggregated this child scope into its search metadata
     insert_aggregated_keywords(scope, const_cast<SearchMetadata&>(metadata));
 
     // scope_impl can be nullptr if we use a mock scope: TypedScopeFixture<testing::Scope>
@@ -151,17 +152,7 @@ void SearchQueryBaseImpl::set_child_scopes(ChildScopeList const& child_scopes)
     lock_guard<mutex> lock(mutex_);
     for (auto const& child : child_scopes)
     {
-        if (child_scopes_.find(child.id) != child_scopes_.end())
-        {
-            // If we already have this child in our map, append the keywords to our existing entry
-            auto& existing_child_keywords = child_scopes_.at(child.id).keywords;
-            existing_child_keywords.insert(child.keywords.begin(), child.keywords.end());
-        }
-        else
-        {
-            // Otherwise, simply insert this child into our map
-            child_scopes_.insert(std::make_pair(child.id, child));
-        }
+        child_scopes_.insert(std::make_pair(child.id, child));
     }
 }
 
