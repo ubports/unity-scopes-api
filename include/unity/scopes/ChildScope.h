@@ -42,6 +42,12 @@ typedef std::vector<ChildScope> ChildScopeList;
 
 struct ChildScope
 {
+    /**
+     \brief Construct a new ChildScope with the specified id, enabled state and keywords list.
+     \param id The scope id of this child scope.
+     \param enabled Whether this child scope should be aggregated.
+     \param keywords The list of keywords used to aggregate this scope (if any).
+    */
     ChildScope(std::string const& id,
                bool enabled,
                std::set<std::string> keywords = {})
@@ -50,8 +56,8 @@ struct ChildScope
         , keywords(keywords) {}
 
     std::string id;                 ///< The scope id of this child scope.
-    bool enabled;                   ///< Holds whether this child scope is aggregated.
-    std::set<std::string> keywords; ///< A list of keywords used to aggregate this scope.
+    bool enabled;                   ///< Whether this child scope should be aggregated.
+    std::set<std::string> keywords; ///< The list of keywords used to aggregate this scope (if any).
 };
 
 } // namespace scopes

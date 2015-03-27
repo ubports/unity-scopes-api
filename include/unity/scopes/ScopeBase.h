@@ -338,9 +338,7 @@ public:
     returned should be set to a default value (i.e. whether the child is enabled or
     disabled by default when newly discovered).
 
-    The default behaviour of this method is to simply return all available scopes on the
-    system in disabled state. This translates to: "Any scope may potentially be aggregated
-    by this scope".
+    The default behaviour of this method is to return an empty list.
 
     \note Only aggregator scopes should implement this method.
 
