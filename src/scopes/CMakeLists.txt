@@ -19,6 +19,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/ColumnLayout.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/CompletionDetails.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Department.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/DateTimePickerFilter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/FilterBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/FilterOption.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/FilterState.cpp
