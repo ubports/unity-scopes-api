@@ -56,11 +56,11 @@ public:
     void set_child_scopes(ChildScopeList const& child_scopes);
 
     QueryCtrlProxy subsearch(ScopeProxy const& scope,
-                                   std::string const& query_string,
-                                   std::string const& department_id,
-                                   FilterState const& filter_state,
-                                   SearchMetadata const& metadata,
-                                   SearchListenerBase::SPtr const& reply);
+                             std::string const& query_string,
+                             std::string const& department_id,
+                             FilterState const& filter_state,
+                             SearchMetadata const& metadata,
+                             SearchListenerBase::SPtr const& reply);
 
     void cancel() override;
     bool valid() const override;
