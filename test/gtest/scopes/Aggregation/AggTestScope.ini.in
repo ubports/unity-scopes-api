@@ -1,4 +1,4 @@
 [ScopeConfig]
-DisplayName = LoopScope
+DisplayName = AggTestScope
 Description = Aggregator scope that makes various loops
 Author = Michi

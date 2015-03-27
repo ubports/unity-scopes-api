@@ -20,7 +20,7 @@
 
 #include <unity/scopes/ScopeBase.h>
 
-class LoopScope : public unity::scopes::ScopeBase
+class AggTestScope : public unity::scopes::ScopeBase
 {
 public:
     virtual void start(std::string const&) override;
@@ -34,6 +34,8 @@ public:
 
     virtual unity::scopes::PreviewQueryBase::UPtr preview(unity::scopes::Result const&,
                                                           unity::scopes::ActionMetadata const &) override;
+
+    virtual unity::scopes::ChildScopeList find_child_scopes() const override;
 
 private:
     std::string id_;

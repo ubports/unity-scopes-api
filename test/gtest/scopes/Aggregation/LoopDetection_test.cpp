@@ -23,7 +23,7 @@
 
 #include <gtest/gtest.h>
 
-#include "LoopScope.h"
+#include "AggTestScope.h"
 
 using namespace std;
 using namespace unity::scopes;

@@ -13,7 +13,7 @@ target_link_libraries(ChildScopes_test ${TESTLIBS})
 add_test(ChildScopes ChildScopes_test)
 
 
-add_executable(LoopDetection_test LoopDetection_test.cpp LoopScope.cpp)
+add_executable(LoopDetection_test LoopDetection_test.cpp AggTestScope.cpp)
 target_link_libraries(LoopDetection_test ${TESTLIBS})
 
 add_dependencies(LoopDetection_test scoperegistry scoperunner)
@@ -24,8 +24,8 @@ set(SCOPE_DIR "${CMAKE_CURRENT_BINARY_DIR}/scopes")
 
 foreach (scope A B C D)
     file(MAKE_DIRECTORY "${SCOPE_DIR}/${scope}")
-    configure_file(LoopScope.ini.in ${SCOPE_DIR}/${scope}/${scope}.ini)
-    add_library(${scope} MODULE LoopScope.cpp)
+    configure_file(AggTestScope.ini.in ${SCOPE_DIR}/${scope}/${scope}.ini)
+    add_library(${scope} MODULE AggTestScope.cpp)
     set_target_properties(${scope}
       PROPERTIES
         LIBRARY_OUTPUT_DIRECTORY "${SCOPE_DIR}/${scope}/"

@@ -16,7 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include "LoopScope.h"
+#include "AggTestScope.h"
 
 #include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/ScopeBase.h>
@@ -133,29 +133,39 @@ private:
 
 }  // namespace
 
-void LoopScope::start(string const& scope_id)
+void AggTestScope::start(string const& scope_id)
 {
     lock_guard<mutex> lock(mutex_);
     id_ = scope_id;
 }
 
-void LoopScope::stop()
+void AggTestScope::stop()
 {
 }
 
-void LoopScope::run()
+void AggTestScope::run()
 {
 }
 
-SearchQueryBase::UPtr LoopScope::search(CannedQuery const& query, SearchMetadata const& metadata)
+SearchQueryBase::UPtr AggTestScope::search(CannedQuery const& query, SearchMetadata const& metadata)
 {
     lock_guard<mutex> lock(mutex_);
     return SearchQueryBase::UPtr(new TestQuery(query, metadata, id_, registry()));
 }
 
-PreviewQueryBase::UPtr LoopScope::preview(Result const&, ActionMetadata const &)
+PreviewQueryBase::UPtr AggTestScope::preview(Result const&, ActionMetadata const &)
 {
     return nullptr;  // unused
+}
+
+ChildScopeList AggTestScope::find_child_scopes() const
+{
+    ChildScopeList list;
+    list.emplace_back(ChildScope{"A", true});
+    list.emplace_back(ChildScope{"B", true});
+    list.emplace_back(ChildScope{"C", true});
+    list.emplace_back(ChildScope{"D", true});
+    return list;
 }
 
 extern "C"
@@ -165,7 +175,7 @@ extern "C"
     // cppcheck-suppress unusedFunction
     UNITY_SCOPE_CREATE_FUNCTION()
     {
-        return new LoopScope;
+        return new AggTestScope;
     }
 
     void
