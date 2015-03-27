@@ -1,6 +1,0 @@
-[Registry]
-Middleware = Zmq
-Zmq.ConfigFile = Zmq.ini
-Scope.InstallDir = /unused
-Click.InstallDir = /unused
-Scoperunner.Path = /unused
