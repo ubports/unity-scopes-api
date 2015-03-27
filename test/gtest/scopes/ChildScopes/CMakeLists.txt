@@ -6,6 +6,13 @@ add_definitions(-DTEST_RUNTIME_PATH="${CMAKE_CURRENT_BINARY_DIR}")
 add_definitions(-DTEST_RUNTIME_FILE="${CMAKE_CURRENT_BINARY_DIR}/Runtime.ini")
 add_definitions(-DTEST_REGISTRY_PATH="${PROJECT_BINARY_DIR}/scoperegistry")
 
+
+add_executable(ChildScopes_test ChildScopes_test.cpp)
+target_link_libraries(ChildScopes_test ${TESTLIBS})
+
+add_test(ChildScopes ChildScopes_test)
+
+
 add_executable(LoopDetection_test LoopDetection_test.cpp LoopScope.cpp)
 target_link_libraries(LoopDetection_test ${TESTLIBS})
 

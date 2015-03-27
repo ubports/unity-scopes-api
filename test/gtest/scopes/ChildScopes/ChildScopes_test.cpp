@@ -63,20 +63,20 @@ public:
     {
         // Create an empty config directory for TestScope
         system::error_code ec;
-        filesystem::create_directory(TEST_BIN_DIR "/TestScope", ec);
+        filesystem::create_directory(TEST_RUNTIME_PATH "/TestScope", ec);
     }
 
     void remove_config_dir()
     {
         // Remove the config directory for TestScope
         system::error_code ec;
-        filesystem::remove_all(TEST_BIN_DIR "/TestScope", ec);
+        filesystem::remove_all(TEST_RUNTIME_PATH "/TestScope", ec);
     }
 
     void write_empty_config()
     {
         // open repository for output
-        std::ofstream repo_file(TEST_BIN_DIR "/TestScope/child-scopes.json");
+        std::ofstream repo_file(TEST_RUNTIME_PATH "/TestScope/child-scopes.json");
         repo_file << "";
         repo_file.close();
     }
@@ -84,7 +84,7 @@ public:
     void write_corrupt_config()
     {
         // open repository for output
-        std::ofstream repo_file(TEST_BIN_DIR "/TestScope/child-scopes.json");
+        std::ofstream repo_file(TEST_RUNTIME_PATH "/TestScope/child-scopes.json");
         repo_file << "ag;hasd;glasd;glkasdhg;klasdf;k;";
         repo_file.close();
     }
@@ -92,7 +92,7 @@ public:
     void write_partially_corrupt_config()
     {
         // open repository for output
-        std::ofstream repo_file(TEST_BIN_DIR "/TestScope/child-scopes.json");
+        std::ofstream repo_file(TEST_RUNTIME_PATH "/TestScope/child-scopes.json");
         repo_file << R"([{"id":"ScopeB","enabled":true},{"id":"ScopeB"},{"id":"ScopeC","enabled":"false"}])";
         repo_file.close();
     }
