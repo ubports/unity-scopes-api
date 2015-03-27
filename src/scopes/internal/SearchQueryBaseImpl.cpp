@@ -149,15 +149,10 @@ void SearchQueryBaseImpl::set_history(History const& h)
     history_ = h;
 }
 
-void SearchQueryBaseImpl::set_child_scopes(ChildScopeList const& child_scopes)
+void SearchQueryBaseImpl::set_child_scopes_func(std::function<ChildScopeList()> const& child_scopes_func)
 {
-    // We use the child scopes list to find and insert aggregated keywords into subsearch metadatas.
-    // Therefore, here we put the child scopes into a map of id:ChildScope for quick reference later.
     lock_guard<mutex> lock(mutex_);
-    for (auto const& child : child_scopes)
-    {
-        child_scopes_.insert(std::make_pair(child.id, child));
-    }
+    child_scopes_func_ = child_scopes_func;
 }
 
 bool SearchQueryBaseImpl::valid() const
@@ -220,6 +215,20 @@ QueryCtrlProxy SearchQueryBaseImpl::insert_aggregated_keywords(ScopeProxy const&
     shared_ptr<QueryCtrlImpl> ctrl_proxy;
 
     lock_guard<mutex> lock(mutex_);
+
+    // Initialize (lazy) our child_scopes_ map
+    if (child_scopes_.empty() && child_scopes_func_)
+    {
+        // We use the child scopes list to find and insert aggregated keywords into subsearch metadatas.
+        // Therefore, here we put the child scopes into a map of id:ChildScope for quick reference.
+        auto child_scopes = child_scopes_func_();
+        for (auto const& child : child_scopes)
+        {
+            child_scopes_.insert(std::make_pair(child.id, child));
+        }
+        // Clear child_scopes_func_ as we don't need or want it anymore
+        child_scopes_func_ = nullptr;
+    }
 
     // Just return if we don't find the target child scope in our child_scopes_ map
     if (child_scopes_.find(scope->identity()) == child_scopes_.end())

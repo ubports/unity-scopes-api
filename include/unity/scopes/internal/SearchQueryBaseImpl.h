@@ -53,7 +53,7 @@ public:
 
     void set_history(History const& h);
 
-    void set_child_scopes(ChildScopeList const& child_scopes);
+    void set_child_scopes_func(std::function<ChildScopeList()> const& child_scopes_func);
 
     QueryCtrlProxy subsearch(ScopeProxy const& scope,
                              std::string const& query_string,
@@ -75,6 +75,8 @@ private:
     std::string client_id_;
     History history_;
     std::vector<QueryCtrlProxy> subqueries_;
+
+    std::function<ChildScopeList()> child_scopes_func_;
     std::map<std::string, ChildScope> child_scopes_;
 
     QueryCtrlProxy check_for_query_loop(ScopeProxy const& scope, SearchListenerBase::SPtr const& reply);

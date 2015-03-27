@@ -190,9 +190,9 @@ MWQueryCtrlProxy ScopeObject::search(CannedQuery const& q,
                          sqb->set_history(history);
                       }
 
-                      // Let this scope's search query know about its child scopes (if any).
+                      // Let this scope's search query know how to get its child scopes if need be.
                       // This list will be used to propagate aggregated keywords when subsearch is called from an aggregator.
-                      sqb->set_child_scopes(child_scopes());
+                      sqb->set_child_scopes_func([this]{ return child_scopes(); });
 
                       return search_query;
                  },
@@ -203,9 +203,9 @@ MWQueryCtrlProxy ScopeObject::search(CannedQuery const& q,
 }
 
 MWQueryCtrlProxy ScopeObject::activate(Result const& result,
-                                           ActionMetadata const& hints,
-                                           MWReplyProxy const& reply,
-                                           InvokeInfo const& info)
+                                       ActionMetadata const& hints,
+                                       MWReplyProxy const& reply,
+                                       InvokeInfo const& info)
 {
     return query(reply,
                  info.mw,
