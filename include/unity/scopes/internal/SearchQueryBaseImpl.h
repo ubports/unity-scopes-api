@@ -78,7 +78,9 @@ private:
     std::map<std::string, ChildScope> child_scopes_;
 
     QueryCtrlProxy check_for_query_loop(ScopeProxy const& scope, SearchListenerBase::SPtr const& reply);
-    void insert_aggregated_keywords(ScopeProxy const& scope, SearchMetadata& metadata);
+    QueryCtrlProxy insert_aggregated_keywords(ScopeProxy const& scope,
+                                              SearchListenerBase::SPtr const& reply,
+                                              SearchMetadata& metadata);
 };
 
 } // namespace internal

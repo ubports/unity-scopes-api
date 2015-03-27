@@ -82,7 +82,11 @@ QueryCtrlProxy SearchQueryBaseImpl::subsearch(ScopeProxy const& scope,
     }
 
     // Insert the keywords used to aggregated this child scope into its search metadata
-    insert_aggregated_keywords(scope, const_cast<SearchMetadata&>(metadata));
+    query_ctrl = insert_aggregated_keywords(scope, reply, const_cast<SearchMetadata&>(metadata));
+    if (query_ctrl)
+    {
+        return query_ctrl;  // Child scope is disabled, return dummy QueryCtrlProxy.
+    }
 
     // scope_impl can be nullptr if we use a mock scope: TypedScopeFixture<testing::Scope>
     // If so, we call the normal search without passing the history through because
@@ -209,13 +213,36 @@ QueryCtrlProxy SearchQueryBaseImpl::check_for_query_loop(ScopeProxy const& scope
     return ctrl_proxy;  // null proxy if there was no loop
 }
 
-void SearchQueryBaseImpl::insert_aggregated_keywords(ScopeProxy const& scope, SearchMetadata& metadata)
+QueryCtrlProxy SearchQueryBaseImpl::insert_aggregated_keywords(ScopeProxy const& scope,
+                                                               SearchListenerBase::SPtr const& reply,
+                                                               SearchMetadata& metadata)
 {
-    // Find the current target child scope in our child_scopes_ map and set the aggregated keywords accordingly.
-    if (child_scopes_.find(scope->identity()) != child_scopes_.end())
+    shared_ptr<QueryCtrlImpl> ctrl_proxy;
+
+    lock_guard<mutex> lock(mutex_);
+
+    // Just return if we don't find the target child scope in our child_scopes_ map
+    if (child_scopes_.find(scope->identity()) == child_scopes_.end())
     {
-        metadata.set_aggregated_keywords(child_scopes_.at(scope->identity()).keywords);
+        return ctrl_proxy;
     }
+
+    auto child_scope = child_scopes_.at(scope->identity());
+
+    if (!child_scope.enabled)
+    {
+        // The child scope is disabled, we should not continue with the subsearch
+        reply->finished(CompletionDetails(CompletionDetails::OK,
+                                          "empty result set due to target child scope \"" + child_scope.id
+                                          + "\" being disabled"));
+        ctrl_proxy = make_shared<QueryCtrlImpl>(nullptr, nullptr);  // Dummy proxy in already-cancelled state
+    }
+    else
+    {
+        // Set the aggregated keywords
+        metadata.set_aggregated_keywords(child_scope.keywords);
+    }
+    return ctrl_proxy;
 }
 
 } // namespace internal
