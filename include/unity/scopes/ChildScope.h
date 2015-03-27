@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <set>
 #include <string>
 #include <vector>
 
@@ -43,14 +44,14 @@ struct ChildScope
 {
     ChildScope(std::string const& id,
                bool enabled,
-               std::vector<std::string> keywords = {})
+               std::set<std::string> keywords = {})
         : id(id)
         , enabled(enabled)
         , keywords(keywords) {}
 
-    std::string id;                    ///< The scope id of this child scope.
-    bool enabled;                      ///< Holds whether this child scope is aggregated.
-    std::vector<std::string> keywords; ///< A list of keywords used to aggregate this scope.
+    std::string id;                 ///< The scope id of this child scope.
+    bool enabled;                   ///< Holds whether this child scope is aggregated.
+    std::set<std::string> keywords; ///< A list of keywords used to aggregate this scope.
 };
 
 } // namespace scopes

@@ -20,6 +20,7 @@
 #pragma once
 
 #include <unity/scopes/CannedQuery.h>
+#include <unity/scopes/ChildScope.h>
 #include <unity/scopes/internal/QueryBaseImpl.h>
 #include <unity/scopes/QueryCtrlProxyFwd.h>
 #include <unity/scopes/ScopeProxyFwd.h>
@@ -52,6 +53,8 @@ public:
 
     void set_history(History const& h);
 
+    void set_child_scopes(ChildScopeList const& child_scopes);
+
     QueryCtrlProxy subsearch(ScopeProxy const& scope,
                                    std::string const& query_string,
                                    std::string const& department_id,
@@ -72,8 +75,10 @@ private:
     std::string client_id_;
     History history_;
     std::vector<QueryCtrlProxy> subqueries_;
+    std::map<std::string, ChildScope> child_scopes_;
 
     QueryCtrlProxy check_for_query_loop(ScopeProxy const& scope, SearchListenerBase::SPtr const& reply);
+    void insert_aggregated_keywords(ScopeProxy const& scope, SearchMetadata& metadata);
 };
 
 } // namespace internal

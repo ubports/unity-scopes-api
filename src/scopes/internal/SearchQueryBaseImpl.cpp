@@ -81,6 +81,8 @@ QueryCtrlProxy SearchQueryBaseImpl::subsearch(ScopeProxy const& scope,
         return query_ctrl;  // Loop was detected, return dummy QueryCtrlProxy.
     }
 
+    insert_aggregated_keywords(scope, const_cast<SearchMetadata&>(metadata));
+
     // scope_impl can be nullptr if we use a mock scope: TypedScopeFixture<testing::Scope>
     // If so, we call the normal search without passing the history through because
     // we don't need loop detection for mock scopes.
@@ -142,6 +144,27 @@ void SearchQueryBaseImpl::set_history(History const& h)
     history_ = h;
 }
 
+void SearchQueryBaseImpl::set_child_scopes(ChildScopeList const& child_scopes)
+{
+    // We use the child scopes list to find and insert aggregated keywords into subsearch metadatas.
+    // Therefore, here we put the child scopes into a map of id:ChildScope for quick reference later.
+    lock_guard<mutex> lock(mutex_);
+    for (auto const& child : child_scopes)
+    {
+        if (child_scopes_.find(child.id) != child_scopes_.end())
+        {
+            // If we already have this child in our map, append the keywords to our existing entry
+            auto& existing_child_keywords = child_scopes_.at(child.id).keywords;
+            existing_child_keywords.insert(child.keywords.begin(), child.keywords.end());
+        }
+        else
+        {
+            // Otherwise, simply insert this child into our map
+            child_scopes_.insert(std::make_pair(child.id, child));
+        }
+    }
+}
+
 bool SearchQueryBaseImpl::valid() const
 {
     lock_guard<mutex> lock(mutex_);
@@ -193,6 +216,15 @@ QueryCtrlProxy SearchQueryBaseImpl::check_for_query_loop(ScopeProxy const& scope
     }
 
     return ctrl_proxy;  // null proxy if there was no loop
+}
+
+void SearchQueryBaseImpl::insert_aggregated_keywords(ScopeProxy const& scope, SearchMetadata& metadata)
+{
+    // Find the current target child scope in our child_scopes_ map and set the aggregated keywords accordingly.
+    if (child_scopes_.find(scope->identity()) != child_scopes_.end())
+    {
+        metadata.set_aggregated_keywords(child_scopes_.at(scope->identity()).keywords);
+    }
 }
 
 } // namespace internal

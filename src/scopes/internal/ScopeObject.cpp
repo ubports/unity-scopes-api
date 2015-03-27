@@ -158,7 +158,6 @@ MWQueryCtrlProxy ScopeObject::search(CannedQuery const& q,
                  info.mw,
                  "search",
                  [&q, &hints, &context, this]() -> SearchQueryBase::UPtr {
-                      ///! call child_scopes and insert keyword info into hints here
                       auto search_query = this->scope_base_->search(q, hints);
                       search_query->set_department_id(q.department_id());
 
@@ -190,6 +189,10 @@ MWQueryCtrlProxy ScopeObject::search(CannedQuery const& q,
                          }
                          sqb->set_history(history);
                       }
+
+                      // Let this scope's search query know about its child scopes (if any).
+                      // This list will be used to propagate aggregated keywords when subsearch is called from an aggregator.
+                      sqb->set_child_scopes(child_scopes());
 
                       return search_query;
                  },

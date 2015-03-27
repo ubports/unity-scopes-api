@@ -23,6 +23,8 @@
 #include <unity/scopes/Variant.h>
 #include <unity/util/DefinesPtrs.h>
 
+#include <set>
+
 namespace unity
 {
 
@@ -109,16 +111,22 @@ public:
     bool has_location() const;
 
     /**
+    \brief Set the list of scope keywords used to initiate this search request.
+    \param aggregated_keywords The list of scope keywords used to initiate this search request.
+    */
+    void set_aggregated_keywords(std::set<std::string> const& aggregated_keywords);
+
+    /**
+    \brief Get the list of scope keywords used to initiate this search request.
+    \return The list of scope keywords used to initiate this search request.
+    */
+    std::set<std::string> aggregated_keywords() const;
+
+    /**
     \brief Check if this search request originated from an aggregator scope.
     \return True if this search request originated from an aggregator scope.
     */
     bool is_aggregated() const;
-
-    /**
-    \brief Get a list of scope keywords used to initiate this search request.
-    \return A list of scope keywords used to initiate this search request.
-    */
-    std::vector<std::string> aggregated_keywords() const;
 
     /**
     \brief Sets a hint.
