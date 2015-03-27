@@ -40,13 +40,14 @@ ChildScopeList ChildScopesRepository::child_scopes(ChildScopeList const& child_s
 
     // unordered_set and ordered_set will act as masks for child_scopes_unordered and
     // child_scopes_ordered respectively when creating our resultant child scope list
-    std::set<std::string> unordered_set;
-    std::set<std::string> ordered_set;
+    std::map<std::string, int> unordered_set;
+    std::map<std::string, int> ordered_set;
 
     // fill unordered_set
+    int i = 0;
     for (auto const& child : child_scopes_unordered)
     {
-        unordered_set.insert(child.id);
+        unordered_set.insert(std::make_pair(child.id, i++));
     }
 
     // fill ordered_set
@@ -55,12 +56,16 @@ ChildScopeList ChildScopesRepository::child_scopes(ChildScopeList const& child_s
     {
         // scopes in child_scopes_ordered that are also in child_scopes_unordered should be removed
         // from unordered_set (to avoid duplicates in our resultant child scope list)
-        if (unordered_set.erase(child.id) > 0)
+        auto it = unordered_set.find(child.id);
+        if (it != unordered_set.end())
         {
             // only the scopes from child_scopes_ordered that appear in child_scopes_unordered
             // should be added to ordered_set (a scope not found in child_scopes_unordered was
             // probably uninstalled since the repo was last written)
-            ordered_set.insert(child.id);
+
+            // store index to item in child_scopes_unordered ->
+            ordered_set.insert(std::make_pair(child.id, it->second));
+            unordered_set.erase(it);
         }
     }
 
@@ -75,7 +80,8 @@ ChildScopeList ChildScopesRepository::child_scopes(ChildScopeList const& child_s
     // using each set as a mask to determine whether or not a scope should be included
     ChildScopeList new_child_scopes_ordered;
     {
-        // add child_scopes_ordered to new_child_scopes_ordered
+        // first add child_scopes_ordered to new_child_scopes_ordered
+        // (known scopes from repo)
         if (child_scopes_ordered.size() == ordered_set.size())
         {
             new_child_scopes_ordered = child_scopes_ordered;
@@ -83,16 +89,20 @@ ChildScopeList ChildScopesRepository::child_scopes(ChildScopeList const& child_s
         else if (!ordered_set.empty())
         {
             // use ordered_set as a mask
-            for (auto const& child : child_scopes_ordered)
+            for (auto& child : child_scopes_ordered)
             {
-                if (ordered_set.find(child.id) != ordered_set.end())
+                auto it = ordered_set.find(child.id);
+                if (it != ordered_set.end())
                 {
+                    // -> always use latest keywords list from child_scopes_unordered
+                    child.keywords = child_scopes_unordered[it->second].keywords;
                     new_child_scopes_ordered.push_back(child);
                 }
             }
         }
 
-        // add child_scopes_unordered to new_child_scopes_ordered
+        // then append whats left in child_scopes_unordered to new_child_scopes_ordered
+        // (newly installed scopes)
         if (child_scopes_unordered.size() == unordered_set.size())
         {
             new_child_scopes_ordered.insert(new_child_scopes_ordered.end(),
