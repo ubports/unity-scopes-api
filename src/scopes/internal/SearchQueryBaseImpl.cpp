@@ -214,8 +214,15 @@ QueryCtrlProxy SearchQueryBaseImpl::insert_aggregated_keywords(ScopeProxy const&
 {
     lock_guard<mutex> lock(mutex_);
 
+    // If we don't have child_scopes_func_, this means the scope was not invocated via the middleware
+    // (e.g. during unit testing). Just return and continue with the subsearch here.
+    if (!child_scopes_func_)
+    {
+        return nullptr;
+    }
+
     // Initialize (lazy) our child_scopes_ map
-    if (child_scopes_.empty() && child_scopes_func_)
+    if (child_scopes_.empty())
     {
         // We use the child scopes list to find and insert aggregated keywords into subsearch metadatas.
         // Therefore, here we put the child scopes into a map of id:ChildScope for quick reference.
@@ -224,8 +231,6 @@ QueryCtrlProxy SearchQueryBaseImpl::insert_aggregated_keywords(ScopeProxy const&
         {
             child_scopes_.insert(std::make_pair(child.id, child));
         }
-        // Clear child_scopes_func_ as we don't need or want it anymore
-        child_scopes_func_ = nullptr;
     }
 
     // Check that the target child scope is in our child_scopes_ map
