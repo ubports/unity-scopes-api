@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Canonical Ltd
+ * Copyright (C) 2015 Canonical Ltd
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License version 3 as
@@ -13,14 +13,13 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authored by: Michi Henning <michi.henning@canonical.com>
+ * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
  */
 
 #include <unity/scopes/CategorisedResult.h>
-#include <unity/scopes/internal/RegistryObject.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
-#include <unity/scopes/internal/ScopeImpl.h>
 
+#include <boost/filesystem/operations.hpp>
 #include <gtest/gtest.h>
 
 #include "AggTestScope.h"
@@ -84,15 +83,29 @@ private:
     condition_variable cond_;
 };
 
-class LoopDetectionTest : public ::testing::Test
+class KeywordsTest : public ::testing::Test
 {
 public:
-    LoopDetectionTest()
+    KeywordsTest()
     {
         runtime_ = Runtime::create(TEST_RUNTIME_FILE);
         auto reg = runtime_->registry();
         auto meta = reg->get_metadata("A");  // First scope to receive a search is always A
         scope_ = meta.proxy();
+    }
+
+    void create_config_dir()
+    {
+        // Create an empty config directory for scope A
+        boost::system::error_code ec;
+        boost::filesystem::create_directory(TEST_RUNTIME_PATH "/A", ec);
+    }
+
+    void remove_config_dir()
+    {
+        // Remove the config directory for scope A
+        boost::system::error_code ec;
+        boost::filesystem::remove_all(TEST_RUNTIME_PATH "/A", ec);
     }
 
     ScopeProxy scope() const
@@ -115,13 +128,30 @@ private:
 // Once a scope's subsearch completes, it pushes a single result with the scope's ID as the
 // category ID. This allows us to set up various callgraphs by writing to the various command files.
 
-TEST_F(LoopDetectionTest, no_error)
+TEST_F(KeywordsTest, blah)
 {
+    // Create an empty config directory for scope A
+    remove_config_dir();
+    create_config_dir();
+
     system("cat >A.cmd << EOF\nB\nC\nEOF");
     system(">B.cmd");
     system(">C.cmd");
     auto receiver = make_shared<CountReceiver>();
+
+    {
+        ChildScopeList list;
+        list.emplace_back(ChildScope{"A", true});
+        list.emplace_back(ChildScope{"B", false});
+        list.emplace_back(ChildScope{"C", true});
+        list.emplace_back(ChildScope{"D", true});
+        scope()->set_child_scopes(list);
+    }
+
+    auto x = scope()->child_scopes();
+
     scope()->search("A", SearchMetadata("unused", "unused"), receiver);
+
     receiver->wait_until_finished();
 
     auto r = receiver->results();
@@ -129,88 +159,9 @@ TEST_F(LoopDetectionTest, no_error)
     EXPECT_TRUE(r.find("A") != r.end());
     EXPECT_TRUE(r.find("B") != r.end());
     EXPECT_TRUE(r.find("C") != r.end());
-}
 
-TEST_F(LoopDetectionTest, diamond)
-{
-    system("cat >A.cmd << EOF\nB\nC\nEOF");
-    system("cat >B.cmd << EOF\nD\nEOF");
-    system("cat >C.cmd << EOF\nD\nEOF");
-    system(">D.cmd");
-    auto receiver = make_shared<CountReceiver>();
-    scope()->search("A", SearchMetadata("unused", "unused"), receiver);
-    receiver->wait_until_finished();
-
-    auto r = receiver->results();
-    EXPECT_EQ(4, r.size());
-    EXPECT_TRUE(r.find("A") != r.end());
-    EXPECT_TRUE(r.find("B") != r.end());
-    EXPECT_TRUE(r.find("C") != r.end());
-    EXPECT_TRUE(r.find("D") != r.end());
-    EXPECT_EQ(2, r.find("D")->second.size());  // B, and C each forwarded to D, so there must be 2 results.
-}
-
-TEST_F(LoopDetectionTest, immediate_loop)
-{
-    system("cat >A.cmd << EOF\nA\nEOF");
-    auto receiver = make_shared<CountReceiver>();
-    scope()->search("A", SearchMetadata("unused", "unused"), receiver);
-    receiver->wait_until_finished();
-
-    auto r = receiver->results();
-    EXPECT_EQ(1, r.size());
-    EXPECT_EQ(3, r.find("A")->second.size());  // "A" has sent the query twice to itself, second attempt stops loop
-}
-
-TEST_F(LoopDetectionTest, intermediate_loop)
-{
-    system("cat >A.cmd << EOF\nB\nEOF");
-    system("cat >B.cmd << EOF\nC\nEOF");
-    system("cat >C.cmd << EOF\nA\nEOF");
-    auto receiver = make_shared<CountReceiver>();
-    scope()->search("A", SearchMetadata("unused", "unused"), receiver);
-    receiver->wait_until_finished();
-
-    auto r = receiver->results();
-    EXPECT_EQ(3, r.size());
-    EXPECT_EQ(2, r.find("A")->second.size());  // "A" got results from B and C
-    EXPECT_EQ(2, r.find("B")->second.size());  // "B" got results from C and A
-    EXPECT_EQ(1, r.find("C")->second.size());  // "C" got result from A
-}
-
-TEST_F(LoopDetectionTest, repeated_search_on_leaf)
-{
-    system("cat >A.cmd << EOF\nB\nC\nD\nEOF");
-    system("cat >B.cmd << EOF\nD\nD\nEOF");
-    system("cat >C.cmd << EOF\nD\nEOF");
-    system(">D.cmd");
-    auto receiver = make_shared<CountReceiver>();
-    scope()->search("A", SearchMetadata("unused", "unused"), receiver);
-    receiver->wait_until_finished();
-
-    auto r = receiver->results();
-    EXPECT_EQ(4, r.size());
-    EXPECT_EQ(1, r.find("A")->second.size());
-    EXPECT_EQ(1, r.find("B")->second.size());
-    EXPECT_EQ(1, r.find("C")->second.size());
-    EXPECT_EQ(3, r.find("D")->second.size());
-}
-
-TEST_F(LoopDetectionTest, repeated_search_on_aggregator)
-{
-    system("cat >A.cmd << EOF\nB\nEOF");
-    system("cat >B.cmd << EOF\nC\nC\nEOF");
-    system(">C.cmd << EOF\nD\nEOF");
-    system(">D.cmd");
-    auto receiver = make_shared<CountReceiver>();
-    scope()->search("A", SearchMetadata("unused", "unused"), receiver);
-    receiver->wait_until_finished();
-
-    auto r = receiver->results();
-    EXPECT_EQ(3, r.size());
-    EXPECT_EQ(1, r.find("A")->second.size());
-    EXPECT_EQ(1, r.find("B")->second.size());
-    EXPECT_EQ(1, r.find("C")->second.size());
+    remove_config_dir();
+    create_config_dir();
 }
 
 #pragma GCC diagnostic pop
@@ -227,7 +178,7 @@ int main(int argc, char **argv)
     auto rpid = fork();
     if (rpid == 0)
     {
-        const char* const args[] = {"scoperegistry [LoopDetection_test]", TEST_RUNTIME_FILE, nullptr};
+        const char* const args[] = {"scoperegistry [Keywords_test]", TEST_RUNTIME_FILE, nullptr};
         if (execv(TEST_REGISTRY_PATH "/scoperegistry", const_cast<char* const*>(args)) < 0)
         {
             perror("Error starting scoperegistry:");

@@ -13,6 +13,12 @@ target_link_libraries(ChildScopes_test ${TESTLIBS})
 add_test(ChildScopes ChildScopes_test)
 
 
+add_executable(Keywords_test Keywords_test.cpp)
+target_link_libraries(Keywords_test ${TESTLIBS})
+
+add_test(Keywords Keywords_test)
+
+
 add_executable(LoopDetection_test LoopDetection_test.cpp AggTestScope.cpp)
 target_link_libraries(LoopDetection_test ${TESTLIBS})
 
