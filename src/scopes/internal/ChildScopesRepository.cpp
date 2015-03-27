@@ -47,6 +47,7 @@ ChildScopeList ChildScopesRepository::child_scopes(ChildScopeList const& child_s
     int i = 0;
     for (auto const& child : child_scopes_unordered)
     {
+        // store index to the child_scopes_unordered item in unordered_set ->
         unordered_set.insert(std::make_pair(child.id, i++));
     }
 
@@ -63,7 +64,7 @@ ChildScopeList ChildScopesRepository::child_scopes(ChildScopeList const& child_s
             // should be added to ordered_set (a scope not found in child_scopes_unordered was
             // probably uninstalled since the repo was last written)
 
-            // store index to item in child_scopes_unordered ->
+            // -> now store index to the child_scopes_unordered item in ordered_set ->
             ordered_set.insert(std::make_pair(child.id, it->second));
             unordered_set.erase(it);
         }
