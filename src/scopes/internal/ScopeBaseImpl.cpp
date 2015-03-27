@@ -183,8 +183,22 @@ void ScopeBaseImpl::set_child_scopes_repo(std::shared_ptr<ChildScopesRepository>
 
 ChildScopeList ScopeBaseImpl::find_child_scopes() const
 {
-    // The default behaviour of this method is to return an empty list.
-    return ChildScopeList();
+    // Get a copy of the registry proxy
+    RegistryProxy reg = registry();
+    if (!reg)
+    {
+        return ChildScopeList();
+    }
+
+    // The default behaviour of this method is to simply return all available scopes on the system.
+    ChildScopeList return_list;
+    auto all_scopes = reg->list();
+    for (auto const& scope : all_scopes)
+    {
+        // New scopes are added disabled by default
+        return_list.push_back( ChildScope{scope.first, true} );
+    }
+    return return_list;
 }
 
 ChildScopeList ScopeBaseImpl::child_scopes(ChildScopeList const& child_scopes_unordered) const
