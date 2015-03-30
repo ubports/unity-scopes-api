@@ -20,6 +20,7 @@
 
 #include <unity/scopes/FilterBase.h>
 #include <chrono>
+#include <bitset>
 
 namespace unity
 {
@@ -44,7 +45,16 @@ public:
     UNITY_DEFINES_PTRS(DateTimePickerFilter);
 /// @endcond
 
-    enum Mode { X, Y }; //FIXME
+    enum ModeFLags {
+        Years,
+        Months,
+        Days,
+        Hours,
+        Minutes,
+        Seconds
+    };
+
+    typedef std::bitset<6> Mode;
 
     /**
     */

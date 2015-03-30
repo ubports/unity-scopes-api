@@ -79,7 +79,7 @@ bool DateTimePickerFilter::has_selected_date(FilterState const& filter_state) co
 {
     return fwd()->has_selected_date(filter_state);
 }
-   
+
 std::chrono::system_clock::time_point DateTimePickerFilter::selected_date(FilterState const& filter_state) const
 {
     return fwd()->selected_date(filter_state);

@@ -20,6 +20,7 @@
 
 #include <unity/scopes/internal/FilterBaseImpl.h>
 #include <unity/scopes/DateTimePickerFilter.h>
+#include <chrono>
 
 namespace unity
 {
@@ -34,6 +35,7 @@ class DateTimePickerFilterImpl: public FilterBaseImpl
 {
 public:
     DateTimePickerFilterImpl(std::string const& id, DateTimePickerFilter::Mode mode);
+    DateTimePickerFilterImpl(VariantMap const& var);
 
     void set_time_label(std::string const& label);
     void set_date_label(std::string const& label);
@@ -53,11 +55,21 @@ public:
     void update_state(FilterState& filter_state, std::chrono::system_clock::time_point const& date) const;
 
     static void update_state(FilterState& filter_state, std::string const& filter_id, std::chrono::system_clock::time_point const& date);
+    static DateTimePickerFilter::SPtr create(VariantMap const& var);
 
 protected:
     void serialize(VariantMap& var) const override;
     void deserialize(VariantMap const& var);
     std::string filter_type() const override;
+    static int64_t to_seconds_from_epoch(std::chrono::system_clock::time_point const& tp);
+    std::chrono::system_clock::time_point to_timepoint(int64_t seconds_from_epoch);
+
+private:
+    DateTimePickerFilter::Mode m_mode;
+    std::string m_time_label;
+    std::string m_date_label;
+    std::unique_ptr<std::chrono::system_clock::time_point> m_min;
+    std::unique_ptr<std::chrono::system_clock::time_point> m_max;
 };
 
 }
