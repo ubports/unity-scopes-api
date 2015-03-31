@@ -47,46 +47,19 @@ class QCategorisedResultImpl;
 class QCategoryImpl
 {
 public:
-    /// @cond
     NONCOPYABLE(QCategoryImpl);
     UNITY_DEFINES_PTRS(QCategoryImpl);
 
     QCategoryImpl(unity::scopes::Category::SCPtr category);
 
     virtual ~QCategoryImpl();
-    /// @endcond
 
-    /**
-     \brief Get identifier of this Category
-     \return The category identifier.
-    */
     QString id() const;
-
-    /**
-     \brief Get title of this Category
-     \return The category title.
-    */
     QString title() const;
-
-    /**
-     \brief Get icon of this Category
-     \return The category icon.
-    */
     QString icon() const;
-
-    /**
-     \brief Query to perform when this category is expanded
-     \return The expansion query or nullptr.
-    */
     CannedQuery::SCPtr query() const;
-
-    /**
-     \brief Get renderer template of this Category
-     \return The category renderer template.
-     */
     CategoryRenderer const& renderer_template() const;
 
-    // @cond
     QVariantMap serialize() const;
 
     static std::shared_ptr<QCategory> create(unity::scopes::Category::SCPtr category);

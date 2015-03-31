@@ -30,7 +30,7 @@
 class QQuery : public unity::scopes::qt::QSearchQueryBase
 {
 public:
-    virtual void run(unity::scopes::qt::QSearchReplyProxy const& ) override
+    virtual void run(unity::scopes::qt::QSearchReplyProxy const&) override
     {
         std::cout << "QQuery::run()" << std::endl;
     }
@@ -44,7 +44,7 @@ public:
 class QPreview : public unity::scopes::qt::QPreviewQueryBase
 {
 public:
-    virtual void run(unity::scopes::qt::QPreviewReplyProxy const& ) override
+    virtual void run(unity::scopes::qt::QPreviewReplyProxy const&) override
     {
         std::cout << "QQuery::run()" << std::endl;
     }
@@ -58,7 +58,6 @@ public:
 class QScope : public unity::scopes::qt::QScopeBase
 {
 public:
-
     virtual void start(QString const&) override
     {
         std::cout << "QScope::start()" << std::endl;
@@ -71,9 +70,8 @@ public:
     }
 
     virtual unity::scopes::qt::QSearchQueryBase::UPtr search(unity::scopes::CannedQuery const&,
-                                          unity::scopes::SearchMetadata const&) override
+                                                             unity::scopes::SearchMetadata const&) override
     {
         return unity::scopes::qt::QSearchQueryBase::UPtr(new QQuery());
     }
-
 };

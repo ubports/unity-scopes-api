@@ -56,6 +56,7 @@ public:
                                    std::string const& query_string,
                                    std::string const& department_id,
                                    FilterState const& filter_state,
+                                   std::unique_ptr<Variant> user_data,
                                    SearchMetadata const& metadata,
                                    SearchListenerBase::SPtr const& reply);
 
@@ -63,6 +64,8 @@ public:
     bool valid() const override;
 
 private:
+    static SearchMetadata filter_metadata(std::shared_ptr<ScopeImpl> const& scope, SearchMetadata const& metdata);
+
     CannedQuery const canned_query_;
     SearchMetadata const search_metadata_;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Canonical Ltd
+ * Copyright (C) 2014 Canonical Ltd
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License version 3 as
@@ -16,8 +16,6 @@
  * Authored by: Xavi Garcia <xavi.garcia.mena@canonical.com>
  */
 
-// allow experimental headers
-#define _ENABLE_QT_EXPERIMENTAL_
 
 #include <unity/scopes/qt/JsonAsyncReader.h>
 #include <unity/scopes/qt/JsonReader.h>
@@ -49,8 +47,6 @@ protected: virtual void SetUp()
     posix::ChildProcess fake_server_ = posix::ChildProcess::invalid();
     std::string fake_server_host;
 };
-
-// std::string fake_server_uri = getServerAddress();
 
 struct Client
 {
@@ -139,7 +135,6 @@ TEST(BadUrlException, state)
     }
 }
 
-//
 TEST_F(ExceptionsTest, user_results_ok)
 {
     JsonReader reader;

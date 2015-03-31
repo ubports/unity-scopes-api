@@ -40,9 +40,9 @@ public:
     explicit CannedQueryImpl(std::string const& scope_id);
     CannedQueryImpl(std::string const& scope_id, std::string const& query_str, std::string const& department_id);
     CannedQueryImpl(VariantMap const& variant);
-    CannedQueryImpl(CannedQueryImpl const &other) = default;
+    CannedQueryImpl(CannedQueryImpl const &other);
     CannedQueryImpl(CannedQueryImpl&&) = default;
-    CannedQueryImpl& operator=(CannedQueryImpl const& other) = default;
+    CannedQueryImpl& operator=(CannedQueryImpl const& other);
     CannedQueryImpl& operator=(CannedQueryImpl&&) = default;
 
     void set_department_id(std::string const& dep_id);
@@ -56,6 +56,9 @@ public:
     std::string to_uri() const;
     static CannedQuery from_uri(std::string const& uri);
     static CannedQuery create(VariantMap const& var);
+    void set_user_data(Variant const& value);
+    bool has_user_data() const;
+    Variant user_data() const;
 
     static const std::string scopes_schema;
 
@@ -65,6 +68,7 @@ private:
     std::string query_string_;
     std::string department_id_;
     FilterState filter_state_;
+    std::unique_ptr<Variant> user_data_;
 };
 
 } // namespace internal

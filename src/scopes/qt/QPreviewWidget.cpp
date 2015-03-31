@@ -104,7 +104,7 @@ QVariantMap QPreviewWidget::serialize() const
 }
 
 QPreviewWidget::QPreviewWidget(internal::QPreviewWidgetImpl* widget)
-    : p(new internal::QPreviewWidgetImpl(*widget))
+    : p(widget)
 {
 }
 /// @endcond

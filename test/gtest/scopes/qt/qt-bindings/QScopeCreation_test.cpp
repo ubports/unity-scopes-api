@@ -20,9 +20,9 @@
 #include <gtest/gtest.h>
 
 #include <unity/scopes/qt/QScopeBaseAPI.h>
-#include <unity/scopes/qt/QUtils.h>
 
 #include <unity/scopes/qt/internal/QScopeBaseAPIImpl.h>
+#include <unity/scopes/qt/internal/QUtils.h>
 
 #include <QtCore/QThread>
 #include <QtCore/QCoreApplication>
@@ -34,7 +34,7 @@ using namespace unity::scopes::qt::internal;
 using namespace unity::scopes::qt;
 using namespace unity::scopes;
 
-QThread * qt_thread = nullptr;
+QThread* qt_thread = nullptr;
 
 // variable to control when the user's scope
 // has been created
@@ -43,18 +43,23 @@ std::atomic<bool> scope_created(false);
 class QScopeBaseAPIImplTest : public QScopeBaseAPIImpl
 {
 public:
-    QScopeBaseAPIImplTest(FactoryFunc const& creator, QObject *parent=0)
-        : QScopeBaseAPIImpl(creator, parent)
+    QScopeBaseAPIImplTest(FactoryFunc const& creator)
+        : QScopeBaseAPIImpl(creator)
     {
     }
 
-    QThread * getQtAppThread()
+    QThread* getQtAppThread()
     {
         return qtapp_->thread();
     }
+
+    bool qtapp_stopped()
+    {
+        return qtapp_stopped_;
+    }
 };
 
-QScopeBase * create_my_scope()
+QScopeBase* create_my_scope()
 {
     // get the current thread for further use
     qt_thread = QThread::currentThread();
@@ -74,9 +79,9 @@ TEST(CreationTest, bindings)
     // As the scope is created in the Qt event loop
     // we have to wait until the event has been processed
     std::chrono::milliseconds dura(10);
-    while(!scope_created)
+    while (!scope_created)
     {
-        std::this_thread::sleep_for( dura );
+        std::this_thread::sleep_for(dura);
     }
 
     // check that the thread of the qt app is the
@@ -85,4 +90,9 @@ TEST(CreationTest, bindings)
 
     // stop the Qt application
     impl.stop();
+
+    while (!impl.qtapp_stopped())
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
 }

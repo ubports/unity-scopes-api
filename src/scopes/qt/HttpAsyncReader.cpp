@@ -15,8 +15,6 @@
 *
 * Author: Xavi Garcia <xavi.garcia.mena@canonical.com>
 */
-// allow experimental headers
-#define _ENABLE_QT_EXPERIMENTAL_
 
 #include <unity/scopes/qt/HttpAsyncReader.h>
 #include <core/net/uri.h>

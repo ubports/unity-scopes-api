@@ -104,8 +104,7 @@ In addition, the library must provide two functions with "C" linkage:
  - a create function that must return a pointer to the derived instance
  - a destroy function that is passed the pointer returned by the create function
 
-Typically, the create and destroy functions will simply call `new` and `delete`, respectively. (However,
-there is no requirement that the derived class instance must be heap-allocated.)
+Typically, the create and destroy functions will simply call `new` and `delete`, respectively.
 If the create function throws an exception, the destroy function will not be called. If the create function returns
 NULL, the destroy function _will_ be called with NULL as its argument.
 
@@ -116,13 +115,13 @@ Rather than hard-coding the names of the functions, use the #UNITY_SCOPE_CREATE_
 unity::scopes::ScopeBase*
 UNITY_SCOPE_CREATE_FUNCTION()
 {
-    return new MyScope; // Example only, heap-allocation is not mandatory
+    return new MyScope;
 }
 
 void
 UNITY_SCOPE_DESTROY_FUNCTION(unity::scopes::ScopeBase* scope)
 {
-    delete scope;       // Example only, heap-allocation is not mandatory
+    delete scope;
 }
 ~~~
 
@@ -376,8 +375,7 @@ private:
 /**
 \brief The function called by the scopes run time to initialize the scope.
 It must return a pointer to an instance derived from `ScopeBase`. The returned
-instance need not be heap-allocated, but must remain in scope until the
-destroy function is called by the scopes run time.
+instance must remain in scope until the destroy function is called by the scopes run time.
 
 If this function throws an exception, the destroy function will _not_ be called. If this function returns NULL,
 the destroy function _will_ be called with NULL as its argument.

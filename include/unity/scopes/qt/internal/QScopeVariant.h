@@ -45,7 +45,6 @@ class QActionMetadataImpl;
 class QScopeVariant : public QVariant
 {
 public:
-    //    explicit QScopeVariant() noexcept;
     virtual ~QScopeVariant();
 
     QScopeVariant(QScopeVariant const& other);
@@ -65,9 +64,6 @@ public:
     std::string get_string() const;
 
 private:
-    /**
-    \brief Creates a Variant instance that stores the supplied integer.
-    */
     explicit QScopeVariant(Variant* val) noexcept;
 
     void setInternalVariant(Variant* val);

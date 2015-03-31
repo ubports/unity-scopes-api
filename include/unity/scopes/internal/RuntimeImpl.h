@@ -64,6 +64,7 @@ public:
 
     std::string cache_directory() const;
     std::string tmp_directory() const;
+    std::string config_directory() const;
 
     ~RuntimeImpl();
 

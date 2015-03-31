@@ -61,6 +61,9 @@ static constexpr char const* DFLT_HOME_LOG_SUBDIR = ".local/share/unity-scopes";
 static constexpr int DFLT_MAX_LOG_FILE_SIZE = 512 * 1024;       // bytes, individual file size
 static constexpr int DFLT_MAX_LOG_DIR_SIZE = 2 * 1024 * 1024;   // bytes, sum of file sizes
 
+static constexpr bool DFLT_LOCATION_PERMITTED = true;    // Whether a scope that wants location data, but does not
+                                                         // have a settings.ini file yet, actually gets the data.
+
 } // namespace internal
 
 } // namespace scopes

@@ -18,6 +18,10 @@
 
 #pragma once
 
+#ifndef _ENABLE_QT_EXPERIMENTAL_
+#error You should define _ENABLE_QT_EXPERIMENTAL_ in order to use this experimental header file.
+#endif
+
 #include <unity/util/DefinesPtrs.h>
 
 #pragma GCC diagnostic push
@@ -25,8 +29,6 @@
 #include <QtCore/QVariantMap>
 #pragma GCC diagnostic pop
 #include <QtCore/QString>
-#include <QtCore/QSharedPointer>
-#include <QtCore/QScopedPointer>
 
 #include <memory>
 
@@ -51,7 +53,7 @@ class QSearchReplyImpl;
 /*! \typedef QDepartmentList
 \brief List of departments (see unity::scopes::qt::QDepartment)
 */
-typedef QList<QSharedPointer<QDepartment const>> QDepartmentList;
+typedef QList<std::shared_ptr<QDepartment const>> QDepartmentList;
 
 /**
 \brief A department with optional sub-departments.

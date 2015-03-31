@@ -18,6 +18,10 @@
 
 #pragma once
 
+#ifndef _ENABLE_QT_EXPERIMENTAL_
+#error You should define _ENABLE_QT_EXPERIMENTAL_ in order to use this experimental header file.
+#endif
+
 #include <unity/util/DefinesPtrs.h>
 #include <unity/scopes/Location.h>
 
@@ -113,6 +117,13 @@ public:
     bool has_location() const;
 
     /**
+    \brief Remove location data entirely.
+
+    This method does nothing if no location data is present.
+    */
+    void remove_location();
+
+    /**
     \brief Sets a hint.
 
     \param key The name of the hint.
@@ -160,7 +171,6 @@ public:
 private:
     /// @cond
     std::unique_ptr<internal::QSearchMetadataImpl> p;
-    friend class internal::QSearchMetadataImpl;
     /// @endcond
 };
 

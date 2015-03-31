@@ -18,6 +18,10 @@
 
 #pragma once
 
+#ifndef _ENABLE_QT_EXPERIMENTAL_
+#error You should define _ENABLE_QT_EXPERIMENTAL_ in order to use this experimental header file.
+#endif
+
 #include <unity/util/DefinesPtrs.h>
 #include <unity/util/NonCopyable.h>
 #include <unity/scopes/SearchListenerBase.h>
@@ -152,7 +156,6 @@ private:
     void init(QSearchQueryBaseAPI* query_api);
 
     std::unique_ptr<internal::QSearchQueryBaseImpl> p;
-    friend class internal::QSearchQueryBaseImpl;
     friend class QSearchQueryBaseAPI;
     ///@endcond
 };

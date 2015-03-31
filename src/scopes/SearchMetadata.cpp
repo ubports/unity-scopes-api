@@ -89,6 +89,11 @@ bool SearchMetadata::has_location() const
     return static_cast<internal::SearchMetadataImpl*>(p.get())->has_location();
 }
 
+void SearchMetadata::remove_location()
+{
+    static_cast<internal::SearchMetadataImpl*>(p.get())->remove_location();
+}
+
 void SearchMetadata::set_hint(std::string const& key, Variant const& value)
 {
     static_cast<internal::SearchMetadataImpl*>(p.get())->hint(key) = value;

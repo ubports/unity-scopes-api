@@ -18,6 +18,10 @@
 
 #pragma once
 
+#ifndef _ENABLE_QT_EXPERIMENTAL_
+#error You should define _ENABLE_QT_EXPERIMENTAL_ in order to use this experimental header file.
+#endif
+
 #include <unity/scopes/ScopeBase.h>
 #include <unity/scopes/QueryBase.h>
 #include <unity/scopes/ReplyProxyFwd.h>
@@ -48,10 +52,6 @@ class QScopeBaseAPIImpl;
 /**
  * Defines the lifecycle of scope plugin, and acts as a factory
  * for Query and Preview objects.
- *
- * Note that the #preview and #search methods are each called on
- * different threads, so some form of interlocking is required
- * if shared data structures are used.
  */
 class QScopeBaseAPI : public unity::scopes::ScopeBase
 {
@@ -105,7 +105,6 @@ public:
 private:
     /// @cond
     std::unique_ptr<internal::QScopeBaseAPIImpl> p;
-    friend class internal::QScopeBaseAPIImpl;
     /// @endcond
 };
 
