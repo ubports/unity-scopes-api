@@ -50,10 +50,7 @@ struct ChildScope
     */
     ChildScope(std::string const& id,
                bool enabled,
-               std::set<std::string> keywords = {})
-        : id(id)
-        , enabled(enabled)
-        , keywords(keywords) {}
+               std::set<std::string> keywords = {});
 
     std::string id;                 ///< The scope id of this child scope.
     bool enabled;                   ///< Whether this child scope should be aggregated.
