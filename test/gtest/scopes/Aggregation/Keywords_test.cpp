@@ -76,6 +76,14 @@ public:
         return results_;
     }
 
+    void reset()
+    {
+        lock_guard<mutex> lock(mutex_);
+
+        results_.clear();
+        query_complete_ = false;
+    }
+
 private:
     map<string, vector<string>> results_;
     bool query_complete_;
@@ -128,48 +136,113 @@ private:
 // Once a scope's subsearch completes, it pushes a single result with the scope's ID as the
 // category ID. This allows us to set up various callgraphs by writing to the various command files.
 
-TEST_F(KeywordsTest, blah)
+TEST_F(KeywordsTest, subsearch_disabled_child)
 {
     // Create an empty config directory for scope A
     remove_config_dir();
     create_config_dir();
 
-    system("cat >A.cmd << EOF\nB\nC\nEOF");
-    system(">B.cmd");
-    system(">C.cmd");
+    system("cat >A.cmd << EOF\nB\nC\nD\nEOF");
     auto receiver = make_shared<CountReceiver>();
 
-    auto x = scope()->child_scopes();
+    scope()->search("A", SearchMetadata("unused", "unused"), receiver);
+    receiver->wait_until_finished();
 
+    // Should see all scopes' results here as all children are enabled by default
+    auto r = receiver->results();
+    EXPECT_EQ(4, r.size());
+    EXPECT_TRUE(r.find("A") != r.end());
+    EXPECT_TRUE(r.find("B") != r.end());
+    EXPECT_TRUE(r.find("C") != r.end());
+    EXPECT_TRUE(r.find("D") != r.end());
+
+    // Disable child scope "C"
     {
         ChildScopeList list;
-        list.emplace_back(ChildScope{"B", false});
+        list.emplace_back(ChildScope{"B", true});
+        list.emplace_back(ChildScope{"C", false});
+        list.emplace_back(ChildScope{"D", true});
+        scope()->set_child_scopes(list);
+    }
+
+    receiver->reset();
+    scope()->search("A", SearchMetadata("unused", "unused"), receiver);
+    receiver->wait_until_finished();
+
+    // Should not see scope C's results here as it has been disabled
+    r = receiver->results();
+    EXPECT_EQ(3, r.size());
+    EXPECT_TRUE(r.find("A") != r.end());
+    EXPECT_TRUE(r.find("B") != r.end());
+    EXPECT_TRUE(r.find("D") != r.end());
+
+    // Disable child scope "D"
+    {
+        ChildScopeList list;
+        list.emplace_back(ChildScope{"B", true});
+        list.emplace_back(ChildScope{"C", false});
+        list.emplace_back(ChildScope{"D", false});
+        scope()->set_child_scopes(list);
+    }
+
+    receiver->reset();
+    scope()->search("A", SearchMetadata("unused", "unused"), receiver);
+    receiver->wait_until_finished();
+
+    // Should not see scope C and D's results here as they are disabled
+    r = receiver->results();
+    EXPECT_EQ(2, r.size());
+    EXPECT_TRUE(r.find("A") != r.end());
+    EXPECT_TRUE(r.find("B") != r.end());
+
+    // Re-enable child scope "C"
+    {
+        ChildScopeList list;
+        list.emplace_back(ChildScope{"B", true});
+        list.emplace_back(ChildScope{"C", true});
+        list.emplace_back(ChildScope{"D", false});
+        scope()->set_child_scopes(list);
+    }
+
+    receiver->reset();
+    scope()->search("A", SearchMetadata("unused", "unused"), receiver);
+    receiver->wait_until_finished();
+
+    // Should not see scope D's results here as it is still disabled
+    r = receiver->results();
+    EXPECT_EQ(3, r.size());
+    EXPECT_TRUE(r.find("A") != r.end());
+    EXPECT_TRUE(r.find("B") != r.end());
+    EXPECT_TRUE(r.find("C") != r.end());
+
+    // Re-enable all child scopes
+    {
+        ChildScopeList list;
+        list.emplace_back(ChildScope{"B", true});
         list.emplace_back(ChildScope{"C", true});
         list.emplace_back(ChildScope{"D", true});
         scope()->set_child_scopes(list);
     }
 
-    x = scope()->child_scopes();
-
-    SearchMetadata meta("unused", "unused");
-    meta["B"] = VariantArray{Variant("Bkw1"), Variant("Bkw2")};
-    meta["C"] = VariantArray{Variant("Ckw1"), Variant("Ckw2")};
-    meta["D"] = VariantArray{Variant("Dkw1"), Variant("Dkw2")};
-
-    scope()->search("A", meta, receiver);
+    receiver->reset();
+    scope()->search("A", SearchMetadata("unused", "unused"), receiver);
     receiver->wait_until_finished();
 
-    x = scope()->child_scopes();
-
-    // should not see B here as it has been disabled
-    auto r = receiver->results();
-    EXPECT_EQ(2, r.size());
+    // Should see all scopes' results here as all children are enabled again
+    r = receiver->results();
+    EXPECT_EQ(4, r.size());
     EXPECT_TRUE(r.find("A") != r.end());
+    EXPECT_TRUE(r.find("B") != r.end());
     EXPECT_TRUE(r.find("C") != r.end());
-
-    remove_config_dir();
-    create_config_dir();
+    EXPECT_TRUE(r.find("D") != r.end());
 }
+
+//    // Provide test keywords via search metadata so that the test scope can insert them
+//    // accordingly during find_child_scopes()
+//    SearchMetadata meta("unused", "unused");
+//    meta["B"] = VariantArray{Variant("Bkw1"), Variant("Bkw2")};
+//    meta["C"] = VariantArray{Variant("Ckw1"), Variant("Ckw2")};
+//    meta["D"] = VariantArray{Variant("Dkw1"), Variant("Dkw2")};
 
 #pragma GCC diagnostic pop
 
