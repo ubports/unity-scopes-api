@@ -127,17 +127,27 @@ std::chrono::system_clock::time_point DateTimePickerFilterImpl::selected_date(Fi
 {
     if (filter_state.has_filter(id()))
     {
+        bool valid = true;
         try
         {
             auto vm = FilterBaseImpl::get(filter_state, id()).get_dict();
             auto it = vm.find("date");
             if (it != vm.end())
             {
-                return to_timepoint(it->second.get_int64_t());
+                auto date = to_timepoint(it->second.get_int64_t());
+                if (is_valid_date(date))
+                {
+                    return date;
+                }
+                valid = false;
             }
         }
         catch (...)
         {
+        }
+        if (!valid)
+        {
+            throw LogicException("DateTimePickerFilter::selected_date(): date for filter '" + id() + "' out of allowed range");
         }
     }
     throw unity::scopes::NotFoundException("DateTimePickerFilter::selected_date(): date not set for filter ", id());
@@ -145,6 +155,11 @@ std::chrono::system_clock::time_point DateTimePickerFilterImpl::selected_date(Fi
 
 void DateTimePickerFilterImpl::update_state(FilterState& filter_state, std::chrono::system_clock::time_point const& date) const
 {
+    if (!is_valid_date(date))
+    {
+        throw LogicException("DateTimePickerFilter::update_state(): date for filter '" + id() + "' out of allowed range");
+    }
+
     update_state(filter_state, id(), date);
 }
 
@@ -159,6 +174,11 @@ void DateTimePickerFilterImpl::update_state(FilterState& filter_state, std::stri
     VariantMap vm;
     vm["date"] = to_seconds_from_epoch(date);
     state[filter_id] = vm;
+}
+
+bool DateTimePickerFilterImpl::is_valid_date(std::chrono::system_clock::time_point const& date) const
+{
+    return ((m_min == nullptr || date >= *m_min - std::chrono::seconds(1)) && (m_max == nullptr || date < *m_max + std::chrono::seconds(1)));
 }
 
 void DateTimePickerFilterImpl::serialize(VariantMap& var) const

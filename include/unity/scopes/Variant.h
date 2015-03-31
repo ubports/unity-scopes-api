@@ -73,7 +73,7 @@ public:
     \brief Creates a Variant instance that stores the supplied integer.
     */
     explicit Variant(int val) noexcept;
-    
+
     explicit Variant(int64_t val) noexcept;
 
     /**

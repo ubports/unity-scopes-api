@@ -24,6 +24,7 @@
 #include <unity/scopes/ScopeExceptions.h>
 
 using namespace unity::scopes;
+using namespace unity::scopes::experimental;
 using namespace unity::scopes::internal;
 
 TEST(DateTimePickerFilter, basic)
@@ -86,6 +87,18 @@ TEST(DateTimePickerFilter, filter_state)
     filter->update_state(state, tp);
     EXPECT_TRUE(filter->has_selected_date(state));
     EXPECT_TRUE(tp - filter->selected_date(state) < std::chrono::seconds(1));
+
+    // set minimum that is higher than selected date
+    auto min = tp + std::chrono::hours(1);
+    filter->set_minimum(min);
+    EXPECT_THROW(filter->selected_date(state), unity::LogicException);
+
+    // set maximum that is lower than selected date
+    auto max = tp - std::chrono::hours(1);
+    filter->set_minimum(tp);
+    EXPECT_NO_THROW(filter->selected_date(state));
+    filter->set_maximum(max);
+    EXPECT_THROW(filter->selected_date(state), unity::LogicException);
 }
 
 TEST(DateTimePickerFilter, serialize)

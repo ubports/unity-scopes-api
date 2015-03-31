@@ -25,6 +25,9 @@ namespace unity
 namespace scopes
 {
 
+namespace experimental
+{
+
 DateTimePickerFilter::DateTimePickerFilter(internal::DateTimePickerFilterImpl* impl)
     : FilterBase(impl)
 {
@@ -113,6 +116,8 @@ void DateTimePickerFilter::update_state(FilterState& filter_state, std::string c
 internal::DateTimePickerFilterImpl* DateTimePickerFilter::fwd() const
 {
     return dynamic_cast<internal::DateTimePickerFilterImpl*>(p.get());
+}
+
 }
 
 }
