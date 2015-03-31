@@ -65,6 +65,21 @@ std::string DateTimePickerFilter::date_label() const
     return fwd()->date_label();
 }
 
+DateTimePickerFilter::Mode DateTimePickerFilter::mode() const
+{
+    return fwd()->mode();
+}
+
+bool DateTimePickerFilter::has_minimum() const
+{
+    return fwd()->has_minimum();
+}
+
+bool DateTimePickerFilter::has_maximum() const
+{
+    return fwd()->has_maximum();
+}
+
 std::chrono::system_clock::time_point DateTimePickerFilter::minimum() const
 {
     return fwd()->minimum();

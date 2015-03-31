@@ -45,7 +45,7 @@ public:
     UNITY_DEFINES_PTRS(DateTimePickerFilter);
 /// @endcond
 
-    enum ModeFLags {
+    enum ModeFlags {
         Years,
         Months,
         Days,
@@ -70,6 +70,11 @@ public:
     */
     std::string time_label() const;
     std::string date_label() const;
+
+    Mode mode() const;
+
+    bool has_minimum() const;
+    bool has_maximum() const;
 
     std::chrono::system_clock::time_point minimum() const;
     std::chrono::system_clock::time_point maximum() const;

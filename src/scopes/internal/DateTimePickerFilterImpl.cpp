@@ -20,6 +20,7 @@
 #include <unity/scopes/internal/Utils.h>
 #include <unity/scopes/FilterState.h>
 #include <unity/UnityExceptions.h>
+#include <unity/scopes/ScopeExceptions.h>
 
 namespace unity
 {
@@ -72,6 +73,21 @@ std::string DateTimePickerFilterImpl::date_label() const
     return m_date_label;
 }
 
+DateTimePickerFilter::Mode DateTimePickerFilterImpl::mode() const
+{
+    return m_mode;
+}
+
+bool DateTimePickerFilterImpl::has_minimum() const
+{
+    return m_min != nullptr;
+}
+
+bool DateTimePickerFilterImpl::has_maximum() const
+{
+    return m_max != nullptr;
+}
+
 std::chrono::system_clock::time_point DateTimePickerFilterImpl::minimum() const
 {
     if (m_min)
@@ -109,7 +125,22 @@ bool DateTimePickerFilterImpl::has_selected_date(FilterState const& filter_state
 
 std::chrono::system_clock::time_point DateTimePickerFilterImpl::selected_date(FilterState const& filter_state) const
 {
-    return std::chrono::system_clock::time_point::min();
+    if (filter_state.has_filter(id()))
+    {
+        try
+        {
+            auto vm = FilterBaseImpl::get(filter_state, id()).get_dict();
+            auto it = vm.find("date");
+            if (it != vm.end())
+            {
+                return to_timepoint(it->second.get_int64_t());
+            }
+        }
+        catch (...)
+        {
+        }
+    }
+    throw unity::scopes::NotFoundException("DateTimePickerFilter::selected_date(): date not set for filter ", id());
 }
 
 void DateTimePickerFilterImpl::update_state(FilterState& filter_state, std::chrono::system_clock::time_point const& date) const
@@ -200,15 +231,14 @@ std::string DateTimePickerFilterImpl::filter_type() const
 
 int64_t DateTimePickerFilterImpl::to_seconds_from_epoch(std::chrono::system_clock::time_point const& tp)
 {
-    auto const diff = tp - std::chrono::system_clock::time_point();
-    return std::chrono::duration_cast<std::chrono::seconds>(diff).count();
+    auto dur = tp.time_since_epoch();
+    return std::chrono::duration_cast<std::chrono::seconds>(dur).count();
 }
 
 std::chrono::system_clock::time_point DateTimePickerFilterImpl::to_timepoint(int64_t seconds_from_epoch)
 {
     std::chrono::seconds const secs(seconds_from_epoch);
-    std::chrono::system_clock::time_point const tp = std::chrono::system_clock::time_point() + secs;
-    return tp;
+    return std::chrono::system_clock::time_point(secs);
 }
 
 }

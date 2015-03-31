@@ -45,6 +45,11 @@ public:
 
     std::string time_label() const;
     std::string date_label() const;
+    
+    DateTimePickerFilter::Mode mode() const;
+
+    bool has_minimum() const;
+    bool has_maximum() const;
 
     std::chrono::system_clock::time_point minimum() const;
     std::chrono::system_clock::time_point maximum() const;
@@ -56,13 +61,14 @@ public:
 
     static void update_state(FilterState& filter_state, std::string const& filter_id, std::chrono::system_clock::time_point const& date);
     static DateTimePickerFilter::SPtr create(VariantMap const& var);
+    
+    static int64_t to_seconds_from_epoch(std::chrono::system_clock::time_point const& tp);
+    static std::chrono::system_clock::time_point to_timepoint(int64_t seconds_from_epoch);
 
 protected:
     void serialize(VariantMap& var) const override;
     void deserialize(VariantMap const& var);
     std::string filter_type() const override;
-    static int64_t to_seconds_from_epoch(std::chrono::system_clock::time_point const& tp);
-    std::chrono::system_clock::time_point to_timepoint(int64_t seconds_from_epoch);
 
 private:
     DateTimePickerFilter::Mode m_mode;
