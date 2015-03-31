@@ -68,8 +68,9 @@ struct PreviewRequest
 
 struct ChildScope
 {
-    id      @0 : Text;
-    enabled @1 : Bool;
+    id       @0 : Text;
+    enabled  @1 : Bool;
+    keywords @2 : List(Text);
 }
 
 struct ChildScopesResponse

@@ -225,7 +225,15 @@ ChildScopeList ZmqScope::child_scopes()
     {
         string id = list[i].getId();
         bool enabled = list[i].getEnabled();
-        child_scope_list.push_back( ChildScope{id, enabled} );
+
+        set<string> keywords;
+        auto keywords_capn = list[i].getKeywords();
+        for (auto const& kw : keywords_capn)
+        {
+            keywords.emplace(kw);
+        }
+
+        child_scope_list.push_back( ChildScope{id, enabled, keywords} );
     }
     return child_scope_list;
 }
@@ -238,12 +246,17 @@ bool ZmqScope::set_child_scopes(ChildScopeList const& child_scopes)
     auto in_params = request.initInParams().getAs<capnproto::Scope::SetChildScopesRequest>();
     auto list = in_params.initChildScopes(child_scopes.size());
 
-    int i = 0;
-    for (auto const& child_scope : child_scopes)
+    for (size_t i = 0; i < child_scopes.size(); ++i)
     {
-        list[i].setId(child_scope.id);
-        list[i].setEnabled(child_scope.enabled);
-        ++i;
+        list[i].setId(child_scopes[i].id);
+        list[i].setEnabled(child_scopes[i].enabled);
+
+        auto keywords = list[i].initKeywords(child_scopes[i].keywords.size());
+        int j = 0;
+        for (auto const& kw : child_scopes[i].keywords)
+        {
+            keywords.set(j++, kw);
+        }
     }
 
     auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_scope_(request_builder); });

@@ -201,8 +201,8 @@ void ScopeI::preview_(Current const& current,
 }
 
 void ScopeI::child_scopes_(Current const&,
-                      capnp::AnyPointer::Reader&,
-                      capnproto::Response::Builder& r)
+                           capnp::AnyPointer::Reader&,
+                           capnproto::Response::Builder& r)
 {
     auto delegate = dynamic_pointer_cast<ScopeObjectBase>(del());
     assert(delegate);
@@ -213,18 +213,23 @@ void ScopeI::child_scopes_(Current const&,
     auto list_response = r.initPayload().getAs<capnproto::Scope::ChildScopesResponse>();
     auto list = list_response.initReturnValue(child_scopes.size());
 
-    int i = 0;
-    for (auto const& child_scope : child_scopes)
+    for (size_t i = 0; i < child_scopes.size(); ++i)
     {
-        list[i].setId(child_scope.id);
-        list[i].setEnabled(child_scope.enabled);
-        ++i;
+        list[i].setId(child_scopes[i].id);
+        list[i].setEnabled(child_scopes[i].enabled);
+
+        auto keywords = list[i].initKeywords(child_scopes[i].keywords.size());
+        int j = 0;
+        for (auto const& kw : child_scopes[i].keywords)
+        {
+            keywords.set(j++, kw);
+        }
     }
 }
 
 void ScopeI::set_child_scopes_(Current const&,
-                      capnp::AnyPointer::Reader& in_params,
-                      capnproto::Response::Builder& r)
+                               capnp::AnyPointer::Reader& in_params,
+                               capnproto::Response::Builder& r)
 {
     auto delegate = std::dynamic_pointer_cast<ScopeObjectBase>(del());
     assert(delegate);
@@ -236,7 +241,15 @@ void ScopeI::set_child_scopes_(Current const&,
     {
         string id = list[i].getId();
         bool enabled = list[i].getEnabled();
-        child_scope_list.push_back( ChildScope{id, enabled} );
+
+        set<string> keywords;
+        auto keywords_capn = list[i].getKeywords();
+        for (auto const& kw : keywords_capn)
+        {
+            keywords.emplace(kw);
+        }
+
+        child_scope_list.push_back( ChildScope{id, enabled, keywords} );
     }
 
     bool result = delegate->set_child_scopes(child_scope_list);
