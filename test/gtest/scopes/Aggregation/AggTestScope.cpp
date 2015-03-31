@@ -133,6 +133,11 @@ private:
 
 }  // namespace
 
+AggTestScope::AggTestScope()
+    : metadata_("", "")
+{
+}
+
 void AggTestScope::start(string const& scope_id)
 {
     lock_guard<mutex> lock(mutex_);
@@ -150,6 +155,7 @@ void AggTestScope::run()
 SearchQueryBase::UPtr AggTestScope::search(CannedQuery const& query, SearchMetadata const& metadata)
 {
     lock_guard<mutex> lock(mutex_);
+    metadata_ = metadata;
     return SearchQueryBase::UPtr(new TestQuery(query, metadata, id_, registry()));
 }
 
@@ -161,11 +167,26 @@ PreviewQueryBase::UPtr AggTestScope::preview(Result const&, ActionMetadata const
 ChildScopeList AggTestScope::find_child_scopes() const
 {
     ChildScopeList list;
-    list.emplace_back(ChildScope{"A", true});
-    list.emplace_back(ChildScope{"B", true});
-    list.emplace_back(ChildScope{"C", true});
-    list.emplace_back(ChildScope{"D", true});
+    list.emplace_back(ChildScope{"A", true, get_keywords("A")});
+    list.emplace_back(ChildScope{"B", true, get_keywords("B")});
+    list.emplace_back(ChildScope{"C", true, get_keywords("C")});
+    list.emplace_back(ChildScope{"D", true, get_keywords("D")});
     return list;
+}
+
+set<string> AggTestScope::get_keywords(string child_id) const
+{
+    lock_guard<mutex> lock(mutex_);
+    set<string> keywords;
+    if (metadata_.contains_hint(child_id) &&
+        metadata_[child_id].which() == Variant::Type::Array)
+    {
+        for (auto const& kw : metadata_[child_id].get_array())
+        {
+            keywords.emplace(kw.get_string());
+        }
+    }
+    return keywords;
 }
 
 extern "C"

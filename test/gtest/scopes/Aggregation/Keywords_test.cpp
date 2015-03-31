@@ -139,6 +139,8 @@ TEST_F(KeywordsTest, blah)
     system(">C.cmd");
     auto receiver = make_shared<CountReceiver>();
 
+    auto x = scope()->child_scopes();
+
     {
         ChildScopeList list;
         list.emplace_back(ChildScope{"A", true});
@@ -148,11 +150,17 @@ TEST_F(KeywordsTest, blah)
         scope()->set_child_scopes(list);
     }
 
-    auto x = scope()->child_scopes();
+    x = scope()->child_scopes();
 
-    scope()->search("A", SearchMetadata("unused", "unused"), receiver);
+    SearchMetadata meta("unused", "unused");
+    meta["B"] = VariantArray{Variant("hello"), Variant("there")};
+
+    //std::this_thread::sleep_for(std::chrono::seconds(15));
+    scope()->search("A", meta, receiver);
 
     receiver->wait_until_finished();
+
+    x = scope()->child_scopes();
 
     auto r = receiver->results();
     EXPECT_EQ(3, r.size());

@@ -195,8 +195,8 @@ ChildScopeList ScopeBaseImpl::find_child_scopes() const
     auto all_scopes = reg->list();
     for (auto const& scope : all_scopes)
     {
-        // New scopes are added disabled by default
-        return_list.push_back( ChildScope{scope.first, true} );
+        // New scopes are added enabled by default
+        return_list.push_back( ChildScope{scope.first} );
     }
     return return_list;
 }

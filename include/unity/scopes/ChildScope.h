@@ -49,7 +49,7 @@ struct ChildScope
      \param keywords The list of keywords used to aggregate this scope (if any).
     */
     ChildScope(std::string const& id,
-               bool enabled,
+               bool enabled = true,
                std::set<std::string> keywords = {});
 
     std::string id;                 ///< The scope id of this child scope.

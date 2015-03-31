@@ -48,7 +48,7 @@ ChildScopeList ChildScopesRepository::child_scopes(ChildScopeList const& child_s
     for (auto const& child : child_scopes_unordered)
     {
         // store index to the child_scopes_unordered item in unordered_set ->
-        unordered_set.insert(std::make_pair(child.id, i++));
+        unordered_set.emplace(std::make_pair(child.id, i++));
     }
 
     // fill ordered_set
@@ -65,16 +65,9 @@ ChildScopeList ChildScopesRepository::child_scopes(ChildScopeList const& child_s
             // probably uninstalled since the repo was last written)
 
             // -> now store index to the child_scopes_unordered item in ordered_set ->
-            ordered_set.insert(std::make_pair(child.id, it->second));
+            ordered_set.emplace(std::make_pair(child.id, it->second));
             unordered_set.erase(it);
         }
-    }
-
-    // has anything changed since the repo was last written?
-    if (child_scopes_ordered.size() == ordered_set.size() && // if no scopes have been removed
-        unordered_set.size() == 0)                           // and no scopes have been added
-    {
-        return child_scopes_ordered; // return the repo list as is
     }
 
     // now create a new list by first adding child_scopes_ordered then child_scopes_unordered,
@@ -83,11 +76,7 @@ ChildScopeList ChildScopesRepository::child_scopes(ChildScopeList const& child_s
     {
         // first add child_scopes_ordered to new_child_scopes_ordered
         // (known scopes from repo)
-        if (child_scopes_ordered.size() == ordered_set.size())
-        {
-            new_child_scopes_ordered = child_scopes_ordered;
-        }
-        else if (!ordered_set.empty())
+        if (!ordered_set.empty())
         {
             // use ordered_set as a mask
             for (auto& child : child_scopes_ordered)
@@ -104,13 +93,7 @@ ChildScopeList ChildScopesRepository::child_scopes(ChildScopeList const& child_s
 
         // then append whats left in child_scopes_unordered to new_child_scopes_ordered
         // (newly installed scopes)
-        if (child_scopes_unordered.size() == unordered_set.size())
-        {
-            new_child_scopes_ordered.insert(new_child_scopes_ordered.end(),
-                                            child_scopes_unordered.begin(),
-                                            child_scopes_unordered.end());
-        }
-        else if (!unordered_set.empty())
+        if (!unordered_set.empty())
         {
             // use unordered_set as a mask
             for (auto const& child : child_scopes_unordered)

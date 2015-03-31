@@ -23,6 +23,8 @@
 class AggTestScope : public unity::scopes::ScopeBase
 {
 public:
+    AggTestScope();
+
     virtual void start(std::string const&) override;
 
     virtual void stop() override;
@@ -39,5 +41,8 @@ public:
 
 private:
     std::string id_;
-    std::mutex mutex_;
+    mutable std::mutex mutex_;
+    unity::scopes::SearchMetadata metadata_;
+
+    std::set<std::string> get_keywords(std::string child_id) const;
 };

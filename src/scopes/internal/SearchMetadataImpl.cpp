@@ -67,7 +67,7 @@ SearchMetadataImpl::SearchMetadataImpl(VariantMap const& var)
         std::set<std::string> keywords_s;
         for (auto const& keyword_v : keywords_v)
         {
-            keywords_s.insert(keyword_v.get_string());
+            keywords_s.emplace(keyword_v.get_string());
         }
         aggregated_keywords_ = keywords_s;
     }
