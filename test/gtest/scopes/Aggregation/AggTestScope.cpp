@@ -167,7 +167,6 @@ PreviewQueryBase::UPtr AggTestScope::preview(Result const&, ActionMetadata const
 ChildScopeList AggTestScope::find_child_scopes() const
 {
     ChildScopeList list;
-    list.emplace_back(ChildScope{"A", true, get_keywords("A")});
     list.emplace_back(ChildScope{"B", true, get_keywords("B")});
     list.emplace_back(ChildScope{"C", true, get_keywords("C")});
     list.emplace_back(ChildScope{"D", true, get_keywords("D")});

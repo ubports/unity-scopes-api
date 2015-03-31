@@ -143,7 +143,6 @@ TEST_F(KeywordsTest, blah)
 
     {
         ChildScopeList list;
-        list.emplace_back(ChildScope{"A", true});
         list.emplace_back(ChildScope{"B", false});
         list.emplace_back(ChildScope{"C", true});
         list.emplace_back(ChildScope{"D", true});
@@ -153,19 +152,19 @@ TEST_F(KeywordsTest, blah)
     x = scope()->child_scopes();
 
     SearchMetadata meta("unused", "unused");
-    meta["B"] = VariantArray{Variant("hello"), Variant("there")};
+    meta["B"] = VariantArray{Variant("Bkw1"), Variant("Bkw2")};
+    meta["C"] = VariantArray{Variant("Ckw1"), Variant("Ckw2")};
+    meta["D"] = VariantArray{Variant("Dkw1"), Variant("Dkw2")};
 
-    //std::this_thread::sleep_for(std::chrono::seconds(15));
     scope()->search("A", meta, receiver);
-
     receiver->wait_until_finished();
 
     x = scope()->child_scopes();
 
+    // should not see B here as it has been disabled
     auto r = receiver->results();
-    EXPECT_EQ(3, r.size());
+    EXPECT_EQ(2, r.size());
     EXPECT_TRUE(r.find("A") != r.end());
-    EXPECT_TRUE(r.find("B") != r.end());
     EXPECT_TRUE(r.find("C") != r.end());
 
     remove_config_dir();
