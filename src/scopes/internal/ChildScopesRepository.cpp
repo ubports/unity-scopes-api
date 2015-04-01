@@ -185,7 +185,7 @@ ChildScopeEnabledMap ChildScopesRepository::json_to_list(std::string const& chil
 
         // If an aggregator aggregates the same child scope more than once (say, for different keywords),
         // we count the enabled state of its first appearance as the overall enabled state of that child.
-        if (return_map.find(id_node->as_string()) != return_map.end())
+        if (return_map.find(id_node->as_string()) == return_map.end())
         {
             return_map.insert(make_pair(id_node->as_string(), enabled_node->as_bool()));
         }
