@@ -17,6 +17,7 @@
  */
 
 #include <unity/scopes/ChildScope.h>
+#include <unity/scopes/internal/ScopeMetadataImpl.h>
 
 namespace unity
 {
@@ -27,7 +28,8 @@ namespace scopes
 ChildScope::ChildScope(std::string const& id,
                        bool enabled,
                        std::set<std::string> keywords)
-    : id(id)
+    : metadata(internal::ScopeMetadataImpl::create(nullptr)) ///!
+    , id(id)
     , enabled(enabled)
     , keywords(keywords) {}
 

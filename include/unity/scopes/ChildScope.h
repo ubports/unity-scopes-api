@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <unity/scopes/ScopeMetadata.h>
+
 #include <set>
 #include <string>
 #include <vector>
@@ -52,6 +54,7 @@ struct ChildScope
                bool enabled = true,
                std::set<std::string> keywords = {});
 
+    ScopeMetadata metadata;         ///< The scope metadata of this child scope.
     std::string id;                 ///< The scope id of this child scope.
     bool enabled;                   ///< Whether this child scope should be aggregated.
     std::set<std::string> keywords; ///< The list of keywords used to aggregate this scope (if any).
