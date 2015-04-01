@@ -112,10 +112,6 @@ public:
                              std::string const& query_string,
                              FilterState const& filter_state,
                              SearchListenerBase::SPtr const& reply);
-    QueryCtrlProxy subsearch(ChildScope const& scope,
-                             std::string const& query_string,
-                             FilterState const& filter_state,
-                             SearchListenerBase::SPtr const& reply);
     QueryCtrlProxy subsearch(ScopeProxy const& scope,
                              std::string const& query_string,
                              std::string const& department_id,
@@ -133,13 +129,6 @@ public:
                              SearchMetadata const& hints,
                              SearchListenerBase::SPtr const& reply);
     QueryCtrlProxy subsearch(ChildScope const& scope,
-                             std::string const& query_string,
-                             std::string const& department_id,
-                             FilterState const& filter_state,
-                             SearchMetadata const& hints,
-                             SearchListenerBase::SPtr const& reply);
-    QueryCtrlProxy subsearch(ScopeProxy const& scope,
-                             std::set<std::string> const& keywords,
                              std::string const& query_string,
                              std::string const& department_id,
                              FilterState const& filter_state,
