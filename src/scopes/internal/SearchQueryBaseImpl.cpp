@@ -60,6 +60,7 @@ SearchMetadata SearchQueryBaseImpl::search_metadata() const
 }
 
 QueryCtrlProxy SearchQueryBaseImpl::subsearch(ScopeProxy const& scope,
+                                              std::set<std::string> const& keywords,
                                               std::string const& query_string,
                                               std::string const& department_id,
                                               FilterState const& filter_state,

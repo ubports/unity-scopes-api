@@ -56,6 +56,7 @@ public:
     void set_child_scopes_func(std::function<ChildScopeList()> const& child_scopes_func);
 
     QueryCtrlProxy subsearch(ScopeProxy const& scope,
+                             std::set<std::string> const& keywords,
                              std::string const& query_string,
                              std::string const& department_id,
                              FilterState const& filter_state,
