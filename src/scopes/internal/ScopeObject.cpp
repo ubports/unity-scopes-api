@@ -190,10 +190,6 @@ MWQueryCtrlProxy ScopeObject::search(CannedQuery const& q,
                          sqb->set_history(history);
                       }
 
-                      // Let this scope's search query know how to get its child scopes if need be.
-                      // This list will be used to propagate aggregated keywords when subsearch is called from an aggregator.
-                      sqb->set_child_scopes_func([this]{ return child_scopes(); });
-
                       return search_query;
                  },
                  [&reply, &hints, this](QueryBase::SPtr query_base, MWQueryCtrlProxy ctrl_proxy) -> QueryObjectBase::SPtr {

@@ -83,11 +83,7 @@ QueryCtrlProxy SearchQueryBaseImpl::subsearch(ScopeProxy const& scope,
     }
 
     // Insert the keywords used to aggregated this child scope into its search metadata
-    query_ctrl = insert_aggregated_keywords(scope, reply, const_cast<SearchMetadata&>(metadata));
-    if (query_ctrl)
-    {
-        return query_ctrl;  // Child scope is disabled, return dummy QueryCtrlProxy.
-    }
+    const_cast<SearchMetadata&>(metadata).set_aggregated_keywords(keywords);
 
     // scope_impl can be nullptr if we use a mock scope: TypedScopeFixture<testing::Scope>
     // If so, we call the normal search without passing the history through because
@@ -150,12 +146,6 @@ void SearchQueryBaseImpl::set_history(History const& h)
     history_ = h;
 }
 
-void SearchQueryBaseImpl::set_child_scopes_func(std::function<ChildScopeList()> const& child_scopes_func)
-{
-    lock_guard<mutex> lock(mutex_);
-    child_scopes_func_ = child_scopes_func;
-}
-
 bool SearchQueryBaseImpl::valid() const
 {
     lock_guard<mutex> lock(mutex_);
@@ -207,58 +197,6 @@ QueryCtrlProxy SearchQueryBaseImpl::check_for_query_loop(ScopeProxy const& scope
     }
 
     return ctrl_proxy;  // null proxy if there was no loop
-}
-
-QueryCtrlProxy SearchQueryBaseImpl::insert_aggregated_keywords(ScopeProxy const& scope,
-                                                               SearchListenerBase::SPtr const& reply,
-                                                               SearchMetadata& metadata)
-{
-    lock_guard<mutex> lock(mutex_);
-
-    // If we don't have child_scopes_func_, this means the scope was not invocated via the middleware
-    // (e.g. during unit testing). Just return and continue with the subsearch here.
-    if (!child_scopes_func_)
-    {
-        return nullptr;
-    }
-
-    // Initialize (lazy) our child_scopes_ map
-    if (child_scopes_.empty())
-    {
-        // We use the child scopes list to find and insert aggregated keywords into subsearch metadatas.
-        // Therefore, here we put the child scopes into a map of id:ChildScope for quick reference.
-        auto child_scopes = child_scopes_func_();
-        for (auto const& child : child_scopes)
-        {
-            child_scopes_.insert(std::make_pair(child.id, child));
-        }
-    }
-
-    // Check that the target child scope is in our child_scopes_ map
-    if (child_scopes_.find(scope->identity()) == child_scopes_.end())
-    {
-        // The child scope was not specified in the child scopes list, we should not continue with the subsearch
-        reply->finished(CompletionDetails(CompletionDetails::OK,
-                                          "empty result set as target child scope \"" + scope->identity()
-                                          + "\" was not specified in this aggregator's child scopes list"));
-        return make_shared<QueryCtrlImpl>(nullptr, nullptr);  // Dummy proxy in already-cancelled state
-    }
-
-    auto child_scope = child_scopes_.at(scope->identity());
-
-    // Check that the target child scope is enabled
-    if (!child_scope.enabled)
-    {
-        // The child scope is disabled, we should not continue with the subsearch
-        reply->finished(CompletionDetails(CompletionDetails::OK,
-                                          "empty result set as target child scope \"" + scope->identity()
-                                          + "\" is currently disabled"));
-        return make_shared<QueryCtrlImpl>(nullptr, nullptr);  // Dummy proxy in already-cancelled state
-    }
-
-    // Set aggregated keywords
-    metadata.set_aggregated_keywords(child_scope.keywords);
-    return nullptr;
 }
 
 } // namespace internal

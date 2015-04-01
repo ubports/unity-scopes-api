@@ -53,8 +53,6 @@ public:
 
     void set_history(History const& h);
 
-    void set_child_scopes_func(std::function<ChildScopeList()> const& child_scopes_func);
-
     QueryCtrlProxy subsearch(ScopeProxy const& scope,
                              std::set<std::string> const& keywords,
                              std::string const& query_string,
@@ -77,13 +75,7 @@ private:
     History history_;
     std::vector<QueryCtrlProxy> subqueries_;
 
-    std::function<ChildScopeList()> child_scopes_func_;
-    std::map<std::string, ChildScope> child_scopes_;
-
     QueryCtrlProxy check_for_query_loop(ScopeProxy const& scope, SearchListenerBase::SPtr const& reply);
-    QueryCtrlProxy insert_aggregated_keywords(ScopeProxy const& scope,
-                                              SearchListenerBase::SPtr const& reply,
-                                              SearchMetadata& metadata);
 };
 
 } // namespace internal
