@@ -21,7 +21,6 @@
 #include <unity/scopes/internal/RegistryObject.h>
 #include <unity/scopes/internal/ScopeImpl.h>
 #include <unity/scopes/testing/ScopeMetadataBuilder.h>
-#include <unity/scopes/testing/MockScope.h>
 
 #include "TestScope.h"
 

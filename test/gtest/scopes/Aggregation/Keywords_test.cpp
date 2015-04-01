@@ -18,6 +18,7 @@
 
 #include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
+#include <unity/scopes/testing/ScopeMetadataBuilder.h>
 
 #include <boost/filesystem/operations.hpp>
 #include <gtest/gtest.h>
@@ -99,6 +100,13 @@ public:
         return scope_;
     }
 
+    ScopeMetadata test_metadata()
+    {
+        unity::scopes::testing::ScopeMetadataBuilder builder;
+        builder.scope_id(" ").proxy(scope_).display_name(" ").description(" ").author(" ");
+        return builder();
+    }
+
 private:
     Runtime::UPtr runtime_;
     ScopeProxy scope_;
@@ -158,10 +166,9 @@ TEST_F(KeywordsTest, subsearch_disabled_child)
     // Disable child scope "C"
     {
         ChildScopeList list;
-        ///!
-//        list.emplace_back(ChildScope{"B", true});
-//        list.emplace_back(ChildScope{"C", false});
-//        list.emplace_back(ChildScope{"D", true});
+        list.emplace_back(ChildScope{"B", test_metadata(), true});
+        list.emplace_back(ChildScope{"C", test_metadata(), false});
+        list.emplace_back(ChildScope{"D", test_metadata(), true});
         scope()->set_child_scopes(list);
     }
 
@@ -179,10 +186,9 @@ TEST_F(KeywordsTest, subsearch_disabled_child)
     // Disable child scope "D"
     {
         ChildScopeList list;
-        ///!
-//        list.emplace_back(ChildScope{"B", true});
-//        list.emplace_back(ChildScope{"C", false});
-//        list.emplace_back(ChildScope{"D", false});
+        list.emplace_back(ChildScope{"B", test_metadata(), true});
+        list.emplace_back(ChildScope{"C", test_metadata(), false});
+        list.emplace_back(ChildScope{"D", test_metadata(), false});
         scope()->set_child_scopes(list);
     }
 
@@ -199,10 +205,9 @@ TEST_F(KeywordsTest, subsearch_disabled_child)
     // Re-enable child scope "C"
     {
         ChildScopeList list;
-        ///!
-//        list.emplace_back(ChildScope{"B", true});
-//        list.emplace_back(ChildScope{"C", true});
-//        list.emplace_back(ChildScope{"D", false});
+        list.emplace_back(ChildScope{"B", test_metadata(), true});
+        list.emplace_back(ChildScope{"C", test_metadata(), true});
+        list.emplace_back(ChildScope{"D", test_metadata(), false});
         scope()->set_child_scopes(list);
     }
 
@@ -220,10 +225,9 @@ TEST_F(KeywordsTest, subsearch_disabled_child)
     // Re-enable all child scopes
     {
         ChildScopeList list;
-        ///!
-//        list.emplace_back(ChildScope{"B", true});
-//        list.emplace_back(ChildScope{"C", true});
-//        list.emplace_back(ChildScope{"D", true});
+        list.emplace_back(ChildScope{"B", test_metadata(), true});
+        list.emplace_back(ChildScope{"C", test_metadata(), true});
+        list.emplace_back(ChildScope{"D", test_metadata(), true});
         scope()->set_child_scopes(list);
     }
 

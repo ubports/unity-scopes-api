@@ -177,11 +177,10 @@ PreviewQueryBase::UPtr AggTestScope::preview(Result const&, ActionMetadata const
 ChildScopeList AggTestScope::find_child_scopes() const
 {
     ChildScopeList list;
-    ///!
-//    list.emplace_back(ChildScope{"A", true, get_keywords("A")});
-//    list.emplace_back(ChildScope{"B", true, get_keywords("B")});
-//    list.emplace_back(ChildScope{"C", true, get_keywords("C")});
-//    list.emplace_back(ChildScope{"D", true, get_keywords("D")});
+    list.emplace_back(ChildScope{"A", registry()->get_metadata("A"), true, get_keywords("A")});
+    list.emplace_back(ChildScope{"B", registry()->get_metadata("B"), true, get_keywords("B")});
+    list.emplace_back(ChildScope{"C", registry()->get_metadata("C"), true, get_keywords("C")});
+    list.emplace_back(ChildScope{"D", registry()->get_metadata("D"), true, get_keywords("D")});
     return list;
 }
 
