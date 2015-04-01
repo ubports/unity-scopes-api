@@ -87,15 +87,29 @@ public:
     TestQuery(CannedQuery const& query,
               SearchMetadata const& metadata,
               string const& id,
-              RegistryProxy const& reg)
+              RegistryProxy const& reg,
+              ChildScopeList const& child_scopes)
         : SearchQueryBase(query, metadata)
         , id_(id)
         , registry_(reg)
+        , child_scopes_(child_scopes)
     {
     }
 
     virtual void cancelled() override
     {
+    }
+
+    shared_ptr<ChildScope> get_child_scope(std::string const& scope_id)
+    {
+        for (auto const& child_scope : child_scopes_)
+        {
+            if (child_scope.id == scope_id && child_scope.enabled)
+            {
+                return make_shared<ChildScope>(child_scope);
+            }
+        }
+        return nullptr;
     }
 
     virtual void run(SearchReplyProxy const& reply) override
@@ -113,9 +127,12 @@ public:
             {
                 continue;  // Ignore empty ID, which is what we get if we act as a leaf scope.
             }
-            auto proxy = registry_->get_metadata(child_id).proxy();
-            cerr << id_ << ": sending subsearch to " << child_id << endl;
-            subsearch(proxy, id_ + "->" + child_id, receiver);
+            auto child_scope = get_child_scope(child_id);
+            if (child_scope)
+            {
+                cerr << id_ << ": sending subsearch to " << child_id << endl;
+                subsearch(*child_scope, id_ + "->" + child_id, receiver);
+            }
         }
         CategorisedResult res(cat);
         res.set_uri("uri");
@@ -139,6 +156,7 @@ public:
 private:
     string id_;
     RegistryProxy registry_;
+    ChildScopeList child_scopes_;
 };
 
 }  // namespace
@@ -166,7 +184,7 @@ SearchQueryBase::UPtr AggTestScope::search(CannedQuery const& query, SearchMetad
 {
     lock_guard<mutex> lock(mutex_);
     metadata_ = metadata;
-    return SearchQueryBase::UPtr(new TestQuery(query, metadata, id_, registry()));
+    return SearchQueryBase::UPtr(new TestQuery(query, metadata, id_, registry(), child_scopes()));
 }
 
 PreviewQueryBase::UPtr AggTestScope::preview(Result const&, ActionMetadata const &)
@@ -186,7 +204,6 @@ ChildScopeList AggTestScope::find_child_scopes() const
 
 set<string> AggTestScope::get_keywords(string child_id) const
 {
-    lock_guard<mutex> lock(mutex_);
     set<string> keywords;
     if (metadata_.contains_hint(child_id) &&
         metadata_[child_id].which() == Variant::Type::Array)
