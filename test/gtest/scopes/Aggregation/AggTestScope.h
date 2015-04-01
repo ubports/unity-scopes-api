@@ -44,5 +44,5 @@ private:
     mutable std::mutex mutex_;
     unity::scopes::SearchMetadata metadata_;
 
-    std::set<std::string> get_keywords(std::string child_id) const;
+    std::set<std::string> get_keywords(std::string const& child_id) const;
 };

@@ -45,7 +45,7 @@ typedef std::vector<ChildScope> ChildScopeList;
 struct ChildScope
 {
     /**
-     \brief Construct a new ChildScope with the specified id, enabled state and keywords list.
+     \brief Construct a new ChildScope with the specified id, metadata, enabled state and keywords list.
      \param id The scope id of this child scope.
      \param metadata The scope metadata of this child scope.
      \param enabled Whether this child scope should be aggregated.
@@ -54,7 +54,7 @@ struct ChildScope
     ChildScope(std::string const& id,
                ScopeMetadata const& metadata,
                bool enabled = true,
-               std::set<std::string> keywords = {});
+               std::set<std::string> const& keywords = {});
 
     std::string id;                 ///< The scope id of this child scope.
     ScopeMetadata metadata;         ///< The scope metadata of this child scope.

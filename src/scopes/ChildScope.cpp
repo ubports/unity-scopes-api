@@ -28,7 +28,7 @@ namespace scopes
 ChildScope::ChildScope(std::string const& id,
                        ScopeMetadata const& metadata,
                        bool enabled,
-                       std::set<std::string> keywords)
+                       std::set<std::string> const& keywords)
     : id(id)
     , metadata(metadata)
     , enabled(enabled)

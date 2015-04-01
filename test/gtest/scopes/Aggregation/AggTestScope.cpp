@@ -191,7 +191,7 @@ ChildScopeList AggTestScope::find_child_scopes() const
     return list;
 }
 
-set<string> AggTestScope::get_keywords(string child_id) const
+set<string> AggTestScope::get_keywords(string const& child_id) const
 {
     set<string> keywords;
     if (metadata_.contains_hint(child_id) &&
