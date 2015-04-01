@@ -158,9 +158,10 @@ TEST_F(KeywordsTest, subsearch_disabled_child)
     // Disable child scope "C"
     {
         ChildScopeList list;
-        list.emplace_back(ChildScope{"B", true});
-        list.emplace_back(ChildScope{"C", false});
-        list.emplace_back(ChildScope{"D", true});
+        ///!
+//        list.emplace_back(ChildScope{"B", true});
+//        list.emplace_back(ChildScope{"C", false});
+//        list.emplace_back(ChildScope{"D", true});
         scope()->set_child_scopes(list);
     }
 
@@ -178,9 +179,10 @@ TEST_F(KeywordsTest, subsearch_disabled_child)
     // Disable child scope "D"
     {
         ChildScopeList list;
-        list.emplace_back(ChildScope{"B", true});
-        list.emplace_back(ChildScope{"C", false});
-        list.emplace_back(ChildScope{"D", false});
+        ///!
+//        list.emplace_back(ChildScope{"B", true});
+//        list.emplace_back(ChildScope{"C", false});
+//        list.emplace_back(ChildScope{"D", false});
         scope()->set_child_scopes(list);
     }
 
@@ -197,9 +199,10 @@ TEST_F(KeywordsTest, subsearch_disabled_child)
     // Re-enable child scope "C"
     {
         ChildScopeList list;
-        list.emplace_back(ChildScope{"B", true});
-        list.emplace_back(ChildScope{"C", true});
-        list.emplace_back(ChildScope{"D", false});
+        ///!
+//        list.emplace_back(ChildScope{"B", true});
+//        list.emplace_back(ChildScope{"C", true});
+//        list.emplace_back(ChildScope{"D", false});
         scope()->set_child_scopes(list);
     }
 
@@ -217,9 +220,10 @@ TEST_F(KeywordsTest, subsearch_disabled_child)
     // Re-enable all child scopes
     {
         ChildScopeList list;
-        list.emplace_back(ChildScope{"B", true});
-        list.emplace_back(ChildScope{"C", true});
-        list.emplace_back(ChildScope{"D", true});
+        ///!
+//        list.emplace_back(ChildScope{"B", true});
+//        list.emplace_back(ChildScope{"C", true});
+//        list.emplace_back(ChildScope{"D", true});
         scope()->set_child_scopes(list);
     }
 

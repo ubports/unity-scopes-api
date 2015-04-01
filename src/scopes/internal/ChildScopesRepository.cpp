@@ -230,8 +230,8 @@ ChildScopeList ChildScopesRepository::json_to_list(std::string const& child_scop
                                                   << child_node->to_json_string();
             continue;
         }
-        return_list.push_back( ChildScope{id_node->as_string(),
-                                          enabled_node->as_bool()} );
+        ///!return_list.push_back( ChildScope{id_node->as_string(),
+        ///!                                  enabled_node->as_bool()} );
     }
     return return_list;
 }

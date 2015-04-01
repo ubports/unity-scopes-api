@@ -249,7 +249,7 @@ void ScopeI::set_child_scopes_(Current const&,
             keywords.emplace(kw);
         }
 
-        child_scope_list.push_back( ChildScope{id, enabled, keywords} );
+        ///!child_scope_list.push_back( ChildScope{id, enabled, keywords} );
     }
 
     bool result = delegate->set_child_scopes(child_scope_list);

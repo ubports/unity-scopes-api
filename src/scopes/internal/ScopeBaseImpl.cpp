@@ -196,7 +196,7 @@ ChildScopeList ScopeBaseImpl::find_child_scopes() const
     for (auto const& scope : all_scopes)
     {
         // New scopes are added enabled by default
-        return_list.push_back( ChildScope{scope.first} );
+        return_list.push_back( ChildScope{scope.first, scope.second} );
     }
     return return_list;
 }

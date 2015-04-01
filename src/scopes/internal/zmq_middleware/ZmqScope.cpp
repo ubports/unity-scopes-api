@@ -233,7 +233,7 @@ ChildScopeList ZmqScope::child_scopes()
             keywords.emplace(kw);
         }
 
-        child_scope_list.push_back( ChildScope{id, enabled, keywords} );
+        ///!child_scope_list.push_back( ChildScope{id, enabled, keywords} );
     }
     return child_scope_list;
 }

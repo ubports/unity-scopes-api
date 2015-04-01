@@ -45,9 +45,10 @@ public:
         if (i == 0)
         {
             ChildScopeList list;
-            list.push_back({"ScopeA", false});
-            list.push_back({"ScopeB", false});
-            list.push_back({"ScopeC", true});
+            ///!
+//            list.push_back({"ScopeA", false});
+//            list.push_back({"ScopeB", false});
+//            list.push_back({"ScopeC", true});
             ++i;
             return list;
         }
@@ -55,11 +56,12 @@ public:
         else if (i == 1)
         {
             ChildScopeList list;
-            list.push_back({"ScopeD", false});
-            list.push_back({"ScopeA", false});
-            list.push_back({"ScopeB", false});
-            list.push_back({"ScopeC", true});
-            list.push_back({"ScopeE", true});
+            ///!
+//            list.push_back({"ScopeD", false});
+//            list.push_back({"ScopeA", false});
+//            list.push_back({"ScopeB", false});
+//            list.push_back({"ScopeC", true});
+//            list.push_back({"ScopeE", true});
             ++i;
             return list;
         }
@@ -67,9 +69,10 @@ public:
         else
         {
             ChildScopeList list;
-            list.push_back({"ScopeD", true});
-            list.push_back({"ScopeA", false});
-            list.push_back({"ScopeB", false});
+            ///!
+//            list.push_back({"ScopeD", true});
+//            list.push_back({"ScopeA", false});
+//            list.push_back({"ScopeB", false});
             return list;
         }
     }

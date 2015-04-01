@@ -155,9 +155,10 @@ TEST_F(ChildScopesTest, get_set_ordered_list)
 
     // Set order to: "B,E,A"
     ChildScopeList list;
-    list.emplace_back(ChildScope{"ScopeB", false});
-    list.emplace_back(ChildScope{"ScopeE", false});
-    list.emplace_back(ChildScope{"ScopeA", true});
+    ///!
+//    list.emplace_back(ChildScope{"ScopeB", false});
+//    list.emplace_back(ChildScope{"ScopeE", false});
+//    list.emplace_back(ChildScope{"ScopeA", true});
     EXPECT_TRUE(test_scope->set_child_scopes(list));
 
     // 2nd TestScope::find_child_scopes() returns: "D,A,B,C,E"
@@ -188,10 +189,11 @@ TEST_F(ChildScopesTest, get_set_ordered_list)
 
     // Set order to: "B,D,X,A"
     list.clear();
-    list.emplace_back(ChildScope{"ScopeB", false});
-    list.emplace_back(ChildScope{"ScopeD", true});
-    list.emplace_back(ChildScope{"ScopeX", true});
-    list.emplace_back(ChildScope{"ScopeA", false});
+    ///!
+//    list.emplace_back(ChildScope{"ScopeB", false});
+//    list.emplace_back(ChildScope{"ScopeD", true});
+//    list.emplace_back(ChildScope{"ScopeX", true});
+//    list.emplace_back(ChildScope{"ScopeA", false});
     EXPECT_TRUE(test_scope->set_child_scopes(list));
 
     // 3rd+ TestScope::find_child_scopes() returns: "D,A,B"
@@ -235,9 +237,10 @@ TEST_F(ChildScopesTest, no_config_dir)
 
     // Set order to: "B,A,C" (should fail)
     ChildScopeList list;
-    list.emplace_back(ChildScope{"ScopeB", false});
-    list.emplace_back(ChildScope{"ScopeA", false});
-    list.emplace_back(ChildScope{"ScopeC", true});
+    ///!
+//    list.emplace_back(ChildScope{"ScopeB", false});
+//    list.emplace_back(ChildScope{"ScopeA", false});
+//    list.emplace_back(ChildScope{"ScopeC", true});
     EXPECT_FALSE(test_scope->set_child_scopes(list));
 
     // 1st TestScope::find_child_scopes() returns: "A,B,C"

@@ -47,15 +47,17 @@ struct ChildScope
     /**
      \brief Construct a new ChildScope with the specified id, enabled state and keywords list.
      \param id The scope id of this child scope.
+     \param metadata The scope metadata of this child scope.
      \param enabled Whether this child scope should be aggregated.
      \param keywords The list of keywords used to aggregate this scope (if any).
     */
     ChildScope(std::string const& id,
+               ScopeMetadata const& metadata,
                bool enabled = true,
                std::set<std::string> keywords = {});
 
-    ScopeMetadata metadata;         ///< The scope metadata of this child scope.
     std::string id;                 ///< The scope id of this child scope.
+    ScopeMetadata metadata;         ///< The scope metadata of this child scope.
     bool enabled;                   ///< Whether this child scope should be aggregated.
     std::set<std::string> keywords; ///< The list of keywords used to aggregate this scope (if any).
 };
