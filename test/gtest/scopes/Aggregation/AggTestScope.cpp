@@ -100,18 +100,6 @@ public:
     {
     }
 
-    shared_ptr<ChildScope> get_child_scope(std::string const& scope_id)
-    {
-        for (auto const& child_scope : child_scopes_)
-        {
-            if (child_scope.id == scope_id && child_scope.enabled)
-            {
-                return make_shared<ChildScope>(child_scope);
-            }
-        }
-        return nullptr;
-    }
-
     virtual void run(SearchReplyProxy const& reply) override
     {
         auto cat = reply->register_category(id_, "", "");
@@ -127,11 +115,15 @@ public:
             {
                 continue;  // Ignore empty ID, which is what we get if we act as a leaf scope.
             }
-            auto child_scope = get_child_scope(child_id);
-            if (child_scope)
+
+            for (auto const& child_scope : child_scopes_)
             {
-                cerr << id_ << ": sending subsearch to " << child_id << endl;
-                subsearch(*child_scope, id_ + "->" + child_id, receiver);
+                if (child_scope.id == child_id && child_scope.enabled)
+                {
+                    cerr << id_ << ": sending subsearch to " << child_id << endl;
+                    subsearch(child_scope, id_ + "->" + child_id, receiver);
+                    break;
+                }
             }
         }
         CategorisedResult res(cat);
