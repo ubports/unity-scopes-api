@@ -87,11 +87,9 @@ public:
     TestQuery(CannedQuery const& query,
               SearchMetadata const& metadata,
               string const& id,
-              RegistryProxy const& reg,
               ChildScopeList const& child_scopes)
         : SearchQueryBase(query, metadata)
         , id_(id)
-        , registry_(reg)
         , child_scopes_(child_scopes)
     {
     }
@@ -147,7 +145,6 @@ public:
 
 private:
     string id_;
-    RegistryProxy registry_;
     ChildScopeList child_scopes_;
 };
 
@@ -176,7 +173,7 @@ SearchQueryBase::UPtr AggTestScope::search(CannedQuery const& query, SearchMetad
 {
     lock_guard<mutex> lock(mutex_);
     metadata_ = metadata;
-    return SearchQueryBase::UPtr(new TestQuery(query, metadata, id_, registry(), child_scopes()));
+    return SearchQueryBase::UPtr(new TestQuery(query, metadata, id_, child_scopes()));
 }
 
 PreviewQueryBase::UPtr AggTestScope::preview(Result const&, ActionMetadata const &)
