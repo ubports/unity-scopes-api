@@ -19,17 +19,18 @@
 #include <unity/scopes/internal/zmq_middleware/ScopeI.h>
 
 #include <scopes/internal/zmq_middleware/capnproto/Scope.capnp.h>
-#include <unity/scopes/internal/ResultImpl.h>
-#include <unity/scopes/internal/CannedQueryImpl.h>
-#include <unity/scopes/internal/ScopeObject.h>
+#include <unity/scopes/CannedQuery.h>
 #include <unity/scopes/internal/ActionMetadataImpl.h>
+#include <unity/scopes/internal/CannedQueryImpl.h>
+#include <unity/scopes/internal/ResultImpl.h>
 #include <unity/scopes/internal/SearchMetadataImpl.h>
+#include <unity/scopes/internal/ScopeMetadataImpl.h>
+#include <unity/scopes/internal/ScopeObject.h>
 #include <unity/scopes/internal/zmq_middleware/ObjectAdapter.h>
 #include <unity/scopes/internal/zmq_middleware/VariantConverter.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqQueryCtrl.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqReply.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqScope.h>
-#include <unity/scopes/CannedQuery.h>
 
 #include <cassert>
 
@@ -216,6 +217,10 @@ void ScopeI::child_scopes_(Current const&,
     for (size_t i = 0; i < child_scopes.size(); ++i)
     {
         list[i].setId(child_scopes[i].id);
+
+        auto dict = list[i].initMetadata();
+        to_value_dict(child_scopes[i].metadata.serialize(), dict);
+
         list[i].setEnabled(child_scopes[i].enabled);
 
         auto keywords = list[i].initKeywords(child_scopes[i].keywords.size());
@@ -227,7 +232,7 @@ void ScopeI::child_scopes_(Current const&,
     }
 }
 
-void ScopeI::set_child_scopes_(Current const&,
+void ScopeI::set_child_scopes_(Current const& current,
                                capnp::AnyPointer::Reader& in_params,
                                capnproto::Response::Builder& r)
 {
@@ -240,6 +245,12 @@ void ScopeI::set_child_scopes_(Current const&,
     for (size_t i = 0; i < list.size(); ++i)
     {
         string id = list[i].getId();
+
+        auto md = list[i].getMetadata();
+        VariantMap m = to_variant_map(md);
+        unique_ptr<ScopeMetadataImpl> smdi(new ScopeMetadataImpl(m, current.adapter->mw()));
+        auto metadata = ScopeMetadata(ScopeMetadataImpl::create(move(smdi)));
+
         bool enabled = list[i].getEnabled();
 
         set<string> keywords;
@@ -249,7 +260,7 @@ void ScopeI::set_child_scopes_(Current const&,
             keywords.emplace(kw);
         }
 
-        ///!child_scope_list.push_back( ChildScope{id, enabled, keywords} );
+        child_scope_list.push_back( ChildScope{id, metadata, enabled, keywords} );
     }
 
     bool result = delegate->set_child_scopes(child_scope_list);
