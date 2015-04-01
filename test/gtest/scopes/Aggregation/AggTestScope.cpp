@@ -120,6 +120,16 @@ public:
         CategorisedResult res(cat);
         res.set_uri("uri");
         res.set_title(id_ + ": result for query \"" + query().query_string() + "\"");
+
+        std::string aggregated_keywords;
+        auto i = search_metadata().aggregated_keywords().size();
+        for (auto const& keyword : search_metadata().aggregated_keywords())
+        {
+            aggregated_keywords += (--i == 0) ? keyword : keyword + ", ";
+        }
+        res["is_aggregated"] = search_metadata().is_aggregated();
+        res["aggregated_keywords"] = aggregated_keywords;
+
         if (valid())
         {
             reply->push(res);
@@ -167,6 +177,7 @@ PreviewQueryBase::UPtr AggTestScope::preview(Result const&, ActionMetadata const
 ChildScopeList AggTestScope::find_child_scopes() const
 {
     ChildScopeList list;
+    list.emplace_back(ChildScope{"A", true, get_keywords("A")});
     list.emplace_back(ChildScope{"B", true, get_keywords("B")});
     list.emplace_back(ChildScope{"C", true, get_keywords("C")});
     list.emplace_back(ChildScope{"D", true, get_keywords("D")});

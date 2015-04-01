@@ -39,19 +39,11 @@ public:
     virtual void push(CategorisedResult result) override
     {
         string cat = result.category()->id();
-        string title = result.title();
+        bool is_aggregated = result["is_aggregated"].get_bool();
+        string aggregated_keywords = result["aggregated_keywords"].get_string();
 
         lock_guard<mutex> lock(mutex_);
-        auto it = results_.find(cat);
-        if (it != results_.end())
-        {
-            it->second.push_back(title);
-        }
-        else
-        {
-            results_.insert(make_pair(cat, vector<string>{ title }));
-        }
-        cerr << "inserted " << cat << ", " << title << endl;
+        results_[cat] = make_pair(is_aggregated, aggregated_keywords);
     }
 
     virtual void finished(CompletionDetails const& details) override
@@ -69,7 +61,7 @@ public:
         query_complete_ = false;
     }
 
-    map<string, vector<string>> results() const
+    map<string, pair<bool, string>> results() const
     {
         lock_guard<mutex> lock(mutex_);
 
@@ -85,7 +77,7 @@ public:
     }
 
 private:
-    map<string, vector<string>> results_;
+    map<string, pair<bool, string>> results_;
     bool query_complete_;
     mutable mutex mutex_;
     condition_variable cond_;
@@ -102,20 +94,6 @@ public:
         scope_ = meta.proxy();
     }
 
-    void create_config_dir()
-    {
-        // Create an empty config directory for scope A
-        boost::system::error_code ec;
-        boost::filesystem::create_directory(TEST_RUNTIME_PATH "/A", ec);
-    }
-
-    void remove_config_dir()
-    {
-        // Remove the config directory for scope A
-        boost::system::error_code ec;
-        boost::filesystem::remove_all(TEST_RUNTIME_PATH "/A", ec);
-    }
-
     ScopeProxy scope() const
     {
         return scope_;
@@ -124,6 +102,25 @@ public:
 private:
     Runtime::UPtr runtime_;
     ScopeProxy scope_;
+};
+
+class RaiiConfigDir
+{
+public:
+    RaiiConfigDir()
+    {
+        // Create an empty config directory for scope A
+        boost::system::error_code ec;
+        boost::filesystem::remove_all(TEST_RUNTIME_PATH "/A", ec);
+        boost::filesystem::create_directory(TEST_RUNTIME_PATH "/A", ec);
+    }
+
+    ~RaiiConfigDir()
+    {
+        // Remove the config directory for scope A
+        boost::system::error_code ec;
+        boost::filesystem::remove_all(TEST_RUNTIME_PATH "/A", ec);
+    }
 };
 
 // Stop warnings about unused return value from system()
@@ -139,10 +136,12 @@ private:
 TEST_F(KeywordsTest, subsearch_disabled_child)
 {
     // Create an empty config directory for scope A
-    remove_config_dir();
-    create_config_dir();
+    RaiiConfigDir config_dir;
 
     system("cat >A.cmd << EOF\nB\nC\nD\nEOF");
+    system(">B.cmd");
+    system(">C.cmd");
+    system(">D.cmd");
     auto receiver = make_shared<CountReceiver>();
 
     scope()->search("A", SearchMetadata("unused", "unused"), receiver);
@@ -237,12 +236,47 @@ TEST_F(KeywordsTest, subsearch_disabled_child)
     EXPECT_TRUE(r.find("D") != r.end());
 }
 
-//    // Provide test keywords via search metadata so that the test scope can insert them
-//    // accordingly during find_child_scopes()
-//    SearchMetadata meta("unused", "unused");
-//    meta["B"] = VariantArray{Variant("Bkw1"), Variant("Bkw2")};
-//    meta["C"] = VariantArray{Variant("Ckw1"), Variant("Ckw2")};
-//    meta["D"] = VariantArray{Variant("Dkw1"), Variant("Dkw2")};
+TEST_F(KeywordsTest, subsearch_with_keywords)
+{
+    // Create an empty config directory for scope A
+    RaiiConfigDir config_dir;
+
+    system("cat >A.cmd << EOF\nB\nC\nD\nEOF");
+    system(">B.cmd");
+    system(">C.cmd");
+    system(">D.cmd");
+    auto receiver = make_shared<CountReceiver>();
+
+    // Provide test keywords via search metadata so that the test scope can insert them
+    // accordingly during find_child_scopes()
+    SearchMetadata meta("unused", "unused");
+    meta["B"] = VariantArray{Variant("Bkw1"), Variant("Bkw2")};
+    meta["C"] = VariantArray{Variant("Ckw1")};
+    meta["D"] = VariantArray{Variant("Dkw1"), Variant("Dkw2"), Variant("Dkw3"), Variant("Dkw4")};
+
+    scope()->search("A", meta, receiver);
+    receiver->wait_until_finished();
+
+    // Should see all scopes' results here as all children are enabled by default
+    auto r = receiver->results();
+    EXPECT_EQ(4, r.size());
+    EXPECT_TRUE(r.find("A") != r.end());
+    EXPECT_TRUE(r.find("B") != r.end());
+    EXPECT_TRUE(r.find("C") != r.end());
+    EXPECT_TRUE(r.find("D") != r.end());
+
+    // Check is_aggregated states
+    EXPECT_FALSE(r.at("A").first);
+    EXPECT_TRUE(r.at("B").first);
+    EXPECT_TRUE(r.at("C").first);
+    EXPECT_TRUE(r.at("D").first);
+
+    // Check aggregated_keywords
+    EXPECT_EQ("", r.at("A").second);
+    EXPECT_EQ("Bkw1, Bkw2", r.at("B").second);
+    EXPECT_EQ("Ckw1", r.at("C").second);
+    EXPECT_EQ("Dkw1, Dkw2, Dkw3, Dkw4", r.at("D").second);
+}
 
 #pragma GCC diagnostic pop
 
