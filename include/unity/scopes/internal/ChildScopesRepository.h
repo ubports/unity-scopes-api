@@ -35,6 +35,8 @@ namespace scopes
 namespace internal
 {
 
+typedef std::map<std::string, bool> ChildScopeEnabledMap;
+
 class ChildScopesRepository
 {
 public:
@@ -43,21 +45,21 @@ public:
     ChildScopesRepository(std::string const& repo_file_path,
                           boost::log::sources::severity_channel_logger_mt<>& logger);
 
-    ChildScopeList child_scopes(ChildScopeList const& child_scopes_unordered);
+    ChildScopeList child_scopes(ChildScopeList const& child_scopes_defaulted);
     bool set_child_scopes(ChildScopeList const& child_scopes);
 
 private:
     bool write_repo(ChildScopeList const& child_scopes_list);
-    ChildScopeList read_repo();
+    ChildScopeEnabledMap read_repo();
 
     std::string list_to_json(ChildScopeList const& child_scopes_list);
-    ChildScopeList json_to_list(std::string const& child_scopes_json);
+    ChildScopeEnabledMap json_to_list(std::string const& child_scopes_json);
 
     std::string const repo_file_path_;
     boost::log::sources::severity_channel_logger_mt<>& logger_;
 
     std::mutex mutex_;
-    ChildScopeList cached_repo_;
+    ChildScopeEnabledMap cached_repo_;
     bool have_latest_cache_;
 };
 

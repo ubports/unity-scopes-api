@@ -201,14 +201,14 @@ ChildScopeList ScopeBaseImpl::find_child_scopes() const
     return return_list;
 }
 
-ChildScopeList ScopeBaseImpl::child_scopes(ChildScopeList const& child_scopes_unordered) const
+ChildScopeList ScopeBaseImpl::child_scopes(ChildScopeList const& child_scopes_defaulted) const
 {
     lock_guard<mutex> lock(mutex_);
     if (!child_scopes_repo_initialized_)
     {
         throw LogicException("ScopeBase::child_scopes() cannot be called from constructor");
     }
-    return child_scopes_repo_ ? child_scopes_repo_->child_scopes(child_scopes_unordered) : ChildScopeList();
+    return child_scopes_repo_ ? child_scopes_repo_->child_scopes(child_scopes_defaulted) : ChildScopeList();
 }
 
 bool ScopeBaseImpl::set_child_scopes(ChildScopeList const& child_scopes)
