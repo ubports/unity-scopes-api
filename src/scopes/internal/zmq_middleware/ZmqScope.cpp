@@ -18,16 +18,17 @@
 
 #include <unity/scopes/internal/zmq_middleware/ZmqScope.h>
 
+#include <scopes/internal/zmq_middleware/capnproto/Scope.capnp.h>
+#include <unity/scopes/CannedQuery.h>
 #include <unity/scopes/internal/QueryCtrlImpl.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
-#include <scopes/internal/zmq_middleware/capnproto/Scope.capnp.h>
+#include <unity/scopes/internal/ScopeMetadataImpl.h>
 #include <unity/scopes/internal/zmq_middleware/VariantConverter.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqException.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqQueryCtrl.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqReceiver.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqReply.h>
 #include <unity/scopes/Result.h>
-#include <unity/scopes/CannedQuery.h>
 
 using namespace std;
 
@@ -224,6 +225,12 @@ ChildScopeList ZmqScope::child_scopes()
     for (size_t i = 0; i < list.size(); ++i)
     {
         string id = list[i].getId();
+
+        auto md = list[i].getMetadata();
+        VariantMap m = to_variant_map(md);
+        unique_ptr<ScopeMetadataImpl> smdi(new ScopeMetadataImpl(m, mw_base()));
+        auto metadata = ScopeMetadata(ScopeMetadataImpl::create(move(smdi)));
+
         bool enabled = list[i].getEnabled();
 
         set<string> keywords;
@@ -233,7 +240,7 @@ ChildScopeList ZmqScope::child_scopes()
             keywords.emplace(kw);
         }
 
-        ///!child_scope_list.push_back( ChildScope{id, enabled, keywords} );
+        child_scope_list.push_back( ChildScope{id, metadata, enabled, keywords} );
     }
     return child_scope_list;
 }
@@ -249,6 +256,10 @@ bool ZmqScope::set_child_scopes(ChildScopeList const& child_scopes)
     for (size_t i = 0; i < child_scopes.size(); ++i)
     {
         list[i].setId(child_scopes[i].id);
+
+        auto dict = list[i].initMetadata();
+        to_value_dict(child_scopes[i].metadata.serialize(), dict);
+
         list[i].setEnabled(child_scopes[i].enabled);
 
         auto keywords = list[i].initKeywords(child_scopes[i].keywords.size());

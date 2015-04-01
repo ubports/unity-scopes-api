@@ -32,7 +32,6 @@ namespace scopes
 
 namespace internal
 {
-
 class ScopeMetadataImpl;
 } // namespace internal
 
