@@ -40,7 +40,7 @@ namespace experimental
 /**
 \brief A date and/or time picker filter.
 
-The DateTimePickerFilter displays a date and/or time picker widgets, that can optionally be
+The DateTimePickerFilter displays a date and/or time picker widget, that can optionally be
 constrained by minimum and maximum point in time.
 */
 
