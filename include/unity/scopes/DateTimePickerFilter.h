@@ -136,14 +136,14 @@ public:
     Mode mode() const;
 
     /**
-     \brief Checks is a minimum date has been set for this filter.
+     \brief Checks if a minimum date has been set for this filter.
 
      \return true if minimum date has been set
      */
     bool has_minimum() const;
 
     /**
-     \brief Checks is a maximum date has been set for this filter.
+     \brief Checks if a maximum date has been set for this filter.
 
      \return true if maximum date has been set
     */
