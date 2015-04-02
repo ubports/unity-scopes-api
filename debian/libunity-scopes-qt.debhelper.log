@@ -27,4 +27,3 @@ dh_builddeb
 dh_builddeb
 dh_builddeb
 dh_builddeb
-dh_auto_test
