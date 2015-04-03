@@ -249,7 +249,7 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::experimental::Annotation::serialize() const@Base" 0.5.0+14.10.20140619
  (c++)"unity::scopes::experimental::Annotation::set_icon(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.5.0+14.10.20140619
  (c++)"unity::scopes::experimental::Annotation::set_label(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.5.0+14.10.20140619
- (c++)"unity::scopes::experimental::DateTimePickerFilter::create(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::bitset<6ul>)@Base" 0replaceme
+ (c++|arch=amd64)"unity::scopes::experimental::DateTimePickerFilter::create(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::bitset<6ul>)@Base" 0replaceme
  (c++|arch=armhf i386)"unity::scopes::experimental::DateTimePickerFilter::create(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::bitset<6u>)@Base" 0replaceme
  (c++)"unity::scopes::experimental::DateTimePickerFilter::date_label() const@Base" 0replaceme
  (c++)"unity::scopes::experimental::DateTimePickerFilter::~DateTimePickerFilter()@Base" 0replaceme
