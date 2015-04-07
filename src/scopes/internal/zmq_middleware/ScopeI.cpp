@@ -60,8 +60,8 @@ interface Scope
     QueryCtrl* preview(ValueDict result, ValueDict hints, Reply* replyProxy);
     QueryCtrl* perform_action(ValueDict result, ValueDict hints, string action_id, Reply* replyProxy);
     QueryCtrl* activate(ValueDict result, ValueDict hints, Reply* replyProxy);
-    ChildScopeList child_scopes_ordered();
-    bool set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered);
+    ChildScopeList child_scopes();
+    bool set_child_scopes(ChildScopeList const& child_scopes);
     bool debug_mode();
 };
 
@@ -75,8 +75,8 @@ ScopeI::ScopeI(ScopeObjectBase::SPtr const& so) :
                       { "preview", bind(&ScopeI::preview_, this, ph::_1, ph::_2, ph::_3) },
                       { "activate", bind(&ScopeI::activate_, this, ph::_1, ph::_2, ph::_3) },
                       { "perform_action", bind(&ScopeI::perform_action_, this, ph::_1, ph::_2, ph::_3) },
-                      { "child_scopes_ordered", bind(&ScopeI::child_scopes_ordered_, this, ph::_1, ph::_2, ph::_3) },
-                      { "set_child_scopes_ordered", bind(&ScopeI::set_child_scopes_ordered_, this, ph::_1, ph::_2, ph::_3) },
+                      { "child_scopes", bind(&ScopeI::child_scopes_, this, ph::_1, ph::_2, ph::_3) },
+                      { "set_child_scopes", bind(&ScopeI::set_child_scopes_, this, ph::_1, ph::_2, ph::_3) },
                       { "debug_mode", bind(&ScopeI::debug_mode_, this, ph::_1, ph::_2, ph::_3) }
     })
 {
@@ -200,21 +200,21 @@ void ScopeI::preview_(Current const& current,
     p.setCategory(ctrl_proxy->target_category().c_str());
 }
 
-void ScopeI::child_scopes_ordered_(Current const&,
+void ScopeI::child_scopes_(Current const&,
                       capnp::AnyPointer::Reader&,
                       capnproto::Response::Builder& r)
 {
     auto delegate = dynamic_pointer_cast<ScopeObjectBase>(del());
     assert(delegate);
 
-    auto child_scopes_ordered = delegate->child_scopes_ordered();
+    auto child_scopes = delegate->child_scopes();
 
     r.setStatus(capnproto::ResponseStatus::SUCCESS);
-    auto list_response = r.initPayload().getAs<capnproto::Scope::ChildScopesOrderedResponse>();
-    auto list = list_response.initReturnValue(child_scopes_ordered.size());
+    auto list_response = r.initPayload().getAs<capnproto::Scope::ChildScopesResponse>();
+    auto list = list_response.initReturnValue(child_scopes.size());
 
     int i = 0;
-    for (auto const& child_scope : child_scopes_ordered)
+    for (auto const& child_scope : child_scopes)
     {
         list[i].setId(child_scope.id);
         list[i].setEnabled(child_scope.enabled);
@@ -222,14 +222,14 @@ void ScopeI::child_scopes_ordered_(Current const&,
     }
 }
 
-void ScopeI::set_child_scopes_ordered_(Current const&,
+void ScopeI::set_child_scopes_(Current const&,
                       capnp::AnyPointer::Reader& in_params,
                       capnproto::Response::Builder& r)
 {
     auto delegate = std::dynamic_pointer_cast<ScopeObjectBase>(del());
     assert(delegate);
 
-    auto list = in_params.getAs<capnproto::Scope::SetChildScopesOrderedRequest>().getChildScopesOrdered();
+    auto list = in_params.getAs<capnproto::Scope::SetChildScopesRequest>().getChildScopes();
 
     ChildScopeList child_scope_list;
     for (size_t i = 0; i < list.size(); ++i)
@@ -239,9 +239,9 @@ void ScopeI::set_child_scopes_ordered_(Current const&,
         child_scope_list.push_back( ChildScope{id, enabled} );
     }
 
-    bool result = delegate->set_child_scopes_ordered(child_scope_list);
+    bool result = delegate->set_child_scopes(child_scope_list);
     r.setStatus(capnproto::ResponseStatus::SUCCESS);
-    auto response = r.initPayload().getAs<capnproto::Scope::SetChildScopesOrderedResponse>();
+    auto response = r.initPayload().getAs<capnproto::Scope::SetChildScopesResponse>();
     response.setReturnValue(result);
 }
 

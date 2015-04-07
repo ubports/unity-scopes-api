@@ -1,6 +1,11 @@
 Release notes
 =============
 
+Changes in version 0.6.15
+=========================
+  - Renamed "child_scopes()" to "find_child_scopes()"
+  - Renamed "child_scopes_ordered()" to "child_scopes()"
+
 Changes in version 0.6.14
 =========================
   - Added push_surfacing_results_from_cache() to Reply proxy. This allows a scope

@@ -72,17 +72,17 @@ struct ChildScope
     enabled @1 : Bool;
 }
 
-struct ChildScopesOrderedResponse
+struct ChildScopesResponse
 {
     returnValue @0 : List(ChildScope);
 }
 
-struct SetChildScopesOrderedRequest
+struct SetChildScopesRequest
 {
-    childScopesOrdered @0 : List(ChildScope);
+    childScopes @0 : List(ChildScope);
 }
 
-struct SetChildScopesOrderedResponse
+struct SetChildScopesResponse
 {
     returnValue @0 : Bool;
 }

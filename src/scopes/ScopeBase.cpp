@@ -102,14 +102,14 @@ unity::scopes::VariantMap ScopeBase::settings() const
     return p->settings();
 }
 
-ChildScopeList ScopeBase::child_scopes() const
+ChildScopeList ScopeBase::find_child_scopes() const
 {
-    return p->child_scopes();
+    return p->find_child_scopes();
 }
 
-ChildScopeList ScopeBase::child_scopes_ordered() const
+ChildScopeList ScopeBase::child_scopes() const
 {
-    return p->child_scopes_ordered(child_scopes());
+    return p->child_scopes(find_child_scopes());
 }
 
 } // namespace scopes

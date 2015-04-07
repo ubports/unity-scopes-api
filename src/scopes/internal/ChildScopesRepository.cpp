@@ -34,7 +34,7 @@ ChildScopesRepository::ChildScopesRepository(std::string const& repo_file_path,
 {
 }
 
-ChildScopeList ChildScopesRepository::child_scopes_ordered(ChildScopeList const& child_scopes_unordered)
+ChildScopeList ChildScopesRepository::child_scopes(ChildScopeList const& child_scopes_unordered)
 {
     std::lock_guard<std::mutex> lock(mutex_);
 
@@ -117,11 +117,11 @@ ChildScopeList ChildScopesRepository::child_scopes_ordered(ChildScopeList const&
     return new_child_scopes_ordered;
 }
 
-bool ChildScopesRepository::set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered)
+bool ChildScopesRepository::set_child_scopes(ChildScopeList const& child_scopes)
 {
     // simply write child_scopes_ordered to file
     std::lock_guard<std::mutex> lock(mutex_);
-    return write_repo(child_scopes_ordered);
+    return write_repo(child_scopes);
 }
 
 bool ChildScopesRepository::write_repo(ChildScopeList const& child_scopes_list)
