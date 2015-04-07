@@ -54,6 +54,10 @@ public:
     Location location() const;
     bool has_location() const;
 
+    void set_aggregated_keywords(std::set<std::string> const& aggregated_keywords);
+    std::set<std::string> aggregated_keywords() const;
+    bool is_aggregated() const;
+
     virtual VariantMap serialize() const override;
 
     static SearchMetadata create(VariantMap const& var);
@@ -67,6 +71,7 @@ protected:
 private:
     int cardinality_;
     boost::optional<Location> location_;
+    boost::optional<std::set<std::string>> aggregated_keywords_;
 };
 
 } // namespace internal

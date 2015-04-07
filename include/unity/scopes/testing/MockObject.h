@@ -36,13 +36,26 @@ namespace testing
 class MockObject : public virtual Object
 {
 public:
-    MockObject() = default;
+    MockObject(std::string const& endpoint = "",
+               std::string const& identity = "")
+        : endpoint_(endpoint)
+        , identity_(identity) {}
 
-    MOCK_METHOD0(endpoint, std::string());
-    MOCK_METHOD0(identity, std::string());
+    std::string endpoint() override
+    {
+        return endpoint_;
+    }
+    std::string identity() override
+    {
+        return identity_;
+    }
     MOCK_METHOD0(target_category, std::string());
     MOCK_METHOD0(timeout, int64_t());
     MOCK_METHOD0(to_string, std::string());
+
+private:
+    std::string const endpoint_;
+    std::string const identity_;
 };
 
 /// @endcond

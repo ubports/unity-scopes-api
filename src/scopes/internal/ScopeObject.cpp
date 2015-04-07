@@ -199,9 +199,9 @@ MWQueryCtrlProxy ScopeObject::search(CannedQuery const& q,
 }
 
 MWQueryCtrlProxy ScopeObject::activate(Result const& result,
-                                           ActionMetadata const& hints,
-                                           MWReplyProxy const& reply,
-                                           InvokeInfo const& info)
+                                       ActionMetadata const& hints,
+                                       MWReplyProxy const& reply,
+                                       InvokeInfo const& info)
 {
     return query(reply,
                  info.mw,

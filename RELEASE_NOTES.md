@@ -5,6 +5,7 @@ Changes in version 0.6.15
 =========================
   - Renamed "child_scopes()" to "find_child_scopes()"
   - Renamed "child_scopes_ordered()" to "child_scopes()"
+  - Added is_aggregated() and aggregated_keywords() to SearchMetaData
 
 Changes in version 0.6.14
 =========================

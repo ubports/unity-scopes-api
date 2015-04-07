@@ -18,8 +18,11 @@
 
 #pragma once
 
-#include <list>
+#include <unity/scopes/ScopeMetadata.h>
+
+#include <set>
 #include <string>
+#include <vector>
 
 namespace unity
 {
@@ -33,7 +36,7 @@ struct ChildScope;
  \brief A list of child scopes.
 */
 
-typedef std::list<ChildScope> ChildScopeList;
+typedef std::vector<ChildScope> ChildScopeList;
 
 /**
  \brief A container for details about an aggregator's child scope.
@@ -41,8 +44,22 @@ typedef std::list<ChildScope> ChildScopeList;
 
 struct ChildScope
 {
-    std::string id; ///< The scope id of this child scope.
-    bool enabled;   ///< Holds whether this child scope is aggregated.
+    /**
+     \brief Construct a new ChildScope with the specified id, metadata, enabled state and keywords list.
+     \param id The scope id of this child scope.
+     \param metadata The scope metadata of this child scope.
+     \param enabled Whether this child scope should be aggregated.
+     \param keywords The list of keywords used to aggregate this scope (if any).
+    */
+    ChildScope(std::string const& id,
+               ScopeMetadata const& metadata,
+               bool enabled = true,
+               std::set<std::string> const& keywords = {});
+
+    std::string id;                 ///< The scope id of this child scope.
+    ScopeMetadata metadata;         ///< The scope metadata of this child scope.
+    bool enabled;                   ///< Whether this child scope should be aggregated.
+    std::set<std::string> keywords; ///< The list of keywords used to aggregate this scope (if any).
 };
 
 } // namespace scopes

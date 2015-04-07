@@ -34,87 +34,34 @@ ChildScopesRepository::ChildScopesRepository(std::string const& repo_file_path,
 {
 }
 
-ChildScopeList ChildScopesRepository::child_scopes(ChildScopeList const& child_scopes_unordered)
+ChildScopeList ChildScopesRepository::child_scopes(ChildScopeList const& child_scopes_defaulted)
 {
+    ChildScopeList child_scopes;
+
     std::lock_guard<std::mutex> lock(mutex_);
 
-    // unordered_set and ordered_set will act as masks for child_scopes_unordered and
-    // child_scopes_ordered respectively when creating our resultant child scope list
-    std::set<std::string> unordered_set;
-    std::set<std::string> ordered_set;
+    // Read child scope enabled states from our repo
+    auto child_enabled_map = read_repo();
 
-    // fill unordered_set
-    for (auto const& child : child_scopes_unordered)
+    // If we find a child scope in the repo, replace its enabled state with the one found in the repo
+    for (auto const& child_scope : child_scopes_defaulted)
     {
-        unordered_set.insert(child.id);
-    }
-
-    // fill ordered_set
-    ChildScopeList child_scopes_ordered = read_repo();
-    for (auto const& child : child_scopes_ordered)
-    {
-        // scopes in child_scopes_ordered that are also in child_scopes_unordered should be removed
-        // from unordered_set (to avoid duplicates in our resultant child scope list)
-        if (unordered_set.erase(child.id) > 0)
+        if (child_enabled_map.find(child_scope.id) != child_enabled_map.end())
         {
-            // only the scopes from child_scopes_ordered that appear in child_scopes_unordered
-            // should be added to ordered_set (a scope not found in child_scopes_unordered was
-            // probably uninstalled since the repo was last written)
-            ordered_set.insert(child.id);
+            ChildScope updated_child_scope = child_scope;
+            updated_child_scope.enabled = child_enabled_map.at(child_scope.id);
+            child_scopes.push_back(updated_child_scope);
         }
-    }
-
-    // has anything changed since the repo was last written?
-    if (child_scopes_ordered.size() == ordered_set.size() && // if no scopes have been removed
-        unordered_set.size() == 0)                           // and no scopes have been added
-    {
-        return child_scopes_ordered; // return the repo list as is
-    }
-
-    // now create a new list by first adding child_scopes_ordered then child_scopes_unordered,
-    // using each set as a mask to determine whether or not a scope should be included
-    ChildScopeList new_child_scopes_ordered;
-    {
-        // add child_scopes_ordered to new_child_scopes_ordered
-        if (child_scopes_ordered.size() == ordered_set.size())
+        else
         {
-            new_child_scopes_ordered = child_scopes_ordered;
-        }
-        else if (!ordered_set.empty())
-        {
-            // use ordered_set as a mask
-            for (auto const& child : child_scopes_ordered)
-            {
-                if (ordered_set.find(child.id) != ordered_set.end())
-                {
-                    new_child_scopes_ordered.push_back(child);
-                }
-            }
-        }
-
-        // add child_scopes_unordered to new_child_scopes_ordered
-        if (child_scopes_unordered.size() == unordered_set.size())
-        {
-            new_child_scopes_ordered.insert(new_child_scopes_ordered.end(),
-                                            child_scopes_unordered.begin(),
-                                            child_scopes_unordered.end());
-        }
-        else if (!unordered_set.empty())
-        {
-            // use unordered_set as a mask
-            for (auto const& child : child_scopes_unordered)
-            {
-                if (unordered_set.find(child.id) != unordered_set.end())
-                {
-                    new_child_scopes_ordered.push_back(child);
-                }
-            }
+            // If we don't find a child scope in the repo, simply add it in default state
+            child_scopes.push_back(child_scope);
         }
     }
 
     // write the new ordered list to file
-    write_repo(new_child_scopes_ordered);
-    return new_child_scopes_ordered;
+    write_repo(child_scopes);
+    return child_scopes;
 }
 
 bool ChildScopesRepository::set_child_scopes(ChildScopeList const& child_scopes)
@@ -141,12 +88,11 @@ bool ChildScopesRepository::write_repo(ChildScopeList const& child_scopes_list)
     repo_file << list_to_json(child_scopes_list);
     repo_file.close();
 
-    cached_repo_ = child_scopes_list;
-    have_latest_cache_ = true;
+    have_latest_cache_ = false;
     return true;
 }
 
-ChildScopeList ChildScopesRepository::read_repo()
+ChildScopeEnabledMap ChildScopesRepository::read_repo()
 {
     // if we already have the latest cache of the repo, simply return it
     if (have_latest_cache_)
@@ -161,7 +107,7 @@ ChildScopeList ChildScopesRepository::read_repo()
         BOOST_LOG_SEV(logger_, Logger::Info) << "ChildScopesRepository::read_repo(): "
                                              << "Failed to open file: \"" << repo_file_path_
                                              << "\"";
-        return ChildScopeList();
+        return ChildScopeEnabledMap();
     }
 
     cached_repo_ = json_to_list(std::string((std::istreambuf_iterator<char>(repo_file)),
@@ -188,7 +134,7 @@ std::string ChildScopesRepository::list_to_json(ChildScopeList const& child_scop
     return child_scopes_json.str();
 }
 
-ChildScopeList ChildScopesRepository::json_to_list(std::string const& child_scopes_json)
+ChildScopeEnabledMap ChildScopesRepository::json_to_list(std::string const& child_scopes_json)
 {
     JsonCppNode json_node;
     try
@@ -200,17 +146,17 @@ ChildScopeList ChildScopesRepository::json_to_list(std::string const& child_scop
         BOOST_LOG_SEV(logger_, Logger::Error) << "ChildScopesRepository::json_to_list(): "
                                               << "Exception thrown while reading json string: "
                                               << e.what();
-        return ChildScopeList();
+        return ChildScopeEnabledMap();
     }
     if (json_node.type() != JsonCppNode::Array)
     {
         BOOST_LOG_SEV(logger_, Logger::Error) << "ChildScopesRepository::json_to_list(): "
                                               << "Root node of json string is not an array:"
                                               << std::endl << child_scopes_json;
-        return ChildScopeList();
+        return ChildScopeEnabledMap();
     }
 
-    ChildScopeList return_list;
+    ChildScopeEnabledMap return_map;
     for (int i = 0; i < json_node.size(); ++i)
     {
         auto child_node = json_node.get_node(i);
@@ -236,8 +182,13 @@ ChildScopeList ChildScopesRepository::json_to_list(std::string const& child_scop
                                                   << child_node->to_json_string();
             continue;
         }
-        return_list.push_back( ChildScope{id_node->as_string(),
-                                          enabled_node->as_bool()} );
+
+        // If an aggregator aggregates the same child scope more than once (say, for different keywords),
+        // we count the enabled state of its first appearance as the overall enabled state of that child.
+        if (return_map.find(id_node->as_string()) == return_map.end())
+        {
+            return_map.insert(make_pair(id_node->as_string(), enabled_node->as_bool()));
+        }
     }
-    return return_list;
+    return return_map;
 }

@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <unity/scopes/ChildScope.h>
 #include <unity/scopes/QueryBase.h>
 #include <unity/scopes/QueryCtrlProxyFwd.h>
 #include <unity/scopes/ScopeProxyFwd.h>
@@ -27,6 +28,8 @@
 
 #include <unity/util/DefinesPtrs.h>
 #include <unity/util/NonCopyable.h>
+
+#include <set>
 
 namespace unity
 {
@@ -100,23 +103,37 @@ public:
     */
     //{@
     QueryCtrlProxy subsearch(ScopeProxy const& scope,
-                                   std::string const& query_string,
-                                   SearchListenerBase::SPtr const& reply);
+                             std::string const& query_string,
+                             SearchListenerBase::SPtr const& reply);
+    QueryCtrlProxy subsearch(ChildScope const& scope,
+                             std::string const& query_string,
+                             SearchListenerBase::SPtr const& reply);
     QueryCtrlProxy subsearch(ScopeProxy const& scope,
-                                   std::string const& query_string,
-                                   FilterState const& filter_state,
-                                   SearchListenerBase::SPtr const& reply);
+                             std::string const& query_string,
+                             FilterState const& filter_state,
+                             SearchListenerBase::SPtr const& reply);
     QueryCtrlProxy subsearch(ScopeProxy const& scope,
-                                   std::string const& query_string,
-                                   std::string const& department_id,
-                                   FilterState const& filter_state,
-                                   SearchListenerBase::SPtr const& reply);
+                             std::string const& query_string,
+                             std::string const& department_id,
+                             FilterState const& filter_state,
+                             SearchListenerBase::SPtr const& reply);
+    QueryCtrlProxy subsearch(ChildScope const& scope,
+                             std::string const& query_string,
+                             std::string const& department_id,
+                             FilterState const& filter_state,
+                             SearchListenerBase::SPtr const& reply);
     QueryCtrlProxy subsearch(ScopeProxy const& scope,
-                                   std::string const& query_string,
-                                   std::string const& department_id,
-                                   FilterState const& filter_state,
-                                   SearchMetadata const& hints,
-                                   SearchListenerBase::SPtr const& reply);
+                             std::string const& query_string,
+                             std::string const& department_id,
+                             FilterState const& filter_state,
+                             SearchMetadata const& hints,
+                             SearchListenerBase::SPtr const& reply);
+    QueryCtrlProxy subsearch(ChildScope const& scope,
+                             std::string const& query_string,
+                             std::string const& department_id,
+                             FilterState const& filter_state,
+                             SearchMetadata const& hints,
+                             SearchListenerBase::SPtr const& reply);
     //@}
 
     /**

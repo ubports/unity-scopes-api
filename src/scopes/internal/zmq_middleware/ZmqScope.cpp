@@ -18,16 +18,17 @@
 
 #include <unity/scopes/internal/zmq_middleware/ZmqScope.h>
 
+#include <scopes/internal/zmq_middleware/capnproto/Scope.capnp.h>
+#include <unity/scopes/CannedQuery.h>
 #include <unity/scopes/internal/QueryCtrlImpl.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
-#include <scopes/internal/zmq_middleware/capnproto/Scope.capnp.h>
+#include <unity/scopes/internal/ScopeMetadataImpl.h>
 #include <unity/scopes/internal/zmq_middleware/VariantConverter.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqException.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqQueryCtrl.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqReceiver.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqReply.h>
 #include <unity/scopes/Result.h>
-#include <unity/scopes/CannedQuery.h>
 
 using namespace std;
 
@@ -224,8 +225,22 @@ ChildScopeList ZmqScope::child_scopes()
     for (size_t i = 0; i < list.size(); ++i)
     {
         string id = list[i].getId();
+
+        auto md = list[i].getMetadata();
+        VariantMap m = to_variant_map(md);
+        unique_ptr<ScopeMetadataImpl> smdi(new ScopeMetadataImpl(m, mw_base()));
+        auto metadata = ScopeMetadata(ScopeMetadataImpl::create(move(smdi)));
+
         bool enabled = list[i].getEnabled();
-        child_scope_list.push_back( ChildScope{id, enabled} );
+
+        set<string> keywords;
+        auto keywords_capn = list[i].getKeywords();
+        for (auto const& kw : keywords_capn)
+        {
+            keywords.emplace(kw);
+        }
+
+        child_scope_list.push_back( ChildScope{id, metadata, enabled, keywords} );
     }
     return child_scope_list;
 }
@@ -238,12 +253,21 @@ bool ZmqScope::set_child_scopes(ChildScopeList const& child_scopes)
     auto in_params = request.initInParams().getAs<capnproto::Scope::SetChildScopesRequest>();
     auto list = in_params.initChildScopes(child_scopes.size());
 
-    int i = 0;
-    for (auto const& child_scope : child_scopes)
+    for (size_t i = 0; i < child_scopes.size(); ++i)
     {
-        list[i].setId(child_scope.id);
-        list[i].setEnabled(child_scope.enabled);
-        ++i;
+        list[i].setId(child_scopes[i].id);
+
+        auto dict = list[i].initMetadata();
+        to_value_dict(child_scopes[i].metadata.serialize(), dict);
+
+        list[i].setEnabled(child_scopes[i].enabled);
+
+        auto keywords = list[i].initKeywords(child_scopes[i].keywords.size());
+        int j = 0;
+        for (auto const& kw : child_scopes[i].keywords)
+        {
+            keywords.set(j++, kw);
+        }
     }
 
     auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_scope_(request_builder); });

@@ -20,6 +20,7 @@
 #pragma once
 
 #include <unity/scopes/CannedQuery.h>
+#include <unity/scopes/ChildScope.h>
 #include <unity/scopes/internal/QueryBaseImpl.h>
 #include <unity/scopes/QueryCtrlProxyFwd.h>
 #include <unity/scopes/ScopeProxyFwd.h>
@@ -53,11 +54,12 @@ public:
     void set_history(History const& h);
 
     QueryCtrlProxy subsearch(ScopeProxy const& scope,
-                                   std::string const& query_string,
-                                   std::string const& department_id,
-                                   FilterState const& filter_state,
-                                   SearchMetadata const& metadata,
-                                   SearchListenerBase::SPtr const& reply);
+                             std::set<std::string> const& keywords,
+                             std::string const& query_string,
+                             std::string const& department_id,
+                             FilterState const& filter_state,
+                             SearchMetadata const& metadata,
+                             SearchListenerBase::SPtr const& reply);
 
     void cancel() override;
     bool valid() const override;

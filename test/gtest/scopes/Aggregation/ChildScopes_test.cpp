@@ -20,6 +20,7 @@
 
 #include <unity/scopes/internal/RegistryObject.h>
 #include <unity/scopes/internal/ScopeImpl.h>
+#include <unity/scopes/testing/ScopeMetadataBuilder.h>
 
 #include "TestScope.h"
 
@@ -63,20 +64,20 @@ public:
     {
         // Create an empty config directory for TestScope
         system::error_code ec;
-        filesystem::create_directory(TEST_BIN_DIR "/TestScope", ec);
+        filesystem::create_directory(TEST_RUNTIME_PATH "/TestScope", ec);
     }
 
     void remove_config_dir()
     {
         // Remove the config directory for TestScope
         system::error_code ec;
-        filesystem::remove_all(TEST_BIN_DIR "/TestScope", ec);
+        filesystem::remove_all(TEST_RUNTIME_PATH "/TestScope", ec);
     }
 
     void write_empty_config()
     {
         // open repository for output
-        std::ofstream repo_file(TEST_BIN_DIR "/TestScope/child-scopes.json");
+        std::ofstream repo_file(TEST_RUNTIME_PATH "/TestScope/child-scopes.json");
         repo_file << "";
         repo_file.close();
     }
@@ -84,7 +85,7 @@ public:
     void write_corrupt_config()
     {
         // open repository for output
-        std::ofstream repo_file(TEST_BIN_DIR "/TestScope/child-scopes.json");
+        std::ofstream repo_file(TEST_RUNTIME_PATH "/TestScope/child-scopes.json");
         repo_file << "ag;hasd;glasd;glkasdhg;klasdf;k;";
         repo_file.close();
     }
@@ -92,7 +93,7 @@ public:
     void write_partially_corrupt_config()
     {
         // open repository for output
-        std::ofstream repo_file(TEST_BIN_DIR "/TestScope/child-scopes.json");
+        std::ofstream repo_file(TEST_RUNTIME_PATH "/TestScope/child-scopes.json");
         repo_file << R"([{"id":"ScopeB","enabled":true},{"id":"ScopeB"},{"id":"ScopeC","enabled":"false"}])";
         repo_file.close();
     }
@@ -123,6 +124,13 @@ public:
         }
     }
 
+    ScopeMetadata test_metadata()
+    {
+        unity::scopes::testing::ScopeMetadataBuilder builder;
+        builder.scope_id(" ").proxy(test_scope).display_name(" ").description(" ").author(" ");
+        return builder();
+    }
+
 protected:
     ScopeProxy test_scope;
 
@@ -133,7 +141,7 @@ private:
     std::thread scope_t_;
 };
 
-TEST_F(ChildScopesTest, get_set_ordered_list)
+TEST_F(ChildScopesTest, get_set_child_scopes)
 {
     // Create an empty config directory for TestScope
     remove_config_dir();
@@ -143,78 +151,61 @@ TEST_F(ChildScopesTest, get_set_ordered_list)
     start_test_scope();
 
     // 1st TestScope::find_child_scopes() returns: "A,B,C"
-    // No order has been set yet, so we should just get: "A,B,C"
     ChildScopeList return_list = test_scope->child_scopes();
-    EXPECT_EQ(3, return_list.size());
-    EXPECT_EQ("ScopeA", return_list.front().id);
-    EXPECT_FALSE(return_list.front().enabled);
-    return_list.pop_front();
-    EXPECT_EQ("ScopeB", return_list.front().id);
-    EXPECT_FALSE(return_list.front().enabled);
-    return_list.pop_front();
-    EXPECT_EQ("ScopeC", return_list.front().id);
-    EXPECT_TRUE(return_list.front().enabled);
+    ASSERT_EQ(3, return_list.size());
+    EXPECT_EQ("ScopeA", return_list[0].id);
+    EXPECT_TRUE(return_list[0].enabled);
+    EXPECT_EQ("ScopeB", return_list[1].id);
+    EXPECT_TRUE(return_list[1].enabled);
+    EXPECT_EQ("ScopeC", return_list[2].id);
+    EXPECT_TRUE(return_list[2].enabled);
 
-    // Set order to: "B,E,A"
+    // Disable scopes B and D
     ChildScopeList list;
-    list.push_back({"ScopeB", false});
-    list.push_back({"ScopeE", false});
-    list.push_back({"ScopeA", true});
+    list.emplace_back(ChildScope{"ScopeB", test_metadata(), false});
+    list.emplace_back(ChildScope{"ScopeD", test_metadata(), false});
     EXPECT_TRUE(test_scope->set_child_scopes(list));
 
     // 2nd TestScope::find_child_scopes() returns: "D,A,B,C,E"
-    // with order: "B,E,A", we should get: "B,E,A,D,C"
     return_list = test_scope->child_scopes();
-    EXPECT_EQ(5, return_list.size());
-    EXPECT_EQ("ScopeB", return_list.front().id);
-    EXPECT_FALSE(return_list.front().enabled);
-    return_list.pop_front();
-    EXPECT_EQ("ScopeE", return_list.front().id);
-    EXPECT_FALSE(return_list.front().enabled);
-    return_list.pop_front();
-    EXPECT_EQ("ScopeA", return_list.front().id);
-    EXPECT_TRUE(return_list.front().enabled);
-    return_list.pop_front();
-    EXPECT_EQ("ScopeD", return_list.front().id);
-    EXPECT_FALSE(return_list.front().enabled);
-    return_list.pop_front();
-    EXPECT_EQ("ScopeC", return_list.front().id);
-    EXPECT_TRUE(return_list.front().enabled);
+    ASSERT_EQ(5, return_list.size());
+    EXPECT_EQ("ScopeD", return_list[0].id);
+    EXPECT_FALSE(return_list[0].enabled);
+    EXPECT_EQ("ScopeA", return_list[1].id);
+    EXPECT_TRUE(return_list[1].enabled);
+    EXPECT_EQ("ScopeB", return_list[2].id);
+    EXPECT_FALSE(return_list[2].enabled);
+    EXPECT_EQ("ScopeC", return_list[3].id);
+    EXPECT_TRUE(return_list[3].enabled);
+    EXPECT_EQ("ScopeE", return_list[4].id);
+    EXPECT_TRUE(return_list[4].enabled);
 
     // 3rd+ TestScope::find_child_scopes() returns: "D,A,B"
-    // with order: "B,E,A,D,C", we should get: "B,A,D"
     return_list = test_scope->child_scopes();
-    EXPECT_EQ(3, return_list.size());
-    EXPECT_EQ("ScopeB", return_list.front().id);
-    EXPECT_FALSE(return_list.front().enabled);
-    return_list.pop_front();
-    EXPECT_EQ("ScopeA", return_list.front().id);
-    EXPECT_TRUE(return_list.front().enabled);
-    return_list.pop_front();
-    EXPECT_EQ("ScopeD", return_list.front().id);
-    EXPECT_FALSE(return_list.front().enabled);
+    ASSERT_EQ(3, return_list.size());
+    EXPECT_EQ("ScopeD", return_list[0].id);
+    EXPECT_FALSE(return_list[0].enabled);
+    EXPECT_EQ("ScopeA", return_list[1].id);
+    EXPECT_TRUE(return_list[1].enabled);
+    EXPECT_EQ("ScopeB", return_list[2].id);
+    EXPECT_FALSE(return_list[2].enabled);
 
-    // Set order to: "B,D,X,A"
+    // Re-enable scope D, disabled scopes A and X (non-existent)
     list.clear();
-    list.push_back({"ScopeB", false});
-    list.push_back({"ScopeD", true});
-    list.push_back({"ScopeX", true});
-    list.push_back({"ScopeA", false});
+    list.emplace_back(ChildScope{"ScopeD", test_metadata(), true});
+    list.emplace_back(ChildScope{"ScopeA", test_metadata(), false});
+    list.emplace_back(ChildScope{"ScopeX", test_metadata(), false});
     EXPECT_TRUE(test_scope->set_child_scopes(list));
 
     // 3rd+ TestScope::find_child_scopes() returns: "D,A,B"
-    // with order: "B,D,X,A", we should get: "B,D,A"
     return_list = test_scope->child_scopes();
-    return_list = test_scope->child_scopes();
-    EXPECT_EQ(3, return_list.size());
-    EXPECT_EQ("ScopeB", return_list.front().id);
-    EXPECT_FALSE(return_list.front().enabled);
-    return_list.pop_front();
-    EXPECT_EQ("ScopeD", return_list.front().id);
-    EXPECT_TRUE(return_list.front().enabled);
-    return_list.pop_front();
-    EXPECT_EQ("ScopeA", return_list.front().id);
-    EXPECT_FALSE(return_list.front().enabled);
+    ASSERT_EQ(3, return_list.size());
+    EXPECT_EQ("ScopeD", return_list[0].id);
+    EXPECT_TRUE(return_list[0].enabled);
+    EXPECT_EQ("ScopeA", return_list[1].id);
+    EXPECT_FALSE(return_list[1].enabled);
+    EXPECT_EQ("ScopeB", return_list[2].id);
+    EXPECT_TRUE(return_list[2].enabled);
 }
 
 TEST_F(ChildScopesTest, existing_config)
@@ -224,17 +215,14 @@ TEST_F(ChildScopesTest, existing_config)
     start_test_scope();
 
     // 1st TestScope::find_child_scopes() returns: "A,B,C"
-    // with order: "B,D,A" (from previous test), we should get: "B,A,C"
     ChildScopeList return_list = test_scope->child_scopes();
-    EXPECT_EQ(3, return_list.size());
-    EXPECT_EQ("ScopeB", return_list.front().id);
-    EXPECT_FALSE(return_list.front().enabled);
-    return_list.pop_front();
-    EXPECT_EQ("ScopeA", return_list.front().id);
-    EXPECT_FALSE(return_list.front().enabled);
-    return_list.pop_front();
-    EXPECT_EQ("ScopeC", return_list.front().id);
-    EXPECT_TRUE(return_list.front().enabled);
+    ASSERT_EQ(3, return_list.size());
+    EXPECT_EQ("ScopeA", return_list[0].id);
+    EXPECT_FALSE(return_list[0].enabled);
+    EXPECT_EQ("ScopeB", return_list[1].id);
+    EXPECT_TRUE(return_list[1].enabled);
+    EXPECT_EQ("ScopeC", return_list[2].id);
+    EXPECT_TRUE(return_list[2].enabled);
 }
 
 TEST_F(ChildScopesTest, no_config_dir)
@@ -245,25 +233,22 @@ TEST_F(ChildScopesTest, no_config_dir)
     // Start TestScope
     start_test_scope();
 
-    // Set order to: "B,A,C" (should fail)
+    // Set some enabled states (should fail)
     ChildScopeList list;
-    list.push_back({"ScopeB", false});
-    list.push_back({"ScopeA", false});
-    list.push_back({"ScopeC", true});
+    list.emplace_back(ChildScope{"ScopeA", test_metadata(), false});
+    list.emplace_back(ChildScope{"ScopeB", test_metadata(), false});
+    list.emplace_back(ChildScope{"ScopeC", test_metadata(), true});
     EXPECT_FALSE(test_scope->set_child_scopes(list));
 
     // 1st TestScope::find_child_scopes() returns: "A,B,C"
-    // No order was set, so we should just get: "A,B,C"
     ChildScopeList return_list = test_scope->child_scopes();
-    EXPECT_EQ(3, return_list.size());
-    EXPECT_EQ("ScopeA", return_list.front().id);
-    EXPECT_FALSE(return_list.front().enabled);
-    return_list.pop_front();
-    EXPECT_EQ("ScopeB", return_list.front().id);
-    EXPECT_FALSE(return_list.front().enabled);
-    return_list.pop_front();
-    EXPECT_EQ("ScopeC", return_list.front().id);
-    EXPECT_TRUE(return_list.front().enabled);
+    ASSERT_EQ(3, return_list.size());
+    EXPECT_EQ("ScopeA", return_list[0].id);
+    EXPECT_TRUE(return_list[0].enabled);
+    EXPECT_EQ("ScopeB", return_list[1].id);
+    EXPECT_TRUE(return_list[1].enabled);
+    EXPECT_EQ("ScopeC", return_list[2].id);
+    EXPECT_TRUE(return_list[2].enabled);
 }
 
 TEST_F(ChildScopesTest, corrupted_config)
@@ -272,22 +257,19 @@ TEST_F(ChildScopesTest, corrupted_config)
     remove_config_dir();
     create_config_dir();
 
-    // Partially corrupt config (Sets order to: "B")
+    // Partially corrupt config (missing enabled state for scope B)
     write_partially_corrupt_config();
     start_test_scope();
 
     // 1st TestScope::find_child_scopes() returns: "A,B,C"
-    // with partial order: "B", we should get: "B,A,C"
     ChildScopeList return_list = test_scope->child_scopes();
-    EXPECT_EQ(3, return_list.size());
-    EXPECT_EQ("ScopeB", return_list.front().id);
-    EXPECT_TRUE(return_list.front().enabled);
-    return_list.pop_front();
-    EXPECT_EQ("ScopeA", return_list.front().id);
-    EXPECT_FALSE(return_list.front().enabled);
-    return_list.pop_front();
-    EXPECT_EQ("ScopeC", return_list.front().id);
-    EXPECT_TRUE(return_list.front().enabled);
+    ASSERT_EQ(3, return_list.size());
+    EXPECT_EQ("ScopeA", return_list[0].id);
+    EXPECT_TRUE(return_list[0].enabled);
+    EXPECT_EQ("ScopeB", return_list[1].id);
+    EXPECT_TRUE(return_list[1].enabled);
+    EXPECT_EQ("ScopeC", return_list[2].id);
+    EXPECT_TRUE(return_list[2].enabled);
 
     // Empty config
     write_empty_config();
@@ -296,15 +278,13 @@ TEST_F(ChildScopesTest, corrupted_config)
 
     // Check that nothing crashes and we simply get the list from the scope as is
     return_list = test_scope->child_scopes();
-    EXPECT_EQ(3, return_list.size());
-    EXPECT_EQ("ScopeA", return_list.front().id);
-    EXPECT_FALSE(return_list.front().enabled);
-    return_list.pop_front();
-    EXPECT_EQ("ScopeB", return_list.front().id);
-    EXPECT_FALSE(return_list.front().enabled);
-    return_list.pop_front();
-    EXPECT_EQ("ScopeC", return_list.front().id);
-    EXPECT_TRUE(return_list.front().enabled);
+    ASSERT_EQ(3, return_list.size());
+    EXPECT_EQ("ScopeA", return_list[0].id);
+    EXPECT_TRUE(return_list[0].enabled);
+    EXPECT_EQ("ScopeB", return_list[1].id);
+    EXPECT_TRUE(return_list[1].enabled);
+    EXPECT_EQ("ScopeC", return_list[2].id);
+    EXPECT_TRUE(return_list[2].enabled);
 
     // Corrupt config
     write_corrupt_config();
@@ -313,13 +293,11 @@ TEST_F(ChildScopesTest, corrupted_config)
 
     // Check that nothing crashes and we simply get the list from the scope as is
     return_list = test_scope->child_scopes();
-    EXPECT_EQ(3, return_list.size());
-    EXPECT_EQ("ScopeA", return_list.front().id);
-    EXPECT_FALSE(return_list.front().enabled);
-    return_list.pop_front();
-    EXPECT_EQ("ScopeB", return_list.front().id);
-    EXPECT_FALSE(return_list.front().enabled);
-    return_list.pop_front();
-    EXPECT_EQ("ScopeC", return_list.front().id);
-    EXPECT_TRUE(return_list.front().enabled);
+    ASSERT_EQ(3, return_list.size());
+    EXPECT_EQ("ScopeA", return_list[0].id);
+    EXPECT_TRUE(return_list[0].enabled);
+    EXPECT_EQ("ScopeB", return_list[1].id);
+    EXPECT_TRUE(return_list[1].enabled);
+    EXPECT_EQ("ScopeC", return_list[2].id);
+    EXPECT_TRUE(return_list[2].enabled);
 }

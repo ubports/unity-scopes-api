@@ -339,7 +339,7 @@ public:
     disabled by default when newly discovered).
 
     The default behaviour of this method is to simply return all available scopes on the
-    system in disabled state. This translates to: "Any scope may potentially be aggregated
+    system in enabled state. This translates to: "Any scope may potentially be aggregated
     by this scope".
 
     \note Only aggregator scopes should implement this method.

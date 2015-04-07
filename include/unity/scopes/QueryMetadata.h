@@ -97,8 +97,6 @@ protected:
 
     std::unique_ptr<internal::QueryMetadataImpl> p;
     QueryMetadata(internal::QueryMetadataImpl* impl);
-
-    friend class internal::SearchQueryBaseImpl;  // Allow access for loop detection
     /// @endcond
 };
 

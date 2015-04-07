@@ -23,7 +23,7 @@
 
 #include <gtest/gtest.h>
 
-#include "LoopScope.h"
+#include "AggTestScope.h"
 
 using namespace std;
 using namespace unity::scopes;
@@ -227,7 +227,7 @@ int main(int argc, char **argv)
     auto rpid = fork();
     if (rpid == 0)
     {
-        const char* const args[] = {"scoperegistry [LoopDetecttion_test]", TEST_RUNTIME_FILE, nullptr};
+        const char* const args[] = {"scoperegistry [LoopDetection_test]", TEST_RUNTIME_FILE, nullptr};
         if (execv(TEST_REGISTRY_PATH "/scoperegistry", const_cast<char* const*>(args)) < 0)
         {
             perror("Error starting scoperegistry:");
