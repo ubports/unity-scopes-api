@@ -160,7 +160,7 @@ public:
      * \return Result of the given future.
      */
     template <typename T>
-    static T get_or_throw(std::future<T>& f, int64_t seconds = 10);
+    static T get_or_throw(std::future<T>& f, int64_t seconds = 20);
 
     /**
      * \brief Constructs a URI with the given host and parameters.
