@@ -60,7 +60,7 @@ public:
     /**
     \brief Type of value held by a Variant instance.
     */
-    enum Type { Null, Int, Bool, String, Double, Dict, Array };
+    enum Type { Null, Int, Bool, String, Double, Dict, Array, Int64 };
 
     /**@name Constructors and destructor
     */
@@ -73,6 +73,8 @@ public:
     \brief Creates a Variant instance that stores the supplied integer.
     */
     explicit Variant(int val) noexcept;
+
+    explicit Variant(int64_t val) noexcept;
 
     /**
        \brief Creates a Variant instance that stores the supplied double.
@@ -125,6 +127,7 @@ public:
     */
     //{@
     Variant& operator=(int val) noexcept;
+    Variant& operator=(int64_t val) noexcept;
     Variant& operator=(double val) noexcept;
     Variant& operator=(bool val) noexcept;
     Variant& operator=(std::string const& val);
@@ -152,6 +155,7 @@ public:
     */
     //{@
     int get_int() const;
+    int64_t get_int64_t() const;
     double get_double() const;
     bool get_bool() const;
     std::string get_string() const;

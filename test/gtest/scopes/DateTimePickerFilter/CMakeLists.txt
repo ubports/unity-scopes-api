@@ -1,0 +1,4 @@
+add_executable(DateTimePickerFilter_test DateTimePickerFilter_test.cpp)
+target_link_libraries(DateTimePickerFilter_test ${TESTLIBS})
+
+add_test(DateTimePickerFilter DateTimePickerFilter_test)

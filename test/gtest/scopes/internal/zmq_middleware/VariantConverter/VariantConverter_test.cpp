@@ -43,6 +43,7 @@ TEST(VariantConverter, basic)
         VariantArray arry { Variant(1), Variant(true) };
         m["hints"] = inner;
         m["foo"] = Variant(1);
+        m["boo"] = Variant(int64_t { 2 });
         m["bar"] = Variant(true);
         m["nil"] = Variant::null();
         m["baz"] = arry;
@@ -59,6 +60,7 @@ TEST(VariantConverter, basic)
     EXPECT_EQ(Variant::Dict, resultVar.which());
     auto outerDict = resultVar.get_dict();
     EXPECT_EQ(1, outerDict["foo"].get_int());
+    EXPECT_EQ(2, outerDict["boo"].get_int64_t());
     EXPECT_TRUE(outerDict["bar"].get_bool());
     EXPECT_TRUE(outerDict["nil"].is_null());
 
