@@ -22,6 +22,8 @@
 
 #include <gtest/gtest.h>
 
+#include "AggTestScope.h"
+
 using namespace std;
 using namespace unity::scopes;
 using namespace unity::scopes::internal;

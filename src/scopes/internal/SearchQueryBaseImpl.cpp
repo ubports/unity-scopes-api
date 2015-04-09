@@ -63,6 +63,7 @@ SearchMetadata SearchQueryBaseImpl::search_metadata() const
 }
 
 QueryCtrlProxy SearchQueryBaseImpl::subsearch(ScopeProxy const& scope,
+                                              std::set<std::string> const& keywords,
                                               std::string const& query_string,
                                               std::string const& department_id,
                                               FilterState const& filter_state,
@@ -85,7 +86,10 @@ QueryCtrlProxy SearchQueryBaseImpl::subsearch(ScopeProxy const& scope,
         return query_ctrl;  // Loop was detected, return dummy QueryCtrlProxy.
     }
 
-    // scope_impl can be nullptr if we use a mock scope: TypedScopeFixture<testing::Scope>.
+    // Insert the keywords used to aggregated this child scope into its search metadata
+    const_cast<SearchMetadata&>(metadata).set_aggregated_keywords(keywords);
+
+    // scope_impl can be nullptr if we use a mock scope: TypedScopeFixture<testing::Scope>
     // If so, we call the normal search without passing the history through because
     // we don't need loop detection for mock scopes.
     auto scope_impl = dynamic_pointer_cast<ScopeImpl>(scope);

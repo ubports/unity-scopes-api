@@ -92,9 +92,7 @@ public:
                     ActionMetadata const&,
                     PreviewListenerBase::SPtr const&));
 
-    MOCK_METHOD0(child_scopes_ordered, ChildScopeList());
-
-    MOCK_METHOD1(set_child_scopes_ordered, bool(ChildScopeList const&));
+    MOCK_METHOD0(child_scopes, ChildScopeList());
 
     MOCK_METHOD6(search, QueryCtrlProxy(std::string const&,
                     std::string const&,
@@ -102,6 +100,7 @@ public:
                     Variant const&,
                     SearchMetadata const&,
                     SearchListenerBase::SPtr const&));
+    MOCK_METHOD1(set_child_scopes, bool(ChildScopeList const&));
 };
 
 

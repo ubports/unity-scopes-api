@@ -59,8 +59,8 @@ public:
 
     virtual ~AbstractScopeBase();
 
+    virtual ChildScopeList find_child_scopes() const = 0;
     virtual ChildScopeList child_scopes() const = 0;
-    virtual ChildScopeList child_scopes_ordered() const = 0;
 
 protected:
     AbstractScopeBase();

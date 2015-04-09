@@ -64,9 +64,9 @@ public:
 
     void set_child_scopes_repo(std::shared_ptr<ChildScopesRepository> const& child_scopes_repo);
 
-    ChildScopeList child_scopes() const;
-    ChildScopeList child_scopes_ordered(ChildScopeList const& unordered_child_scopes) const;
-    bool set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered);
+    ChildScopeList find_child_scopes() const;
+    ChildScopeList child_scopes(ChildScopeList const& unordered_child_scopes) const;
+    bool set_child_scopes(ChildScopeList const& child_scopes);
 
 private:
     std::string scope_directory_;

@@ -18,7 +18,10 @@
 
 #pragma once
 
-#include <unity/scopes/Scope.h>
+#include <unity/scopes/ScopeProxyFwd.h>
+#include <unity/scopes/Variant.h>
+#include <unity/util/DefinesPtrs.h>
+
 #include <set>
 
 namespace unity
@@ -29,7 +32,6 @@ namespace scopes
 
 namespace internal
 {
-
 class ScopeMetadataImpl;
 } // namespace internal
 

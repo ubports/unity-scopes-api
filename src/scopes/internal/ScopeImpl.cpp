@@ -337,14 +337,14 @@ QueryCtrlProxy ScopeImpl::preview(Result const& result,
     return ctrl;
 }
 
-ChildScopeList ScopeImpl::child_scopes_ordered()
+ChildScopeList ScopeImpl::child_scopes()
 {
-    return fwd()->child_scopes_ordered();
+    return fwd()->child_scopes();
 }
 
-bool ScopeImpl::set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered)
+bool ScopeImpl::set_child_scopes(ChildScopeList const& child_scopes)
 {
-    return fwd()->set_child_scopes_ordered(child_scopes_ordered);
+    return fwd()->set_child_scopes(child_scopes);
 }
 
 ScopeProxy ScopeImpl::create(MWScopeProxy const& mw_proxy, std::string const& scope_id)

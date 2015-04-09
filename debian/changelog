@@ -1,3 +1,16 @@
+unity-scopes-api (0.6.15+15.04.20150407-0ubuntu1) vivid; urgency=medium
+
+  [ Marcus Tomlinson ]
+  * Renamed "child_scopes()" to "find_child_scopes()"
+  * Renamed "child_scopes_ordered()" to "child_scopes()"
+  * Added is_aggregated() and aggregated_keywords() to SearchMetaData
+
+  [ CI Train Bot ]
+  * debian/libunity-scopes3.symbols: update to released version.
+  * New rebuild forced.
+
+ -- CI Train Bot <ci-train-bot@canonical.com>  Tue, 07 Apr 2015 06:33:09 +0000
+
 unity-scopes-api (0.6.15-0ubuntu1) UNRELEASED; urgency=medium
 
   * Added support for attaching arbitrary data to CannedQuery.
