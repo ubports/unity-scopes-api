@@ -21,6 +21,7 @@
 #include <unity/scopes/internal/FilterStateImpl.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/smartscopes/SmartScopesClient.h>
+#include <unity/scopes/internal/Utils.h>
 
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
@@ -34,7 +35,6 @@
 #include <utility>
 #include <map>
 #include <sstream>
-#include <sys/stat.h>
 
 static std::string homedir()
 {
@@ -860,7 +860,7 @@ void SmartScopesClient::cancel_query(unsigned int query_id)
 void SmartScopesClient::write_cache(std::string const& scopes_json)
 {
     // make cache directory (fails silently if already exists)
-    mkdir(c_scopes_cache_dir.c_str(), 0755);
+    make_directories(c_scopes_cache_dir, 0755);
 
     // open cache for output
     std::ofstream cache_file(c_scopes_cache_dir + c_scopes_cache_filename);
