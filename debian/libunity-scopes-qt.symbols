@@ -70,7 +70,7 @@ libunity-scopes-qt.so.01 libunity-scopes-qt #MINVER#
  (c++)"unity::scopes::qt::QCannedQuery::department_id() const@Base" 0.6.13+15.04.20150205.1
  (c++)"unity::scopes::qt::QCannedQuery::filter_state() const@Base" 0.6.13+15.04.20150205.1
  (c++)"unity::scopes::qt::QCannedQuery::from_uri(QString const&)@Base" 0.6.13+15.04.20150205.1
- (c++)"unity::scopes::qt::QCannedQuery::has_user_data() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QCannedQuery::has_user_data() const@Base" 0.6.16+15.04.20150410.3
  (c++)"unity::scopes::qt::QCannedQuery::operator=(unity::scopes::qt::QCannedQuery&&)@Base" 0.6.13+15.04.20150205.1
  (c++)"unity::scopes::qt::QCannedQuery::operator=(unity::scopes::qt::QCannedQuery const&)@Base" 0.6.13+15.04.20150205.1
  (c++)"unity::scopes::qt::QCannedQuery::~QCannedQuery()@Base" 0.6.13+15.04.20150205.1
@@ -87,7 +87,7 @@ libunity-scopes-qt.so.01 libunity-scopes-qt #MINVER#
  (c++)"unity::scopes::qt::QCannedQuery::set_filter_state(unity::scopes::FilterState const&)@Base" 0.6.13+15.04.20150205.1
  (c++)"unity::scopes::qt::QCannedQuery::set_query_string(QString const&)@Base" 0.6.13+15.04.20150205.1
  (c++)"unity::scopes::qt::QCannedQuery::to_uri() const@Base" 0.6.13+15.04.20150205.1
- (c++)"unity::scopes::qt::QCannedQuery::user_data() const@Base" 0replaceme
+ (c++)"unity::scopes::qt::QCannedQuery::user_data() const@Base" 0.6.16+15.04.20150410.3
  (c++)"unity::scopes::qt::QCategorisedResult::category() const@Base" 0.6.13+15.04.20150205.1
  (c++)"unity::scopes::qt::QCategorisedResult::fwd() const@Base" 0.6.13+15.04.20150205.1
  (c++)"unity::scopes::qt::QCategorisedResult::operator=(unity::scopes::qt::QCategorisedResult&&)@Base" 0.6.13+15.04.20150205.1
@@ -135,12 +135,12 @@ libunity-scopes-qt.so.01 libunity-scopes-qt #MINVER#
  (c++)"unity::scopes::qt::QDepartment::serialize() const@Base" 0.6.13+15.04.20150205.1
  (c++)"unity::scopes::qt::QDepartment::set_alternate_label(QString const&)@Base" 0.6.13+15.04.20150205.1
  (c++)"unity::scopes::qt::QDepartment::set_has_subdepartments(bool)@Base" 0.6.13+15.04.20150205.1
- (c++)"unity::scopes::qt::QDepartment::set_subdepartments(QList<std::shared_ptr<unity::scopes::qt::QDepartment const> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QDepartment::set_subdepartments(QList<std::shared_ptr<unity::scopes::qt::QDepartment const> > const&)@Base" 0.6.16+15.04.20150410.3
  (c++)"unity::scopes::qt::QDepartment::subdepartments() const@Base" 0.6.13+15.04.20150205.1
  (c++)"unity::scopes::qt::QPreviewQueryBase::action_metadata() const@Base" 0.6.13+15.04.20150205.1
  (c++)"unity::scopes::qt::QPreviewQueryBaseAPI::cancelled()@Base" 0.6.13+15.04.20150205.1
  (c++)"unity::scopes::qt::QPreviewQueryBaseAPI::event(QEvent*)@Base" 0.6.13+15.04.20150205.1
- (c++)"unity::scopes::qt::QPreviewQueryBaseAPI::init()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QPreviewQueryBaseAPI::init()@Base" 0.6.16+15.04.20150410.3
  (c++)"unity::scopes::qt::QPreviewQueryBaseAPI::metaObject() const@Base" 0.6.13+15.04.20150205.1
  (c++)"unity::scopes::qt::QPreviewQueryBaseAPI::~QPreviewQueryBaseAPI()@Base" 0.6.13+15.04.20150205.1
  (c++)"unity::scopes::qt::QPreviewQueryBaseAPI::QPreviewQueryBaseAPI(std::shared_ptr<QCoreApplication>, unity::scopes::qt::QScopeBase&, unity::scopes::Result const&, unity::scopes::ActionMetadata const&, QObject*)@Base" 0.6.13+15.04.20150205.1
@@ -236,13 +236,13 @@ libunity-scopes-qt.so.01 libunity-scopes-qt #MINVER#
  (c++)"unity::scopes::qt::QSearchMetadata::QSearchMetadata(QString const&, QString const&)@Base" 0.6.13+15.04.20150205.1
  (c++)"unity::scopes::qt::QSearchMetadata::QSearchMetadata(unity::scopes::qt::QSearchMetadata&&)@Base" 0.6.13+15.04.20150205.1
  (c++)"unity::scopes::qt::QSearchMetadata::QSearchMetadata(unity::scopes::qt::QSearchMetadata const&)@Base" 0.6.13+15.04.20150205.1
- (c++)"unity::scopes::qt::QSearchMetadata::remove_location()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchMetadata::remove_location()@Base" 0.6.16+15.04.20150410.3
  (c++)"unity::scopes::qt::QSearchMetadata::set_cardinality(int)@Base" 0.6.13+15.04.20150205.1
  (c++)"unity::scopes::qt::QSearchMetadata::set_hint(QString const&, QVariant const&)@Base" 0.6.13+15.04.20150205.1
  (c++)"unity::scopes::qt::QSearchMetadata::set_location(unity::scopes::Location const&)@Base" 0.6.13+15.04.20150205.1
  (c++)"unity::scopes::qt::QSearchQueryBaseAPI::cancelled()@Base" 0.6.13+15.04.20150205.1
  (c++)"unity::scopes::qt::QSearchQueryBaseAPI::event(QEvent*)@Base" 0.6.13+15.04.20150205.1
- (c++)"unity::scopes::qt::QSearchQueryBaseAPI::init()@Base" 0replaceme
+ (c++)"unity::scopes::qt::QSearchQueryBaseAPI::init()@Base" 0.6.16+15.04.20150410.3
  (c++)"unity::scopes::qt::QSearchQueryBaseAPI::metaObject() const@Base" 0.6.13+15.04.20150205.1
  (c++)"unity::scopes::qt::QSearchQueryBaseAPI::~QSearchQueryBaseAPI()@Base" 0.6.13+15.04.20150205.1
  (c++)"unity::scopes::qt::QSearchQueryBaseAPI::QSearchQueryBaseAPI(std::shared_ptr<QCoreApplication>, unity::scopes::qt::QScopeBase&, unity::scopes::CannedQuery const&, unity::scopes::SearchMetadata const&, QObject*)@Base" 0.6.13+15.04.20150205.1
@@ -275,7 +275,7 @@ libunity-scopes-qt.so.01 libunity-scopes-qt #MINVER#
  (c++)"unity::scopes::qt::QSearchReply::register_departments(std::shared_ptr<unity::scopes::qt::QDepartment const> const&)@Base" 0.6.13+15.04.20150205.1
  (c++)"unity::scopes::qt::QSearchReply::staticMetaObject@Base" 0.6.13+15.04.20150205.1
  (c++)"unity::scopes::qt::QVariantBuilder::add_tuple(QVector<QPair<QString, QVariant> > const&)@Base" 0.6.13+15.04.20150205.1
- (c++)"unity::scopes::qt::QVariantBuilder::add_tuple(std::initializer_list<QPair<QString, QVariant> > const&)@Base" 0replaceme
+ (c++)"unity::scopes::qt::QVariantBuilder::add_tuple(std::initializer_list<QPair<QString, QVariant> > const&)@Base" 0.6.16+15.04.20150410.3
  (c++)"unity::scopes::qt::QVariantBuilder::end()@Base" 0.6.13+15.04.20150205.1
  (c++)"unity::scopes::qt::QVariantBuilder::operator=(unity::scopes::qt::QVariantBuilder&&)@Base" 0.6.13+15.04.20150205.1
  (c++)"unity::scopes::qt::QVariantBuilder::operator=(unity::scopes::qt::QVariantBuilder const&)@Base" 0.6.13+15.04.20150205.1

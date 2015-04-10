@@ -1,12 +1,18 @@
-unity-scopes-api (0.6.16-0ubuntu1) UNRELEASED; urgency=medium
+unity-scopes-api (0.6.16+15.04.20150410.3-0ubuntu1) vivid; urgency=medium
 
+  [ Pawel Stolowski ]
   * Added support for attaching arbitrary data to CannedQuery.
   * Added _ENABLE_QT_EXPERIMENTAL_ guard to qt headers until that library
     is finalized. Further changes in the unity::scopes::qt namespace are
     expected at this point.
   * Added DateTimePickerFilter into experimental namespace.
 
- -- Pawel Stolowski <pawel.stolowski@canonical.com>  Fri, 10 Apr 2015 09:19:56 +0200
+  [ CI Train Bot ]
+  * debian/libunity-scopes-qt.symbols: update to released version.
+  * debian/libunity-scopes3.symbols: update to released version.
+  * New rebuild forced.
+
+ -- CI Train Bot <ci-train-bot@canonical.com>  Fri, 10 Apr 2015 18:55:46 +0000
 
 unity-scopes-api (0.6.15+15.04.20150407-0ubuntu1) vivid; urgency=medium
 
