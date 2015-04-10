@@ -19,17 +19,18 @@
 #include <unity/scopes/internal/zmq_middleware/ScopeI.h>
 
 #include <scopes/internal/zmq_middleware/capnproto/Scope.capnp.h>
-#include <unity/scopes/internal/ResultImpl.h>
-#include <unity/scopes/internal/CannedQueryImpl.h>
-#include <unity/scopes/internal/ScopeObject.h>
+#include <unity/scopes/CannedQuery.h>
 #include <unity/scopes/internal/ActionMetadataImpl.h>
+#include <unity/scopes/internal/CannedQueryImpl.h>
+#include <unity/scopes/internal/ResultImpl.h>
 #include <unity/scopes/internal/SearchMetadataImpl.h>
+#include <unity/scopes/internal/ScopeMetadataImpl.h>
+#include <unity/scopes/internal/ScopeObject.h>
 #include <unity/scopes/internal/zmq_middleware/ObjectAdapter.h>
 #include <unity/scopes/internal/zmq_middleware/VariantConverter.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqQueryCtrl.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqReply.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqScope.h>
-#include <unity/scopes/CannedQuery.h>
 
 #include <cassert>
 
@@ -60,8 +61,8 @@ interface Scope
     QueryCtrl* preview(ValueDict result, ValueDict hints, Reply* replyProxy);
     QueryCtrl* perform_action(ValueDict result, ValueDict hints, string action_id, Reply* replyProxy);
     QueryCtrl* activate(ValueDict result, ValueDict hints, Reply* replyProxy);
-    ChildScopeList child_scopes_ordered();
-    bool set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered);
+    ChildScopeList child_scopes();
+    bool set_child_scopes(ChildScopeList const& child_scopes);
     bool debug_mode();
 };
 
@@ -75,8 +76,8 @@ ScopeI::ScopeI(ScopeObjectBase::SPtr const& so) :
                       { "preview", bind(&ScopeI::preview_, this, ph::_1, ph::_2, ph::_3) },
                       { "activate", bind(&ScopeI::activate_, this, ph::_1, ph::_2, ph::_3) },
                       { "perform_action", bind(&ScopeI::perform_action_, this, ph::_1, ph::_2, ph::_3) },
-                      { "child_scopes_ordered", bind(&ScopeI::child_scopes_ordered_, this, ph::_1, ph::_2, ph::_3) },
-                      { "set_child_scopes_ordered", bind(&ScopeI::set_child_scopes_ordered_, this, ph::_1, ph::_2, ph::_3) },
+                      { "child_scopes", bind(&ScopeI::child_scopes_, this, ph::_1, ph::_2, ph::_3) },
+                      { "set_child_scopes", bind(&ScopeI::set_child_scopes_, this, ph::_1, ph::_2, ph::_3) },
                       { "debug_mode", bind(&ScopeI::debug_mode_, this, ph::_1, ph::_2, ph::_3) }
     })
 {
@@ -200,48 +201,71 @@ void ScopeI::preview_(Current const& current,
     p.setCategory(ctrl_proxy->target_category().c_str());
 }
 
-void ScopeI::child_scopes_ordered_(Current const&,
-                      capnp::AnyPointer::Reader&,
-                      capnproto::Response::Builder& r)
+void ScopeI::child_scopes_(Current const&,
+                           capnp::AnyPointer::Reader&,
+                           capnproto::Response::Builder& r)
 {
     auto delegate = dynamic_pointer_cast<ScopeObjectBase>(del());
     assert(delegate);
 
-    auto child_scopes_ordered = delegate->child_scopes_ordered();
+    auto child_scopes = delegate->child_scopes();
 
     r.setStatus(capnproto::ResponseStatus::SUCCESS);
-    auto list_response = r.initPayload().getAs<capnproto::Scope::ChildScopesOrderedResponse>();
-    auto list = list_response.initReturnValue(child_scopes_ordered.size());
+    auto list_response = r.initPayload().getAs<capnproto::Scope::ChildScopesResponse>();
+    auto list = list_response.initReturnValue(child_scopes.size());
 
-    int i = 0;
-    for (auto const& child_scope : child_scopes_ordered)
+    for (size_t i = 0; i < child_scopes.size(); ++i)
     {
-        list[i].setId(child_scope.id);
-        list[i].setEnabled(child_scope.enabled);
-        ++i;
+        list[i].setId(child_scopes[i].id);
+
+        auto dict = list[i].initMetadata();
+        to_value_dict(child_scopes[i].metadata.serialize(), dict);
+
+        list[i].setEnabled(child_scopes[i].enabled);
+
+        auto keywords = list[i].initKeywords(child_scopes[i].keywords.size());
+        int j = 0;
+        for (auto const& kw : child_scopes[i].keywords)
+        {
+            keywords.set(j++, kw);
+        }
     }
 }
 
-void ScopeI::set_child_scopes_ordered_(Current const&,
-                      capnp::AnyPointer::Reader& in_params,
-                      capnproto::Response::Builder& r)
+void ScopeI::set_child_scopes_(Current const& current,
+                               capnp::AnyPointer::Reader& in_params,
+                               capnproto::Response::Builder& r)
 {
     auto delegate = std::dynamic_pointer_cast<ScopeObjectBase>(del());
     assert(delegate);
 
-    auto list = in_params.getAs<capnproto::Scope::SetChildScopesOrderedRequest>().getChildScopesOrdered();
+    auto list = in_params.getAs<capnproto::Scope::SetChildScopesRequest>().getChildScopes();
 
     ChildScopeList child_scope_list;
     for (size_t i = 0; i < list.size(); ++i)
     {
         string id = list[i].getId();
+
+        auto md = list[i].getMetadata();
+        VariantMap m = to_variant_map(md);
+        unique_ptr<ScopeMetadataImpl> smdi(new ScopeMetadataImpl(m, current.adapter->mw()));
+        auto metadata = ScopeMetadata(ScopeMetadataImpl::create(move(smdi)));
+
         bool enabled = list[i].getEnabled();
-        child_scope_list.push_back( ChildScope{id, enabled} );
+
+        set<string> keywords;
+        auto keywords_capn = list[i].getKeywords();
+        for (auto const& kw : keywords_capn)
+        {
+            keywords.emplace(kw);
+        }
+
+        child_scope_list.push_back( ChildScope{id, metadata, enabled, keywords} );
     }
 
-    bool result = delegate->set_child_scopes_ordered(child_scope_list);
+    bool result = delegate->set_child_scopes(child_scope_list);
     r.setStatus(capnproto::ResponseStatus::SUCCESS);
-    auto response = r.initPayload().getAs<capnproto::Scope::SetChildScopesOrderedResponse>();
+    auto response = r.initPayload().getAs<capnproto::Scope::SetChildScopesResponse>();
     response.setReturnValue(result);
 }
 

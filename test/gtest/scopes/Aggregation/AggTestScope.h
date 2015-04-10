@@ -20,9 +20,11 @@
 
 #include <unity/scopes/ScopeBase.h>
 
-class LoopScope : public unity::scopes::ScopeBase
+class AggTestScope : public unity::scopes::ScopeBase
 {
 public:
+    AggTestScope();
+
     virtual void start(std::string const&) override;
 
     virtual void stop() override;
@@ -35,7 +37,12 @@ public:
     virtual unity::scopes::PreviewQueryBase::UPtr preview(unity::scopes::Result const&,
                                                           unity::scopes::ActionMetadata const &) override;
 
+    virtual unity::scopes::ChildScopeList find_child_scopes() const override;
+
 private:
     std::string id_;
-    std::mutex mutex_;
+    mutable std::mutex mutex_;
+    unity::scopes::SearchMetadata metadata_;
+
+    std::set<std::string> get_keywords(std::string const& child_id) const;
 };

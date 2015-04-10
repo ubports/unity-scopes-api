@@ -16,7 +16,7 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
-#include "LoopScope.h"
+#include "AggTestScope.h"
 
 #include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/ScopeBase.h>
@@ -87,10 +87,10 @@ public:
     TestQuery(CannedQuery const& query,
               SearchMetadata const& metadata,
               string const& id,
-              RegistryProxy const& reg)
+              ChildScopeList const& child_scopes)
         : SearchQueryBase(query, metadata)
         , id_(id)
-        , registry_(reg)
+        , child_scopes_(child_scopes)
     {
     }
 
@@ -113,13 +113,30 @@ public:
             {
                 continue;  // Ignore empty ID, which is what we get if we act as a leaf scope.
             }
-            auto proxy = registry_->get_metadata(child_id).proxy();
-            cerr << id_ << ": sending subsearch to " << child_id << endl;
-            subsearch(proxy, id_ + "->" + child_id, receiver);
+
+            for (auto const& child_scope : child_scopes_)
+            {
+                if (child_scope.id == child_id && child_scope.enabled)
+                {
+                    cerr << id_ << ": sending subsearch to " << child_id << endl;
+                    subsearch(child_scope, id_ + "->" + child_id, receiver);
+                    break;
+                }
+            }
         }
         CategorisedResult res(cat);
         res.set_uri("uri");
         res.set_title(id_ + ": result for query \"" + query().query_string() + "\"");
+
+        std::string aggregated_keywords;
+        auto i = search_metadata().aggregated_keywords().size();
+        for (auto const& keyword : search_metadata().aggregated_keywords())
+        {
+            aggregated_keywords += (--i == 0) ? keyword : keyword + ", ";
+        }
+        res["is_aggregated"] = search_metadata().is_aggregated();
+        res["aggregated_keywords"] = aggregated_keywords;
+
         if (valid())
         {
             reply->push(res);
@@ -128,34 +145,64 @@ public:
 
 private:
     string id_;
-    RegistryProxy registry_;
+    ChildScopeList child_scopes_;
 };
 
 }  // namespace
 
-void LoopScope::start(string const& scope_id)
+AggTestScope::AggTestScope()
+    : metadata_("", "")
+{
+}
+
+void AggTestScope::start(string const& scope_id)
 {
     lock_guard<mutex> lock(mutex_);
     id_ = scope_id;
 }
 
-void LoopScope::stop()
+void AggTestScope::stop()
 {
 }
 
-void LoopScope::run()
+void AggTestScope::run()
 {
 }
 
-SearchQueryBase::UPtr LoopScope::search(CannedQuery const& query, SearchMetadata const& metadata)
+SearchQueryBase::UPtr AggTestScope::search(CannedQuery const& query, SearchMetadata const& metadata)
 {
     lock_guard<mutex> lock(mutex_);
-    return SearchQueryBase::UPtr(new TestQuery(query, metadata, id_, registry()));
+    metadata_ = metadata;
+    return SearchQueryBase::UPtr(new TestQuery(query, metadata, id_, child_scopes()));
 }
 
-PreviewQueryBase::UPtr LoopScope::preview(Result const&, ActionMetadata const &)
+PreviewQueryBase::UPtr AggTestScope::preview(Result const&, ActionMetadata const &)
 {
     return nullptr;  // unused
+}
+
+ChildScopeList AggTestScope::find_child_scopes() const
+{
+    ChildScopeList list;
+    list.emplace_back(ChildScope{"A", registry()->get_metadata("A"), true, get_keywords("A")});
+    list.emplace_back(ChildScope{"B", registry()->get_metadata("B"), true, get_keywords("B")});
+    list.emplace_back(ChildScope{"C", registry()->get_metadata("C"), true, get_keywords("C")});
+    list.emplace_back(ChildScope{"D", registry()->get_metadata("D"), true, get_keywords("D")});
+    return list;
+}
+
+set<string> AggTestScope::get_keywords(string const& child_id) const
+{
+    set<string> keywords;
+    if (metadata_.contains_hint(child_id) &&
+        metadata_[child_id].which() == Variant::Type::Array)
+    {
+        for (auto const& kw : metadata_[child_id].get_array())
+        {
+            keywords.emplace(kw.get_string());
+        }
+    }
+    return keywords;
 }
 
 extern "C"
@@ -165,7 +212,7 @@ extern "C"
     // cppcheck-suppress unusedFunction
     UNITY_SCOPE_CREATE_FUNCTION()
     {
-        return new LoopScope;
+        return new AggTestScope;
     }
 
     void

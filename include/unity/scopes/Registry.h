@@ -21,6 +21,7 @@
 #include <core/signal.h>
 #include <unity/scopes/Object.h>
 #include <unity/scopes/RegistryProxyFwd.h>
+#include <unity/scopes/Scope.h>
 #include <unity/scopes/ScopeMetadata.h>
 
 #include <map>

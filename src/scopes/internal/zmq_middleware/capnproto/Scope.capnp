@@ -68,21 +68,23 @@ struct PreviewRequest
 
 struct ChildScope
 {
-    id      @0 : Text;
-    enabled @1 : Bool;
+    id       @0 : Text;
+    metadata @1 : ValueDict.ValueDict;
+    enabled  @2 : Bool;
+    keywords @3 : List(Text);
 }
 
-struct ChildScopesOrderedResponse
+struct ChildScopesResponse
 {
     returnValue @0 : List(ChildScope);
 }
 
-struct SetChildScopesOrderedRequest
+struct SetChildScopesRequest
 {
-    childScopesOrdered @0 : List(ChildScope);
+    childScopes @0 : List(ChildScope);
 }
 
-struct SetChildScopesOrderedResponse
+struct SetChildScopesResponse
 {
     returnValue @0 : Bool;
 }

@@ -18,16 +18,17 @@
 
 #include <unity/scopes/internal/zmq_middleware/ZmqScope.h>
 
+#include <scopes/internal/zmq_middleware/capnproto/Scope.capnp.h>
+#include <unity/scopes/CannedQuery.h>
 #include <unity/scopes/internal/QueryCtrlImpl.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
-#include <scopes/internal/zmq_middleware/capnproto/Scope.capnp.h>
+#include <unity/scopes/internal/ScopeMetadataImpl.h>
 #include <unity/scopes/internal/zmq_middleware/VariantConverter.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqException.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqQueryCtrl.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqReceiver.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqReply.h>
 #include <unity/scopes/Result.h>
-#include <unity/scopes/CannedQuery.h>
 
 using namespace std;
 
@@ -56,8 +57,8 @@ interface Scope
     QueryCtrl* activate(string query, ValueDict hints, Reply* replyProxy);
     QueryCtrl* perform_action(string query, ValueDict hints, string action_id, Reply* replyProxy);
     QueryCtrl* preview(string query, ValueDict hints, Reply* replyProxy);
-    ChildScopeList child_scopes_ordered();
-    bool set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered);
+    ChildScopeList child_scopes();
+    bool set_child_scopes(ChildScopeList const& child_scopes);
     bool debug_mode();
 };
 
@@ -207,10 +208,10 @@ QueryCtrlProxy ZmqScope::preview(VariantMap const& result, VariantMap const& hin
     return make_shared<QueryCtrlImpl>(p, reply_proxy);
 }
 
-ChildScopeList ZmqScope::child_scopes_ordered()
+ChildScopeList ZmqScope::child_scopes()
 {
     capnp::MallocMessageBuilder request_builder;
-    make_request_(request_builder, "child_scopes_ordered");
+    make_request_(request_builder, "child_scopes");
 
     auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_scope_(request_builder); });
 
@@ -218,32 +219,55 @@ ChildScopeList ZmqScope::child_scopes_ordered()
     auto response = out_params.reader->getRoot<capnproto::Response>();
     throw_if_runtime_exception(response);
 
-    auto list = response.getPayload().getAs<capnproto::Scope::ChildScopesOrderedResponse>().getReturnValue();
+    auto list = response.getPayload().getAs<capnproto::Scope::ChildScopesResponse>().getReturnValue();
 
     ChildScopeList child_scope_list;
     for (size_t i = 0; i < list.size(); ++i)
     {
         string id = list[i].getId();
+
+        auto md = list[i].getMetadata();
+        VariantMap m = to_variant_map(md);
+        unique_ptr<ScopeMetadataImpl> smdi(new ScopeMetadataImpl(m, mw_base()));
+        auto metadata = ScopeMetadata(ScopeMetadataImpl::create(move(smdi)));
+
         bool enabled = list[i].getEnabled();
-        child_scope_list.push_back( ChildScope{id, enabled} );
+
+        set<string> keywords;
+        auto keywords_capn = list[i].getKeywords();
+        for (auto const& kw : keywords_capn)
+        {
+            keywords.emplace(kw);
+        }
+
+        child_scope_list.push_back( ChildScope{id, metadata, enabled, keywords} );
     }
     return child_scope_list;
 }
 
-bool ZmqScope::set_child_scopes_ordered(ChildScopeList const& child_scopes_ordered)
+bool ZmqScope::set_child_scopes(ChildScopeList const& child_scopes)
 {
     capnp::MallocMessageBuilder request_builder;
-    auto request = make_request_(request_builder, "set_child_scopes_ordered");
+    auto request = make_request_(request_builder, "set_child_scopes");
 
-    auto in_params = request.initInParams().getAs<capnproto::Scope::SetChildScopesOrderedRequest>();
-    auto list = in_params.initChildScopesOrdered(child_scopes_ordered.size());
+    auto in_params = request.initInParams().getAs<capnproto::Scope::SetChildScopesRequest>();
+    auto list = in_params.initChildScopes(child_scopes.size());
 
-    int i = 0;
-    for (auto const& child_scope : child_scopes_ordered)
+    for (size_t i = 0; i < child_scopes.size(); ++i)
     {
-        list[i].setId(child_scope.id);
-        list[i].setEnabled(child_scope.enabled);
-        ++i;
+        list[i].setId(child_scopes[i].id);
+
+        auto dict = list[i].initMetadata();
+        to_value_dict(child_scopes[i].metadata.serialize(), dict);
+
+        list[i].setEnabled(child_scopes[i].enabled);
+
+        auto keywords = list[i].initKeywords(child_scopes[i].keywords.size());
+        int j = 0;
+        for (auto const& kw : child_scopes[i].keywords)
+        {
+            keywords.set(j++, kw);
+        }
     }
 
     auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_scope_(request_builder); });
@@ -251,7 +275,7 @@ bool ZmqScope::set_child_scopes_ordered(ChildScopeList const& child_scopes_order
     auto r = out_params.reader->getRoot<capnproto::Response>();
     throw_if_runtime_exception(r);
 
-    auto response = r.getPayload().getAs<capnproto::Scope::SetChildScopesOrderedResponse>();
+    auto response = r.getPayload().getAs<capnproto::Scope::SetChildScopesResponse>();
     return response.getReturnValue();
 }
 

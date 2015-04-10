@@ -1,12 +1,19 @@
 Release notes
 =============
 
-Changes in version 0.6.15
+Changes in version 0.6.16
 =========================
   - Added support for attaching arbitrary data to CannedQuery.
   - Added _ENABLE_QT_EXPERIMENTAL_ guard to qt headers until that library
     is finalized. Further changes in the unity::scopes::qt namespace are
     expected at this point.
+  - Added DateTimePickerFilter into experimental namespace.
+
+Changes in version 0.6.15
+=========================
+  - Renamed "child_scopes()" to "find_child_scopes()"
+  - Renamed "child_scopes_ordered()" to "child_scopes()"
+  - Added is_aggregated() and aggregated_keywords() to SearchMetaData
 
 Changes in version 0.6.14
 =========================

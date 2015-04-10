@@ -19,6 +19,8 @@
 #pragma once
 
 #include <unity/scopes/ScopeBase.h>
+#include <unity/scopes/testing/ScopeMetadataBuilder.h>
+#include <unity/scopes/testing/MockScope.h>
 
 namespace unity
 {
@@ -39,39 +41,47 @@ public:
         return nullptr;
     }
 
-    ChildScopeList child_scopes() const override
+    ChildScopeList find_child_scopes() const override
     {
-        // 1st TestScope::child_scopes() returns: "A,B,C"
+        // 1st TestScope::find_child_scopes() returns: "A,B,C"
         if (i == 0)
         {
             ChildScopeList list;
-            list.push_back({"ScopeA", false});
-            list.push_back({"ScopeB", false});
-            list.push_back({"ScopeC", true});
+            list.push_back({"ScopeA", empty_metadata()});
+            list.push_back({"ScopeB", empty_metadata()});
+            list.push_back({"ScopeC", empty_metadata()});
             ++i;
             return list;
         }
-        // 2nd TestScope::child_scopes() returns: "D,A,B,C,E"
+        // 2nd TestScope::find_child_scopes() returns: "D,A,B,C,E"
         else if (i == 1)
         {
             ChildScopeList list;
-            list.push_back({"ScopeD", false});
-            list.push_back({"ScopeA", false});
-            list.push_back({"ScopeB", false});
-            list.push_back({"ScopeC", true});
-            list.push_back({"ScopeE", true});
+            list.push_back({"ScopeD", empty_metadata()});
+            list.push_back({"ScopeA", empty_metadata()});
+            list.push_back({"ScopeB", empty_metadata()});
+            list.push_back({"ScopeC", empty_metadata()});
+            list.push_back({"ScopeE", empty_metadata()});
             ++i;
             return list;
         }
-        // 3rd+ TestScope::child_scopes() returns: D,A,B
+        // 3rd+ TestScope::find_child_scopes() returns: D,A,B
         else
         {
             ChildScopeList list;
-            list.push_back({"ScopeD", true});
-            list.push_back({"ScopeA", false});
-            list.push_back({"ScopeB", false});
+            list.push_back({"ScopeD", empty_metadata()});
+            list.push_back({"ScopeA", empty_metadata()});
+            list.push_back({"ScopeB", empty_metadata()});
             return list;
         }
+    }
+
+    ScopeMetadata empty_metadata() const
+    {
+        unity::scopes::testing::ScopeMetadataBuilder builder;
+        builder.scope_id(" ").proxy(std::make_shared<unity::scopes::testing::MockScope>(" ", " "))
+               .display_name(" ").description(" ").author(" ");
+        return builder();
     }
 
 private:
