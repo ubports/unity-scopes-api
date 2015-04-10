@@ -19,13 +19,16 @@
 
 #include <unity/scopes/internal/SearchQueryBaseImpl.h>
 
+#include <unity/scopes/internal/DfltConfig.h>
 #include <unity/scopes/internal/QueryCtrlImpl.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/ScopeImpl.h>
 #include <unity/scopes/internal/SearchMetadataImpl.h>
 #include <unity/scopes/ScopeExceptions.h>
 
+#include <boost/filesystem/operations.hpp>
 #include <unity/UnityExceptions.h>
+#include <unity/util/IniParser.h>
 
 #include <algorithm>
 #include <cassert>
@@ -64,6 +67,7 @@ QueryCtrlProxy SearchQueryBaseImpl::subsearch(ScopeProxy const& scope,
                                               std::string const& query_string,
                                               std::string const& department_id,
                                               FilterState const& filter_state,
+                                              std::unique_ptr<Variant> user_data,
                                               SearchMetadata const& metadata,
                                               SearchListenerBase::SPtr const& reply)
 {
@@ -91,11 +95,18 @@ QueryCtrlProxy SearchQueryBaseImpl::subsearch(ScopeProxy const& scope,
     auto scope_impl = dynamic_pointer_cast<ScopeImpl>(scope);
     if (scope_impl)
     {
-        query_ctrl = scope_impl->search(query_string, department_id, filter_state, metadata, history_, reply);
+        // TODO: HACK: Strip location info from metadata if the child isn't allowed to see it.
+        //             We need to remove this once a scope is able to do this itself.
+        SearchMetadata clean_metadata = filter_metadata(scope_impl, metadata);
+
+        query_ctrl = scope_impl->search(query_string, department_id, filter_state, std::move(user_data), clean_metadata,
+                                        history_, reply);
     }
     else
     {
-        query_ctrl = scope->search(query_string, department_id, filter_state, metadata, reply);
+        query_ctrl = user_data ?
+                         scope->search(query_string, department_id, filter_state, *user_data, metadata, reply) :
+                         scope->search(query_string, department_id, filter_state, metadata, reply);
     }
 
     lock_guard<mutex> lock(mutex_);
@@ -197,6 +208,81 @@ QueryCtrlProxy SearchQueryBaseImpl::check_for_query_loop(ScopeProxy const& scope
     }
 
     return ctrl_proxy;  // null proxy if there was no loop
+}
+
+namespace
+{
+
+// Return a copy of the passed metadata sans its location information.
+
+SearchMetadata strip_location(SearchMetadata const& metadata)
+{
+    SearchMetadata stripped(metadata);
+    stripped.remove_location();
+    return stripped;
+}
+
+} // namespace
+
+// Return a copy of the metadata without location information if the scope isn't alloweed
+// to get location data. Otherwise, return the metadata unchanged.
+
+SearchMetadata SearchQueryBaseImpl::filter_metadata(shared_ptr<ScopeImpl>const& scope, SearchMetadata const& metadata)
+{
+    assert(scope);
+
+    namespace fs = boost::filesystem;
+
+    if (!metadata.has_location())
+    {
+        return metadata;  // Nothing to strip in the first place.
+    }
+
+    static string config_dir(scope->runtime()->config_directory());
+
+    // We cache the write time and the setting for each scope,
+    // so we re-parse the settings file only if it has changed.
+    struct LocationPerm
+    {
+        time_t last_write_time;
+        bool   perm;
+    };
+    static map<string, LocationPerm> perms;  // Key is scope ID
+    static mutex perms_mutex;
+
+    string const scope_id = scope->identity();
+    fs::path settings_path = config_dir + "/" + scope_id + "/settings.ini";
+
+    bool permitted = DFLT_LOCATION_PERMITTED;
+
+    lock_guard<mutex> lock(perms_mutex);
+
+    auto it = perms.find(scope_id);
+    try
+    {
+        // Check cache.
+        if (it != perms.end())
+        {
+            if (fs::last_write_time(settings_path) == it->second.last_write_time)
+            {
+                // Got cache hit, and file write time is still the same.
+                return it->second.perm ? metadata : strip_location(metadata);
+            }
+        }
+
+        // We don't have cached data yet, or the file has been updated.
+        unity::util::IniParser parser(settings_path.native().c_str());
+        permitted = parser.get_boolean("General", "internal.location");
+
+        // Update cache.
+        perms.insert(make_pair(scope_id, LocationPerm{ fs::last_write_time(settings_path), permitted }));
+    }
+    catch (std::exception const&)
+    {
+        // Couldn't stat or parse the settings file, so we return the default.
+    }
+
+    return permitted ? metadata : strip_location(metadata);
 }
 
 } // namespace internal

@@ -39,7 +39,11 @@ class CannedQueryImpl;
 \brief Parameters of a search query.
 
 Holds all parameters of a search query: the target scope id, query string, department id, and
-state of the filters. Can be converted to/from scope:// uri schema string.
+state of the filters. CannedQuery can also carry arbitrary data (set by calling CannedQuery::set_user_data(Variant const&))
+which can then be retrieved back with CannedQuery::user_data() when CannedQuery object is received in ScopeBase::search. This arbitrary
+data can be used to store any state-related information that may be useful for the scope when new search request is performed.
+
+Can be converted to/from scope:// uri schema string.
 */
 
 class CannedQuery final
@@ -132,6 +136,28 @@ public:
     \throws InvalidArgumentException if the URI cannot be parsed.
     */
     static CannedQuery from_uri(std::string const& uri);
+
+    /**
+    \brief Attach arbitrary data.
+
+    \param value Data to attach to this canned query
+    */
+    void set_user_data(Variant const& value);
+
+    /**
+    \brief Checks if user data has been attached to this query.
+
+    \return true if data is available.
+    */
+    bool has_user_data() const;
+
+    /**
+    \brief Get user data attached to this query.
+
+    \return Data variant
+    \throws unity::LogicException if user data is not available.
+    */
+    Variant user_data() const;
 
 private:
     CannedQuery(internal::CannedQueryImpl *impl);

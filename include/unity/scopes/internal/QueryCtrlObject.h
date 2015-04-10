@@ -45,7 +45,7 @@ public:
     virtual void cancel(InvokeInfo const& info) override;
     virtual void destroy(InvokeInfo const& info) override;
 
-    // Called by create_query() after instantiation to tell this ctrl what its corresponding
+    // Called by search() after instantiation to tell this ctrl what its corresponding
     // query facade is.
     void set_query(std::shared_ptr<QueryObjectBase> const& qo);
 

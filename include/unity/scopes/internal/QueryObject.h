@@ -61,7 +61,7 @@ public:
     virtual bool pushable(InvokeInfo const& info) const noexcept override;    // Called locally, by ReplyImpl
     virtual int cardinality(InvokeInfo const& info) const noexcept override;  // Called locally, by ReplyImpl
 
-    // Called by create_query(), to hold the reference count high until the run call arrives via the middleware,
+    // Called by search(), to hold the reference count high until the run call arrives via the middleware,
     // and we can pass the shared_ptr to the ReplyImpl.
     void set_self(QueryObjectBase::SPtr const& self) noexcept override;
 

@@ -40,6 +40,7 @@ struct Value
         dictVal   @4 : ValueDict;
         arrayVal  @5 : List(Value);
         nullVal   @6 : NullVal;
+        int64Val  @7 : Int64;
     }
 }
 

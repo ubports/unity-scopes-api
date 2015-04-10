@@ -156,6 +156,26 @@ public:
     */
     virtual bool set_child_scopes(ChildScopeList const& child_scopes) = 0;
 
+    /**
+    \brief Initiates a search query (overloaded method).
+
+    This method has same synopsis as previous search method, but it takes additional user_data argument.
+
+    \param query_string search string
+    \param department_id identifier of a department to search
+    \param filter_state state of filters
+    \param user_data arbitrary data
+    \param metadata additional data to pass to scope
+    \param reply The callback object to receive replies
+    \return query handler
+    */
+    virtual QueryCtrlProxy search(std::string const& query_string,
+                                  std::string const& department_id,
+                                  FilterState const& filter_state,
+                                  Variant const& user_data,
+                                  SearchMetadata const& metadata,
+                                  SearchListenerBase::SPtr const& reply) = 0;
+
 protected:
     /// @cond
     Scope();

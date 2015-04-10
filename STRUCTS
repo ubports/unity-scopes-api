@@ -177,3 +177,11 @@ ActionMetadata (returned by serialize())
 ========================================
   all QueryMetadata attributes
   'scope_data'  : variant
+
+CannedQuery (returned by serialize())
+=====================================
+ 'scope'         : string
+ 'query_string'  : string
+ 'department_id' : string
+ 'filter_state'  : variant
+ 'data'          : variant (optional)

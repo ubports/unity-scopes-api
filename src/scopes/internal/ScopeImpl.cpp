@@ -92,13 +92,31 @@ QueryCtrlProxy ScopeImpl::search(string const& query_string,
 QueryCtrlProxy ScopeImpl::search(std::string const& query_string,
                                  std::string const& department_id,
                                  FilterState const& filter_state,
+                                 std::unique_ptr<Variant> user_data,
                                  SearchMetadata const& metadata,
                                  SearchQueryBaseImpl::History const& history,
                                  SearchListenerBase::SPtr const& reply)
 {
     CannedQuery query(scope_id_, query_string, department_id);
     query.set_filter_state(filter_state);
+    if (user_data)
+    {
+        query.set_user_data(*user_data);
+    }
     return search(query, metadata, history, reply);
+}
+
+QueryCtrlProxy ScopeImpl::search(std::string const& query_string,
+                                  std::string const& department_id,
+                                  FilterState const& filter_state,
+                                  Variant const& user_data,
+                                  SearchMetadata const& metadata,
+                                  SearchListenerBase::SPtr const& reply)
+{
+    CannedQuery query(scope_id_, query_string, department_id);
+    query.set_user_data(user_data);
+    query.set_filter_state(filter_state);
+    return search(query, metadata, SearchQueryBaseImpl::History(), reply);
 }
 
 QueryCtrlProxy ScopeImpl::search(CannedQuery const& query,

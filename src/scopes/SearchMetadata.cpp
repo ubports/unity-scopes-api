@@ -89,6 +89,11 @@ bool SearchMetadata::has_location() const
     return static_cast<internal::SearchMetadataImpl*>(p.get())->has_location();
 }
 
+void SearchMetadata::remove_location()
+{
+    static_cast<internal::SearchMetadataImpl*>(p.get())->remove_location();
+}
+
 void SearchMetadata::set_aggregated_keywords(std::set<std::string> const& aggregated_keywords)
 {
     static_cast<internal::SearchMetadataImpl*>(p.get())->set_aggregated_keywords(aggregated_keywords);

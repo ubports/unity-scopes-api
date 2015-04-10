@@ -50,41 +50,15 @@ class QSearchQueryBaseImpl
     friend QSearchQueryBase;
 
 public:
-    /// @cond
     NONCOPYABLE(QSearchQueryBaseImpl);
     UNITY_DEFINES_PTRS(QSearchQueryBaseImpl);
-    /// @endcond
 
     QSearchQueryBaseImpl();
     ~QSearchQueryBaseImpl() = default;
 
-    /**
-     \brief Get a canned query for this search request.
-
-     \return The canned query.
-     \throws unity::LogicException if the canned query was not initialized (was default-constructed).
-     */
     QCannedQuery query() const;
-
-    /**
-     \brief Get metadata for this search request.
-     \return The search metadata.
-     \throws unity::LogicException if search metadata was not initialized (was default-constructed).
-    */
     unity::scopes::SearchMetadata search_metadata() const;
 
-    /** @name Subquery methods
-    The subsearch() methods are for use by aggregating scopes.
-    When an aggregator passes a query to its child scopes, it should
-    use subsearch() instead of the normal Scope::search()
-    that would be called by a client. subsearch() takes care
-    of automatically forwarding query cancellation to child scopes.
-    This means that there is no need for an aggregating scope to
-    explicitly forward cancellation to child scopes
-    when its QueryBase::cancelled() method is called by the scopes
-    run time.
-    */
-    //{@
     QueryCtrlProxy subsearch(ScopeProxy const& scope,
                              std::string const& query_string,
                              SearchListenerBase::SPtr const& reply);

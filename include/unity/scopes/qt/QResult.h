@@ -18,6 +18,10 @@
 
 #pragma once
 
+#ifndef _ENABLE_QT_EXPERIMENTAL_
+#error You should define _ENABLE_QT_EXPERIMENTAL_ in order to use this experimental header file.
+#endif
+
 #include <unity/util/DefinesPtrs.h>
 
 #include <unity/scopes/ScopeProxyFwd.h>
@@ -63,7 +67,6 @@ public:
     UNITY_DEFINES_PTRS(QResult);
     /// @endcond
 
-    QResult();
     /**@name Copy and assignment
     Copy and assignment (move and non-move versions) have the usual value semantics.
     */

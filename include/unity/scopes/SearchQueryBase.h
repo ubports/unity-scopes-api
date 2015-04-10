@@ -57,7 +57,7 @@ class SSQueryObject;
 /**
 \brief Abstract base class to represent a particular query.
 
-A scope must return an instance of this class from its implementation of ScopeBase::create_query().
+A scope must return an instance of this class from its implementation of ScopeBase::search().
 
 \note The constructor of the instance must complete in a timely manner. Do not perform anything in the
 constructor that might block.
@@ -132,6 +132,20 @@ public:
                              std::string const& query_string,
                              std::string const& department_id,
                              FilterState const& filter_state,
+                             SearchMetadata const& hints,
+                             SearchListenerBase::SPtr const& reply);
+    QueryCtrlProxy subsearch(ChildScope const& scope,
+                             std::string const& query_string,
+                             std::string const& department_id,
+                             FilterState const& filter_state,
+                             Variant const& user_data,
+                             SearchMetadata const& hints,
+                             SearchListenerBase::SPtr const& reply);
+    QueryCtrlProxy subsearch(ScopeProxy const& scope,
+                             std::string const& query_string,
+                             std::string const& department_id,
+                             FilterState const& filter_state,
+                             Variant const& user_data,
                              SearchMetadata const& hints,
                              SearchListenerBase::SPtr const& reply);
     //@}

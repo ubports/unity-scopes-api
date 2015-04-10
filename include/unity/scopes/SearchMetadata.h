@@ -111,6 +111,13 @@ public:
     bool has_location() const;
 
     /**
+    \brief Remove location data entirely.
+
+    This method does nothing if no location data is present.
+    */
+    void remove_location();
+
+    /**
     \brief Set the list of scope keywords used to initiate this search request.
     \param aggregated_keywords The list of scope keywords used to initiate this search request.
     */

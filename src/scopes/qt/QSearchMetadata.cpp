@@ -17,7 +17,6 @@
  */
 
 #include <unity/scopes/qt/QSearchMetadata.h>
-#include <unity/scopes/qt/QUtils.h>
 
 #include <unity/scopes/qt/internal/QSearchMetadataImpl.h>
 #include <unity/scopes/qt/internal/QScopeVariant.h>
@@ -68,6 +67,11 @@ Location QSearchMetadata::location() const
 bool QSearchMetadata::has_location() const
 {
     return p->has_location();
+}
+
+void QSearchMetadata::remove_location()
+{
+    p->remove_location();
 }
 
 void QSearchMetadata::set_hint(QString const& key, QVariant const& value)

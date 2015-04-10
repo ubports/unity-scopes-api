@@ -94,6 +94,12 @@ public:
 
     MOCK_METHOD0(child_scopes, ChildScopeList());
 
+    MOCK_METHOD6(search, QueryCtrlProxy(std::string const&,
+                    std::string const&,
+                    FilterState const&,
+                    Variant const&,
+                    SearchMetadata const&,
+                    SearchListenerBase::SPtr const&));
     MOCK_METHOD1(set_child_scopes, bool(ChildScopeList const&));
 };
 

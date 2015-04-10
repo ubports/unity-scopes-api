@@ -49,7 +49,7 @@ struct NullVariant
 
 struct VariantImpl
 {
-    boost::variant<NullVariant, int, bool, string, double, VariantMap, VariantArray> v;
+    boost::variant<NullVariant, int, bool, string, double, VariantMap, VariantArray, int64_t> v;
 };
 
 } // namespace internal
@@ -60,6 +60,11 @@ Variant::Variant() noexcept
 }
 
 Variant::Variant(int val) noexcept
+    : p(new internal::VariantImpl { val })
+{
+}
+
+Variant::Variant(int64_t val) noexcept
     : p(new internal::VariantImpl { val })
 {
 }
@@ -130,6 +135,12 @@ Variant& Variant::operator=(int val) noexcept
     return *this;
 }
 
+Variant& Variant::operator=(int64_t val) noexcept
+{
+    p->v = val;
+    return *this;
+}
+
 Variant& Variant::operator=(double val) noexcept
 {
     p->v = val;
@@ -185,6 +196,18 @@ int Variant::get_int() const
     catch (std::exception const&)
     {
         throw LogicException("Variant does not contain an int value");
+    }
+}
+
+int64_t Variant::get_int64_t() const
+{
+    try
+    {
+        return boost::get<int64_t>(p->v);
+    }
+    catch (std::exception const&)
+    {
+        throw LogicException("Variant does not contain an int64_t value");
     }
 }
 

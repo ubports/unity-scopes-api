@@ -18,6 +18,10 @@
 
 #pragma once
 
+#ifndef _ENABLE_QT_EXPERIMENTAL_
+#error You should define _ENABLE_QT_EXPERIMENTAL_ in order to use this experimental header file.
+#endif
+
 #include <unity/util/DefinesPtrs.h>
 #include <unity/util/NonCopyable.h>
 
@@ -37,6 +41,11 @@ namespace scopes
 namespace qt
 {
 
+namespace tests
+{
+class QSearchQueryBaseAPIMock;
+}
+
 namespace internal
 {
 class QScopeBaseAPIImpl;
@@ -48,7 +57,7 @@ class QScopeBaseAPI;
 /**
 \brief Abstract base class to represent a particular query.
 
-A scope must return an instance of this class from its implementation of ScopeBase::create_query().
+A scope must return an instance of this class from its implementation of ScopeBase::search().
 
 This is the class that links scope API calls with the main QThread.
 The instance of this class is moved to the main QThread and pushes events to the Qt event loop.
@@ -112,6 +121,9 @@ protected:
     std::unique_ptr<QSearchQueryBase> qtquery_;
     QScopeBase& qtscope_;
 
+private:
+    void init();
+    friend unity::scopes::qt::tests::QSearchQueryBaseAPIMock;
     friend internal::QScopeBaseAPIImpl;
 
 Q_SIGNALS:

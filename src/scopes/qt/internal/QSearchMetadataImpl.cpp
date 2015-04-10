@@ -18,8 +18,7 @@
 
 #include <unity/scopes/qt/internal/QSearchMetadataImpl.h>
 #include <unity/scopes/qt/internal/QScopeVariant.h>
-
-#include <unity/scopes/qt/QUtils.h>
+#include <unity/scopes/qt/internal/QUtils.h>
 
 #include <unity/scopes/SearchMetadata.h>
 
@@ -81,18 +80,25 @@ Location QSearchMetadataImpl::location() const
 
 bool QSearchMetadataImpl::has_location() const
 {
-    return api_search_metadata_->cardinality();
+    sync_values();
+    return api_search_metadata_->has_location();
+}
+
+void QSearchMetadataImpl::remove_location()
+{
+    sync_values();
+    api_search_metadata_->remove_location();
 }
 
 void QSearchMetadataImpl::set_hint(QString const& key, QVariant const& value)
 {
-    api_search_metadata_->set_hint(key.toUtf8().data(), qVariantToScopeVariant(value));
+    api_search_metadata_->set_hint(key.toUtf8().data(), qvariant_to_variant(value));
 }
 
 QVariantMap QSearchMetadataImpl::hints() const
 {
     sync_values();
-    return scopeVariantMapToQVariantMap(api_search_metadata_->hints());
+    return variantmap_to_qvariantmap(api_search_metadata_->hints());
 }
 
 bool QSearchMetadataImpl::contains_hint(QString const& key) const

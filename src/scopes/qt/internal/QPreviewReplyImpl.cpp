@@ -19,8 +19,7 @@
 #include <unity/scopes/qt/internal/QPreviewReplyImpl.h>
 #include <unity/scopes/qt/internal/QColumnLayoutImpl.h>
 #include <unity/scopes/qt/internal/QPreviewWidgetImpl.h>
-
-#include <unity/scopes/qt/QUtils.h>
+#include <unity/scopes/qt/internal/QUtils.h>
 
 #include <unity/scopes/ColumnLayout.h>
 #include <unity/scopes/PreviewReply.h>
@@ -55,7 +54,7 @@ bool QPreviewReplyImpl::push(QPreviewWidgetList const& widget_list)
 
 bool QPreviewReplyImpl::push(QString const& key, QVariant const& value)
 {
-    return api_reply_->push(key.toUtf8().data(), qVariantToScopeVariant(value));
+    return api_reply_->push(key.toUtf8().data(), qvariant_to_variant(value));
 }
 
 QPreviewReplyImpl::~QPreviewReplyImpl() = default;

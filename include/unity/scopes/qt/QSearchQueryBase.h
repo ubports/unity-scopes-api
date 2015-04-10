@@ -18,6 +18,10 @@
 
 #pragma once
 
+#ifndef _ENABLE_QT_EXPERIMENTAL_
+#error You should define _ENABLE_QT_EXPERIMENTAL_ in order to use this experimental header file.
+#endif
+
 #include <unity/util/DefinesPtrs.h>
 #include <unity/util/NonCopyable.h>
 #include <unity/scopes/SearchListenerBase.h>
@@ -50,7 +54,7 @@ class QSearchQueryBaseAPI;
 /**
 \brief Abstract base class to represent a particular query.
 
-A scope must return an instance of this class from its implementation of ScopeBase::create_query().
+A scope must return an instance of this class from its implementation of ScopeBase::search().
 
 \note The constructor of the instance must complete in a timely manner. Do not perform anything in the
 constructor that might block.
@@ -152,7 +156,6 @@ private:
     void init(QSearchQueryBaseAPI* query_api);
 
     std::unique_ptr<internal::QSearchQueryBaseImpl> p;
-    friend class internal::QSearchQueryBaseImpl;
     friend class QSearchQueryBaseAPI;
     ///@endcond
 };

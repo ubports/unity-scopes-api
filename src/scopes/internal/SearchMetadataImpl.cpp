@@ -106,6 +106,11 @@ bool SearchMetadataImpl::has_location() const
     return bool(location_);
 }
 
+void SearchMetadataImpl::remove_location()
+{
+    location_ = boost::none;
+}
+
 void SearchMetadataImpl::set_aggregated_keywords(std::set<std::string> const& aggregated_keywords)
 {
     aggregated_keywords_ = aggregated_keywords;

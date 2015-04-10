@@ -46,26 +46,13 @@ namespace internal
 class QPreviewQueryBaseImpl
 {
 public:
-    /// @cond
     NONCOPYABLE(QPreviewQueryBaseImpl);
     UNITY_DEFINES_PTRS(QPreviewQueryBaseImpl);
-    /// @endcond
 
     QPreviewQueryBaseImpl();
     ~QPreviewQueryBaseImpl() = default;
 
-    /**
-     \brief Get result for this preview request.
-     \throws unity::LogicException if result was not initialized (the default ctor was used).
-     \return result
-     */
     QResult result() const;
-
-    /**
-     \brief Get metadata for this preview request.
-     \return search metadata
-     \throws unity::LogicException if preview metadata was not initialized (the default ctor was used).
-    */
     QActionMetadata action_metadata() const;
 
 protected:

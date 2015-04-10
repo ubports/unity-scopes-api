@@ -539,6 +539,11 @@ string RuntimeImpl::tmp_directory() const
     return find_tmp_dir();
 }
 
+string RuntimeImpl::config_directory() const
+{
+    return config_dir_;
+}
+
 string RuntimeImpl::demangled_id(string const& scope_id) const
 {
     // For scopes that are in a click package together with an app,

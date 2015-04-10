@@ -72,7 +72,7 @@ In the template, a manifest such as the following is used:
 }
 \endcode
 
-\subsubsection multiarch Multi-arch click packages
+\subsubsection multiarch_click Multi-arch click packages
 The search path for the shared library inside a click package is as follows:
 
 <ul>

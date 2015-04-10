@@ -1,0 +1,5 @@
+[ScopeConfig]
+DisplayName = Leaf
+Description = Leaf scope that returns whether it received location data in the "location_data" field.
+Author = Michi
+LocationDataNeeded = true

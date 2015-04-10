@@ -18,6 +18,10 @@
 
 #pragma once
 
+#ifndef _ENABLE_QT_EXPERIMENTAL_
+#error You should define _ENABLE_QT_EXPERIMENTAL_ in order to use this experimental header file.
+#endif
+
 #include <unity/util/DefinesPtrs.h>
 #include <unity/util/NonCopyable.h>
 
@@ -40,6 +44,11 @@ class ActionMetadata;
 
 namespace qt
 {
+
+namespace tests
+{
+class QPreviewQueryBaseAPIMock;
+}
 
 namespace internal
 {
@@ -116,7 +125,11 @@ protected:
     std::unique_ptr<QPreviewQueryBase> qtquery_;
     QScopeBase& qtscope_;
 
+private:
+    void init();
+
     friend internal::QScopeBaseAPIImpl;
+    friend  unity::scopes::qt::tests::QPreviewQueryBaseAPIMock;
     /// @endcond
 };
 
