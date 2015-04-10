@@ -20,12 +20,18 @@
 #include <unity/scopes/internal/SearchReplyImpl.h>
 
 #include <unity/scopes/Annotation.h>
-#include <unity/scopes/CategorisedResult.h>
+#include <unity/scopes/internal/CategorisedResultImpl.h>
 #include <unity/scopes/internal/DepartmentImpl.h>
-#include <unity/scopes/internal/MWReply.h>
 #include <unity/scopes/internal/FilterBaseImpl.h>
+#include <unity/scopes/internal/FilterStateImpl.h>
+#include <unity/scopes/internal/MWReply.h>
 #include <unity/scopes/internal/QueryObjectBase.h>
+#include <unity/scopes/internal/RuntimeImpl.h>
+#include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
+#include <unity/util/FileIO.h>
+
+#include <stdlib.h>
 
 using namespace std;
 
@@ -39,21 +45,24 @@ namespace internal
 {
 
 SearchReplyImpl::SearchReplyImpl(MWReplyProxy const& mw_proxy,
-                                 std::shared_ptr<QueryObjectBase> const& qo,
+                                 shared_ptr<QueryObjectBase> const& qo,
                                  int cardinality,
-                                 std::string const& current_department_id,
-                                 boost::log::sources::severity_channel_logger_mt<>& logger)
-    : ObjectImpl(mw_proxy, logger)
-    , ReplyImpl(mw_proxy, qo, logger)
+                                 string const& query_string,
+                                 string const& current_department_id)
+    : ObjectImpl(mw_proxy)
+    , ReplyImpl(mw_proxy, qo)
     , cat_registry_(new CategoryRegistry())
     , cardinality_(cardinality)
     , num_pushes_(0)
+    , finished_(false)
+    , query_string_(query_string)
     , current_department_(current_department_id)
 {
 }
 
 SearchReplyImpl::~SearchReplyImpl()
 {
+    finished();
 }
 
 void SearchReplyImpl::register_departments(Department::SCPtr const& parent)
@@ -68,6 +77,12 @@ void SearchReplyImpl::register_departments(Department::SCPtr const& parent)
         throw unity::LogicException("SearchReplyImpl::register_departments(): Failed to validate departments");
     }
 
+    if (query_string_.empty())
+    {
+        lock_guard<mutex> lock(mutex_);
+        cached_departments_ = parent;
+    }
+
     ReplyImpl::push(internal::DepartmentImpl::serialize_departments(parent)); // ignore return value?
 }
 
@@ -77,10 +92,10 @@ void SearchReplyImpl::register_category(Category::SCPtr category)
     push(category);
 }
 
-Category::SCPtr SearchReplyImpl::register_category(std::string const& id,
-                                             std::string const& title,
-                                             std::string const &icon,
-                                             CategoryRenderer const& renderer_template)
+Category::SCPtr SearchReplyImpl::register_category(string const& id,
+                                                   string const& title,
+                                                   string const &icon,
+                                                   CategoryRenderer const& renderer_template)
 {
     // will throw if adding same category again
     auto cat = cat_registry_->register_category(id, title, icon, nullptr, renderer_template);
@@ -88,11 +103,11 @@ Category::SCPtr SearchReplyImpl::register_category(std::string const& id,
     return cat;
 }
 
-Category::SCPtr SearchReplyImpl::register_category(std::string const& id,
-                                             std::string const& title,
-                                             std::string const& icon,
-                                             CannedQuery const& query,
-                                             CategoryRenderer const& renderer_template)
+Category::SCPtr SearchReplyImpl::register_category(string const& id,
+                                                   string const& title,
+                                                   string const& icon,
+                                                   CannedQuery const& query,
+                                                   CategoryRenderer const& renderer_template)
 {
     // will throw if adding same category again
     auto cat = cat_registry_->register_category(id, title, icon, make_shared<CannedQuery>(query), renderer_template);
@@ -100,7 +115,7 @@ Category::SCPtr SearchReplyImpl::register_category(std::string const& id,
     return cat;
 }
 
-Category::SCPtr SearchReplyImpl::lookup_category(std::string const& id)
+Category::SCPtr SearchReplyImpl::lookup_category(string const& id)
 {
     return cat_registry_->lookup_category(id);
 }
@@ -126,6 +141,14 @@ bool SearchReplyImpl::push(unity::scopes::CategorisedResult const& result)
     if (!ReplyImpl::push(var))
     {
         return false;
+    }
+
+    // We cache the results of surfacing queries so, if a scope has not connectivity,
+    // we can replay the results of the last successful surfacing query.
+    if (query_string_.empty())
+    {
+        lock_guard<mutex> lock(mutex_);
+        cached_results_.push_back(result);
     }
 
     // Enforce cardinality limit (0 means no limit). If the scope pushes more results
@@ -154,6 +177,13 @@ bool SearchReplyImpl::push(unity::scopes::Filters const& filters, unity::scopes:
         throw unity::LogicException("SearchReplyImpl::push(): Failed to validate filters");
     }
 
+    if (query_string_.empty())
+    {
+        lock_guard<mutex> lock(mutex_);
+        cached_filters_ = filters;
+        cached_filter_state_ = filter_state;
+    }
+
     VariantMap var;
     var["filters"] = internal::FilterBaseImpl::serialize_filters(filters);
     var["filter_state"] = filter_state.serialize();
@@ -165,6 +195,220 @@ bool SearchReplyImpl::push(Category::SCPtr category)
     VariantMap var;
     var["category"] = category->serialize();
     return ReplyImpl::push(var);
+}
+
+void SearchReplyImpl::finished()
+{
+    if (finished_.exchange(true))
+    {
+        return;
+    }
+    write_cached_results();
+    ReplyImpl::finished();  // Upcall to deal with the normal case
+}
+
+static constexpr char const* cache_file_name = ".surfacing_cache";
+
+void SearchReplyImpl::write_cached_results() noexcept
+{
+    assert(finished_);
+
+    if (!query_string_.empty())
+    {
+        return;  // Caching applies only to surfacing queries
+    }
+
+    string tmp_path;
+    try
+    {
+        // Open a temporary file for writing.
+        tmp_path = mw_proxy_->mw_base()->runtime()->cache_directory() + "/" + cache_file_name + "XXXXXX";
+        auto opener = [tmp_path]()
+        {
+            int tmp_fd = mkstemp(const_cast<char*>(tmp_path.c_str()));
+            if (tmp_fd == -1)
+            {
+                throw FileException("cannot open tmp file " + tmp_path, errno);
+            }
+            return tmp_fd;
+        };
+        auto closer = [tmp_path](int fd)
+        {
+            if (::close(fd) == -1)
+            {
+                // LCOV_EXCL_START
+                throw FileException("cannot close tmp file " + tmp_path + " (fd = " + std::to_string(fd) + ")", errno);
+                // LCOV_EXCL_STOP
+            }
+        };
+        unity::util::ResourcePtr<int, decltype(closer)> tmp_file(opener(), closer);
+
+        // Turn departments, categories, and results into a JSON string.
+        VariantMap departments;
+        if (cached_departments_)
+        {
+            departments = cached_departments_->serialize();
+        }
+        auto filters = internal::FilterBaseImpl::serialize_filters(cached_filters_);
+        auto filter_state = cached_filter_state_.serialize();
+        VariantArray categories = cat_registry_->serialize();
+        VariantArray results;
+        for (auto const& r : cached_results_)
+        {
+            results.push_back(Variant(r.serialize()));
+        }
+        VariantMap vm;
+        vm["departments"] = move(departments);
+        vm["categories"] = move(categories);
+        vm["filters"] = move(filters);
+        vm["filter_state"] = move(filter_state);
+        vm["results"] = move(results);
+        string const json = Variant(move(vm)).serialize_json();
+
+        // Write tmp file.
+        if (::write(tmp_file.get(), json.c_str(), json.size()) != static_cast<int>(json.size()))
+        {
+            // LCOV_EXCL_START
+            throw FileException("cannot write tmp file " + tmp_path + " (fd = " + std::to_string(tmp_file.get()) + ")",
+                                errno);
+            // LCOV_EXCL_STOP
+        }
+        tmp_file.dealloc();  // Close tmp file.
+
+        // Atomically replace the old cache with the new one.
+        string cache_path = mw_proxy_->mw_base()->runtime()->cache_directory() + "/" + cache_file_name;
+        if (rename(tmp_path.c_str(), cache_path.c_str()) == -1)
+        {
+            throw FileException("cannot rename tmp file " + tmp_path + " to " + cache_path, errno);  // LCOV_EXCL_LINE
+        }
+    }
+    catch (std::exception const& e)
+    {
+        ::unlink(tmp_path.c_str());
+        BOOST_LOG(mw_proxy_->mw_base()->runtime()->logger())
+            << "SearchReply::write_cached_results(): " << e.what();
+    }
+    // LCOV_EXCL_START
+    catch (...)
+    {
+        ::unlink(tmp_path.c_str());
+        BOOST_LOG(mw_proxy_->mw_base()->runtime()->logger())
+            << "SearchReply::write_cached_results(): unknown exception";
+    }
+    // LCOV_EXCL_STOP
+}
+
+void SearchReplyImpl::push_surfacing_results_from_cache() noexcept
+{
+    if (!query_string_.empty())
+    {
+        return;  // Caching applies only to surfacing queries
+    }
+
+    if (finished_.exchange(true))
+    {
+        return;
+    }
+
+    string cache_path = mw_proxy_->mw_base()->runtime()->cache_directory() + "/" + cache_file_name;
+    try
+    {
+        // Read cache file.
+        string json;
+        try
+        {
+            json = unity::util::read_text_file(cache_path);
+        }
+        catch (unity::FileException const& e)
+        {
+            if (e.error() == ENOENT)
+            {
+                ReplyImpl::finished();
+                return;  // No cache has been written yet.
+            }
+            throw;
+        }
+
+        // Decode JSON for the three sections.
+        Variant v(Variant::deserialize_json(json));
+        VariantMap vm = v.get_dict();
+
+        auto it = vm.find("departments");
+        if (it == vm.end())
+        {
+            throw unity::scopes::NotFoundException("malformed cache file", "departments");
+        }
+        auto department_dict = it->second.get_dict();
+
+        it = vm.find("categories");
+        if (it == vm.end())
+        {
+            throw unity::scopes::NotFoundException("malformed cache file", "categories");
+        }
+        auto category_array = it->second.get_array();
+
+        it = vm.find("filters");
+        if (it == vm.end())
+        {
+            throw unity::scopes::NotFoundException("malformed cache file", "filters");
+        }
+        auto filter_array = it->second.get_array();
+
+        it = vm.find("filter_state");
+        if (it == vm.end())
+        {
+            throw unity::scopes::NotFoundException("malformed cache file", "filter_state");
+        }
+        auto filter_state_dict = it->second.get_dict();
+
+        it = vm.find("results");
+        if (it == vm.end())
+        {
+            throw unity::scopes::NotFoundException("malformed cache file", "results");
+        }
+        auto result_array = it->second.get_array();
+
+        // We have the JSON strings as Variants, re-create the native representations
+        // and re-instate them.
+        if (!department_dict.empty())
+        {
+            auto departments = DepartmentImpl::create(move(department_dict));
+            register_departments(move(departments));
+        }
+
+        for (auto const& c : category_array)
+        {
+            // Can't use make_shared here because that isn't a friend of Category.
+            auto cp = Category::SCPtr(new Category(move(c.get_dict())));
+            register_category(cp);
+        }
+
+        auto filters = FilterBaseImpl::deserialize_filters(move(filter_array));
+        auto filter_state = FilterStateImpl::deserialize(move(filter_state_dict));
+        push(filters, filter_state);
+
+        for (auto const& r : result_array)
+        {
+            VariantMap dict = r.get_dict();
+            auto cr = CategorisedResult(new CategorisedResultImpl(*cat_registry_, dict));
+            push(cr);
+        }
+    }
+    catch (std::exception const& e)
+    {
+        BOOST_LOG(mw_proxy_->mw_base()->runtime()->logger())
+            << "SearchReply::push_surfacing_results_from_cache() (file = " + cache_path + "): " << e.what();
+    }
+    // LCOV_EXCL_START
+    catch (...)
+    {
+        BOOST_LOG(mw_proxy_->mw_base()->runtime()->logger())
+            << "SearchReply::push_surfacing_results_from_cache() (file = " + cache_path + "): unknown exception";
+    }
+    // LCOV_EXCL_STOP
+
+    // Query is complete.
+    ReplyImpl::finished();
 }
 
 } // namespace internal

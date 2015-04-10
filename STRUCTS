@@ -79,7 +79,7 @@ ScopeMetadata (returned by serialize()):
  'location_data_needed'  : bool, optional
  'child_scopes'          : array of strings, optional
  'version'               : int, optional
- 'keywords'              : array of strings, optional
+ 'keywords'              : set of strings, optional
  'is_aggregator'         : bool, optional
 
 Query (returned by serialize())
@@ -161,10 +161,10 @@ ActivationResponse (returned by serialize())
 
 QueryMetadata (returned by serialize())
 =======================================
- 'type'        : string (metadata type)
- 'locale'      : string
- 'form_factor' : string
- 'hints'       : dict
+ 'type'                  : string (metadata type)
+ 'locale'                : string
+ 'form_factor'           : string
+ 'hints'                 : dict
  'internet_connectivity' : bool (optional)
 
 SearchMetadata (returned by serialize())
@@ -177,3 +177,11 @@ ActionMetadata (returned by serialize())
 ========================================
   all QueryMetadata attributes
   'scope_data'  : variant
+
+CannedQuery (returned by serialize())
+=====================================
+ 'scope'         : string
+ 'query_string'  : string
+ 'department_id' : string
+ 'filter_state'  : variant
+ 'data'          : variant (optional)

@@ -16,10 +16,12 @@
  * Authored by: Michal Hruby <michal.hruby@canonical.com>
 */
 
+#include <unity/scopes/internal/PreviewQueryObject.h>
+
 #include <unity/scopes/internal/MWQueryCtrl.h>
 #include <unity/scopes/internal/MWReply.h>
-#include <unity/scopes/internal/PreviewQueryObject.h>
 #include <unity/scopes/internal/PreviewReplyImpl.h>
+#include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/ListenerBase.h>
 #include <unity/scopes/PreviewReply.h>
 #include <unity/scopes/QueryBase.h>
@@ -41,9 +43,8 @@ namespace internal
 
 PreviewQueryObject::PreviewQueryObject(std::shared_ptr<PreviewQueryBase> const& preview_base,
                                        MWReplyProxy const& reply,
-                                       MWQueryCtrlProxy const& ctrl,
-                                       boost::log::sources::severity_channel_logger_mt<>& logger)
-    : QueryObject(preview_base, reply, ctrl, logger)
+                                       MWQueryCtrlProxy const& ctrl)
+    : QueryObject(preview_base, reply, ctrl)
     , preview_base_(preview_base)
 {
     assert(preview_base);
@@ -54,11 +55,21 @@ PreviewQueryObject::~PreviewQueryObject()
     // parent destructor will call ctrl_->destroy()
 }
 
-void PreviewQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& /* info */) noexcept
+void PreviewQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& info) noexcept
 {
+    unique_lock<mutex> lock(mutex_);
+
+    // See comment in QueryObject::run()
+    if (!pushable_)
+    {
+        self_ = nullptr;
+        disconnect();
+        return;
+    }
+
     assert(self_);
 
-    auto reply_proxy = make_shared<PreviewReplyImpl>(reply, self_, logger_);
+    auto reply_proxy = make_shared<PreviewReplyImpl>(reply, self_);
     assert(reply_proxy);
     reply_proxy_ = reply_proxy;
 
@@ -67,24 +78,33 @@ void PreviewQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& /* inf
     self_ = nullptr;
     disconnect();
 
-    // Synchronous call into scope implementation.
-    // On return, replies for the query may still be outstanding.
     try
     {
+        lock.unlock();
+
+        // Synchronous call into scope implementation.
+        // On return, replies for the preview may still be outstanding.
         auto preview_query = dynamic_pointer_cast<PreviewQueryBase>(query_base_);
         assert(preview_query);
         preview_query->run(reply_proxy);
     }
     catch (std::exception const& e)
     {
-        pushable_ = false;
-        BOOST_LOG_SEV(logger_, Logger::Error) << "PreviewQueryObject::run(): " << e.what();
-        reply_->finished(CompletionDetails(CompletionDetails::Error, e.what()));  // Oneway, can't block
+        {
+            lock_guard<mutex> lock(mutex_);
+            pushable_ = false;
+        }
+        BOOST_LOG(info.mw->runtime()->logger()) << "PreviewQueryBase::run(): " << e.what();
+        reply_->finished(CompletionDetails(CompletionDetails::Error, string("PreviewQueryBase::run(): ") + e.what()));
     }
     catch (...)
     {
-        BOOST_LOG_SEV(logger_, Logger::Error) << "PreviewQueryObject::run(): unknown exception";
-        reply_->finished(CompletionDetails(CompletionDetails::Error, "unknown exception"));  // Oneway, can't block
+        {
+            lock_guard<mutex> lock(mutex_);
+            pushable_ = false;
+        }
+        BOOST_LOG(info.mw->runtime()->logger()) << "PreviewQueryBase::run(): unknown exception";
+        reply_->finished(CompletionDetails(CompletionDetails::Error, "PreviewQueryBase::run(): unknown exception"));
     }
 }
 

@@ -19,8 +19,8 @@
 #include <unity/scopes/internal/SearchMetadataImpl.h>
 #include <unity/scopes/internal/Utils.h>
 #include <unity/scopes/ScopeExceptions.h>
+
 #include <unity/UnityExceptions.h>
-#include <sstream>
 
 namespace unity
 {
@@ -50,10 +50,26 @@ SearchMetadataImpl::SearchMetadataImpl(VariantMap const& var)
     auto it = find_or_throw("SearchMetadataImpl()", var, "cardinality");
     cardinality_ = it->second.get_int();
     check_cardinality("SearchMetadataImpl(VariantMap)", cardinality_);
+
     try
     {
         it = find_or_throw("SearchMetadataImpl()", var, "location");
         location_ = Location(it->second.get_dict());
+    }
+    catch (std::exception &e)
+    {
+    }
+
+    try
+    {
+        it = find_or_throw("SearchMetadataImpl()", var, "aggregated_keywords");
+        std::vector<Variant> keywords_v = it->second.get_array();
+        std::set<std::string> keywords_s;
+        for (auto const& keyword_v : keywords_v)
+        {
+            keywords_s.emplace(keyword_v.get_string());
+        }
+        aggregated_keywords_ = keywords_s;
     }
     catch (std::exception &e)
     {
@@ -87,9 +103,32 @@ Location SearchMetadataImpl::location() const
 
 bool SearchMetadataImpl::has_location() const
 {
-    return location_;
+    return bool(location_);
 }
 
+void SearchMetadataImpl::remove_location()
+{
+    location_ = boost::none;
+}
+
+void SearchMetadataImpl::set_aggregated_keywords(std::set<std::string> const& aggregated_keywords)
+{
+    aggregated_keywords_ = aggregated_keywords;
+}
+
+std::set<std::string> SearchMetadataImpl::aggregated_keywords() const
+{
+    if (is_aggregated())
+    {
+        return *aggregated_keywords_;
+    }
+    return std::set<std::string>();
+}
+
+bool SearchMetadataImpl::is_aggregated() const
+{
+    return bool(aggregated_keywords_);
+}
 
 std::string SearchMetadataImpl::metadata_type() const
 {
@@ -104,6 +143,15 @@ void SearchMetadataImpl::serialize(VariantMap& var) const
     if (location_)
     {
         var["location"] = location_->serialize();
+    }
+    if (aggregated_keywords_)
+    {
+        std::vector<Variant> keywords_v;
+        for (auto const& keyword_s : *aggregated_keywords_)
+        {
+            keywords_v.emplace_back(Variant(keyword_s));
+        }
+        var["aggregated_keywords"] = keywords_v;
     }
 }
 

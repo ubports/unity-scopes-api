@@ -23,6 +23,8 @@
 #include <unity/scopes/Variant.h>
 #include <unity/util/DefinesPtrs.h>
 
+#include <set>
+
 namespace unity
 {
 
@@ -31,8 +33,9 @@ namespace scopes
 
 namespace internal
 {
+
 class SearchMetadataImpl;
-class ScopeObject;
+
 }
 
 /**
@@ -106,6 +109,31 @@ public:
     \return True if there is a location property.
     */
     bool has_location() const;
+
+    /**
+    \brief Remove location data entirely.
+
+    This method does nothing if no location data is present.
+    */
+    void remove_location();
+
+    /**
+    \brief Set the list of scope keywords used to initiate this search request.
+    \param aggregated_keywords The list of scope keywords used to initiate this search request.
+    */
+    void set_aggregated_keywords(std::set<std::string> const& aggregated_keywords);
+
+    /**
+    \brief Get the list of scope keywords used to initiate this search request.
+    \return The list of scope keywords used to initiate this search request.
+    */
+    std::set<std::string> aggregated_keywords() const;
+
+    /**
+    \brief Check if this search request originated from an aggregator scope.
+    \return True if this search request originated from an aggregator scope.
+    */
+    bool is_aggregated() const;
 
     /**
     \brief Sets a hint.

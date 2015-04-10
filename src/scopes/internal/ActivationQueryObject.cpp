@@ -17,10 +17,12 @@
 */
 
 #include <unity/scopes/internal/ActivationQueryObject.h>
-#include <unity/scopes/ListenerBase.h>
+
 #include <unity/scopes/ActivationQueryBase.h>
-#include <unity/scopes/internal/MWReply.h>
 #include <unity/scopes/internal/MWQueryCtrl.h>
+#include <unity/scopes/internal/MWReply.h>
+#include <unity/scopes/internal/RuntimeImpl.h>
+#include <unity/scopes/ListenerBase.h>
 
 #include <cassert>
 
@@ -38,9 +40,8 @@ namespace internal
 
 ActivationQueryObject::ActivationQueryObject(std::shared_ptr<ActivationQueryBase> const& act_base,
                                              MWReplyProxy const& reply,
-                                             MWQueryCtrlProxy const& ctrl,
-                                             boost::log::sources::severity_channel_logger_mt<>& logger)
-    : QueryObject(act_base, reply, ctrl, logger)
+                                             MWQueryCtrlProxy const& ctrl)
+    : QueryObject(act_base, reply, ctrl)
     , act_base_(act_base)
 {
 }
@@ -50,12 +51,12 @@ ActivationQueryObject::~ActivationQueryObject()
     // parent destructor will call ctrl_->destroy()
 }
 
-void ActivationQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& /* info */) noexcept
+void ActivationQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& info) noexcept
 {
     assert(self_);
 
-    // The reply proxy now holds our reference count high, so
-    // we can drop our own smart pointer and disconnect from the middleware.
+    // Disconnect from middleware. While this request is in progress,
+    // this instance will not be deallocated.
     self_ = nullptr;
     disconnect();
 
@@ -70,13 +71,15 @@ void ActivationQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& /* 
     }
     catch (std::exception const& e)
     {
-        BOOST_LOG_SEV(logger_, Logger::Error) << "ActivationQueryObject::run(): " << e.what();
-        reply_->finished(CompletionDetails(CompletionDetails::Error, e.what()));  // Oneway, can't block
+        BOOST_LOG(info.mw->runtime()->logger()) << "ActivationQueryBase::activate(): " << e.what();
+        reply_->finished(CompletionDetails(CompletionDetails::Error,
+                                           string("ActivationQueryBase::activate(): ") + e.what()));
     }
     catch (...)
     {
-        BOOST_LOG_SEV(logger_, Logger::Error) << "ActivationQueryObject::run(): unknown exception";
-        reply_->finished(CompletionDetails(CompletionDetails::Error, "unknown exception"));  // Oneway, can't block
+        BOOST_LOG(info.mw->runtime()->logger()) << "ActivationQueryBase::activate(): unknown exception";
+        reply_->finished(CompletionDetails(CompletionDetails::Error,
+                                           "ActivationQueryBase::activate(): unknown exception"));
     }
 }
 

@@ -18,17 +18,17 @@
 
 #include <unity/scopes/internal/zmq_middleware/ZmqScope.h>
 
-#include <unity/scopes/internal/Logger.h>
+#include <scopes/internal/zmq_middleware/capnproto/Scope.capnp.h>
+#include <unity/scopes/CannedQuery.h>
 #include <unity/scopes/internal/QueryCtrlImpl.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
-#include <scopes/internal/zmq_middleware/capnproto/Scope.capnp.h>
+#include <unity/scopes/internal/ScopeMetadataImpl.h>
 #include <unity/scopes/internal/zmq_middleware/VariantConverter.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqException.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqQueryCtrl.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqReceiver.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqReply.h>
 #include <unity/scopes/Result.h>
-#include <unity/scopes/CannedQuery.h>
 
 using namespace std;
 
@@ -57,6 +57,8 @@ interface Scope
     QueryCtrl* activate(string query, ValueDict hints, Reply* replyProxy);
     QueryCtrl* perform_action(string query, ValueDict hints, string action_id, Reply* replyProxy);
     QueryCtrl* preview(string query, ValueDict hints, Reply* replyProxy);
+    ChildScopeList child_scopes();
+    bool set_child_scopes(ChildScopeList const& child_scopes);
     bool debug_mode();
 };
 
@@ -77,7 +79,10 @@ ZmqScope::~ZmqScope()
 {
 }
 
-QueryCtrlProxy ZmqScope::search(CannedQuery const& query, VariantMap const& hints, MWReplyProxy const& reply)
+QueryCtrlProxy ZmqScope::search(CannedQuery const& query,
+                                VariantMap const& hints,
+                                VariantMap const& context,
+                                MWReplyProxy const& reply)
 {
     capnp::MallocMessageBuilder request_builder;
     auto reply_proxy = dynamic_pointer_cast<ZmqReply>(reply);
@@ -92,6 +97,8 @@ QueryCtrlProxy ZmqScope::search(CannedQuery const& query, VariantMap const& hint
         p.setEndpoint(reply_proxy->endpoint().c_str());
         p.setIdentity(reply_proxy->identity().c_str());
         p.setCategory(reply_proxy->target_category().c_str());
+        auto d = in_params.initContext();
+        to_value_dict(context, d);
     }
 
     auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_scope_(request_builder); });
@@ -105,7 +112,7 @@ QueryCtrlProxy ZmqScope::search(CannedQuery const& query, VariantMap const& hint
                                          proxy.getEndpoint().cStr(),
                                          proxy.getIdentity().cStr(),
                                          proxy.getCategory().cStr()));
-    return make_shared<QueryCtrlImpl>(p, reply_proxy, mw_base()->runtime()->logger());
+    return make_shared<QueryCtrlImpl>(p, reply_proxy);
 }
 
 QueryCtrlProxy ZmqScope::activate(VariantMap const& result, VariantMap const& hints, MWReplyProxy const& reply)
@@ -135,7 +142,7 @@ QueryCtrlProxy ZmqScope::activate(VariantMap const& result, VariantMap const& hi
                                          proxy.getEndpoint().cStr(),
                                          proxy.getIdentity().cStr(),
                                          proxy.getCategory().cStr()));
-    return make_shared<QueryCtrlImpl>(p, reply_proxy, mw_base()->runtime()->logger());
+    return make_shared<QueryCtrlImpl>(p, reply_proxy);
 }
 
 QueryCtrlProxy ZmqScope::perform_action(VariantMap const& result,
@@ -168,7 +175,7 @@ QueryCtrlProxy ZmqScope::perform_action(VariantMap const& result,
                                          proxy.getEndpoint().cStr(),
                                          proxy.getIdentity().cStr(),
                                          proxy.getCategory().cStr()));
-    return make_shared<QueryCtrlImpl>(p, reply_proxy, mw_base()->runtime()->logger());
+    return make_shared<QueryCtrlImpl>(p, reply_proxy);
 }
 
 QueryCtrlProxy ZmqScope::preview(VariantMap const& result, VariantMap const& hints, MWReplyProxy const& reply)
@@ -198,7 +205,78 @@ QueryCtrlProxy ZmqScope::preview(VariantMap const& result, VariantMap const& hin
                                          proxy.getEndpoint().cStr(),
                                          proxy.getIdentity().cStr(),
                                          proxy.getCategory().cStr()));
-    return make_shared<QueryCtrlImpl>(p, reply_proxy, mw_base()->runtime()->logger());
+    return make_shared<QueryCtrlImpl>(p, reply_proxy);
+}
+
+ChildScopeList ZmqScope::child_scopes()
+{
+    capnp::MallocMessageBuilder request_builder;
+    make_request_(request_builder, "child_scopes");
+
+    auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_scope_(request_builder); });
+
+    auto out_params = future.get();
+    auto response = out_params.reader->getRoot<capnproto::Response>();
+    throw_if_runtime_exception(response);
+
+    auto list = response.getPayload().getAs<capnproto::Scope::ChildScopesResponse>().getReturnValue();
+
+    ChildScopeList child_scope_list;
+    for (size_t i = 0; i < list.size(); ++i)
+    {
+        string id = list[i].getId();
+
+        auto md = list[i].getMetadata();
+        VariantMap m = to_variant_map(md);
+        unique_ptr<ScopeMetadataImpl> smdi(new ScopeMetadataImpl(m, mw_base()));
+        auto metadata = ScopeMetadata(ScopeMetadataImpl::create(move(smdi)));
+
+        bool enabled = list[i].getEnabled();
+
+        set<string> keywords;
+        auto keywords_capn = list[i].getKeywords();
+        for (auto const& kw : keywords_capn)
+        {
+            keywords.emplace(kw);
+        }
+
+        child_scope_list.push_back( ChildScope{id, metadata, enabled, keywords} );
+    }
+    return child_scope_list;
+}
+
+bool ZmqScope::set_child_scopes(ChildScopeList const& child_scopes)
+{
+    capnp::MallocMessageBuilder request_builder;
+    auto request = make_request_(request_builder, "set_child_scopes");
+
+    auto in_params = request.initInParams().getAs<capnproto::Scope::SetChildScopesRequest>();
+    auto list = in_params.initChildScopes(child_scopes.size());
+
+    for (size_t i = 0; i < child_scopes.size(); ++i)
+    {
+        list[i].setId(child_scopes[i].id);
+
+        auto dict = list[i].initMetadata();
+        to_value_dict(child_scopes[i].metadata.serialize(), dict);
+
+        list[i].setEnabled(child_scopes[i].enabled);
+
+        auto keywords = list[i].initKeywords(child_scopes[i].keywords.size());
+        int j = 0;
+        for (auto const& kw : child_scopes[i].keywords)
+        {
+            keywords.set(j++, kw);
+        }
+    }
+
+    auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_scope_(request_builder); });
+    auto out_params = future.get();
+    auto r = out_params.reader->getRoot<capnproto::Response>();
+    throw_if_runtime_exception(r);
+
+    auto response = r.getPayload().getAs<capnproto::Scope::SetChildScopesResponse>();
+    return response.getReturnValue();
 }
 
 bool ZmqScope::debug_mode()

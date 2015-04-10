@@ -25,27 +25,17 @@ $Cxx.namespace("unity::scopes::internal::zmq_middleware::capnproto::Scope");
 using Proxy = import "Proxy.capnp";
 using ValueDict = import "ValueDict.capnp";
 
-# Factory for queries. The Scope object runs on the ctrl-endpoint.
+# Factory for queries.
 # createQuery() creates a Query object on the normal endpoint, and a QueryCtrl object
 # on the ctrl-endpoint. It then calls run() on the Query object to set it executing in its own thread, before
 # returning the QueryCtrl proxy that permits cancellation. This guarantees that createQuery() will not block.
-
-# Scope interface
-#
-# Operations:
-#
-# Proxy createQuery(string query, ValueDict hints, Proxy reply_proxy);
-
-# The createQuery method instantiates a Query Object and its corresponding QueryCtrlObject.
-# The return value is the proxy to the QueryCtrl object.
-# The implementation of createQuery calls the Query's run() method to give a thread of control
-# to the application code.
 
 struct CreateQueryRequest
 {
     query @0      : ValueDict.ValueDict;
     hints @1      : ValueDict.ValueDict;
     replyProxy @2 : Proxy.Proxy;
+    context @3    : ValueDict.ValueDict;  # Additional context for the request, such as client ID and history.
 }
 
 struct CreateQueryResponse
@@ -74,6 +64,29 @@ struct PreviewRequest
     result @0     : ValueDict.ValueDict;
     hints @1      : ValueDict.ValueDict;
     replyProxy @2 : Proxy.Proxy;
+}
+
+struct ChildScope
+{
+    id       @0 : Text;
+    metadata @1 : ValueDict.ValueDict;
+    enabled  @2 : Bool;
+    keywords @3 : List(Text);
+}
+
+struct ChildScopesResponse
+{
+    returnValue @0 : List(ChildScope);
+}
+
+struct SetChildScopesRequest
+{
+    childScopes @0 : List(ChildScope);
+}
+
+struct SetChildScopesResponse
+{
+    returnValue @0 : Bool;
 }
 
 struct DebugModeResponse

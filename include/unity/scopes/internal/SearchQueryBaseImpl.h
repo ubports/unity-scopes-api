@@ -20,6 +20,7 @@
 #pragma once
 
 #include <unity/scopes/CannedQuery.h>
+#include <unity/scopes/ChildScope.h>
 #include <unity/scopes/internal/QueryBaseImpl.h>
 #include <unity/scopes/QueryCtrlProxyFwd.h>
 #include <unity/scopes/ScopeProxyFwd.h>
@@ -41,38 +42,43 @@ public:
     SearchQueryBaseImpl(CannedQuery const& query, SearchMetadata const& metadata);
     CannedQuery query() const;
     SearchMetadata search_metadata() const;
+
     void set_department_id(std::string const& department_id);
     std::string department_id() const;
 
+    void set_client_id(const std::string& id);
+
+    typedef std::tuple<std::string, std::string, std::string> HistoryData;
+    typedef std::vector<HistoryData> History;
+
+    void set_history(History const& h);
+
     QueryCtrlProxy subsearch(ScopeProxy const& scope,
-                                   std::string const& query_string,
-                                   SearchListenerBase::SPtr const& reply);
-    QueryCtrlProxy subsearch(ScopeProxy const& scope,
-                                   std::string const& query_string,
-                                   FilterState const& filter_state,
-                                   SearchListenerBase::SPtr const& reply);
-    QueryCtrlProxy subsearch(ScopeProxy const& scope,
-                                   std::string const& query_string,
-                                   std::string const& department_id,
-                                   FilterState const& filter_state,
-                                   SearchListenerBase::SPtr const& reply);
-    QueryCtrlProxy subsearch(ScopeProxy const& scope,
-                                   std::string const& query_string,
-                                   std::string const& department_id,
-                                   FilterState const& filter_state,
-                                   SearchMetadata const& metadata,
-                                   SearchListenerBase::SPtr const& reply);
+                             std::set<std::string> const& keywords,
+                             std::string const& query_string,
+                             std::string const& department_id,
+                             FilterState const& filter_state,
+                             std::unique_ptr<Variant> user_data,
+                             SearchMetadata const& metadata,
+                             SearchListenerBase::SPtr const& reply);
 
     void cancel() override;
     bool valid() const override;
 
 private:
-    bool valid_;
+    static SearchMetadata filter_metadata(std::shared_ptr<ScopeImpl> const& scope, SearchMetadata const& metdata);
+
+    CannedQuery const canned_query_;
+    SearchMetadata const search_metadata_;
+
     mutable std::mutex mutex_;
-    const CannedQuery canned_query_;
-    const SearchMetadata search_metadata_;
+    bool valid_;
     std::string department_id_;
+    std::string client_id_;
+    History history_;
     std::vector<QueryCtrlProxy> subqueries_;
+
+    QueryCtrlProxy check_for_query_loop(ScopeProxy const& scope, SearchListenerBase::SPtr const& reply);
 };
 
 } // namespace internal

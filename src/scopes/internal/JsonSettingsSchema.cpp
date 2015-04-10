@@ -18,11 +18,12 @@
 
 #include <unity/scopes/internal/JsonSettingsSchema.h>
 
-#include <unity/UnityExceptions.h>
+#include <unity/scopes/internal/DfltConfig.h>
 
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/filesystem.hpp>
 #include <jsoncpp/json/json.h>
+#include <unity/UnityExceptions.h>
 
 #include <set>
 
@@ -181,7 +182,11 @@ static auto const parameters_key = Json::StaticString("parameters");
 void Setting::set_default_value(Json::Value const& v, Type expected_type)
 {
     auto v_param = v[parameters_key];
-    if (!v_param.isObject())
+    if (v_param.isNull())
+    {
+        return;
+    }
+    else if (!v_param.isObject())
     {
         throw ResourceException("JsonSettingsSchema(): expected value of type object for \"parameters\", id = \"" + id_ + "\"");
     }
@@ -423,7 +428,7 @@ void JsonSettingsSchema::add_location_setting()
     //             Realistically, the shell should not store this user-preference
     //             in the scope's settings database, and should only pay attention to the scope's
     //             LocationDataNeeded metadata attribute.
-    Setting s("internal.location", "boolean", "Enable location data", VariantArray(), Variant(true));
+    Setting s("internal.location", "boolean", "Enable location data", VariantArray(), Variant(DFLT_LOCATION_PERMITTED));
     definitions_.push_back(s.to_schema_definition());
 }
 

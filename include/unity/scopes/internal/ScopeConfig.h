@@ -54,7 +54,7 @@ public:
     bool debug_mode() const;               // Optional, returns false if not present
     std::vector<std::string> child_scope_ids() const;  // Optional, returns an empty vector if no ids are present
     int version() const;                   // Optional, returns 0 if not present
-    std::vector<std::string> keywords() const; // Optional, returns an empty vector if no keywords are present
+    std::set<std::string> keywords() const;  // Optional, returns an empty set if no keywords are present
     bool is_aggregator() const;            // Optional, returns false if not present
 
     VariantMap appearance_attributes() const; // Optional, returns empty map if no attributes are present
@@ -78,7 +78,7 @@ private:
     bool debug_mode_;
     std::vector<std::string> child_scope_ids_;
     int version_;
-    std::vector<std::string> keywords_;
+    std::set<std::string> keywords_;
     bool is_aggregator_;
 
     VariantMap appearance_attributes_;

@@ -42,6 +42,13 @@ TEST(Variant, basic)
     }
 
     {
+        int64_t x = 99;
+        Variant v(x);
+        EXPECT_EQ(Variant::Type::Int64, v.which());
+        EXPECT_EQ(99, v.get_int64_t());
+    }
+
+    {
         Variant v(10.5f);
         EXPECT_EQ(Variant::Type::Double, v.which());
         EXPECT_TRUE(v.get_double() - 10.5f < 0.00001f);

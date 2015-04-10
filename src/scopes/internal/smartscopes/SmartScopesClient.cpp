@@ -19,6 +19,7 @@
 
 #include <unity/scopes/internal/FilterBaseImpl.h>
 #include <unity/scopes/internal/FilterStateImpl.h>
+#include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/smartscopes/SmartScopesClient.h>
 
 #include <unity/scopes/ScopeExceptions.h>
@@ -54,12 +55,15 @@ static const std::string c_scopes_cache_dir = homedir() + "/.cache/unity-scopes/
 static const std::string c_scopes_cache_filename = "remote-scopes.json";
 static const std::string c_partner_id_file = "/custom/partner-id";
 
+// Some of the tests don't have a runtime, so we use a separate logger in that case.
+BOOST_LOG_INLINE_GLOBAL_LOGGER_DEFAULT(test_logger, boost::log::sources::severity_channel_logger_mt<>)
+
 using namespace unity::scopes;
 using namespace unity::scopes::internal::smartscopes;
 
 //-- SearchHandle
 
-SearchHandle::SearchHandle(uint search_id, SmartScopesClient::SPtr ssc)
+SearchHandle::SearchHandle(unsigned int search_id, SmartScopesClient::SPtr ssc)
     : search_id_(search_id)
     , ssc_(ssc)
 {
@@ -82,7 +86,7 @@ void SearchHandle::cancel_search()
 
 //-- PreviewHandle
 
-PreviewHandle::PreviewHandle(uint preview_id, SmartScopesClient::SPtr ssc)
+PreviewHandle::PreviewHandle(unsigned int preview_id, SmartScopesClient::SPtr ssc)
     : preview_id_(preview_id)
     , ssc_(ssc)
 {
@@ -107,12 +111,12 @@ void PreviewHandle::cancel_preview()
 
 SmartScopesClient::SmartScopesClient(HttpClientInterface::SPtr http_client,
                                      JsonNodeInterface::SPtr json_node,
-                                     boost::log::sources::severity_channel_logger_mt<>& logger,
+                                     RuntimeImpl* runtime,
                                      std::string const& url,
                                      std::string const& partner_id_path)
     : http_client_(http_client)
     , json_node_(json_node)
-    , logger_(logger)
+    , logger_(runtime ? runtime->logger() : test_logger::get())
     , have_latest_cache_(false)
     , query_counter_(0)
     , partner_file_(partner_id_path)
@@ -185,7 +189,7 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
             auto partner_id = util::read_text_file(partner_file_);
             if (!partner_id.empty())
             {
-                std::string const user_agent_hdr = "partner_id=" + http_client_->to_percent_encoding(partner_id);
+                std::string const user_agent_hdr = "partner=" + http_client_->to_percent_encoding(partner_id);
                 headers.push_back(std::make_pair("User-Agent", user_agent_hdr));
                 BOOST_LOG_SEV(logger_, Logger::Info) << "User agent: " << user_agent_hdr;
             }
@@ -195,24 +199,27 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
             BOOST_LOG_SEV(logger_, Logger::Error) << "SmartScopesClient.get_remote_scopes(): failed to read " << partner_file_ << ": " << e.what();
         }
 
-        HttpResponseHandle::SPtr response = http_client_->get(remote_scopes_uri.str(), [&response_str](std::string const& replyLine) {
-                response_str += replyLine; // accumulate all reply lines
+        std::mutex reponse_mutex;
+        HttpResponseHandle::SPtr response = http_client_->get(remote_scopes_uri.str(), [&response_str, &reponse_mutex](std::string const& replyLine)
+        {
+            std::lock_guard<std::mutex> lock(reponse_mutex);
+            response_str += replyLine; // accumulate all reply lines
         }, headers);
-        response->wait();
+
+        response->get();
 
         BOOST_LOG_SEV(logger_, Logger::Info)
             << "SmartScopesClient.get_remote_scopes(): Remote scopes:\n" << response_str;
     }
     catch (std::exception const& e)
     {
-        BOOST_LOG_SEV(logger_, Logger::Error)
+        BOOST_LOG(logger_)
             << "SmartScopesClient.get_remote_scopes(): Failed to retrieve remote scopes from uri: "
             << url_ << c_remote_scopes_resource << ": " << e.what();
 
         if (caching_enabled)
         {
-            BOOST_LOG_SEV(logger_, Logger::Error)
-                << "SmartScopesClient.get_remote_scopes(): Using remote scopes from cache";
+            BOOST_LOG(logger_) << "SmartScopesClient.get_remote_scopes(): Using remote scopes from cache";
 
             response_str = read_cache();
             if (response_str.empty())
@@ -239,9 +246,8 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
     }
     catch (std::exception const& e)
     {
-        BOOST_LOG_SEV(logger_, Logger::Error)
-            << "SmartScopesClient.get_remote_scopes() Failed to parse json response from uri: "
-            << url_ << c_remote_scopes_resource << ": " << e.what();
+        BOOST_LOG(logger_) << "SmartScopesClient.get_remote_scopes() Failed to parse json response from uri: "
+                           << url_ << c_remote_scopes_resource << ": " << e.what();
         throw;
     }
 
@@ -256,8 +262,7 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
 
             if (!child_node->has_node("id"))
             {
-                BOOST_LOG_SEV(logger_, Logger::Error)
-                    << "SmartScopesClient.get_remote_scopes(): Skipping scope with no id";
+                BOOST_LOG(logger_) << "SmartScopesClient.get_remote_scopes(): Skipping scope with no id";
                 continue;
             }
 
@@ -269,7 +274,7 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
             {
                 if (!child_node->has_node(field))
                 {
-                    BOOST_LOG_SEV(logger_, Logger::Error)
+                    BOOST_LOG(logger_)
                         << "SmartScopesClient.get_remote_scopes(): Scope: \"" << scope.id
                         << "\" has no \"" << field << "\" field";
                     err = true;
@@ -277,8 +282,7 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
             }
             if (err)
             {
-                BOOST_LOG_SEV(logger_, Logger::Error)
-                    << "SmartScopesClient.get_remote_scopes(): Skipping scope: \"" << scope.id << "\"";
+                BOOST_LOG(logger_) << "SmartScopesClient.get_remote_scopes(): Skipping scope: \"" << scope.id << "\"";
                 continue;
             }
 
@@ -317,11 +321,9 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
             scope.version = child_node->has_node("version") ? child_node->get_node("version")->as_int() : 0;
             if (scope.version < 0)
             {
-                BOOST_LOG_SEV(logger_, Logger::Error)
+                BOOST_LOG(logger_)
                     << "SmartScopesClient.get_remote_scopes(): Scope: \"" << scope.id
-                    << "\" returned a negative \"version\" value";
-                BOOST_LOG_SEV(logger_, Logger::Error)
-                    << "SmartScopesClient.get_remote_scopes(): Skipping scope: \"" << scope.id << "\"";
+                    << "\" returned a negative \"version\" value, skipping scope";
                 continue;
             }
 
@@ -335,11 +337,11 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
                     {
                         try
                         {
-                            scope.keywords.push_back(keyword.get_string());
+                            scope.keywords.emplace(keyword.get_string());
                         }
                         catch (unity::LogicException const& e)
                         {
-                            BOOST_LOG_SEV(logger_, Logger::Error)
+                            BOOST_LOG(logger_)
                                 << "SmartScopesClient.get_remote_scopes(): Scope: \"" << scope.id
                                 << "\" returned a non-string keyword";
                         }
@@ -347,7 +349,7 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
                 }
                 else
                 {
-                    BOOST_LOG_SEV(logger_, Logger::Error)
+                    BOOST_LOG(logger_)
                         << "SmartScopesClient.get_remote_scopes(): Scope: \"" << scope.id
                         << "\" returned an invalid value type for \"keywords\"";
                 }
@@ -357,7 +359,7 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
         }
         catch (std::exception const& e)
         {
-            BOOST_LOG_SEV(logger_, Logger::Error)
+            BOOST_LOG(logger_)
                 << "SmartScopesClient.get_remote_scopes(): Skipping scope: \""
                 << scope.id << "\" due to a json parsing failure: " << e.what();
         }
@@ -365,7 +367,7 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
 
     if (remote_scopes.empty())
     {
-        BOOST_LOG_SEV(logger_, Logger::Error)
+        BOOST_LOG(logger_)
             << "SmartScopesClient.get_remote_scopes(): No valid remote scopes retrieved from uri: "
             << url_ << c_remote_scopes_resource;
     }
@@ -379,7 +381,7 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
             }
             catch (std::exception const& e)
             {
-                BOOST_LOG_SEV(logger_, Logger::Error)
+                BOOST_LOG(logger_)
                     << "SmartScopesClient.get_remote_scopes(): Failed to write to cache file: "
                     << c_scopes_cache_dir << c_scopes_cache_filename << ": " << e.what();
             }
@@ -410,7 +412,7 @@ SearchHandle::UPtr SmartScopesClient::search(SearchReplyHandler const& handler,
                                              std::string const& locale,
                                              LocationInfo const& location,
                                              std::string const& user_agent_hdr,
-                                             uint limit)
+                                             unsigned int limit)
 {
     std::ostringstream search_uri;
     search_uri.imbue(std::locale::classic()); // so that doubles use one standard formatting wrt decimal point
@@ -459,7 +461,7 @@ SearchHandle::UPtr SmartScopesClient::search(SearchReplyHandler const& handler,
     }
 
     std::lock_guard<std::mutex> lock(query_results_mutex_);
-    uint search_id = ++query_counter_;
+    unsigned int search_id = ++query_counter_;
 
     BOOST_LOG_SEV(logger_, Logger::Info) << "SmartScopesClient.search(): GET " << search_uri.str();
 
@@ -470,15 +472,18 @@ SearchHandle::UPtr SmartScopesClient::search(SearchReplyHandler const& handler,
         headers.push_back(std::make_pair("User-Agent", user_agent_hdr));
     }
 
-    query_results_[search_id] = http_client_->get(search_uri.str(), [this, handler](std::string const& lineData) {
-            try
-            {
-                parse_line(lineData, handler);
-            }
-            catch (std::exception const &e)
-            {
-                BOOST_LOG_SEV(logger_, Logger::Error) << "SmartScopesClient.search(): Failed to parse: " << e.what();
-            }
+    auto reponse_mutex = std::make_shared<std::mutex>();
+    query_results_[search_id] = http_client_->get(search_uri.str(), [this, handler, reponse_mutex](std::string const& line_data)
+    {
+        std::lock_guard<std::mutex> lock(*reponse_mutex);
+        try
+        {
+            parse_line(line_data, handler);
+        }
+        catch (std::exception const &e)
+        {
+            BOOST_LOG_SEV(logger_, Logger::Error) << "SmartScopesClient.search(): Failed to parse: " << e.what();
+        }
     }, headers);
 
     return SearchHandle::UPtr(new SearchHandle(search_id, shared_from_this()));
@@ -489,7 +494,7 @@ PreviewHandle::UPtr SmartScopesClient::preview(PreviewReplyHandler const& handle
                                                std::string const& result,
                                                std::string const& session_id,
                                                std::string const& platform,
-                                               const uint widgets_api_version,
+                                               const unsigned int widgets_api_version,
                                                VariantMap const& settings,
                                                std::string const& locale,
                                                std::string const& country,
@@ -531,26 +536,25 @@ PreviewHandle::UPtr SmartScopesClient::preview(PreviewReplyHandler const& handle
     }
 
     std::lock_guard<std::mutex> lock(query_results_mutex_);
-    uint preview_id = ++query_counter_;
+    unsigned int preview_id = ++query_counter_;
 
     BOOST_LOG_SEV(logger_, Logger::Info) << "SmartScopesClient.preview(): GET " << preview_uri.str();
-    query_results_[preview_id] = http_client_->get(preview_uri.str(), [this, handler](std::string const& lineData) {
-            try
-            {
-                parse_line(lineData, handler);
-            }
-            catch (std::exception const &e)
-            {
-                BOOST_LOG_SEV(logger_, Logger::Error) << "SmartScopesClient.preview(): Failed to parse: " << e.what();
-            }
+
+    auto reponse_mutex = std::make_shared<std::mutex>();
+    query_results_[preview_id] = http_client_->get(preview_uri.str(), [this, handler, reponse_mutex](std::string const& line_data)
+    {
+        std::lock_guard<std::mutex> lock(*reponse_mutex);
+        try
+        {
+            parse_line(line_data, handler);
+        }
+        catch (std::exception const &e)
+        {
+            BOOST_LOG_SEV(logger_, Logger::Error) << "SmartScopesClient.preview(): Failed to parse: " << e.what();
+        }
     }, headers);
 
     return PreviewHandle::UPtr(new PreviewHandle(preview_id, shared_from_this()));
-}
-
-boost::log::sources::severity_channel_logger_mt<>& SmartScopesClient::logger() const
-{
-    return logger_;
 }
 
 void SmartScopesClient::parse_line(std::string const& json, PreviewReplyHandler const& handler)
@@ -681,7 +685,7 @@ void SmartScopesClient::parse_line(std::string const& json, SearchReplyHandler c
     }
 }
 
-void SmartScopesClient::wait_for_search(uint search_id)
+void SmartScopesClient::wait_for_search(unsigned int search_id)
 {
     try
     {
@@ -703,7 +707,7 @@ void SmartScopesClient::wait_for_search(uint search_id)
     }
     catch (std::exception const& e)
     {
-        BOOST_LOG_SEV(logger_, Logger::Error)
+        BOOST_LOG(logger_)
             << "SmartScopesClient.get_search_results(): Failed to retrieve search results for query "
             << search_id << ": " << e.what();
         throw;
@@ -752,7 +756,7 @@ std::shared_ptr<DepartmentInfo> SmartScopesClient::parse_departments(JsonNodeInt
             catch (std::exception const& e)
             {
                 // error in one subdepartment is not critical - just ignore it
-                BOOST_LOG_SEV(logger_, Logger::Error)
+                BOOST_LOG(logger_)
                     << "SmartScopesClient::parse_departments(): Error parsing subdepartment of department '"
                     << dep->label << "': " << e.what();
             }
@@ -787,7 +791,7 @@ FilterState SmartScopesClient::parse_filter_state(JsonNodeInterface::SPtr node)
     return FilterStateImpl::deserialize(node->to_variant().get_dict());
 }
 
-void SmartScopesClient::wait_for_preview(uint preview_id)
+void SmartScopesClient::wait_for_preview(unsigned int preview_id)
 {
     try
     {
@@ -809,7 +813,7 @@ void SmartScopesClient::wait_for_preview(uint preview_id)
     }
     catch (std::exception const& e)
     {
-        BOOST_LOG_SEV(logger_, Logger::Error)
+        BOOST_LOG(logger_)
             << "SmartScopesClient.get_preview_results(): Failed to retrieve preview results for query "
             << preview_id;
         throw;
@@ -823,7 +827,7 @@ std::vector<std::string> SmartScopesClient::extract_json_stream(std::string cons
 {
     std::vector<std::string> jsons;
 
-    uint start_pos = 0;
+    unsigned int start_pos = 0;
 
     while (start_pos < json_stream.size())
     {
@@ -841,7 +845,7 @@ std::vector<std::string> SmartScopesClient::extract_json_stream(std::string cons
     return jsons;
 }
 
-void SmartScopesClient::cancel_query(uint query_id)
+void SmartScopesClient::cancel_query(unsigned int query_id)
 {
     std::lock_guard<std::mutex> lock(query_results_mutex_);
 
@@ -925,7 +929,7 @@ std::string SmartScopesClient::stringify_settings(VariantMap const& settings)
             setting_valid = true;
             break;
         default:
-            BOOST_LOG_SEV(logger_, Logger::Error)
+            BOOST_LOG(logger_)
                 << "SmartScopesClient.stringify_settings(): Ignoring unsupported Variant type for settings value: \""
                 << setting.first << "\"";
         }
@@ -945,4 +949,9 @@ std::string SmartScopesClient::stringify_settings(VariantMap const& settings)
         return std::string();
     }
     return result_str.str();
+}
+
+boost::log::sources::severity_channel_logger_mt<>& SmartScopesClient::logger() const
+{
+    return logger_;
 }

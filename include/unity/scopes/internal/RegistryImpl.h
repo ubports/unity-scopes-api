@@ -31,12 +31,10 @@ namespace scopes
 namespace internal
 {
 
-class RuntimeImpl;
-
 class RegistryImpl : public virtual unity::scopes::Registry, public virtual ObjectImpl
 {
 public:
-    RegistryImpl(MWRegistryProxy const& mw_proxy, RuntimeImpl* runtime);
+    RegistryImpl(MWRegistryProxy const& mw_proxy);
     ~RegistryImpl();
 
     virtual ScopeMetadata get_metadata(std::string const& scope_id) override;

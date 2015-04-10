@@ -49,6 +49,31 @@ To run the tests with valgrind:
 
     $ make valgrind
 
+It doesn't make sense for some tests to run them with valgrind. For
+example, the header compilation tests don't need valgrind because
+we'd just be testing that Python doesn't leak. There are also some
+tests that run too slow and time out under valgrind and, occasionally,
+valgrind crashes for a particular test.
+
+There are two ways to suppress tests:
+
+You can add a test name to CTestCustom.cmake.in to suppress that
+test completely. That makes sense for the header compilation tests,
+for example.
+
+If a specific test case in a test program causes a valgrind problem,
+you can selectively disable a section of code like this:
+
+    #include <valgrind/valgrind.h>
+
+    if (!RUNNING_ON_VALGRIND)
+    {
+        // Code here crashes valgrind...
+    }
+
+That way, the test will still be run as part of the normal "make test"
+target, but will be ommitted when running "make valgrind".
+
 Coverage
 --------
 
@@ -61,12 +86,7 @@ To build with the flags for coverage testing enabled and get coverage:
     $ make test
     $ make coverage
 
-Note that, with gcc 4.7.2 and cmake 2.8.10, you may get a bunch of
-warnings. To fix this, you can build cmake 2.8.10 with the following patch:
-
-http://cmake.org/gitweb?p=cmake.git;a=commitdiff;h=61ace1df2616e472d056b302e4269cbf112fb020#patch1
-
-Unfortunately, it is not possibly to get 100% coverage for some files,
+Unfortunately, it is not possible to get 100% coverage for some files,
 mainly due to gcc's generation of two destructors for dynamic and non-
 dynamic instances. For abstract base classes and for classes that
 prevent stack and static allocation, this causes one of the destructors
@@ -85,7 +105,8 @@ into the old coverage output. You can get rid of this problem by running
 
     $ make clean-coverage
 
-This deletes all the .gcda files, allowing the merge to succeed again.
+This deletes all the .gcda files, allowing the merge to (sometimes) succeed again.
+If this doesn't work either, the only remedy is to do a clean build.
 
 If lcov complains about unrecognized lines involving '=====',
 you can patch geninfo and gcovr as explained here:
@@ -102,12 +123,20 @@ Code style
 We use a format tool that fixes a whole lot of issues
 regarding code style. The formatting changes made by
 the tool are generally sensible (even though they may not be your
-personal preference in all case). If there is a case where the formatting
+personal preference in all cases). If there is a case where the formatting
 really messes things up, consider re-arranging the code to avoid the problem.
 The convenience of running the entire code base through the pretty-printer
 far outweighs any minor glitches with pretty printing, and it means that
 we get consistent code style for free, rather than endlessly having to
 watch out for formatting issues during code reviews.
+
+As of clang-format-3.7, you can use
+
+    // clang-format off
+    void    unformatted_code  ;
+    // clang-format on
+
+to suppress formatting for a section of code.
 
 To format specific files:
 
@@ -138,6 +167,17 @@ run the tests (from the build directory) with these suppressions
 enabled, use:
 
     $ TSAN_OPTIONS="suppressions=../tsan-suppress" make test
+
+If a test runs too slowly under address sanitizer, you can
+hide a section of code from address sanitzer with:
+
+#if defined(__has_feature)
+    #if !__has_feature(address_sanitizer)
+
+    // Code here takes forever under address sanitizer...
+
+    #endif
+#endif
 
 Updating symbols file
 ---------------------
@@ -190,37 +230,10 @@ src/compat_reports/libunity-scopes.so/[version]_to_[version]/compat_report.html
 
 The report provides a nicely layed-out page with all the details.
 
-Debugging IPC
--------------
-
-There are lots of messages being passed between the various scope processes,
-and therefore it might be sometimes useful to see those to help with debugging.
-There is a special monitoring code that is enabled if you pass
--DIPC_MONITORING=ON to cmake. When you build the library with this code,
-the messages can be introspected using the python scripts in the tools directory.
-
-Note that the tools require python dependencies that are otherwise not required
-for regular builds, to get those, grab python-zmq and python-capnproto.
-
-As of time of writing this, python-capnproto is not present in the distro,
-so get it from https://github.com/jparyani/pycapnp.git, also note that the master
-branch is compatible with capnproto 0.3, not 0.4 which we're using, so you need
-to switch to the "feature/v0.4" branch.
-
-Once you have the extra python dependencies you need to run:
-
-    $ ./zmq-monitor-host.py &
-
-This runs a monitor proxy that forwards the monitored messages from all publishers
-to all subscribers.
-Then you can run a subscriber that will display content of the messages:
-
-    $ ./zmq-parser.py
-
 Autopkg test suite
 ------------------
 
-Scopes comes with an autopkg smoke test.
+Scopes come with an autopkg smoke test.
 
 http://packaging.ubuntu.com/html/auto-pkg-test.html
 

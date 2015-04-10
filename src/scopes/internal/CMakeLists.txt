@@ -16,9 +16,11 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/CategoryImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/CategoryRegistry.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/CategoryRendererImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/ChildScopesRepository.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ColumnLayoutImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/CompletionDetailsImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ConfigBase.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/DateTimePickerFilterImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/DepartmentImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/DynamicLoader.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Executor.cpp

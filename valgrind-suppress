@@ -1,8 +1,3 @@
-# Leak suppressions for Ice below are all for bogus "possibly lost" reports.
-# In all cases, we ultimately end up in the std::string library, which does
-# weird things with pointers that point somewhere into the middle of an allocated
-# block to avoid copies. In turn, that causes bogus reports from valgrind.
-
 # Bogus "possibly leaked" reports for pthreads
 
 {
@@ -66,52 +61,6 @@
     fun:call_init.part.0
     fun:_dl_init
     obj:/lib/x86_64-linux-gnu/ld-2.18.so
-}
-
-# False positives for memory leaks in Qt
-
-{
-   QNetworkConfigurationManager
-   Memcheck:Leak
-   fun:*alloc
-   ...
-   fun:_ZN35QNetworkConfigurationManagerPrivate20updateConfigurationsEv
-   fun:_ZN35QNetworkConfigurationManagerPrivate10initializeEv
-}
-
-{
-   QCoreApplication
-   Memcheck:Leak
-   fun:realloc
-   ...
-   fun:_ZN7QObject5eventEP6QEvent
-   fun:_ZN16QCoreApplication6notifyEP7QObjectP6QEvent
-}
-
-{
-   QNetworkAccessManager
-   Memcheck:Leak
-   ...
-   fun:_ZN21QNetworkAccessManager13createRequestENS_9OperationERK15QNetworkRequestP9QIODevice
-   fun:_ZN21QNetworkAccessManager3getERK15QNetworkRequest
-}
-
-{
-   QNetworkConfigurationManager
-   Memcheck:Leak
-   match-leak-kinds: possible
-   ...
-   fun:_ZN7QThread5startENS_8PriorityE
-   fun:_ZN35QNetworkConfigurationManagerPrivate10initializeEv
-   fun:_Z35qNetworkConfigurationManagerPrivatev
-}
-
-{
-   QFactoryLoader
-   Memcheck:Leak
-   fun:*alloc
-   ...
-   fun:_ZNK14QFactoryLoader8instanceEi
 }
 
 # Bogus "invalid read" reports for ::putenv and ::genenv
@@ -241,3 +190,18 @@
    fun:zmq_getsockopt
 }
 
+# Leaks in net-cpp. See bug #1419620
+# TODO: Remove these two suppressions once that bug is fixed.
+{
+    net_cpp_client_leak
+    Memcheck:Leak
+    ...
+    fun:_ZN4core3net4http4impl4curl6Client3getERKNS1_7Request13ConfigurationE
+}
+
+{
+    net_cpp_client_leak_2
+    Memcheck:Leak
+    ...
+    fun:_ZN4core3net4http11make_clientEv
+}

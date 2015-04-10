@@ -43,6 +43,11 @@ void to_value(Variant const& v, capnproto::Value::Builder& b)
             b.setIntVal(v.get_int());
             break;
         }
+        case Variant::Int64:
+        {
+            b.setInt64Val(v.get_int64_t());
+            break;
+        }
         case Variant::Double:
         {
             b.setDoubleVal(v.get_double());
@@ -89,6 +94,10 @@ Variant to_variant(capnproto::Value::Reader const& r)
         case capnproto::Value::INT_VAL:
         {
             return Variant(r.getIntVal());
+        }
+        case capnproto::Value::INT64_VAL:
+        {
+            return Variant(int64_t { r.getInt64Val() });
         }
         case capnproto::Value::DOUBLE_VAL:
         {

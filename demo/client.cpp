@@ -257,7 +257,7 @@ public:
         cout << "\tGot activation response: " << response.status() << endl;
     }
 
-    void finished(CompletionDetails const& details)
+    void finished(CompletionDetails const& details) override
     {
         cout << "\tActivation finished, status: " << to_string(details.status()) << ", message: " << details.message() << endl;
         lock_guard<decltype(mutex_)> lock(mutex_);

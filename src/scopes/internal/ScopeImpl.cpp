@@ -43,16 +43,21 @@ namespace scopes
 namespace internal
 {
 
-ScopeImpl::ScopeImpl(MWScopeProxy const& mw_proxy, RuntimeImpl* runtime, std::string const& scope_id) :
-    ObjectImpl(mw_proxy, runtime->logger()),
-    runtime_(runtime),
+ScopeImpl::ScopeImpl(MWScopeProxy const& mw_proxy, std::string const& scope_id) :
+    ObjectImpl(mw_proxy),
+    runtime_(mw_proxy->mw_base()->runtime()),
     scope_id_(scope_id)
 {
-    assert(runtime);
+    assert(runtime_);
 }
 
 ScopeImpl::~ScopeImpl()
 {
+}
+
+RuntimeImpl* ScopeImpl::runtime() const
+{
+    return runtime_;
 }
 
 QueryCtrlProxy ScopeImpl::search(std::string const& query_string,
@@ -63,7 +68,7 @@ QueryCtrlProxy ScopeImpl::search(std::string const& query_string,
 {
     CannedQuery query(scope_id_, query_string, department_id);
     query.set_filter_state(filter_state);
-    return search(query, metadata, reply);
+    return search(query, metadata, SearchQueryBaseImpl::History(), reply);
 }
 
 QueryCtrlProxy ScopeImpl::search(std::string const& query_string,
@@ -71,23 +76,52 @@ QueryCtrlProxy ScopeImpl::search(std::string const& query_string,
                                  SearchMetadata const& metadata,
                                  SearchListenerBase::SPtr const& reply)
 {
-    CannedQuery query(scope_id_);
-    query.set_query_string(query_string);
+    CannedQuery query(scope_id_, query_string, "");
     query.set_filter_state(filter_state);
-    return search(query, metadata, reply);
+    return search(query, metadata, SearchQueryBaseImpl::History(), reply);
 }
 
 QueryCtrlProxy ScopeImpl::search(string const& query_string,
                                  SearchMetadata const& metadata,
                                  SearchListenerBase::SPtr const& reply)
 {
-    CannedQuery query(scope_id_);
-    query.set_query_string(query_string);
-    return search(query, metadata, reply);
+    CannedQuery query(scope_id_, query_string, "");
+    return search(query, metadata, SearchQueryBaseImpl::History(), reply);
+}
+
+QueryCtrlProxy ScopeImpl::search(std::string const& query_string,
+                                 std::string const& department_id,
+                                 FilterState const& filter_state,
+                                 std::unique_ptr<Variant> user_data,
+                                 SearchMetadata const& metadata,
+                                 SearchQueryBaseImpl::History const& history,
+                                 SearchListenerBase::SPtr const& reply)
+{
+    CannedQuery query(scope_id_, query_string, department_id);
+    query.set_filter_state(filter_state);
+    if (user_data)
+    {
+        query.set_user_data(*user_data);
+    }
+    return search(query, metadata, history, reply);
+}
+
+QueryCtrlProxy ScopeImpl::search(std::string const& query_string,
+                                  std::string const& department_id,
+                                  FilterState const& filter_state,
+                                  Variant const& user_data,
+                                  SearchMetadata const& metadata,
+                                  SearchListenerBase::SPtr const& reply)
+{
+    CannedQuery query(scope_id_, query_string, department_id);
+    query.set_user_data(user_data);
+    query.set_filter_state(filter_state);
+    return search(query, metadata, SearchQueryBaseImpl::History(), reply);
 }
 
 QueryCtrlProxy ScopeImpl::search(CannedQuery const& query,
                                  SearchMetadata const& metadata,
+                                 SearchQueryBaseImpl::History const& history,
                                  SearchListenerBase::SPtr const& reply)
 {
     if (reply == nullptr)
@@ -99,7 +133,7 @@ QueryCtrlProxy ScopeImpl::search(CannedQuery const& query,
     MWReplyProxy rp = fwd()->mw_base()->add_reply_object(ro);
 
     // "Fake" QueryCtrlProxy that doesn't have a real MWQueryCtrlProxy yet.
-    shared_ptr<QueryCtrlImpl> ctrl = make_shared<QueryCtrlImpl>(nullptr, rp, runtime_->logger());
+    shared_ptr<QueryCtrlImpl> ctrl = make_shared<QueryCtrlImpl>(nullptr, rp);
 
     // We pass a shared pointer to the lambda (instead of the this pointer)
     // to keep ourselves alive until after the lambda fires.
@@ -107,12 +141,32 @@ QueryCtrlProxy ScopeImpl::search(CannedQuery const& query,
     // sent in the new thread, the lambda will call into this by-now-destroyed instance.
     auto impl = dynamic_pointer_cast<ScopeImpl>(shared_from_this());
 
-    auto send_search = [impl, query, metadata, rp, ro, ctrl]() -> void
+    string const my_id = runtime_->scope_id();
+    auto send_search = [my_id, impl, query, metadata, history, rp, ro, ctrl]() -> void
     {
         try
         {
+            // Create query context with our own ID and the query history for loop detection.
+            VariantMap context;
+            context["client_id"] = my_id;
+
+            VariantArray hist;
+            for (auto const& tuple : history)
+            {
+                VariantMap d;
+                d["c"] = get<0>(tuple);  // Client
+                d["a"] = get<1>(tuple);  // Aggregator
+                d["r"] = get<2>(tuple);  // Receiver
+                hist.push_back(Variant(d));
+            }
+            context["history"] = Variant(hist);
+
             // Forward the (synchronous) search() method across the bus.
-            auto real_ctrl = dynamic_pointer_cast<QueryCtrlImpl>(impl->fwd()->search(query, metadata.serialize(), rp));
+            auto real_ctrl = dynamic_pointer_cast<QueryCtrlImpl>(impl->fwd()->search(query,
+                                                                                     metadata.serialize(),
+                                                                                     context,
+                                                                                     rp));
+
             assert(real_ctrl);
 
             // Call has completed now, so we update the MWQueryCtrlProxy for the fake proxy
@@ -152,7 +206,7 @@ QueryCtrlProxy ScopeImpl::activate(Result const& result,
     ReplyObject::SPtr ro(make_shared<ActivationReplyObject>(reply, runtime_, to_string(), fwd()->debug_mode()));
     MWReplyProxy rp = fwd()->mw_base()->add_reply_object(ro);
 
-    shared_ptr<QueryCtrlImpl> ctrl = make_shared<QueryCtrlImpl>(nullptr, rp, runtime_->logger());
+    shared_ptr<QueryCtrlImpl> ctrl = make_shared<QueryCtrlImpl>(nullptr, rp);
 
     auto impl = dynamic_pointer_cast<ScopeImpl>(shared_from_this());
 
@@ -200,7 +254,7 @@ QueryCtrlProxy ScopeImpl::perform_action(Result const& result,
     ReplyObject::SPtr ro(make_shared<ActivationReplyObject>(reply, runtime_, to_string(), fwd()->debug_mode()));
     MWReplyProxy rp = fwd()->mw_base()->add_reply_object(ro);
 
-    shared_ptr<QueryCtrlImpl> ctrl = make_shared<QueryCtrlImpl>(nullptr, rp, runtime_->logger());
+    shared_ptr<QueryCtrlImpl> ctrl = make_shared<QueryCtrlImpl>(nullptr, rp);
 
     auto impl = dynamic_pointer_cast<ScopeImpl>(shared_from_this());
 
@@ -249,7 +303,7 @@ QueryCtrlProxy ScopeImpl::preview(Result const& result,
     ReplyObject::SPtr ro(make_shared<PreviewReplyObject>(reply, runtime_, to_string(), fwd()->debug_mode()));
     MWReplyProxy rp = fwd()->mw_base()->add_reply_object(ro);
 
-    shared_ptr<QueryCtrlImpl> ctrl = make_shared<QueryCtrlImpl>(nullptr, rp, runtime_->logger());
+    shared_ptr<QueryCtrlImpl> ctrl = make_shared<QueryCtrlImpl>(nullptr, rp);
 
     auto impl = dynamic_pointer_cast<ScopeImpl>(shared_from_this());
 
@@ -283,9 +337,19 @@ QueryCtrlProxy ScopeImpl::preview(Result const& result,
     return ctrl;
 }
 
-ScopeProxy ScopeImpl::create(MWScopeProxy const& mw_proxy, RuntimeImpl* runtime, std::string const& scope_id)
+ChildScopeList ScopeImpl::child_scopes()
 {
-    return make_shared<ScopeImpl>(mw_proxy, runtime, scope_id);
+    return fwd()->child_scopes();
+}
+
+bool ScopeImpl::set_child_scopes(ChildScopeList const& child_scopes)
+{
+    return fwd()->set_child_scopes(child_scopes);
+}
+
+ScopeProxy ScopeImpl::create(MWScopeProxy const& mw_proxy, std::string const& scope_id)
+{
+    return make_shared<ScopeImpl>(mw_proxy, scope_id);
 }
 
 MWScopeProxy ScopeImpl::fwd()

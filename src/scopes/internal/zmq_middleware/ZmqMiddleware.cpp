@@ -160,24 +160,27 @@ ZmqMiddleware::~ZmqMiddleware()
         // Until we figure out what's going on here, we measure
         // how long it takes and print a warning if it takes
         // longer than 100 ms.
+        //
+        // Update: This happens only when build nodes on
+        // Jenkins are ridiculously slow. Leaving the
+        // diagnostic in place for the time being, which
+        // helps with realizing when something isn't working
+        // right on Jenkins.
         auto start_time = chrono::system_clock::now();
         context_.terminate();
         auto end_time = chrono::system_clock::now();
         auto millisecs = chrono::duration_cast<chrono::milliseconds>(end_time - start_time).count();
         if (millisecs > 100)
         {
-            BOOST_LOG_SEV(logger_, Logger::Error)
-                << "warning: ~ZmqMiddleware(): context_.terminate() took " << millisecs
-                << " ms to complete for " << server_name_;
+            cerr << "warning: ~ZmqMiddleware(): context_.terminate() took " << millisecs
+                 << " ms to complete for " << server_name_ << endl;
         }
-    }
-    catch (std::exception const& e)
-    {
-        BOOST_LOG_SEV(logger_, Logger::Error) << "~ZmqMiddleware(): " << e.what();
     }
     catch (...)
     {
-        BOOST_LOG_SEV(logger_, Logger::Error) << "~ZmqMiddleware(): unknown exception";
+        // Don't log here. RuntimeImpl does that after calling wait_for_shutdown().
+        // We may no longer have a logger here if something holds the middleware
+        // in scope beyond the life time of the runtime.
     }
 }
 
@@ -559,7 +562,7 @@ MWQueryCtrlProxy ZmqMiddleware::add_query_ctrl_object(QueryCtrlObjectBase::SPtr 
     }
     catch (std::exception const& e)  // Can happen during shutdown
     {
-        BOOST_LOG_SEV(logger_, Logger::Error) << "exception in add_query_ctrl_object(): " << e.what();
+        BOOST_LOG(logger_) << "exception in add_query_ctrl_object(): " << e.what();
         throw;
     }
     return proxy;
@@ -579,7 +582,7 @@ void ZmqMiddleware::add_dflt_query_ctrl_object(QueryCtrlObjectBase::SPtr const& 
     }
     catch (std::exception const& e)  // Can happen during shutdown
     {
-        BOOST_LOG_SEV(logger_, Logger::Error) << "exception in add_dflt_query_ctrl_object(): " << e.what();
+        BOOST_LOG(logger_) << "exception in add_dflt_query_ctrl_object(): " << e.what();
         throw;
     }
 }
@@ -601,7 +604,7 @@ MWQueryProxy ZmqMiddleware::add_query_object(QueryObjectBase::SPtr const& query)
     }
     catch (std::exception const& e)  // Can happen during shutdown
     {
-        BOOST_LOG_SEV(logger_, Logger::Error) << "exception in add_query_object(): " << e.what();
+        BOOST_LOG(logger_) << "exception in add_query_object(): " << e.what();
         throw;
     }
     return proxy;
@@ -621,7 +624,7 @@ void ZmqMiddleware::add_dflt_query_object(QueryObjectBase::SPtr const& query)
     }
     catch (std::exception const& e)  // Can happen during shutdown
     {
-        BOOST_LOG_SEV(logger_, Logger::Error) << "exception in add_dflt_query_object(): " << e.what();
+        BOOST_LOG(logger_) << "exception in add_dflt_query_object(): " << e.what();
         throw;
     }
 }
@@ -645,7 +648,7 @@ MWRegistryProxy ZmqMiddleware::add_registry_object(string const& identity, Regis
     }
     catch (std::exception const& e)  // Can happen during shutdown
     {
-        BOOST_LOG_SEV(logger_, Logger::Error) << "exception in add_registry_object(): " << e.what();
+        BOOST_LOG(logger_) << "exception in add_registry_object(): " << e.what();
         throw;
     }
     return proxy;
@@ -668,7 +671,7 @@ MWReplyProxy ZmqMiddleware::add_reply_object(ReplyObjectBase::SPtr const& reply)
     }
     catch (std::exception const& e)  // Can happen during shutdown
     {
-        BOOST_LOG_SEV(logger_, Logger::Error) << "exception in add_reply_object(): " << e.what();
+        BOOST_LOG(logger_) << "exception in add_reply_object(): " << e.what();
         throw;
     }
     return proxy;
@@ -692,7 +695,7 @@ MWScopeProxy ZmqMiddleware::add_scope_object(string const& identity, ScopeObject
     }
     catch (std::exception const& e)  // Can happen during shutdown
     {
-        BOOST_LOG_SEV(logger_, Logger::Error) << "exception in add_scope_object(): " << e.what();
+        BOOST_LOG(logger_) << "exception in add_scope_object(): " << e.what();
         throw;
     }
     return proxy;
@@ -712,7 +715,7 @@ void ZmqMiddleware::add_dflt_scope_object(ScopeObjectBase::SPtr const& scope)
     }
     catch (std::exception const& e)  // Can happen during shutdown
     {
-        BOOST_LOG_SEV(logger_, Logger::Error) << "exception in add_dflt_scope_object(): " << e.what();
+        BOOST_LOG(logger_) << "exception in add_dflt_scope_object(): " << e.what();
         throw;
     }
 }
@@ -737,7 +740,7 @@ MWStateReceiverProxy ZmqMiddleware::add_state_receiver_object(std::string const&
     }
     catch (std::exception const& e)  // Can happen during shutdown
     {
-        BOOST_LOG_SEV(logger_, Logger::Error) << "exception in add_state_receiver_object(): " << e.what();
+        BOOST_LOG(logger_) << "exception in add_state_receiver_object(): " << e.what();
         throw;
     }
     return proxy;
@@ -826,12 +829,12 @@ ObjectProxy ZmqMiddleware::make_typed_proxy(string const& endpoint,
     if (category == scope_category)
     {
         auto p = make_shared<ZmqScope>(this, endpoint, identity, category, timeout);
-        return ScopeImpl::create(p, runtime(), identity);
+        return ScopeImpl::create(p, identity);
     }
     else if (category == registry_category)
     {
         auto p = make_shared<ZmqRegistry>(this, endpoint, identity, category, timeout);
-        return make_shared<RegistryImpl>(p, runtime());
+        return make_shared<RegistryImpl>(p);
     }
     else
     {

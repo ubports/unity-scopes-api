@@ -18,13 +18,14 @@
 
 #pragma once
 
+#include <unity/scopes/ActivationListenerBase.h>
 #include <unity/scopes/internal/MWScopeProxyFwd.h>
 #include <unity/scopes/internal/ObjectImpl.h>
-#include <unity/scopes/QueryCtrlProxyFwd.h>
-#include <unity/scopes/SearchListenerBase.h>
-#include <unity/scopes/ActivationListenerBase.h>
+#include <unity/scopes/internal/SearchQueryBaseImpl.h>
 #include <unity/scopes/PreviewListenerBase.h>
+#include <unity/scopes/QueryCtrlProxyFwd.h>
 #include <unity/scopes/Scope.h>
+#include <unity/scopes/SearchListenerBase.h>
 
 namespace unity
 {
@@ -45,8 +46,10 @@ class RuntimeImpl;
 class ScopeImpl : public virtual unity::scopes::Scope, public virtual ObjectImpl
 {
 public:
-    ScopeImpl(MWScopeProxy const& mw_proxy, RuntimeImpl* runtime, std::string const& scope_id);
+    ScopeImpl(MWScopeProxy const& mw_proxy, std::string const& scope_id);
     virtual ~ScopeImpl();
+
+    RuntimeImpl* runtime() const;
 
     virtual QueryCtrlProxy search(std::string const& q,
                                   SearchMetadata const& metadata,
@@ -63,9 +66,25 @@ public:
                                   SearchMetadata const& metadata,
                                   SearchListenerBase::SPtr const& reply) override;
 
+    virtual QueryCtrlProxy search(std::string const& query_string,
+                                  std::string const& department_id,
+                                  FilterState const& filter_state,
+                                  Variant const& user_data,
+                                  SearchMetadata const& metadata,
+                                  SearchListenerBase::SPtr const& reply) override;
+
+    QueryCtrlProxy search(std::string const& query_string,
+                          std::string const& department_id,
+                          FilterState const& filter_state,
+                          std::unique_ptr<Variant> user_data,
+                          SearchMetadata const& metadata,
+                          SearchQueryBaseImpl::History const& history,
+                          SearchListenerBase::SPtr const& reply);       // Not remote, hence not override
+
     QueryCtrlProxy search(CannedQuery const& query,
                           SearchMetadata const& metadata,
-                          SearchListenerBase::SPtr const& reply); // Not remote, hence not override
+                          SearchQueryBaseImpl::History const& history,
+                          SearchListenerBase::SPtr const& reply);       // Not remote, hence not override
 
     virtual QueryCtrlProxy activate(Result const& result,
                                     ActionMetadata const& metadata,
@@ -81,7 +100,10 @@ public:
                                    ActionMetadata const& hints,
                                    PreviewListenerBase::SPtr const& reply) override;
 
-    static ScopeProxy create(MWScopeProxy const& mw_proxy, RuntimeImpl* runtime, std::string const& scope_id);
+    virtual ChildScopeList child_scopes() override;
+    virtual bool set_child_scopes(ChildScopeList const& child_scopes) override;
+
+    static ScopeProxy create(MWScopeProxy const& mw_proxy, std::string const& scope_id);
 
 private:
     MWScopeProxy fwd();

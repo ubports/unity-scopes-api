@@ -19,6 +19,7 @@
 #pragma once
 
 #include <unity/scopes/ActivationListenerBase.h>
+#include <unity/scopes/ChildScope.h>
 #include <unity/scopes/Object.h>
 #include <unity/scopes/PreviewListenerBase.h>
 #include <unity/scopes/QueryCtrlProxyFwd.h>
@@ -139,6 +140,41 @@ public:
     Destroying a Scope has no effect on any query that might still be in progress.
     */
     virtual ~Scope();
+
+    /**
+    \brief Returns a list of child scopes aggregated by this scope.
+    \return The list of child scopes aggregated by this scope.
+    */
+    virtual ChildScopeList child_scopes() = 0;
+
+    /**
+    \brief Sets the list of child scopes aggregated by this scope.
+    \note The only time this call will return false is if the scope cannot write to its config directory.
+    This should not happen in real-world usage, but if it does, check the log for more detail.
+    \param child_scopes The list of child scopes aggregated by this scope.
+    \return True if the list was successfully set.
+    */
+    virtual bool set_child_scopes(ChildScopeList const& child_scopes) = 0;
+
+    /**
+    \brief Initiates a search query (overloaded method).
+
+    This method has same synopsis as previous search method, but it takes additional user_data argument.
+
+    \param query_string search string
+    \param department_id identifier of a department to search
+    \param filter_state state of filters
+    \param user_data arbitrary data
+    \param metadata additional data to pass to scope
+    \param reply The callback object to receive replies
+    \return query handler
+    */
+    virtual QueryCtrlProxy search(std::string const& query_string,
+                                  std::string const& department_id,
+                                  FilterState const& filter_state,
+                                  Variant const& user_data,
+                                  SearchMetadata const& metadata,
+                                  SearchListenerBase::SPtr const& reply) = 0;
 
 protected:
     /// @cond

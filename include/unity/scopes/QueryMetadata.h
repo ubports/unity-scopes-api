@@ -31,6 +31,7 @@ namespace internal
 {
 
 class QueryMetadataImpl;
+class SearchQueryBaseImpl;
 
 }
 

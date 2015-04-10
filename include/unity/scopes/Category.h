@@ -36,13 +36,14 @@ namespace internal
 {
     class CategoryImpl;
     class CategoryRegistry;
+    class SearchReplyImpl;
 }
 
 /**
    \brief A set of related results returned by a scope
    and displayed within a single pane in the Unity dash.
 
-   To create a Category, use ReplyProxy::register_category.
+   To create a Category, use SearchReplyProxy::register_category.
    \see ResultItem
 */
 class Category
@@ -100,6 +101,7 @@ protected:
     /// @endcond
 
     friend class internal::CategoryRegistry;
+    friend class internal::SearchReplyImpl;
 
 private:
     std::unique_ptr<internal::CategoryImpl> p;

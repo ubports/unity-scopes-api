@@ -18,13 +18,14 @@
 
 #pragma once
 
+#include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/SearchReply.h>
 #include <unity/scopes/SearchReplyProxyFwd.h>
-#include <unity/scopes/CategorisedResult.h>
-#include <memory>
-#include <vector>
-#include <mutex>
+
 #include <atomic>
+#include <memory>
+#include <mutex>
+#include <vector>
 
 namespace unity
 {
@@ -62,6 +63,8 @@ public:
     bool push(unity::scopes::CategorisedResult const& result) override;
     bool push(unity::scopes::Filters const& filters, unity::scopes::FilterState const& filter_state) override;
 
+    void push_surfacing_results_from_cache() noexcept override;
+
     // Reply interface
     void finished() override;
     void error(std::exception_ptr ex) override;
@@ -78,7 +81,7 @@ public:
 
 private:
     std::mutex mutex_;
-    unity::scopes::SearchReplyProxy upstream_;  // Immutable
+    unity::scopes::SearchReplyProxy const upstream_;
     std::atomic<bool> buffer_;
     std::vector<CategorisedResult> results_;
 };

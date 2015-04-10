@@ -1,0 +1,5 @@
+[ScopeConfig]
+DisplayName = Aggregator
+Description = Aggregator scope that blindly forwards to scope "Leaf"
+Author = Michi
+LocationDataNeeded = true

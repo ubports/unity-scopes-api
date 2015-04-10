@@ -2,7 +2,7 @@
  * Copyright (C) 2013 Canonical Ltd
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the Lesser GNU General Public License version 3 as
+ * it under the terms of the GNU Lesser General Public License version 3 as
  * published by the Free Software Foundation.
  *
  * This program is distributed in the hope that it will be useful,
@@ -18,8 +18,11 @@
 
 #pragma once
 
-#include <unity/scopes/Scope.h>
-#include <vector>
+#include <unity/scopes/ScopeProxyFwd.h>
+#include <unity/scopes/Variant.h>
+#include <unity/util/DefinesPtrs.h>
+
+#include <set>
 
 namespace unity
 {
@@ -29,7 +32,6 @@ namespace scopes
 
 namespace internal
 {
-
 class ScopeMetadataImpl;
 } // namespace internal
 
@@ -204,14 +206,14 @@ public:
     int version() const;
 
     /**
-    \brief Return the list of keywords specified by this scope.
+    \brief Return the set of keywords specified by this scope.
 
-    The list returned by this method is formulated from the value specified under
+    The set returned by this method is formulated from the value specified under
     the "Keywords" key in the scope's .ini file.
 
-    \return The list of scope keywords specified by this scope.
+    \return The set of keywords specified by this scope.
     */
-    std::vector<std::string> keywords() const;
+    std::set<std::string> keywords() const;
 
     /**
     \brief Check if this scope is an aggregator.

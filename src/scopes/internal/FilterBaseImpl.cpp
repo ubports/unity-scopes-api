@@ -26,6 +26,7 @@
 #include <unity/scopes/internal/RatingFilterImpl.h>
 #include <unity/scopes/internal/SwitchFilterImpl.h>
 #include <unity/scopes/internal/ValueSliderFilterImpl.h>
+#include <unity/scopes/internal/DateTimePickerFilterImpl.h>
 #include <unity/UnityExceptions.h>
 #include <sstream>
 
@@ -149,6 +150,10 @@ FilterBase::SCPtr FilterBaseImpl::deserialize(VariantMap const& var)
         if (ftype == "value_slider")
         {
             return ValueSliderFilterImpl::create(var);
+        }
+        if (ftype == "datetime_picker")
+        {
+            return DateTimePickerFilterImpl::create(var);
         }
         throw unity::LogicException("Unknown filter type: " + ftype);
     }

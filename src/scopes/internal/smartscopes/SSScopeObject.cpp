@@ -45,10 +45,9 @@ SSScopeObject::SSScopeObject(std::string const& ss_scope_id,
                              SSRegistryObject::SPtr ss_registry)
     : ss_scope_id_(ss_scope_id)
     , co_(std::make_shared<SSQueryCtrlObject>())
-    , qo_(std::make_shared<SSQueryObject>(middleware->runtime()->logger()))
+    , qo_(std::make_shared<SSQueryObject>())
     , smartscope_(new SmartScope(ss_registry))
     , ss_registry_(ss_registry)
-    , logger_(middleware->runtime()->logger())
 {
     // Connect the query ctrl to the middleware.
     middleware->add_dflt_query_ctrl_object(co_);
@@ -65,9 +64,10 @@ SSScopeObject::~SSScopeObject()
 }
 
 MWQueryCtrlProxy SSScopeObject::search(CannedQuery const& q,
-                                             SearchMetadata const& hints,
-                                             MWReplyProxy const& reply,
-                                             InvokeInfo const& info)
+                                       SearchMetadata const& hints,
+                                       VariantMap const& /* context */,
+                                       MWReplyProxy const& reply,
+                                       InvokeInfo const& info)
 {
     return query(info,
                  reply,
@@ -173,7 +173,7 @@ MWQueryCtrlProxy SSScopeObject::query(InvokeInfo const& info,
         catch (...)
         {
         }
-        BOOST_LOG_SEV(logger_, Logger::Error) << "SSScopeObject::query(): " << e.what();
+        BOOST_LOG(info.mw->runtime()->logger()) << "SSScopeObject::query(): " << e.what();
         throw;
     }
     catch (...)
@@ -185,11 +185,21 @@ MWQueryCtrlProxy SSScopeObject::query(InvokeInfo const& info,
         catch (...)
         {
         }
-        BOOST_LOG_SEV(logger_, Logger::Error) << "SSScopeObject::query(): unknown exception";
+        BOOST_LOG(info.mw->runtime()->logger()) << "SSScopeObject::query(): unknown exception";
         throw;
     }
 
     return info.mw->create_query_ctrl_proxy(reply->identity() + ".c", info.mw->get_query_ctrl_endpoint());
+}
+
+ChildScopeList SSScopeObject::child_scopes() const
+{
+    return ChildScopeList();
+}
+
+bool SSScopeObject::set_child_scopes(ChildScopeList const&)
+{
+    return false;
 }
 
 bool SSScopeObject::debug_mode() const

@@ -19,6 +19,7 @@
 #pragma once
 
 #include <unity/scopes/ActivationQueryBase.h>
+#include <unity/scopes/ChildScope.h>
 #include <unity/scopes/PreviewQueryBase.h>
 #include <unity/scopes/Registry.h>
 #include <unity/scopes/SearchQueryBase.h>
@@ -55,6 +56,14 @@ public:
     virtual std::string tmp_directory() const = 0;
     virtual unity::scopes::RegistryProxy registry() const = 0;
     virtual VariantMap settings() const = 0;
+
+    virtual ~AbstractScopeBase();
+
+    virtual ChildScopeList find_child_scopes() const = 0;
+    virtual ChildScopeList child_scopes() const = 0;
+
+protected:
+    AbstractScopeBase();
 /// @endcond
 };
 

@@ -309,7 +309,7 @@ TEST(Runtime, search)
     auto mw = rt->factory()->create("TestScope", "Zmq", "Zmq.ini");
     mw->start();
     auto proxy = mw->create_scope_proxy("TestScope");
-    auto scope = internal::ScopeImpl::create(proxy, rt.get(), "TestScope");
+    auto scope = internal::ScopeImpl::create(proxy, "TestScope");
 
     auto receiver = make_shared<Receiver>();
     auto ctrl = scope->search("test", SearchMetadata("en", "phone"), receiver);
@@ -324,7 +324,7 @@ TEST(Runtime, consecutive_search)
     mw->start();
 
     auto proxy = mw->create_scope_proxy("TestScope");
-    auto scope = internal::ScopeImpl::create(proxy, rt.get(), "TestScope");
+    auto scope = internal::ScopeImpl::create(proxy, "TestScope");
 
     auto receiver = make_shared<Receiver>();
     auto ctrl = scope->search("test", SearchMetadata("en", "phone"), receiver);
@@ -367,7 +367,7 @@ TEST(Runtime, preview)
     auto mw = rt->factory()->create("TestScope", "Zmq", "Zmq.ini");
     mw->start();
     auto proxy = mw->create_scope_proxy("TestScope");
-    auto scope = internal::ScopeImpl::create(proxy, rt.get(), "TestScope");
+    auto scope = internal::ScopeImpl::create(proxy, "TestScope");
 
     // run a query first, so we have a result to preview
     auto receiver = make_shared<Receiver>();
@@ -396,7 +396,7 @@ TEST(Runtime, cardinality)
     auto mw = rt->factory()->create("PusherScope", "Zmq", "Zmq.ini");
     mw->start();
     auto proxy = mw->create_scope_proxy("PusherScope");
-    auto scope = internal::ScopeImpl::create(proxy, rt.get(), "PusherScope");
+    auto scope = internal::ScopeImpl::create(proxy, "PusherScope");
 
     // Run a query with unlimited cardinality. We check that the
     // scope returns 100 results.
@@ -453,7 +453,7 @@ TEST(Runtime, early_cancel)
     auto mw = rt->factory()->create("SlowCreateScope", "Zmq", "Zmq.ini");
     mw->start();
     auto proxy = mw->create_scope_proxy("SlowCreateScope");
-    auto scope = internal::ScopeImpl::create(proxy, rt.get(), "SlowCreateScope");
+    auto scope = internal::ScopeImpl::create(proxy, "SlowCreateScope");
 
     // Allow some time for the middleware to start up.
     this_thread::sleep_for(chrono::milliseconds(200));

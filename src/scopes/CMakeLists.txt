@@ -1,10 +1,12 @@
 add_subdirectory(utility)
 add_subdirectory(internal)
 add_subdirectory(testing)
+add_subdirectory(qt)
 
 set(CAPNPROTO_FILES ${CAPNPROTO_FILES} PARENT_SCOPE)
 
 set(SRC
+    ${CMAKE_CURRENT_SOURCE_DIR}/AbstractScopeBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ActionMetadata.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ActivationListenerBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ActivationQueryBase.cpp
@@ -14,9 +16,11 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/CategorisedResult.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Category.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/CategoryRenderer.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/ChildScope.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ColumnLayout.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/CompletionDetails.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Department.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/DateTimePickerFilter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/FilterBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/FilterOption.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/FilterState.cpp

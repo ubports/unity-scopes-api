@@ -38,7 +38,9 @@ namespace testing
 class MockScope : public unity::scopes::Scope, public unity::scopes::testing::MockObject
 {
 public:
-    MockScope() = default;
+    MockScope(std::string const& endpoint = "",
+              std::string const& identity = "")
+        : MockObject(endpoint, identity) {}
 
     MOCK_METHOD3(search, QueryCtrlProxy(std::string const&,
                                         SearchMetadata const&,
@@ -63,6 +65,17 @@ public:
     MOCK_METHOD3(preview, QueryCtrlProxy(unity::scopes::Result const&,
                                          ActionMetadata const&,
                                          PreviewListenerBase::SPtr const&));
+
+    MOCK_METHOD0(child_scopes, ChildScopeList());
+
+    MOCK_METHOD6(search, QueryCtrlProxy(std::string const&,
+                                        std::string const&,
+                                        FilterState const&,
+                                        Variant const&,
+                                        SearchMetadata const&,
+                                        SearchListenerBase::SPtr const&));
+
+    MOCK_METHOD1(set_child_scopes, bool(ChildScopeList const&));
 };
 
 /// @endcond
