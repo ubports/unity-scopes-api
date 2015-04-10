@@ -35,11 +35,13 @@ namespace scopes
 namespace testing
 {
 
-/// @cond
-
+/**
+ \brief Mock for unity::scopes::SearchReply class.
+ */
 class MockSearchReply : public unity::scopes::SearchReply, public virtual MockObject
 {
 public:
+/// @cond
     MockSearchReply() = default;
 
     // From Reply
@@ -66,9 +68,10 @@ public:
     MOCK_METHOD2(push, bool(Filters const&, FilterState const&));
     MOCK_METHOD1(push, bool(experimental::Annotation const& annotation));
     MOCK_METHOD0(push_surfacing_results_from_cache, void());
-};
 
 /// @endcond
+};
+
 
 } // namespace testing
 

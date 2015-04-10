@@ -33,11 +33,13 @@ namespace scopes
 namespace testing
 {
 
-/// @cond
-
+/**
+ \brief Mock for unity::scopes::PreviewReply class.
+ */
 class MockPreviewReply : public unity::scopes::PreviewReply, public unity::scopes::testing::MockObject
 {
 public:
+    /// @cond
     MockPreviewReply() = default;
 
     // From Reply
@@ -49,9 +51,9 @@ public:
     MOCK_METHOD1(register_layout, bool(ColumnLayoutList const&));
     MOCK_METHOD1(push, bool(PreviewWidgetList const&));
     MOCK_METHOD2(push, bool(std::string const&, Variant const&));
+/// @endcond
 };
 
-/// @endcond
 
 } // namespace testing
 

@@ -65,10 +65,19 @@ class TypedScopeFixtureHelper
     friend class TypedScopeFixture;
 };
 
+/// @endcond
+
+/**
+ \brief Fixture for testing scope testing.
+
+ This fixture template provides convienience SetUp() and TearDown() functions, as well as
+ a number of setters that ease the creation of scope tests.
+ */
 template<typename Scope>
 class TypedScopeFixture : public ::testing::Test
 {
 public:
+/// @cond
     TypedScopeFixture()
         : registry_proxy(&registry, [](unity::scopes::Registry*) {})
         , scope(ScopeTraits<Scope>::construct())
@@ -116,9 +125,9 @@ protected:
     unity::scopes::testing::MockRegistry registry;
     unity::scopes::RegistryProxy registry_proxy;
     std::shared_ptr<Scope> scope;
+/// @endcond
 };
 
-/// @endcond
 
 } // namespace testing
 
