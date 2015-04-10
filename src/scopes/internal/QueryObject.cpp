@@ -203,9 +203,9 @@ int QueryObject::cardinality(InvokeInfo const& /* info */) const noexcept
 // The point of keeping a shared_ptr to ourselves is to make sure this QueryObject cannot
 // go out of scope in between being created by the Scope, and the first ReplyProxy for this
 // query being created in QueryObject::run(). If the scope's run() method returns immediately,
-// by the time QueryObject::run() starts executing, Scope::create_query() may already have
+// by the time QueryObject::run() starts executing, Scope::search() may already have
 // returned and removed the query object from the middleware, causing this QueryObject's reference
-// count to reach zero and get deallocated. So, create_query() calls set_self(), which remembers
+// count to reach zero and get deallocated. So, search() calls set_self(), which remembers
 // the the shared_ptr, increasing the refcount, and QueryObject::run() clears the shared_ptr after creating
 // the ReplyProxy, which decrements the refcount again.
 //

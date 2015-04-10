@@ -57,7 +57,7 @@ class QScopeBaseAPI;
 /**
 \brief Abstract base class to represent a particular query.
 
-A scope must return an instance of this class from its implementation of ScopeBase::create_query().
+A scope must return an instance of this class from its implementation of ScopeBase::search().
 
 This is the class that links scope API calls with the main QThread.
 The instance of this class is moved to the main QThread and pushes events to the Qt event loop.
