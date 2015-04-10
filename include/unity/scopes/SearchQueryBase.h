@@ -54,7 +54,7 @@ class SSQueryObject;
 /**
 \brief Abstract base class to represent a particular query.
 
-A scope must return an instance of this class from its implementation of ScopeBase::create_query().
+A scope must return an instance of this class from its implementation of ScopeBase::search().
 
 \note The constructor of the instance must complete in a timely manner. Do not perform anything in the
 constructor that might block.

@@ -69,7 +69,7 @@ void SSQueryCtrlObject::destroy(InvokeInfo const& /* info */)
     disconnect();
 }
 
-// Called by create_query() to tell us what the query facade object
+// Called by search() to tell us what the query facade object
 // is. We use the query facade object to forward cancellation.
 
 void SSQueryCtrlObject::set_query(QueryObjectBase::SPtr const& qo)

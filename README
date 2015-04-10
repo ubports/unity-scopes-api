@@ -313,7 +313,7 @@ try-catch block; if the servant throws an exception, dispatch_() takes
 care of returning an exception to the client.
 
 The concrete servant method called by dispatch_ (such as
-ScopeI::create_query) now unmarshals any in-parameters, translates them to
+ScopeI::search) now unmarshals any in-parameters, translates them to
 the middleware-independent equivalents, forwards the invocation to the
 middleware-independent servant, and translates and marshals any return
 values or exceptions.
