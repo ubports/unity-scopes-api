@@ -20,9 +20,15 @@
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
+#include <boost/filesystem.hpp>
+
 #include <iomanip>
 #include <locale>
 #include <mutex>
+
+#include <sys/stat.h>
+
+using namespace std;
 
 namespace unity
 {
@@ -33,7 +39,7 @@ namespace scopes
 namespace internal
 {
 
-VariantMap::const_iterator find_or_throw(std::string const& context, VariantMap const& var, std::string const& key)
+VariantMap::const_iterator find_or_throw(string const& context, VariantMap const& var, string const& key)
 {
     auto it = var.find(key);
     if (it == var.end())
@@ -43,14 +49,14 @@ VariantMap::const_iterator find_or_throw(std::string const& context, VariantMap 
     return it;
 }
 
-std::string to_percent_encoding(std::string const& str)
+string to_percent_encoding(string const& str)
 {
-    std::ostringstream result;
+    ostringstream result;
     for (auto const& c: str)
     {
         if ((!isalnum(c)))
         {
-            result << '%' << std::setw(2) << std::setfill('0') << std::hex << std::uppercase << static_cast<int>(static_cast<unsigned char>(c)) << std::nouppercase;
+            result << '%' << setw(2) << setfill('0') << hex << uppercase << static_cast<int>(static_cast<unsigned char>(c)) << nouppercase;
         }
         else
         {
@@ -60,9 +66,9 @@ std::string to_percent_encoding(std::string const& str)
     return result.str();
 }
 
-std::string from_percent_encoding(std::string const& str)
+string from_percent_encoding(string const& str)
 {
-    std::ostringstream result;
+    ostringstream result;
     for (auto it = str.begin(); it != str.end(); it++)
     {
         auto c = *it;
@@ -75,16 +81,16 @@ std::string from_percent_encoding(std::string const& str)
                 c = *it;
                 if (++it != str.end())
                 {
-                    std::string const hexnum { c, *it };
+                    string const hexnum { c, *it };
                     try
                     {
-                        auto k = std::stoi(hexnum, nullptr, 16);
+                        auto k = stoi(hexnum, nullptr, 16);
                         result << static_cast<char>(k);
                         valid = true;
                     }
-                    catch (std::logic_error const& e) // covers both std::invalid_argument and std::out_of_range
+                    catch (logic_error const& e) // covers both invalid_argument and out_of_range
                     {
-                        std::stringstream err;
+                        stringstream err;
                         err << "from_percent_encoding(): unsupported conversion of '" << hexnum << "'";
                         throw unity::InvalidArgumentException(err.str());
                     }
@@ -103,33 +109,33 @@ std::string from_percent_encoding(std::string const& str)
     return result.str();
 }
 
-std::string uncamelcase(std::string const& str)
+string uncamelcase(string const& str)
 {
-    const std::locale loc("");
+    const locale loc("");
     if (str.size() == 0)
     {
         return str;
     }
     auto it = str.begin();
-    int previous_is_lower = std::islower(*it);
-    std::stringstream res;
-    res << std::tolower(*it, loc);
+    int previous_is_lower = islower(*it);
+    stringstream res;
+    res << tolower(*it, loc);
     ++it;
     while (it != str.end())
     {
-        if (std::isupper(*it) && previous_is_lower)
+        if (isupper(*it) && previous_is_lower)
         {
             res << "-";
         }
-        previous_is_lower = std::islower(*it);
-        res << std::tolower(*it, loc);
+        previous_is_lower = islower(*it);
+        res << tolower(*it, loc);
         ++it;
     }
     return res.str();
 }
 
 template<>
-bool convert_to<bool>(std::string const& val, Variant& out)
+bool convert_to<bool>(string const& val, Variant& out)
 {
     if (val == "true")
     {
@@ -144,11 +150,44 @@ bool convert_to<bool>(std::string const& val, Variant& out)
     return false;
 }
 
-int safe_system_call(std::string const& command)
+int safe_system_call(string const& command)
 {
-    static std::mutex system_mutex;
-    std::lock_guard<std::mutex> lock(system_mutex);
-    return std::system(command.c_str());
+    static mutex system_mutex;
+    lock_guard<mutex> lock(system_mutex);
+    return system(command.c_str());
+}
+
+// Recursively create the directories in path, setting permissions to the specified mode
+// (regardless of the setting of umask). If one or more directories already exist, they
+// are left unchanged (including their permissions). If a directory cannot be created,
+// fail silently.
+
+void make_directories(string const& path_name, mode_t mode)
+{
+    using namespace boost::filesystem;
+
+    // We can't use boost::create_directories() here because that does not allow control over permissions.
+    auto abs = absolute(path_name);
+    path path_so_far = "";
+    path::iterator it = abs.begin();
+    ++it; // No point in trying to create /
+    while (it != abs.end())
+    {
+        path_so_far += "/";
+        path_so_far += *it++;
+        string p = path_so_far.native();
+        if (mkdir(p.c_str(), mode) != 0)
+        {
+            if (errno == EEXIST)
+            {
+                continue;
+            }
+            return;  // No point in continuing, we'd fail on all subsequent iterations.
+        }
+        // We just created the dir, make sure it has the requested permissions,
+        // not the permissions modified by umask.
+        chmod(p.c_str(), mode);
+    }
 }
 
 } // namespace internal

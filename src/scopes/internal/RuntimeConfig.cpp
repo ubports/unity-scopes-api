@@ -19,17 +19,13 @@
 #include <unity/scopes/internal/RuntimeConfig.h>
 
 #include <unity/scopes/internal/DfltConfig.h>
+#include <unity/scopes/internal/Utils.h>
 #include <unity/scopes/ScopeExceptions.h>
 
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/constants.hpp>
 #include <boost/algorithm/string/split.hpp>
-#include <boost/filesystem.hpp>
 #include <unity/UnityExceptions.h>
-
-#include <sys/stat.h>
-
-#include <stdlib.h>
 
 using namespace std;
 
@@ -343,9 +339,7 @@ string RuntimeConfig::default_log_directory()
         throw ResourceException("RuntimeConfig::default_log_directory(): $HOME not set");
     }
     string dir = string(home) + "/" + DFLT_HOME_LOG_SUBDIR;
-
-    boost::system::error_code ec;
-    !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700);
+    make_directories(dir, 0700);
 
     return dir;
 }
