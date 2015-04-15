@@ -8,7 +8,7 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"typeinfo for unity::scopes::CategoryRenderer@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo for unity::scopes::ConfigException@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo for unity::scopes::experimental::Annotation@Base" 0.5.0+14.10.20140619
- (c++)"typeinfo for unity::scopes::experimental::DateTimePickerFilter@Base" 0replaceme
+ (c++)"typeinfo for unity::scopes::experimental::DateTimePickerFilter@Base" 0.6.16+15.04.20150410.3
  (c++)"typeinfo for unity::scopes::experimental::RadioButtonsFilter@Base" 0.5.0+14.10.20140619
  (c++)"typeinfo for unity::scopes::experimental::RangeInputFilter@Base" 0.5.0+14.10.20140619
  (c++)"typeinfo for unity::scopes::experimental::RatingFilter@Base" 0.5.0+14.10.20140619
@@ -56,7 +56,7 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"typeinfo name for unity::scopes::CategoryRenderer@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo name for unity::scopes::ConfigException@Base" 0.4.0+14.04.20140312.1
  (c++)"typeinfo name for unity::scopes::experimental::Annotation@Base" 0.5.0+14.10.20140619
- (c++)"typeinfo name for unity::scopes::experimental::DateTimePickerFilter@Base" 0replaceme
+ (c++)"typeinfo name for unity::scopes::experimental::DateTimePickerFilter@Base" 0.6.16+15.04.20150410.3
  (c++)"typeinfo name for unity::scopes::experimental::RadioButtonsFilter@Base" 0.5.0+14.10.20140619
  (c++)"typeinfo name for unity::scopes::experimental::RangeInputFilter@Base" 0.5.0+14.10.20140619
  (c++)"typeinfo name for unity::scopes::experimental::RatingFilter@Base" 0.5.0+14.10.20140619
@@ -147,7 +147,7 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::CannedQuery::department_id() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::CannedQuery::filter_state() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::CannedQuery::from_uri(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.3+14.10.20140428
- (c++)"unity::scopes::CannedQuery::has_user_data() const@Base" 0replaceme
+ (c++)"unity::scopes::CannedQuery::has_user_data() const@Base" 0.6.16+15.04.20150410.3
  (c++)"unity::scopes::CannedQuery::operator=(unity::scopes::CannedQuery&&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::CannedQuery::operator=(unity::scopes::CannedQuery const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::CannedQuery::query_string() const@Base" 0.4.0+14.04.20140312.1
@@ -156,9 +156,9 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::CannedQuery::set_department_id(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::CannedQuery::set_filter_state(unity::scopes::FilterState const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::CannedQuery::set_query_string(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::CannedQuery::set_user_data(unity::scopes::Variant const&)@Base" 0replaceme
+ (c++)"unity::scopes::CannedQuery::set_user_data(unity::scopes::Variant const&)@Base" 0.6.16+15.04.20150410.3
  (c++)"unity::scopes::CannedQuery::to_uri() const@Base" 0.4.3+14.10.20140428
- (c++)"unity::scopes::CannedQuery::user_data() const@Base" 0replaceme
+ (c++)"unity::scopes::CannedQuery::user_data() const@Base" 0.6.16+15.04.20150410.3
  (c++)"unity::scopes::CategorisedResult::~CategorisedResult()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::CategorisedResult::CategorisedResult(std::shared_ptr<unity::scopes::Category const>)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::CategorisedResult::CategorisedResult(unity::scopes::CategorisedResult&&)@Base" 0.4.0+14.04.20140312.1
@@ -251,30 +251,30 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::experimental::Annotation::serialize() const@Base" 0.5.0+14.10.20140619
  (c++)"unity::scopes::experimental::Annotation::set_icon(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.5.0+14.10.20140619
  (c++)"unity::scopes::experimental::Annotation::set_label(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.5.0+14.10.20140619
- (c++|arch=amd64)"unity::scopes::experimental::DateTimePickerFilter::create(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::bitset<6ul>)@Base" 0replaceme
- (c++|arch=armhf i386)"unity::scopes::experimental::DateTimePickerFilter::create(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::bitset<6u>)@Base" 0replaceme
- (c++)"unity::scopes::experimental::DateTimePickerFilter::date_label() const@Base" 0replaceme
- (c++)"unity::scopes::experimental::DateTimePickerFilter::~DateTimePickerFilter()@Base" 0replaceme
- (c++)"unity::scopes::experimental::DateTimePickerFilter::DateTimePickerFilter(unity::scopes::internal::DateTimePickerFilterImpl*)@Base" 0replaceme
- (c++)"unity::scopes::experimental::DateTimePickerFilter::fwd() const@Base" 0replaceme
- (c++)"unity::scopes::experimental::DateTimePickerFilter::has_maximum() const@Base" 0replaceme
- (c++)"unity::scopes::experimental::DateTimePickerFilter::has_minimum() const@Base" 0replaceme
- (c++)"unity::scopes::experimental::DateTimePickerFilter::has_selected_date(unity::scopes::FilterState const&) const@Base" 0replaceme
- (c++)"unity::scopes::experimental::DateTimePickerFilter::maximum() const@Base" 0replaceme
- (c++)"unity::scopes::experimental::DateTimePickerFilter::minimum() const@Base" 0replaceme
- (c++)"unity::scopes::experimental::DateTimePickerFilter::mode() const@Base" 0replaceme
- (c++)"unity::scopes::experimental::DateTimePickerFilter::selected_date(unity::scopes::FilterState const&) const@Base" 0replaceme
- (c++)"unity::scopes::experimental::DateTimePickerFilter::set_date_label(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
- (c++|arch=amd64)"unity::scopes::experimental::DateTimePickerFilter::set_maximum(std::chrono::time_point<std::chrono::_V2::system_clock, std::chrono::duration<long, std::ratio<1l, 1000000000l> > > const&)@Base" 0replaceme
- (c++|arch=armhf i386)"unity::scopes::experimental::DateTimePickerFilter::set_maximum(std::chrono::time_point<std::chrono::_V2::system_clock, std::chrono::duration<long long, std::ratio<1ll, 1000000000ll> > > const&)@Base" 0replaceme
- (c++|arch=amd64)"unity::scopes::experimental::DateTimePickerFilter::set_minimum(std::chrono::time_point<std::chrono::_V2::system_clock, std::chrono::duration<long, std::ratio<1l, 1000000000l> > > const&)@Base" 0replaceme
- (c++|arch=armhf i386)"unity::scopes::experimental::DateTimePickerFilter::set_minimum(std::chrono::time_point<std::chrono::_V2::system_clock, std::chrono::duration<long long, std::ratio<1ll, 1000000000ll> > > const&)@Base" 0replaceme
- (c++)"unity::scopes::experimental::DateTimePickerFilter::set_time_label(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
- (c++)"unity::scopes::experimental::DateTimePickerFilter::time_label() const@Base" 0replaceme
- (c++|arch=amd64)"unity::scopes::experimental::DateTimePickerFilter::update_state(unity::scopes::FilterState&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::chrono::time_point<std::chrono::_V2::system_clock, std::chrono::duration<long, std::ratio<1l, 1000000000l> > > const&)@Base" 0replaceme
- (c++|arch=armhf i386)"unity::scopes::experimental::DateTimePickerFilter::update_state(unity::scopes::FilterState&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::chrono::time_point<std::chrono::_V2::system_clock, std::chrono::duration<long long, std::ratio<1ll, 1000000000ll> > > const&)@Base" 0replaceme
- (c++|arch=amd64)"unity::scopes::experimental::DateTimePickerFilter::update_state(unity::scopes::FilterState&, std::chrono::time_point<std::chrono::_V2::system_clock, std::chrono::duration<long, std::ratio<1l, 1000000000l> > > const&) const@Base" 0replaceme
- (c++|arch=armhf i386)"unity::scopes::experimental::DateTimePickerFilter::update_state(unity::scopes::FilterState&, std::chrono::time_point<std::chrono::_V2::system_clock, std::chrono::duration<long long, std::ratio<1ll, 1000000000ll> > > const&) const@Base" 0replaceme
+ (c++|arch=amd64 ppc64el arm64)"unity::scopes::experimental::DateTimePickerFilter::create(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::bitset<6ul>)@Base" 0.6.16+15.04.20150410.3
+ (c++|arch=armhf i386 powerpc)"unity::scopes::experimental::DateTimePickerFilter::create(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::bitset<6u>)@Base" 0.6.16+15.04.20150410.3
+ (c++)"unity::scopes::experimental::DateTimePickerFilter::date_label() const@Base" 0.6.16+15.04.20150410.3
+ (c++)"unity::scopes::experimental::DateTimePickerFilter::~DateTimePickerFilter()@Base" 0.6.16+15.04.20150410.3
+ (c++)"unity::scopes::experimental::DateTimePickerFilter::DateTimePickerFilter(unity::scopes::internal::DateTimePickerFilterImpl*)@Base" 0.6.16+15.04.20150410.3
+ (c++)"unity::scopes::experimental::DateTimePickerFilter::fwd() const@Base" 0.6.16+15.04.20150410.3
+ (c++)"unity::scopes::experimental::DateTimePickerFilter::has_maximum() const@Base" 0.6.16+15.04.20150410.3
+ (c++)"unity::scopes::experimental::DateTimePickerFilter::has_minimum() const@Base" 0.6.16+15.04.20150410.3
+ (c++)"unity::scopes::experimental::DateTimePickerFilter::has_selected_date(unity::scopes::FilterState const&) const@Base" 0.6.16+15.04.20150410.3
+ (c++)"unity::scopes::experimental::DateTimePickerFilter::maximum() const@Base" 0.6.16+15.04.20150410.3
+ (c++)"unity::scopes::experimental::DateTimePickerFilter::minimum() const@Base" 0.6.16+15.04.20150410.3
+ (c++)"unity::scopes::experimental::DateTimePickerFilter::mode() const@Base" 0.6.16+15.04.20150410.3
+ (c++)"unity::scopes::experimental::DateTimePickerFilter::selected_date(unity::scopes::FilterState const&) const@Base" 0.6.16+15.04.20150410.3
+ (c++)"unity::scopes::experimental::DateTimePickerFilter::set_date_label(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.6.16+15.04.20150410.3
+ (c++|arch=amd64 ppc64el arm64)"unity::scopes::experimental::DateTimePickerFilter::set_maximum(std::chrono::time_point<std::chrono::_V2::system_clock, std::chrono::duration<long, std::ratio<1l, 1000000000l> > > const&)@Base" 0.6.16+15.04.20150410.3
+ (c++|arch=armhf i386 powerpc)"unity::scopes::experimental::DateTimePickerFilter::set_maximum(std::chrono::time_point<std::chrono::_V2::system_clock, std::chrono::duration<long long, std::ratio<1ll, 1000000000ll> > > const&)@Base" 0.6.16+15.04.20150410.3
+ (c++|arch=amd64 ppc64el arm64)"unity::scopes::experimental::DateTimePickerFilter::set_minimum(std::chrono::time_point<std::chrono::_V2::system_clock, std::chrono::duration<long, std::ratio<1l, 1000000000l> > > const&)@Base" 0.6.16+15.04.20150410.3
+ (c++|arch=armhf i386 powerpc)"unity::scopes::experimental::DateTimePickerFilter::set_minimum(std::chrono::time_point<std::chrono::_V2::system_clock, std::chrono::duration<long long, std::ratio<1ll, 1000000000ll> > > const&)@Base" 0.6.16+15.04.20150410.3
+ (c++)"unity::scopes::experimental::DateTimePickerFilter::set_time_label(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.6.16+15.04.20150410.3
+ (c++)"unity::scopes::experimental::DateTimePickerFilter::time_label() const@Base" 0.6.16+15.04.20150410.3
+ (c++|arch=amd64 ppc64el arm64)"unity::scopes::experimental::DateTimePickerFilter::update_state(unity::scopes::FilterState&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::chrono::time_point<std::chrono::_V2::system_clock, std::chrono::duration<long, std::ratio<1l, 1000000000l> > > const&)@Base" 0.6.16+15.04.20150410.3
+ (c++|arch=armhf i386 powerpc)"unity::scopes::experimental::DateTimePickerFilter::update_state(unity::scopes::FilterState&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::chrono::time_point<std::chrono::_V2::system_clock, std::chrono::duration<long long, std::ratio<1ll, 1000000000ll> > > const&)@Base" 0.6.16+15.04.20150410.3
+ (c++|arch=amd64 ppc64el arm64)"unity::scopes::experimental::DateTimePickerFilter::update_state(unity::scopes::FilterState&, std::chrono::time_point<std::chrono::_V2::system_clock, std::chrono::duration<long, std::ratio<1l, 1000000000l> > > const&) const@Base" 0.6.16+15.04.20150410.3
+ (c++|arch=armhf i386 powerpc)"unity::scopes::experimental::DateTimePickerFilter::update_state(unity::scopes::FilterState&, std::chrono::time_point<std::chrono::_V2::system_clock, std::chrono::duration<long long, std::ratio<1ll, 1000000000ll> > > const&) const@Base" 0.6.16+15.04.20150410.3
  (c++)"unity::scopes::experimental::RadioButtonsFilter::active_option(unity::scopes::FilterState const&) const@Base" 0.5.0+14.10.20140619
  (c++)"unity::scopes::experimental::RadioButtonsFilter::add_option(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.5.0+14.10.20140619
  (c++)"unity::scopes::experimental::RadioButtonsFilter::create(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.5.0+14.10.20140619
@@ -456,7 +456,7 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::internal::RuntimeConfig::trace_channels() const@Base" 0.6.11+15.04.20150119
  (c++)"unity::scopes::internal::RuntimeImpl::async_pool() const@Base" 0.4.3+14.10.20140428
  (c++)"unity::scopes::internal::RuntimeImpl::cache_directory() const@Base" 0.6.14+15.04.20150213
- (c++)"unity::scopes::internal::RuntimeImpl::config_directory() const@Base" 0replaceme
+ (c++)"unity::scopes::internal::RuntimeImpl::config_directory() const@Base" 0.6.16+15.04.20150410.3
  (c++)"unity::scopes::internal::RuntimeImpl::confined() const@Base" 0.6.8+15.04.20141119
  (c++)"unity::scopes::internal::RuntimeImpl::confinement_type() const@Base" 0.6.8+15.04.20141119
  (c++)"unity::scopes::internal::RuntimeImpl::create(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
@@ -516,9 +516,9 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::internal::ScopeImpl::runtime() const@Base" 0.6.12+15.04.20150127.2
  (c++)"unity::scopes::internal::ScopeImpl::~ScopeImpl()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeImpl::ScopeImpl(std::shared_ptr<unity::scopes::internal::MWScope> const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.6.11+15.04.20150119
- (c++)"unity::scopes::internal::ScopeImpl::search(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::FilterState const&, std::unique_ptr<unity::scopes::Variant, std::default_delete<unity::scopes::Variant> >, unity::scopes::SearchMetadata const&, std::vector<std::tuple<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::tuple<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > > const&, std::shared_ptr<unity::scopes::SearchListenerBase> const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeImpl::search(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::FilterState const&, std::unique_ptr<unity::scopes::Variant, std::default_delete<unity::scopes::Variant> >, unity::scopes::SearchMetadata const&, std::vector<std::tuple<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::tuple<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > > const&, std::shared_ptr<unity::scopes::SearchListenerBase> const&)@Base" 0.6.16+15.04.20150410.3
  (c++)"unity::scopes::internal::ScopeImpl::search(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::FilterState const&, unity::scopes::SearchMetadata const&, std::shared_ptr<unity::scopes::SearchListenerBase> const&)@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::internal::ScopeImpl::search(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::FilterState const&, unity::scopes::Variant const&, unity::scopes::SearchMetadata const&, std::shared_ptr<unity::scopes::SearchListenerBase> const&)@Base" 0replaceme
+ (c++)"unity::scopes::internal::ScopeImpl::search(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::FilterState const&, unity::scopes::Variant const&, unity::scopes::SearchMetadata const&, std::shared_ptr<unity::scopes::SearchListenerBase> const&)@Base" 0.6.16+15.04.20150410.3
  (c++)"unity::scopes::internal::ScopeImpl::search(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::FilterState const&, unity::scopes::SearchMetadata const&, std::shared_ptr<unity::scopes::SearchListenerBase> const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeImpl::search(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::SearchMetadata const&, std::shared_ptr<unity::scopes::SearchListenerBase> const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::ScopeImpl::search(unity::scopes::CannedQuery const&, unity::scopes::SearchMetadata const&, std::vector<std::tuple<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::tuple<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> > > > > const&, std::shared_ptr<unity::scopes::SearchListenerBase> const&)@Base" 0.6.12+15.04.20150127.2
@@ -872,7 +872,7 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::SearchMetadata::operator[](std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::SearchMetadata::operator=(unity::scopes::SearchMetadata&&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::SearchMetadata::operator=(unity::scopes::SearchMetadata const&)@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::SearchMetadata::remove_location()@Base" 0replaceme
+ (c++)"unity::scopes::SearchMetadata::remove_location()@Base" 0.6.16+15.04.20150410.3
  (c++)"unity::scopes::SearchMetadata::~SearchMetadata()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::SearchMetadata::SearchMetadata(int, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::SearchMetadata::SearchMetadata(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
@@ -892,12 +892,12 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::SearchQueryBase::set_department_id(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.5.0+14.10.20140619
  (c++)"unity::scopes::SearchQueryBase::subsearch(std::shared_ptr<unity::scopes::Scope> const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::FilterState const&, std::shared_ptr<unity::scopes::SearchListenerBase> const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::SearchQueryBase::subsearch(std::shared_ptr<unity::scopes::Scope> const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::FilterState const&, unity::scopes::SearchMetadata const&, std::shared_ptr<unity::scopes::SearchListenerBase> const&)@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::SearchQueryBase::subsearch(std::shared_ptr<unity::scopes::Scope> const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::FilterState const&, unity::scopes::Variant const&, unity::scopes::SearchMetadata const&, std::shared_ptr<unity::scopes::SearchListenerBase> const&)@Base" 0replaceme
+ (c++)"unity::scopes::SearchQueryBase::subsearch(std::shared_ptr<unity::scopes::Scope> const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::FilterState const&, unity::scopes::Variant const&, unity::scopes::SearchMetadata const&, std::shared_ptr<unity::scopes::SearchListenerBase> const&)@Base" 0.6.16+15.04.20150410.3
  (c++)"unity::scopes::SearchQueryBase::subsearch(std::shared_ptr<unity::scopes::Scope> const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::shared_ptr<unity::scopes::SearchListenerBase> const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::SearchQueryBase::subsearch(std::shared_ptr<unity::scopes::Scope> const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::FilterState const&, std::shared_ptr<unity::scopes::SearchListenerBase> const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::SearchQueryBase::subsearch(unity::scopes::ChildScope const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::FilterState const&, std::shared_ptr<unity::scopes::SearchListenerBase> const&)@Base" 0.6.15+15.04.20150407
  (c++)"unity::scopes::SearchQueryBase::subsearch(unity::scopes::ChildScope const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::FilterState const&, unity::scopes::SearchMetadata const&, std::shared_ptr<unity::scopes::SearchListenerBase> const&)@Base" 0.6.15+15.04.20150407
- (c++)"unity::scopes::SearchQueryBase::subsearch(unity::scopes::ChildScope const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::FilterState const&, unity::scopes::Variant const&, unity::scopes::SearchMetadata const&, std::shared_ptr<unity::scopes::SearchListenerBase> const&)@Base" 0replaceme
+ (c++)"unity::scopes::SearchQueryBase::subsearch(unity::scopes::ChildScope const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unity::scopes::FilterState const&, unity::scopes::Variant const&, unity::scopes::SearchMetadata const&, std::shared_ptr<unity::scopes::SearchListenerBase> const&)@Base" 0.6.16+15.04.20150410.3
  (c++)"unity::scopes::SearchQueryBase::subsearch(unity::scopes::ChildScope const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::shared_ptr<unity::scopes::SearchListenerBase> const&)@Base" 0.6.15+15.04.20150407
  (c++)"unity::scopes::SearchReply::~SearchReply()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::SearchReply::SearchReply()@Base" 0.4.0+14.04.20140312.1
@@ -987,7 +987,7 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::Variant::get_bool() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Variant::get_dict() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Variant::get_double() const@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::Variant::get_int64_t() const@Base" 0replaceme
+ (c++)"unity::scopes::Variant::get_int64_t() const@Base" 0.6.16+15.04.20150410.3
  (c++)"unity::scopes::Variant::get_int() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Variant::get_string() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Variant::is_null() const@Base" 0.4.0+14.04.20140312.1
@@ -996,8 +996,8 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::Variant::operator=(char const*)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Variant::operator=(double)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Variant::operator=(int)@Base" 0.4.0+14.04.20140312.1
- (c++|arch=amd64)"unity::scopes::Variant::operator=(long)@Base" 0replaceme
- (c++|arch=armhf i386)"unity::scopes::Variant::operator=(long long)@Base" 0replaceme
+ (c++|arch=amd64 ppc64el arm64)"unity::scopes::Variant::operator=(long)@Base" 0.6.16+15.04.20150410.3
+ (c++|arch=armhf i386 powerpc)"unity::scopes::Variant::operator=(long long)@Base" 0.6.16+15.04.20150410.3
  (c++)"unity::scopes::Variant::operator=(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Variant::operator=(std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unity::scopes::Variant> > > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Variant::operator=(std::vector<unity::scopes::Variant, std::allocator<unity::scopes::Variant> > const&)@Base" 0.4.0+14.04.20140312.1
@@ -1013,8 +1013,8 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::Variant::Variant(char const*)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Variant::Variant(double)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Variant::Variant(int)@Base" 0.4.0+14.04.20140312.1
- (c++|arch=amd64)"unity::scopes::Variant::Variant(long)@Base" 0replaceme
- (c++|arch=armhf i386)"unity::scopes::Variant::Variant(long long)@Base" 0replaceme
+ (c++|arch=amd64 ppc64el arm64)"unity::scopes::Variant::Variant(long)@Base" 0.6.16+15.04.20150410.3
+ (c++|arch=armhf i386 powerpc)"unity::scopes::Variant::Variant(long long)@Base" 0.6.16+15.04.20150410.3
  (c++)"unity::scopes::Variant::Variant(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Variant::Variant(std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unity::scopes::Variant> > > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Variant::Variant(std::vector<unity::scopes::Variant, std::allocator<unity::scopes::Variant> > const&)@Base" 0.4.0+14.04.20140312.1
@@ -1048,7 +1048,7 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"vtable for unity::scopes::CategoryRenderer@Base" 0.4.0+14.04.20140312.1
  (c++)"vtable for unity::scopes::ConfigException@Base" 0.4.0+14.04.20140312.1
  (c++)"vtable for unity::scopes::experimental::Annotation@Base" 0.5.0+14.10.20140619
- (c++)"vtable for unity::scopes::experimental::DateTimePickerFilter@Base" 0replaceme
+ (c++)"vtable for unity::scopes::experimental::DateTimePickerFilter@Base" 0.6.16+15.04.20150410.3
  (c++)"vtable for unity::scopes::experimental::RadioButtonsFilter@Base" 0.5.0+14.10.20140619
  (c++)"vtable for unity::scopes::experimental::RangeInputFilter@Base" 0.5.0+14.10.20140619
  (c++)"vtable for unity::scopes::experimental::RatingFilter@Base" 0.5.0+14.10.20140619
