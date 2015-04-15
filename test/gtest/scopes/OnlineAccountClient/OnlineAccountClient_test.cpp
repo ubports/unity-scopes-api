@@ -307,7 +307,9 @@ TEST_F(OnlineAccountClientTest, register_account_login_result)
     auto cat = reg.register_category("1", "title", "icon", nullptr, CategoryRenderer());
     CategorisedResult result(cat);
 
+    EXPECT_FALSE(result.is_account_login_result());
     oa_client.register_account_login_item(result, CannedQuery("test"), OnlineAccountClient::InvalidateResults, OnlineAccountClient::DoNothing);
+    EXPECT_TRUE(result.is_account_login_result());
 
     EXPECT_TRUE(result.contains("online_account_details"));
 
