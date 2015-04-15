@@ -1,6 +1,10 @@
 Release notes
 =============
 
+Changes in version 0.6.17
+=========================
+  - Added is_account_login_result() method to Result class.
+
 Changes in version 0.6.16
 =========================
   - Added support for attaching arbitrary data to CannedQuery.
@@ -8,7 +12,6 @@ Changes in version 0.6.16
     is finalized. Further changes in the unity::scopes::qt namespace are
     expected at this point.
   - Added DateTimePickerFilter into experimental namespace.
-  - Added is_account_login_result() method to Result class.
 
 Changes in version 0.6.15
 =========================
