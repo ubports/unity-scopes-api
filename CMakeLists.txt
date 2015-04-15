@@ -70,7 +70,7 @@ pkg_check_modules(JSONCPP jsoncpp REQUIRED)
 pkg_check_modules(LIBACCOUNTS libaccounts-glib REQUIRED)
 pkg_check_modules(LIBSIGNON libsignon-glib REQUIRED)
 pkg_check_modules(ZMQLIB libzmq REQUIRED)
-pkg_check_modules(NET_CPP net-cpp REQUIRED)
+pkg_check_modules(NET_CPP net-cpp>=1.2.0 REQUIRED)
 
 find_library(ZMQPPLIB zmqpp)
 if(NOT ZMQPPLIB)
