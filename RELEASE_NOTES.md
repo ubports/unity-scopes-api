@@ -1,6 +1,10 @@
 Release notes
 =============
 
+Changes in version 0.6.17
+=========================
+  - Added is_account_login_result() method to Result class.
+
 Changes in version 0.6.16
 =========================
   - Added support for attaching arbitrary data to CannedQuery.

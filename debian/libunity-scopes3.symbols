@@ -781,6 +781,7 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::Result::direct_activation() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Result::dnd_uri() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Result::has_stored_result() const@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::Result::is_account_login_result() const@Base" 0replaceme
  (c++)"unity::scopes::Result::operator[](std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Result::operator[](std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Result::operator=(unity::scopes::Result&&)@Base" 0.4.0+14.04.20140312.1
