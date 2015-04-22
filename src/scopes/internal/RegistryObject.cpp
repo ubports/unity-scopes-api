@@ -64,7 +64,6 @@ RegistryObject::RegistryObject(core::posix::ChildProcess::DeathObserver& death_o
               on_process_death(cp);
           })
       },
-      publisher_notify_interrupt_(false),
       state_receiver_(new StateReceiverObject()),
       state_receiver_connection_
       {
@@ -75,7 +74,8 @@ RegistryObject::RegistryObject(core::posix::ChildProcess::DeathObserver& death_o
           })
       },
       executor_(executor),
-      generate_desktop_files_(generate_desktop_files)
+      generate_desktop_files_(generate_desktop_files),
+      publisher_notify_interrupt_(false)
 {
     if (middleware)
     {
@@ -107,7 +107,7 @@ RegistryObject::~RegistryObject()
         lock_guard<decltype(mutex_)> lock(mutex_);
     }
 
-    if (publisher_notify_thread_)
+    if (publisher_notify_thread_ && publisher_notify_thread_->joinable())
     {
         publisher_notify_interrupt_ = true;
         publisher_notify_cond_.notify_one();
@@ -341,7 +341,7 @@ bool RegistryObject::remove_local_scope(std::string const& scope_id)
         {
             publisher_notify_interrupt_ = true;
             lock.unlock();
-            publisher_notify_cond_.notify_all();
+            publisher_notify_cond_.notify_one();
             if (publisher_notify_thread_->joinable())
             {
                 publisher_notify_thread_->join();
