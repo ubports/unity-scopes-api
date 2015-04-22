@@ -1315,6 +1315,9 @@ The `Keywords` key is optional, but we recommend that you use it. Keywords are u
 similar type (E.g. The Music scope will aggregate scopes with the keyword "music", and so on). The value of `Keywords` should specify a
 list of keywords your scope falls under. Like `ChildScopes`, this value must be a semicolon separated list (E.g. `Keywords = music;video`).
 
+\note Please refer to the <a href="https://developer.ubuntu.com/en/scopes/tutorials/scope-keywords/">Scope Keywords</a>
+tutorial document for more detail on using keywords in your scope.
+
 \subsection scopetool The scope tool
 
 The Unity Scope Tool is a stand-alone redering tool that allows you
