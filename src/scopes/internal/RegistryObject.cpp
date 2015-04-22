@@ -37,6 +37,7 @@ using namespace std;
 
 static const char* c_debug_dbus_started_cmd = "dbus-send --type=method_call --dest=com.ubuntu.SDKAppLaunch /ScopeRegistryCallback com.ubuntu.SDKAppLaunch.ScopeLoaded";
 static const char* c_debug_dbus_stopped_cmd = "dbus-send --type=method_call --dest=com.ubuntu.SDKAppLaunch /ScopeRegistryCallback com.ubuntu.SDKAppLaunch.ScopeStopped";
+static const int removal_notification_delay_secs = 1;
 
 namespace unity
 {
@@ -103,6 +104,13 @@ RegistryObject::~RegistryObject()
         // The destructor may be called from an arbitrary
         // thread, so we need a full fence here.
         lock_guard<decltype(mutex_)> lock(mutex_);
+    }
+
+    if (publisher_notify_thread_)
+    {
+        publisher_notify_interrupt_ = true;
+        publisher_notify_cond_.notify_one();
+        publisher_notify_thread_->join();
     }
 
     // kill all scope processes
@@ -322,8 +330,41 @@ bool RegistryObject::remove_local_scope(std::string const& scope_id)
 
     if (publisher_ && erased)
     {
-        // Send a blank message to subscribers to inform them that the registry has been updated
-        publisher_->send_message("");
+        // Send a blank message to subscribers to inform them that the registry has been updated.
+        // Delay notification so that scope is not seen as removed and then added when updated.
+        unique_lock<decltype(mutex_)> lock(mutex_);
+        publisher_notify_timepoint_ = chrono::system_clock::now() + chrono::seconds(removal_notification_delay_secs);
+
+        // if thread is already running, wake it up
+        if (publisher_notify_thread_)
+        {
+            publisher_notify_interrupt_ = true;
+            publisher_notify_cond_.notify_all();
+            if (publisher_notify_thread_->joinable())
+            {
+                BOOST_LOG(logger_) << "RegistryObject(): waiting for old notify thread"; //FIXME
+                publisher_notify_thread_->join();
+            }
+            publisher_notify_interrupt_ = false;
+        }
+
+        publisher_notify_thread_.reset(new thread([this] {
+                    BOOST_LOG(logger_) << "RegistryObject(): in thread"; //FIXME
+                    unique_lock<decltype(mutex_)> lock(mutex_);
+                    publisher_notify_cond_.wait_until(lock, publisher_notify_timepoint_, [this]() -> bool {
+                        bool status = publisher_notify_interrupt_ || chrono::system_clock::now() >= publisher_notify_timepoint_;
+                        BOOST_LOG(logger_) << "RegistryObject(): in thread pred:" << status; //FIXME
+                        return status;
+                    });
+
+                    if (chrono::system_clock::now() >= publisher_notify_timepoint_) // else do nothing (woken up prematurely, new thread will be started)
+                    {
+                        BOOST_LOG(logger_) << "RegistryObject(): publisher"; //FIXME
+                        publisher_->send_message("");
+                    } else {
+                        BOOST_LOG(logger_) << "RegistryObject(): premature!!"; //FIXME
+                    }
+                }));
     }
 
     if (ex)
