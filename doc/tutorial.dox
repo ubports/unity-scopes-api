@@ -651,8 +651,9 @@ ChildScopeList MyScope::find_child_scopes() const override
 To send a query to another scope, use one of the `subsearch()` overloads of \link unity::scopes::SearchQueryBase\endlink
 inside your implementation of
 \link unity::scopes::SearchQueryBase::run SearchQueryBase::run()\endlink.
-This method requires the proxy to the child scope to query, the query details (\link unity::scopes::CannedQuery CannedQuery\endlink), plus
-an instance of your `SearchListenerBase` implementation that will receive the query results.
+This method requires a handle to the child scope to query (either via proxy or ChildScope handle), the query details
+(\link unity::scopes::CannedQuery CannedQuery\endlink), plus an instance of your `SearchListenerBase` implementation
+that will receive the query results.
 
 \note `subsearch()` is identical to
 \link unity::scopes::ScopeBase::search search()\endlink but, for `subsearch()`, the scopes run time transparently
@@ -661,11 +662,19 @@ does not need to forward cancellation to its children.
 (However, your query class still needs to react to cancellation and should terminate the current query
 is quickly as possible in response to a cancelled message.)
 
+You should always call \link unity::scopes::ScopeBase::child_scopes ScopeBase::child_scopes()\endlink from within your
+aggregator's \link unity::scopes::ScopeBase::search search()\endlink method in order to retrieve the latest child
+scopes list containing the most recent "enabled" states. You can then pass this list into your instantiation of
+SearchQueryBase for later use.
+
+\note An aggregator must respect the "enabled" states of its child scopes, querying only the child scopes that are
+enabled.
+
 Here is how you could implement an aggregating scope that passes a query to a single child scope "scope-A":
 
 \code{.cpp}
 
-void MyScope::start(std::string const& scope_id) override
+ChildScopeList MyScope::find_child_scopes() const override
 {
     auto reg = registry();  // Up-call into base class
     if (!reg)
@@ -673,21 +682,23 @@ void MyScope::start(std::string const& scope_id) override
         throw ConfigException(scope_id + ": No registry available, cannot locate child scopes");
     }
 
+    ChildScopeList list;
     try
     {
         auto meta = reg->get_metadata("scope-A");
-        scope_to_query_ = meta.proxy(); // store the proxy for passing it further in search 
+        list.emplace_back(ChildScope{"scope-A",  meta});
     }
     catch (NotFoundException const& e)
     {
         ...
     }
+    return list;
 }
 
 QueryBase::UPtr MyScope::search(CannedQuery const& query,
                                 SearchMetadata const& metadata)
 {
-    SearchQueryBase::UPtr q(new MyQuery(query, metadata, scope_to_query_));
+    SearchQueryBase::UPtr q(new MyQuery(query, metadata, child_scopes()));
     return q;
 }
 
@@ -695,9 +706,13 @@ QueryBase::UPtr MyScope::search(CannedQuery const& query,
 
 void MyQuery::run(SearchReplyProxy const& upstream_reply) 
 {
-    auto category = reply->register_category("recommended", "Recommended", icon, "");
-    SearchListenerBase::SPtr reply(new MyReceiver(upstream_reply, category));
-    subsearch(scope_to_query_, query_, reply);
+    // Continue only if our child scope is installed AND enabled
+    if (!child_scopes_.empty() && child_scopes_.front().enabled)
+    {
+        auto category = reply->register_category("recommended", "Recommended", icon, "");
+        SearchListenerBase::SPtr reply(new MyReceiver(upstream_reply, category));
+        subsearch(child_scopes_.front(), query_, reply);
+    }
 }
 \endcode
 
