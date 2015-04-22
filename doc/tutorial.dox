@@ -217,6 +217,51 @@ Cardinality is the maximum number of results expected from a query (a value of 0
 do not return more results than indicated by the cardinality. If you more than the requested number of results, you are
 wasting resources. (The scopes run time ignores the additional results.)
 
+\paragraph handlingaggregation Handling aggregation
+
+As previously stated, SearchMetadata contains additional information about the search requests you receive, including
+the methods:
+
+<ul>
+<li>\link unity::scopes::SearchMetadata::is_aggregated is_aggregated()\endlink - true if the request was initiated by
+    an aggregator,
+<li>and \link unity::scopes::SearchMetadata::aggregated_keywords aggregated_keywords()\endlink - the list of keywords
+    used by the aggregator to find your scope.
+</ul>
+
+\note Please refer to the <a href="https://developer.ubuntu.com/en/scopes/tutorials/scope-keywords/">Scope Keywords</a>
+tutorial document for more detail on using keywords in your scope.
+
+You can use the is_aggregated() method from within
+\link unity::scopes::SearchQueryBase::run SearchQueryBase::run()\endlink in order to ensure that an appropriate set of
+results are returned when queried by an aggregator:
+
+\code{.cpp}
+void MyQuery::run(SearchReplyProxy const& reply)
+{
+    if (metadata_.is_aggregated())
+    {
+        auto category = reply->register_category("agg_cat",
+                                                 "MyScope Featured",
+                                                 agg_icon);
+        do_aggregated_search(reply, category);
+    }
+    else
+    {
+        do_normal_search(reply);
+    }
+}
+\endcode
+
+You may notice in the code snippet above that for each aggregated search we receive, we register a specific results
+category. Although aggregators may be willing to accept more than one category from its child scopes, they are only
+required to accept the first.
+
+Thereafter, an aggregator may choose to ignore any additional categories the child scope registers. It is therefore
+recommended that scope authors follow the above method of handling aggregated searches. It is also recommended that
+your scope provide a decent category title (e.g. "MyScope Featured"). An aggregator is likely to display this category
+title as is within its result set, so try to keep it clean and descriptive.
+
 \paragraph surfacingmode Surfacing mode
 
 The query string may be the empty string. If so, the UI is asking your scope to produce default results
@@ -549,7 +594,7 @@ To receive results from its child scopes, your scope must implement a class that
 of this class to each sub-query; the scopes run time invokes callback methods on this class
 to let you know when a new result or status update arrives, and when a query completes.
 
-\paragraph childscopes Locating child scopes
+\paragraph childscopes Finding child scopes
 
 To send queries to its child scopes, your scope must obtain a proxy for each child scope. The scopes run time
 runs a registry process. The job of the registry (among other things) is to provide information about available
@@ -560,13 +605,55 @@ on the registry, supplying the ID of the child scope. The return value is an ins
 \link unity::scopes::ScopeMetadata ScopeMetadata\endlink that describes the scope and also provides access to the
 proxy for the scope.
 
+You can also aggregate scopes indirectly via keyword(s). Keywords describe the type of content a scope provides (e.g.
+a scope with the keyword "music" will return music results, the "video" keyword indicates video content, and so on).
+You can obtain child scopes via keywords by calling \link unity::scopes::Registry::list_if list_if()\endlink on the
+registry, supplying a predicate function. The return value is a map containing only those scopes for which the predicate
+returns true. Therefore, your predicate function should return true for all scopes matching the keyword(s) you wish to
+aggregate.
+
+\note Please refer to the <a href="https://developer.ubuntu.com/en/scopes/tutorials/scope-keywords/">Scope Keywords</a>
+tutorial document for a list of recommended keywords to use.
+
+As an aggregator scope author you must provide an implementation of the virtual
+\link unity::scopes::ScopeBase::find_child_scopes ScopeBase::find_child_scopes()\endlink method. All logic for finding
+your aggregator's child scopes should be implemented within this method. The return value is of type
+\link unity::scopes::ChildScopeList ChildScopeList\endlink and must contain an instance of
+\link unity::scopes::ChildScope ChildScope\endlink for each scope your aggregator may collect results from.
+
+Here is how you could implement find_child_scopes() to return all scopes in the registry that contain the keywords
+"sports" and "news":
+
+\code{.cpp}
+ChildScopeList MyScope::find_child_scopes() const override
+{
+    auto sportsnews_scopes = registry()->list_if([](ScopeMetadata const& item)
+    {
+        auto keywords = item.keywords();
+        return (keywords.find("sports") != keywords.end()) &&
+               (keywords.find("news") != keywords.end());
+    });
+
+    ChildScopeList list;
+    for (auto const& sportsnews_scope : sportsnews_scopes)
+    {
+        list.emplace_back(ChildScope{sportsnews_scope.first,  // Child scope ID
+                                     sportsnews_scope.second, // Child scope metadata
+                                     true,                    // Default enabled state (when first discovered)
+                                     {"sports", "news"}});    // Keywords used to aggregate this scope
+    }
+    return list;
+}
+\endcode
+
 \paragraph subquery Sub-queries
 
 To send a query to another scope, use one of the `subsearch()` overloads of \link unity::scopes::SearchQueryBase\endlink
 inside your implementation of
 \link unity::scopes::SearchQueryBase::run SearchQueryBase::run()\endlink.
-This method requires the proxy to the child scope to query, the query details (\link unity::scopes::CannedQuery CannedQuery\endlink), plus
-an instance of your `SearchListenerBase` implementation that will receive the query results.
+This method requires a handle to the child scope to query (either via proxy or ChildScope handle), the query details
+(\link unity::scopes::CannedQuery CannedQuery\endlink), plus an instance of your `SearchListenerBase` implementation
+that will receive the query results.
 
 \note `subsearch()` is identical to
 \link unity::scopes::ScopeBase::search search()\endlink but, for `subsearch()`, the scopes run time transparently
@@ -575,11 +662,19 @@ does not need to forward cancellation to its children.
 (However, your query class still needs to react to cancellation and should terminate the current query
 is quickly as possible in response to a cancelled message.)
 
+You should always call \link unity::scopes::ScopeBase::child_scopes ScopeBase::child_scopes()\endlink from within your
+aggregator's \link unity::scopes::ScopeBase::search search()\endlink method in order to retrieve the latest child
+scopes list containing the most recent "enabled" states. You can then pass this list into your instantiation of
+SearchQueryBase for later use.
+
+\note An aggregator must respect the "enabled" states of its child scopes, querying only the child scopes that are
+enabled.
+
 Here is how you could implement an aggregating scope that passes a query to a single child scope "scope-A":
 
 \code{.cpp}
 
-void MyScope::start(std::string const& scope_id) override
+ChildScopeList MyScope::find_child_scopes() const override
 {
     auto reg = registry();  // Up-call into base class
     if (!reg)
@@ -587,21 +682,23 @@ void MyScope::start(std::string const& scope_id) override
         throw ConfigException(scope_id + ": No registry available, cannot locate child scopes");
     }
 
+    ChildScopeList list;
     try
     {
         auto meta = reg->get_metadata("scope-A");
-        scope_to_query_ = meta.proxy(); // store the proxy for passing it further in search 
+        list.emplace_back(ChildScope{"scope-A",  meta});
     }
     catch (NotFoundException const& e)
     {
         ...
     }
+    return list;
 }
 
 QueryBase::UPtr MyScope::search(CannedQuery const& query,
                                 SearchMetadata const& metadata)
 {
-    SearchQueryBase::UPtr q(new MyQuery(query, metadata, scope_to_query_));
+    SearchQueryBase::UPtr q(new MyQuery(query, metadata, child_scopes()));
     return q;
 }
 
@@ -609,9 +706,13 @@ QueryBase::UPtr MyScope::search(CannedQuery const& query,
 
 void MyQuery::run(SearchReplyProxy const& upstream_reply) 
 {
-    auto category = reply->register_category("recommended", "Recommended", icon, "");
-    SearchListenerBase::SPtr reply(new MyReceiver(upstream_reply, category));
-    subsearch(scope_to_query_, query_, reply);
+    // Continue only if our child scope is installed AND enabled
+    if (!child_scopes_.empty() && child_scopes_.front().enabled)
+    {
+        auto category = reply->register_category("recommended", "Recommended", icon, "");
+        SearchListenerBase::SPtr reply(new MyReceiver(upstream_reply, category));
+        subsearch(child_scopes_.front(), query_, reply);
+    }
 }
 \endcode
 
@@ -1213,6 +1314,9 @@ This list of scopes is translated to the names of children scopes when in the sc
 The `Keywords` key is optional, but we recommend that you use it. Keywords are used by aggregators to collect results from scopes of
 similar type (E.g. The Music scope will aggregate scopes with the keyword "music", and so on). The value of `Keywords` should specify a
 list of keywords your scope falls under. Like `ChildScopes`, this value must be a semicolon separated list (E.g. `Keywords = music;video`).
+
+\note Please refer to the <a href="https://developer.ubuntu.com/en/scopes/tutorials/scope-keywords/">Scope Keywords</a>
+tutorial document for more detail on using keywords in your scope.
 
 \subsection scopetool The scope tool
 
