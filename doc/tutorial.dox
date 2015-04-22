@@ -594,7 +594,7 @@ To receive results from its child scopes, your scope must implement a class that
 of this class to each sub-query; the scopes run time invokes callback methods on this class
 to let you know when a new result or status update arrives, and when a query completes.
 
-\paragraph childscopes Locating child scopes
+\paragraph childscopes Finding child scopes
 
 To send queries to its child scopes, your scope must obtain a proxy for each child scope. The scopes run time
 runs a registry process. The job of the registry (among other things) is to provide information about available
@@ -604,6 +604,47 @@ You can obtain the proxy for a child scope by calling  \link unity::scopes::Regi
 on the registry, supplying the ID of the child scope. The return value is an instance of type
 \link unity::scopes::ScopeMetadata ScopeMetadata\endlink that describes the scope and also provides access to the
 proxy for the scope.
+
+You can also aggregate scopes indirectly via keyword(s). Keywords describe the type of content a scope provides (e.g.
+a scope with the keyword "music" will return music results, the "video" keyword indicates video content, and so on).
+You can obtain child scopes via keywords by calling \link unity::scopes::Registry::list_if list_if()\endlink on the
+registry, supplying a predicate function. The return value is a map containing only those scopes for which the predicate
+returns true. Therefore, your predicate function should return true for all scopes matching the keyword(s) you wish to
+aggregate.
+
+\note Please refer to the <a href="https://developer.ubuntu.com/en/scopes/tutorials/scope-keywords/">Scope Keywords</a>
+tutorial document for a list of recommended keywords to use.
+
+As an aggregator scope author you must provide an implementation of the virtual
+\link unity::scopes::ScopeBase::find_child_scopes ScopeBase::find_child_scopes()\endlink method. All logic for finding
+your aggregator's child scopes should be implemented within this method. The return value is of type
+\link unity::scopes::ChildScopeList ChildScopeList\endlink and must contain an instance of
+\link unity::scopes::ChildScope ChildScope\endlink for each scope your aggregator may collect results from.
+
+Here is how you could implement find_child_scopes() to return all scopes in the registry that contain the keywords
+"sports" and "news":
+
+\code{.cpp}
+ChildScopeList MyScope::find_child_scopes() const override
+{
+    auto sportsnews_scopes = registry()->list_if([](ScopeMetadata const& item)
+    {
+        auto keywords = item.keywords();
+        return (keywords.find("sports") != keywords.end()) &&
+               (keywords.find("news") != keywords.end());
+    });
+
+    ChildScopeList list;
+    for (auto const& sportsnews_scope : sportsnews_scopes)
+    {
+        list.emplace_back(ChildScope{sportsnews_scope.first,  // Child scope ID
+                                     sportsnews_scope.second, // Child scope metadata
+                                     true,                    // Default enabled state (when first discovered)
+                                     {"sports", "news"}});    // Keywords used to aggregate this scope
+    }
+    return list;
+}
+\endcode
 
 \paragraph subquery Sub-queries
 
