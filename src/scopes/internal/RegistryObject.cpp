@@ -37,7 +37,7 @@ using namespace std;
 
 static const char* c_debug_dbus_started_cmd = "dbus-send --type=method_call --dest=com.ubuntu.SDKAppLaunch /ScopeRegistryCallback com.ubuntu.SDKAppLaunch.ScopeLoaded";
 static const char* c_debug_dbus_stopped_cmd = "dbus-send --type=method_call --dest=com.ubuntu.SDKAppLaunch /ScopeRegistryCallback com.ubuntu.SDKAppLaunch.ScopeStopped";
-static const std::chrono::seconds removal_notification_delay_secs(3);
+static const std::chrono::seconds removal_notification_delay_secs(5);
 
 namespace unity
 {
