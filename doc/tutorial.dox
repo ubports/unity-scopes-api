@@ -217,6 +217,51 @@ Cardinality is the maximum number of results expected from a query (a value of 0
 do not return more results than indicated by the cardinality. If you more than the requested number of results, you are
 wasting resources. (The scopes run time ignores the additional results.)
 
+\paragraph handlingaggregation Handling aggregation
+
+As previously stated, SearchMetadata contains additional information about the search requests you receive, including
+the methods:
+
+<ul>
+<li>\link unity::scopes::SearchMetadata::is_aggregated is_aggregated()\endlink - true if the request was initiated by
+    an aggregator,
+<li>and \link unity::scopes::SearchMetadata::aggregated_keywords aggregated_keywords()\endlink - the list of keywords
+    used by the aggregator to find your scope.
+</ul>
+
+\note Please refer to the <a href="https://developer.ubuntu.com/en/scopes/tutorials/scope-keywords/">Scope Keywords</a>
+tutorial document for more detail on using keywords in your scope.
+
+You can use the is_aggregated() method from within
+\link unity::scopes::SearchQueryBase::run SearchQueryBase::run()\endlink in order to ensure that an appropriate set of
+results are returned when queried by an aggregator:
+
+\code{.cpp}
+void MyQuery::run(SearchReplyProxy const& reply)
+{
+    if (metadata_.is_aggregated())
+    {
+        auto category = reply->register_category("agg_cat",
+                                                 "MyScope Featured",
+                                                 agg_icon);
+        do_aggregated_search(reply, category);
+    }
+    else
+    {
+        do_normal_search(reply);
+    }
+}
+\endcode
+
+You may notice in the code snippet above that for each aggregated search we receive, we register a specific results
+category. Although aggregators may be willing to accept more than one category from its child scopes, they are only
+required to accept the first.
+
+Thereafter, an aggregator may choose to ignore any additional categories the child scope registers. It is therefore
+recommended that scope authors follow the above method of handling aggregated searches. It is also recommended that
+your scope provide a decent category title (e.g. "MyScope Featured"). An aggregator is likely to display this category
+title as is within its result set, so try to keep it clean and descriptive.
+
 \paragraph surfacingmode Surfacing mode
 
 The query string may be the empty string. If so, the UI is asking your scope to produce default results
