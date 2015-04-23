@@ -1,3 +1,13 @@
+unity-scopes-api (0.6.17-0ubuntu1) UNRELEASED; urgency=medium
+
+  [ Marcus Tomlinson ]
+  * Added is_account_login_result() method to Result class.
+
+  [ Pawel Stolowski ]
+  * Fix LP: #1446499.
+
+ -- Marcus Tomlinson <marcus.tomlinson@canonical.com>  Wed, 15 Apr 2015 17:22:07 +0200
+
 unity-scopes-api (0.6.16+15.04.20150410.3-0ubuntu1) vivid; urgency=medium
 
   [ Pawel Stolowski ]

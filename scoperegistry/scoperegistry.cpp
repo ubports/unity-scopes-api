@@ -26,13 +26,13 @@
 #include <unity/scopes/internal/ScopeConfig.h>
 #include <unity/scopes/internal/ScopeImpl.h>
 #include <unity/scopes/internal/ScopeMetadataImpl.h>
+#include <unity/scopes/internal/Utils.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 
+#include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
-#include <boost/filesystem/operations.hpp>
 
-#include <sys/stat.h>  // TODO: remove this once hack for creating data root dir is removed
 #include <wordexp.h>
 
 using namespace scoperegistry;
@@ -535,28 +535,17 @@ int main(int argc, char* argv[])
             identity = runtime->registry_identity();
             ss_reg_id = runtime->ss_registry_identity();
 
-            // TODO: HACK: We create the root of the cache and app directories for
-            //       confined scopes, in case the scope is confined and the dir doesn't
-            //       exist yet. This really should be done by the click-installation but,
-            //       prior to RTM, we don't rely on that.
-            boost::system::error_code ec;
-
+            // Make sure that the cache and app directories exist.
             string cache_root = rt_config.cache_directory() + "/leaf-net";
-            !boost::filesystem::exists(cache_root, ec) && ::mkdir(cache_root.c_str(), 0700);
+            make_directories(cache_root, 0700);
 
             string app_root = rt_config.app_directory();
-            !boost::filesystem::exists(app_root, ec) && ::mkdir(app_root.c_str(), 0700);
+            make_directories(app_root, 0700);
         } // Release memory for config parser
 
-        // Make sure that the parent directories for confined scope tmp directory exist.
-        {
-            string dir = string("/run/user/") + std::to_string(geteuid());
-            dir += "/scopes";
-            boost::system::error_code ec;
-            !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700 | S_ISVTX);
-            dir += "/leaf-net";
-            !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700 | S_ISVTX);
-        }
+        // Make sure that the confined scope tmp directory exists.
+        string tmp_dir = string("/run/user/") + std::to_string(geteuid()) + "/scopes/leaf-net";
+        make_directories(tmp_dir, 0700);
 
         // Collect the registry config data.
 

@@ -16,6 +16,7 @@ global:
         unity::scopes::internal::Executor::*;
         unity::scopes::internal::IniSettingsSchema::*;
         unity::scopes::internal::JsonSettingsSchema::*;
+        unity::scopes::internal::make_directories*;
         unity::scopes::internal::MiddlewareBase::*;
         unity::scopes::internal::MiddlewareFactory::*;
         unity::scopes::internal::RegistryConfig::*;

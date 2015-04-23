@@ -32,7 +32,7 @@ using namespace unity::scopes::internal;
 
 TEST(RuntimeConfig, basic)
 {
-    setenv("HOME", TEST_SRC_DIR, 1);
+    setenv("HOME", TEST_DIR, 1);
 
     RuntimeConfig c("");
     EXPECT_EQ("Registry", c.registry_identity());
@@ -50,7 +50,7 @@ TEST(RuntimeConfig, basic)
 
 TEST(RuntimeConfig, complete)
 {
-    RuntimeConfig c(TEST_SRC_DIR "/Complete.ini");
+    RuntimeConfig c(TEST_DIR "/Complete.ini");
     EXPECT_EQ("R.Id", c.registry_identity());
     EXPECT_EQ("R.Config", c.registry_configfile());
     EXPECT_EQ("SS.R.Id", c.ss_registry_identity());
@@ -70,25 +70,25 @@ TEST(RuntimeConfig, complete)
 
 TEST(RuntimeConfig, _default_cache_dir)
 {
-    setenv("HOME", TEST_SRC_DIR, 1);
+    setenv("HOME", TEST_DIR, 1);
 
     RuntimeConfig c("");
-    EXPECT_EQ(TEST_SRC_DIR "/.local/share/unity-scopes", c.cache_directory());
+    EXPECT_EQ(TEST_DIR "/.local/share/unity-scopes", c.cache_directory());
 }
 
 TEST(RuntimeConfig, overridden_cache_dir)
 {
     unsetenv("HOME");
 
-    RuntimeConfig c(TEST_SRC_DIR "/CacheDir.ini");
+    RuntimeConfig c(TEST_DIR "/CacheDir.ini");
     EXPECT_EQ("cachedir", c.cache_directory());
 }
 
 TEST(RuntimeConfig, overridden_cache_dir_with_home_dir)
 {
-    setenv("HOME", TEST_SRC_DIR, 1);
+    setenv("HOME", TEST_DIR, 1);
 
-    RuntimeConfig c(TEST_SRC_DIR "/CacheDir.ini");
+    RuntimeConfig c(TEST_DIR "/CacheDir.ini");
     EXPECT_EQ("cachedir", c.cache_directory());
 }
 
@@ -96,15 +96,15 @@ TEST(RuntimeConfig, overridden_app_dir)
 {
     unsetenv("HOME");
 
-    RuntimeConfig c(TEST_SRC_DIR "/CacheDir.ini");
+    RuntimeConfig c(TEST_DIR "/CacheDir.ini");
     EXPECT_EQ("appdir", c.app_directory());
 }
 
 TEST(RuntimeConfig, overridden_app_dir_with_home_dir)
 {
-    setenv("HOME", TEST_SRC_DIR, 1);
+    setenv("HOME", TEST_DIR, 1);
 
-    RuntimeConfig c(TEST_SRC_DIR "/ConfigDir.ini");
+    RuntimeConfig c(TEST_DIR "/ConfigDir.ini");
     EXPECT_EQ("appdir", c.app_directory());
 }
 
@@ -112,15 +112,15 @@ TEST(RuntimeConfig, overridden_config_dir)
 {
     unsetenv("HOME");
 
-    RuntimeConfig c(TEST_SRC_DIR "/ConfigDir.ini");
+    RuntimeConfig c(TEST_DIR "/ConfigDir.ini");
     EXPECT_EQ("configdir", c.config_directory());
 }
 
 TEST(RuntimeConfig, overridden_config_dir_with_home_dir)
 {
-    setenv("HOME", TEST_SRC_DIR, 1);
+    setenv("HOME", TEST_DIR, 1);
 
-    RuntimeConfig c(TEST_SRC_DIR "/ConfigDir.ini");
+    RuntimeConfig c(TEST_DIR "/ConfigDir.ini");
     EXPECT_EQ("configdir", c.config_directory());
 }
 
@@ -128,13 +128,13 @@ TEST(RuntimeConfig, overridden_log_dir)
 {
     unsetenv("HOME");
 
-    RuntimeConfig c(TEST_SRC_DIR "/LogDir.ini");
+    RuntimeConfig c(TEST_DIR "/LogDir.ini");
     EXPECT_EQ("logdir", c.log_directory());
 }
 
 TEST(RuntimeConfig, overridden_log_dir_with_home_dir)
 {
-    RuntimeConfig c(TEST_SRC_DIR "/LogDir.ini");
+    RuntimeConfig c(TEST_DIR "/LogDir.ini");
     EXPECT_EQ("logdir", c.log_directory());
 }
 
@@ -142,7 +142,7 @@ TEST(RuntimeConfig, log_dir_env_var_override)
 {
     setenv("UNITY_SCOPES_LOGDIR", "otherdir", 1);
 
-    RuntimeConfig c(TEST_SRC_DIR "/LogDir.ini");
+    RuntimeConfig c(TEST_DIR "/LogDir.ini");
     EXPECT_EQ("otherdir", c.log_directory());
 }
 
@@ -150,7 +150,7 @@ TEST(RuntimeConfig, trace_channels_env_var_override)
 {
     setenv("UNITY_SCOPES_LOG_TRACECHANNELS", "ABC;XYZ;;DEF", 1);
 
-    RuntimeConfig c(TEST_SRC_DIR "/Complete.ini");
+    RuntimeConfig c(TEST_DIR "/Complete.ini");
     EXPECT_EQ((vector<string>{ "ABC", "XYZ", "DEF"}), c.trace_channels());
 }
 
@@ -158,36 +158,36 @@ TEST(RuntimeConfig, exceptions)
 {
     try
     {
-        RuntimeConfig c(TEST_SRC_DIR "/BadMW.ini");
+        RuntimeConfig c(TEST_DIR "/BadMW.ini");
         FAIL();
     }
     catch (ConfigException const& e)
     {
-        EXPECT_STREQ("unity::scopes::ConfigException: \"" TEST_SRC_DIR "/BadMW.ini\": Illegal value for Default.Middleware: "
+        EXPECT_STREQ("unity::scopes::ConfigException: \"" TEST_DIR "/BadMW.ini\": Illegal value for Default.Middleware: "
                      "\"Foo\": legal values are \"Zmq\" and \"REST\"",
                      e.what());
     }
 
     try
     {
-        RuntimeConfig c(TEST_SRC_DIR "/BadReapExpiry.ini");
+        RuntimeConfig c(TEST_DIR "/BadReapExpiry.ini");
         FAIL();
     }
     catch (ConfigException const& e)
     {
-        EXPECT_STREQ("unity::scopes::ConfigException: \"" TEST_SRC_DIR "/BadReapExpiry.ini\": Illegal value (0) for "
+        EXPECT_STREQ("unity::scopes::ConfigException: \"" TEST_DIR "/BadReapExpiry.ini\": Illegal value (0) for "
                      "Reap.Expiry: value must be > 0",
                      e.what());
     }
 
     try
     {
-        RuntimeConfig c(TEST_SRC_DIR "/BadReapInterval.ini");
+        RuntimeConfig c(TEST_DIR "/BadReapInterval.ini");
         FAIL();
     }
     catch (ConfigException const& e)
     {
-        EXPECT_STREQ("unity::scopes::ConfigException: \"" TEST_SRC_DIR "/BadReapInterval.ini\": Illegal value (0) for "
+        EXPECT_STREQ("unity::scopes::ConfigException: \"" TEST_DIR "/BadReapInterval.ini\": Illegal value (0) for "
                      "Reap.Interval: value must be > 0",
                      e.what());
     }
@@ -196,12 +196,12 @@ TEST(RuntimeConfig, exceptions)
     {
         unsetenv("HOME");
 
-        RuntimeConfig c(TEST_SRC_DIR "/NoCacheDir.ini");
+        RuntimeConfig c(TEST_DIR "/NoCacheDir.ini");
         FAIL();
     }
     catch (ConfigException const& e)
     {
-        EXPECT_STREQ("unity::scopes::ConfigException: \"" TEST_SRC_DIR "/NoCacheDir.ini\": No CacheDir configured and "
+        EXPECT_STREQ("unity::scopes::ConfigException: \"" TEST_DIR "/NoCacheDir.ini\": No CacheDir configured and "
                      "failed to get default:\n    unity::ResourceException: RuntimeConfig::default_cache_directory(): "
                      "$HOME not set",
                      e.what());
@@ -211,12 +211,12 @@ TEST(RuntimeConfig, exceptions)
     {
         unsetenv("HOME");
 
-        RuntimeConfig c(TEST_SRC_DIR "/NoConfigDir.ini");
+        RuntimeConfig c(TEST_DIR "/NoConfigDir.ini");
         FAIL();
     }
     catch (ConfigException const& e)
     {
-        EXPECT_STREQ("unity::scopes::ConfigException: \"" TEST_SRC_DIR "/NoConfigDir.ini\": No ConfigDir configured and "
+        EXPECT_STREQ("unity::scopes::ConfigException: \"" TEST_DIR "/NoConfigDir.ini\": No ConfigDir configured and "
                      "failed to get default:\n    unity::ResourceException: RuntimeConfig::default_config_directory(): "
                      "$HOME not set",
                      e.what());
@@ -226,13 +226,13 @@ TEST(RuntimeConfig, exceptions)
     {
         unsetenv("HOME");
 
-        RuntimeConfig c(TEST_SRC_DIR "/NoLogDir.ini");
+        RuntimeConfig c(TEST_DIR "/NoLogDir.ini");
         FAIL();
     }
     catch (ConfigException const& e)
     {
         // Using regex here because error message returned by glib changed from Utopic to Vivid.
-        // The final .* takes care of the difference. Note that, instead of using TEST_SRC_DIR, we
+        // The final .* takes care of the difference. Note that, instead of using TEST_DIR, we
         // use .+. That's because, when building with bzr bd, we end up with a '+' in the path,
         // and that is a regex metacharacter, causing the match to fail.
         boost::regex r("unity::scopes::ConfigException: \".+/NoLogDir.ini\": "
@@ -246,12 +246,12 @@ TEST(RuntimeConfig, exceptions)
     {
         unsetenv("HOME");
 
-        RuntimeConfig c(TEST_SRC_DIR "/NoAppDir.ini");
+        RuntimeConfig c(TEST_DIR "/NoAppDir.ini");
         FAIL();
     }
     catch (ConfigException const& e)
     {
-        EXPECT_STREQ("unity::scopes::ConfigException: \"" TEST_SRC_DIR "/NoAppDir.ini\": "
+        EXPECT_STREQ("unity::scopes::ConfigException: \"" TEST_DIR "/NoAppDir.ini\": "
                      "No AppDir configured and failed to get default:\n"
                      "    unity::ResourceException: RuntimeConfig::default_app_directory(): $HOME not set",
                      e.what());
@@ -259,24 +259,24 @@ TEST(RuntimeConfig, exceptions)
 
     try
     {
-        RuntimeConfig c(TEST_SRC_DIR "/BadLogFileSize.ini");
+        RuntimeConfig c(TEST_DIR "/BadLogFileSize.ini");
         FAIL();
     }
     catch (ConfigException const& e)
     {
-        EXPECT_STREQ("unity::scopes::ConfigException: \"" TEST_SRC_DIR "/BadLogFileSize.ini\": "
+        EXPECT_STREQ("unity::scopes::ConfigException: \"" TEST_DIR "/BadLogFileSize.ini\": "
                      "Illegal value (999) for Log.MaxFileSize: value must be > 1024",
                      e.what());
     }
 
     try
     {
-        RuntimeConfig c(TEST_SRC_DIR "/BadLogDirSize.ini");
+        RuntimeConfig c(TEST_DIR "/BadLogDirSize.ini");
         FAIL();
     }
     catch (ConfigException const& e)
     {
-        EXPECT_STREQ("unity::scopes::ConfigException: \"" TEST_SRC_DIR "/BadLogDirSize.ini\": "
+        EXPECT_STREQ("unity::scopes::ConfigException: \"" TEST_DIR "/BadLogDirSize.ini\": "
                      "Illegal value (1024) for Log.MaxDirSize: value must be > Log.MaxFileSize (2048)",
                      e.what());
     }

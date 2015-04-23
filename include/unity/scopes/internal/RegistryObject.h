@@ -29,6 +29,7 @@
 #include <condition_variable>
 #include <mutex>
 #include <thread>
+#include <chrono>
 
 namespace unity
 {
@@ -152,6 +153,12 @@ private:
     mutable std::mutex mutex_;
 
     MWPublisher::SPtr publisher_;
+    std::thread publisher_notify_thread_;
+    std::condition_variable publisher_notify_cond_;
+    std::chrono::system_clock::time_point publisher_notify_timepoint_;
+    bool publisher_notify_reset_timer_;
+    bool publisher_notify_exit_;
+
     MWSubscriber::SPtr ss_list_update_subscriber_;
     std::shared_ptr<core::ScopedConnection> ss_list_update_connection_;
     bool generate_desktop_files_;
