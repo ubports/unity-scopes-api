@@ -335,29 +335,28 @@ bool RegistryObject::remove_local_scope(std::string const& scope_id)
 
         if (!publisher_notify_thread_.joinable())
         {
+            publisher_notify_timepoint_ = chrono::system_clock::now() + removal_notification_delay;
             publisher_notify_thread_ = thread([this]
             {
                 unique_lock<decltype(mutex_)> lock(mutex_);
                 while (!publisher_notify_exit_)
                 {
-                    auto later = chrono::system_clock::now() + removal_notification_delay;
                     auto pred = [this]
                     {
                         return publisher_notify_exit_ || publisher_notify_reset_timer_;
                     };
-                    if (!publisher_notify_cond_.wait_until(lock, later, pred))
+                    if (!publisher_notify_cond_.wait_until(lock, publisher_notify_timepoint_, pred)) // pred is false, but timeout reached
                     {
                         publisher_->send_message("");
+                        publisher_notify_timepoint_ = chrono::system_clock::time_point::max();
                     }
                     publisher_notify_reset_timer_ = false;
                 }
             });
         }
-        else
-        {
-            publisher_notify_reset_timer_ = true;
-            publisher_notify_cond_.notify_one();
-        }
+        publisher_notify_reset_timer_ = true;
+        publisher_notify_timepoint_ = chrono::system_clock::now() + removal_notification_delay;
+        publisher_notify_cond_.notify_one();
     }
 
     if (ex)

@@ -155,6 +155,7 @@ private:
     MWPublisher::SPtr publisher_;
     std::thread publisher_notify_thread_;
     std::condition_variable publisher_notify_cond_;
+    std::chrono::system_clock::time_point publisher_notify_timepoint_;
     bool publisher_notify_reset_timer_;
     bool publisher_notify_exit_;
 
