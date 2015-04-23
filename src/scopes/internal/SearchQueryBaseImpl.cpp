@@ -193,14 +193,19 @@ QueryCtrlProxy SearchQueryBaseImpl::check_for_query_loop(ScopeProxy const& scope
         reply->finished(CompletionDetails(CompletionDetails::OK,
                                           "empty result set due to aggregator loop or repeated query on aggregating scope "
                                           + get<1>(tuple)));
-        auto scope_impl = dynamic_pointer_cast<ScopeImpl>(scope);
-        auto logger = scope_impl->runtime()->logger();
         ctrl_proxy = make_shared<QueryCtrlImpl>(nullptr, nullptr);  // Dummy proxy in already-cancelled state
-        BOOST_LOG_SEV(logger, Logger::Warning)
-            << "query loop for query \"" << canned_query_.query_string()
-            << "\", client: " << get<0>(tuple)
-            << ", aggregator: " << get<1>(tuple)
-            << ", receiver: " << get<2>(tuple) << endl;
+
+        auto scope_impl = dynamic_pointer_cast<ScopeImpl>(scope);
+        // scope_impl can be nullptr if we use a mock scope: TypedScopeFixture<testing::Scope>
+        if (scope_impl)
+        {
+            auto logger = scope_impl->runtime()->logger();
+            BOOST_LOG_SEV(logger, Logger::Warning)
+                << "query loop for query \"" << canned_query_.query_string()
+                << "\", client: " << get<0>(tuple)
+                << ", aggregator: " << get<1>(tuple)
+                << ", receiver: " << get<2>(tuple) << endl;
+        }
     }
     else
     {

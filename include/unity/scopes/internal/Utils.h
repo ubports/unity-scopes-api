@@ -55,6 +55,8 @@ bool convert_to<bool>(std::string const& val, Variant& out);
 
 int safe_system_call(std::string const& command);
 
+void make_directories(std::string const& path_name, mode_t mode);
+
 } // namespace internal
 
 } // namespace scopes

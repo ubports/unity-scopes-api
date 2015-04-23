@@ -229,6 +229,12 @@ public:
     */
     VariantMap serialize() const;
 
+    /**
+    \brief Check if this result is an online account login result.
+    \return True if this result is an online account login result.
+    */
+    bool is_account_login_result() const;
+
     /// @cond
 protected:
     explicit Result(const VariantMap &variant_map);

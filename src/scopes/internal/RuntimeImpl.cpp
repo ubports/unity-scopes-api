@@ -30,6 +30,7 @@
 #include <unity/scopes/internal/ScopeObject.h>
 #include <unity/scopes/internal/SettingsDB.h>
 #include <unity/scopes/internal/UniqueID.h>
+#include <unity/scopes/internal/Utils.h>
 #include <unity/scopes/ScopeBase.h>
 #include <unity/scopes/ScopeExceptions.h>
 
@@ -42,7 +43,6 @@
 #include <future>
 
 #include <sys/apparmor.h>
-#include <sys/stat.h>
 
 using namespace std;
 using namespace unity::scopes;
@@ -592,43 +592,39 @@ string RuntimeImpl::confinement_type() const
 string RuntimeImpl::find_cache_dir() const
 {
     // Create the cache_dir_/<confinement-type>/<id> directories if they don't exist.
-    boost::system::error_code ec;
-    !confined() && !boost::filesystem::exists(cache_dir_, ec) && ::mkdir(cache_dir_.c_str(), 0700);
     string dir = cache_dir_ + "/" + confinement_type();
-    !confined() && !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700);
-
+    if (!confined())  // Avoid apparmor noise
+    {
+        string dir = cache_dir_ + "/" + confinement_type();
+        make_directories(cache_dir_, 0700);
+    }
     // A confined scope is allowed to create this dir.
     dir += "/" + demangled_id(scope_id_);
-    !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700);
-
+    make_directories(dir, 0700);
     return dir;
 }
 
 string RuntimeImpl::find_app_dir() const
 {
     // Create the app_dir_/<id> directories if they don't exist.
-    boost::system::error_code ec;
-    !confined() && !boost::filesystem::exists(app_dir_, ec) && ::mkdir(app_dir_.c_str(), 0700);
     string dir = app_dir_ + "/" + demangled_id(scope_id_);
-    !confined() && !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700);
-
+    if (!confined())  // Avoid apparmor noise
+    {
+        make_directories(dir, 0700);
+    }
     return dir;
 }
 
 string RuntimeImpl::find_log_dir(string const& id) const
 {
-    // Create the log_dir_/<confinement-type>/<id>/logs directories if they don't exist.
-    boost::system::error_code ec;
-    !confined() && !boost::filesystem::exists(log_dir_, ec) && ::mkdir(log_dir_.c_str(), 0700);
     string dir = log_dir_ + "/" + confinement_type();
-    !confined() && !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700);
-
+    if (!confined())  // Avoid apparmore noise
+    {
+        make_directories(dir, 0700);
+    }
     // A confined scope is allowed to create this dir.
-    dir += "/" + demangled_id(id);
-    !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700);
-    dir += "/logs";
-    !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700);
-
+    dir += "/" + demangled_id(id) + "/logs";
+    make_directories(dir, 0700);
     return dir;
 }
 
@@ -638,17 +634,14 @@ string RuntimeImpl::find_tmp_dir() const
     // We need to create any directories under /run/user/<uid> because they might not
     // exist. We set the sticky bit because, without this, things in
     // /run/user may be deleted if not accessed for more than six hours.
-    string dir = string("/run/user/") + std::to_string(geteuid());
-    dir += "/scopes";
-    boost::system::error_code ec;
-    !confined() && !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700 | S_ISVTX);
-    dir += "/" + confinement_type();
-    !confined() && !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700 | S_ISVTX);
-
+    string dir = string("/run/user/") + std::to_string(geteuid()) + "/scopes/" + confinement_type();
+    if (!confined())  // Avoid apparmor noise
+    {
+        make_directories(dir, 0700);
+    }
     // A confined scope is allowed to create this dir.
     dir += "/" + scope_id_;  // Not demangled, use the real scope ID.
-    !boost::filesystem::exists(dir, ec) && ::mkdir(dir.c_str(), 0700 | S_ISVTX);
-
+    make_directories(dir, 0700);
     return dir;
 }
 

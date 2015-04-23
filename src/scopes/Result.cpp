@@ -154,6 +154,11 @@ VariantMap Result::serialize() const
     return p->serialize();
 }
 
+bool Result::is_account_login_result() const
+{
+    return p->contains("online_account_details");
+}
+
 //! @endcond
 
 } // namespace scopes
