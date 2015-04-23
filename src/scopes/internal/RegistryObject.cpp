@@ -341,7 +341,7 @@ bool RegistryObject::remove_local_scope(std::string const& scope_id)
                 while (!publisher_notify_exit_)
                 {
                     auto later = chrono::system_clock::now() + removal_notification_delay;
-                    auto static pred = [this]
+                    auto pred = [this]
                     {
                         return publisher_notify_exit_ || publisher_notify_reset_timer_;
                     };
