@@ -213,7 +213,8 @@ ChildScopeList ZmqScope::child_scopes()
     capnp::MallocMessageBuilder request_builder;
     make_request_(request_builder, "child_scopes");
 
-    auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_scope_(request_builder, 2000); });
+    int64_t timeout = mw_base()->child_scopes_timeout();
+    auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_scope_(request_builder, timeout); });
 
     auto out_params = future.get();
     auto response = out_params.reader->getRoot<capnproto::Response>();
@@ -270,7 +271,8 @@ bool ZmqScope::set_child_scopes(ChildScopeList const& child_scopes)
         }
     }
 
-    auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_scope_(request_builder, 2000); });
+    int64_t timeout = mw_base()->child_scopes_timeout();
+    auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_scope_(request_builder, timeout); });
     auto out_params = future.get();
     auto r = out_params.reader->getRoot<capnproto::Response>();
     throw_if_runtime_exception(r);
