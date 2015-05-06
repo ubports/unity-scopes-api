@@ -256,7 +256,6 @@ void SettingsDB::watch_thread()
                 lock_guard<mutex> lock(mutex_);
                 if (thread_state_ == Stopping)
                 {
-                    thread_state_ = Idle;
                     break;
                 }
             }
