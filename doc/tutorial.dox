@@ -181,7 +181,7 @@ The scope ID passed to `start()` is taken from the name your scope's `.ini` conf
 The scopes run time calls \link unity::scopes::ScopeBase::stop() stop()\endlink to inform your scope
 that it should shut down. You can use this method to perform any one-time clean-up.
 
-Prior to sending any queries, the scopes run time calls \link unity::scopes::ScopeBase::run() run()\endlink if your `stop()` method
+Prior to sending any queries, the scopes run time calls \link unity::scopes::ScopeBase::run() run()\endlink if your `start()` method
 completed successfully (did not throw an exception). The `run()` method
 is called by a separate thread that you can use for your own purposes, for example, to run an event loop.
 The scopes run time has no further interest in this thread, but you must ensure that, if you do not return
@@ -191,7 +191,7 @@ For typical and simple cases, you can ignore `run()`.
 
 \paragraph handlingsearch Handling search
 
-The unity::scopes::ScopeBase::search() method is called once for each query. Its purpose is to instantiante
+The unity::scopes::ScopeBase::search() method is called once for each query. Its purpose is to instantiate
 and return a new C++ instance that encapsulates the query, that is, `search()` is a factory method.
 (Do not start execution of the query as part of `search()`; the query object has a separate method for this.)
 
@@ -295,7 +295,7 @@ Your class must implement a \link unity::scopes::SearchQueryBase::run run()\endl
 `run()` to execute the query.
 
 The \link unity::scopes::SearchReplyProxy SearchReplyProxy\endlink that is passed to `run()` is an invocation
-handle that allows you push results for the query back towards the client. (`SearchReplyProxy` is a `shared_ptr`
+handle that allows you to push results for the query back towards the client. (`SearchReplyProxy` is a `shared_ptr`
 to a \link unity::scopes::SearchReply SearchReply\endlink object.)
 
 Two important methods of `SerchReply` are \link unity::scopes::SearchReply::register_category register_category()\endlink
