@@ -256,6 +256,7 @@ void SettingsDB::watch_thread()
                 lock_guard<mutex> lock(mutex_);
                 if (thread_state_ == Stopping)
                 {
+                    thread_state_ = Idle;
                     break;
                 }
             }
@@ -347,6 +348,10 @@ void SettingsDB::process_all_docs()
 
             if (thread_state_ == Idle)
             {
+                if (thread_.joinable()) {
+                    thread_.join();
+                }
+
                 thread_state_ = Running;
                 thread_ = thread(&SettingsDB::watch_thread, this);
             }
