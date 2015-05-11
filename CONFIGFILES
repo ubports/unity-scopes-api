@@ -248,6 +248,16 @@ The following keys are recognized:
 
   The default value is 5000 milliseconds.
 
+- ChildScopes.Timeout
+
+  The timeout to be used when invoking either child_scopes() or set_child_scopes()
+  on a scope. These methods require more time to execute than other scope methods
+  as they read from and write to disk.
+
+  Only values in the range 10 to 15000 milliseconds are accepted.
+
+  The default value is 2000 milliseconds.
+
 
 Registry.ini
 ------------

@@ -1,6 +1,12 @@
 Release notes
 =============
 
+Changes in version 0.6.18
+=========================
+  - Allow child_scopes() and set_child_scopes() methods more time to
+    execute as they read from and write to disk.
+  - Added ChildScopes.Timeout configuration parameter to Zmq.ini
+
 Changes in version 0.6.17
 =========================
   - Added is_account_login_result() method to Result class.

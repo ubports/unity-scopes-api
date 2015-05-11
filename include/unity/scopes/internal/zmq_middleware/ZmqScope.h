@@ -70,6 +70,7 @@ public:
 
 private:
     ZmqObjectProxy::TwowayOutParams invoke_scope_(capnp::MessageBuilder& in_params);
+    ZmqObjectProxy::TwowayOutParams invoke_scope_(capnp::MessageBuilder& in_params, int64_t timeout);
     std::mutex debug_mode_mutex_;
     std::unique_ptr<bool> debug_mode_;
 };

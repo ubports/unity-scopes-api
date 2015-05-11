@@ -213,7 +213,8 @@ ChildScopeList ZmqScope::child_scopes()
     capnp::MallocMessageBuilder request_builder;
     make_request_(request_builder, "child_scopes");
 
-    auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_scope_(request_builder); });
+    int64_t timeout = mw_base()->child_scopes_timeout();
+    auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_scope_(request_builder, timeout); });
 
     auto out_params = future.get();
     auto response = out_params.reader->getRoot<capnproto::Response>();
@@ -270,7 +271,8 @@ bool ZmqScope::set_child_scopes(ChildScopeList const& child_scopes)
         }
     }
 
-    auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_scope_(request_builder); });
+    int64_t timeout = mw_base()->child_scopes_timeout();
+    auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_scope_(request_builder, timeout); });
     auto out_params = future.get();
     auto r = out_params.reader->getRoot<capnproto::Response>();
     throw_if_runtime_exception(r);
@@ -303,13 +305,18 @@ bool ZmqScope::debug_mode()
 
 ZmqObjectProxy::TwowayOutParams ZmqScope::invoke_scope_(capnp::MessageBuilder& in_params)
 {
+    return invoke_scope_(in_params, timeout());
+}
+
+ZmqObjectProxy::TwowayOutParams ZmqScope::invoke_scope_(capnp::MessageBuilder& in_params, int64_t timeout)
+{
     // Check if this scope has requested debug mode, if so, disable two-way timeout and set
     // locate timeout to 15s.
     if (debug_mode())
     {
         return this->invoke_twoway_(in_params, -1, 15000);
     }
-    return this->invoke_twoway_(in_params);
+    return this->invoke_twoway_(in_params, timeout);
 }
 
 } // namespace zmq_middleware
