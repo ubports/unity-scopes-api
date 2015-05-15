@@ -125,6 +125,7 @@ TEST(ScopeConfig, bad_child_scope_ids)
     try
     {
         ScopeConfig cfg(BAD_CHILD_IDS);
+        FAIL();
     }
     catch(ConfigException const& e)
     {
@@ -193,6 +194,7 @@ TEST(ScopeConfig, bad_keywords)
     try
     {
         ScopeConfig cfg(BAD_KEYWORDS);
+        FAIL();
     }
     catch(ConfigException const& e)
     {
@@ -211,6 +213,48 @@ TEST(ScopeConfig, single_keyword)
 {
     ScopeConfig cfg(SINGLE_KEYWORD);
     EXPECT_EQ(cfg.keywords().size(), 1);
+}
+
+TEST(ScopeConfig, empty_display_name)
+{
+    try
+    {
+        ScopeConfig cfg(EMPTY_DISPLAY_NAME);
+        FAIL();
+    }
+    catch(ConfigException const& e)
+    {
+        boost::regex r("unity::scopes::ConfigException: \".*\": DisplayName cannot be empty or whitespace only");
+        EXPECT_TRUE(boost::regex_match(e.what(), r));
+    }
+}
+
+TEST(ScopeConfig, empty_description)
+{
+    try
+    {
+        ScopeConfig cfg(EMPTY_DESCRIPTION);
+        FAIL();
+    }
+    catch(ConfigException const& e)
+    {
+        boost::regex r("unity::scopes::ConfigException: \".*\": Description cannot be empty or whitespace only");
+        EXPECT_TRUE(boost::regex_match(e.what(), r));
+    }
+}
+
+TEST(ScopeConfig, empty_author)
+{
+    try
+    {
+        ScopeConfig cfg(EMPTY_AUTHOR);
+        FAIL();
+    }
+    catch(ConfigException const& e)
+    {
+        boost::regex r("unity::scopes::ConfigException: \".*\": Author cannot be empty or whitespace only");
+        EXPECT_TRUE(boost::regex_match(e.what(), r));
+    }
 }
 
 class ScopeConfigWithIntl: public ::testing::Test
