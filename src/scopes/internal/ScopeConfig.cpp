@@ -23,6 +23,8 @@
 #include <unity/UnityExceptions.h>
 #include <unity/scopes/internal/Utils.h>
 
+#include <boost/algorithm/string/trim.hpp>
+
 #include <algorithm>
 #include <sstream>
 #include <string>
@@ -87,8 +89,25 @@ ScopeConfig::ScopeConfig(string const& configfile) :
     }
 
     display_name_ = parser()->get_locale_string(scope_config_group, scope_name_key);
+    boost::trim(display_name_);
+    if (display_name_.empty())
+    {
+        throw_ex(scope_name_key + " cannot be empty or whitespace only");
+    }
+
     description_ = parser()->get_locale_string(scope_config_group, description_key);
+    boost::trim(description_);
+    if (description_.empty())
+    {
+        throw_ex(description_key + " cannot be empty or whitespace only");
+    }
+
     author_ = parser()->get_string(scope_config_group, author_key);
+    boost::trim(author_);
+    if (author_.empty())
+    {
+        throw_ex(author_key + " cannot be empty or whitespace only");
+    }
 
     // For optional values, we store them in a unique_ptr so we can distinguish the "not set at all" case
     // from the "explicitly set to empty string" case. parser()->get_string throws LogicException if

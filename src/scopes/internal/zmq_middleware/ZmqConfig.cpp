@@ -42,6 +42,7 @@ namespace
     const string twoway_timeout_key = "Default.Twoway.Timeout";
     const string locate_timeout_key = "Locate.Timeout";
     const string registry_timeout_key = "Registry.Timeout";
+    const string child_scopes_timeout_key = "ChildScopes.Timeout";
     const string registry_endpoint_dir_key = "Registry.EndpointDir";
     const string ss_registry_endpoint_dir_key = "Smartscopes.Registry.EndpointDir";
 }
@@ -90,6 +91,12 @@ ZmqConfig::ZmqConfig(string const& configfile) :
         throw_ex("Illegal value (" + to_string(locate_timeout_) + ") for " + locate_timeout_key + ": value must be 10-15000");
     }
 
+    child_scopes_timeout_ = get_optional_int(zmq_config_group, child_scopes_timeout_key, DFLT_ZMQ_CHILDSCOPES_TIMEOUT);
+    if (child_scopes_timeout_ < 10 || child_scopes_timeout_ > 15000)
+    {
+        throw_ex("Illegal value (" + to_string(child_scopes_timeout_) + ") for " + child_scopes_timeout_key + ": value must be 10-15000");
+    }
+
     registry_endpoint_dir_ = get_optional_string(zmq_config_group, registry_endpoint_dir_key);
     ss_registry_endpoint_dir_ = get_optional_string(zmq_config_group, ss_registry_endpoint_dir_key);
 
@@ -100,6 +107,7 @@ ZmqConfig::ZmqConfig(string const& configfile) :
                                                 twoway_timeout_key,
                                                 locate_timeout_key,
                                                 registry_timeout_key,
+                                                child_scopes_timeout_key,
                                                 registry_endpoint_dir_key,
                                                 ss_registry_endpoint_dir_key
                                              }
@@ -130,6 +138,11 @@ int ZmqConfig::locate_timeout() const
 int ZmqConfig::registry_timeout() const
 {
     return registry_timeout_;
+}
+
+int ZmqConfig::child_scopes_timeout() const
+{
+    return child_scopes_timeout_;
 }
 
 string ZmqConfig::registry_endpoint_dir() const
