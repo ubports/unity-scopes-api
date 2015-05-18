@@ -166,8 +166,8 @@ HttpResponseHandle::SPtr HttpClientNetCpp::get(std::string const& request_url,
                         promise->set_exception(std::make_exception_ptr(re));
                     }),
                 [line_data](const std::string& const_data)
-                {    
-                    line_data(const_data);                     
+                {
+                    line_data(const_data);
                 });
 
     return std::make_shared<HttpResponseHandle>(
