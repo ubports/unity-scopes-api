@@ -157,6 +157,8 @@ HttpResponseHandle::SPtr HttpClientNetCpp::get(std::string const& request_url,
                         }
                         else
                         {
+                            // flush out any leftover data
+                            line_data("\n");
                             promise->set_value();
                         }
                     })
