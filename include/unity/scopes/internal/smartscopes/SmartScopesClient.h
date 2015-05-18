@@ -215,8 +215,10 @@ private:
     std::shared_ptr<DepartmentInfo> parse_departments(JsonNodeInterface::SPtr node);
     Filters parse_filters(JsonNodeInterface::SPtr node);
     FilterState parse_filter_state(JsonNodeInterface::SPtr node);
-    void parse_line(std::string const& json, SearchReplyHandler const& handler);
-    void parse_line(std::string const& json, PreviewReplyHandler const& handler);
+
+    std::string handle_chunk(const std::string& chunk, std::function<void(const std::string&)> line_handler);
+    void handle_line(std::string const& json, SearchReplyHandler const& handler);
+    void handle_line(std::string const& json, PreviewReplyHandler const& handler);
 
     std::vector<std::string> extract_json_stream(std::string const& json_stream);
 

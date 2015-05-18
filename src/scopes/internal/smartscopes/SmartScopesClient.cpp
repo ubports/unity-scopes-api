@@ -472,18 +472,17 @@ SearchHandle::UPtr SmartScopesClient::search(SearchReplyHandler const& handler,
         headers.push_back(std::make_pair("User-Agent", user_agent_hdr));
     }
 
-    auto reponse_mutex = std::make_shared<std::mutex>();
-    query_results_[search_id] = http_client_->get(search_uri.str(), [this, handler, reponse_mutex](std::string const& line_data)
+    auto tmp_data = std::make_shared<std::string>();
+    query_results_[search_id] = http_client_->get(search_uri.str(), [this, tmp_data, handler](std::string const& chunk)
     {
-        std::lock_guard<std::mutex> lock(*reponse_mutex);
-        try
+        // prepend any leftover data from the previous handle_chunk call
+        std::string data = *tmp_data + (chunk.empty() ? "\n" : chunk);
+
+        // store the leftover data from the handle_chunk call into tmp_data
+        *tmp_data = handle_chunk(data, [this, handler](const std::string& line)
         {
-            parse_line(line_data, handler);
-        }
-        catch (std::exception const &e)
-        {
-            BOOST_LOG_SEV(logger_, Logger::Error) << "SmartScopesClient.search(): Failed to parse: " << e.what();
-        }
+            handle_line(line, handler);
+        });
     }, headers);
 
     return SearchHandle::UPtr(new SearchHandle(search_id, shared_from_this()));
@@ -540,24 +539,54 @@ PreviewHandle::UPtr SmartScopesClient::preview(PreviewReplyHandler const& handle
 
     BOOST_LOG_SEV(logger_, Logger::Info) << "SmartScopesClient.preview(): GET " << preview_uri.str();
 
-    auto reponse_mutex = std::make_shared<std::mutex>();
-    query_results_[preview_id] = http_client_->get(preview_uri.str(), [this, handler, reponse_mutex](std::string const& line_data)
+    auto tmp_data = std::make_shared<std::string>();
+    query_results_[preview_id] = http_client_->get(preview_uri.str(), [this, tmp_data, handler](std::string const& chunk)
     {
-        std::lock_guard<std::mutex> lock(*reponse_mutex);
-        try
+        // prepend any leftover data from the previous handle_chunk call
+        std::string data = *tmp_data + (chunk.empty() ? "\n" : chunk);
+
+        // store the leftover data from the handle_chunk call into tmp_data
+        *tmp_data = handle_chunk(data, [this, handler](const std::string& line)
         {
-            parse_line(line_data, handler);
-        }
-        catch (std::exception const &e)
-        {
-            BOOST_LOG_SEV(logger_, Logger::Error) << "SmartScopesClient.preview(): Failed to parse: " << e.what();
-        }
+            handle_line(line, handler);
+        });
     }, headers);
 
     return PreviewHandle::UPtr(new PreviewHandle(preview_id, shared_from_this()));
 }
 
-void SmartScopesClient::parse_line(std::string const& json, PreviewReplyHandler const& handler)
+std::string SmartScopesClient::handle_chunk(const std::string& chunk, std::function<void(const std::string&)> line_handler)
+{
+    // According to the docs, we expect:
+    // The response will have Content-Type
+    // application/json, it will be a chunked response, in practice a series of
+    // “\r\n” delimited lines, each containing one JSON object, with the
+    // possible forms, matching what currently can be pushed into a reply in the
+    // new scopes API
+    static constexpr const char separator{'\n'};
+
+    // read data line-by-line calling line_handler() for each
+    auto newline_pos = 0;
+    auto endline_pos = chunk.find(separator);
+    while (endline_pos != std::string::npos)
+    {
+        try
+        {
+            line_handler(chunk.substr(newline_pos, endline_pos - newline_pos));
+        }
+        catch (std::exception const &e)
+        {
+            BOOST_LOG_SEV(logger_, Logger::Error) << "SmartScopesClient.handle_chunk(): Failed to parse line: " << e.what();
+        }
+        newline_pos = endline_pos + 1;
+        endline_pos = chunk.find(separator, newline_pos);
+    }
+
+    // return the leftover data
+    return chunk.substr(newline_pos, chunk.size() - newline_pos);
+}
+
+void SmartScopesClient::handle_line(std::string const& json, PreviewReplyHandler const& handler)
 {
     JsonNodeInterface::SPtr root_node;
     JsonNodeInterface::SPtr child_node;
@@ -605,7 +634,7 @@ void SmartScopesClient::parse_line(std::string const& json, PreviewReplyHandler 
     }
 }
 
-void SmartScopesClient::parse_line(std::string const& json, SearchReplyHandler const& handler)
+void SmartScopesClient::handle_line(std::string const& json, SearchReplyHandler const& handler)
 {
     JsonNodeInterface::SPtr root_node;
     JsonNodeInterface::SPtr child_node;
