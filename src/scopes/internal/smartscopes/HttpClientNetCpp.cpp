@@ -157,8 +157,8 @@ HttpResponseHandle::SPtr HttpClientNetCpp::get(std::string const& request_url,
                         }
                         else
                         {
-                            // flush out any leftover data
-                            line_data("\n");
+                            // call line_data with empty string to signal end of chunked data
+                            line_data("");
                             promise->set_value();
                         }
                     })

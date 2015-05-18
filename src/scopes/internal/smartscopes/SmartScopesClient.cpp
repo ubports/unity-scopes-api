@@ -476,7 +476,7 @@ SearchHandle::UPtr SmartScopesClient::search(SearchReplyHandler const& handler,
     query_results_[search_id] = http_client_->get(search_uri.str(), [this, tmp_data, handler](std::string const& chunk)
     {
         // prepend any leftover data from the previous handle_chunk call
-        std::string data = *tmp_data + chunk;
+        std::string data = *tmp_data + (chunk.empty() ? "\n" : chunk);
 
         // store the leftover data from the handle_chunk call into tmp_data
         *tmp_data = handle_chunk(data, [this, handler](const std::string& line)
@@ -543,7 +543,7 @@ PreviewHandle::UPtr SmartScopesClient::preview(PreviewReplyHandler const& handle
     query_results_[preview_id] = http_client_->get(preview_uri.str(), [this, tmp_data, handler](std::string const& chunk)
     {
         // prepend any leftover data from the previous handle_chunk call
-        std::string data = *tmp_data + chunk;
+        std::string data = *tmp_data + (chunk.empty() ? "\n" : chunk);
 
         // store the leftover data from the handle_chunk call into tmp_data
         *tmp_data = handle_chunk(data, [this, handler](const std::string& line)
