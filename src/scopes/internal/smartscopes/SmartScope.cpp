@@ -50,18 +50,6 @@ void SmartQuery::cancelled()
 
 void SmartQuery::run(SearchReplyProxy const& reply)
 {
-    static const std::string no_net_hint("no-internet");
-    if (hints_.contains_hint(no_net_hint))
-    {
-        auto var = hints_[no_net_hint];
-        if (var.which() == Variant::Type::Bool && var.get_bool())
-        {
-            BOOST_LOG_SEV(ss_client_->logger(), Logger::Info)
-                << "SmartQuery(): networking disabled for remote scope " << scope_id_ << ", skipping";
-            return;
-        }
-    }
-
     struct FiltersHandler
     {
         FiltersHandler(SearchReplyProxy reply, std::string const& scope_id):
