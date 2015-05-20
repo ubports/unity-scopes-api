@@ -90,6 +90,7 @@ The following widget types are recognized by Unity:
 \arg \c progress
 \arg \c text
 \arg \c rating-input
+\arg \c rating-edit
 \arg \c reviews
 \arg \c expandable
 
@@ -318,6 +319,29 @@ List of attributes:
     ...
 }
 \endcode
+
+\subsection rating-edit rating-edit widget
+
+The rating-edit widget allows users to edit an existing review and rating. When used in a preview, the widget displays an existing
+review and a small "pen" icon; user can update the review and/or rating after tapping the "pen" icon.
+
+This widget supports all the attributes of rating-input widget, plus three
+extra attributes (\c "review", \c "rating", \c "author") to pre-fill the widget with data of an existing review.
+
+List of attributes:
+
+\arg \c rating-label String for the star-based rating (default: "Rate this")
+\arg \c review-label String for the review input (default: "Add a review")
+\arg \c submit-label String for the confirmation button (default: "Send")
+\arg \c rating-icon-empty URI for an empty rating icon
+\arg \c rating-icon-full URI for a full rating icon
+\arg \c visible String specifying which of the two widgets are visible (\c "rating", \c "review" or default:\c "both")
+\arg \c required String specifying which of the two widgets are required to be filled in (\c "rating", \c "review" or default:\c "both")
+\arg \c author String for the name of the reviewer (optional)
+\arg \c review String for the text of existing review (optional)
+\arg \c rating Number for the rating value (optional)
+
+Note: The rating-edit widget may not be supported by older versions of unity8 shell.
 
 \subsection reviews reviews widget
 
