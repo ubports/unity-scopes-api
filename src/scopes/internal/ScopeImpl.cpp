@@ -157,6 +157,7 @@ QueryCtrlProxy ScopeImpl::search(CannedQuery const& query,
                 d["c"] = get<0>(tuple);  // Client
                 d["a"] = get<1>(tuple);  // Aggregator
                 d["r"] = get<2>(tuple);  // Receiver
+                d["d"] = get<3>(tuple);  // Details (query string, department, filter state, user data, metadata)
                 hist.push_back(Variant(d));
             }
             context["history"] = Variant(hist);
