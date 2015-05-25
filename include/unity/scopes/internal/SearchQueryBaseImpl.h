@@ -48,7 +48,7 @@ public:
 
     void set_client_id(const std::string& id);
 
-    typedef std::tuple<std::string, std::string, std::string> HistoryData;
+    typedef std::tuple<std::string, std::string, std::string, std::string> HistoryData;
     typedef std::vector<HistoryData> History;
 
     void set_history(History const& h);
@@ -78,7 +78,9 @@ private:
     History history_;
     std::vector<QueryCtrlProxy> subqueries_;
 
-    QueryCtrlProxy check_for_query_loop(ScopeProxy const& scope, SearchListenerBase::SPtr const& reply);
+    QueryCtrlProxy check_for_query_loop(ScopeProxy const& scope,
+                                        SearchListenerBase::SPtr const& reply,
+                                        VariantMap const& details);
 };
 
 } // namespace internal

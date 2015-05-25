@@ -184,7 +184,8 @@ MWQueryCtrlProxy ScopeObject::search(CannedQuery const& q,
                              string client_id = t.get_dict()["c"].get_string();
                              string agg = t.get_dict()["a"].get_string();
                              string recv = t.get_dict()["r"].get_string();
-                             SearchQueryBaseImpl::HistoryData hd = make_tuple(client_id, agg, recv);
+                             string details = t.get_dict()["d"].get_string();
+                             SearchQueryBaseImpl::HistoryData hd = make_tuple(client_id, agg, recv, details);
                              history.push_back(hd);
                          }
                          sqb->set_history(history);
