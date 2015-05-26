@@ -80,7 +80,13 @@ QueryCtrlProxy SearchQueryBaseImpl::subsearch(ScopeProxy const& scope,
         throw InvalidArgumentException("QueryBase::subsearch(): reply cannot be nullptr");
     }
 
-    auto query_ctrl = check_for_query_loop(scope, reply);
+    VariantMap details;
+    details["query_string"] = query_string;
+    details["department_id"] = department_id;
+    details["filter_state"] = filter_state.serialize();
+    details["user_data"] = user_data ? *user_data : Variant();
+    details["metadata"] = metadata.serialize();
+    auto query_ctrl = check_for_query_loop(scope, reply, move(details));
     if (query_ctrl)
     {
         return query_ctrl;  // Loop was detected, return dummy QueryCtrlProxy.
@@ -179,17 +185,22 @@ bool SearchQueryBaseImpl::valid() const
 // It is possible for an aggregator to send a query to itself, but only once.
 
 QueryCtrlProxy SearchQueryBaseImpl::check_for_query_loop(ScopeProxy const& scope,
-                                                         SearchListenerBase::SPtr const& reply)
+                                                         SearchListenerBase::SPtr const& reply,
+                                                         VariantMap const& details)
 {
     shared_ptr<QueryCtrlImpl> ctrl_proxy;
 
     lock_guard<mutex> lock(mutex_);
 
-    HistoryData tuple = make_tuple(client_id_, canned_query_.scope_id(), scope->identity());
+    HistoryData tuple = make_tuple(client_id_,
+                        canned_query_.scope_id(),
+                        scope->identity(),
+                        Variant(details).serialize_json());
     auto it = find(history_.begin(), history_.end(), tuple);
     if (it != history_.end())
     {
-        // Query has been here before from the same client and with the same child scope as the target.
+        // Query has been here before from the same client and with the same child scope as the target,
+        // and with the same query details (query, department, filter state, user data, and metadata).
         reply->finished(CompletionDetails(CompletionDetails::OK,
                                           "empty result set due to aggregator loop or repeated query on aggregating scope "
                                           + get<1>(tuple)));
@@ -204,7 +215,8 @@ QueryCtrlProxy SearchQueryBaseImpl::check_for_query_loop(ScopeProxy const& scope
                 << "query loop for query \"" << canned_query_.query_string()
                 << "\", client: " << get<0>(tuple)
                 << ", aggregator: " << get<1>(tuple)
-                << ", receiver: " << get<2>(tuple) << endl;
+                << ", receiver: " << get<2>(tuple)
+                << ", details: " << get<3>(tuple) << endl;
         }
     }
     else
