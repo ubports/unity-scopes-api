@@ -357,6 +357,13 @@ public:
     */
     virtual ChildScopeList child_scopes() const final;
 
+    /**
+      TODO
+     */
+    virtual ActivationQueryBase::UPtr activate_result_action(Result const& result,
+            ActionMetadata const& metadata,
+            std::string const& action_id);
+
 protected:
     /// @cond
     ScopeBase();

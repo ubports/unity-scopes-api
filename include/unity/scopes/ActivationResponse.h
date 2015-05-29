@@ -20,6 +20,7 @@
 
 #include <unity/scopes/Variant.h>
 #include <unity/scopes/CannedQuery.h>
+#include <unity/scopes/Result.h>
 #include <memory>
 
 namespace unity
@@ -45,19 +46,20 @@ public:
      */
     enum Status
     {
-        NotHandled,  /**< Activation of this result wasn't handled by the scope */
-        ShowDash,    /**< Activation of this result was handled, show the Dash */
-        HideDash,    /**< Activation of this result was handled, hide the Dash */
-        ShowPreview, /**< Preview should be requested for this result */
-        PerformQuery /**< Perform new search. This state is implied if creating ActivationResponse with CannedQuery object and is invalid otherwise */
+        NotHandled,   /**< Activation of this result wasn't handled by the scope */
+        ShowDash,     /**< Activation of this result was handled, show the Dash */
+        HideDash,     /**< Activation of this result was handled, hide the Dash */
+        ShowPreview,  /**< Preview should be requested for this result */
+        PerformQuery, /**< Perform new search. This state is implied if creating ActivationResponse with CannedQuery object and is invalid otherwise */
+        UpdateResult, /**< Update the result. This state is implied if creating ActivationResponse with Result object and is invalid otherwise */
     };
 
     /**
     \brief Creates ActivationResponse with given status.
     \param status The activation status.
-    \throws unity::InvalidArgumentException if status is Status::PerformQuery. To
-    create an ActivationResponse of that type, use the ActivationResponse(CannedQuery const&)
-    constructor.
+    \throws unity::InvalidArgumentException if status is Status::PerformQuery or Status::Update.
+    To create an ActivationResponse for one of these types, use the ActivationResponse(CannedQuery const&)
+    or ActivationResponse(Result const&) constructors.
     */
     ActivationResponse(Status status);
 
@@ -66,6 +68,11 @@ public:
     \param query The search query to be executed by the client.
      */
     ActivationResponse(CannedQuery const& query);
+
+    /**
+     TODO
+     */
+    ActivationResponse(Result const& updated_result);
 
     /**@name Copy and assignment
     Copy and assignment operators (move and non-move versions) have the usual value semantics.
@@ -105,6 +112,11 @@ public:
      \return The query to be executed by the client.
     */
     CannedQuery query() const;
+
+    /**
+     TODO
+     */
+    Result updated_result() const;
 
     /// @cond
     VariantMap serialize() const;

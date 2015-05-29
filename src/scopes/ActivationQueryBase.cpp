@@ -37,6 +37,11 @@ ActivationQueryBase::ActivationQueryBase(Result const& result, ActionMetadata co
 {
 }
 
+ActivationQueryBase::ActivationQueryBase(Result const& update_result, ActionMetadata const& metadata, std::string const& action_id) :
+    QueryBase(new internal::ActivationQueryBaseImpl(update_result, metadata, "", action_id))
+{
+}
+
 ActivationQueryBase::~ActivationQueryBase()
 {
 }

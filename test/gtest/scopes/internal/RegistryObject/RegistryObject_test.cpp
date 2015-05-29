@@ -101,6 +101,10 @@ public:
                     SearchMetadata const&,
                     SearchListenerBase::SPtr const&));
     MOCK_METHOD1(set_child_scopes, bool(ChildScopeList const&));
+    MOCK_METHOD4(activate_result_action, QueryCtrlProxy(unity::scopes::Result const&,
+                                                        ActionMetadata const&,
+                                                        std::string const&,
+                                                        ActivationListenerBase::SPtr const&));
 };
 
 

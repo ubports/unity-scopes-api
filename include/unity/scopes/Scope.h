@@ -176,6 +176,14 @@ public:
                                   SearchMetadata const& metadata,
                                   SearchListenerBase::SPtr const& reply) = 0;
 
+    /**
+      TODO
+      */
+    virtual QueryCtrlProxy activate_result_action(Result const& result,
+            ActionMetadata const& metadata,
+            std::string const& action_id,
+            ActivationListenerBase::SPtr const& reply) = 0;
+
 protected:
     /// @cond
     Scope();

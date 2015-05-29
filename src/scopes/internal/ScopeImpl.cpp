@@ -338,6 +338,14 @@ QueryCtrlProxy ScopeImpl::preview(Result const& result,
     return ctrl;
 }
 
+QueryCtrlProxy ScopeImpl::activate_result_action(Result const& result,
+                                      ActionMetadata const& metadata,
+                                      std::string const& action_id,
+                                      ActivationListenerBase::SPtr const& reply)
+{
+    //TODO
+}
+
 ChildScopeList ScopeImpl::child_scopes()
 {
     return fwd()->child_scopes();

@@ -19,6 +19,7 @@
 #include <unity/scopes/internal/ActivationResponseImpl.h>
 #include <unity/UnityExceptions.h>
 #include <unity/scopes/internal/CannedQueryImpl.h>
+#include <unity/scopes/internal/ResultImpl.h>
 #include <cassert>
 
 namespace unity
@@ -42,6 +43,12 @@ ActivationResponseImpl::ActivationResponseImpl(ActivationResponse::Status status
 ActivationResponseImpl::ActivationResponseImpl(CannedQuery const& query)
     : status_(ActivationResponse::Status::PerformQuery),
       query_(std::make_shared<CannedQuery>(query))
+{
+}
+
+ActivationResponseImpl::ActivationResponseImpl(Result const& updated_result)
+    : status_(ActivationResponse::Status::UpdateResult),
+      updated_result_(std::make_shared<Result>(updated_result))
 {
 }
 
@@ -70,6 +77,15 @@ ActivationResponseImpl::ActivationResponseImpl(VariantMap const& var)
         }
         query_ = std::make_shared<CannedQuery>(CannedQueryImpl::create(it->second.get_dict()));
     }
+    else if (status_ == ActivationResponse::Status::UpdateResult)
+    {
+        it = var.find("updated_result");
+        if (it == var.end())
+        {
+            throw LogicException("ActivationResponseImpl(): Invalid data, missing 'updated_result'");
+        }
+        updated_result_ = std::make_shared<Result>(ResultImpl::create_result(it->second.get_dict()));
+    }
 }
 
 ActivationResponse::Status ActivationResponseImpl::status() const
@@ -97,6 +113,16 @@ CannedQuery ActivationResponseImpl::query() const
     throw LogicException("ActivationResponse::query(): query is only available for status of Status::PerformQuery");
 }
 
+Result ActivationResponseImpl::updated_result() const
+{
+    if (updated_result_)
+    {
+        assert(status_ == ActivationResponse::Status::UpdateResult);
+        return *updated_result_;
+    }
+    throw LogicException("ActivationResponse::updated_result(): updated result is only available for status of Status::UpdateResult");
+}
+
 VariantMap ActivationResponseImpl::serialize() const
 {
     VariantMap vm;
@@ -105,6 +131,10 @@ VariantMap ActivationResponseImpl::serialize() const
     if (query_)
     {
         vm["query"] = query_->serialize();
+    }
+    if (updated_result_)
+    {
+        vm["updated_result"] = updated_result_->serialize();
     }
     return vm;
 }

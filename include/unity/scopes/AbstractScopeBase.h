@@ -62,6 +62,10 @@ public:
     virtual ChildScopeList find_child_scopes() const = 0;
     virtual ChildScopeList child_scopes() const = 0;
 
+    virtual ActivationQueryBase::UPtr activate_result_action(Result const& result,
+            ActionMetadata const& metadata,
+            std::string const& action_id) = 0;
+
 protected:
     AbstractScopeBase();
 /// @endcond

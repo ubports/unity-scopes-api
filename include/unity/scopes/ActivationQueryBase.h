@@ -70,6 +70,11 @@ public:
     ActivationQueryBase(Result const& result, ActionMetadata const& metadata, std::string const& widget_id, std::string const& action_id);
 
     /**
+      TODO
+    */
+    ActivationQueryBase(Result const& update_result, ActionMetadata const& metadata, std::string const& action_id);
+
+    /**
      \brief Called when the originator of the activation request cancelled it.
      */
     virtual void cancelled() override;
