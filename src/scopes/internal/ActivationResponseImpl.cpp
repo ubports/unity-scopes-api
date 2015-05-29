@@ -38,6 +38,10 @@ ActivationResponseImpl::ActivationResponseImpl(ActivationResponse::Status status
     {
         throw unity::InvalidArgumentException("ActivationResponse(): Status::PerformQuery allowed only with CannedQuery object");
     }
+    if (status == ActivationResponse::Status::UpdateResult)
+    {
+        throw unity::InvalidArgumentException("ActivationResponse(): Status::UpdateResult allowed only with Result object");
+    }
 }
 
 ActivationResponseImpl::ActivationResponseImpl(CannedQuery const& query)

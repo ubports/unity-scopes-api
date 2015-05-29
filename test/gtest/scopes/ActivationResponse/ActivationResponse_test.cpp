@@ -19,6 +19,7 @@
 #include <unity/scopes/ActivationResponse.h>
 #include <unity/scopes/CannedQuery.h>
 #include <unity/scopes/internal/ActivationResponseImpl.h>
+#include <unity/scopes/internal/ResultImpl.h>
 #include <unity/UnityExceptions.h>
 #include <gtest/gtest.h>
 
@@ -53,12 +54,35 @@ TEST(ActivationResponse, basic)
         ActivationResponse resp(query);
         EXPECT_EQ(ActivationResponse::Status::PerformQuery, resp.status());
     }
+    {
+        VariantMap vm;
+        VariantMap attrs;
+        attrs["uri"] = "foo";
+        vm["internal"] = Variant(VariantMap());
+        vm["attrs"] = Variant(attrs);
+        auto const res = ResultImpl::create_result(vm);
+
+        ActivationResponse resp(res);
+        EXPECT_EQ(ActivationResponse::Status::UpdateResult, resp.status());
+        EXPECT_EQ(res.uri(), resp.updated_result().uri());
+    }
+
 
     // Search only allowed with CannedQuery
     {
         try
         {
             ActivationResponse resp(ActivationResponse::Status::PerformQuery);
+            FAIL();
+        }
+        catch (unity::InvalidArgumentException const&) {}
+    }
+
+    // UpdateResult only allowed with Result
+    {
+        try
+        {
+            ActivationResponse resp(ActivationResponse::Status::UpdateResult);
             FAIL();
         }
         catch (unity::InvalidArgumentException const&) {}
@@ -84,6 +108,19 @@ TEST(ActivationResponse, serialize)
         auto var = resp.serialize();
         EXPECT_EQ(ActivationResponse::Status::PerformQuery, static_cast<ActivationResponse::Status>(var["status"].get_int()));
         EXPECT_EQ("scope-foo", var["query"].get_dict()["scope"].get_string());
+    }
+    {
+        VariantMap vm;
+        VariantMap attrs;
+        attrs["uri"] = Variant("foo");
+        vm["internal"] = Variant(VariantMap());
+        vm["attrs"] = Variant(attrs);
+        auto const res = ResultImpl::create_result(vm);
+
+        ActivationResponse resp(res);
+        auto var = resp.serialize();
+        EXPECT_EQ(ActivationResponse::Status::UpdateResult, static_cast<ActivationResponse::Status>(var["status"].get_int()));
+        EXPECT_EQ("foo", var["updated_result"].get_dict()["attrs"].get_dict()["uri"].get_string());
     }
 }
 
