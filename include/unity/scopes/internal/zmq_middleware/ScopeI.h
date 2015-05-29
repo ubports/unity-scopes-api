@@ -53,6 +53,9 @@ private:
     virtual void preview_(Current const& current,
                           capnp::AnyPointer::Reader& in_params,
                           capnproto::Response::Builder& r);
+    virtual void activate_result_action_(Current const& current,
+                           capnp::AnyPointer::Reader& in_params,
+                           capnproto::Response::Builder& r);
     virtual void child_scopes_(Current const& current,
                           capnp::AnyPointer::Reader& in_params,
                           capnproto::Response::Builder& r);

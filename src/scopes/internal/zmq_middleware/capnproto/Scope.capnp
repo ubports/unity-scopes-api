@@ -59,6 +59,14 @@ struct ActionActivationRequest
     replyProxy @4 : Proxy.Proxy;
 }
 
+struct ResultActionActivationRequest
+{
+    result @0     : ValueDict.ValueDict;
+    hints @1      : ValueDict.ValueDict;
+    actionId @2   : Text;
+    replyProxy @3 : Proxy.Proxy;
+}
+
 struct PreviewRequest
 {
     result @0     : ValueDict.ValueDict;

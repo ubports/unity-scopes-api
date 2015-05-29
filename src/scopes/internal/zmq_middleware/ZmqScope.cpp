@@ -178,6 +178,40 @@ QueryCtrlProxy ZmqScope::perform_action(VariantMap const& result,
     return make_shared<QueryCtrlImpl>(p, reply_proxy);
 }
 
+QueryCtrlProxy ZmqScope::activate_result_action(VariantMap const& result,
+        VariantMap const& hints,
+        std::string const& action_id,
+        MWReplyProxy const& reply)
+{
+    capnp::MallocMessageBuilder request_builder;
+    auto reply_proxy = dynamic_pointer_cast<ZmqReply>(reply);
+    {
+        auto request = make_request_(request_builder, "activate_result_action");
+        auto in_params = request.initInParams().getAs<capnproto::Scope::ResultActionActivationRequest>();
+        auto res = in_params.initResult();
+        to_value_dict(result, res);
+        auto h = in_params.initHints();
+        to_value_dict(hints, h);
+        in_params.setActionId(action_id);
+        auto p = in_params.initReplyProxy();
+        p.setEndpoint(reply_proxy->endpoint().c_str());
+        p.setIdentity(reply_proxy->identity().c_str());
+    }
+
+    auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_scope_(request_builder); });
+
+    auto out_params = future.get();
+    auto response = out_params.reader->getRoot<capnproto::Response>();
+    throw_if_runtime_exception(response);
+
+    auto proxy = response.getPayload().getAs<capnproto::Scope::CreateQueryResponse>().getReturnValue();
+    ZmqQueryCtrlProxy p(new ZmqQueryCtrl(mw_base(),
+                                         proxy.getEndpoint().cStr(),
+                                         proxy.getIdentity().cStr(),
+                                         proxy.getCategory().cStr()));
+    return make_shared<QueryCtrlImpl>(p, reply_proxy);
+}
+
 QueryCtrlProxy ZmqScope::preview(VariantMap const& result, VariantMap const& hints, MWReplyProxy const& reply)
 {
     capnp::MallocMessageBuilder request_builder;

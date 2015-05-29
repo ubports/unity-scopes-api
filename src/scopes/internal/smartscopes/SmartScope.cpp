@@ -361,3 +361,9 @@ ActivationQueryBase::UPtr SmartScope::perform_action(std::string const& scope_id
         << "SmartScope: created activation for \"" << scope_id << "\": \"" << result.uri() << "\"";
     return activation;
 }
+
+ActivationQueryBase::UPtr SmartScope::activate_result_action(std::string const& scope_id, Result const& result, ActionMetadata const& metadata, std::string const& action_id)
+{
+    ActivationQueryBase::UPtr activation(new NullActivation(result, metadata));
+    return activation;
+}

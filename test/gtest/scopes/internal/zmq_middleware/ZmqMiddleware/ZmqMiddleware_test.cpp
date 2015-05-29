@@ -446,6 +446,15 @@ public:
         return nullptr;
     }
 
+    virtual MWQueryCtrlProxy activate_result_action(Result const&,
+                                                    ActionMetadata const&,
+                                                    std::string const&,
+                                                    MWReplyProxy const&,
+                                                    InvokeInfo const&) override
+    {
+        return nullptr;
+    }
+
     virtual MWQueryCtrlProxy preview(Result const&,
                                      ActionMetadata const&,
                                      MWReplyProxy const&,

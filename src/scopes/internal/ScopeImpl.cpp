@@ -343,7 +343,48 @@ QueryCtrlProxy ScopeImpl::activate_result_action(Result const& result,
                                       std::string const& action_id,
                                       ActivationListenerBase::SPtr const& reply)
 {
-    //TODO
+    if (reply == nullptr)
+    {
+        throw unity::InvalidArgumentException("Scope::activate_result_action(): invalid ActivationListenerBase (nullptr)");
+    }
+
+    ReplyObject::SPtr ro(make_shared<ActivationReplyObject>(reply, runtime_, to_string(), fwd()->debug_mode()));
+    MWReplyProxy rp = fwd()->mw_base()->add_reply_object(ro);
+
+    shared_ptr<QueryCtrlImpl> ctrl = make_shared<QueryCtrlImpl>(nullptr, rp);
+
+    auto impl = dynamic_pointer_cast<ScopeImpl>(shared_from_this());
+
+    auto send_activate_action = [impl, result, metadata, action_id, rp, ro, ctrl]() -> void
+    {
+        try
+        {
+            auto real_ctrl = dynamic_pointer_cast<QueryCtrlImpl>(impl->fwd()->activate_result_action(
+                                                                               result.p->activation_target(),
+                                                                               metadata.serialize(),
+                                                                               action_id,
+                                                                               rp));
+            assert(real_ctrl);
+
+            auto new_proxy = dynamic_pointer_cast<MWQueryCtrl>(real_ctrl->proxy());
+            assert(new_proxy);
+            ctrl->set_proxy(new_proxy);
+        }
+        catch (std::exception const& e)
+        {
+            try
+            {
+                ro->finished(CompletionDetails(CompletionDetails::Error, e.what()));
+            }
+            catch (...)
+            {
+            }
+        }
+    };
+
+    auto future = runtime_->async_pool()->submit(send_activate_action);
+    runtime_->future_queue()->push(move(future));
+    return ctrl;
 }
 
 ChildScopeList ScopeImpl::child_scopes()

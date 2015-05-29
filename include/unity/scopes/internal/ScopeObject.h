@@ -82,6 +82,12 @@ public:
 
     virtual bool debug_mode() const override;
 
+    virtual MWQueryCtrlProxy activate_result_action(Result const& result,
+                                                    ActionMetadata const& hints,
+                                                    std::string const& action_id,
+                                                    MWReplyProxy const &reply,
+                                                    InvokeInfo const& info) override;
+
 private:
     MWQueryCtrlProxy query(MWReplyProxy const& reply, MiddlewareBase* mw_base,
         std::string const& method,
