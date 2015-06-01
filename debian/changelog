@@ -15,6 +15,7 @@ unity-scopes-api (0.6.17+15.10.20150526-0ubuntu1) wily; urgency=medium
   [ CI Train Bot ]
   * debian/libunity-scopes3.symbols: update to released version.
 
+  [ Pawel Stolowski ]
   * Fix for over-zealous loop detection. A loop is now detected only if
     a query loops back with the exact same details, that is, query
     string, department, filter state, user data, and metadata must all
