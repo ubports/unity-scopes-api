@@ -604,6 +604,49 @@ TEST(Activation, scope)
         EXPECT_EQ("widget1action1", response->scope_data().get_dict()["activated action"].get_string());
         EXPECT_EQ("maiden", response->scope_data().get_dict()["received_hints"].get_dict()["iron"].get_string());
         EXPECT_EQ("uri", response->scope_data().get_dict()["activated_uri"].get_string());
+   }
+}
+
+TEST(Activation, result_action)
+{
+    auto reg_rt = run_test_registry();
+
+    auto scope_rt = Runtime::create_scope_runtime("TestScope", TEST_DIR "/Runtime.ini");
+    RaiiScopeThread<TestScope> scope_thread(move(scope_rt));
+
+    // parent: connect to scope and run a query
+    auto rt = internal::RuntimeImpl::create("", TEST_DIR "/Runtime.ini");
+    auto mw = rt->factory()->create("TestScope", "Zmq", TEST_DIR "/Zmq.ini");
+    mw->start();
+    auto proxy = mw->create_scope_proxy("TestScope");
+    auto scope = internal::ScopeImpl::create(proxy, "TestScope");
+
+    VariantMap hints;
+    auto receiver = std::make_shared<SearchReceiver>();
+    auto ctrl = scope->search("test", SearchMetadata("pl", "phone"), receiver);
+    receiver->wait_until_finished();
+
+    auto result = receiver->result;
+    ASSERT_TRUE(result != nullptr);
+
+    auto target = result->target_scope_proxy();
+    EXPECT_TRUE(target != nullptr);
+
+    // activate result action
+    {
+        auto act_receiver = std::make_shared<ActivationReceiver>();
+        ActionMetadata meta("en", "phone");
+        hints["iron"] = "maiden";
+        meta.set_scope_data(Variant(hints));
+        ctrl = target->activate_result_action(*result, meta, "action1", act_receiver);
+        act_receiver->wait_until_finished();
+
+        auto response = act_receiver->response;
+        EXPECT_TRUE(response != nullptr);
+        EXPECT_EQ(ActivationResponse::Status::UpdateResult, response->status());
+        EXPECT_EQ("uri", response->updated_result().uri());
+        EXPECT_EQ("action1", response->scope_data().get_dict()["activated result action"].get_string());
+        EXPECT_EQ("maiden", response->scope_data().get_dict()["received_hints"].get_dict()["iron"].get_string());
     }
 }
 
