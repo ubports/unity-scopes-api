@@ -1,10 +1,14 @@
 unity-scopes-api (0.6.18-0ubuntu1) UNRELEASED; urgency=medium
 
+  [ Marcus Tomlinson ]
   * Allow child_scopes() and set_child_scopes() methods more time to
     execute as they read from and write to disk.
   * Added ChildScopes.Timeout configuration parameter to Zmq.ini
 
- -- Marcus Tomlinson <marcus.tomlinson@canonical.com>  Wed, 06 May 2015 07:47:15 +0200
+  [ Pawel Stolowski ]
+  * Added API for activation of in-card result actions.
+
+ -- Pawel Stolowski <pawel.stolowski@canonical.com>  Mon, 01 Jun 2015 10:14:41 +0000
 
 unity-scopes-api (0.6.17+15.04.20150423.2-0ubuntu1) vivid; urgency=medium
 
