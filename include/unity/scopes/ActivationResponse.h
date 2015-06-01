@@ -70,7 +70,8 @@ public:
     ActivationResponse(CannedQuery const& query);
 
     /**
-     TODO
+    \brief Creates an ActivationResponse with status Status::UpdateResult and an updated result that should replace original result of the action.
+    \param updated_result The updated result to replace original result of the action.
      */
     ActivationResponse(Result const& updated_result);
 
@@ -114,8 +115,11 @@ public:
     CannedQuery query() const;
 
     /**
-     TODO
-     */
+     \brief The updated result if status is Status::UpdateResult.
+
+     \throws unity::LogicException if the status of this ActivationResponse is anything other than Status::UpdateResult.
+     \return The result to be displayed instead of the original result.
+    */
     Result updated_result() const;
 
     /// @cond

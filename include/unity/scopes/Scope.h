@@ -177,8 +177,13 @@ public:
                                   SearchListenerBase::SPtr const& reply) = 0;
 
     /**
-      TODO
-      */
+    \brief Initiates activation of a result (in-card) action.
+    \param result Result whose action got activated.
+    \param metadata additional data to pass to scope
+    \param action_id identifier of an action to activate
+    \param reply The callback object to receive replies
+    \return A proxy that permits cancellation of this request
+    */
     virtual QueryCtrlProxy activate_result_action(Result const& result,
             ActionMetadata const& metadata,
             std::string const& action_id,

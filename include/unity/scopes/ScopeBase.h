@@ -358,8 +358,19 @@ public:
     virtual ChildScopeList child_scopes() const final;
 
     /**
-      TODO
-     */
+    \brief Invoked when a scope is requested to handle a result in-card action.
+
+    This method must return an instance that is derived from `ActivationQueryBase`. The implementation
+    of this method must return in a timely manner, that is, it should perform only minimal
+    initialization that is guaranteed to complete quickly. The call to activate() is made
+    by an arbitrary thread.
+    The default implementation returns an instance of ActivationQueryBase that responds with
+    ActivationResponse::Status::NotHandled.
+    \param result The result whose action got activated.
+    \param metadata Additional data sent by client.
+    \param action_id The identifier of the action that was activated.
+    \return The activation instance.
+    */
     virtual ActivationQueryBase::UPtr activate_result_action(Result const& result,
             ActionMetadata const& metadata,
             std::string const& action_id);
