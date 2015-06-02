@@ -73,6 +73,12 @@ public:
     virtual bool set_child_scopes(ChildScopeList const& child_scopes) = 0;
 
     virtual bool debug_mode() const = 0;
+
+    virtual MWQueryCtrlProxy activate_result_action(Result const& result,
+                                            ActionMetadata const& hints,
+                                            std::string const& action_id,
+                                            MWReplyProxy const& reply,
+                                            InvokeInfo const& info) = 0;
 };
 
 } // namespace internal

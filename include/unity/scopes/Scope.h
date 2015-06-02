@@ -54,10 +54,10 @@ public:
     Results for the query may begin to arrive only after search() completes (but may
     also arrive while search() is still running).
 
-    \param query_string search string
-    \param metadata additional data to pass to scope
-    \param reply The callback object to receive replies
-    \return A proxy that permits cancellation of this request
+    \param query_string The search string.
+    \param metadata Additional data to pass to the scope.
+    \param reply The callback object to receive replies.
+    \return A proxy that permits cancellation of this request.
     */
     virtual QueryCtrlProxy search(std::string const& query_string,
                                   SearchMetadata const& metadata,
@@ -68,11 +68,11 @@ public:
 
     This method has same synopsis as previous method, but it takes additional unity::scopes::FilterState argument.
 
-    \param query_string search string
-    \param filter_state state of filters
-    \param metadata additional data to pass to scope
-    \param reply The callback object to receive replies
-    \return A proxy that permits cancellation of this request
+    \param query_string The search string.
+    \param filter_state The state of filters.
+    \param metadata Additional data to pass to the scope.
+    \param reply The callback object to receive replies.
+    \return A proxy that permits cancellation of this request.
     */
     virtual QueryCtrlProxy search(std::string const& query_string,
                                   FilterState const& filter_state,
@@ -84,12 +84,12 @@ public:
 
     This method has same synopsis as previous method, but it takes additional department identifier argument.
 
-    \param query_string search string
-    \param department_id identifier of a department to search
-    \param filter_state state of filters
-    \param metadata additional data to pass to scope
-    \param reply The callback object to receive replies
-    \return query handler
+    \param query_string The search string.
+    \param department_id The identifier of a department to search.
+    \param filter_state The state of filters.
+    \param metadata Additional data to pass to the scope.
+    \param reply The callback object to receive replies.
+    \return A proxy that permits cancellation of this request.
     */
     virtual QueryCtrlProxy search(std::string const& query_string,
                                   std::string const& department_id,
@@ -99,10 +99,10 @@ public:
 
     /**
     \brief Initiates activation of a search result.
-    \param result activated result
-    \param metadata additional data to pass to scope
+    \param result The result that was activated.
+    \param metadata Additional data to pass to the scope.
     \param reply The callback object to receive replies
-    \return A proxy that permits cancellation of this request
+    \return A proxy that permits cancellation of this request.
     */
     virtual QueryCtrlProxy activate(Result const& result,
                                     ActionMetadata const& metadata,
@@ -110,12 +110,12 @@ public:
 
     /**
     \brief Initiates activation of a preview action.
-    \param result Result that was previewed.
-    \param metadata additional data to pass to scope
-    \param widget_id identifier of 'actions' widget of activated action
-    \param action_id identifier of an action to activate
+    \param result The result that was previewed.
+    \param metadata Additional data to pass to the scope.
+    \param widget_id The identifier of the 'actions' widget of the activated action.
+    \param action_id The identifier of an action to activate.
     \param reply The callback object to receive replies
-    \return A proxy that permits cancellation of this request
+    \return A proxy that permits cancellation of this request.
     */
     virtual QueryCtrlProxy perform_action(Result const& result,
                                           ActionMetadata const& metadata,
@@ -125,10 +125,10 @@ public:
 
     /**
     \brief Initiates preview request.
-    \param result Result to be previewed
-    \param metadata additional data to pass to scope
-    \param reply The callback object to receive replies
-    \return A proxy that permits cancellation of this request
+    \param result The result to be previewed.
+    \param metadata Additional data to pass to the scope.
+    \param reply The callback object to receive replies.
+    \return A proxy that permits cancellation of this request.
     */
     virtual QueryCtrlProxy preview(Result const& result,
                                    ActionMetadata const& metadata,
@@ -161,13 +161,13 @@ public:
 
     This method has same synopsis as previous search method, but it takes additional user_data argument.
 
-    \param query_string search string
-    \param department_id identifier of a department to search
-    \param filter_state state of filters
-    \param user_data arbitrary data
-    \param metadata additional data to pass to scope
+    \param query_string The search string.
+    \param department_id The identifier of a department to search.
+    \param filter_state The state of filters.
+    \param user_data Arbitrary data.
+    \param metadata Additional data to pass to the scope.
     \param reply The callback object to receive replies
-    \return query handler
+    \return A proxy that permits cancellation of this request.
     */
     virtual QueryCtrlProxy search(std::string const& query_string,
                                   std::string const& department_id,
@@ -175,6 +175,19 @@ public:
                                   Variant const& user_data,
                                   SearchMetadata const& metadata,
                                   SearchListenerBase::SPtr const& reply) = 0;
+
+    /**
+    \brief Initiates activation of a result (in-card) action.
+    \param result The result that was was activated.
+    \param metadata Additional data to pass to the scope.
+    \param action_id The identifier of the action.
+    \param reply The callback object to receive replies
+    \return A proxy that permits cancellation of this request.
+    */
+    virtual QueryCtrlProxy activate_result_action(Result const& result,
+            ActionMetadata const& metadata,
+            std::string const& action_id,
+            ActivationListenerBase::SPtr const& reply) = 0;
 
 protected:
     /// @cond

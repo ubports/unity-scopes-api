@@ -65,6 +65,13 @@ ActivationQueryBase::UPtr ScopeBase::perform_action(Result const& result, Action
     return ActivationQueryBase::UPtr(new ActivationQueryBase(result, metadata, widget_id, action_id)); // default impl returns NotHandled
 }
 
+ActivationQueryBase::UPtr ScopeBase::activate_result_action(Result const& result,
+            ActionMetadata const& metadata,
+            std::string const& action_id)
+{
+    return ActivationQueryBase::UPtr(new ActivationQueryBase(result, metadata, action_id)); // default impl returns NotHandled
+}
+
 void ScopeBase::runtime_version(int& v_major, int& v_minor, int& v_micro) noexcept
 {
     v_major = unity::scopes::major_version();

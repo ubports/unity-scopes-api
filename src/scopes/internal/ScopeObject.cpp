@@ -239,6 +239,26 @@ MWQueryCtrlProxy ScopeObject::perform_action(Result const& result,
     );
 }
 
+MWQueryCtrlProxy ScopeObject::activate_result_action(Result const& result,
+                                                    ActionMetadata const& hints,
+                                                    std::string const& action_id,
+                                                    MWReplyProxy const &reply,
+                                                    InvokeInfo const& info)
+{
+    return query(reply,
+                 info.mw,
+                 "activate_result_action",
+                 [&result, &hints, &action_id, this]() -> QueryBase::SPtr {
+                     return this->scope_base_->activate_result_action(result, hints, action_id);
+                 },
+                 [&reply, this](QueryBase::SPtr query_base, MWQueryCtrlProxy ctrl_proxy) -> QueryObjectBase::SPtr {
+                     auto activation_base = dynamic_pointer_cast<ActivationQueryBase>(query_base);
+                     assert(activation_base);
+                     return make_shared<ActivationQueryObject>(activation_base, reply, ctrl_proxy);
+                 }
+    );
+}
+
 MWQueryCtrlProxy ScopeObject::preview(Result const& result,
                                       ActionMetadata const& hints,
                                       MWReplyProxy const& reply,

@@ -361,3 +361,12 @@ ActivationQueryBase::UPtr SmartScope::perform_action(std::string const& scope_id
         << "SmartScope: created activation for \"" << scope_id << "\": \"" << result.uri() << "\"";
     return activation;
 }
+
+ActivationQueryBase::UPtr SmartScope::activate_result_action(std::string const& scope_id, Result const& result, ActionMetadata const& metadata, std::string const& action_id)
+{
+    // NOTE: there is no endpoint for it really, SmartActivation is a no-op (not-handled)
+    ActivationQueryBase::UPtr activation(new SmartActivation(result, metadata, "", action_id));
+    BOOST_LOG_SEV(ss_client_->logger(), Logger::Info)
+        << "SmartScope: created result action activation for \"" << scope_id << "\": \"" << result.uri() << "\", action_id=" << action_id;
+    return activation;
+}

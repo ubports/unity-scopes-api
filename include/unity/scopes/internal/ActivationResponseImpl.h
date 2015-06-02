@@ -20,6 +20,7 @@
 
 #include <unity/scopes/ActivationResponse.h>
 #include <unity/scopes/CannedQuery.h>
+#include <unity/scopes/Result.h>
 
 namespace unity
 {
@@ -35,6 +36,7 @@ class ActivationResponseImpl final
 public:
     ActivationResponseImpl(ActivationResponse::Status status);
     ActivationResponseImpl(CannedQuery const& query);
+    ActivationResponseImpl(Result const& result);
     ActivationResponseImpl(VariantMap const& var);
     ~ActivationResponseImpl() = default;
 
@@ -47,6 +49,7 @@ public:
     void set_scope_data(Variant const& hints);
     Variant scope_data() const;
     CannedQuery query() const;
+    Result updated_result() const;
 
     VariantMap serialize() const;
 
@@ -56,6 +59,7 @@ private:
     ActivationResponse::Status status_;
     CannedQuery::SPtr query_;
     Variant scope_data_;
+    Result::SPtr updated_result_;
 };
 
 } // namespace internal
