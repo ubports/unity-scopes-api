@@ -74,7 +74,7 @@ public:
 
      \param update_result The result received by ScopeBase::activate_result_action().
      \param metadata The metadata received by ScopeBase::activate_result_action().
-     \param action_id The action identifier receiver of ScopeBase::activate_result_action().
+     \param action_id The action identifier received by ScopeBase::activate_result_action().
     */
     ActivationQueryBase(Result const& update_result, ActionMetadata const& metadata, std::string const& action_id);
 

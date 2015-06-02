@@ -42,7 +42,8 @@ class ActivationResponse final
 {
 public:
     /**
-     \brief Status of a unity::scopes::ScopeBase::activate or unity::scopes::ScopeBase::perform_action request.
+     \brief Status of a unity::scopes::ScopeBase::activate, unity::scopes::ScopeBase::perform_action,
+     or unity::scopes::ScopeBase::activate_result_action request.
      */
     enum Status
     {
@@ -70,8 +71,9 @@ public:
     ActivationResponse(CannedQuery const& query);
 
     /**
-    \brief Creates an ActivationResponse with status Status::UpdateResult and an updated result that should replace original result of the action.
-    \param updated_result The updated result to replace original result of the action.
+    \brief Creates an ActivationResponse with status Status::UpdateResult and an updated result that
+    replaces the original result of the action.
+    \param updated_result The updated result to replace the original result of the action.
      */
     ActivationResponse(Result const& updated_result);
 
@@ -96,13 +98,13 @@ public:
      \brief Attach arbitrary data to this response.
 
      The attached data is sent back to the scope if the status of this response is Status::ShowPreview.
-     \param data arbitrary value attached to response
+     \param data An arbitrary value attached to the response.
      */
     void set_scope_data(Variant const& data);
 
     /**
      \brief Get data attached to this response object.
-     \return The data attached to response.
+     \return The data attached to the response.
      */
     Variant scope_data() const;
 
