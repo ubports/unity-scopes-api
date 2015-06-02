@@ -362,12 +362,12 @@ public:
 
     This method must return an instance that is derived from `ActivationQueryBase`. The implementation
     of this method must return in a timely manner, that is, it should perform only minimal
-    initialization that is guaranteed to complete quickly. The call to activate() is made
+    initialization that is guaranteed to complete quickly. The call to activate_result_action() is made
     by an arbitrary thread.
     The default implementation returns an instance of ActivationQueryBase that responds with
     ActivationResponse::Status::NotHandled.
-    \param result The result whose action got activated.
-    \param metadata Additional data sent by client.
+    \param result The result whose action was activated.
+    \param metadata Additional data sent by the client.
     \param action_id The identifier of the action that was activated.
     \return The activation instance.
     */
