@@ -383,6 +383,11 @@ The following keys are recognized in the ScopeConfig group:
 
   Whether the scope is hidden in the UI. The default value is false.
 
+- DebugMode (undocumented)
+
+  Disables a bunch of timeouts when debugging a scope with the SDK.
+  Default value is false.
+
 The following keys are recognized in the Appearance group:
 
 - see tutorial.dox

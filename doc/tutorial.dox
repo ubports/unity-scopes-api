@@ -1241,10 +1241,10 @@ following keys:
     HotKey =
     ResultsTtlType = None, Small, Medium, or Large
     Keywords =
+    IsAggregator = true or false
     IdleTimeout = idle timeout in seconds
     LocationDataNeeded = true or false
     ScopeRunner = path_to_scope_runner args... %R %S
-    DebugMode = true or false
 
     [Appearance]
     ForegroundColor = default text color (defaults to theme-provided foreground color)
@@ -1281,6 +1281,8 @@ to collect results from scopes of similar type (E.g. The Music scope will aggreg
 keyword "music", and so on). The value of `Keywords` should specify a list of keywords your scope
 falls under. This value must be a semicolon separated list (E.g. `Keywords = music;video`).
 
+The `IsAggregator` key must be set to `true` for aggregating scopes. The default value is `false`.
+
 The `IdleTimeout` key controls how long a scope can remain idle before it is told to stop by the registry (or
 killed if it does not stop within 4 seconds). The default idle timeout is 40 seconds, meaning that a
 scope will be told to stop if no query was sent to it for that amount of time.
@@ -1303,9 +1305,6 @@ For example, the following setting causes a scope to be run under `gdb`:
 `ScopeRunner = /usr/bin/gdb --ex run --args /usr/lib/x86_64-linux-gnu/unity-scopes/scoperunner %R %S`
 
 The `%R` expands to the path to the `Runtime.ini` config file, and `%S` expands to the scope's `.ini` file.
-
-The `DebugMode` key is used by debugging tools to disable various timeouts that can interfere with debugging.
-The default value is `false`.
 
 The `Appearance` group and all keys within it are optional and can be used to customize the look of the scope.
 Some of the `Appearance` keys (such as `PageHeader.Background`) require background scheme URIs.

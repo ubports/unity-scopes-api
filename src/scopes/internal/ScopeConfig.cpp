@@ -56,11 +56,11 @@ namespace
     const string scoperunner_key = "ScopeRunner";
     const string idle_timeout_key = "IdleTimeout";
     const string results_ttl_key = "ResultsTtlType";
-    const string debug_mode_key = "DebugMode";
+    const string debug_mode_key = "DebugMode";                      // Deliberately undocumented
     const string child_scope_ids_key = "ChildScopes";               // Deprecated
     const string version_key = "Version";
     const string keywords_key = "Keywords";
-    const string is_aggregator_key = "IsAggregator";                // Deliberately undocumented
+    const string is_aggregator_key = "IsAggregator";
 
     const string scope_appearance_group = "Appearance";
     const string fg_color_key = "ForegroundColor";
