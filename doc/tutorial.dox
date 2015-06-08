@@ -1240,8 +1240,8 @@ following keys:
     SearchHint = hint text displayed to user when viewing scope
     HotKey =
     ResultsTtlType = None, Small, Medium, or Large
-    ChildScopes =
     Keywords =
+    IsAggregator = true or false
     IdleTimeout = idle timeout in seconds
     LocationDataNeeded = true or false
     ScopeRunner = path_to_scope_runner args... %R %S
@@ -1274,9 +1274,23 @@ This allows an aggregating scope to adjust its behavior according to which versi
 your scope is installed.
 If not set, the default value is 0. You can set the value to any integer >= 1.
 
+The `SearchHint` key provides text that may be shown by the UI, such as "Enter a city name".
+
+The `Keywords` key is optional, but we recommend that you use it. Keywords are used by aggregators
+to collect results from scopes of similar type (E.g. The Music scope will aggregate scopes with the
+keyword "music", and so on). The value of `Keywords` should specify a list of keywords your scope
+falls under. This value must be a semicolon separated list (E.g. `Keywords = music;video`).
+
+The `IsAggregator` key must be set to `true` for aggregating scopes. The default value is `false`.
+
 The `IdleTimeout` key controls how long a scope can remain idle before it is told to stop by the registry (or
 killed if it does not stop within 4 seconds). The default idle timeout is 40 seconds, meaning that a
 scope will be told to stop if no query was sent to it for that amount of time.
+
+`ResultTtl` determines how long results should be cached by the UI before they are considered "stale"
+and should be refreshed. `None` indicates that results remain valid indefinitely; `Small` indicates
+results are valid for around a minute; `Medium` indicates that results are valid for a few minutes;
+`Large` indicates that results remain valid for around an hour.
 
 `LocationDataNeeded` should be set to `true` if the scope requires location data. In that case, the
 \link unity::scopes::SearchMetadata SearchMetadata\endlink provides access to
@@ -1293,8 +1307,8 @@ For example, the following setting causes a scope to be run under `gdb`:
 The `%R` expands to the path to the `Runtime.ini` config file, and `%S` expands to the scope's `.ini` file.
 
 The `Appearance` group and all keys within it are optional and can be used to customize the look of the scope.
-Some of the `Appearance` keys (such as `PageHeader.Background`) require background scheme uris.
-Valid uris for these keys include:
+Some of the `Appearance` keys (such as `PageHeader.Background`) require background scheme URIs.
+Valid URIs for these keys include:
 
 <ul>
 <li>color:///\#aarrggbb</li>
@@ -1303,17 +1317,6 @@ Valid uris for these keys include:
 <li>/absolute/path/to/image</li>
 <li>http://remote-server.com/path/to/image</li>
 </ul>
-
-The value of `ChildScopes` key is to be used by aggregator scopes. It must be a semicolon separated list of scope identifiers that
-might be aggregated by this scope, for example:
-
-`ChildScopes = com.foo.bar;com.foo.bar2`
-
-This list of scopes is translated to the names of children scopes when in the scopes overview page of the Unity Dash.
-
-The `Keywords` key is optional, but we recommend that you use it. Keywords are used by aggregators to collect results from scopes of
-similar type (E.g. The Music scope will aggregate scopes with the keyword "music", and so on). The value of `Keywords` should specify a
-list of keywords your scope falls under. Like `ChildScopes`, this value must be a semicolon separated list (E.g. `Keywords = music;video`).
 
 \note Please refer to the <a href="https://developer.ubuntu.com/en/scopes/tutorials/scope-keywords/">Scope Keywords</a>
 tutorial document for more detail on using keywords in your scope.

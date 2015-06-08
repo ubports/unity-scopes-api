@@ -348,6 +348,9 @@ The following keys are recognized:
 <scope_id>.ini
 --------------
 
+NOTE: Only undocumented and deprecated keys are listed here.
+      See tutorial.dox for the "official" list of keys.
+
 The recognized groups in this file are:
 
 - ScopeConfig
@@ -355,7 +358,7 @@ The recognized groups in this file are:
 
 The following keys are recognized in the ScopeConfig group:
 
-- Override
+- Override (undocumented)
 
   Determines whether an OEM scope is allowed to override a Canonical scope. This key is used only by Canonical
   scopes. If true, the Canonical scope can be replaced by an OEM scope with the same ID. The default value
@@ -363,44 +366,11 @@ The following keys are recognized in the ScopeConfig group:
 
   For OEM scopes and click scopes, the setting of this key is ignored.
 
-- DisplayName
-
-  The display name of a scope (mandatory, localizable).
-
-- Description
-
-  The description of a scope (mandatory, localizable).
-
-- Author
-
-  The author of the scope (mandatory).
-
-- Version
-
-  A integer describing the scope version. The setting is optional, but we strongly
-  recommend to set it. If the behavior of your scope changes in any way that is
-  visible to the query source (such having added or removed a result attribute),
-  you should increment the version number. This allows an aggregating scope to
-  adjust its behavior according to which version of your scope is installed.
-  If not set, the default value is 0. You can set the value to any integer >= 1.
-
-- Art
-
-  Artwork to be shown for the scope. The default value is the empty string.
-
-- Icon
-
-  The icon to be shown for the scope. The default value is the empty string.
-
-- SearchHint
-
-  A search hint for on-screen display (localizable). The default value is the empty string.
-
-- HotKey
+- HotKey (undocumented, currently unused)
 
   The hot key for the scope. The default value is the empty string.
 
-- ChildScopes
+- ChildScopes (deprecated)
 
   The list of ids of scopes aggregated by this scope (if any). The values in this list
   must be separated by semicolons. This list is translated to the names of
@@ -409,60 +379,15 @@ The following keys are recognized in the ScopeConfig group:
   Note: make sure there are no trailing spaces following
   the ids, as they will be preserved.
 
-- Invisible
+- Invisible (undocumented)
 
   Whether the scope is hidden in the UI. The default value is false.
 
-- ScopeRunner
+- DebugMode (undocumented)
 
-  A custom scoperunner command-line to be executed when the scope is invoked.
-  The following placeholders can be used to substitute config paths where required:
-
-  - %R - absolute path to the run time .ini config file
-  - %S - absolute path to the scope's .ini config file
-
-  E.g. "ScopeRunner = /usr/bin/gdb --ex run --args /usr/lib/x86_64-linux-gnu/unity-scopes/scoperunner %R %S"
-  
-  If not set, the default scoperunner is used.
-
-- IdleTimeout
-
-  The amount of time (in seconds) a running scope can be inactive before it will automatically shut down.
-  If not set, a default value of 40 is used.
-
-- ResultsTtlType
-
-  If set, the results for this scope will be set to expire, and be refreshed. Valid values are:
-
-  - None
-
-  - Small - in the order of a minute
-
-  - Medium - in the order of a few minutes
-
-  - Large - in the order of an hour
-
-- LocationDataNeeded
-
-  Whether the scope wants to have location data delivered to it. Note that this does not mean that the scope
-  will actually receive location data at run time. (The user may deny access, or may only provide approximate
-  location data.)
-
-  If not set, the default value is false.
-
-- Keywords
-
-  A list of keywords this scope falls under (if any). The values in this list must be separated by semicolons.
-
-  E.g. "Keywords = music;video"
-
-  Note: make sure there are no trailing spaces following the keywords, as they will be preserved.
-
-- IsAggregator
-
-  Whether the scope is an aggregator. The default value is false.
-
+  Disables a bunch of timeouts when debugging a scope with the SDK.
+  Default value is false.
 
 The following keys are recognized in the Appearance group:
 
-- TODO: document this
+- see tutorial.dox

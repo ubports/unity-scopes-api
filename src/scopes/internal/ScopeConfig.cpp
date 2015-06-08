@@ -50,14 +50,14 @@ namespace
     const string art_key = "Art";
     const string icon_key = "Icon";
     const string search_hint_key = "SearchHint";
-    const string hot_key_key = "HotKey";
-    const string invisible_key = "Invisible";
+    const string hot_key_key = "HotKey";                            // Undocumented, currently unused
+    const string invisible_key = "Invisible";                       // Deliberately undocumented
     const string location_data_needed_key = "LocationDataNeeded";
     const string scoperunner_key = "ScopeRunner";
     const string idle_timeout_key = "IdleTimeout";
     const string results_ttl_key = "ResultsTtlType";
-    const string debug_mode_key = "DebugMode";
-    const string child_scope_ids_key = "ChildScopes";
+    const string debug_mode_key = "DebugMode";                      // Deliberately undocumented
+    const string child_scope_ids_key = "ChildScopes";               // Deprecated
     const string version_key = "Version";
     const string keywords_key = "Keywords";
     const string is_aggregator_key = "IsAggregator";
@@ -180,7 +180,6 @@ ScopeConfig::ScopeConfig(string const& configfile) :
         throw_ex("Illegal value (" + std::to_string(idle_timeout_) + ") for " + idle_timeout_key +
                  ": value must be >= 0 and <= " + std::to_string(max_idle_timeout));
     }
-
 
     results_ttl_type_ = ScopeMetadata::ResultsTtlType::None;
     try
