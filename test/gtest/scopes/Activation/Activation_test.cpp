@@ -645,6 +645,7 @@ TEST(Activation, result_action)
         EXPECT_TRUE(response != nullptr);
         EXPECT_EQ(ActivationResponse::Status::UpdateResult, response->status());
         EXPECT_EQ("uri", response->updated_result().uri());
+        ASSERT_NO_THROW(response->updated_result().target_scope_proxy());
         EXPECT_EQ("action1", response->scope_data().get_dict()["activated result action"].get_string());
         EXPECT_EQ("maiden", response->scope_data().get_dict()["received_hints"].get_dict()["iron"].get_string());
     }

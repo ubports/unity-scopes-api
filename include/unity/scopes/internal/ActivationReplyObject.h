@@ -39,6 +39,7 @@ public:
 
 private:
     ActivationListenerBase::SPtr const receiver_;
+    RuntimeImpl const* runtime_;
 };
 
 } // namespace internal
