@@ -127,6 +127,7 @@ TEST(ActivationResponse, serialize)
 
 TEST(ActivationResponse, deserialize)
 {
+    // just to make ResultImpl::set_runtime() happy, runtime must not be null.
     auto runtime = internal::RuntimeImpl::create("fooscope", TEST_DIR "/Runtime.ini");
 
     // invalid variant
