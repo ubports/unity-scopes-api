@@ -33,15 +33,14 @@ namespace internal
 ActivationReplyObject::ActivationReplyObject(ActivationListenerBase::SPtr const& receiver, RuntimeImpl const* runtime,
                                              std::string const& scope_id, bool dont_reap) :
     ReplyObject(std::static_pointer_cast<ListenerBase>(receiver), runtime, scope_id, dont_reap),
-    receiver_(receiver),
-    runtime_(runtime)
+    receiver_(receiver)
 {
     assert(receiver_);
 }
 
 bool ActivationReplyObject::process_data(VariantMap const& data)
 {
-    ActivationResponse resp = ActivationResponseImpl::create(data, runtime_);
+    ActivationResponse resp = ActivationResponseImpl::create(data, runtime());
     receiver_->activated(resp);
     return false;
 }
