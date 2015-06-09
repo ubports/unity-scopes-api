@@ -68,8 +68,14 @@ public:
 
     virtual bool debug_mode() override;
 
+    virtual QueryCtrlProxy activate_result_action(VariantMap const& result,
+                                                  VariantMap const& hints,
+                                                  std::string const& action_id,
+                                                  MWReplyProxy const& reply) override;
+
 private:
     ZmqObjectProxy::TwowayOutParams invoke_scope_(capnp::MessageBuilder& in_params);
+    ZmqObjectProxy::TwowayOutParams invoke_scope_(capnp::MessageBuilder& in_params, int64_t timeout);
     std::mutex debug_mode_mutex_;
     std::unique_ptr<bool> debug_mode_;
 };

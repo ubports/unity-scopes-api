@@ -70,7 +70,7 @@ pkg_check_modules(JSONCPP jsoncpp REQUIRED)
 pkg_check_modules(LIBACCOUNTS libaccounts-glib REQUIRED)
 pkg_check_modules(LIBSIGNON libsignon-glib REQUIRED)
 pkg_check_modules(ZMQLIB libzmq REQUIRED)
-pkg_check_modules(NET_CPP net-cpp REQUIRED)
+pkg_check_modules(NET_CPP net-cpp>=1.2.0 REQUIRED)
 
 find_library(ZMQPPLIB zmqpp)
 if(NOT ZMQPPLIB)
@@ -154,15 +154,6 @@ include_directories(
     ${OTHER_INCLUDE_DIRS}
 )
 
-# We require g++ 4.9, to avoid ABI breakage with earlier version.
-# Note that this must match what is specifed in debian/control.
-set(cxx_version_required 4.9)
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    if (NOT CMAKE_CXX_COMPILER_VERSION MATCHES "^${cxx_version_required}")
-        message(FATAL_ERROR "g++ version must be ${cxx_version_required}, found ${CMAKE_CXX_COMPILER_VERSION}!")
-    endif()
-endif()
-
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -pedantic -Wno-variadic-macros -Wextra -fPIC")
 
 # By default, all symbols are visible in the library. We strip out things we don't
@@ -227,7 +218,7 @@ set(UNITY_SCOPES_LIB unity-scopes)
 # API version
 set(UNITY_SCOPES_MAJOR 0)
 set(UNITY_SCOPES_MINOR 6)
-set(UNITY_SCOPES_MICRO 17)
+set(UNITY_SCOPES_MICRO 18)
 set(UNITY_SCOPES_SOVERSION 3)
 
 # Version for testing, with all symbols visible

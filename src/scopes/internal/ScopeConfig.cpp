@@ -23,6 +23,8 @@
 #include <unity/UnityExceptions.h>
 #include <unity/scopes/internal/Utils.h>
 
+#include <boost/algorithm/string/trim.hpp>
+
 #include <algorithm>
 #include <sstream>
 #include <string>
@@ -48,14 +50,14 @@ namespace
     const string art_key = "Art";
     const string icon_key = "Icon";
     const string search_hint_key = "SearchHint";
-    const string hot_key_key = "HotKey";
-    const string invisible_key = "Invisible";
+    const string hot_key_key = "HotKey";                            // Undocumented, currently unused
+    const string invisible_key = "Invisible";                       // Deliberately undocumented
     const string location_data_needed_key = "LocationDataNeeded";
     const string scoperunner_key = "ScopeRunner";
     const string idle_timeout_key = "IdleTimeout";
     const string results_ttl_key = "ResultsTtlType";
-    const string debug_mode_key = "DebugMode";
-    const string child_scope_ids_key = "ChildScopes";
+    const string debug_mode_key = "DebugMode";                      // Deliberately undocumented
+    const string child_scope_ids_key = "ChildScopes";               // Deprecated
     const string version_key = "Version";
     const string keywords_key = "Keywords";
     const string is_aggregator_key = "IsAggregator";
@@ -87,8 +89,25 @@ ScopeConfig::ScopeConfig(string const& configfile) :
     }
 
     display_name_ = parser()->get_locale_string(scope_config_group, scope_name_key);
+    boost::trim(display_name_);
+    if (display_name_.empty())
+    {
+        throw_ex(scope_name_key + " cannot be empty or whitespace only");
+    }
+
     description_ = parser()->get_locale_string(scope_config_group, description_key);
+    boost::trim(description_);
+    if (description_.empty())
+    {
+        throw_ex(description_key + " cannot be empty or whitespace only");
+    }
+
     author_ = parser()->get_string(scope_config_group, author_key);
+    boost::trim(author_);
+    if (author_.empty())
+    {
+        throw_ex(author_key + " cannot be empty or whitespace only");
+    }
 
     // For optional values, we store them in a unique_ptr so we can distinguish the "not set at all" case
     // from the "explicitly set to empty string" case. parser()->get_string throws LogicException if
@@ -161,7 +180,6 @@ ScopeConfig::ScopeConfig(string const& configfile) :
         throw_ex("Illegal value (" + std::to_string(idle_timeout_) + ") for " + idle_timeout_key +
                  ": value must be >= 0 and <= " + std::to_string(max_idle_timeout));
     }
-
 
     results_ttl_type_ = ScopeMetadata::ResultsTtlType::None;
     try

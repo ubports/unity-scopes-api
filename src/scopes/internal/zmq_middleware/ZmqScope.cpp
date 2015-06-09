@@ -178,6 +178,40 @@ QueryCtrlProxy ZmqScope::perform_action(VariantMap const& result,
     return make_shared<QueryCtrlImpl>(p, reply_proxy);
 }
 
+QueryCtrlProxy ZmqScope::activate_result_action(VariantMap const& result,
+        VariantMap const& hints,
+        std::string const& action_id,
+        MWReplyProxy const& reply)
+{
+    capnp::MallocMessageBuilder request_builder;
+    auto reply_proxy = dynamic_pointer_cast<ZmqReply>(reply);
+    {
+        auto request = make_request_(request_builder, "activate_result_action");
+        auto in_params = request.initInParams().getAs<capnproto::Scope::ResultActionActivationRequest>();
+        auto res = in_params.initResult();
+        to_value_dict(result, res);
+        auto h = in_params.initHints();
+        to_value_dict(hints, h);
+        in_params.setActionId(action_id);
+        auto p = in_params.initReplyProxy();
+        p.setEndpoint(reply_proxy->endpoint().c_str());
+        p.setIdentity(reply_proxy->identity().c_str());
+    }
+
+    auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_scope_(request_builder); });
+
+    auto out_params = future.get();
+    auto response = out_params.reader->getRoot<capnproto::Response>();
+    throw_if_runtime_exception(response);
+
+    auto proxy = response.getPayload().getAs<capnproto::Scope::CreateQueryResponse>().getReturnValue();
+    ZmqQueryCtrlProxy p(new ZmqQueryCtrl(mw_base(),
+                                         proxy.getEndpoint().cStr(),
+                                         proxy.getIdentity().cStr(),
+                                         proxy.getCategory().cStr()));
+    return make_shared<QueryCtrlImpl>(p, reply_proxy);
+}
+
 QueryCtrlProxy ZmqScope::preview(VariantMap const& result, VariantMap const& hints, MWReplyProxy const& reply)
 {
     capnp::MallocMessageBuilder request_builder;
@@ -213,7 +247,8 @@ ChildScopeList ZmqScope::child_scopes()
     capnp::MallocMessageBuilder request_builder;
     make_request_(request_builder, "child_scopes");
 
-    auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_scope_(request_builder); });
+    int64_t timeout = mw_base()->child_scopes_timeout();
+    auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_scope_(request_builder, timeout); });
 
     auto out_params = future.get();
     auto response = out_params.reader->getRoot<capnproto::Response>();
@@ -270,7 +305,8 @@ bool ZmqScope::set_child_scopes(ChildScopeList const& child_scopes)
         }
     }
 
-    auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_scope_(request_builder); });
+    int64_t timeout = mw_base()->child_scopes_timeout();
+    auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_scope_(request_builder, timeout); });
     auto out_params = future.get();
     auto r = out_params.reader->getRoot<capnproto::Response>();
     throw_if_runtime_exception(r);
@@ -303,13 +339,18 @@ bool ZmqScope::debug_mode()
 
 ZmqObjectProxy::TwowayOutParams ZmqScope::invoke_scope_(capnp::MessageBuilder& in_params)
 {
+    return invoke_scope_(in_params, timeout());
+}
+
+ZmqObjectProxy::TwowayOutParams ZmqScope::invoke_scope_(capnp::MessageBuilder& in_params, int64_t timeout)
+{
     // Check if this scope has requested debug mode, if so, disable two-way timeout and set
     // locate timeout to 15s.
     if (debug_mode())
     {
         return this->invoke_twoway_(in_params, -1, 15000);
     }
-    return this->invoke_twoway_(in_params);
+    return this->invoke_twoway_(in_params, timeout);
 }
 
 } // namespace zmq_middleware

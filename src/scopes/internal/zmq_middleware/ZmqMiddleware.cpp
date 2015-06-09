@@ -107,6 +107,7 @@ ZmqMiddleware::ZmqMiddleware(string const& server_name, RuntimeImpl* runtime, st
         twoway_timeout_ = config.twoway_timeout();
         locate_timeout_ = config.locate_timeout();
         registry_timeout_ = config.registry_timeout();
+        child_scopes_timeout_ = config.child_scopes_timeout();
         public_endpoint_dir_ = config.endpoint_dir();
         private_endpoint_dir_ = public_endpoint_dir_ + "/priv";
         registry_endpoint_dir_ = public_endpoint_dir_;
@@ -812,6 +813,11 @@ int64_t ZmqMiddleware::locate_timeout() const noexcept
 int64_t ZmqMiddleware::registry_timeout() const noexcept
 {
     return registry_timeout_;
+}
+
+int64_t ZmqMiddleware::child_scopes_timeout() const noexcept
+{
+    return child_scopes_timeout_;
 }
 
 ObjectProxy ZmqMiddleware::make_typed_proxy(string const& endpoint,

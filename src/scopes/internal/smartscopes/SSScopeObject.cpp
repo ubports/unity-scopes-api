@@ -109,6 +109,20 @@ MWQueryCtrlProxy SSScopeObject::perform_action(Result const& result,
                      { qo_->add_query(SSQuery::Activation, query_base, reply); });
 }
 
+MWQueryCtrlProxy SSScopeObject::activate_result_action(Result const& result,
+                                                       ActionMetadata const& hints,
+                                                       std::string const& action_id,
+                                                       MWReplyProxy const& reply,
+                                                       InvokeInfo const& info)
+{
+    return query(info,
+                 reply,
+                 [&result, &hints, &info, &action_id, this ]()->QueryBase::SPtr
+                     { return this->smartscope_->activate_result_action(info.id, result, hints, action_id); },
+                 [&reply, &info, this](QueryBase::SPtr query_base)
+                     { qo_->add_query(SSQuery::Activation, query_base, reply); });
+}
+
 MWQueryCtrlProxy SSScopeObject::preview(Result const& result,
                                         ActionMetadata const& hints,
                                         MWReplyProxy const& reply,

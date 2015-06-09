@@ -100,6 +100,11 @@ public:
                                    ActionMetadata const& hints,
                                    PreviewListenerBase::SPtr const& reply) override;
 
+    virtual QueryCtrlProxy activate_result_action(Result const& result,
+                                                  ActionMetadata const& metadata,
+                                                  std::string const& action_id,
+                                                  ActivationListenerBase::SPtr const& reply);
+
     virtual ChildScopeList child_scopes() override;
     virtual bool set_child_scopes(ChildScopeList const& child_scopes) override;
 

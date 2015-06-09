@@ -156,8 +156,10 @@ PushRequest (capnproto structure)
 
 ActivationResponse (returned by serialize())
 ============================================
- 'status'      : int (corresponds to ActivationResponse::Status enum)
- 'scope_data'  : variant
+ 'status'         : int (corresponds to ActivationResponse::Status enum)
+ 'scope_data'     : variant
+ 'query'          : variant (optional)
+ 'updated_result' : variant (optional)
 
 QueryMetadata (returned by serialize())
 =======================================

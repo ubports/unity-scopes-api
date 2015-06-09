@@ -60,6 +60,9 @@ public:
     void finished(CompletionDetails const& details) noexcept override;
     void info(OperationInfo const& op_info) noexcept override;
 
+protected:
+    RuntimeImpl const* runtime() const;
+
 private:
     RuntimeImpl const* runtime_;
     ListenerBase::SPtr listener_base_;

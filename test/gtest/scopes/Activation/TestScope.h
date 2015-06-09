@@ -94,6 +94,32 @@ private:
     Variant recv_hints_;
 };
 
+class TestInCardActivation : public ActivationQueryBase
+{
+public:
+    TestInCardActivation(Result const& result, ActionMetadata const& metadata, std::string const& action_id,
+            std::string const& hint, std::string const& hint_val)
+        : ActivationQueryBase(result, metadata, action_id),
+          hint_key_(hint),
+          hint_val_(hint_val)
+    {
+    }
+
+    virtual ActivationResponse activate() override
+    {
+        ActivationResponse resp(result());
+        VariantMap var;
+        var[hint_key_] = hint_val_;
+        var["received_hints"] = action_metadata().scope_data(); // send received hints back for testing
+        resp.set_scope_data(Variant(var));
+        return resp;
+    }
+
+private:
+    std::string hint_key_;
+    std::string hint_val_;
+};
+
 class TestScope : public ScopeBase
 {
 public:
@@ -121,6 +147,11 @@ public:
     virtual ActivationQueryBase::UPtr perform_action(Result const& result, ActionMetadata const& hints, std::string const& widget_id, std::string const& action_id) override
     {
         return ActivationQueryBase::UPtr(new TestActivation(result, hints, widget_id, action_id, "activated action", widget_id + action_id, result.uri(), hints.scope_data()));
+    }
+
+    virtual ActivationQueryBase::UPtr activate_result_action(Result const& result, ActionMetadata const& hints, std::string const& action_id) override
+    {
+        return ActivationQueryBase::UPtr(new TestInCardActivation(result, hints, action_id, "activated result action", action_id));
     }
 };
 
