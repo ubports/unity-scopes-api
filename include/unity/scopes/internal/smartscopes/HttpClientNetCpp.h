@@ -30,7 +30,7 @@ namespace net
 {
 namespace http
 {
-class Client;
+class StreamingClient;
 }
 }
 }
@@ -63,7 +63,7 @@ private:
     void cancel_get(unsigned int session_id) override;
 
     unsigned int no_reply_timeout;
-    std::shared_ptr<core::net::http::Client> client;
+    std::shared_ptr<core::net::http::StreamingClient> client;
     std::thread worker;
 };
 

@@ -39,6 +39,7 @@ public:
     int twoway_timeout() const;
     int locate_timeout() const;
     int registry_timeout() const;
+    int child_scopes_timeout() const;
     std::string registry_endpoint_dir() const;
     std::string ss_registry_endpoint_dir() const;
 
@@ -47,6 +48,7 @@ private:
     int twoway_timeout_;
     int locate_timeout_;
     int registry_timeout_;
+    int child_scopes_timeout_;
     std::string registry_endpoint_dir_;
     std::string ss_registry_endpoint_dir_;
 };

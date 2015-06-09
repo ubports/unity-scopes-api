@@ -479,6 +479,11 @@ Result ResultImpl::create_result(VariantMap const& variant_map)
     return Result(variant_map);
 }
 
+Result ResultImpl::create_result(ResultImpl *impl)
+{
+    return Result(impl);
+}
+
 } // namespace internal
 
 } // namespace scopes

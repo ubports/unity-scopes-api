@@ -46,12 +46,13 @@ static constexpr int DFLT_SCOPE_IDLE_TIMEOUT = 40;           // seconds
 
 static constexpr char const* DFLT_SS_SCOPE_IDENTITY = "SmartScope";
 
-static constexpr int DFLT_REAP_EXPIRY = 45;              // seconds
-static constexpr int DFLT_REAP_INTERVAL = 10;            // seconds
-static constexpr int DFLT_PROCESS_TIMEOUT = 4000;        // milliseconds
-static constexpr int DFLT_ZMQ_TWOWAY_TIMEOUT = 500;      // milliseconds
-static constexpr int DFLT_ZMQ_LOCATE_TIMEOUT = 5000;     // milliseconds
-static constexpr int DFLT_ZMQ_REGISTRY_TIMEOUT = 5000;   // milliseconds
+static constexpr int DFLT_REAP_EXPIRY = 45;                // seconds
+static constexpr int DFLT_REAP_INTERVAL = 10;              // seconds
+static constexpr int DFLT_PROCESS_TIMEOUT = 4000;          // milliseconds
+static constexpr int DFLT_ZMQ_TWOWAY_TIMEOUT = 500;        // milliseconds
+static constexpr int DFLT_ZMQ_LOCATE_TIMEOUT = 5000;       // milliseconds
+static constexpr int DFLT_ZMQ_REGISTRY_TIMEOUT = 5000;     // milliseconds
+static constexpr int DFLT_ZMQ_CHILDSCOPES_TIMEOUT = 2000;  // milliseconds
 
 static constexpr char const* DFLT_HOME_CACHE_SUBDIR = ".local/share/unity-scopes";
 static constexpr char const* DFLT_HOME_APP_SUBDIR = ".local/share";

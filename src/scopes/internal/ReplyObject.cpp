@@ -232,6 +232,11 @@ std::string ReplyObject::origin_proxy() const
     return origin_proxy_;
 }
 
+RuntimeImpl const* ReplyObject::runtime() const
+{
+    return runtime_;
+}
+
 } // namespace internal
 
 } // namespace scopes

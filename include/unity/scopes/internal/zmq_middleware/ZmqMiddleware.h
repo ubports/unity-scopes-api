@@ -94,6 +94,7 @@ public:
     ThreadPool* twoway_pool();
     int64_t locate_timeout() const noexcept;
     int64_t registry_timeout() const noexcept;
+    int64_t child_scopes_timeout() const noexcept;
 
 private:
     ObjectProxy make_typed_proxy(std::string const& endpoint,
@@ -138,6 +139,7 @@ private:
     int64_t twoway_timeout_;                    // Default timeout for twoway invocations
     int64_t locate_timeout_;                    // Timeout for registry locate()
     int64_t registry_timeout_;                  // Timeout for registry operations other than locate()
+    int64_t child_scopes_timeout_;              // Timeout for child_scopes() and set_child_scopes() methods
 
     std::string public_endpoint_dir_;
     std::string private_endpoint_dir_;

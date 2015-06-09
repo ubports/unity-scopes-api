@@ -92,6 +92,7 @@ public:
     QueryBase::UPtr preview(std::string const& scope_id, Result const& result, ActionMetadata const& hints);
     ActivationQueryBase::UPtr activate(std::string const&, Result const& result, ActionMetadata const& metadata);
     ActivationQueryBase::UPtr perform_action(std::string const& scope_id, Result const& result, ActionMetadata const& metadata, std::string const& widget_id, std::string const& action_id);
+    ActivationQueryBase::UPtr activate_result_action(std::string const& scope_id, Result const& result, ActionMetadata const& metadata, std::string const& action_id);
 
 private:
     SSRegistryObject::SPtr reg_;

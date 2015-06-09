@@ -19,6 +19,7 @@
 #include <unity/scopes/internal/ActivationResponseImpl.h>
 #include <unity/UnityExceptions.h>
 #include <unity/scopes/internal/CannedQueryImpl.h>
+#include <unity/scopes/internal/ResultImpl.h>
 #include <cassert>
 
 namespace unity
@@ -37,6 +38,10 @@ ActivationResponseImpl::ActivationResponseImpl(ActivationResponse::Status status
     {
         throw unity::InvalidArgumentException("ActivationResponse(): Status::PerformQuery allowed only with CannedQuery object");
     }
+    if (status == ActivationResponse::Status::UpdateResult)
+    {
+        throw unity::InvalidArgumentException("ActivationResponse(): Status::UpdateResult allowed only with Result object");
+    }
 }
 
 ActivationResponseImpl::ActivationResponseImpl(CannedQuery const& query)
@@ -45,7 +50,13 @@ ActivationResponseImpl::ActivationResponseImpl(CannedQuery const& query)
 {
 }
 
-ActivationResponseImpl::ActivationResponseImpl(VariantMap const& var)
+ActivationResponseImpl::ActivationResponseImpl(Result const& updated_result)
+    : status_(ActivationResponse::Status::UpdateResult),
+      updated_result_(std::make_shared<Result>(updated_result))
+{
+}
+
+ActivationResponseImpl::ActivationResponseImpl(VariantMap const& var, RuntimeImpl const* runtime)
 {
     auto it = var.find("scope_data");
     if (it == var.end())
@@ -69,6 +80,17 @@ ActivationResponseImpl::ActivationResponseImpl(VariantMap const& var)
             throw LogicException("ActivationResponseImpl(): Invalid data, missing 'query'");
         }
         query_ = std::make_shared<CannedQuery>(CannedQueryImpl::create(it->second.get_dict()));
+    }
+    else if (status_ == ActivationResponse::Status::UpdateResult)
+    {
+        it = var.find("updated_result");
+        if (it == var.end())
+        {
+            throw LogicException("ActivationResponseImpl(): Invalid data, missing 'updated_result'");
+        }
+        auto impl = new ResultImpl(it->second.get_dict());
+        impl->set_runtime(runtime);
+        updated_result_ = std::make_shared<Result>(ResultImpl::create_result(impl));
     }
 }
 
@@ -97,6 +119,16 @@ CannedQuery ActivationResponseImpl::query() const
     throw LogicException("ActivationResponse::query(): query is only available for status of Status::PerformQuery");
 }
 
+Result ActivationResponseImpl::updated_result() const
+{
+    if (updated_result_)
+    {
+        assert(status_ == ActivationResponse::Status::UpdateResult);
+        return *updated_result_;
+    }
+    throw LogicException("ActivationResponse::updated_result(): updated result is only available for status of Status::UpdateResult");
+}
+
 VariantMap ActivationResponseImpl::serialize() const
 {
     VariantMap vm;
@@ -106,12 +138,16 @@ VariantMap ActivationResponseImpl::serialize() const
     {
         vm["query"] = query_->serialize();
     }
+    if (updated_result_)
+    {
+        vm["updated_result"] = updated_result_->serialize();
+    }
     return vm;
 }
 
-ActivationResponse ActivationResponseImpl::create(VariantMap const& var)
+ActivationResponse ActivationResponseImpl::create(VariantMap const& var, RuntimeImpl const* runtime)
 {
-    return ActivationResponse(new ActivationResponseImpl(var));
+    return ActivationResponse(new ActivationResponseImpl(var, runtime));
 }
 
 } // namespace internal

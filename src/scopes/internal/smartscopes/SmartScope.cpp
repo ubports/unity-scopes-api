@@ -50,18 +50,6 @@ void SmartQuery::cancelled()
 
 void SmartQuery::run(SearchReplyProxy const& reply)
 {
-    static const std::string no_net_hint("no-internet");
-    if (hints_.contains_hint(no_net_hint))
-    {
-        auto var = hints_[no_net_hint];
-        if (var.which() == Variant::Type::Bool && var.get_bool())
-        {
-            BOOST_LOG_SEV(ss_client_->logger(), Logger::Info)
-                << "SmartQuery(): networking disabled for remote scope " << scope_id_ << ", skipping";
-            return;
-        }
-    }
-
     struct FiltersHandler
     {
         FiltersHandler(SearchReplyProxy reply, std::string const& scope_id):
@@ -371,5 +359,14 @@ ActivationQueryBase::UPtr SmartScope::perform_action(std::string const& scope_id
     ActivationQueryBase::UPtr activation(new SmartActivation(result, metadata, widget_id, action_id));
     BOOST_LOG_SEV(ss_client_->logger(), Logger::Info)
         << "SmartScope: created activation for \"" << scope_id << "\": \"" << result.uri() << "\"";
+    return activation;
+}
+
+ActivationQueryBase::UPtr SmartScope::activate_result_action(std::string const& scope_id, Result const& result, ActionMetadata const& metadata, std::string const& action_id)
+{
+    // NOTE: there is no endpoint for it really, SmartActivation is a no-op (not-handled)
+    ActivationQueryBase::UPtr activation(new SmartActivation(result, metadata, "", action_id));
+    BOOST_LOG_SEV(ss_client_->logger(), Logger::Info)
+        << "SmartScope: created result action activation for \"" << scope_id << "\": \"" << result.uri() << "\", action_id=" << action_id;
     return activation;
 }

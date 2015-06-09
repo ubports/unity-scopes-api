@@ -76,6 +76,7 @@ ScopeI::ScopeI(ScopeObjectBase::SPtr const& so) :
                       { "preview", bind(&ScopeI::preview_, this, ph::_1, ph::_2, ph::_3) },
                       { "activate", bind(&ScopeI::activate_, this, ph::_1, ph::_2, ph::_3) },
                       { "perform_action", bind(&ScopeI::perform_action_, this, ph::_1, ph::_2, ph::_3) },
+                      { "activate_result_action", bind(&ScopeI::activate_result_action_, this, ph::_1, ph::_2, ph::_3) },
                       { "child_scopes", bind(&ScopeI::child_scopes_, this, ph::_1, ph::_2, ph::_3) },
                       { "set_child_scopes", bind(&ScopeI::set_child_scopes_, this, ph::_1, ph::_2, ph::_3) },
                       { "debug_mode", bind(&ScopeI::debug_mode_, this, ph::_1, ph::_2, ph::_3) }
@@ -192,6 +193,35 @@ void ScopeI::preview_(Current const& current,
                                                                            metadata,
                                                                            reply_proxy,
                                                                            to_info(current)));
+    assert(ctrl_proxy);
+    r.setStatus(capnproto::ResponseStatus::SUCCESS);
+    auto search_response = r.initPayload().getAs<capnproto::Scope::CreateQueryResponse>();
+    auto p = search_response.initReturnValue();
+    p.setEndpoint(ctrl_proxy->endpoint().c_str());
+    p.setIdentity(ctrl_proxy->identity().c_str());
+    p.setCategory(ctrl_proxy->target_category().c_str());
+}
+
+void ScopeI::activate_result_action_(Current const& current,
+                           capnp::AnyPointer::Reader& in_params,
+                           capnproto::Response::Builder& r)
+{
+    auto req = in_params.getAs<capnproto::Scope::ResultActionActivationRequest>();
+    auto result = ResultImpl::create_result(to_variant_map(req.getResult()));
+    auto metadata = ActionMetadataImpl::create(to_variant_map(req.getHints()));
+    auto proxy = req.getReplyProxy();
+    auto action_id = req.getActionId().cStr();
+    ZmqReplyProxy reply_proxy(new ZmqReply(current.adapter->mw(),
+                                           proxy.getEndpoint().cStr(),
+                                           proxy.getIdentity().cStr(),
+                                           proxy.getCategory().cStr()));
+    auto delegate = dynamic_pointer_cast<ScopeObjectBase>(del());
+    assert(delegate);
+    auto ctrl_proxy = dynamic_pointer_cast<ZmqQueryCtrl>(delegate->activate_result_action(result,
+                                                                                          metadata,
+                                                                                          action_id,
+                                                                                          reply_proxy,
+                                                                                          to_info(current)));
     assert(ctrl_proxy);
     r.setStatus(capnproto::ResponseStatus::SUCCESS);
     auto search_response = r.initPayload().getAs<capnproto::Scope::CreateQueryResponse>();

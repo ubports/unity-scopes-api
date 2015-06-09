@@ -20,6 +20,7 @@
 
 #include <unity/scopes/ActivationResponse.h>
 #include <unity/scopes/CannedQuery.h>
+#include <unity/scopes/Result.h>
 
 namespace unity
 {
@@ -30,12 +31,15 @@ namespace scopes
 namespace internal
 {
 
+class RuntimeImpl;
+
 class ActivationResponseImpl final
 {
 public:
     ActivationResponseImpl(ActivationResponse::Status status);
     ActivationResponseImpl(CannedQuery const& query);
-    ActivationResponseImpl(VariantMap const& var);
+    ActivationResponseImpl(Result const& result);
+    ActivationResponseImpl(VariantMap const& var, RuntimeImpl const* runtime);
     ~ActivationResponseImpl() = default;
 
     ActivationResponseImpl(ActivationResponseImpl const& other) = default;
@@ -47,15 +51,17 @@ public:
     void set_scope_data(Variant const& hints);
     Variant scope_data() const;
     CannedQuery query() const;
+    Result updated_result() const;
 
     VariantMap serialize() const;
 
-    static ActivationResponse create(VariantMap const& var);
+    static ActivationResponse create(VariantMap const& var, RuntimeImpl const *runtime);
 
 private:
     ActivationResponse::Status status_;
     CannedQuery::SPtr query_;
     Variant scope_data_;
+    Result::SPtr updated_result_;
 };
 
 } // namespace internal

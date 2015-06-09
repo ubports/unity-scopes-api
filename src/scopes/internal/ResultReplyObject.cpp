@@ -49,7 +49,6 @@ ResultReplyObject::ResultReplyObject(SearchListenerBase::SPtr const& receiver, R
     ReplyObject(std::static_pointer_cast<ListenerBase>(receiver), runtime, scope_id, dont_reap),
     receiver_(receiver),
     cat_registry_(new CategoryRegistry()),
-    runtime_(runtime),
     cardinality_(cardinality),
     num_pushes_(0)
 {
@@ -113,7 +112,7 @@ bool ResultReplyObject::process_data(VariantMap const& data)
         auto result_var = it->second.get_dict();
         auto impl = std::unique_ptr<internal::CategorisedResultImpl>(new internal::CategorisedResultImpl(*cat_registry_, result_var));
 
-        impl->set_runtime(runtime_);
+        impl->set_runtime(runtime());
         // set result origin
         if (impl->origin().empty())
         {

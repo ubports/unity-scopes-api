@@ -36,6 +36,11 @@ ActivationResponse::ActivationResponse(CannedQuery const& query)
 {
 }
 
+ActivationResponse::ActivationResponse(Result const& updated_result)
+    : p(new internal::ActivationResponseImpl(updated_result))
+{
+}
+
 /// @cond
 ActivationResponse::ActivationResponse(internal::ActivationResponseImpl* pimpl)
     : p(pimpl)
@@ -86,6 +91,11 @@ Variant ActivationResponse::scope_data() const
 CannedQuery ActivationResponse::query() const
 {
     return p->query();
+}
+
+Result ActivationResponse::updated_result() const
+{
+    return p->updated_result();
 }
 
 } // namespace scopes

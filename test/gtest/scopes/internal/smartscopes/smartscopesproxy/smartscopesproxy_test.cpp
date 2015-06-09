@@ -53,8 +53,7 @@ public:
         , ss_config_("")
     {
         // set the LANGUAGE env var
-        std::string locale_env = "LANGUAGE=test_TEST";
-        ::putenv(const_cast<char*>(locale_env.c_str()));
+        ::setenv("LANGUAGE", "test_TEST", 1);
 
         // Instantiate runtime
         rt_ = RuntimeImpl::create(reg_id_, SS_RUNTIME_PATH);
@@ -191,38 +190,32 @@ TEST_F(smartscopesproxytest, ss_registry)
 TEST_F(smartscopesproxytest, ss_registry_locale)
 {
     // set an invalid LANGUAGE env var (should return 0 scopes)
-    std::string locale_env = "LANGUAGE=test_FAIL";
-    ::putenv(const_cast<char*>(locale_env.c_str()));
+    ::setenv("LANGUAGE", "test_FAIL", 1);
     reset_reg();
     EXPECT_EQ(0, reg_->list().size());
 
     // set an empty LANGUAGE env var (should return 2 scopes)
-    locale_env = "LANGUAGE=";
-    ::putenv(const_cast<char*>(locale_env.c_str()));
+    ::setenv("LANGUAGE", "", 1);
     reset_reg();
     EXPECT_EQ(4u, reg_->list().size());
 
     // set a valid LANGUAGE env var (should return 2 scopes)
-    locale_env = "LANGUAGE=test_TEST";
-    ::putenv(const_cast<char*>(locale_env.c_str()));
+    ::setenv("LANGUAGE", "test_TEST", 1);
     reset_reg();
     EXPECT_EQ(4u, reg_->list().size());
 
     // set a colon only LANGUAGE env var (should return 2 scopes)
-    locale_env = "LANGUAGE=:";
-    ::putenv(const_cast<char*>(locale_env.c_str()));
+    ::setenv("LANGUAGE", ":", 1);
     reset_reg();
     EXPECT_EQ(4u, reg_->list().size());
 
     // set a colon seperated LANGUAGE env var (first valid - should return 2 scopes)
-    locale_env = "LANGUAGE=test_TEST:test_FAIL";
-    ::putenv(const_cast<char*>(locale_env.c_str()));
+    ::setenv("LANGUAGE", "test_TEST:test_FAIL", 1);
     reset_reg();
     EXPECT_EQ(4u, reg_->list().size());
 
     // set a colon seperated LANGUAGE env var (first invalid - should return 0 scopes)
-    locale_env = "LANGUAGE=test_FAIL:test_TEST";
-    ::putenv(const_cast<char*>(locale_env.c_str()));
+    ::setenv("LANGUAGE", "test_FAIL:test_TEST", 1);
     reset_reg();
     EXPECT_EQ(0, reg_->list().size());
 }

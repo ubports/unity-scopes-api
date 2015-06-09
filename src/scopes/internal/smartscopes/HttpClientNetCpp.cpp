@@ -20,8 +20,8 @@
 
 #include <unity/UnityExceptions.h>
 
-#include <core/net/http/client.h>
-#include <core/net/http/request.h>
+#include <core/net/http/streaming_client.h>
+#include <core/net/http/streaming_request.h>
 #include <core/net/http/response.h>
 #include <core/net/http/status.h>
 
@@ -102,7 +102,7 @@ struct CancellationRegistry
 
 HttpClientNetCpp::HttpClientNetCpp(unsigned int no_reply_timeout)
     : no_reply_timeout{no_reply_timeout},
-      client{http::make_client()},
+      client{http::make_streaming_client()},
       worker([this]() { client->run(); })
 {
 }
@@ -129,7 +129,7 @@ HttpResponseHandle::SPtr HttpClientNetCpp::get(std::string const& request_url,
     }
     http_config.header = http_header;
 
-    auto request = client->get(http_config);
+    auto request = client->streaming_get(http_config);
     request->set_timeout(std::chrono::milliseconds{no_reply_timeout});
 
     auto promise = std::make_shared<std::promise<void>>();
@@ -157,12 +157,8 @@ HttpResponseHandle::SPtr HttpClientNetCpp::get(std::string const& request_url,
                         }
                         else
                         {
-                            std::istringstream in(response.body);
-                            std::string line;
-                            while (std::getline(in, line))
-                            {
-                                line_data(line);
-                            }
+                            // call line_data with empty string to signal end of chunked data
+                            line_data("");
                             promise->set_value();
                         }
                     })
@@ -170,7 +166,11 @@ HttpResponseHandle::SPtr HttpClientNetCpp::get(std::string const& request_url,
                     {
                         unity::ResourceException re(e.what());
                         promise->set_exception(std::make_exception_ptr(re));
-                    }));
+                    }),
+                [line_data](const std::string& const_data)
+                {
+                    line_data(const_data);
+                });
 
     return std::make_shared<HttpResponseHandle>(
                 shared_from_this(),

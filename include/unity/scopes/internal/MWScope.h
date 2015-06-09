@@ -64,6 +64,11 @@ public:
 
     virtual bool debug_mode() = 0;
 
+    virtual QueryCtrlProxy activate_result_action(VariantMap const& result,
+                                                  VariantMap const& hints,
+                                                  std::string const& action_id,
+                                                  MWReplyProxy const& reply) = 0;
+
 protected:
     MWScope(MiddlewareBase* mw_base);
 };
