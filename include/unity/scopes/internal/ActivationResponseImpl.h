@@ -31,13 +31,15 @@ namespace scopes
 namespace internal
 {
 
+class RuntimeImpl;
+
 class ActivationResponseImpl final
 {
 public:
     ActivationResponseImpl(ActivationResponse::Status status);
     ActivationResponseImpl(CannedQuery const& query);
     ActivationResponseImpl(Result const& result);
-    ActivationResponseImpl(VariantMap const& var);
+    ActivationResponseImpl(VariantMap const& var, RuntimeImpl const* runtime);
     ~ActivationResponseImpl() = default;
 
     ActivationResponseImpl(ActivationResponseImpl const& other) = default;
@@ -53,7 +55,7 @@ public:
 
     VariantMap serialize() const;
 
-    static ActivationResponse create(VariantMap const& var);
+    static ActivationResponse create(VariantMap const& var, RuntimeImpl const *runtime);
 
 private:
     ActivationResponse::Status status_;

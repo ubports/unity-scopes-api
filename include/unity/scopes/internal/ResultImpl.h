@@ -84,6 +84,7 @@ public:
     // a public static method, so there's access to the private constructor
     // without the need to define too many classes as friends
     static Result create_result(VariantMap const&);
+    static Result create_result(ResultImpl *impl);
 
 protected:
     virtual void serialize_internal(VariantMap& var) const;

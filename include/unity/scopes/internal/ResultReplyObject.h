@@ -45,7 +45,6 @@ public:
 private:
     SearchListenerBase::SPtr const receiver_;
     std::shared_ptr<CategoryRegistry> cat_registry_;
-    RuntimeImpl const* runtime_;
     std::atomic_int cardinality_;
     std::atomic_int num_pushes_;
 };

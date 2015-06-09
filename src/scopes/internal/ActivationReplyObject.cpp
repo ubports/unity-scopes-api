@@ -40,7 +40,7 @@ ActivationReplyObject::ActivationReplyObject(ActivationListenerBase::SPtr const&
 
 bool ActivationReplyObject::process_data(VariantMap const& data)
 {
-    ActivationResponse resp = ActivationResponseImpl::create(data);
+    ActivationResponse resp = ActivationResponseImpl::create(data, runtime());
     receiver_->activated(resp);
     return false;
 }

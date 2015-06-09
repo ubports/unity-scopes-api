@@ -20,6 +20,7 @@
 #include <unity/scopes/CannedQuery.h>
 #include <unity/scopes/internal/ActivationResponseImpl.h>
 #include <unity/scopes/internal/ResultImpl.h>
+#include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/UnityExceptions.h>
 #include <gtest/gtest.h>
 
@@ -126,12 +127,15 @@ TEST(ActivationResponse, serialize)
 
 TEST(ActivationResponse, deserialize)
 {
+    // just to make ResultImpl::set_runtime() happy, runtime must not be null.
+    auto runtime = internal::RuntimeImpl::create("fooscope", TEST_DIR "/Runtime.ini");
+
     // invalid variant
     {
         VariantMap var;
         try
         {
-            internal::ActivationResponseImpl res(var);
+            internal::ActivationResponseImpl res(var, runtime.get());
             FAIL();
         }
         catch (unity::LogicException const &e)
@@ -145,7 +149,7 @@ TEST(ActivationResponse, deserialize)
         var["scope_data"] = VariantMap();
         try
         {
-            internal::ActivationResponseImpl::create(var);
+            internal::ActivationResponseImpl::create(var, runtime.get());
             FAIL();
         }
         catch (unity::LogicException const &e)
@@ -162,7 +166,7 @@ TEST(ActivationResponse, deserialize)
         var["status"] = static_cast<int>(ActivationResponse::Status::PerformQuery);
         try
         {
-            internal::ActivationResponseImpl res(var);
+            internal::ActivationResponseImpl res(var, runtime.get());
             FAIL();
         }
         catch (unity::LogicException const &e) {}
@@ -177,7 +181,7 @@ TEST(ActivationResponse, deserialize)
         var["status"] = static_cast<int>(ActivationResponse::Status::HideDash);
         try
         {
-            internal::ActivationResponseImpl res(var);
+            internal::ActivationResponseImpl res(var, runtime.get());
             EXPECT_EQ("bar", res.scope_data().get_dict()["foo"].get_string());
             EXPECT_EQ(ActivationResponse::Status::HideDash, res.status());
         }
@@ -196,7 +200,7 @@ TEST(ActivationResponse, deserialize)
         var["query"] = query.serialize();
         try
         {
-            internal::ActivationResponseImpl res(var);
+            internal::ActivationResponseImpl res(var, runtime.get());
             EXPECT_EQ(ActivationResponse::Status::PerformQuery, res.status());
             EXPECT_EQ("scope-foo", res.query().scope_id());
         }
@@ -213,7 +217,7 @@ TEST(ActivationResponse, deserialize)
         var["status"] = static_cast<int>(ActivationResponse::Status::HideDash);
         try
         {
-            internal::ActivationResponseImpl res(var);
+            internal::ActivationResponseImpl res(var, runtime.get());
             EXPECT_EQ("foobar", res.scope_data().get_string());
             EXPECT_EQ(ActivationResponse::Status::HideDash, res.status());
         }

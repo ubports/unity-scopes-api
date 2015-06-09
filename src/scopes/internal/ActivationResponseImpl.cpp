@@ -56,7 +56,7 @@ ActivationResponseImpl::ActivationResponseImpl(Result const& updated_result)
 {
 }
 
-ActivationResponseImpl::ActivationResponseImpl(VariantMap const& var)
+ActivationResponseImpl::ActivationResponseImpl(VariantMap const& var, RuntimeImpl const* runtime)
 {
     auto it = var.find("scope_data");
     if (it == var.end())
@@ -88,7 +88,9 @@ ActivationResponseImpl::ActivationResponseImpl(VariantMap const& var)
         {
             throw LogicException("ActivationResponseImpl(): Invalid data, missing 'updated_result'");
         }
-        updated_result_ = std::make_shared<Result>(ResultImpl::create_result(it->second.get_dict()));
+        auto impl = new ResultImpl(it->second.get_dict());
+        impl->set_runtime(runtime);
+        updated_result_ = std::make_shared<Result>(ResultImpl::create_result(impl));
     }
 }
 
@@ -143,9 +145,9 @@ VariantMap ActivationResponseImpl::serialize() const
     return vm;
 }
 
-ActivationResponse ActivationResponseImpl::create(VariantMap const& var)
+ActivationResponse ActivationResponseImpl::create(VariantMap const& var, RuntimeImpl const* runtime)
 {
-    return ActivationResponse(new ActivationResponseImpl(var));
+    return ActivationResponse(new ActivationResponseImpl(var, runtime));
 }
 
 } // namespace internal
