@@ -1,4 +1,4 @@
-unity-scopes-api (0.6.18-0ubuntu1) UNRELEASED; urgency=medium
+unity-scopes-api (0.6.18+15.10.20150609.1-0ubuntu1) wily; urgency=medium
 
   [ Marcus Tomlinson ]
   * Allow child_scopes() and set_child_scopes() methods more time to
@@ -8,7 +8,11 @@ unity-scopes-api (0.6.18-0ubuntu1) UNRELEASED; urgency=medium
   [ Pawel Stolowski ]
   * Added API for activation of in-card result actions.
 
- -- Pawel Stolowski <pawel.stolowski@canonical.com>  Mon, 01 Jun 2015 10:14:41 +0000
+  [ CI Train Bot ]
+  * debian/libunity-scopes3.symbols: update to released version.
+  * New rebuild forced.
+
+ -- CI Train Bot <ci-train-bot@canonical.com>  Tue, 09 Jun 2015 12:21:21 +0000
 
 unity-scopes-api (0.6.17+15.10.20150526-0ubuntu1) wily; urgency=medium
 
