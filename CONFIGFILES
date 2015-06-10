@@ -127,6 +127,9 @@ The following keys are recognized:
 
   The default value is $HOME/.cache/unity-scopes.
 
+  The environment variable UNITY_SCOPES_CONFIG_DIR overrides this key (useful when running
+  automated tests that should not overwrite any of the real configuration files).
+
 - LogDir
 
   The parent directory under which the run time writes the scope log files.

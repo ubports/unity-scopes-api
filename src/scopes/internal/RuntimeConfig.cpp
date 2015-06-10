@@ -127,7 +127,10 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
             }
         }
 
-        config_directory_ = get_optional_string(runtime_config_group, config_dir_key);
+        // UNITY_SCOPES_CONFIG_DIR env var can be used to override the value of ConfigDir key of Runtime.ini
+        char const* scopes_cfg_dir_override = getenv("UNITY_SCOPES_CONFIG_DIR");
+        config_directory_ = (scopes_cfg_dir_override != nullptr && !scopes_cfg_dir_override != '\0') ?
+            string(scopes_cfg_dir_override) : get_optional_string(runtime_config_group, config_dir_key);
         if (config_directory_.empty())
         {
             try

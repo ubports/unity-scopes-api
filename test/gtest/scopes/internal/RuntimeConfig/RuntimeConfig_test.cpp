@@ -111,6 +111,7 @@ TEST(RuntimeConfig, overridden_app_dir_with_home_dir)
 TEST(RuntimeConfig, overridden_config_dir)
 {
     unsetenv("HOME");
+    unsetenv("UNITY_SCOPES_CONFIG_DIR");
 
     RuntimeConfig c(TEST_DIR "/ConfigDir.ini");
     EXPECT_EQ("configdir", c.config_directory());
@@ -119,9 +120,19 @@ TEST(RuntimeConfig, overridden_config_dir)
 TEST(RuntimeConfig, overridden_config_dir_with_home_dir)
 {
     setenv("HOME", TEST_DIR, 1);
+    unsetenv("UNITY_SCOPES_CONFIG_DIR");
 
     RuntimeConfig c(TEST_DIR "/ConfigDir.ini");
     EXPECT_EQ("configdir", c.config_directory());
+}
+
+TEST(RuntimeConfig, overridden_config_dir_with_unity_scopes_cfg_dir)
+{
+    setenv("HOME", TEST_DIR, 1);
+    setenv("UNITY_SCOPES_CONFIG_DIR", "foobar", 1);
+
+    RuntimeConfig c(TEST_DIR "/ConfigDir.ini");
+    EXPECT_EQ("foobar", c.config_directory());
 }
 
 TEST(RuntimeConfig, overridden_log_dir)
