@@ -382,6 +382,8 @@ The following keys are recognized in the ScopeConfig group:
   Note: make sure there are no trailing spaces following
   the ids, as they will be preserved.
 
+  This option is deprecated, please reimplement ScopeBase::find_child_scopes() instead.
+
 - Invisible (undocumented)
 
   Whether the scope is hidden in the UI. The default value is false.
