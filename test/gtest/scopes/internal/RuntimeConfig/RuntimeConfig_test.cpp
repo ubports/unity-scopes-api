@@ -30,7 +30,15 @@ using namespace std;
 using namespace unity::scopes;
 using namespace unity::scopes::internal;
 
-TEST(RuntimeConfig, basic)
+class RuntimeConfigTest: public ::testing::Test {
+    public:
+        virtual void SetUp()
+        {
+            unsetenv("UNITY_SCOPES_CONFIG_DIR");
+        }
+};
+
+TEST_F(RuntimeConfigTest, basic)
 {
     setenv("HOME", TEST_DIR, 1);
 
@@ -48,7 +56,7 @@ TEST(RuntimeConfig, basic)
     EXPECT_TRUE(c.trace_channels().empty());
 }
 
-TEST(RuntimeConfig, complete)
+TEST_F(RuntimeConfigTest, complete)
 {
     RuntimeConfig c(TEST_DIR "/Complete.ini");
     EXPECT_EQ("R.Id", c.registry_identity());
@@ -68,7 +76,7 @@ TEST(RuntimeConfig, complete)
     EXPECT_EQ(vector<string>{ "IPC" }, c.trace_channels());
 }
 
-TEST(RuntimeConfig, _default_cache_dir)
+TEST_F(RuntimeConfigTest, _default_cache_dir)
 {
     setenv("HOME", TEST_DIR, 1);
 
@@ -76,7 +84,7 @@ TEST(RuntimeConfig, _default_cache_dir)
     EXPECT_EQ(TEST_DIR "/.local/share/unity-scopes", c.cache_directory());
 }
 
-TEST(RuntimeConfig, overridden_cache_dir)
+TEST_F(RuntimeConfigTest, overridden_cache_dir)
 {
     unsetenv("HOME");
 
@@ -84,7 +92,7 @@ TEST(RuntimeConfig, overridden_cache_dir)
     EXPECT_EQ("cachedir", c.cache_directory());
 }
 
-TEST(RuntimeConfig, overridden_cache_dir_with_home_dir)
+TEST_F(RuntimeConfigTest, overridden_cache_dir_with_home_dir)
 {
     setenv("HOME", TEST_DIR, 1);
 
@@ -92,7 +100,7 @@ TEST(RuntimeConfig, overridden_cache_dir_with_home_dir)
     EXPECT_EQ("cachedir", c.cache_directory());
 }
 
-TEST(RuntimeConfig, overridden_app_dir)
+TEST_F(RuntimeConfigTest, overridden_app_dir)
 {
     unsetenv("HOME");
 
@@ -100,7 +108,7 @@ TEST(RuntimeConfig, overridden_app_dir)
     EXPECT_EQ("appdir", c.app_directory());
 }
 
-TEST(RuntimeConfig, overridden_app_dir_with_home_dir)
+TEST_F(RuntimeConfigTest, overridden_app_dir_with_home_dir)
 {
     setenv("HOME", TEST_DIR, 1);
 
@@ -108,25 +116,23 @@ TEST(RuntimeConfig, overridden_app_dir_with_home_dir)
     EXPECT_EQ("appdir", c.app_directory());
 }
 
-TEST(RuntimeConfig, overridden_config_dir)
+TEST_F(RuntimeConfigTest, overridden_config_dir)
 {
     unsetenv("HOME");
-    unsetenv("UNITY_SCOPES_CONFIG_DIR");
 
     RuntimeConfig c(TEST_DIR "/ConfigDir.ini");
     EXPECT_EQ("configdir", c.config_directory());
 }
 
-TEST(RuntimeConfig, overridden_config_dir_with_home_dir)
+TEST_F(RuntimeConfigTest, overridden_config_dir_with_home_dir)
 {
     setenv("HOME", TEST_DIR, 1);
-    unsetenv("UNITY_SCOPES_CONFIG_DIR");
 
     RuntimeConfig c(TEST_DIR "/ConfigDir.ini");
     EXPECT_EQ("configdir", c.config_directory());
 }
 
-TEST(RuntimeConfig, overridden_config_dir_with_unity_scopes_cfg_dir)
+TEST_F(RuntimeConfigTest, overridden_config_dir_with_unity_scopes_cfg_dir)
 {
     setenv("HOME", TEST_DIR, 1);
     setenv("UNITY_SCOPES_CONFIG_DIR", "foobar", 1);
@@ -135,7 +141,7 @@ TEST(RuntimeConfig, overridden_config_dir_with_unity_scopes_cfg_dir)
     EXPECT_EQ("foobar", c.config_directory());
 }
 
-TEST(RuntimeConfig, overridden_log_dir)
+TEST_F(RuntimeConfigTest, overridden_log_dir)
 {
     unsetenv("HOME");
 
@@ -143,13 +149,13 @@ TEST(RuntimeConfig, overridden_log_dir)
     EXPECT_EQ("logdir", c.log_directory());
 }
 
-TEST(RuntimeConfig, overridden_log_dir_with_home_dir)
+TEST_F(RuntimeConfigTest, overridden_log_dir_with_home_dir)
 {
     RuntimeConfig c(TEST_DIR "/LogDir.ini");
     EXPECT_EQ("logdir", c.log_directory());
 }
 
-TEST(RuntimeConfig, log_dir_env_var_override)
+TEST_F(RuntimeConfigTest, log_dir_env_var_override)
 {
     setenv("UNITY_SCOPES_LOGDIR", "otherdir", 1);
 
@@ -157,7 +163,7 @@ TEST(RuntimeConfig, log_dir_env_var_override)
     EXPECT_EQ("otherdir", c.log_directory());
 }
 
-TEST(RuntimeConfig, trace_channels_env_var_override)
+TEST_F(RuntimeConfigTest, trace_channels_env_var_override)
 {
     setenv("UNITY_SCOPES_LOG_TRACECHANNELS", "ABC;XYZ;;DEF", 1);
 
@@ -165,7 +171,7 @@ TEST(RuntimeConfig, trace_channels_env_var_override)
     EXPECT_EQ((vector<string>{ "ABC", "XYZ", "DEF"}), c.trace_channels());
 }
 
-TEST(RuntimeConfig, exceptions)
+TEST_F(RuntimeConfigTest, exceptions)
 {
     try
     {
