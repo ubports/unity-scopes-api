@@ -28,6 +28,9 @@
 #include <boost/filesystem.hpp>
 
 #include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 using namespace unity::util;
 using namespace std;
@@ -73,14 +76,6 @@ static FileLock unix_lock(string const& path)
     }
 
     return file_lock;
-}
-
-static void watch_deleter(int fd, int watch)
-{
-    if (fd >= 0 && watch >= 0)
-    {
-        inotify_rm_watch(fd, watch);
-    }
 }
 
 static const char* GROUP_NAME = "General";
@@ -129,150 +124,17 @@ SettingsDB::UPtr SettingsDB::create_from_schema(string const& db_path,
 SettingsDB::SettingsDB(string const& db_path,
                        SettingsSchema const& schema,
                        boost::log::sources::severity_channel_logger_mt<>& logger)
-    : state_changed_(false)
-    , db_path_(db_path)
-    , fd_(inotify_init(), bind(&close, placeholders::_1))
-    , watch_(-1, bind(&watch_deleter, fd_.get(), placeholders::_1))
-    , thread_state_(Idle)
+    : db_path_(db_path)
+    , last_write_time_(-1)
+    , last_write_inode_(0)
     , logger_(logger)
 {
-    // Validate the file descriptor
-    if (fd_.get() < 0)
-    {
-        throw SyscallException("SettingsDB(): inotify_init() failed on inotify fd (fd = " +
-                               to_string(fd_.get()) + ")", errno);
-    }
-
     // Initialize the def_map_ so we can look things
     // up quickly.
     definitions_ = schema.definitions();
     for (auto const& d : definitions_)
     {
         def_map_.emplace(make_pair(d.get_dict()["id"].get_string(), d));
-    }
-
-    process_all_docs();
-}
-
-SettingsDB::~SettingsDB()
-{
-    // Tell the thread to stop politely
-    {
-        lock_guard<mutex> lock(mutex_);
-        // Important to stop the watch, as this unblocks the select() call
-        watch_.dealloc();
-        thread_state_ = ThreadState::Stopping;
-    }
-
-    // Wait for thread to terminate
-    if (thread_.joinable()) {
-        thread_.join();
-    }
-}
-
-void SettingsDB::watch_thread()
-{
-    try
-    {
-        fd_set fds;
-        FD_ZERO(&fds);
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-        FD_SET(fd_.get(), &fds);
-#pragma GCC diagnostic pop
-
-        int bytes_avail = 0;
-        string buffer;
-
-        // Poll for notifications until stop is requested
-        while (true)
-        {
-            // Wait for a payload to arrive
-            int ret = select(fd_.get() + 1, &fds, nullptr, nullptr, nullptr);
-            if (ret < 0)
-            {
-                throw SyscallException("SettingsDB::watch_thread(): Thread aborted: "
-                                       "select() failed on inotify fd (fd = " +
-                                       to_string(fd_.get()) + ")", errno);
-            }
-
-            // Get number of bytes available
-            ret = ioctl(fd_.get(), FIONREAD, &bytes_avail);
-            if (ret < 0)
-            {
-                throw SyscallException("SettingsDB::watch_thread(): Thread aborted: "
-                                       "ioctl() failed on inotify fd (fd = " +
-                                       to_string(fd_.get()) + ")", errno);
-            }
-
-            // Read available bytes
-            buffer.resize(bytes_avail);
-            int bytes_read = read(fd_.get(), &buffer[0], buffer.size());
-            if (bytes_read < 0)
-            {
-                throw SyscallException("SettingsDB::watch_thread(): Thread aborted: "
-                                       "read() failed on inotify fd (fd = " +
-                                       to_string(fd_.get()) + ")", errno);
-            }
-            if (bytes_read != bytes_avail)
-            {
-                throw ResourceException("SettingsDB::watch_thread(): Thread aborted: "
-                                       "read() returned " + std::to_string(bytes_read) +
-                                       " bytes, expected " + std::to_string(bytes_avail) +
-                                       " bytes (fd = " + std::to_string(fd_.get()) + ")");
-            }
-
-            // Process event(s) received
-            int i = 0;
-            while (i < bytes_read)
-            {
-                static_assert(std::alignment_of<char*>::value >= std::alignment_of<struct inotify_event>::value,
-                              "cannot use std::string as buffer for inotify events");
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wcast-align"
-                auto event = reinterpret_cast<inotify_event const*>(&buffer[i]);
-#pragma GCC diagnostic pop
-
-                if (event->mask & IN_DELETE_SELF)
-                {
-                    lock_guard<mutex> lock(mutex_);
-                    state_changed_ = false;
-                    watch_.dealloc();
-                    watch_.reset(-1);
-                    thread_state_ = Stopping;
-                }
-                else if (event->mask & IN_CLOSE_WRITE)
-                {
-                    lock_guard<mutex> lock(mutex_);
-                    state_changed_ = true;
-                }
-                i += sizeof(inotify_event) + event->len;
-            }
-
-
-            // Break from the loop if we are stopping
-            {
-                lock_guard<mutex> lock(mutex_);
-                if (thread_state_ == Stopping)
-                {
-                    thread_state_ = Idle;
-                    break;
-                }
-            }
-        }
-    }
-    catch (exception const& e)
-    {
-        BOOST_LOG(logger_) << "SettingsDB::watch_thread(): Thread aborted: " << e.what();
-        lock_guard<mutex> lock(mutex_);
-        thread_state_ = Failed;
-    }
-    catch (...)
-    {
-        BOOST_LOG(logger_) << "SettingsDB::watch_thread(): Thread aborted: unknown exception";
-        lock_guard<mutex> lock(mutex_);
-        thread_state_ = Failed;
     }
 }
 
@@ -326,70 +188,64 @@ void SettingsDB::process_doc_(string const& id, IniParser const& p)
 
 void SettingsDB::process_all_docs()
 {
-    lock_guard<mutex> lock(mutex_);
-
-    if (!watch_ || watch_.get() < 0)
+    try
     {
-        boost::filesystem::path p(db_path_);
-        if (boost::filesystem::exists(p))
+        struct stat st;
+        bool file_exists = ::stat(db_path_.c_str(), &st) == 0 && S_ISREG(st.st_mode);
+
+        if (file_exists)
         {
-            watch_.reset(inotify_add_watch(fd_.get(),
-                                           db_path_.c_str(),
-                                           IN_CLOSE_WRITE
-                                           | IN_DELETE_SELF));
-            if (watch_.get() < 0)
+            FileLock lock = unix_lock(db_path_);
+            if (::fstat(lock.get(), &st) == 0) // re-stat the file
             {
-                throw SyscallException("SettingsDB::add_watch(): failed to add watch for path: \"" +
-                                       db_path_ + "\". inotify_add_watch() failed. (fd = " +
-                                       to_string(fd_.get()) + ", path = " + db_path_ + ")", errno);
-            }
+                auto const wt = st.st_mtim.tv_nsec;
 
-            state_changed_ = true;
+                if (wt != last_write_time_ || st.st_ino != last_write_inode_)
+                {
+                    // We re-establish the defaults and re-read everything. We need to put the defaults back because
+                    // settings may have been deleted from the database.
+                    set_defaults();
 
-            if (thread_state_ == Idle)
-            {
-                if (thread_.joinable()) {
-                    thread_.join();
+                    try
+                    {
+                        IniParser p(db_path_.c_str());
+
+                        if (p.has_group(GROUP_NAME))
+                        {
+                            auto keys = p.get_keys(GROUP_NAME);
+                            for (auto const& key : keys) {
+                                process_doc_(key, p);
+                            }
+                        }
+                    }
+                    catch (FileException const& e)
+                    {
+                        throw ResourceException(e.what());
+                    }
+
+                    last_write_time_ = wt;
+                    last_write_inode_ = st.st_ino;
+
+                    return;
                 }
-
-                thread_state_ = Running;
-                thread_ = thread(&SettingsDB::watch_thread, this);
             }
         }
         else
         {
-            state_changed_ = false;
-
             set_defaults();
-            return;
         }
     }
-
-    if (state_changed_)
+    catch (FileException const&)
     {
-        state_changed_ = false;
-        // We re-establish the defaults and re-read everything. We need to put the defaults back because
-        // settings may have been deleted from the database.
+        // failure in obtaining the lock shouldn't be reported to the scope, it's not fatal;
+        // instead give the last know values (or defaults) back.
+    }
+
+    // only set default values if we don't have some values already; we might have failed because
+    // of a temporary issue and therefore we want to present most recent cached settings.
+    if (values_.size() == 0)
+    {
         set_defaults();
-
-        try
-        {
-            FileLock lock = unix_lock(db_path_);
-
-            IniParser p(db_path_.c_str());
-
-            if (p.has_group(GROUP_NAME))
-            {
-                auto keys = p.get_keys(GROUP_NAME);
-                for (auto const& key : keys) {
-                    process_doc_(key, p);
-                }
-            }
-        }
-        catch (FileException & e)
-        {
-            throw ResourceException(e.what());
-        }
     }
 }
 
