@@ -41,7 +41,7 @@ string const db_name = TEST_BIN_DIR "/foo.ini";
 
 void write_db(const string& src)
 {
-    int fd = ::open(db_name.c_str(), O_WRONLY|O_CREAT);
+    int fd = ::open(db_name.c_str(), O_WRONLY|O_CREAT, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP);
     if (fd == -1)
     {
         FAIL() << "Couldn't open file " << db_name << " " << errno;
@@ -69,13 +69,12 @@ void write_db(const string& src)
     // copy the file
     int n = 0;
     char buf[1024];
-    while ((n = read(fd2, buf, 1024)) > 0)
+    while ((n = ::read(fd2, buf, 1024)) > 0)
     {
-        write(fd, buf, n);
+        ::write(fd, buf, n);
     }
-    close (fd2);
-
-    close(fd);
+    ::close(fd2);
+    ::close(fd);
 
     // make sure the next write doesn't happen too fast or otherwise modification time of settings db
     // will be the same and change will not be detected by SettingsDB. Note, this is not an issue with
