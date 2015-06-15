@@ -18,11 +18,6 @@
  *   Pete Woods <pete.woods@canonical.com>
  */
 
-#define BOOST_NO_CXX11_SCOPED_ENUMS // We need this to successfully link against Boost when calling
-                                    // copy_file. See https://svn.boost.org/trac/boost/ticket/6779
-#include <boost/filesystem/operations.hpp>
-
-#undef BOOST_NO_CXX11_SCOPED_ENUMS
 #include <unity/scopes/internal/SettingsDB.h>
 
 #include <unity/UnityExceptions.h>
