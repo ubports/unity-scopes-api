@@ -1,3 +1,9 @@
+unity-scopes-api (0.6.19-0ubuntu1) UNRELEASED; urgency=medium
+
+  * Support UNITY_SCOPES_CONFIG_DIR environment variable.
+
+ -- Pawel Stolowski <pawel.stolowski@canonical.com>  Tue, 16 Jun 2015 13:53:20 +0000
+
 unity-scopes-api (0.6.18+15.10.20150609.1-0ubuntu1) wily; urgency=medium
 
   [ Marcus Tomlinson ]
