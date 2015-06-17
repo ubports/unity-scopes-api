@@ -195,6 +195,10 @@ void SettingsDB::process_all_docs()
 
         if (file_exists)
         {
+            if (::access(db_path_.c_str(), R_OK) != 0)
+            {
+                throw SyscallException("SettingsDB(): cannot access settings database file '" + db_path_ + "'", errno);
+            }
             FileLock lock = unix_lock(db_path_);
             if (::fstat(lock.get(), &st) == 0) // re-stat the file
             {

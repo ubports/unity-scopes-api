@@ -364,6 +364,32 @@ TEST(SettingsDB, exceptions)
 
     try
     {
+        // Open DB that doesn't exist yet.
+        unlink(db_name.c_str());
+        auto schema = TEST_SRC_DIR "/schema.ini";
+        auto db = SettingsDB::create_from_ini_file(db_name, schema, test_logger::get());
+
+        // Add a record, which creates the DB
+        write_db("db_location.ini");
+
+        // Remove read permission.
+        if (system(string("chmod -r " + db_name).c_str()) < 0)
+        {
+            FAIL();
+        }
+
+        // Call settings(), which will try to open the DB and fail.
+        db->settings();
+        FAIL();
+    }
+    catch (SyscallException const& e)
+    {
+        boost::regex r("unity::SyscallException: SettingsDB\\(\\): cannot access settings database file '.*' \\(errno = 13\\)");
+        EXPECT_TRUE(boost::regex_match(e.what(), r)) << e.what();
+    }
+
+    try
+    {
         unlink(db_name.c_str());
 
         // Create DB with one record.
