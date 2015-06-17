@@ -20,7 +20,6 @@
 #include <unity/UnityExceptions.h>
 
 #include <boost/variant.hpp>
-#include <sstream>
 
 #include <gtest/gtest.h>
 
