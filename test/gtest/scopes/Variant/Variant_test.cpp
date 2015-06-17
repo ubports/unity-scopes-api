@@ -20,6 +20,7 @@
 #include <unity/UnityExceptions.h>
 
 #include <boost/variant.hpp>
+#include <sstream>
 
 #include <gtest/gtest.h>
 
@@ -245,7 +246,8 @@ TEST(Variant, serialize_json)
 
     {
         Variant v(10.5f);
-        EXPECT_EQ("10.50\n", v.serialize_json());
+        auto const str = v.serialize_json();
+        EXPECT_TRUE(str == "10.50\n" || str == "10.5\n");
     }
 
     {
