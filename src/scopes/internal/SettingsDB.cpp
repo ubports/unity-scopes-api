@@ -237,11 +237,11 @@ void SettingsDB::process_all_docs()
     }
     catch (FileException const&)
     {
-        // failure in obtaining the lock shouldn't be reported to the scope, it's not fatal;
-        // instead give the last know values (or defaults) back.
+        // Failure in obtaining the lock shouldn't be reported to the scope, it's not fatal;
+        // instead give the last known values (or defaults) back.
     }
 
-    // only set default values if we don't have some values already; we might have failed because
+    // Only set default values if we don't have some values already; we might have failed because
     // of a temporary issue and therefore we want to present most recent cached settings.
     if (values_.size() == 0)
     {
