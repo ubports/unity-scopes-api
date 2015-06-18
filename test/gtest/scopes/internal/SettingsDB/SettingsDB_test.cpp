@@ -382,9 +382,9 @@ TEST(SettingsDB, exceptions)
         db->settings();
         FAIL();
     }
-    catch (SyscallException const& e)
+    catch (FileException const& e)
     {
-        boost::regex r("unity::SyscallException: SettingsDB\\(\\): cannot access settings database file '.*' \\(errno = 13\\)");
+        boost::regex r("unity::FileException: Couldn't open file .* \\(errno = 13\\)");
         EXPECT_TRUE(boost::regex_match(e.what(), r)) << e.what();
     }
 

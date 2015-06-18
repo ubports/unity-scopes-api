@@ -326,6 +326,7 @@ public:
 
     \return The scope's current settings.
     \throws LogicException if called from the constructor of this instance.
+    \throws FileException if settings file is not readable.
     */
     virtual VariantMap settings() const final;
 

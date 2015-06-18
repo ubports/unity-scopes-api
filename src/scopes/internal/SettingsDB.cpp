@@ -195,10 +195,6 @@ void SettingsDB::process_all_docs()
 
         if (file_exists)
         {
-            if (::access(db_path_.c_str(), R_OK) != 0)
-            {
-                throw SyscallException("SettingsDB(): cannot access settings database file '" + db_path_ + "'", errno);
-            }
             FileLock lock = unix_lock(db_path_);
             if (::fstat(lock.get(), &st) == 0) // re-stat the file
             {
@@ -224,6 +220,10 @@ void SettingsDB::process_all_docs()
                     }
                     catch (FileException const& e)
                     {
+                        if (e.error() == EACCES)
+                        {
+                            throw e;//SyscallException("SettingsDB(): cannot access settings database file '" + db_path_ + "'", e.error());
+                        }
                         throw ResourceException(e.what());
                     }
 
@@ -239,8 +239,13 @@ void SettingsDB::process_all_docs()
             set_defaults();
         }
     }
-    catch (FileException const&)
+    catch (FileException const& e)
     {
+        if (e.error() == EACCES)
+        {
+            throw e;
+        }
+
         // Failure in obtaining the lock shouldn't be reported to the scope, it's not fatal;
         // instead give the last known values (or defaults) back.
     }
