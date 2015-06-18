@@ -220,9 +220,9 @@ void SettingsDB::process_all_docs()
                     }
                     catch (FileException const& e)
                     {
-                        if (e.error() == EACCES)
+                        if (e.error() == EACCES) // very unlikely; only if permissions changed after we acquired the lock
                         {
-                            throw e;//SyscallException("SettingsDB(): cannot access settings database file '" + db_path_ + "'", e.error());
+                            throw e;
                         }
                         throw ResourceException(e.what());
                     }
