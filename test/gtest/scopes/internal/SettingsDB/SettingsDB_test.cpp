@@ -18,30 +18,63 @@
  *   Pete Woods <pete.woods@canonical.com>
  */
 
-#define BOOST_NO_CXX11_SCOPED_ENUMS // We need this to successfully link against Boost when calling
-                                    // copy_file. See https://svn.boost.org/trac/boost/ticket/6779
-#include <boost/filesystem/operations.hpp>
-
-#undef BOOST_NO_CXX11_SCOPED_ENUMS
 #include <unity/scopes/internal/SettingsDB.h>
 
 #include <unity/UnityExceptions.h>
 
 #include <boost/regex.hpp>  // Use Boost implementation until http://gcc.gnu.org/bugzilla/show_bug.cgi?id=53631 is fixed.
 #include <gtest/gtest.h>
+#include <fcntl.h>
 #include <ctime>
-
+#include <thread>
 
 using namespace unity;
 using namespace unity::scopes::internal;
 using namespace std;
-using namespace boost::filesystem;
 
 string const db_name = TEST_BIN_DIR "/foo.ini";
 
 void write_db(const string& src)
 {
-    copy_file(string(TEST_SRC_DIR) + "/" + src, db_name, copy_option::overwrite_if_exists);
+    int fd = ::open(db_name.c_str(), O_WRONLY|O_CREAT, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP);
+    if (fd == -1)
+    {
+        FAIL() << "Couldn't open file " << db_name << " " << errno;
+    }
+
+    struct flock fl;
+    fl.l_whence = SEEK_SET;
+    fl.l_start = 0;
+    fl.l_len = 0;
+    fl.l_type = F_WRLCK;
+    fl.l_pid = getpid();
+
+    if (::fcntl(fd, F_SETLKW, &fl) != 0)
+    {
+        FAIL() << "Couldn't get write lock for " << db_name << " " << errno;
+    }
+
+    string pth = string(TEST_SRC_DIR) + "/" + src;
+    int fd2 = ::open(pth.c_str(), O_RDONLY);
+    if (fd2 == -1)
+    {
+        FAIL() << "Failed to open input file " << pth;
+    }
+
+    // copy the file
+    int n = 0;
+    char buf[1024];
+    while ((n = ::read(fd2, buf, 1024)) > 0)
+    {
+        ::write(fd, buf, n);
+    }
+    ::close(fd2);
+    ::close(fd);
+
+    // make sure the next write doesn't happen too fast or otherwise modification time of settings db
+    // will be the same and change will not be detected by SettingsDB. Note, this is not an issue with
+    // real use cases when settings are modified by the UI (and SettingsDB uses nanosecond-based mtime).
+    std::this_thread::sleep_for(std::chrono::seconds(1));
 }
 
 #define TRY_EXPECT_EQ(expected, actual) \
@@ -349,9 +382,9 @@ TEST(SettingsDB, exceptions)
         db->settings();
         FAIL();
     }
-    catch (SyscallException const& e)
+    catch (FileException const& e)
     {
-        boost::regex r("unity::SyscallException: SettingsDB::add_watch\\(\\): failed to add watch for path: \".*\". inotify_add_watch\\(\\) failed. \\(fd = [0-9]+, path = .*\\) \\(errno = 13\\)");
+        boost::regex r("unity::FileException: Couldn't open file .* \\(errno = 13\\)");
         EXPECT_TRUE(boost::regex_match(e.what(), r)) << e.what();
     }
 
