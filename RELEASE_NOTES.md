@@ -1,6 +1,11 @@
 Release notes
 =============
 
+Changes in version 0.6.19
+=========================
+  - Added Debug.Process.Timeout configuration parameter to Registry.ini
+  - Added Debug.Locate.Timeout configuration parameter to Zmq.ini
+
 Changes in version 0.6.18
 =========================
   - Allow child_scopes() and set_child_scopes() methods more time to
