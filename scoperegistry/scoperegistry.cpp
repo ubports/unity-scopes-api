@@ -424,7 +424,7 @@ void add_local_scope(RegistryObject::SPtr const& registry,
                 scope_dir.filename().native();
     }
 
-    // Check if this scope has requested debug mode, if so, set the process timeout to 30s
+    // Check if this scope has requested debug mode, if so, set the process timeout to debug_process_timeout
     if (sc.debug_mode())
     {
         exec_data.timeout_ms = debug_timeout_ms;
