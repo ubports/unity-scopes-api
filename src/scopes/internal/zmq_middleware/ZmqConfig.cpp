@@ -93,7 +93,7 @@ ZmqConfig::ZmqConfig(string const& configfile) :
     }
 
     debug_locate_timeout_ = get_optional_int(zmq_config_group, debug_locate_timeout_key, DFLT_ZMQ_DEBUG_LOCATE_TIMEOUT);
-    if (debug_locate_timeout_ < 10 || locate_timeout_ > 120000)
+    if (debug_locate_timeout_ < 10 || debug_locate_timeout_ > 120000)
     {
         throw_ex("Illegal value (" + to_string(debug_locate_timeout_) + ") for " + debug_locate_timeout_key + ": value must be 10-120000");
     }
