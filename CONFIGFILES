@@ -301,7 +301,7 @@ The following keys are recognized:
 
 - Process.Timeout
 
-  This parameter determines how the registry will wait for a scope
+  This parameter determines how long the registry will wait for a scope
   to start and stop. The registry waits for at most Process.Timeout
   milliseconds before it concludes that a scope failed to initialize
   or terminate correctly. If a scope does not respond
