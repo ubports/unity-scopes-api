@@ -81,9 +81,9 @@ RegistryConfig::RegistryConfig(string const& identity, string const& configfile)
         throw_ex("Illegal value (" + to_string(process_timeout_) + ") for " + process_timeout_key + ": value must be 10-15000 ms");
     }
     debug_process_timeout_ = get_optional_int(registry_config_group, debug_process_timeout_key, DFLT_DEBUG_PROCESS_TIMEOUT);
-    if (process_timeout_ < 10 || process_timeout_ > 120000)
+    if (debug_process_timeout_ < 10 || debug_process_timeout_ > 120000)
     {
-        throw_ex("Illegal value (" + to_string(process_timeout_) + ") for " + debug_process_timeout_key + ": value must be 10-120000 ms");
+        throw_ex("Illegal value (" + to_string(debug_process_timeout_) + ") for " + debug_process_timeout_key + ": value must be 10-120000 ms");
     }
 
     KnownEntries const known_entries = {
