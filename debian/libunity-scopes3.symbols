@@ -395,6 +395,7 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::internal::MiddlewareFactory::MiddlewareFactory(unity::scopes::internal::RuntimeImpl*)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::MiddlewareFactory::to_kind(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RegistryConfig::click_installdir() const@Base" 0.4.3+14.10.20140428
+ (c++)"unity::scopes::internal::RegistryConfig::debug_process_timeout() const@Base" 0replaceme
  (c++)"unity::scopes::internal::RegistryConfig::identity() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RegistryConfig::mw_configfile() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::internal::RegistryConfig::mw_kind() const@Base" 0.4.0+14.04.20140312.1
