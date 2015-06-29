@@ -1,9 +1,19 @@
-unity-scopes-api (0.6.19-0ubuntu1) UNRELEASED; urgency=medium
+unity-scopes-api (0.6.20-0ubuntu1) UNRELEASED; urgency=medium
 
   * Added Debug.Process.Timeout configuration parameter to Registry.ini
   * Added Debug.Locate.Timeout configuration parameter to Zmq.ini
 
  -- Marcus Tomlinson <marcus.tomlinson@canonical.com>  Mon, 29 Jun 2015 07:56:37 +0200
+
+unity-scopes-api (0.6.19+15.10.20150617.2-0ubuntu1) wily; urgency=medium
+
+  [ Pawel Stolowski ]
+  * Support UNITY_SCOPES_CONFIG_DIR environment variable.
+
+  [ CI Train Bot ]
+  * New rebuild forced.
+
+ -- CI Train Bot <ci-train-bot@canonical.com>  Wed, 17 Jun 2015 16:30:27 +0000
 
 unity-scopes-api (0.6.18+15.10.20150609.1-0ubuntu1) wily; urgency=medium
 

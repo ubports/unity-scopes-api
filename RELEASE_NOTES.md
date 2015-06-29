@@ -1,10 +1,14 @@
 Release notes
 =============
 
-Changes in version 0.6.19
+Changes in version 0.6.20
 =========================
   - Added Debug.Process.Timeout configuration parameter to Registry.ini
   - Added Debug.Locate.Timeout configuration parameter to Zmq.ini
+
+Changes in version 0.6.19
+=========================
+  - Support UNITY_SCOPES_CONFIG_DIR environment variable.
 
 Changes in version 0.6.18
 =========================
