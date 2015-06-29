@@ -423,10 +423,10 @@ void add_local_scope(RegistryObject::SPtr const& registry,
                 scope_dir.filename().native();
     }
 
-    // Check if this scope has requested debug mode, if so, set the process timeout to 15s
+    // Check if this scope has requested debug mode, if so, set the process timeout to 30s
     if (sc.debug_mode())
     {
-        exec_data.timeout_ms = 15000;
+        exec_data.timeout_ms = 30000;
     }
     else
     {
