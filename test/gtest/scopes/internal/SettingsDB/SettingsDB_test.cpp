@@ -77,6 +77,43 @@ void write_db(const string& src)
     std::this_thread::sleep_for(std::chrono::seconds(1));
 }
 
+#define TRY_EXPECT_EQ(expected, actual) \
+{ \
+  auto now = chrono::system_clock::now(); \
+  auto later = now + chrono::seconds(10); \
+  while (now < later) \
+  { \
+    if ((expected) == (actual)) \
+    { \
+        break; \
+    } \
+    this_thread::sleep_for(chrono::milliseconds(10)); \
+    now = chrono::system_clock::now(); \
+  } \
+  EXPECT_EQ((expected), (actual)); \
+}
+
+#define TRY_EXPECT_TRUE(expr) \
+{ \
+  auto now = chrono::system_clock::now(); \
+  auto later = now + chrono::seconds(10); \
+  while (now < later) \
+  { \
+    if (expr) \
+    { \
+        break; \
+    } \
+    this_thread::sleep_for(chrono::milliseconds(10)); \
+    now = chrono::system_clock::now(); \
+  } \
+  EXPECT_TRUE(expr); \
+}
+
+#define TRY_EXPECT_FALSE(expr) \
+{ \
+  TRY_EXPECT_TRUE(!(expr)); \
+}
+
 BOOST_LOG_INLINE_GLOBAL_LOGGER_DEFAULT(test_logger, boost::log::sources::severity_channel_logger_mt<>)
 
 TEST(SettingsDB, basic)
@@ -117,7 +154,7 @@ TEST(SettingsDB, basic)
         // Change the location.
         write_db("db_location.ini");
         EXPECT_EQ(4, db->settings().size());
-        EXPECT_EQ("New York", db->settings()["locationSetting"].get_string());
+        TRY_EXPECT_EQ("New York", db->settings()["locationSetting"].get_string());
         EXPECT_EQ(1, db->settings()["unitTempSetting"].get_int());
         EXPECT_EQ(23, db->settings()["ageSetting"].get_double());
         EXPECT_TRUE(db->settings()["enabledSetting"].get_bool());
@@ -126,7 +163,7 @@ TEST(SettingsDB, basic)
         write_db("db_loctemp.ini");
         EXPECT_EQ(4, db->settings().size());
         EXPECT_EQ("New York", db->settings()["locationSetting"].get_string());
-        EXPECT_EQ(0, db->settings()["unitTempSetting"].get_int());
+        TRY_EXPECT_EQ(0, db->settings()["unitTempSetting"].get_int());
         EXPECT_EQ(23, db->settings()["ageSetting"].get_double());
         EXPECT_TRUE(db->settings()["enabledSetting"].get_bool());
 
@@ -135,7 +172,7 @@ TEST(SettingsDB, basic)
         EXPECT_EQ(4, db->settings().size());
         EXPECT_EQ("New York", db->settings()["locationSetting"].get_string());
         EXPECT_EQ(0, db->settings()["unitTempSetting"].get_int());
-        EXPECT_EQ(42.0, db->settings()["ageSetting"].get_double());
+        TRY_EXPECT_EQ(42.0, db->settings()["ageSetting"].get_double());
         EXPECT_TRUE(db->settings()["enabledSetting"].get_bool());
 
         // Call settings again. This causes state_changed_ in the implementation
@@ -153,7 +190,7 @@ TEST(SettingsDB, basic)
         EXPECT_EQ("New York", db->settings()["locationSetting"].get_string());
         EXPECT_EQ(0, db->settings()["unitTempSetting"].get_int());
         EXPECT_EQ(42, db->settings()["ageSetting"].get_double());
-        EXPECT_FALSE(db->settings()["enabledSetting"].get_bool());
+        TRY_EXPECT_FALSE(db->settings()["enabledSetting"].get_bool());
     }
 
     {
@@ -173,7 +210,7 @@ TEST(SettingsDB, basic)
 
         // Check that they are correct
         EXPECT_EQ(4, db->settings().size());
-        EXPECT_EQ("New York", db->settings()["locationSetting"].get_string());
+        TRY_EXPECT_EQ("New York", db->settings()["locationSetting"].get_string());
         EXPECT_EQ(0, db->settings()["unitTempSetting"].get_int());
         EXPECT_EQ(23, db->settings()["ageSetting"].get_double());
         EXPECT_TRUE(db->settings()["enabledSetting"].get_bool());
@@ -191,7 +228,7 @@ TEST(SettingsDB, basic)
 
         // Check that they are correct.
         EXPECT_EQ(4, db->settings().size());
-        EXPECT_EQ("New York", db->settings()["locationSetting"].get_string());
+        TRY_EXPECT_EQ("New York", db->settings()["locationSetting"].get_string());
         EXPECT_EQ(0, db->settings()["unitTempSetting"].get_int());
         EXPECT_EQ(23, db->settings()["ageSetting"].get_double());
         EXPECT_TRUE(db->settings()["enabledSetting"].get_bool());
@@ -201,7 +238,7 @@ TEST(SettingsDB, basic)
 
         // Check that nothing has changed.
         EXPECT_EQ(4, db->settings().size());
-        EXPECT_EQ("Paris", db->settings()["locationSetting"].get_string());
+        TRY_EXPECT_EQ("Paris", db->settings()["locationSetting"].get_string());
         EXPECT_EQ(0, db->settings()["unitTempSetting"].get_int());
         EXPECT_EQ(23, db->settings()["ageSetting"].get_double());
         EXPECT_TRUE(db->settings()["enabledSetting"].get_bool());
@@ -223,7 +260,7 @@ TEST(SettingsDB, chinese_characters)
         // Change the location.
         write_db("db_chinese_location.ini");
         EXPECT_EQ(1, db->settings().size());
-        EXPECT_EQ("丈", db->settings()["locationSetting"].get_string());
+        TRY_EXPECT_EQ("丈", db->settings()["locationSetting"].get_string());
     }
 }
 
@@ -247,7 +284,7 @@ TEST(SettingsDB, delete_db)
 
         // Settings should be updated.
         EXPECT_EQ(4, db->settings().size());
-        EXPECT_EQ("New York", db->settings()["locationSetting"].get_string());
+        TRY_EXPECT_EQ("New York", db->settings()["locationSetting"].get_string());
         EXPECT_EQ(0, db->settings()["unitTempSetting"].get_int());
         EXPECT_EQ(42, db->settings()["ageSetting"].get_double());
         EXPECT_FALSE(db->settings()["enabledSetting"].get_bool());
@@ -257,7 +294,7 @@ TEST(SettingsDB, delete_db)
 
         // Default values should come back.
         EXPECT_EQ(4, db->settings().size());
-        EXPECT_EQ("London", db->settings()["locationSetting"].get_string());
+        TRY_EXPECT_EQ("London", db->settings()["locationSetting"].get_string());
         EXPECT_EQ(1, db->settings()["unitTempSetting"].get_int());
         EXPECT_EQ(23, db->settings()["ageSetting"].get_double());
         EXPECT_TRUE(db->settings()["enabledSetting"].get_bool());
@@ -293,7 +330,7 @@ TEST(SettingsDB, from_json_string)
         // Change the location.
         write_db("db_location_json.ini");
         EXPECT_EQ(1, db->settings().size());
-        EXPECT_EQ("New York", db->settings()["location"].get_string());
+        TRY_EXPECT_EQ("New York", db->settings()["location"].get_string());
     }
 }
 
@@ -362,7 +399,7 @@ TEST(SettingsDB, exceptions)
         auto db = SettingsDB::create_from_ini_file(db_name, schema, test_logger::get());
 
         EXPECT_EQ(4, db->settings().size());
-        EXPECT_EQ("Munich", db->settings()["locationSetting"].get_string());
+        TRY_EXPECT_EQ("Munich", db->settings()["locationSetting"].get_string());
 
         // Clobber the DB.
         if (system((string("cat >") + db_name + " <<EOF\nx\nEOF" + db_name).c_str()) < 0)
