@@ -41,6 +41,7 @@ namespace
     const string endpoint_dir_key = "EndpointDir";
     const string twoway_timeout_key = "Default.Twoway.Timeout";
     const string locate_timeout_key = "Locate.Timeout";
+    const string debug_locate_timeout_key = "Debug.Locate.Timeout";
     const string registry_timeout_key = "Registry.Timeout";
     const string child_scopes_timeout_key = "ChildScopes.Timeout";
     const string registry_endpoint_dir_key = "Registry.EndpointDir";
@@ -91,6 +92,12 @@ ZmqConfig::ZmqConfig(string const& configfile) :
         throw_ex("Illegal value (" + to_string(locate_timeout_) + ") for " + locate_timeout_key + ": value must be 10-15000");
     }
 
+    debug_locate_timeout_ = get_optional_int(zmq_config_group, debug_locate_timeout_key, DFLT_ZMQ_DEBUG_LOCATE_TIMEOUT);
+    if (debug_locate_timeout_ < 10 || debug_locate_timeout_ > 120000)
+    {
+        throw_ex("Illegal value (" + to_string(debug_locate_timeout_) + ") for " + debug_locate_timeout_key + ": value must be 10-120000");
+    }
+
     child_scopes_timeout_ = get_optional_int(zmq_config_group, child_scopes_timeout_key, DFLT_ZMQ_CHILDSCOPES_TIMEOUT);
     if (child_scopes_timeout_ < 10 || child_scopes_timeout_ > 15000)
     {
@@ -106,6 +113,7 @@ ZmqConfig::ZmqConfig(string const& configfile) :
                                                 endpoint_dir_key,
                                                 twoway_timeout_key,
                                                 locate_timeout_key,
+                                                debug_locate_timeout_key,
                                                 registry_timeout_key,
                                                 child_scopes_timeout_key,
                                                 registry_endpoint_dir_key,
@@ -133,6 +141,11 @@ int ZmqConfig::twoway_timeout() const
 int ZmqConfig::locate_timeout() const
 {
     return locate_timeout_;
+}
+
+int ZmqConfig::debug_locate_timeout() const
+{
+    return debug_locate_timeout_;
 }
 
 int ZmqConfig::registry_timeout() const
