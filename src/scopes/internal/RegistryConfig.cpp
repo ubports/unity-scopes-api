@@ -45,6 +45,7 @@ namespace
     const string click_installdir_key = "Click.InstallDir";
     const string scoperunner_path_key = "Scoperunner.Path";
     const string process_timeout_key = "Process.Timeout";
+    const string debug_process_timeout_key = "Debug.Process.Timeout";
 }
 
 RegistryConfig::RegistryConfig(string const& identity, string const& configfile) :
@@ -79,6 +80,11 @@ RegistryConfig::RegistryConfig(string const& identity, string const& configfile)
     {
         throw_ex("Illegal value (" + to_string(process_timeout_) + ") for " + process_timeout_key + ": value must be 10-15000 ms");
     }
+    debug_process_timeout_ = get_optional_int(registry_config_group, debug_process_timeout_key, DFLT_DEBUG_PROCESS_TIMEOUT);
+    if (debug_process_timeout_ < 10 || debug_process_timeout_ > 120000)
+    {
+        throw_ex("Illegal value (" + to_string(debug_process_timeout_) + ") for " + debug_process_timeout_key + ": value must be 10-120000 ms");
+    }
 
     KnownEntries const known_entries = {
                                           {  registry_config_group,
@@ -89,7 +95,8 @@ RegistryConfig::RegistryConfig(string const& identity, string const& configfile)
                                                 oem_installdir_key,
                                                 click_installdir_key,
                                                 scoperunner_path_key,
-                                                process_timeout_key
+                                                process_timeout_key,
+                                                debug_process_timeout_key
                                              }
                                           }
                                        };
@@ -138,6 +145,11 @@ string RegistryConfig::scoperunner_path() const
 int RegistryConfig::process_timeout() const
 {
     return process_timeout_;
+}
+
+int RegistryConfig::debug_process_timeout() const
+{
+    return debug_process_timeout_;
 }
 
 } // namespace internal

@@ -293,7 +293,8 @@ void add_local_scope(RegistryObject::SPtr const& registry,
                      string const& scoperunner_path,
                      string const& config_file,
                      bool click,
-                     int timeout_ms)
+                     int timeout_ms,
+                     int debug_timeout_ms)
 {
     unique_ptr<ScopeMetadataImpl> mi(new ScopeMetadataImpl(mw.get()));
     string scope_config(scope.second);
@@ -423,10 +424,10 @@ void add_local_scope(RegistryObject::SPtr const& registry,
                 scope_dir.filename().native();
     }
 
-    // Check if this scope has requested debug mode, if so, set the process timeout to 30s
+    // Check if this scope has requested debug mode, if so, set the process timeout to debug_process_timeout
     if (sc.debug_mode())
     {
-        exec_data.timeout_ms = 30000;
+        exec_data.timeout_ms = debug_timeout_ms;
     }
     else
     {
@@ -479,13 +480,14 @@ void add_local_scopes(RegistryObject::SPtr const& registry,
                       string const& scoperunner_path,
                       string const& config_file,
                       bool click,
-                      int timeout_ms)
+                      int timeout_ms,
+                      int debug_timeout_ms)
 {
     for (auto&& pair : all_scopes)
     {
         try
         {
-            add_local_scope(registry, pair, mw, scoperunner_path, config_file, click, timeout_ms);
+            add_local_scope(registry, pair, mw, scoperunner_path, config_file, click, timeout_ms, debug_timeout_ms);
         }
         catch (unity::Exception const& e)
         {
@@ -555,6 +557,7 @@ int main(int argc, char* argv[])
         string click_installdir;
         string scoperunner_path;
         int process_timeout;
+        int debug_process_timeout;
         {
             RegistryConfig c(identity, runtime->registry_configfile());
             mw_kind = c.mw_kind();
@@ -563,6 +566,7 @@ int main(int argc, char* argv[])
             click_installdir = c.click_installdir();
             scoperunner_path = c.scoperunner_path();
             process_timeout = c.process_timeout();
+            debug_process_timeout = c.debug_process_timeout();
         } // Release memory for config parser
 
         // Inform the signal thread that it should shutdown the runtime
@@ -603,8 +607,8 @@ int main(int argc, char* argv[])
             local_scopes[scope_id] = argv[i];                   // operator[] overwrites pre-existing entries
         }
 
-        add_local_scopes(registry, local_scopes, middleware, scoperunner_path, config_file, false, process_timeout);
-        add_local_scopes(registry, click_scopes, middleware, scoperunner_path, config_file, true, process_timeout);
+        add_local_scopes(registry, local_scopes, middleware, scoperunner_path, config_file, false, process_timeout, debug_process_timeout);
+        add_local_scopes(registry, click_scopes, middleware, scoperunner_path, config_file, true, process_timeout, debug_process_timeout);
         if (ss_reg_id.empty())
         {
             error("no remote registry configured, only local scopes will be available");
@@ -615,12 +619,12 @@ int main(int argc, char* argv[])
         }
 
         // Configure watches for scope install directories
-        auto local_watch_lambda = [registry, &middleware, &scoperunner_path, &config_file, process_timeout]
+        auto local_watch_lambda = [registry, &middleware, &scoperunner_path, &config_file, process_timeout, debug_process_timeout]
                                   (pair<string, string> const& scope)
         {
             try
             {
-                add_local_scope(registry, scope, middleware, scoperunner_path, config_file, false, process_timeout);
+                add_local_scope(registry, scope, middleware, scoperunner_path, config_file, false, process_timeout, debug_process_timeout);
             }
             catch (unity::Exception const& e)
             {
@@ -631,12 +635,12 @@ int main(int argc, char* argv[])
         local_scopes_watcher.add_install_dir(scope_installdir);
         local_scopes_watcher.add_install_dir(oem_installdir);
 
-        auto click_watch_lambda = [registry, &middleware, &scoperunner_path, &config_file, process_timeout]
+        auto click_watch_lambda = [registry, &middleware, &scoperunner_path, &config_file, process_timeout, debug_process_timeout]
                                   (pair<string, string> const& scope)
         {
             try
             {
-                add_local_scope(registry, scope, middleware, scoperunner_path, config_file, true, process_timeout);
+                add_local_scope(registry, scope, middleware, scoperunner_path, config_file, true, process_timeout, debug_process_timeout);
             }
             catch (unity::Exception const& e)
             {

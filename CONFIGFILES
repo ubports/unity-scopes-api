@@ -76,22 +76,6 @@ The following keys are recognized:
 
   The default value is 10 seconds.
 
-- Process.Timeout
-
-  This parameter determines how the registry will wait for a scope
-  to start and stop. The registry waits for at most Process.Timeout
-  milliseconds before it concludes that a scope failed to initialize
-  or terminate correctly. If a scope does not respond
-  within the allotted time, it is killed with SIGKILL.
-
-  Only values in the range 10 to 15000 milliseconds are accepted.
-
-  The default value is 4000 milliseconds.
-
-  Note that this value must be less than Locate.Timeout in the [<Middleware>]
-  config group, otherwise the middleware can prematurely conclude that
-  a locate() request failed to start a scope.
-
 - CacheDir
 
   The parent directory under which a scope can write scope-specific data files
@@ -242,6 +226,15 @@ The following keys are recognized:
 
   The default value is 5000 milliseconds.
 
+- Debug.Locate.Timeout
+
+  This parameter overrides the value of Locate.Timeout above when DebugMode is enabled on
+  a target scope. (See DebugMode in <scope_id>.ini for more details)
+
+  Only values in the range 10 to 120000 milliseconds are accepted.
+
+  The default value is 30000 milliseconds.
+
 - Registry.Timeout
 
   The timeout to be used when invoking a twoway operation on the registry other
@@ -305,6 +298,31 @@ The following keys are recognized:
   The directory in which to look for subdirectories containing scopes installed from click packages.
 
   The default value is "$HOME/.local/share/unity-scopes".
+
+- Process.Timeout
+
+  This parameter determines how long the registry will wait for a scope
+  to start and stop. The registry waits for at most Process.Timeout
+  milliseconds before it concludes that a scope failed to initialize
+  or terminate correctly. If a scope does not respond
+  within the allotted time, it is killed with SIGKILL.
+
+  Only values in the range 10 to 15000 milliseconds are accepted.
+
+  The default value is 4000 milliseconds.
+
+  Note that this value must be less than Locate.Timeout in the [<Middleware>]
+  config group, otherwise the middleware can prematurely conclude that
+  a locate() request failed to start a scope.
+
+- Debug.Process.Timeout
+
+  This parameter overrides the value of Process.Timeout above when DebugMode is enabled on
+  a target scope. (See DebugMode in <scope_id>.ini for more details)
+
+  Only values in the range 10 to 120000 milliseconds are accepted.
+
+  The default value is 30000 milliseconds.
 
 
 Smartscopes.ini
