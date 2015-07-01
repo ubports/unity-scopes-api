@@ -43,7 +43,6 @@ public:
     std::string click_installdir() const;       // Directory for Click scope config files
     std::string scoperunner_path() const;       // Path to scoperunner binary
     int process_timeout() const;                // Milliseconds to wait before scope is considereed non-responsive.
-    int debug_process_timeout() const;          // Milliseconds to wait before scope is considereed non-responsive in debug mode.
 
 private:
     std::string identity_;
@@ -54,7 +53,6 @@ private:
     std::string click_installdir_;
     std::string scoperunner_path_;
     int process_timeout_;                       // Milliseconds
-    int debug_process_timeout_;                 // Milliseconds
 };
 
 } // namespace internal
