@@ -190,7 +190,13 @@ void ZmqObjectProxy::invoke_oneway_(capnp::MessageBuilder& request)
 
 ZmqObjectProxy::TwowayOutParams ZmqObjectProxy::invoke_twoway_(capnp::MessageBuilder& request)
 {
-    return invoke_twoway_(request, timeout_);
+    return invoke_twoway_(request, timeout_, mw_base()->locate_timeout());
+}
+
+ZmqObjectProxy::TwowayOutParams ZmqObjectProxy::invoke_twoway_(capnp::MessageBuilder& request,
+                                                               int64_t twoway_timeout)
+{
+    return invoke_twoway_(request, twoway_timeout, mw_base()->locate_timeout());
 }
 
 ZmqObjectProxy::TwowayOutParams ZmqObjectProxy::invoke_twoway_(capnp::MessageBuilder& request,
@@ -211,14 +217,8 @@ ZmqObjectProxy::TwowayOutParams ZmqObjectProxy::invoke_twoway_(capnp::MessageBui
         try
         {
             ObjectProxy new_proxy;
-            if (locate_timeout != -1)
-            {
-                new_proxy = registry_proxy->locate(identity(), locate_timeout);
-            }
-            else
-            {
-                new_proxy = registry_proxy->locate(identity());
-            }
+            new_proxy = registry_proxy->locate(identity(), locate_timeout);
+
             // update our proxy with the newly received data
             // (we need to first store values in local variables outside of the mutex,
             // otherwise we will deadlock on the following ZmqObjectProxy methods)

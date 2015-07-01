@@ -91,8 +91,10 @@ protected:
 
     TwowayOutParams invoke_twoway_(capnp::MessageBuilder& request);
     TwowayOutParams invoke_twoway_(capnp::MessageBuilder& request,
+                                   int64_t twoway_timeout);
+    TwowayOutParams invoke_twoway_(capnp::MessageBuilder& request,
                                    int64_t twoway_timeout,
-                                   int64_t locate_timeout = -1);
+                                   int64_t locate_timeout);
 
 private:
     TwowayOutParams invoke_twoway__(capnp::MessageBuilder& request, int64_t timeout);
