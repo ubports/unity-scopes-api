@@ -38,7 +38,6 @@ public:
     std::string endpoint_dir() const;
     int twoway_timeout() const;
     int locate_timeout() const;
-    int debug_locate_timeout() const;
     int registry_timeout() const;
     int child_scopes_timeout() const;
     std::string registry_endpoint_dir() const;
@@ -48,7 +47,6 @@ private:
     std::string endpoint_dir_;
     int twoway_timeout_;
     int locate_timeout_;
-    int debug_locate_timeout_;
     int registry_timeout_;
     int child_scopes_timeout_;
     std::string registry_endpoint_dir_;

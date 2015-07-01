@@ -226,15 +226,6 @@ The following keys are recognized:
 
   The default value is 5000 milliseconds.
 
-- Debug.Locate.Timeout
-
-  This parameter overrides the value of Locate.Timeout above when DebugMode is enabled on
-  a target scope. (See DebugMode in <scope_id>.ini for more details)
-
-  Only values in the range 10 to 120000 milliseconds are accepted.
-
-  The default value is 30000 milliseconds.
-
 - Registry.Timeout
 
   The timeout to be used when invoking a twoway operation on the registry other
@@ -314,15 +305,6 @@ The following keys are recognized:
   Note that this value must be less than Locate.Timeout in the [<Middleware>]
   config group, otherwise the middleware can prematurely conclude that
   a locate() request failed to start a scope.
-
-- Debug.Process.Timeout
-
-  This parameter overrides the value of Process.Timeout above when DebugMode is enabled on
-  a target scope. (See DebugMode in <scope_id>.ini for more details)
-
-  Only values in the range 10 to 120000 milliseconds are accepted.
-
-  The default value is 30000 milliseconds.
 
 
 Smartscopes.ini

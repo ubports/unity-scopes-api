@@ -325,8 +325,7 @@ bool ZmqScope::debug_mode()
         capnp::MallocMessageBuilder request_builder;
         make_request_(request_builder, "debug_mode");
 
-        int64_t timeout = mw_base()->debug_locate_timeout();
-        auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_twoway_(request_builder, -1, timeout); });
+        auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_twoway_(request_builder, -1, 30000); });
         auto out_params = future.get();
         auto response = out_params.reader->getRoot<capnproto::Response>();
         throw_if_runtime_exception(response);
@@ -346,11 +345,10 @@ ZmqObjectProxy::TwowayOutParams ZmqScope::invoke_scope_(capnp::MessageBuilder& i
 ZmqObjectProxy::TwowayOutParams ZmqScope::invoke_scope_(capnp::MessageBuilder& in_params, int64_t timeout)
 {
     // Check if this scope has requested debug mode, if so, disable two-way timeout and set
-    // locate timeout to debug_locate_timeout.
+    // locate timeout to 30s.
     if (debug_mode())
     {
-        int64_t timeout = mw_base()->debug_locate_timeout();
-        return this->invoke_twoway_(in_params, -1, timeout);
+        return this->invoke_twoway_(in_params, -1, 30000);
     }
     return this->invoke_twoway_(in_params, timeout);
 }
