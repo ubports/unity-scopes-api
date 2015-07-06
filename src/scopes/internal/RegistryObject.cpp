@@ -37,7 +37,6 @@ using namespace std;
 
 static const char* c_debug_dbus_started_cmd = "dbus-send --type=method_call --dest=com.ubuntu.SDKAppLaunch /ScopeRegistryCallback com.ubuntu.SDKAppLaunch.ScopeLoaded";
 static const char* c_debug_dbus_stopped_cmd = "dbus-send --type=method_call --dest=com.ubuntu.SDKAppLaunch /ScopeRegistryCallback com.ubuntu.SDKAppLaunch.ScopeStopped";
-static const std::chrono::seconds removal_notification_delay(5);
 
 namespace unity
 {
@@ -74,8 +73,6 @@ RegistryObject::RegistryObject(core::posix::ChildProcess::DeathObserver& death_o
           })
       },
       executor_(executor),
-      publisher_notify_reset_timer_(false),
-      publisher_notify_exit_(false),
       generate_desktop_files_(generate_desktop_files)
 {
     if (middleware)
@@ -102,14 +99,10 @@ RegistryObject::RegistryObject(core::posix::ChildProcess::DeathObserver& death_o
 
 RegistryObject::~RegistryObject()
 {
-    if (publisher_notify_thread_.joinable())
     {
-        {
-            lock_guard<decltype(mutex_)> lock(mutex_);
-            publisher_notify_exit_ = true;
-            publisher_notify_cond_.notify_one();
-        }
-        publisher_notify_thread_.join();
+        // The destructor may be called from an arbitrary
+        // thread, so we need a full fence here.
+        lock_guard<decltype(mutex_)> lock(mutex_);
     }
 
     // kill all scope processes
@@ -329,34 +322,8 @@ bool RegistryObject::remove_local_scope(std::string const& scope_id)
 
     if (publisher_ && erased)
     {
-        // Send a blank message to subscribers to inform them that the registry has been updated.
-        // Delay notification so that scope is not seen as removed and then added when updated.
-        lock_guard<decltype(mutex_)> lock(mutex_);
-
-        if (!publisher_notify_thread_.joinable())
-        {
-            publisher_notify_timepoint_ = chrono::system_clock::now() + removal_notification_delay;
-            publisher_notify_thread_ = thread([this]
-            {
-                unique_lock<decltype(mutex_)> lock(mutex_);
-                while (!publisher_notify_exit_)
-                {
-                    auto pred = [this]
-                    {
-                        return publisher_notify_exit_ || publisher_notify_reset_timer_;
-                    };
-                    if (!publisher_notify_cond_.wait_until(lock, publisher_notify_timepoint_, pred)) // pred is false, but timeout reached
-                    {
-                        publisher_->send_message("");
-                        publisher_notify_timepoint_ = chrono::system_clock::time_point::max();
-                    }
-                    publisher_notify_reset_timer_ = false;
-                }
-            });
-        }
-        publisher_notify_reset_timer_ = true;
-        publisher_notify_timepoint_ = chrono::system_clock::now() + removal_notification_delay;
-        publisher_notify_cond_.notify_one();
+        // Send a blank message to subscribers to inform them that the registry has been updated
+        publisher_->send_message("");
     }
 
     if (ex)
