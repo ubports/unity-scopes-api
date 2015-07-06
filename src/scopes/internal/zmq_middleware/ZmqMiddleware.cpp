@@ -106,7 +106,6 @@ ZmqMiddleware::ZmqMiddleware(string const& server_name, RuntimeImpl* runtime, st
 
         twoway_timeout_ = config.twoway_timeout();
         locate_timeout_ = config.locate_timeout();
-        debug_locate_timeout_ = config.debug_locate_timeout();
         registry_timeout_ = config.registry_timeout();
         child_scopes_timeout_ = config.child_scopes_timeout();
         public_endpoint_dir_ = config.endpoint_dir();
@@ -809,11 +808,6 @@ ThreadPool* ZmqMiddleware::twoway_pool()
 int64_t ZmqMiddleware::locate_timeout() const noexcept
 {
     return locate_timeout_;
-}
-
-int64_t ZmqMiddleware::debug_locate_timeout() const noexcept
-{
-    return debug_locate_timeout_;
 }
 
 int64_t ZmqMiddleware::registry_timeout() const noexcept
