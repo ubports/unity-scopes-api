@@ -153,7 +153,7 @@ TEST(Registry, metadata)
     EXPECT_FALSE(meta.is_aggregator());
 }
 
-auto const wait_for_update_time = std::chrono::milliseconds(10000);
+auto const wait_for_update_time = std::chrono::milliseconds(5000);
 
 TEST(Registry, scope_state_notify)
 {
