@@ -326,6 +326,8 @@ public:
 
     \return The scope's current settings.
     \throws LogicException if called from the constructor of this instance.
+    \throws ResourceException if settings database file is corrupted.
+    \throws FileException if settings database file is not readable.
     */
     virtual VariantMap settings() const final;
 

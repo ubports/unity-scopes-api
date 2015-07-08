@@ -1,6 +1,10 @@
 Release notes
 =============
 
+Changes in version 0.6.19
+=========================
+  - Support UNITY_SCOPES_CONFIG_DIR environment variable.
+
 Changes in version 0.6.18
 =========================
   - Allow child_scopes() and set_child_scopes() methods more time to

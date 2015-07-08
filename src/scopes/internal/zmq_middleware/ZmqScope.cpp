@@ -325,7 +325,18 @@ bool ZmqScope::debug_mode()
         capnp::MallocMessageBuilder request_builder;
         make_request_(request_builder, "debug_mode");
 
-        auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_twoway_(request_builder); });
+        // When making any two-way request there is an implicit locate() call made to the registry to first ensure that
+        // the scope is actually running - I.e. 1. reg->locate(scope), 2. scope->request().
+
+        // Here we are trying to determine whether the target scope is in debug mode, hence we cannot assume upfront
+        // that it will start up within the regular timeout constraint. Therefore we need to disable the locate()
+        // timeout here to allow enough time for debugged scopes to reply.
+
+        // In the situation where a scope is not in debug mode but starts up slowly, the registry's own
+        // "Process.Timeout" will kick in, meaning that the implicit locate() call will return at a regular timeout for
+        // regular scopes, and will not timeout for debugged scopes.
+
+        auto future = mw_base()->twoway_pool()->submit([&] { return this->invoke_twoway_(request_builder, timeout(), -1); });
         auto out_params = future.get();
         auto response = out_params.reader->getRoot<capnproto::Response>();
         throw_if_runtime_exception(response);
@@ -344,11 +355,10 @@ ZmqObjectProxy::TwowayOutParams ZmqScope::invoke_scope_(capnp::MessageBuilder& i
 
 ZmqObjectProxy::TwowayOutParams ZmqScope::invoke_scope_(capnp::MessageBuilder& in_params, int64_t timeout)
 {
-    // Check if this scope has requested debug mode, if so, disable two-way timeout and set
-    // locate timeout to 15s.
+    // Check if this scope has requested debug mode, if so, disable two-way and locate timeouts.
     if (debug_mode())
     {
-        return this->invoke_twoway_(in_params, -1, 15000);
+        return this->invoke_twoway_(in_params, -1, -1);
     }
     return this->invoke_twoway_(in_params, timeout);
 }
