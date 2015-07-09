@@ -198,7 +198,12 @@ void SettingsDB::process_all_docs()
             FileLock lock = unix_lock(db_path_);
             if (::fstat(lock.get(), &st) == 0) // re-stat the file
             {
-                auto const wt = st.st_mtim.tv_nsec;
+                auto wt = st.st_mtim.tv_nsec;
+                // Nanoseconds are not available on older filesystems (e.g. ext3; see man fstat),
+                // in such case use seconds as fallback.
+                if (wt == 0) {
+                    wt = st.st_ctime;
+                }
 
                 if (wt != last_write_time_ || st.st_ino != last_write_inode_)
                 {
