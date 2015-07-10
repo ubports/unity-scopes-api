@@ -103,6 +103,8 @@ public:
         CategorisedResult res(cat);
         res.set_uri("uri");
         res.set_title(query().query_string());
+        int64_t v = 1;
+        res["int64value"] = Variant(v);
         if (valid())
         {
             reply->push(res);
