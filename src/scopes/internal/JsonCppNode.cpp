@@ -84,7 +84,7 @@ Json::Value JsonCppNode::from_variant(Variant const& var)
         default:
             {
                 std::ostringstream s;
-                s << "JsonCppNode::from_variant(): unsupported json type ";
+                s << "JsonCppNode::from_variant(): unsupported variant type ";
                 s << static_cast<int>(var.which());
                 throw unity::LogicException(s.str());
             }
