@@ -74,7 +74,8 @@ private:
     void set_defaults();
 
     std::string db_path_;
-    decltype(::timespec::tv_nsec) last_write_time_;
+    decltype(::timespec::tv_nsec) last_write_time_nsec_;
+    decltype(::timespec::tv_sec) last_write_time_sec_;
     ::ino_t last_write_inode_;
     VariantArray definitions_;                       // Returned by SettingsSchema
     std::map<std::string, Variant> def_map_;  // Allows fast access to the Variants in definitions_
