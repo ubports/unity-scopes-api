@@ -27,9 +27,6 @@
 #include <fcntl.h>
 #include <ctime>
 #include <thread>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
 
 using namespace unity;
 using namespace unity::scopes::internal;
