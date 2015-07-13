@@ -30,6 +30,7 @@
 
 #include <atomic>
 #include <mutex>
+#include <cstdint>
 
 using namespace std;
 using namespace unity::scopes;
@@ -105,6 +106,8 @@ public:
         res.set_title(query().query_string());
         int64_t v = 1;
         res["int64value"] = Variant(v);
+        int64_t v2 = INT64_MAX;
+        res["int64value2"] = Variant(v2);
         if (valid())
         {
             reply->push(res);

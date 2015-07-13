@@ -119,11 +119,12 @@ Variant JsonCppNode::to_variant(Json::Value const& value)
             return Variant(value.asString());
         case Json::ValueType::intValue:
         case Json::ValueType::uintValue:
-            if (value.isInt64())
+            // this can throw std::runtime_error from jsoncpp if unsigned int to int conversion is not possible
+            if (value.isInt())
             {
-                return Variant(static_cast<int64_t>(value.asInt64()));
+                return Variant(value.asInt());
             }
-            return Variant(value.asInt()); // this can throw std::runtime_error from jsoncpp if unsigned int to int conversion is not possible
+            return Variant(static_cast<int64_t>(value.asInt64()));
         case Json::ValueType::realValue:
             return Variant(value.asDouble());
         case Json::ValueType::booleanValue:
