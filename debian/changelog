@@ -1,3 +1,13 @@
+unity-scopes-api (0.6.19+15.10.20150714-0ubuntu1) wily; urgency=medium
+
+  [ CI Train Bot ]
+  * New rebuild forced.
+
+  [ Pawel Stolowski ]
+  * Merged devel.
+
+ -- CI Train Bot <ci-train-bot@canonical.com>  Tue, 14 Jul 2015 09:26:41 +0000
+
 unity-scopes-api (0.6.19+15.10.20150708-0ubuntu1) wily; urgency=medium
 
   [ CI Train Bot ]
