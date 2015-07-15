@@ -127,6 +127,7 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::ActivationQueryBase::result() const@Base" 0.5.0+14.10.20140619
  (c++)"unity::scopes::ActivationQueryBase::widget_id() const@Base" 0.5.0+14.10.20140619
  (c++)"unity::scopes::ActivationResponse::~ActivationResponse()@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::ActivationResponse::ActivationResponse(std::list<unity::scopes::PreviewWidget, std::allocator<unity::scopes::PreviewWidget> > const&)@Base" 0replaceme
  (c++)"unity::scopes::ActivationResponse::ActivationResponse(unity::scopes::ActivationResponse&&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ActivationResponse::ActivationResponse(unity::scopes::ActivationResponse const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ActivationResponse::ActivationResponse(unity::scopes::ActivationResponse::Status)@Base" 0.4.0+14.04.20140312.1
@@ -141,6 +142,7 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::ActivationResponse::set_scope_data(unity::scopes::Variant const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ActivationResponse::status() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ActivationResponse::updated_result() const@Base" 0.6.18+15.10.20150609.1
+ (c++)"unity::scopes::ActivationResponse::updated_widgets() const@Base" 0replaceme
  (c++)"unity::scopes::CannedQuery::~CannedQuery()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::CannedQuery::CannedQuery(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::CannedQuery::CannedQuery(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
