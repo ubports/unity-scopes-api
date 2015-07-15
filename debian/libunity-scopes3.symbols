@@ -794,6 +794,7 @@ libunity-scopes.so.3 libunity-scopes3 #MINVER#
  (c++)"unity::scopes::Result::operator[](std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Result::operator=(unity::scopes::Result&&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Result::operator=(unity::scopes::Result const&)@Base" 0.4.0+14.04.20140312.1
+ (c++)"unity::scopes::Result::operator==(unity::scopes::Result const&) const@Base" 0replaceme
  (c++)"unity::scopes::Result::~Result()@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Result::Result(std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unity::scopes::Variant> > > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Result::Result(unity::scopes::internal::ResultImpl*)@Base" 0.4.0+14.04.20140312.1
