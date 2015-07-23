@@ -223,7 +223,7 @@ void SearchReplyImpl::write_cached_results() noexcept
     {
         // Open a temporary file for writing.
         tmp_path = mw_proxy_->mw_base()->runtime()->cache_directory() + "/" + cache_file_name + "XXXXXX";
-        auto opener = [tmp_path]()
+        auto opener = [&tmp_path]()
         {
             int tmp_fd = mkstemp(const_cast<char*>(tmp_path.c_str()));
             if (tmp_fd == -1)
@@ -232,7 +232,7 @@ void SearchReplyImpl::write_cached_results() noexcept
             }
             return tmp_fd;
         };
-        auto closer = [tmp_path](int fd)
+        auto closer = [&tmp_path](int fd)
         {
             if (::close(fd) == -1)
             {
