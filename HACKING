@@ -179,28 +179,6 @@ hide a section of code from address sanitzer with:
     #endif
 #endif
 
-Updating symbols file
----------------------
-
-To easily spot new/removed/changed symbols in the library, the debian
-package maintains a .symbols file that lists all exported symbols
-present in the library .so. If you add new public symbols to the library,
-it's necessary to refresh the symbols file, otherwise the package will
-fail to build. The easiest way to do that is using bzr-builddeb:
-
-    $ bzr bd -- -us -uc -j8  # Don't sign source package or changes file, 8 compiles in parallel
-    $ # this will exit with an error if symbols file isn't up-to-date
-    $ cd ../build-area/unity-scopes-api-[version]
-    $ ./obj-[arch]/tools/symbol_diff
-
-This creates a diff of the symbols in /tmp/symbols.diff.
-(The demangled symbols from the debian build are in ./new_symbols.)
-
-Review any changes in /tmp/symbols.diff. If they are OK:
-
-    $ cd -
-    $ patch -p0 < /tmp/symbols.diff
-
 ABI compliance test
 -------------------
 To use this, install abi-compliance-checker package from the archives.
