@@ -31,7 +31,7 @@ Build-Depends: capnproto,
                valgrind,
                libnet-cpp-dev (>=1.1.0),
                python-tornado
-Standards-Version: 3.9.5
+Standards-Version: 3.9.6
 XS-Testsuite: autopkgtest
 Section: libs
 Homepage: https://launchpad.net/unity-scopes-api
