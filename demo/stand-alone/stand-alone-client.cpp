@@ -85,12 +85,19 @@ int main()
         // Syntax: ipc://<endpoint>#<identity>!<timeout>!<category>
         //
         // "ipc://"         - prefix for all proxies
-        // "/tmp/scope-A    - endpoint at which the scope listens
+        // "/path/scope-A   - endpoint at which the scope listens
         // "scope-A         - scope ID (must be the same as last component of endpoint path)
         // "t=300"          - optional timeout (infinite if not specified)
         // "c=Scope"        - type of proxy (must be "c=Scope")
 
-        ObjectProxy p = rt->string_to_proxy("ipc:///tmp/scope-A#scope-A!t=300!c=Scope");
+        char* xdg_runtime_dir = getenv("XDG_RUNTIME_DIR");
+        if (!xdg_runtime_dir || *xdg_runtime_dir == '\0')
+        {
+            throw ConfigException("No endpoint directories specified, and XDG_RUNTIME_DIR "
+                                  "environment variable not set");
+        }
+        string stringified_proxy = string("ipc://") + xdg_runtime_dir + "/zmq/priv/scope-A#scope-A!t=300!c=Scope";
+        ObjectProxy p = rt->string_to_proxy(stringified_proxy);
         assert(p);
 
         // The returned proxy is of type ObjectProxy and must be down-cast to a scope proxy:

@@ -39,16 +39,7 @@ TEST(RegistryConfig, basic)
 
 TEST(RegistryConfig, RegistryIDEmpty)
 {
-    try
-    {
-        RegistryConfig c("", TEST_REGISTRY_PATH);
-        FAIL();
-    }
-    catch (InvalidArgumentException const& e)
-    {
-        EXPECT_STREQ("unity::InvalidArgumentException: Registry identity cannot be an empty string",
-                     e.what());
-    }
+    RegistryConfig c("", TEST_REGISTRY_PATH);
 }
 
 TEST(RegistryConfig, HomeNotSet)
