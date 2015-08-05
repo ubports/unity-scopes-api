@@ -1,0 +1,2 @@
+[Runtime]
+Zmq.ConfigFile=@CMAKE_CURRENT_BINARY_DIR@/Zmq.ini
