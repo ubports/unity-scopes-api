@@ -111,7 +111,7 @@ int main(int argc, char **argv)
     if (rpid == 0)
     {
         // Start a scoperunner without any registry config.
-        static const char* const args[] = {"scoperunner [StandAloneScope test]", TEST_RUNTIME_FILE, "SimpleScope.ini"};
+        const char* const args[] = {"scoperunner [StandAloneScope test]", TEST_RUNTIME_FILE, "SimpleScope.ini", nullptr};
         if (execv(TEST_SCOPERUNNER_PATH "/scoperunner", const_cast<char* const*>(args)) < 0)
         {
             perror("Error starting scoperunner:");
