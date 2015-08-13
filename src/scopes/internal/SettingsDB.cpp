@@ -125,7 +125,8 @@ SettingsDB::SettingsDB(string const& db_path,
                        SettingsSchema const& schema,
                        boost::log::sources::severity_channel_logger_mt<>& logger)
     : db_path_(db_path)
-    , last_write_time_(-1)
+    , last_write_time_nsec_(-1)
+    , last_write_time_sec_(-1)
     , last_write_inode_(0)
     , logger_(logger)
 {
@@ -198,9 +199,8 @@ void SettingsDB::process_all_docs()
             FileLock lock = unix_lock(db_path_);
             if (::fstat(lock.get(), &st) == 0) // re-stat the file
             {
-                auto const wt = st.st_mtim.tv_nsec;
-
-                if (wt != last_write_time_ || st.st_ino != last_write_inode_)
+                // it's neccessary to use both sec and nsec, cause it seems that on low-res kernels tv_nsec can duplicate from second to second.
+                if (st.st_mtim.tv_nsec != last_write_time_nsec_ || st.st_mtim.tv_sec != last_write_time_sec_ || st.st_ino != last_write_inode_)
                 {
                     // We re-establish the defaults and re-read everything. We need to put the defaults back because
                     // settings may have been deleted from the database.
@@ -227,7 +227,8 @@ void SettingsDB::process_all_docs()
                         throw ResourceException(e.what());
                     }
 
-                    last_write_time_ = wt;
+                    last_write_time_nsec_ = st.st_mtim.tv_nsec;
+                    last_write_time_sec_ = st.st_mtim.tv_sec;
                     last_write_inode_ = st.st_ino;
 
                     return;

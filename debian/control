@@ -7,7 +7,6 @@ Build-Depends: capnproto,
                dbus-test-runner,
                debhelper (>= 9),
                doxygen,
-               g++,
                google-mock,
                graphviz,
                libaccounts-glib-dev,
@@ -32,7 +31,7 @@ Build-Depends: capnproto,
                valgrind,
                libnet-cpp-dev (>=1.1.0),
                python-tornado
-Standards-Version: 3.9.5
+Standards-Version: 3.9.6
 XS-Testsuite: autopkgtest
 Section: libs
 Homepage: https://launchpad.net/unity-scopes-api

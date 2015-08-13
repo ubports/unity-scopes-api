@@ -5,10 +5,6 @@
 #export DH_VERBOSE=1
 export DPKG_GENSYMBOLS_CHECK_LEVEL=4
 
-# We require a specific gcc version to avoid ABI breakage.
-export CC=$(DEB_HOST_GNU_TYPE)-gcc-4.9
-export CXX=$(DEB_HOST_GNU_TYPE)-g++-4.9
-
 %:
 	dh $@ --parallel --fail-missing --with click
 

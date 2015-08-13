@@ -212,7 +212,7 @@ ZmqObjectProxy::TwowayOutParams ZmqObjectProxy::invoke_twoway_(capnp::MessageBui
 
     // If a registry is configured and this object is not a registry itself,
     // attempt to locate the scope before invoking it.
-    if (!this_is_registry && !this_is_ss_registry)
+    if (registry_proxy && !this_is_registry && !this_is_ss_registry)
     {
         try
         {

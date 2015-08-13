@@ -24,6 +24,7 @@
 
 #include <boost/filesystem.hpp>
 #include <gtest/gtest.h>
+#include <cstdint>
 
 #include "CacheScope.h"
 
@@ -181,6 +182,8 @@ TEST_F(CacheScopeTest, surfacing_query)
 
     auto r = receiver->result();
     EXPECT_EQ(r->title(), "");
+    EXPECT_EQ(r->value("int64value").get_int64_t(), 1);
+    EXPECT_EQ(r->value("int64value2").get_int64_t(), INT64_MAX);
     auto d = receiver->dept();
     EXPECT_EQ(d->id(), "");
     auto sd = *d->subdepartments().begin();
@@ -223,6 +226,8 @@ TEST_F(CacheScopeTest, push_from_cache)
 
     auto r = receiver->result();
     EXPECT_EQ(r->title(), "");
+    EXPECT_EQ(r->value("int64value").get_int(), 1);
+    EXPECT_EQ(r->value("int64value2").get_int64_t(), INT64_MAX);
     auto d = receiver->dept();
     EXPECT_EQ(d->id(), "");
     auto sd = *d->subdepartments().begin();
@@ -276,6 +281,7 @@ TEST_F(CacheScopeTest, surfacing_query_2)
 
     auto r = receiver->result();
     EXPECT_EQ(r->title(), "");
+    EXPECT_EQ(r->value("int64value").get_int64_t(), 1);
     auto d = receiver->dept();
     EXPECT_EQ(d->id(), "");
     auto sd = *d->subdepartments().begin();
