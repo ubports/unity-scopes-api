@@ -404,7 +404,7 @@ the text entered by the user.
 
 List of attributes:
 
-\arg \c submit-label String for the label of the submit button (optional, use "Submit" by default).
+\arg \c submit-label String for the label of the submit button (optional, uses "Submit" by default).
 
 \code{.cpp}
 {
