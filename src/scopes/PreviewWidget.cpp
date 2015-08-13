@@ -87,11 +87,14 @@ The following widget types are recognized by Unity:
 \arg \c gallery
 \arg \c header
 \arg \c actions
+\arg \c icon-actions
 \arg \c progress
 \arg \c text
 \arg \c rating-input
 \arg \c rating-edit
 \arg \c reviews
+\arg \c comment-input
+\arg \c comment
 \arg \c expandable
 
 \subsection audio audio widget
@@ -242,6 +245,17 @@ You can construct composite attributes with unity::scopes::VariantBuilder:
 }
 \endcode
 
+\subsection icon-actions icon-actions widget
+
+The icon-actions widget displays one or more buttons represented by icons and/or labels. It's similar to actions widget, but uses different layout.
+Every button can provide an optional temporary icon to be displayed immediately after user taps it.
+
+List of attributes:
+
+\arg \c actions A composite attribute containing an array of tuples, where each tuple has at least
+these fields: \c id (a mandatory string that is passed to unity::scopes::ScopeBase::activate_preview_action()),
+\c label (optional string), \c icon (optional URI, required if label is missing), \c temporaryIcon (optional URI).
+
 \subsection progress progress widget
 
 The progress widget displays the progress of an action, such as download progress.
@@ -377,6 +391,39 @@ You can construct composite attributes with unity::scopes::VariantBuilder:
     ...
 }
 \endcode
+
+\subsection comment-input comment-input widget
+
+The comment-input widget allows users to add comments. It displays an input box along with "Send" button.
+
+When a user presses the "Send" button, the scope receives a preview
+action activation with the id \c "commented".  The actual comment
+can be accessed via unity::scopes::ActionMetadata::scope_data.
+The scope data will be a VariantMap with the \c "comment" field holding
+the text entered by the user.
+
+List of attributes:
+
+\arg \c submit-label String for the label of the submit button (optional, use "Submit" by default).
+
+\code{.cpp}
+{
+    PreviewWidget w1("cmt", "comment-input");
+
+    w1.add_attribute_value("submit-label", Variant("Comment it!"));
+    ...
+}
+\endcode
+
+\subsection comment comment widget
+
+The comment widget shows an avatar, author name, subtitle and a comment text.
+
+List of attributes:
+\arg \c source URI for an avatar icon (optional)
+\arg \c author A string specifying the author of the comment (mandatory)
+\arg \c subtitle A string for the subtitle (optional)
+\arg \c comment A string for the comment text (mandatory)
 
 \subsection expandable expandable widget
 
