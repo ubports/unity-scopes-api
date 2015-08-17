@@ -41,7 +41,7 @@
                                     UNITY_SCOPES_VERSION_XSTR(UNITY_SCOPES_VERSION_MINOR) "." \
                                     UNITY_SCOPES_VERSION_XSTR(UNITY_SCOPES_VERSION_MICRO)
 
-#define UNITY_SCOPES_VERSIONED_CREATE_SYM unity_scope_create_v ## @UNITY_SCOPES_SOVERSION@
+#define UNITY_SCOPES_VERSIONED_CREATE_SYM unity_scope_create_v ## @UNITY_SCOPES_MAJOR@_@UNITY_SCOPES_MINOR@
 
 /**
 \brief Top-level namespace for all things Unity-related.
@@ -60,14 +60,12 @@ namespace scopes
 Version information is represented as
 <i>&lt;<code>major</code>&gt;</i>.<i>&lt;<code>minor</code>&gt;</i>.<i>&lt;<code>micro</code>&gt;</i>.
 
-Releases that differ in the major version number are binary incompatible.
+Releases that differ in the major version number or minor are binary incompatible.
 
-Releases of the library that differ in the minor or micro version number are binary compatible with older releases,
+Releases of the library that differ in the micro version number are binary compatible with older releases,
 so client code does not need to be recompiled to use the newer library version.
 
-Changes in the micro version number indicate bug fixes.
-
-Changes in the minor version number indicate feature additions that are binary compatible.
+Changes in the micro version number indicate bug fixes or feature additions that are binary compatible.
 */
 
 /**
