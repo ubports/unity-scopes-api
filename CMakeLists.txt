@@ -258,7 +258,7 @@ set(LIB_INSTALL_PREFIX lib/${CMAKE_LIBRARY_ARCHITECTURE})
 set(LIBDIR ${CMAKE_INSTALL_LIBDIR})
 
 set(LIBSUBDIR ${LIBDIR}/${UNITY_SCOPES_LIB}})
-set(HDR_INSTALL_DIR include/${UNITY_SCOPES_LIB}-${UNITY_SCOPES_MAJOR})
+set(HDR_INSTALL_DIR include/${UNITY_SCOPES_LIB}-${UNITY_SCOPES_SOVERSION})
 
 #####################################################################
 # Enable code coverage calculation with gcov/gcovr/lcov
