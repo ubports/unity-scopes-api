@@ -1,3 +1,0 @@
-Pattern: ${home}/.local/share/unity-scopes/${id}
-User-Level: yes
-Hook-Name: scope
