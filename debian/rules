@@ -17,3 +17,7 @@ override_dh_auto_test:
 
 override_dh_click:
 	dh_click --name scope
+
+override_dh_auto_clean:
+	`pwd`/tools/gen-debian-files `pwd`
+	dh_auto_clean

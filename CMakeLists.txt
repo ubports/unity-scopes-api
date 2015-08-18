@@ -216,7 +216,7 @@ endif()
 set(UNITY_SCOPES_LIB unity-scopes)
 
 # Check the distribution we are building for.
-execute_process(COMMAND lsb_release -c -s OUTPUT_VARIABLE DISTRIBUTION)
+execute_process(COMMAND lsb_release -c -s OUTPUT_VARIABLE DISTRIBUTION OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 # Read API version from VERSION file. The version is in the form <major>.<minor>.<micro>.
 # We have a separate version file for vivid because our versioning scheme changed from wily onwards.
@@ -225,6 +225,8 @@ if(${DISTRIBUTION} MATCHES "vivid")
 else()
     file(READ VERSION FULL_VERSION)
 endif()
+string(STRIP ${FULL_VERSION} FULL_VERSION)
+message("FULL: \"${FULL_VERSION}\"")
 
 # Parse out the three components.
 STRING(REGEX MATCHALL "[0-9]+" FULL_VERSION_COMPONENTS ${FULL_VERSION})
@@ -239,6 +241,8 @@ if(${DISTRIBUTION} MATCHES "vivid")
 else()
     set(UNITY_SCOPES_SOVERSION "${UNITY_SCOPES_MAJOR}.${UNITY_SCOPES_MINOR}")
 endif()
+string(STRIP ${UNITY_SCOPES_SOVERSION} UNITY_SCOPES_SOVERSION)
+message("SOV: \"${UNITY_SCOPES_SOVERSION}\"")
 
 # Version for testing, with all symbols visible
 set(UNITY_SCOPES_TEST_LIB ${UNITY_SCOPES_LIB}-test)
