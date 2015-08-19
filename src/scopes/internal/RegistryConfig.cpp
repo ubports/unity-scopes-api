@@ -51,10 +51,6 @@ RegistryConfig::RegistryConfig(string const& identity, string const& configfile)
     ConfigBase(configfile, DFLT_REGISTRY_INI)
 {
     identity_ = identity;
-    if (identity.empty())
-    {
-        throw InvalidArgumentException("Registry identity cannot be an empty string");
-    }
     mw_kind_ = get_middleware(registry_config_group, mw_kind_key);
     mw_configfile_ = get_optional_string(registry_config_group, mw_kind_ + configfile_key);
     scope_installdir_ = get_optional_string(registry_config_group, scope_installdir_key, DFLT_SCOPE_INSTALL_DIR);
