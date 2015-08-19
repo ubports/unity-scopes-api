@@ -221,9 +221,9 @@ execute_process(COMMAND lsb_release -c -s OUTPUT_VARIABLE DISTRIBUTION OUTPUT_ST
 # Read API version from VERSION file. The version is in the form <major>.<minor>.<micro>.
 # We have a separate version file for vivid because our versioning scheme changed from wily onwards.
 if(${DISTRIBUTION} MATCHES "vivid")
-    file(READ VERSION-vivid UNITY_SCOPES_FULL_VERSION)
+    file(READ debian/VERSION-vivid UNITY_SCOPES_FULL_VERSION)
 else()
-    file(READ VERSION UNITY_SCOPES_FULL_VERSION)
+    file(READ debian/VERSION UNITY_SCOPES_FULL_VERSION)
 endif()
 string(STRIP ${UNITY_SCOPES_FULL_VERSION} UNITY_SCOPES_FULL_VERSION)
 
@@ -236,7 +236,7 @@ LIST(GET full_version_components 2 UNITY_SCOPES_MICRO)
 # For vivid, we read the SOVERSION from SOVERSION-vivid.
 # For wily and later, the SOVERSION is <major>.<minor>.
 if(${DISTRIBUTION} MATCHES "vivid")
-    file(READ SOVERSION-vivid UNITY_SCOPES_SOVERSION)
+    file(READ debian/SOVERSION-vivid UNITY_SCOPES_SOVERSION)
 else()
     set(UNITY_SCOPES_SOVERSION "${UNITY_SCOPES_MAJOR}.${UNITY_SCOPES_MINOR}")
 endif()
@@ -245,9 +245,9 @@ string(STRIP ${UNITY_SCOPES_SOVERSION} UNITY_SCOPES_SOVERSION)
 # Figure out the version information for the qt library.
 # The soversion is always in the form <major>.<minor> for that, even on Vivid.
 if(${DISTRIBUTION} MATCHES "vivid")
-    file(READ QT-VERSION-vivid UNITY_SCOPES_QT_FULL_VERSION)
+    file(READ debian/QT-VERSION-vivid UNITY_SCOPES_QT_FULL_VERSION)
 else()
-    file(READ QT-VERSION UNITY_SCOPES_QT_FULL_VERSION)
+    file(READ debian/QT-VERSION UNITY_SCOPES_QT_FULL_VERSION)
 endif()
 string(STRIP ${UNITY_SCOPES_QT_FULL_VERSION} UNITY_SCOPES_QT_FULL_VERSION)
 
