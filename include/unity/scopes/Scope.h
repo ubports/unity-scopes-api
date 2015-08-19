@@ -74,6 +74,7 @@ public:
     \param reply The callback object to receive replies.
     \return A proxy that permits cancellation of this request.
     */
+    virtual void foo() {}
     virtual QueryCtrlProxy search(std::string const& query_string,
                                   FilterState const& filter_state,
                                   SearchMetadata const& metadata,
