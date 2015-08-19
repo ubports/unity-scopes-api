@@ -17,7 +17,7 @@
 #
 
 prefix=@CMAKE_INSTALL_PREFIX@
-includedir=${prefix}/@HDR_INSTALL_DIR@/unity/scopes/qt
+includedir=${prefix}/include/unity-scopes-qt-@UNITY_SCOPES_QT_SOVERSION@
 libdir=${prefix}/@LIBDIR@
 
 Name: lib@LIB_QT@

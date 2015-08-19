@@ -221,18 +221,17 @@ execute_process(COMMAND lsb_release -c -s OUTPUT_VARIABLE DISTRIBUTION OUTPUT_ST
 # Read API version from VERSION file. The version is in the form <major>.<minor>.<micro>.
 # We have a separate version file for vivid because our versioning scheme changed from wily onwards.
 if(${DISTRIBUTION} MATCHES "vivid")
-    file(READ VERSION-vivid FULL_VERSION)
+    file(READ VERSION-vivid UNITY_SCOPES_FULL_VERSION)
 else()
-    file(READ VERSION FULL_VERSION)
+    file(READ VERSION UNITY_SCOPES_FULL_VERSION)
 endif()
-string(STRIP ${FULL_VERSION} FULL_VERSION)
-message("FULL: \"${FULL_VERSION}\"")
+string(STRIP ${UNITY_SCOPES_FULL_VERSION} UNITY_SCOPES_FULL_VERSION)
 
 # Parse out the three components.
-STRING(REGEX MATCHALL "[0-9]+" FULL_VERSION_COMPONENTS ${FULL_VERSION})
-LIST(GET FULL_VERSION_COMPONENTS 0 UNITY_SCOPES_MAJOR)
-LIST(GET FULL_VERSION_COMPONENTS 1 UNITY_SCOPES_MINOR)
-LIST(GET FULL_VERSION_COMPONENTS 2 UNITY_SCOPES_MICRO)
+STRING(REGEX MATCHALL "[0-9]+" full_version_components ${UNITY_SCOPES_FULL_VERSION})
+LIST(GET full_version_components 0 UNITY_SCOPES_MAJOR)
+LIST(GET full_version_components 1 UNITY_SCOPES_MINOR)
+LIST(GET full_version_components 2 UNITY_SCOPES_MICRO)
 
 # For vivid, we read the SOVERSION from SOVERSION-vivid.
 # For wily and later, the SOVERSION is <major>.<minor>.
@@ -242,7 +241,24 @@ else()
     set(UNITY_SCOPES_SOVERSION "${UNITY_SCOPES_MAJOR}.${UNITY_SCOPES_MINOR}")
 endif()
 string(STRIP ${UNITY_SCOPES_SOVERSION} UNITY_SCOPES_SOVERSION)
-message("SOV: \"${UNITY_SCOPES_SOVERSION}\"")
+
+# Figure out the version information for the qt library.
+# The soversion is always in the form <major>.<minor> for that, even on Vivid.
+if(${DISTRIBUTION} MATCHES "vivid")
+    file(READ QT-VERSION-vivid UNITY_SCOPES_QT_FULL_VERSION)
+else()
+    file(READ QT-VERSION UNITY_SCOPES_QT_FULL_VERSION)
+endif()
+string(STRIP ${UNITY_SCOPES_QT_FULL_VERSION} UNITY_SCOPES_QT_FULL_VERSION)
+
+# Parse out the three components.
+STRING(REGEX MATCHALL "[0-9]+" full_version_components ${UNITY_SCOPES_QT_FULL_VERSION})
+LIST(GET full_version_components 0 UNITY_SCOPES_QT_MAJOR)
+LIST(GET full_version_components 1 UNITY_SCOPES_QT_MINOR)
+LIST(GET full_version_components 2 UNITY_SCOPES_QT_MICRO)
+
+# The SOVERSION is <major>.<minor>.
+set(UNITY_SCOPES_QT_SOVERSION "${UNITY_SCOPES_QT_MAJOR}.${UNITY_SCOPES_QT_MINOR}")
 
 # Version for testing, with all symbols visible
 set(UNITY_SCOPES_TEST_LIB ${UNITY_SCOPES_LIB}-test)
@@ -327,14 +343,14 @@ set_target_properties(${UNITY_SCOPES_LIB_OBJ} PROPERTIES COMPILE_FLAGS "-fPIC")
 # Use the object files to make the normal library.
 add_library(${UNITY_SCOPES_LIB} SHARED $<TARGET_OBJECTS:${UNITY_SCOPES_LIB_OBJ}>)
 set_target_properties(${UNITY_SCOPES_LIB} PROPERTIES
-    VERSION ${FULL_VERSION}
+    VERSION ${UNITY_SCOPES_FULL_VERSION}
     SOVERSION ${UNITY_SCOPES_SOVERSION}
 )
 
 # Use the object files to make the test library.
 add_library(${UNITY_SCOPES_TEST_LIB} SHARED $<TARGET_OBJECTS:${UNITY_SCOPES_LIB_OBJ}>)
 set_target_properties(${UNITY_SCOPES_TEST_LIB} PROPERTIES
-    VERSION ${FULL_VERSION}
+    VERSION ${UNITY_SCOPES_FULL_VERSION}
     SOVERSION ${UNITY_SCOPES_SOVERSION}
 )
 
