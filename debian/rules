@@ -19,6 +19,5 @@ override_dh_click:
 	dh_click --name scope
 
 override_dh_auto_clean:
-	chmod 755 `pwd`/debian
 	/bin/sh `pwd`/debian/gen-debian-files `pwd`
 	dh_auto_clean
