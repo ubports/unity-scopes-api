@@ -34,7 +34,7 @@ cat >"${dir}"/control <<EOF
 #
 # Modifications should be made to debian/control.in instead.
 # This file is regenerated automatically in the clean target.
-
+#
 EOF
 sed "s/@UNITY_SCOPES_SOVERSION@/${soversion}/" "${dir}"/control.in \
 | sed "s/@UNITY_SCOPES_QT_SOVERSION@/${qt_soversion}/" >>"${dir}"/control
@@ -47,7 +47,7 @@ cat >"${dir}"/libunity-scopes${soversion}.install <<EOF
 #
 # Modifications should be made to debian/libunity-scopes.install.in instead.
 # This file is regenerated automatically in the clean target.
-
+#
 EOF
 cat "${dir}"/libunity-scopes.install.in >>"${dir}"/libunity-scopes${soversion}.install
 
@@ -57,7 +57,7 @@ cat >"${dir}"/libunity-scopes-dev.install <<EOF
 #
 # Modifications should be made to debian/libunity-scopes-dev.install.in instead.
 # This file is regenerated automatically in the clean target.
-
+#
 EOF
 sed "s/@UNITY_SCOPES_SOVERSION@/${soversion}/" "${dir}"/libunity-scopes-dev.install.in >>"${dir}"/libunity-scopes-dev.install
 
@@ -67,7 +67,7 @@ cat >"${dir}"/libunity-scopes${soversion}.scope.click-hook <<EOF
 #
 # Modifications should be made to debian/libunity-scopes.scope.click-hook.in instead.
 # This file is regenerated automatically in the clean target.
-
+#
 EOF
 cat "${dir}"/libunity-scopes.scope.click-hook.in >>"${dir}"/libunity-scopes${soversion}.scope.click-hook
 
@@ -95,7 +95,7 @@ cat >"${dir}"/libunity-scopes-qt${qt_soversion}.install <<EOF
 #
 # Modifications should be made to debian/libunity-scopes-qt.install.in instead.
 # This file is regenerated automatically in the clean target.
-
+#
 EOF
 cat "${dir}"/libunity-scopes-qt.install.in >>"${dir}"/libunity-scopes-qt${qt_soversion}.install
 
@@ -105,7 +105,7 @@ cat >"${dir}"/libunity-scopes-qt-dev.install <<EOF
 #
 # Modifications should be made to debian/libunity-scopes-qt-dev.install.in instead.
 # This file is regenerated automatically in the clean target.
-
+#
 EOF
 sed "s/@UNITY_SCOPES_QT_SOVERSION@/${qt_soversion}/" "${dir}"/libunity-scopes-qt-dev.install.in >>"${dir}"/libunity-scopes-qt-dev.install
 
