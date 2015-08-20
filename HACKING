@@ -179,27 +179,57 @@ hide a section of code from address sanitzer with:
     #endif
 #endif
 
-Updating symbols file
----------------------
+ABI compatibility
+-----------------
 
-To easily spot new/removed/changed symbols in the library, the debian
-package maintains a .symbols file that lists all exported symbols
-present in the library .so. If you add new public symbols to the library,
-it's necessary to refresh the symbols file, otherwise the package will
-fail to build. The easiest way to do that is using bzr-builddeb:
+By definition, if a change is ABI compatible, you must increment
+UNITY_SCOPES_MICRO in CMakeLists.txt. (Without this, we cannot
+identify from the version number whether a particular fix
+is in this build or not.) The best time to update the micro
+version is when creating a silo for landing in the archives.
 
-    $ bzr bd -- -us -uc -j8  # Don't sign source package or changes file, 8 compiles in parallel
-    $ # this will exit with an error if symbols file isn't up-to-date
-    $ cd ../build-area/unity-scopes-api-[version]
-    $ ./obj-[arch]/tools/symbol_diff
+For ABI incompatible changes, either UNITY_SCOPES_MINOR or
+UNITY_SCOPES_MAJOR must be incremented, and the lower-order
+version numbers must be reset to zero.
 
-This creates a diff of the symbols in /tmp/symbols.diff.
-(The demangled symbols from the debian build are in ./new_symbols.)
+UNITY_SCOPES_MAJOR is meant to indicate major official releases.
+What is "major" or "official" is somewhat arbitrary; unless we
+are about to release a new Ubuntu version or there are major
+feature changes in the scopes run time or API, incrementing
+UNITY_SCOPES_MINOR is sufficient.
 
-Review any changes in /tmp/symbols.diff. If they are OK:
+The .so version for the library is <major>.<minor>. For example,
+version 1.3.1 has the name libunity-scopes.so.1.3.
+This is defined in CMakeLists.txt as UNITY_SCOPES_SOVERSION.
 
-    $ cd -
-    $ patch -p0 < /tmp/symbols.diff
+When incrementing the minor or major version number, follow these steps:
+
+1) Set UNITY_SCOPES_MAJOR, UNITY_SCOPES_MINOR, and UNITY_SCOPES_MICRO
+   in CMakeLists.txt as appropriate. This automatically sets
+   UNITY_SCOPES_SOVERSION.
+
+2) Add an entry to debian/changelog with the new version number.
+
+3) Update RELEASE_NOTES.md
+
+4) Modify debian/control and modify the libunity-scopes<major>.<minor>
+   Package name for the new version. For example, when
+   changing from version 1.2.2 to 1.3.0, set the Package
+   to "libunity-scopes1.3".
+
+   Add the previous version (such as libunity-scopes1.2) to
+   the "Replaces" and "Conflicts" sections.
+
+   Update the "Depends" sections for the other packages
+   with the new soversion.
+
+5) Rename the following files to reflect the new soversion.
+
+   libunity-scopes<soversion>.install
+   libunity-scopes<soversion>.scope.click-hook
+
+6) If you incremented the major version number, update
+   debian/libunity-scopes-dev.install with the new major version number.
 
 ABI compliance test
 -------------------
