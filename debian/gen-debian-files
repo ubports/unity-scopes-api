@@ -6,6 +6,9 @@
 }
 dir="$1"/debian
 
+echo "gen-debian-files: running lsb_release -a"
+lsb_release -a
+
 # Set soversion depending on whether we are running on vivid (read it from SOVERSION-vivid)
 # or wily (set it from the full version in VERSION).
 distro=`lsb_release -c -s`
