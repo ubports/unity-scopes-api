@@ -182,6 +182,10 @@ hide a section of code from address sanitzer with:
 ABI compatibility
 -----------------
 
+NOTE: The instructions below are for libunity-scopes, but all
+      the same rules apply to libunity-scopes-qt (which maintains
+      its own separate version numbers).
+
 By definition, if a change is ABI compatible, you must increment
 UNITY_SCOPES_MICRO in CMakeLists.txt. (Without this, we cannot
 identify from the version number whether a particular fix
@@ -230,6 +234,8 @@ When incrementing the minor or major version number, follow these steps:
 
 6) If you incremented the major version number, update
    debian/libunity-scopes-dev.install with the new major version number.
+
+7) Update the debian/shlibs file with the new version numbers.
 
 ABI compliance test
 -------------------
