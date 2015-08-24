@@ -218,7 +218,7 @@ set(UNITY_SCOPES_LIB unity-scopes)
 # API version
 set(UNITY_SCOPES_MAJOR 1)  # Major official release number
 set(UNITY_SCOPES_MINOR 0)  # Must be changed for ABI incompatible changes
-set(UNITY_SCOPES_MICRO 0)  # For ABI compatible changes
+set(UNITY_SCOPES_MICRO 1)  # For ABI compatible changes
 set(UNITY_SCOPES_SOVERSION ${UNITY_SCOPES_MAJOR}.${UNITY_SCOPES_MINOR})
 
 # Version for testing, with all symbols visible

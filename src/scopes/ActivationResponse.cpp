@@ -41,6 +41,11 @@ ActivationResponse::ActivationResponse(Result const& updated_result)
 {
 }
 
+ActivationResponse::ActivationResponse(PreviewWidgetList const& updated_widgets)
+    :p(new internal::ActivationResponseImpl(updated_widgets))
+{
+}
+
 /// @cond
 ActivationResponse::ActivationResponse(internal::ActivationResponseImpl* pimpl)
     : p(pimpl)
@@ -96,6 +101,11 @@ CannedQuery ActivationResponse::query() const
 Result ActivationResponse::updated_result() const
 {
     return p->updated_result();
+}
+
+PreviewWidgetList ActivationResponse::updated_widgets() const
+{
+    return p->updated_widgets();
 }
 
 } // namespace scopes
