@@ -474,6 +474,26 @@ void ResultImpl::deserialize(VariantMap const& var)
     }
 }
 
+bool ResultImpl::compare(ResultImpl *other) const
+{
+    // Compare all attributes and stored result (if set).
+    // Ignore origin, runtime and flags.
+    if (this == other)
+    {
+        return true;
+    }
+
+    if ((stored_result_  == nullptr) != (other->stored_result_ == nullptr))
+    {
+        return false;
+    }
+    if (stored_result_ != nullptr && *stored_result_ != *(other->stored_result_))
+    {
+        return false;
+    }
+    return attrs_ == other->attrs_;
+}
+
 Result ResultImpl::create_result(VariantMap const& variant_map)
 {
     return Result(variant_map);

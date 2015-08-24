@@ -1,6 +1,14 @@
 Release notes
 =============
 
+Changes in version 0.6.20
+=========================
+  - Support preview widget updates via ActivationResponse.
+  - Consolidated build for gcc 4.9 and 5.0 so we can build
+    both Vivid and Wily packages from the same tree. All
+    the debian files are no generated from the debian/rules
+    clean target.
+
 Changes in version 0.6.19
 =========================
   - Support UNITY_SCOPES_CONFIG_DIR environment variable.
@@ -39,7 +47,7 @@ Changes in version 0.6.14
     swiping to the scope while the device has no network access, or the scope's
     data source is off-line.
 
-    Note: This is change is ABI compatible with gcc and clang despite the addition 
+    Note: This is change is ABI compatible with gcc and clang despite the addition
           a new virtual function.
 
 Changes in version 0.6.13
@@ -116,7 +124,7 @@ Changes in version 0.6.2
   - New setting to enable/disable of location data being fed to scopes.
 
   - New DebugMode scope configuration option.
- 
+
 Changes in version 0.6.1
 ========================
   - Clear any signal masks inherited from the parent process when forking.
@@ -304,7 +312,7 @@ Changes in version 0.3.0
 
 - Preliminary API for filters has been added via OptionSelectorFilter and
   FilterState classes. This part of the API is not yet supported by Unity shell
-  and should be considered highly experimental. 
+  and should be considered highly experimental.
 
 - ScopeBase::create_query() method now takes Query object instance instead of
   just a search query string. Search query string is now encapsulated in the

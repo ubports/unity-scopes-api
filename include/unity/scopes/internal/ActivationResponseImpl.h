@@ -21,6 +21,7 @@
 #include <unity/scopes/ActivationResponse.h>
 #include <unity/scopes/CannedQuery.h>
 #include <unity/scopes/Result.h>
+#include <unity/scopes/PreviewWidget.h>
 
 namespace unity
 {
@@ -39,6 +40,7 @@ public:
     ActivationResponseImpl(ActivationResponse::Status status);
     ActivationResponseImpl(CannedQuery const& query);
     ActivationResponseImpl(Result const& result);
+    ActivationResponseImpl(PreviewWidgetList const& updated_widgets);
     ActivationResponseImpl(VariantMap const& var, RuntimeImpl const* runtime);
     ~ActivationResponseImpl() = default;
 
@@ -52,6 +54,7 @@ public:
     Variant scope_data() const;
     CannedQuery query() const;
     Result updated_result() const;
+    PreviewWidgetList updated_widgets() const;
 
     VariantMap serialize() const;
 
@@ -62,6 +65,7 @@ private:
     CannedQuery::SPtr query_;
     Variant scope_data_;
     Result::SPtr updated_result_;
+    std::shared_ptr<PreviewWidgetList> updated_widgets_;
 };
 
 } // namespace internal
