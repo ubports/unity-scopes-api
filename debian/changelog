@@ -1,8 +1,28 @@
+unity-scopes-api (1.0.0+15.10.20150821.3-0ubuntu1) wily; urgency=medium
+
+  [ Michi Henning ]
+  * Changed package name and soname for toolchain update to gcc 5.0.
+
+  [ CI Train Bot ]
+  * New rebuild forced.
+
+ -- CI Train Bot <ci-train-bot@canonical.com>  Fri, 21 Aug 2015 22:11:51 +0000
+
 unity-scopes-api (1.0.0-0ubuntu1) wily; urgency=medium
 
   * Changed package name and soname for toolchain update to gcc 5.0.
 
  -- Michi Henning <michi.henning@canonical.com>  Fri, 24 Jul 2015 15:12:14 +1000
+
+unity-scopes-api (0.6.19+15.10.20150724.3-0ubuntu1) wily; urgency=medium
+
+  [ Michi Henning ]
+  * Updated standards version to 3.9.6 in debian/control. Removed
+    copyonly from configure() calls because cmake 3.2.2 doesn't like it.
+    Removed g++ dependency from debian/control because bzr bd emitted a
+    warning.
+
+ -- CI Train Bot <ci-train-bot@canonical.com>  Fri, 24 Jul 2015 12:52:52 +0000
 
 unity-scopes-api (0.6.19+15.10.20150721-0ubuntu1) wily; urgency=medium
 
