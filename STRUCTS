@@ -88,12 +88,12 @@ Query (returned by serialize())
  'query_string'  : string
  'department_id' : string
  'filter_state'  : dictionary (serialized FilterState)
- 
+
 Link (returned by serialize())
 ==============================
  'label'      : string
  'query'      : Query
- 
+
 Annotation (returned by serialize())
 ====================================
  'type'       : string
@@ -160,6 +160,7 @@ ActivationResponse (returned by serialize())
  'scope_data'     : variant
  'query'          : variant (optional)
  'updated_result' : variant (optional)
+ 'updated_widgets': variant (optional)
 
 QueryMetadata (returned by serialize())
 =======================================

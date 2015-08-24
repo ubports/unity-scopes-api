@@ -68,7 +68,6 @@ TEST(ActivationResponse, basic)
         EXPECT_EQ(res.uri(), resp.updated_result().uri());
     }
 
-
     // Search only allowed with CannedQuery
     {
         try
@@ -88,10 +87,49 @@ TEST(ActivationResponse, basic)
         }
         catch (unity::InvalidArgumentException const&) {}
     }
+
+    // UpdatePreview only allowed with PreviewWidgetList
+    {
+        try
+        {
+            ActivationResponse resp(ActivationResponse::Status::UpdatePreview);
+            FAIL();
+        }
+        catch (unity::InvalidArgumentException const&) {}
+    }
+}
+
+TEST(ActivationResponse, with_updated_widgets)
+{
+    {
+        PreviewWidget w("w1", "foo");
+        PreviewWidgetList const widgets {w};
+
+        ActivationResponse resp(widgets);
+        EXPECT_EQ(ActivationResponse::Status::UpdatePreview, resp.status());
+        EXPECT_EQ(1, resp.updated_widgets().size());
+        EXPECT_EQ("w1", resp.updated_widgets().begin()->id());
+    }
+
+    {
+        PreviewWidgetList const widgets;
+
+        try
+        {
+            ActivationResponse resp(widgets);
+            FAIL();
+        }
+        catch (unity::InvalidArgumentException const&)
+        {
+        }
+    }
 }
 
 TEST(ActivationResponse, serialize)
 {
+    // just to make ResultImpl::set_runtime() happy, runtime must not be null.
+    auto runtime = internal::RuntimeImpl::create("fooscope", TEST_DIR "/Runtime.ini");
+
     {
         ActivationResponse resp(ActivationResponse::Status::HideDash);
         {
@@ -122,6 +160,18 @@ TEST(ActivationResponse, serialize)
         auto var = resp.serialize();
         EXPECT_EQ(ActivationResponse::Status::UpdateResult, static_cast<ActivationResponse::Status>(var["status"].get_int()));
         EXPECT_EQ("foo", var["updated_result"].get_dict()["attrs"].get_dict()["uri"].get_string());
+    }
+    {
+        PreviewWidget const w("w1", "foo");
+        PreviewWidgetList const widgets {w};
+
+        ActivationResponse resp(widgets);
+        auto var = resp.serialize();
+
+        ActivationResponse resp2 = internal::ActivationResponseImpl::create(var, runtime.get());
+        EXPECT_EQ(ActivationResponse::Status::UpdatePreview, resp2.status());
+        EXPECT_EQ(1, resp2.updated_widgets().size());
+        EXPECT_EQ("w1", resp2.updated_widgets().begin()->id());
     }
 }
 

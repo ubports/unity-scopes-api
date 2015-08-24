@@ -5,9 +5,8 @@
 #export DH_VERBOSE=1
 export DPKG_GENSYMBOLS_CHECK_LEVEL=4
 
-# We require a specific gcc version to avoid ABI breakage.
-export CC=$(DEB_HOST_GNU_TYPE)-gcc-4.9
-export CXX=$(DEB_HOST_GNU_TYPE)-g++-4.9
+# Skip tests on the archs they are known to be flaky with current configuration
+testskip_architectures := powerpc ppc64el
 
 %:
 	dh $@ --parallel --fail-missing --with click
@@ -17,7 +16,9 @@ override_dh_auto_configure:
 
 # Tests are not written to be run in parallel.
 override_dh_auto_test:
+ifeq (,$(filter $(testskip_architectures),$(DEB_HOST_ARCH)))
 	dh_auto_test --max-parallel=1 -- ARGS="--verbose"
+endif
 
 override_dh_click:
 	dh_click --name scope

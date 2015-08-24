@@ -7,7 +7,6 @@ Build-Depends: capnproto,
                dbus-test-runner,
                debhelper (>= 9),
                doxygen,
-               g++,
                google-mock,
                graphviz,
                libaccounts-glib-dev,
@@ -32,7 +31,7 @@ Build-Depends: capnproto,
                valgrind,
                libnet-cpp-dev (>=1.1.0),
                python-tornado
-Standards-Version: 3.9.5
+Standards-Version: 3.9.6
 XS-Testsuite: autopkgtest
 Section: libs
 Homepage: https://launchpad.net/unity-scopes-api
@@ -42,7 +41,7 @@ Homepage: https://launchpad.net/unity-scopes-api
 Vcs-Bzr: lp:unity-scopes-api
 Vcs-Browser: https://code.launchpad.net/unity-scopes-api
 
-Package: libunity-scopes3
+Package: libunity-scopes1.0
 Architecture: any
 Multi-Arch: same
 Pre-Depends: ${misc:Pre-Depends},
@@ -51,9 +50,11 @@ Depends: ${misc:Depends},
 Replaces: libunity-scopes0,
           libunity-scopes1,
           libunity-scopes2,
+          libunity-scopes3,
 Conflicts: libunity-scopes0,
            libunity-scopes1,
            libunity-scopes2,
+           libunity-scopes3,
 Description: API for Unity scopes integration
  Library to integrate scopes with the Unity shell
 
@@ -64,7 +65,7 @@ Multi-Arch: same
 Pre-Depends: ${misc:Pre-Depends},
 Depends: libproperties-cpp-dev,
          libunity-api-dev,
-         libunity-scopes3 (= ${binary:Version}),
+         libunity-scopes1.0 (= ${binary:Version}),
          ${misc:Depends},
 Description: Header files for Unity scopes API
  Library to integrate scopes with the Unity shell (dev files)
@@ -74,7 +75,7 @@ Section: devel
 Architecture: any
 Multi-Arch: foreign
 Pre-Depends: ${misc:Pre-Depends},
-Depends: libunity-scopes3 (= ${binary:Version}),
+Depends: libunity-scopes1.0 (= ${binary:Version}),
          ${misc:Depends},
          ${shlibs:Depends},
 Description: Client utility for Unity scopes API
@@ -88,7 +89,7 @@ Depends: ${misc:Depends},
 Description: Documentation for Unity scopes API
  Library to integrate scopes with the Unity shell (documentation)
 
-Package: libunity-scopes-qt
+Package: libunity-scopes-qt0.1
 Architecture: any
 Multi-Arch: same
 Pre-Depends: ${misc:Pre-Depends},
@@ -103,10 +104,9 @@ Architecture: any
 Multi-Arch: same
 Pre-Depends: ${misc:Pre-Depends},
 Depends: libunity-scopes-dev (= ${binary:Version}),
-         libunity-scopes-qt (= ${binary:Version}),
+         libunity-scopes-qt0.1 (= ${binary:Version}),
          libnet-cpp-dev (>=1.1.0),
          ${misc:Depends},
-         ${shlibs:Depends}
 Description: Header files for Qt library for Unity scopes API
  Library that integrates classes based on Qt for convenience (dev files)
 

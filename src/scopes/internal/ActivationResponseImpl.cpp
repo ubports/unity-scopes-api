@@ -17,6 +17,7 @@
 */
 
 #include <unity/scopes/internal/ActivationResponseImpl.h>
+#include <unity/scopes/internal/PreviewWidgetImpl.h>
 #include <unity/UnityExceptions.h>
 #include <unity/scopes/internal/CannedQueryImpl.h>
 #include <unity/scopes/internal/ResultImpl.h>
@@ -42,6 +43,10 @@ ActivationResponseImpl::ActivationResponseImpl(ActivationResponse::Status status
     {
         throw unity::InvalidArgumentException("ActivationResponse(): Status::UpdateResult allowed only with Result object");
     }
+    if (status == ActivationResponse::Status::UpdatePreview)
+    {
+        throw unity::InvalidArgumentException("ActivationResponse(): Status::UpdatePreview allowed only with PreviewWidgetList object");
+    }
 }
 
 ActivationResponseImpl::ActivationResponseImpl(CannedQuery const& query)
@@ -54,6 +59,16 @@ ActivationResponseImpl::ActivationResponseImpl(Result const& updated_result)
     : status_(ActivationResponse::Status::UpdateResult),
       updated_result_(std::make_shared<Result>(updated_result))
 {
+}
+
+ActivationResponseImpl::ActivationResponseImpl(PreviewWidgetList const& updated_widgets)
+    : status_(ActivationResponse::Status::UpdatePreview),
+      updated_widgets_(std::make_shared<PreviewWidgetList>(updated_widgets))
+{
+    if (updated_widgets.size() == 0)
+    {
+        throw InvalidArgumentException("ActivationResponse(): the list of widgets to update cannot be empty");
+    }
 }
 
 ActivationResponseImpl::ActivationResponseImpl(VariantMap const& var, RuntimeImpl const* runtime)
@@ -92,6 +107,20 @@ ActivationResponseImpl::ActivationResponseImpl(VariantMap const& var, RuntimeImp
         impl->set_runtime(runtime);
         updated_result_ = std::make_shared<Result>(ResultImpl::create_result(impl));
     }
+    else if (status_ == ActivationResponse::Status::UpdatePreview)
+    {
+        it = var.find("updated_widgets");
+        if (it == var.end())
+        {
+            throw LogicException("ActivationResponseImpl(): Invalid data, missing 'updated_widgets'");
+        }
+        updated_widgets_.reset(new PreviewWidgetList());
+        VariantArray arr = it->second.get_array();
+        for (unsigned i = 0; i < arr.size(); i++)
+        {
+            updated_widgets_->emplace_back(PreviewWidgetImpl::create(arr[i].get_dict()));
+        }
+    }
 }
 
 ActivationResponse::Status ActivationResponseImpl::status() const
@@ -129,6 +158,16 @@ Result ActivationResponseImpl::updated_result() const
     throw LogicException("ActivationResponse::updated_result(): updated result is only available for status of Status::UpdateResult");
 }
 
+PreviewWidgetList ActivationResponseImpl::updated_widgets() const
+{
+    if (updated_widgets_)
+    {
+        assert(status_ == ActivationResponse::Status::UpdatePreview);
+        return *updated_widgets_;
+    }
+    throw LogicException("ActivationResponse::updated_widgets(): updated widgets are only available for status of Status::UpdatePreview");
+}
+
 VariantMap ActivationResponseImpl::serialize() const
 {
     VariantMap vm;
@@ -141,6 +180,15 @@ VariantMap ActivationResponseImpl::serialize() const
     if (updated_result_)
     {
         vm["updated_result"] = updated_result_->serialize();
+    }
+    else if (updated_widgets_)
+    {
+        VariantArray arr;
+        for (auto const& widget : *updated_widgets_)
+        {
+            arr.push_back(Variant(widget.serialize()));
+        }
+        vm["updated_widgets"] = arr;
     }
     return vm;
 }

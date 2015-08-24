@@ -1,0 +1,4 @@
+[ScopeConfig]
+DisplayName = SimpleScope
+Description = Simple scope. Returns a single result containing the query string.
+Author = Michi
