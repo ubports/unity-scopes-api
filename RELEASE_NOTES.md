@@ -6,7 +6,7 @@ Changes in version 0.6.20
   - Support preview widget updates via ActivationResponse.
   - Consolidated build for gcc 4.9 and 5.0 so we can build
     both Vivid and Wily packages from the same tree. All
-    the debian files are no generated from the debian/rules
+    the debian files are now generated from the debian/rules
     clean target.
 
 Changes in version 0.6.19

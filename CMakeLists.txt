@@ -236,7 +236,7 @@ LIST(GET full_version_components 2 UNITY_SCOPES_MICRO)
 # For vivid, we read the SOVERSION from SOVERSION-vivid.
 # For wily and later, the SOVERSION is <major>.<minor>.
 if(${DISTRIBUTION} MATCHES "vivid")
-    file(READ debian/SOVERSION-vivid UNITY_SCOPES_SOVERSION)
+    math(EXPR UNITY_SCOPES_SOVERSION ${UNITY_SCOPES_MINOR} - 3)
 else()
     set(UNITY_SCOPES_SOVERSION "${UNITY_SCOPES_MAJOR}.${UNITY_SCOPES_MINOR}")
 endif()
