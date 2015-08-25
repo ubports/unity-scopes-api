@@ -257,6 +257,7 @@ libunity-scopes.so.@UNITY_SCOPES_SOVERSION@ libunity-scopes@UNITY_SCOPES_SOVERSI
  (c++)"unity::scopes::experimental::Annotation::set_icon(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.5.0+14.10.20140619
  (c++)"unity::scopes::experimental::Annotation::set_label(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.5.0+14.10.20140619
  (c++|arch=amd64 ppc64el arm64)"unity::scopes::experimental::DateTimePickerFilter::create(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::bitset<6ul>)@Base" 0.6.16+15.04.20150410.3
+  (c++|arch=armhf i386 powerpc)unity::scopes::experimental::DateTimePickerFilter::create(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::bitset<6u>)@Base 0replaceme
  (c++)"unity::scopes::experimental::DateTimePickerFilter::date_label() const@Base" 0.6.16+15.04.20150410.3
  (c++)"unity::scopes::experimental::DateTimePickerFilter::~DateTimePickerFilter()@Base" 0.6.16+15.04.20150410.3
  (c++)"unity::scopes::experimental::DateTimePickerFilter::DateTimePickerFilter(unity::scopes::internal::DateTimePickerFilterImpl*)@Base" 0.6.16+15.04.20150410.3
@@ -270,11 +271,15 @@ libunity-scopes.so.@UNITY_SCOPES_SOVERSION@ libunity-scopes@UNITY_SCOPES_SOVERSI
  (c++)"unity::scopes::experimental::DateTimePickerFilter::selected_date(unity::scopes::FilterState const&) const@Base" 0.6.16+15.04.20150410.3
  (c++)"unity::scopes::experimental::DateTimePickerFilter::set_date_label(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.6.16+15.04.20150410.3
  (c++|arch=amd64 ppc64el arm64)"unity::scopes::experimental::DateTimePickerFilter::set_maximum(std::chrono::time_point<std::chrono::_V2::system_clock, std::chrono::duration<long, std::ratio<1l, 1000000000l> > > const&)@Base" 0.6.16+15.04.20150410.3
+ (c++|arch=armhf i386 powerpc)unity::scopes::experimental::DateTimePickerFilter::set_maximum(std::chrono::time_point<std::chrono::_V2::system_clock, std::chrono::duration<long long, std::ratio<1ll, 1000000000ll> > > const&)@Base 0replaceme
  (c++|arch=amd64 ppc64el arm64)"unity::scopes::experimental::DateTimePickerFilter::set_minimum(std::chrono::time_point<std::chrono::_V2::system_clock, std::chrono::duration<long, std::ratio<1l, 1000000000l> > > const&)@Base" 0.6.16+15.04.20150410.3
+ (c++|arch=armhf i386 powerpc)unity::scopes::experimental::DateTimePickerFilter::set_minimum(std::chrono::time_point<std::chrono::_V2::system_clock, std::chrono::duration<long long, std::ratio<1ll, 1000000000ll> > > const&)@Base 0replaceme
  (c++)"unity::scopes::experimental::DateTimePickerFilter::set_time_label(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.6.16+15.04.20150410.3
  (c++)"unity::scopes::experimental::DateTimePickerFilter::time_label() const@Base" 0.6.16+15.04.20150410.3
  (c++|arch=amd64 ppc64el arm64)"unity::scopes::experimental::DateTimePickerFilter::update_state(unity::scopes::FilterState&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::chrono::time_point<std::chrono::_V2::system_clock, std::chrono::duration<long, std::ratio<1l, 1000000000l> > > const&)@Base" 0.6.16+15.04.20150410.3
+  (c++|arch=armhf i386 powerpc)unity::scopes::experimental::DateTimePickerFilter::update_state(unity::scopes::FilterState&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::chrono::time_point<std::chrono::_V2::system_clock, std::chrono::duration<long long, std::ratio<1ll, 1000000000ll> > > const&)@Base 0replaceme
  (c++|arch=amd64 ppc64el arm64)"unity::scopes::experimental::DateTimePickerFilter::update_state(unity::scopes::FilterState&, std::chrono::time_point<std::chrono::_V2::system_clock, std::chrono::duration<long, std::ratio<1l, 1000000000l> > > const&) const@Base" 0.6.16+15.04.20150410.3
+ (c++|arch=armhf i386 powerpc)unity::scopes::experimental::DateTimePickerFilter::update_state(unity::scopes::FilterState&, std::chrono::time_point<std::chrono::_V2::system_clock, std::chrono::duration<long long, std::ratio<1ll, 1000000000ll> > > const&) const@Base 0replaceme
  (c++)"unity::scopes::experimental::RadioButtonsFilter::active_option(unity::scopes::FilterState const&) const@Base" 0.5.0+14.10.20140619
  (c++)"unity::scopes::experimental::RadioButtonsFilter::add_option(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.5.0+14.10.20140619
  (c++)"unity::scopes::experimental::RadioButtonsFilter::create(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.5.0+14.10.20140619
@@ -1003,6 +1008,7 @@ libunity-scopes.so.@UNITY_SCOPES_SOVERSION@ libunity-scopes@UNITY_SCOPES_SOVERSI
  (c++)"unity::scopes::Variant::operator=(double)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Variant::operator=(int)@Base" 0.4.0+14.04.20140312.1
  (c++|arch=amd64 ppc64el arm64)"unity::scopes::Variant::operator=(long)@Base" 0.6.16+15.04.20150410.3
+ (c++|arch=armhf i386 powerpc)unity::scopes::Variant::operator=(long long)@Base 0replaceme
  (c++)"unity::scopes::Variant::operator=(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Variant::operator=(std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unity::scopes::Variant> > > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Variant::operator=(std::vector<unity::scopes::Variant, std::allocator<unity::scopes::Variant> > const&)@Base" 0.4.0+14.04.20140312.1
@@ -1019,6 +1025,7 @@ libunity-scopes.so.@UNITY_SCOPES_SOVERSION@ libunity-scopes@UNITY_SCOPES_SOVERSI
  (c++)"unity::scopes::Variant::Variant(double)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Variant::Variant(int)@Base" 0.4.0+14.04.20140312.1
  (c++|arch=amd64 ppc64el arm64)"unity::scopes::Variant::Variant(long)@Base" 0.6.16+15.04.20150410.3
+ (c++|arch=armhf i386 powerpc)unity::scopes::Variant::Variant(long long)@Base 0replaceme
  (c++)"unity::scopes::Variant::Variant(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Variant::Variant(std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, unity::scopes::Variant, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unity::scopes::Variant> > > const&)@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::Variant::Variant(std::vector<unity::scopes::Variant, std::allocator<unity::scopes::Variant> > const&)@Base" 0.4.0+14.04.20140312.1
