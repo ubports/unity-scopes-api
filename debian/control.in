@@ -19,7 +19,7 @@ Build-Depends: capnproto,
                libdbustest1-dev,
                libjsoncpp-dev,
                liblttng-ust-dev,
-               libnet-cpp-dev (>= 1.1.0),
+               libnet-cpp-dev (>= 1.2.0),
                libprocess-cpp-dev (>= 1.0.1),
                libsignon-glib-dev,
                libunity-api-dev (>= 7.80.7~),
@@ -103,7 +103,7 @@ Multi-Arch: same
 Pre-Depends: ${misc:Pre-Depends},
 Depends: libunity-scopes-dev (= ${binary:Version}),
          libunity-scopes-qt@UNITY_SCOPES_QT_SOVERSION@ (= ${binary:Version}),
-         libnet-cpp-dev (>=1.1.0),
+         libnet-cpp-dev (>=1.2.0),
          ${misc:Depends},
 Description: Header files for Qt library for Unity scopes API
  Library that integrates classes based on Qt for convenience (dev files)
