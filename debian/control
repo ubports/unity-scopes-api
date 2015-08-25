@@ -55,11 +55,9 @@ Depends: ${misc:Depends},
 Replaces: libunity-scopes0,
           libunity-scopes1,
           libunity-scopes2,
-          libunity-scopes3,
 Conflicts: libunity-scopes0,
            libunity-scopes1,
            libunity-scopes2,
-           libunity-scopes3,
 Description: API for Unity scopes integration
  Library to integrate scopes with the Unity shell
 

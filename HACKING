@@ -251,6 +251,16 @@ files:
       The full version number for libunity-scopes-qt, for example, 0.1.0.
 
       The major version *must* remain at 0, no matter what.
+    
+    - control and control.in
+
+      *If* the soname changes, you need to add the outdated
+      version to the "Replaces:" and "Conflicts:" entries
+      in control and control.in. See gen-debian-files
+      for the sed scripts that append a line to the stanza
+      if the Vivid soname is changed. This also may apply
+      if the soname of the Qt library changes, in which case
+      gen-debian-files needs a corresponding update.
 
 - For Wily and later:
 
