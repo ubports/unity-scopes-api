@@ -833,7 +833,6 @@ libunity-scopes.so.@UNITY_SCOPES_SOVERSION@ libunity-scopes@UNITY_SCOPES_SOVERSI
  (c++)"unity::scopes::ScopeBase::start(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0.6.0+14.10.20140804.1
  (c++)"unity::scopes::ScopeBase::stop()@Base" 0.5.0+14.10.20140619
  (c++)"unity::scopes::ScopeBase::tmp_directory() const@Base" 0.6.0+14.10.20140804.1
- (c++)"unity::scopes::Scope::foo()@Base" 0replaceme
  (c++)"unity::scopes::ScopeMetadata::appearance_attributes() const@Base" 0.4.2+14.04.20140404.2
  (c++)"unity::scopes::ScopeMetadata::art() const@Base" 0.4.0+14.04.20140312.1
  (c++)"unity::scopes::ScopeMetadata::author() const@Base" 0.4.0+14.04.20140312.1
