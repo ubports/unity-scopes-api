@@ -21,6 +21,7 @@
 #include <unity/scopes/Variant.h>
 #include <unity/scopes/CannedQuery.h>
 #include <unity/scopes/Result.h>
+#include <unity/scopes/PreviewWidget.h>
 #include <memory>
 
 namespace unity
@@ -53,6 +54,7 @@ public:
         ShowPreview,  /**< Preview should be requested for this result */
         PerformQuery, /**< Perform new search. This state is implied if creating ActivationResponse with CannedQuery object and is invalid otherwise */
         UpdateResult, /**< Update the result. This state is implied if creating ActivationResponse with Result object and is invalid otherwise */
+        UpdatePreview /**< Update the preview. This state is implied if creating ActivationResponse with PreviewWidgetList and is invalid otherwise */
     };
 
     /**
@@ -76,6 +78,16 @@ public:
     \param updated_result The updated result to replace the original result of the action.
      */
     ActivationResponse(Result const& updated_result);
+
+    /**
+    \brief Creates ActivationResponse with status Status::UpdatePreview and an updated list of preview widgets
+    that replace the original widgets in the preview. Widgets not included in this list stay intact and are still
+    displayed in the preview. Responding with this type of ActivationResponse outside of a preview context will not
+    have any effect.
+    \param updated_widgets The updated widgets to replace the original widgets in the preview.
+    \throws unity::InvalidArgumentException if updated_widgets list is empty.
+    */
+    ActivationResponse(PreviewWidgetList const& updated_widgets);
 
     /**@name Copy and assignment
     Copy and assignment operators (move and non-move versions) have the usual value semantics.
@@ -123,6 +135,13 @@ public:
      \return The result to be displayed instead of the original result.
     */
     Result updated_result() const;
+
+    /**
+     \brief The updated widgets if status is Status::UpdatePreview.
+     \throws unity::LogicException if the status of this ActivationResponse is anything other than Status::UpdatePreview.
+     \return The widgets to be displayed instead of the original widgets with same IDs.
+     */
+    PreviewWidgetList updated_widgets() const;
 
     /// @cond
     VariantMap serialize() const;

@@ -81,6 +81,8 @@ public:
 
     VariantMap serialize() const;
 
+    bool compare(ResultImpl *other) const;
+
     // a public static method, so there's access to the private constructor
     // without the need to define too many classes as friends
     static Result create_result(VariantMap const&);

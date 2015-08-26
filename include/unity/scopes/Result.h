@@ -240,6 +240,12 @@ public:
     */
     bool is_account_login_result() const;
 
+    /**
+    \brief Compare result.
+    \return True if results have all attributes equal.
+    */
+    bool operator==(Result const& other) const;
+
     /// @cond
 protected:
     explicit Result(const VariantMap &variant_map);
