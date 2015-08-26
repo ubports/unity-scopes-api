@@ -21,9 +21,11 @@ qt_full_version=`cat "${dir}"/QT-VERSION${suffix}`
 
 major=`echo $full_version | cut -d'.' -f1`
 minor=`echo $full_version | cut -d'.' -f2`
+major_minor="${major}.${minor}"
 
 qt_major=`echo $qt_full_version | cut -d'.' -f1`
 qt_minor=`echo $qt_full_version | cut -d'.' -f2`
+qt_major_minor="${qt_major}.${qt_minor}"
 
 if [ "$distro" = "vivid" ]
 then
@@ -109,6 +111,8 @@ else
         -e "s/@UNITY_SCOPES_QT_SOVERSION@/${qt_soversion}/g" \
         -e "s/@UNITY_SCOPES_FULL_VERSION@/${full_version}/g" \
         -e "s/@UNITY_SCOPES_QT_FULL_VERSION@/${qt_full_version}/g" \
+        -e "s/@UNITY_SCOPES_MAJOR_MINOR@/${major_minor}/g" \
+        -e "s/@UNITY_SCOPES_QT_MAJOR_MINOR@/${qt_major_minor}/g" \
         "$infile" >>"$outfile"
 fi
 
