@@ -236,14 +236,14 @@ files:
 
       The full version number for libunity-scopes, for example, 0.6.19.
 
-      The major version *must* remain at 0. (The gen-debian-files build script
+      The major version *must* remain at 0. (The gen-debian-files.sh build script
       enforces this.)
 
     - QT-VERSION-vivid
 
       The full version number for libunity-scopes-qt, for example, 0.1.0.
 
-      The major version *must* remain at 0. (The gen-debian-files build script
+      The major version *must* remain at 0. (The gen-debian-files.sh build script
       enforces this.)
     
 - For Wily and later:
@@ -260,11 +260,11 @@ files:
 
   - *If* the soname changes, you need to add the outdated
     version to the "Replaces:" and "Conflicts:" entries
-    in control and control.in. See gen-debian-files
+    in control and control.in. See gen-debian-files.sh
     for the sed scripts that append a line to the stanza
     if the Vivid soname is changed. This also may apply
     if the soname of the Qt library changes, in which case
-    gen-debian-files needs a corresponding update.
+    gen-debian-files.sh needs a corresponding update.
 
 The soversion for each library is derived from the corresponding file.
 Unless it changes, you don't need to do anything special.
@@ -295,7 +295,7 @@ number as <minor> - 3.)
 When incrementing the minor or major version number, follow these steps:
 
 1) Edit one or more of the version files, control, and control.in as
-   described above. Also verify that debian/gen-debian-files correctly
+   described above. Also verify that debian/gen-debian-files.sh correctly
    updates the "Replaces:" and "Conflicts:" entries.
 
 2) Add an entry to debian/changelog with the new version number (for Wily).
