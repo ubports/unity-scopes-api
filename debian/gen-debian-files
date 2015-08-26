@@ -1,15 +1,10 @@
 #!/bin/sh
 
-set -x
-
 [ $# -ne 1 ] && {
     echo "usage: `basename $0` build-root_dir" >&2
     exit 1
 }
 dir="$1"/debian
-
-echo "gen-debian-files: running lsb_release -a"
-lsb_release -a
 
 # Set soversion depending on whether we are running on vivid or wily.
 
@@ -18,6 +13,8 @@ distro=`lsb_release -c -s`
 [ "$distro" = "vivid" ] && {
     suffix="-vivid"
 }
+
+echo "gen-debian-files: detected distribution: $distro"
 
 full_version=`cat "${dir}"/VERSION${suffix}`
 qt_full_version=`cat "${dir}"/QT-VERSION${suffix}`
@@ -30,30 +27,26 @@ qt_minor=`echo $qt_full_version | cut -d'.' -f2`
 
 if [ "$distro" = "vivid" ]
 then
-    if [ $major -gt 0 ]
-    then
+    [ $major -gt 0 ] && {
         echo "impossible major version for Vivid: $major (Vivid major version must be 0)" >&2
         exit 1
-    fi
-    if [ $minor < 6 ]
-    then
+    }
+    [ $minor -lt 6 ] && {
         echo "impossible minor version for Vivid: $minor (Vivid minor version must be >= 6)" >&2
         exit 1
-    fi
+    }
     soversion=`expr $minor - 3`
 else
     soversion="${major}.${minor}"
 fi
 
-if [ "$distro" = "vivid" ]
-then
-    if [ $qt_major -gt 0 ]
-    then
+[ "$distro" = "vivid" ] && {
+    [ $qt_major -gt 0 ] && {
         echo "impossible Qt major version for Vivid: $qt_major (Vivid Qt major version must be 0)" >&2
         exit 1
-    fi
-fi
-qt_soversion="${major}.${minor}"
+    }
+}
+qt_soversion="${qt_major}.${qt_minor}"
 
 # Generate debian/control from debian/control.in, substituting the soversion for both libs.
 # For wily onwards, we also add an entry for the vivid version to "Conflicts:" and "Replaces:".
@@ -147,9 +140,8 @@ EOF
 sed "s/@UNITY_SCOPES_QT_SOVERSION@/${qt_soversion}/" "${dir}"/libunity-scopes-qt-dev.install.in >>"${dir}"/libunity-scopes-qt-dev.install
 
 # Qt symbols file for vivid
-if [ "$distro" = "vivid" ]
-then
+[ "$distro" = "vivid" ] && {
     sed "s/@UNITY_SCOPES_QT_SOVERSION@/${qt_soversion}/g" "${dir}"/libunity-scopes-qt.symbols.in >"${dir}"/libunity-scopes-qt${qt_soversion}.symbols
-fi
+}
 
 exit 0
