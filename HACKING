@@ -180,7 +180,7 @@ hide a section of code from address sanitzer with:
 #endif
 
 Updating symbols files (only for Vivid)
---------------------------------------
+---------------------------------------
 
 On Vivid only, we maintain symbols files, using the gcc 4.9 ABI names.
 On Wily, there is no symbols file because we don't care whether we
@@ -189,8 +189,7 @@ we use a shlibs file.
 
 For Vivid, the symbols files are generated from debian/libunity-scopes.symbols.in
 and debian/libunity-scopes-qt.symbols.in. (The soversion is substituted
-automatically into the files by reading SOVERSION-vivid (for libunity-scopes),
-and by reading QT-VERSION (for libunity-scopes-qt).
+automatically into the files.)
 
 To easily spot new/removed/changed symbols in the library, the debian
 package maintains a .symbols file that lists all exported symbols
@@ -221,10 +220,9 @@ ABI compatibility
 Version numbers for both libraries use <major>.<minor>.<micro>.
 
 On Vivid only, the soversion for libunity-scopes is a single
-integer, such as 3, and the soversion for libunityh-scopes-qt
-is <major>.<minor>.
+integer, such as 3. (It is, by definition, <minor> - 3.)
 
-On Wily and later, the soversion for both libraries is <major>.<minor>.
+The soversion for libunity-scopes-qt is <major>.<minor> (whether Wily or Vivid).
 
 The version numbers for the libraries are generated from files
 in the debian directory. (See below for general rules on versioning.)
@@ -238,30 +236,16 @@ files:
 
       The full version number for libunity-scopes, for example, 0.6.19.
 
-      The major version *must* remain at 0, no matter what.
-
-    - SOVERSION-vivid
-
-      The soversion number for libunity-scopes. This is a single
-      integer. If you change the minor version in VERSION-vivid,
-      you *must* increment the version number in SOVERSION-vivid.
+      The major version *must* remain at 0. (The gen-debian-files build script
+      enforces this.)
 
     - QT-VERSION-vivid
 
       The full version number for libunity-scopes-qt, for example, 0.1.0.
 
-      The major version *must* remain at 0, no matter what.
+      The major version *must* remain at 0. (The gen-debian-files build script
+      enforces this.)
     
-    - control and control.in
-
-      *If* the soname changes, you need to add the outdated
-      version to the "Replaces:" and "Conflicts:" entries
-      in control and control.in. See gen-debian-files
-      for the sed scripts that append a line to the stanza
-      if the Vivid soname is changed. This also may apply
-      if the soname of the Qt library changes, in which case
-      gen-debian-files needs a corresponding update.
-
 - For Wily and later:
 
     - VERSION
@@ -272,8 +256,20 @@ files:
 
       The full version number for libunity-scopes-qt, for example, 1.0.0.
 
-    On wily and later, the soversion for each library is derived
-    from the corresponding file, so there is no separate SOVERSION file.
+- For all distributions (Vivid, Wily, and later):
+
+  - *If* the soname changes, you need to add the outdated
+    version to the "Replaces:" and "Conflicts:" entries
+    in control and control.in. See gen-debian-files
+    for the sed scripts that append a line to the stanza
+    if the Vivid soname is changed. This also may apply
+    if the soname of the Qt library changes, in which case
+    gen-debian-files needs a corresponding update.
+
+The soversion for each library is derived from the corresponding file.
+Unless it changes, you don't need to do anything special.
+
+Versioning rules:
     
 By definition, if a change is ABI compatible, you must increment
 the micro version number. (Without this, we cannot
@@ -291,12 +287,16 @@ feature changes in the scopes run time or API, incrementing
 the minor version number is sufficient.
 
 The .so version for the library is <major>.<minor>. For example,
-version 1.3.1 has the name libunity-scopes.so.1.3 (on Wily
-and later, see above).
+version 1.3.1 has the name libunity-scopes.so.1.3. (On Vivid only,
+for libunity-scopes.so only, the .so version is a single integer,
+such as libunity-scopes.so.3. (It is derived from the minor version
+number as <minor> - 3.)
 
 When incrementing the minor or major version number, follow these steps:
 
-1) Edit one or more of the version files as described above.
+1) Edit one or more of the version files, control, and control.in as
+   described above. Also verify that debian/gen-debian-files correctly
+   updates the "Replaces:" and "Conflicts:" entries.
 
 2) Add an entry to debian/changelog with the new version number (for Wily).
 

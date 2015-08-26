@@ -40,11 +40,9 @@ else
     soversion="${major}.${minor}"
 fi
 
-[ "$distro" = "vivid" ] && {
-    [ $qt_major -gt 0 ] && {
-        echo "impossible Qt major version for Vivid: $qt_major (Vivid Qt major version must be 0)" >&2
-        exit 1
-    }
+[ "$distro" = "vivid" -a $qt_major -gt 0 ] && {
+    echo "impossible Qt major version for Vivid: $qt_major (Vivid Qt major version must be 0)" >&2
+    exit 1
 }
 qt_soversion="${qt_major}.${qt_minor}"
 
@@ -61,13 +59,12 @@ EOF
 sed -e "s/@UNITY_SCOPES_SOVERSION@/${soversion}/" \
     -e "s/@UNITY_SCOPES_QT_SOVERSION@/${qt_soversion}/" "${dir}"/control.in >>"${dir}"/control
 
-if [ "$distro" != "vivid" ]
-then
+[ "$distro" != "vivid" ] && {
     sed -i -e "Replaces: libunity-scopes0,/a\
 \          libunity-scopes${so_version}," \
            -e "Conflicts: libunity-scopes0,/a\
 \           libunity-scopes${so_version}," "${dir}"/control
-fi
+}
 
 # Generate the install files, naming them according to the soversion.
 
