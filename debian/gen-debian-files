@@ -1,10 +1,10 @@
 #!/bin/bash
 
-[ $# -ne 1 ] && {
-    echo "usage: $(basename $0) build-root_dir" >&2
+[ $# -ne 0 ] && {
+    echo "usage: $(basename $0)" >&2
     exit 1
 }
-dir="$1"/debian
+dir=./debian
 
 # Set soversion depending on whether we are running on vivid or wily.
 
@@ -15,8 +15,6 @@ distro=$(lsb_release -c -s)
 }
 
 echo "gen-debian-files: detected distribution: $distro"
-
-set -x
 
 full_version=$(cat "${dir}"/VERSION${suffix})
 qt_full_version=$(cat "${dir}"/QT-VERSION${suffix})
