@@ -819,6 +819,40 @@ void MyReceiver::push(CategorisedResult original_result)
 }
 \endcode
 
+\subsection threading Threading model
+
+It is important to understand how the runtime uses threads to call methods on scopes and clients.
+The runtime maintains a number of threads that each call one or more methods. Methods in the same
+group are always called by the same thread. This means that methods in the same group do not run concurrently,
+but methods in different groups _do_ run concurrently. If you share state between methods in
+different groups, you _must_ synchronize access to that state, otherwise your code will suffer from
+race conditions.
+
+The following lists shows how methods are grouped. Each group has a single dedicated dispatch thread.
+
+<ul>
+<li>\link unity::scopes::ScopeBase::run() ScopeBase::run()\endlink,
+<li>\link unity::scopes::ScopeBase::search() ScopeBase::search()\endlink,
+\link unity::scopes::ScopeBase::preview() ScopeBase::preview()\endlink, and
+\link unity::scopes::ScopeBase::perform_action() ScopeBase::perform_action()\endlink.
+<li>\link unity::scopes::SearchQueryBase::run() SearchQueryBase::run()\endlink,
+\link unity::scopes::PreviewQueryBase::run() PreviewQueryBase::run()\endlink, and
+\link unity::scopes::ActivationQueryBase::activate() ActivationQueryBase::activate()\endlink.
+<li>\link unity::scopes::QueryBase::cancelled() QueryBase::cancelled()\endlink.
+<li>\link unity::scopes::SearchListenerBase::push() SearchListenerBase::push()\endlink,
+\link unity::scopes::PreviewListenerBase::push() PreviewListenerBase::push()\endlink,
+\link unity::scopes::ActivationListenerBase::activated() ActivationListenerBase::activated()\endlink,
+\link unity::scopes::ListenerBase::finished() ListenerBase::finished()\endlink,
+\link unity::scopes::ListenerBase::info() ListenerBase::info()\endlink.
+</ul>
+For your scope implementation, keep in mind that `cancelled()` is _not_ called by
+the same thread that called, for example, `search()` or `run()`. This means that any state you
+established in `search()` or `run()` must be synchronized if you use that state in `cancelled()`.
+
+Similar considerations apply for aggregating scopes, which act as both client and server: you must
+synchronize any state that is shared between the client side, such as `search()` and the server side,
+such as `push()` and `finished()`.
+
 \subsection scopesettings Settings
 
 A scope can provide for simple customizations, such as allowing the user to configure an email address or
