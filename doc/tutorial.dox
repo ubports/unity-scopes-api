@@ -1360,7 +1360,7 @@ tutorial document for more detail on using keywords in your scope.
 
 \subsection scopetool The scope tool
 
-The Unity Scope Tool is a stand-alone redering tool that allows you
+The Unity Scope Tool is a stand-alone rendering tool that allows you
 to see how the dash will render your scope.
 
 You can install the tool from the Ubuntu archive using:
@@ -1383,7 +1383,7 @@ you can just copy the JSON definition back into your scope
 (see unity::scopes::CategoryRenderer::CategoryRenderer()).
 
 The scope-tool supports a few command line arguments:
-\arg by default (without any arguments) it will communicate with all scopes
+\arg By default (without any arguments) it will communicate with all scopes
 installed on the system and available on the smart scopes server.
 \arg When a path to a scope configuration file is provided, only that scope is
 initialized, but you can either pass multiple configuration files or
