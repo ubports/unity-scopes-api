@@ -831,7 +831,10 @@ race conditions.
 The following lists shows how methods are grouped. Each group has a single dedicated dispatch thread.
 
 <ul>
-<li>\link unity::scopes::ScopeBase::run() ScopeBase::run()\endlink,
+<li>\link UNITY_SCOPE_CREATE_FUNCTION()\endlink,
+\link unity::scopes::ScopeBase::start() ScopeBase::start()\endlink,
+\link unity::scopes::ScopeBase::stop() ScopeBase::stop()\endlink, and
+\link UNITY_SCOPE_DESTROY_FUNCTION\endlink.
 <li>\link unity::scopes::ScopeBase::search() ScopeBase::search()\endlink,
 \link unity::scopes::ScopeBase::preview() ScopeBase::preview()\endlink, and
 \link unity::scopes::ScopeBase::perform_action() ScopeBase::perform_action()\endlink.
@@ -850,8 +853,8 @@ the same thread that called, for example, `search()` or `run()`. This means that
 established in `search()` or `run()` must be synchronized if you use that state in `cancelled()`.
 
 Similar considerations apply for aggregating scopes, which act as both client and server: you must
-synchronize any state that is shared between the client side, such as `search()` and the server side,
-such as `push()` and `finished()`.
+synchronize any state that is shared between the client side and the server side. For example,
+you must synchronize state established in `search()` and accessed from `push()` or `finished()`.
 
 \subsection scopesettings Settings
 
