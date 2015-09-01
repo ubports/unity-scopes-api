@@ -48,7 +48,7 @@ Results for the query are delivered to the client by the scopes run
 time by invoking the appropriate push method.
 
 If the implementation of a push method throws an exception, the scopes
-run time calls ListenerBase::finished() with an 'Error' status.
+runtime calls ListenerBase::finished() with an 'Error' status.
 
 \see ListenerBase
 */
@@ -64,26 +64,26 @@ public:
     /// @endcond
 
     /**
-    \brief Called at most once by the scopes run time for a tree of departments returned by a query.
+    \brief Called at most once by the scopes runtime for a tree of departments returned by a query.
 
     The default implementation does nothing.
     */
     virtual void push(Department::SCPtr const& parent);
 
     /**
-    \brief Called once by the scopes run time for each result that is returned by a query().
+    \brief Called once by the scopes runtime for each result that is returned by a query().
     */
     virtual void push(CategorisedResult result) = 0;
 
     /**
-    \brief Called once by the scopes run time for each annotation that is returned by a query().
+    \brief Called once by the scopes runtime for each annotation that is returned by a query().
 
     The default implementation does nothing.
     */
     virtual void push(experimental::Annotation annotation);
 
     /**
-    \brief Called once by the scopes run time for each category that is returned by a query().
+    \brief Called once by the scopes runtime for each category that is returned by a query().
 
     Receipt of categories may be interleaved with
     the receipt of results, that is, there is no guarantee that the complete set of categories
