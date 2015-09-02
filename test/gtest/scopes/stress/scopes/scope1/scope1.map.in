@@ -1,9 +1,0 @@
-{
-global:
-        "unity_scope_create_v@UNITY_SCOPES_SOVERSION_SYM_SUFFIX@";
-        "unity_scope_destroy";
-local:
-    extern "C++" {
-        *;
-    };
-};
