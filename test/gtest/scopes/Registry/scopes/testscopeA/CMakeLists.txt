@@ -10,4 +10,3 @@ set_target_properties(testscopeA
     PREFIX "${CMAKE_LIBRARY_ARCHITECTURE}/lib"
 )
 target_link_libraries(testscopeA ${LIBGTEST})
-add_custom_command(TARGET testscopeA POST_BUILD COMMAND nm --demangle -D $<TARGET_FILE:testscopeA>)
