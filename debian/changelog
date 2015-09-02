@@ -1,13 +1,19 @@
-unity-scopes-api (1.0.1-0ubuntu1) UNRELEASED; urgency=medium
+unity-scopes-api (1.0.1+15.10.20150826-0ubuntu2) UNRELEASED; urgency=medium
+
+  * Consolidate debian packaging for Vivid and Wily, so we don't
+    need to keep to separate series for the gcc 5 ABI break.
+
+ -- Michi Henning <michi.henning@canonical.com>  Wed, 02 Sep 2015 12:55:56 +1000
+
+unity-scopes-api (1.0.1+15.10.20150826-0ubuntu1) wily; urgency=medium
 
   [ Pawel Stolowski ]
   * Added support for preview widget updates via ActivationResponse.
 
-  [ Michi Henning ]
-  * Consolidate debian packaging for Vivid and Wily, so we don't
-    need to keep to separate series for the gcc 5 ABI break.
+  [ CI Train Bot ]
+  * New rebuild forced.
 
- -- Pawel Stolowski <pawel.stolowski@canonical.com>  Mon, 20 Jul 2015 17:15:39 +0200
+ -- CI Train Bot <ci-train-bot@canonical.com>  Wed, 26 Aug 2015 08:59:51 +0000
 
 unity-scopes-api (1.0.0-0ubuntu1) wily; urgency=medium
 
