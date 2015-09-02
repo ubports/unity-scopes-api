@@ -46,7 +46,7 @@ public:
     The destructor implicitly calls finished() if a Reply goes out of scope without
     a prior call to finished(). Similarly, QueryBase::run() implicitly calls finished() when
     it returns, provided there are no more reply proxies in scope. In other words, calling
-    finished() is optional. The scopes run time ensures that the call happens automatically,
+    finished() is optional. The scopes runtime ensures that the call happens automatically,
     either when the last reply proxy goes out of scope, or when QueryBase::run() returns
     (whichever happens last).
     */

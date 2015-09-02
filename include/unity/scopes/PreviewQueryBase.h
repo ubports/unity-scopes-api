@@ -63,7 +63,7 @@ public:
     /// @endcond
 
     /**
-    \brief Called by scopes run time to start the preview.
+    \brief Called by scopes runtime to start the preview.
 
     Your implementation of run() can use the reply proxy to push results
     for the preview. You can push results from within run(), in which case
@@ -79,7 +79,7 @@ public:
 
     \param reply The proxy on which to push results for the preview.
     */
-    virtual void run(PreviewReplyProxy const& reply) = 0;         // Called by the run time to start this preview
+    virtual void run(PreviewReplyProxy const& reply) = 0;         // Called by the runtime to start this preview
 
     /**
      \brief Get result for this preview request.
