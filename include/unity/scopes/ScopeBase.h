@@ -27,6 +27,9 @@
 \brief Expands to the identifier of the scope create function. @hideinitializer
 */
 #define UNITY_SCOPE_CREATE_FUNCTION UNITY_SCOPES_VERSIONED_CREATE_SYM
+#define STR(x) #x
+#define XSTR(x) STR(x)
+#pragma message "UNITY_SCOPE_CREATE_FUNCTION: " XSTR(UNITY_SCOPE_CREATE_FUNCTION)
 
 /**
 \brief Expands to the identifier of the scope destroy function. @hideinitializer
@@ -38,20 +41,17 @@
 // UNITY_SCOPE_CREATE_SYMSTR and UNITY_SCOPE_DESTROY_SYMSTR expand to a string literal containing the name
 // of the create and destroy function, respectively.
 
-#ifndef DOXYGEN_SKIP
-#    define UNITY_SCOPE_STR(sym) #sym
-#    define UNITY_SCOPE_XSTR(sym) UNITY_SCOPE_STR(sym)
-#endif
-
 /**
 \brief Expands to the identifier of the scope create function as a string literal. @hideinitializer
 */
-#define UNITY_SCOPE_CREATE_SYMSTR UNITY_SCOPE_XSTR(UNITY_SCOPE_CREATE_FUNCTION)
+#define UNITY_SCOPE_CREATE_SYMSTR UNITY_SCOPES_VERSION_XSTR(UNITY_SCOPE_CREATE_FUNCTION)
+
+#pragma message "UNITY_SCOPE_CREATE_SYMSTR: " UNITY_SCOPES_VERSION_XSTR(UNITY_SCOPE_CREATE_SYMSTR)
 
 /**
 \brief Expands to the identifier of the scope destroy function as a string literal. @hideinitializer
 */
-#define UNITY_SCOPE_DESTROY_SYMSTR UNITY_SCOPE_XSTR(UNITY_SCOPE_DESTROY_FUNCTION)
+#define UNITY_SCOPE_DESTROY_SYMSTR UNITY_SCOPES_VERSION_XSTR(UNITY_SCOPE_DESTROY_FUNCTION)
 
 namespace unity
 {

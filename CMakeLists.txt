@@ -245,7 +245,7 @@ LIST(GET full_version_components 2 UNITY_SCOPES_QT_MICRO)
 
 # For vivid, the scopes library SOVERSION is minor - 3.
 # For wily and later, the scopes library SOVERSION is <major>.<minor>.
-# UNITY_SCOPES_SOVERSION_SYM_SUFFIX is used in Version.h.in to set suffix
+# UNITY_SCOPES_SOVERSION_SYM_SUFFIX is used in Version.h.in to set the suffix
 # for the unity_scope_create_v<suffix> function.
 if(${DISTRIBUTION} MATCHES "vivid")
     math(EXPR UNITY_SCOPES_SOVERSION "${UNITY_SCOPES_MINOR} - 3")
