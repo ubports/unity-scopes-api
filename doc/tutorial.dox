@@ -834,7 +834,7 @@ The following lists shows how methods are grouped. Each group has a single dedic
 <li>\link UNITY_SCOPE_CREATE_FUNCTION()\endlink,
 \link unity::scopes::ScopeBase::start() ScopeBase::start()\endlink,
 \link unity::scopes::ScopeBase::stop() ScopeBase::stop()\endlink, and
-\link UNITY_SCOPE_DESTROY_FUNCTION\endlink.
+\link UNITY_SCOPE_DESTROY_FUNCTION()\endlink.
 <li>\link unity::scopes::ScopeBase::search() ScopeBase::search()\endlink,
 \link unity::scopes::ScopeBase::preview() ScopeBase::preview()\endlink, and
 \link unity::scopes::ScopeBase::perform_action() ScopeBase::perform_action()\endlink.
