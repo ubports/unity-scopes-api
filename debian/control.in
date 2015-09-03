@@ -44,7 +44,6 @@ Vcs-Browser: https://code.launchpad.net/unity-scopes-api
 Package: libunity-scopes@UNITY_SCOPES_SOVERSION@
 Architecture: any
 Multi-Arch: same
-Pre-Depends: ${misc:Pre-Depends},
 Depends: ${misc:Depends},
          ${shlibs:Depends},
 Replaces: libunity-scopes0,
@@ -60,7 +59,6 @@ Package: libunity-scopes-dev
 Section: libdevel
 Architecture: any
 Multi-Arch: same
-Pre-Depends: ${misc:Pre-Depends},
 Depends: libproperties-cpp-dev,
          libunity-api-dev,
          libunity-scopes@UNITY_SCOPES_SOVERSION@ (= ${binary:Version}),
@@ -72,7 +70,6 @@ Package: libunity-scopes-cli
 Section: devel
 Architecture: any
 Multi-Arch: foreign
-Pre-Depends: ${misc:Pre-Depends},
 Depends: libunity-scopes@UNITY_SCOPES_SOVERSION@ (= ${binary:Version}),
          ${misc:Depends},
          ${shlibs:Depends},
@@ -90,7 +87,6 @@ Description: Documentation for Unity scopes API
 Package: libunity-scopes-qt@UNITY_SCOPES_QT_SOVERSION@
 Architecture: any
 Multi-Arch: same
-Pre-Depends: ${misc:Pre-Depends},
 Depends: ${misc:Depends},
          ${shlibs:Depends},
 Description: Qt library for Unity scopes API
@@ -100,7 +96,6 @@ Package: libunity-scopes-qt-dev
 Section: libdevel
 Architecture: any
 Multi-Arch: same
-Pre-Depends: ${misc:Pre-Depends},
 Depends: libunity-scopes-dev (= ${binary:Version}),
          libunity-scopes-qt@UNITY_SCOPES_QT_SOVERSION@ (= ${binary:Version}),
          libnet-cpp-dev (>=1.2.0),

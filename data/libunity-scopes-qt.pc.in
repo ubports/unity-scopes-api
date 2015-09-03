@@ -22,7 +22,7 @@ libdir=${prefix}/@LIBDIR@
 
 Name: lib@LIB_QT@
 Description: Unity Scopes API QT library
-Requires: libunity-api, lib@UNITY_SCOPES_LIB@
+Requires: lib@UNITY_SCOPES_LIB@
 Version: @UNITY_SCOPES_QT_MAJOR@.@UNITY_SCOPES_QT_MINOR@.@UNITY_SCOPES_QT_MICRO@
 Libs: -L${libdir} -l@LIB_QT@
 Cflags: -I${includedir}
