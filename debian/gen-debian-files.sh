@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Copyright (C) 2015 Canonical Ltd
 #
@@ -50,18 +50,13 @@ set -e  # Fail if any command fails.
 }
 dir=./debian
 
-# Set soversion depending on whether we are running on vivid or wily.
+# Set soversions depending on whether we are running on vivid or wily and later.
 
 distro=$(lsb_release -c -s)
-
-[ "$distro" = "vivid" ] && {
-    suffix="-vivid"
-}
-
 echo "gen-debian-files: detected distribution: $distro"
 
-full_version=$(cat "${dir}"/VERSION${suffix})
-qt_full_version=$(cat "${dir}"/QT-VERSION${suffix})
+full_version=$(cat "${dir}"/VERSION)
+qt_full_version=$(cat "${dir}"/QT-VERSION)
 
 major=$(echo $full_version | cut -d'.' -f1)
 minor=$(echo $full_version | cut -d'.' -f2)
@@ -71,26 +66,17 @@ qt_major=$(echo $qt_full_version | cut -d'.' -f1)
 qt_minor=$(echo $qt_full_version | cut -d'.' -f2)
 qt_major_minor="${qt_major}.${qt_minor}"
 
+vivid_soversion=$(expr $minor + 3)
 if [ "$distro" = "vivid" ]
 then
-    [ $major -gt 0 ] && {
-        echo "impossible major version for Vivid: $major (Vivid major version must be 0)" >&2
-        exit 1
-    }
-    [ $minor -lt 6 ] && {
-        echo "impossible minor version for Vivid: $minor (Vivid minor version must be >= 6)" >&2
-        exit 1
-    }
-    soversion=$(expr $minor - 3)
+    soversion=$vivid_soversion
+    qt_soversion=${qt_minor}
 else
     soversion="${major}.${minor}"
+    qt_soversion="${qt_major}.${qt_minor}"
 fi
-
-[ "$distro" = "vivid" -a $qt_major -gt 0 ] && {
-    echo "impossible Qt major version for Vivid: $qt_major (Vivid Qt major version must be 0)" >&2
-    exit 1
-}
-qt_soversion="${qt_major}.${qt_minor}"
+[ -n $soversion ]
+[ -n $qt_soversion ]
 
 warning_msg()
 {
@@ -115,8 +101,6 @@ cat $warning $infile \
           -e "s/@UNITY_SCOPES_QT_SOVERSION@/${qt_soversion}/" >"$outfile"
 
 [ "$distro" != "vivid" ] && {
-    vivid_minor=$(cut -d'.' -f2 "${dir}"/VERSION-vivid)
-    vivid_soversion=$(expr $vivid_minor - 3)
     sed -i -e "/Replaces: libunity-scopes0,/a\
 \          libunity-scopes${vivid_soversion}," \
            -e "/Conflicts: libunity-scopes0,/a\
@@ -151,7 +135,12 @@ then
     infile="${dir}"/libunity-scopes.symbols.in
     outfile="${dir}"/libunity-scopes${soversion}.symbols
     sed "s/@UNITY_SCOPES_SOVERSION@/${soversion}/g" "$infile" >"$outfile"
+
+    infile="${dir}"/libunity-scopes-qt.symbols.in
+    outfile="${dir}"/libunity-scopes-qt${qt_soversion}.symbols
+    sed "s/@UNITY_SCOPES_QT_SOVERSION@/${qt_soversion}/g" "$infile" >"$outfile"
 else
+    # Single shlibs file for both libunity-scopes and libunity-scopes-qt.
     infile="${dir}"/shlibs.in
     outfile="${dir}"/shlibs
     warning_msg "$infile"
@@ -175,12 +164,5 @@ outfile="${dir}"/libunity-scopes-qt-dev.install
 warning_msg "$infile"
 cat $warning $infile \
     | sed "s/@UNITY_SCOPES_QT_SOVERSION@/${qt_soversion}/" >"$outfile"
-
-# Qt symbols file for vivid
-[ "$distro" = "vivid" ] && {
-    infile="${dir}"/libunity-scopes-qt.symbols.in
-    outfile="${dir}"/libunity-scopes-qt${qt_soversion}.symbols
-    sed "s/@UNITY_SCOPES_QT_SOVERSION@/${qt_soversion}/g" "$infile" >"$outfile"
-}
 
 exit 0

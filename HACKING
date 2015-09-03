@@ -219,55 +219,38 @@ ABI compatibility
 
 Version numbers for both libraries use <major>.<minor>.<micro>.
 
-On Vivid only, the soversion for libunity-scopes is a single
-integer, such as 3. (It is, by definition, <minor> - 3.)
+On Vivid, the soversion for the libraries are a single
+integer, such as 3. That integer increments every time
+the minor or major version is changed.
 
-The soversion for libunity-scopes-qt is <major>.<minor> (whether Wily or Vivid).
+On Wily and later, gthe soversion is of the form <major>.<minor>.
 
 The version numbers for the libraries are generated from files
 in the debian directory. (See below for general rules on versioning.)
-There are no version numbers defined in any of the MakeLists.txt.
+There are no version numbers defined in any of the MakeLists.txt files.
 Instead, to change the version number, you must edit the following
 files:
 
-- For Vivid *only*:
+  - VERSION
 
-    - VERSION-vivid
+    The full version number for libunity-scopes, for example, 1.0.0.
 
-      The full version number for libunity-scopes, for example, 0.6.19.
+  - QT-VERSION
 
-      The major version *must* remain at 0. (The gen-debian-files.sh build script
-      enforces this.)
-
-    - QT-VERSION-vivid
-
-      The full version number for libunity-scopes-qt, for example, 0.1.0.
-
-      The major version *must* remain at 0. (The gen-debian-files.sh build script
-      enforces this.)
-    
-- For Wily and later:
-
-    - VERSION
-
-      The full version number for libunity-scopes, for example, 1.0.0.
-
-    - QT-VERSION
-
-      The full version number for libunity-scopes-qt, for example, 1.0.0.
-
-- For all distributions (Vivid, Wily, and later):
+    The full version number for libunity-scopes-qt, for example, 0.1.0.
 
   - *If* the soname changes, you need to add the outdated
-    version to the "Replaces:" and "Conflicts:" entries
-    in control and control.in. See gen-debian-files.sh
+    versions to the "Replaces:" and "Conflicts:" entries
+    in control and control.in. (You need an extra
+    entry for each Vivid and Wily. See gen-debian-files.sh
     for the sed scripts that append a line to the stanza
-    if the Vivid soname is changed. This also may apply
+    if the soname is changed. This also may apply
     if the soname of the Qt library changes, in which case
     gen-debian-files.sh needs a corresponding update.
 
-The soversion for each library is derived from the corresponding file.
-Unless it changes, you don't need to do anything special.
+The soversion for each library is derived from the corresponding
+version file so, unless the soversion changes, you don't need to
+do anything special.
 
 Versioning rules:
     
@@ -290,7 +273,7 @@ The .so version for the library is <major>.<minor>. For example,
 version 1.3.1 has the name libunity-scopes.so.1.3. (On Vivid only,
 for libunity-scopes.so only, the .so version is a single integer,
 such as libunity-scopes.so.3. (It is derived from the minor version
-number as <minor> - 3.)
+number.)
 
 When incrementing the minor or major version number, follow these steps:
 

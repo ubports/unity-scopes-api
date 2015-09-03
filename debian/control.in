@@ -92,7 +92,7 @@ Architecture: any
 Multi-Arch: same
 Pre-Depends: ${misc:Pre-Depends},
 Depends: ${misc:Depends},
-         ${shlibs:Depends}
+         ${shlibs:Depends},
 Description: Qt library for Unity scopes API
  Library that integrates classes based on Qt for convenience
 
