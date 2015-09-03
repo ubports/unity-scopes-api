@@ -93,7 +93,7 @@ EOF
 }
 
 # Generate debian/control from debian/control.in, substituting the soversion for both libs.
-# For wily onwards, we also add an entry for the vivid version to "Conflicts:" and "Replaces:".
+# For wily onwards, we also add an entry for the vivid versions to "Conflicts:" and "Replaces:".
 
 infile="${dir}"/control.in
 outfile="${dir}"/control
@@ -107,9 +107,10 @@ cat $warning $infile \
 \          libunity-scopes${vivid_soversion}," \
            -e "/Conflicts: libunity-scopes0,/a\
 \           libunity-scopes${vivid_soversion}," \
-           -e "/^Package: libunity-scopes-qt/a\
-Replaces: libunity-scopes-qt${vivid_qt_soversion},\\n\
-Conflicts: libunity-scopes-qt${vivid_qt_soversion}," \
+           -e "/Replaces: libunity-scopes-qt0.1.0,/a\
+\          libunity-scopes-qt${vivid_qt_soversion}," \
+           -e "/Conflicts: libunity-scopes-qt0.1.0,/a\
+\           libunity-scopes-qt${vivid_qt_soversion}," \
         "$outfile"
 }
 
