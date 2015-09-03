@@ -44,6 +44,7 @@ Vcs-Browser: https://code.launchpad.net/unity-scopes-api
 Package: libunity-scopes@UNITY_SCOPES_SOVERSION@
 Architecture: any
 Multi-Arch: same
+Pre-Depends: ${misc:Pre-Depends},
 Depends: ${misc:Depends},
          ${shlibs:Depends},
 Replaces: libunity-scopes0,
@@ -87,6 +88,7 @@ Description: Documentation for Unity scopes API
 Package: libunity-scopes-qt@UNITY_SCOPES_QT_SOVERSION@
 Architecture: any
 Multi-Arch: same
+Pre-Depends: ${misc:Pre-Depends},
 Depends: ${misc:Depends},
          ${shlibs:Depends},
 Replaces: libunity-scopes-qt0.1.0,
