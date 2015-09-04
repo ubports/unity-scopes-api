@@ -368,7 +368,8 @@ List of attributes:
 
 \subsection table table widget
 
-The table widget is used to show a table with labels and values
+The table widget is used to show a table with labels and values.
+When used inside an Expandable widget, the topmost 3 rows are shown until it's expanded.
 
 List of attributes:
 \arg \c title A string specifying the title to be shown on top
