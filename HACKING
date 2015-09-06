@@ -223,7 +223,7 @@ On Vivid, the soversion for the libraries are a single
 integer, such as 3. That integer increments every time
 the minor or major version is changed.
 
-On Wily and later, gthe soversion is of the form <major>.<minor>.
+On Wily and later, the soversion is of the form <major>.<minor>.
 
 The version numbers for the libraries are generated from files
 in the debian directory. (See below for general rules on versioning.)
