@@ -215,11 +215,57 @@ endif()
 # to the debian files.
 set(UNITY_SCOPES_LIB unity-scopes)
 
-# API version
-set(UNITY_SCOPES_MAJOR 1)  # Major official release number
-set(UNITY_SCOPES_MINOR 0)  # Must be changed for ABI incompatible changes
-set(UNITY_SCOPES_MICRO 1)  # For ABI compatible changes
-set(UNITY_SCOPES_SOVERSION ${UNITY_SCOPES_MAJOR}.${UNITY_SCOPES_MINOR})
+# Check the distribution we are building for.
+execute_process(COMMAND lsb_release -c -s OUTPUT_VARIABLE DISTRIBUTION OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+# Read API versions. from VERSION file. The version is in the form <major>.<minor>.<micro>.
+
+file(READ debian/VERSION UNITY_SCOPES_FULL_VERSION)
+string(STRIP ${UNITY_SCOPES_FULL_VERSION} UNITY_SCOPES_FULL_VERSION)
+
+file(READ debian/QT-VERSION UNITY_SCOPES_QT_FULL_VERSION)
+string(STRIP ${UNITY_SCOPES_QT_FULL_VERSION} UNITY_SCOPES_QT_FULL_VERSION)
+
+# Parse out the three components.
+STRING(REGEX MATCHALL "[0-9]+" full_version_components ${UNITY_SCOPES_FULL_VERSION})
+LIST(GET full_version_components 0 UNITY_SCOPES_MAJOR)
+LIST(GET full_version_components 1 UNITY_SCOPES_MINOR)
+LIST(GET full_version_components 2 UNITY_SCOPES_MICRO)
+
+# Again, for the Qt library.
+STRING(REGEX MATCHALL "[0-9]+" full_version_components ${UNITY_SCOPES_QT_FULL_VERSION})
+LIST(GET full_version_components 0 UNITY_SCOPES_QT_MAJOR)
+LIST(GET full_version_components 1 UNITY_SCOPES_QT_MINOR)
+LIST(GET full_version_components 2 UNITY_SCOPES_QT_MICRO)
+
+# For vivid, we maintain a separate soversion sequence. The
+# soversion is 3 for 1.0.x and increments by 1 every
+# the minor or major version is updated.
+# For wily and later, the scopes library SOVERSION is <major>.<minor>.
+# UNITY_SCOPES_SOVERSION_SYM_SUFFIX is used in Version.h.in to set the suffix
+# for the unity_scope_create_v<suffix> function.
+
+if(NOT ${UNITY_SCOPES_MAJOR} EQUAL 1)
+    message(FATAL_ERROR "Change in major version number. You need to adjust gen-debian-files.sh and the calculation of UNITY_SCOPES_SOVERSION")
+endif()
+
+if(NOT ${UNITY_SCOPES_QT_MAJOR} EQUAL 0)
+    message(FATAL_ERROR "Change in Qt major version number. You need to adjust gen-debian-files.sh and the calculation of UNITY_SCOPES_QT_SOVERSION")
+endif()
+
+if(${DISTRIBUTION} MATCHES "vivid")
+    math(EXPR UNITY_SCOPES_SOVERSION "${UNITY_SCOPES_MINOR} + 3")
+    set(UNITY_SCOPES_SOVERSION_SYM_SUFFIX ${UNITY_SCOPES_SOVERSION})
+    set(UNITY_SCOPES_QT_SOVERSION ${UNITY_SCOPES_QT_MINOR})
+else()
+    set(UNITY_SCOPES_SOVERSION "${UNITY_SCOPES_MAJOR}.${UNITY_SCOPES_MINOR}")
+    set(UNITY_SCOPES_SOVERSION_SYM_SUFFIX ${UNITY_SCOPES_MAJOR}_${UNITY_SCOPES_MINOR})
+    set(UNITY_SCOPES_QT_SOVERSION "${UNITY_SCOPES_QT_MAJOR}.${UNITY_SCOPES_QT_MINOR}")
+endif()
+set(UNITY_SCOPES_MAJOR_MINOR "${UNITY_SCOPES_MAJOR}.${UNITY_SCOPES_MINOR}")
+set(UNITY_SCOPES_QT_MAJOR_MINOR "${UNITY_SCOPES_QT_SOVERSION}")
+
+# For the Qt library, SOVERSION is <major>.<minor>.
 
 # Version for testing, with all symbols visible
 set(UNITY_SCOPES_TEST_LIB ${UNITY_SCOPES_LIB}-test)
@@ -235,7 +281,7 @@ set(LIB_INSTALL_PREFIX lib/${CMAKE_LIBRARY_ARCHITECTURE})
 set(LIBDIR ${CMAKE_INSTALL_LIBDIR})
 
 set(LIBSUBDIR ${LIBDIR}/${UNITY_SCOPES_LIB}})
-set(HDR_INSTALL_DIR include/${UNITY_SCOPES_LIB}-${UNITY_SCOPES_MAJOR})
+set(HDR_INSTALL_DIR include/${UNITY_SCOPES_LIB}-${UNITY_SCOPES_SOVERSION})
 
 #####################################################################
 # Enable code coverage calculation with gcov/gcovr/lcov
@@ -304,14 +350,14 @@ set_target_properties(${UNITY_SCOPES_LIB_OBJ} PROPERTIES COMPILE_FLAGS "-fPIC")
 # Use the object files to make the normal library.
 add_library(${UNITY_SCOPES_LIB} SHARED $<TARGET_OBJECTS:${UNITY_SCOPES_LIB_OBJ}>)
 set_target_properties(${UNITY_SCOPES_LIB} PROPERTIES
-    VERSION "${UNITY_SCOPES_MAJOR}.${UNITY_SCOPES_MINOR}.${UNITY_SCOPES_MICRO}"
+    VERSION ${UNITY_SCOPES_FULL_VERSION}
     SOVERSION ${UNITY_SCOPES_SOVERSION}
 )
 
 # Use the object files to make the test library.
 add_library(${UNITY_SCOPES_TEST_LIB} SHARED $<TARGET_OBJECTS:${UNITY_SCOPES_LIB_OBJ}>)
 set_target_properties(${UNITY_SCOPES_TEST_LIB} PROPERTIES
-    VERSION "${UNITY_SCOPES_MAJOR}.${UNITY_SCOPES_MINOR}.${UNITY_SCOPES_MICRO}"
+    VERSION ${UNITY_SCOPES_FULL_VERSION}
     SOVERSION ${UNITY_SCOPES_SOVERSION}
 )
 

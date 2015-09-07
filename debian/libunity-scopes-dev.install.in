@@ -1,0 +1,6 @@
+usr/include/unity-scopes-@UNITY_SCOPES_SOVERSION@/unity/scopes/*.h
+usr/include/unity-scopes-@UNITY_SCOPES_SOVERSION@/unity/scopes/testing
+usr/include/unity-scopes-@UNITY_SCOPES_SOVERSION@/unity/scopes/utility
+usr/include/unity-scopes-@UNITY_SCOPES_SOVERSION@/unity-scopes.h
+usr/lib/*/libunity-scopes.so
+usr/lib/*/pkgconfig/libunity-scopes.pc
