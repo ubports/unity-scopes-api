@@ -38,20 +38,15 @@
 // UNITY_SCOPE_CREATE_SYMSTR and UNITY_SCOPE_DESTROY_SYMSTR expand to a string literal containing the name
 // of the create and destroy function, respectively.
 
-#ifndef DOXYGEN_SKIP
-#    define UNITY_SCOPE_STR(sym) #sym
-#    define UNITY_SCOPE_XSTR(sym) UNITY_SCOPE_STR(sym)
-#endif
-
 /**
 \brief Expands to the identifier of the scope create function as a string literal. @hideinitializer
 */
-#define UNITY_SCOPE_CREATE_SYMSTR UNITY_SCOPE_XSTR(UNITY_SCOPE_CREATE_FUNCTION)
+#define UNITY_SCOPE_CREATE_SYMSTR UNITY_SCOPES_VERSION_XSTR(UNITY_SCOPE_CREATE_FUNCTION)
 
 /**
 \brief Expands to the identifier of the scope destroy function as a string literal. @hideinitializer
 */
-#define UNITY_SCOPE_DESTROY_SYMSTR UNITY_SCOPE_XSTR(UNITY_SCOPE_DESTROY_FUNCTION)
+#define UNITY_SCOPE_DESTROY_SYMSTR UNITY_SCOPES_VERSION_XSTR(UNITY_SCOPE_DESTROY_FUNCTION)
 
 namespace unity
 {
@@ -81,7 +76,7 @@ class TypedScopeFixtureHelper;
 \class ScopeBase
 \brief Base class for a scope implementation.
 
-Scopes are accessed by the scopes run time as a shared library (one library per scope).
+Scopes are accessed by the scopes runtime as a shared library (one library per scope).
 Each scope must implement a class that derives from ScopeBase, for example:
 
 ~~~
@@ -125,10 +120,10 @@ UNITY_SCOPE_DESTROY_FUNCTION(unity::scopes::ScopeBase* scope)
 }
 ~~~
 
-After the scopes run time has obtained a pointer to the class instance from the create function, it calls start(),
+After the scopes runtime has obtained a pointer to the class instance from the create function, it calls start(),
 which allows the scope to intialize itself. This is followed by a call to run(). The call to run() is made by
 a separate thread; its only purpose is to pass a thread of control to the scope, for example, to run an event loop.
-When the scope should complete its activities, the run time calls stop(). The calls to the create function, start(),
+When the scope should complete its activities, the runtime calls stop(). The calls to the create function, start(),
 stop(), and the destroy function) are made by the same thread.
 
 The scope implementation, if it does not return from run(), is expected to return from run() in response to a
@@ -144,7 +139,7 @@ public:
     /// @endcond
 
     /**
-    \brief Called by the scopes run time after the create function completes.
+    \brief Called by the scopes runtime after the create function completes.
 
     If start() throws an exception, stop() will _not_ be called.
 
@@ -155,7 +150,7 @@ public:
     virtual void start(std::string const& scope_id);
 
     /**
-    \brief Called by the scopes run time when the scope should shut down.
+    \brief Called by the scopes runtime when the scope should shut down.
 
     A scope should deallocate as many resources as possible when stop() is called, for example,
     deallocate any caches and close network connections. In addition, if the scope implements run()
@@ -168,19 +163,19 @@ public:
     virtual void stop();
 
     /**
-    \brief Called by the scopes run time after it has called start() to hand a thread of control to the scope.
+    \brief Called by the scopes runtime after it has called start() to hand a thread of control to the scope.
 
     run() passes a thread of control to the scope to do with as it sees fit, for example, to run an event loop.
-    During finalization, the scopes run time joins with the thread that called run(). This means that, if
+    During finalization, the scopes runtime joins with the thread that called run(). This means that, if
     the scope implementation does not return from run(), it is expected to arrange for run() to complete
     in a timely manner in response to a call to stop(). Failure to do so will cause deadlock during finalization.
 
-    If run() throws an exception, the run time handles the exception and calls stop() in response.
+    If run() throws an exception, the runtime handles the exception and calls stop() in response.
     */
     virtual void run();
 
     /**
-    \brief Called by the scopes run time when a scope needs to instantiate a query.
+    \brief Called by the scopes runtime when a scope needs to instantiate a query.
 
     This method must return an instance that is derived from `QueryBase`. The implementation
     of this method must return in a timely manner, that is, it should perform only minimal
@@ -193,7 +188,7 @@ public:
     virtual SearchQueryBase::UPtr search(CannedQuery const& query, SearchMetadata const& metadata) = 0;
 
     /**
-    \brief Called by the scopes run time when a scope needs to respond to a result activation request.
+    \brief Called by the scopes runtime when a scope needs to respond to a result activation request.
 
     This method must return an instance that is derived from `ActivationQueryBase`. The implementation
     of this method must return in a timely manner, that is, it should perform only minimal
@@ -394,9 +389,9 @@ private:
 } // namespace unity
 
 /**
-\brief The function called by the scopes run time to initialize the scope.
+\brief The function called by the scopes runtime to initialize the scope.
 It must return a pointer to an instance derived from `ScopeBase`. The returned
-instance must remain in scope until the destroy function is called by the scopes run time.
+instance must remain in scope until the destroy function is called by the scopes runtime.
 
 If this function throws an exception, the destroy function will _not_ be called. If this function returns NULL,
 the destroy function _will_ be called with NULL as its argument.
@@ -410,7 +405,7 @@ not attempt to call any methods on `ScopeBase` from the constructor.
 extern "C" unity::scopes::ScopeBase* UNITY_SCOPE_CREATE_FUNCTION();
 
 /**
-\brief The function called by the scopes run time to finalize the scope.
+\brief The function called by the scopes runtime to finalize the scope.
 The passed pointer is the pointer that was returned by the create function.
 
 Exceptions thrown by the destroy function are ignored.

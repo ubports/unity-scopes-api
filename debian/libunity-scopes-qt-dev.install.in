@@ -1,0 +1,3 @@
+usr/include/unity-scopes-qt-@UNITY_SCOPES_QT_SOVERSION@/unity/scopes/qt
+usr/lib/*/libunity-scopes-qt.so
+usr/lib/*/pkgconfig/libunity-scopes-qt.pc
