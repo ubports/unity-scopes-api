@@ -71,7 +71,11 @@ void write_db(const string& src)
     char buf[1024];
     while ((n = ::read(fd2, buf, 1024)) > 0)
     {
-        ::write(fd, buf, n);
+        int rc = ::write(fd, buf, n);
+        if (rc != n)
+        {
+            FAIL() << "write returned " << n << ", expected " << n << " " << db_name << " " << errno;
+        }
     }
     ::close(fd2);
     ::close(fd);

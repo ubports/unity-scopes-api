@@ -250,15 +250,12 @@ ZmqObjectProxy::TwowayOutParams ZmqObjectProxy::invoke_twoway_(capnp::MessageBui
 
 ZmqObjectProxy::TwowayOutParams ZmqObjectProxy::invoke_twoway__(capnp::MessageBuilder& request, int64_t timeout)
 {
-    RequestMode mode;
     std::string endpoint;
     {
         lock_guard<mutex> lock(shared_mutex);
-        mode = mode_;
         endpoint = endpoint_;
+        assert(mode_ == RequestMode::Twoway);
     }
-
-    assert(mode == RequestMode::Twoway);
 
     zmqpp::socket s(*mw_base()->context(), zmqpp::socket_type::request);
     // Allow some linger time so we don't hang indefinitely if the other end disappears.
