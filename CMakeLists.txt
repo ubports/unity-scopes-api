@@ -300,6 +300,9 @@ if(cmake_build_type_lower MATCHES coverage)
 endif()
 include(EnableCoverageReport)
 
+# ABI compliance test is slow, so allow it to be turned off.
+option(abi_compliance_test "Run ABI compliance test" ON)
+
 # Tests
 include(CTest)
 enable_testing()
