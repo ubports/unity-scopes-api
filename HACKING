@@ -287,30 +287,33 @@ When incrementing the minor or major version number, follow these steps:
 
 ABI compliance test
 -------------------
-To use this, install abi-compliance-checker package from the archives.
 
-You can use abi-compliance-checker to test whether a particular build
-is ABI compatible with another build. The tool does some source-level
-analysis in addition to checking library symbols, so it catches things
-that are potentially dangerous, but won't be picked up by just looking
-at the symbol table.
+The tests include an ABI compliance test (for Wily and later). To run it:
 
-Assume you have built devel in src/devel, and you have a later build
-in src/mybranch and want to check that mybranch is still compatible.
-To run the compliance test:
+    $ cd test/abi-compliance
+    $ make test
+or:
+    $ cd test/abi-compliance
+    $ sh check-abi-compliance.sh
 
-$ cd src
-$ abi-compliance-checker -lib libunity-scopes.so -old devel/build/test/abi-compliance/abi.xml -new mybranch/build/test/abi-compliance/abi.xml
+The test is also automatically run as part of the test suite.
+It takes several minutes to run . If you don't want to wait during local builds,
+set the cmake abi_compliance_test option to OFF to skip the check.
 
-The script will take about two minutes to run.
+The baseline ABI files for the test are in test/abi-compliance/abi_dumps.
+There is a separate directory for each architecture.
+The ABI dump files should never be updated or removed.
+Instead, when the ABI changes, you need to add a new baseline
+ABI file for each architecture. The easiest way to generate
+these files is to make a branch with a modified install file
+that installs the ABI dump in, say, /usr/lib. Then throw
+the branch at a silo to get it build for all architectures.
+Once all the packages are built, you can extract the ABI dump
+files and add them to the corresponding directory in the source tree.
 
-You will get a message about compilation errors. These are caused by a Qt macro and
-can be ignored. (The log file in src/logs/libunity-scopes.so/[version]/log.txt
-contains the details.)
+The abi-compliance-checker tool produces a report in
 
-Now point your browser at 
-
-src/compat_reports/libunity-scopes.so/[version]_to_[version]/compat_report.html
+    test/abi-compliance/compat_reports/libunity-scopes.so/[version]_to_[version]/compat_report.html
 
 The report provides a nicely layed-out page with all the details.
 
