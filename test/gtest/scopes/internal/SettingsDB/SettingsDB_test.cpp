@@ -44,7 +44,7 @@ void write_db(const string& src)
     int fd = ::open(db_name.c_str(), O_WRONLY|O_CREAT, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP);
     if (fd == -1)
     {
-        FAIL() << "Couldn't open file " << db_name << " " << errno;
+        FAIL() << "Couldn't open file " << db_name << ", errno: " << errno;
     }
 
     struct flock fl;
@@ -56,7 +56,7 @@ void write_db(const string& src)
 
     if (::fcntl(fd, F_SETLKW, &fl) != 0)
     {
-        FAIL() << "Couldn't get write lock for " << db_name << " " << errno;
+        FAIL() << "Couldn't get write lock for " << db_name << ", errno: " << errno;
     }
 
     string pth = string(TEST_SRC_DIR) + "/" + src;
@@ -71,7 +71,11 @@ void write_db(const string& src)
     char buf[1024];
     while ((n = ::read(fd2, buf, 1024)) > 0)
     {
-        ::write(fd, buf, n);
+        int rc = ::write(fd, buf, n);
+        if (rc != n)
+        {
+            FAIL() << "Write returned " << rc << ", expected " << n << " (" << db_name << ", errno: " << errno << ")";
+        }
     }
     ::close(fd2);
     ::close(fd);
