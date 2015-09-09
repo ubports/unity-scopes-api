@@ -45,6 +45,9 @@ rebuilding. It's not possible to fix this with cmake because cmake cannot
 add build dependencies to built-in targets. To make sure that everything
 is up-to-date, run "make" before running "make test"!
 
+Some tests are slow. If you want to skip them during development,
+you can set the cmake option "slowtests" to OFF.
+
 To run the tests with valgrind:
 
     $ make valgrind
@@ -285,6 +288,8 @@ When incrementing the minor or major version number, follow these steps:
 
 3) Update RELEASE_NOTES.md
 
+4) Add new ABI baseline files to test/abi-compliance/abi_dumps (see below).
+
 ABI compliance test
 -------------------
 
@@ -292,9 +297,6 @@ The tests include an ABI compliance test (for Wily and later). To run it:
 
     $ cd test/abi-compliance
     $ make test
-or:
-    $ cd test/abi-compliance
-    $ sh check-abi-compliance.sh
 
 The test is also automatically run as part of the test suite.
 It takes several minutes to run . If you don't want to wait during local builds,

@@ -21,11 +21,10 @@
 # Script to check whether the ABI is still intact.
 #
 # The base ABI (for version <x>.<y>.0) is kept in libunity-scopes_<x>.<y>.0.abi.tar.gz.
-# If the micro version is non-zero, we run abi-compliance-checker to dump the ABI
-# into the build dir as libunity-scopes_<x>.<y>.<z>.abi.tar.gz and then run
-# abi-compliance-checker to compare the two versions. If there are any complaints,
-# print an error message ane return non-zero status.
+# If the micro version is non-zero, we run abi-compliance-checker to compare the two versions.
+# If there are any complaints, we print an error message ane return non-zero status.
 
+set -x
 progname=$(basename $0)
 
 distro=$(lsb_release -c -s)
@@ -36,10 +35,7 @@ distro=$(lsb_release -c -s)
 
 libname=lib@UNITY_SCOPES_LIB@
 
-# Dump the current ABI.
-abi-compliance-checker -lib ${libname} -dump @CMAKE_CURRENT_BINARY_DIR@/abi.xml
-
-base_abi=@CMAKE_CURRENT_SOURCE_DIR@/abi_dumps/@CMAKE_LIBRARY_ARCHITECTURE@/${libname}_1.0.0.abi.tar.gz
+base_abi=@CMAKE_CURRENT_SOURCE_DIR@/abi_dumps/@CMAKE_LIBRARY_ARCHITECTURE@/${libname}_@UNITY_SCOPES_MAJOR_MINOR@.0.abi.tar.gz
 cur_abi=@CMAKE_CURRENT_BINARY_DIR@/abi_dumps/${libname}/${libname}_@UNITY_SCOPES_FULL_VERSION@.abi.tar.gz
 
 # Compare against the base ABI.

@@ -185,8 +185,8 @@ else()
     option(Werror "Treat warnings as errors" OFF)
 endif()
 
-# Some tests are slow, so make it possible not to run them
-# during day-to-day development.
+# Some tests are slow, so make it possible not to run them during day-to-day development.
+# The default for this *must* stay ON, otherwise the tests won't run in Jenkins.
 option(slowtests "Run slow tests" ON)
 
 if (${Werror})
@@ -299,9 +299,6 @@ if(cmake_build_type_lower MATCHES coverage)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage -g")
 endif()
 include(EnableCoverageReport)
-
-# ABI compliance test is slow, so allow it to be turned off.
-option(abi_compliance_test "Run ABI compliance test" ON)
 
 # Tests
 include(CTest)
