@@ -24,7 +24,6 @@
 # If the micro version is non-zero, we run abi-compliance-checker to compare the two versions.
 # If there are any complaints, we print an error message ane return non-zero status.
 
-set -x
 progname=$(basename $0)
 
 distro=$(lsb_release -c -s)
