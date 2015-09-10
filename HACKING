@@ -309,7 +309,7 @@ Instead, when the ABI changes, you need to add a new baseline
 ABI file for each architecture. The easiest way to generate
 these files is to make a branch with a modified install file
 that installs the ABI dump in, say, /usr/lib. Then throw
-the branch at a silo to get it build for all architectures.
+the branch at a silo to get it built for all architectures.
 Once all the packages are built, you can extract the ABI dump
 files and add them to the corresponding directory in the source tree.
 
