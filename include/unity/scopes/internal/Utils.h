@@ -22,6 +22,8 @@
 #include <string>
 #include <sstream>
 
+#include <boost/filesystem.hpp>
+
 namespace unity
 {
 
@@ -56,6 +58,8 @@ bool convert_to<bool>(std::string const& val, Variant& out);
 int safe_system_call(std::string const& command);
 
 void make_directories(std::string const& path_name, mode_t mode);
+
+std::string convert_exec_rel_to_abs(std::string const& id, boost::filesystem::path const& scope_dir, std::string const& custom_exec);
 
 } // namespace internal
 

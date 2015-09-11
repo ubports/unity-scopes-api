@@ -259,30 +259,6 @@ void convert_relative_attribute(VariantMap& inner_map, const string& id, const f
     }
 }
 
-string get_first_component(string const& id, string const& custom_exec)
-{
-    if (custom_exec.empty())
-    {
-        throw unity::InvalidArgumentException("Invalid scope runner executable for scope: " + id);
-    }
-
-    wordexp_t exp;
-    string result;
-
-    // Split command into program and args
-    if (wordexp(custom_exec.c_str(), &exp, WRDE_NOCMD) == 0)
-    {
-        util::ResourcePtr<wordexp_t*, decltype(&wordfree)> free_guard(&exp, wordfree);
-        result = exp.we_wordv[0];
-    }
-    else
-    {
-        throw unity::InvalidArgumentException("Invalid scope runner executable for scope: " + id);
-    }
-
-    return result;
-}
-
 // For each scope, open the config file for the scope, create the metadata info from the config,
 // and add an entry to the RegistryObject.
 // If the scope uses settings, also parse the settings file and add the settings to the metadata.
@@ -435,33 +411,7 @@ void add_local_scope(RegistryObject::SPtr const& registry,
 
     try
     {
-        auto custom_exec = sc.scope_runner();
-        filesystem::path program(get_first_component( scope.first, custom_exec));
-        if (program.is_relative())
-        {
-            // First look inside the arch-specific directory
-            if (filesystem::exists(scope_dir / DEB_HOST_MULTIARCH / program))
-            {
-                // Join the full command, not just the program path
-                exec_data.custom_exec = (scope_dir / DEB_HOST_MULTIARCH / custom_exec).native();
-            }
-            // Next try in the non arch-aware directory
-            else if (filesystem::exists(scope_dir / program))
-            {
-                // Join the full command, not just the program path
-                exec_data.custom_exec = (scope_dir / custom_exec).native();
-            }
-            else
-            {
-                throw unity::InvalidArgumentException(
-                        "Nonexistent scope runner '" + custom_exec
-                                + "' executable for scope: " + scope.first);
-            }
-        }
-        else
-        {
-            exec_data.custom_exec = custom_exec;
-        }
+        exec_data.custom_exec = convert_exec_rel_to_abs(scope.first, scope_dir, sc.scope_runner());
     }
     catch (NotFoundException const&)
     {

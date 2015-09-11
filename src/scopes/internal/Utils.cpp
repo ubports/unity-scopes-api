@@ -19,12 +19,14 @@
 #include <unity/scopes/internal/Utils.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
+#include <unity/util/ResourcePtr.h>
 
 #include <boost/filesystem.hpp>
 
 #include <iomanip>
 #include <locale>
 #include <mutex>
+#include <wordexp.h>
 
 #include <sys/stat.h>
 
@@ -188,6 +190,86 @@ void make_directories(string const& path_name, mode_t mode)
         // not the permissions modified by umask.
         chmod(p.c_str(), mode);
     }
+}
+
+vector<string> split_args(string const& id, string const& custom_exec)
+{
+    if (custom_exec.empty())
+    {
+        throw unity::InvalidArgumentException("Invalid scope runner executable for scope: " + id);
+    }
+
+    wordexp_t exp;
+    vector<string> result;
+
+    // Split command into program and args
+    if (wordexp(custom_exec.c_str(), &exp, WRDE_NOCMD) == 0)
+    {
+        util::ResourcePtr<wordexp_t*, decltype(&wordfree)> free_guard(&exp, wordfree);
+        for (size_t i = 0; i < exp.we_wordc; ++i )
+        {
+            auto argument = string(exp.we_wordv[i]);
+            if(argument.find_first_of(' ') != std::string::npos)
+            {
+                // This argument contains spaces, enclose it in quotation marks
+                result.emplace_back("\"" + argument + "\"");
+            }
+            else
+            {
+                result.emplace_back(argument);
+            }
+        }
+    }
+    else
+    {
+        throw unity::InvalidArgumentException("Invalid scope runner executable for scope: " + id);
+    }
+
+    return result;
+}
+
+string convert_exec_rel_to_abs(string const& id, boost::filesystem::path const& scope_dir, string const& custom_exec)
+{
+    string result;
+
+    // Loop through each argument of the scope runner command and ensure all path args are absolute
+    auto custom_exec_args = split_args(id, custom_exec);
+    for (auto custom_exec_arg : custom_exec_args)
+    {
+        boost::filesystem::path argument(custom_exec_arg);
+        if (argument.is_relative())
+        {
+            // First look inside the arch-specific directory
+            if (boost::filesystem::exists(scope_dir / DEB_HOST_MULTIARCH / argument))
+            {
+                // Append the argument as a relative path
+                result += (scope_dir / DEB_HOST_MULTIARCH / argument).native() + " ";
+            }
+            // Next try in the non arch-aware directory
+            else if (boost::filesystem::exists(scope_dir / argument))
+            {
+                // Append the argument as a relative path
+                result += (scope_dir / argument).native() + " ";
+            }
+            // If this is the first argument (program name) it must exist, throw here
+            else if (result.empty())
+            {
+                throw unity::InvalidArgumentException(
+                        "Nonexistent scope runner executable '" + custom_exec_arg
+                                + "' for scope: " + id);
+            }
+            // Otherwise just append the argument as is
+            else
+            {
+                result += custom_exec_arg + " ";
+            }
+        }
+        else
+        {
+            result += custom_exec_arg + " ";
+        }
+    }
+    return result;
 }
 
 } // namespace internal
