@@ -8,6 +8,7 @@ Maintainer: This not the real control file because it is generated during the bu
 Build-Depends: click-dev (>= 0.2.2),
                debhelper (>= 9),
                lsb-release,
+
 Package: libunity-scopes1.0
 Architecture: any
 Description: This not the real control file because it is generated during the build from control.in.
