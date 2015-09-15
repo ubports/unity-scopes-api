@@ -43,7 +43,7 @@ abi-compliance-checker -lib ${libname} -old $base_abi -new $cur_abi
 status=$?
 report=@CMAKE_CURRENT_BINARY_DIR@/compat_reports/${libname}/1.0.0_to_@UNITY_SCOPES_FULL_VERSION@/compat_report.html
 [ -e $report ] && {
-    echo "${progname}: Compatibility report generated to @CMAKE_CURRENT_BINARY_DIR@/compat_reports/${libname}/1.0.0_to_@UNITY_SCOPES_FULL_VERSION@/compat_report.html"
+    echo "${progname}: Compatibility report generated to $report"
 }
 
 [ $status -ne 0 ] && {
