@@ -5,6 +5,7 @@
 #
 Source: unity-scopes-api
 Maintainer: This not the real control file because it is generated during the build from control.in.
+Build-Depends: debhelper (>= 9),
 
 Package: libunity-scopes1.0
 Architecture: any
