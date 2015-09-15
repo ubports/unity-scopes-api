@@ -192,11 +192,11 @@ void make_directories(string const& path_name, mode_t mode)
     }
 }
 
-vector<string> split_args(string const& id, string const& custom_exec)
+vector<string> split_exec_args(string const& id, string const& custom_exec)
 {
     if (custom_exec.empty())
     {
-        throw unity::InvalidArgumentException("Invalid scope runner executable for scope: " + id);
+        throw unity::InvalidArgumentException("Invalid empty executable for scope: '" + id + "'");
     }
 
     wordexp_t exp;
@@ -222,7 +222,7 @@ vector<string> split_args(string const& id, string const& custom_exec)
     }
     else
     {
-        throw unity::InvalidArgumentException("Invalid scope runner executable for scope: " + id);
+        throw unity::InvalidArgumentException("Invalid executable for scope: '" + id + "'");
     }
 
     return result;
@@ -233,7 +233,7 @@ string convert_exec_rel_to_abs(string const& id, boost::filesystem::path const& 
     string result;
 
     // Loop through each argument of the scope runner command and ensure all path args are absolute
-    auto custom_exec_args = split_args(id, custom_exec);
+    auto custom_exec_args = split_exec_args(id, custom_exec);
     for (auto custom_exec_arg : custom_exec_args)
     {
         boost::filesystem::path argument(custom_exec_arg);
@@ -255,8 +255,8 @@ string convert_exec_rel_to_abs(string const& id, boost::filesystem::path const& 
             else if (result.empty())
             {
                 throw unity::InvalidArgumentException(
-                        "Nonexistent scope runner executable '" + custom_exec_arg
-                                + "' for scope: " + id);
+                        "Nonexistent scope runner executable: '" + custom_exec_arg
+                                + "' for scope: '" + id + "'");
             }
             // Otherwise just append the argument as is
             else
@@ -269,6 +269,7 @@ string convert_exec_rel_to_abs(string const& id, boost::filesystem::path const& 
             result += custom_exec_arg + " ";
         }
     }
+    result.resize(result.size() - 1);
     return result;
 }
 

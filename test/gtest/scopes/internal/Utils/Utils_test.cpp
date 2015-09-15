@@ -132,3 +132,89 @@ TEST(Utils, make_directories)
 
     chmod(child.c_str(), 0777);  // Don't leave the dir behind without permissions.
 }
+
+TEST(Utils, split_exec_args)
+{
+    // Test empty executable
+    try
+    {
+        split_exec_args("test", "");
+        FAIL();
+    }
+    catch (std::exception const& e)
+    {
+        EXPECT_STREQ("unity::InvalidArgumentException: Invalid empty executable for scope: 'test'", e.what());
+    }
+
+    // Test invalid executable
+    try
+    {
+        split_exec_args("test", "\"");
+        FAIL();
+    }
+    catch (std::exception const& e)
+    {
+        EXPECT_STREQ("unity::InvalidArgumentException: Invalid executable for scope: 'test'", e.what());
+    }
+
+    // Test argument splitting
+    auto exec_args = split_exec_args("test", "/path\\ to/exec' 'file arg \"arg 2\" arg' '3 arg\\ 4");
+    ASSERT_EQ(5, exec_args.size());
+    EXPECT_STREQ("\"/path to/exec file\"", exec_args[0].c_str());
+    EXPECT_STREQ("arg", exec_args[1].c_str());
+    EXPECT_STREQ("\"arg 2\"", exec_args[2].c_str());
+    EXPECT_STREQ("\"arg 3\"", exec_args[3].c_str());
+    EXPECT_STREQ("\"arg 4\"", exec_args[4].c_str());
+}
+
+TEST(Utils, convert_exec_rel_to_abs)
+{
+    // Test empty executable
+    try
+    {
+        convert_exec_rel_to_abs("test", boost::filesystem::path(TEST_DIR), "");
+        FAIL();
+    }
+    catch (std::exception const& e)
+    {
+        EXPECT_STREQ("unity::InvalidArgumentException: Invalid empty executable for scope: 'test'", e.what());
+    }
+
+    // Test invalid executable
+    try
+    {
+        convert_exec_rel_to_abs("test", boost::filesystem::path(TEST_DIR), "\"");
+        FAIL();
+    }
+    catch (std::exception const& e)
+    {
+        EXPECT_STREQ("unity::InvalidArgumentException: Invalid executable for scope: 'test'", e.what());
+    }
+
+    // Test nonexistent executable
+    try
+    {
+        convert_exec_rel_to_abs("test", boost::filesystem::path(TEST_DIR), "noexec");
+        FAIL();
+    }
+    catch (std::exception const& e)
+    {
+        EXPECT_STREQ("unity::InvalidArgumentException: Nonexistent scope runner executable: 'noexec' for scope: 'test'", e.what());
+    }
+
+    // Test absolute executable
+    auto abs_exec = convert_exec_rel_to_abs("test", boost::filesystem::path(TEST_DIR), "/bin/bash");
+    EXPECT_STREQ("/bin/bash", abs_exec.c_str());
+
+    // Test absolute executable w/ args
+    abs_exec = convert_exec_rel_to_abs("test", boost::filesystem::path(TEST_DIR), "/bin/bash arg \"arg 2\" arg' '3 arg\\ 4");
+    EXPECT_STREQ("/bin/bash arg \"arg 2\" \"arg 3\" \"arg 4\"", abs_exec.c_str());
+
+    // Test relative executable (w/ ./)
+    abs_exec = convert_exec_rel_to_abs("test", boost::filesystem::path(TEST_DIR), "./Utils_test");
+    EXPECT_TRUE(boost::filesystem::exists(abs_exec));
+
+    // Test relative executable (w/o ./)
+    abs_exec = convert_exec_rel_to_abs("test", boost::filesystem::path(TEST_DIR), "Utils_test");
+    EXPECT_TRUE(boost::filesystem::exists(abs_exec));
+}
