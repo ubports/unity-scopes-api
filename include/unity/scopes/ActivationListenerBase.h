@@ -43,7 +43,7 @@ public:
     /// @endcond
 
     /**
-    \brief Called once by the scopes run time with the activation response.
+    \brief Called once by the scopes runtime with the activation response.
 
     The default implementation does nothing.
     \param response The response to the activation request, returned by a scope from ActivationQueryBase::activate().
@@ -51,7 +51,7 @@ public:
     virtual void activated(ActivationResponse const& response);
 
     /**
-    \brief Called once by the scopes run time after the final result for a request was sent.
+    \brief Called once by the scopes runtime after the final result for a request was sent.
 
     Calls to finished() are made by an arbitrary thread.
 

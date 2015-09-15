@@ -72,7 +72,7 @@ public:
     /// @endcond
 
     /**
-    \brief Called by scopes run time to start the query.
+    \brief Called by scopes runtime to start the query.
 
     Your implementation of run() can use the reply proxy to push results
     for the query. You can push results from within run(), in which case
@@ -99,7 +99,7 @@ public:
     This means that there is no need for an aggregating scope to
     explicitly forward cancellation to child scopes
     when its QueryBase::cancelled() method is called by the scopes
-    run time.
+    runtime.
     */
     //{@
     QueryCtrlProxy subsearch(ScopeProxy const& scope,

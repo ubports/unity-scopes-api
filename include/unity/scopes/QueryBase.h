@@ -66,7 +66,7 @@ public:
     /// @endcond
 
     /**
-    \brief Called by the scopes run time when the query originator
+    \brief Called by the scopes runtime when the query originator
     cancels a query.
 
     Your implementation of this method should ensure that the scope stops
@@ -81,7 +81,7 @@ public:
     \brief Check whether this query is still valid.
 
     valid() returns false if this query is finished or was cancelled earlier. Note that it is possible
-    that the run time may call SearchQueryBase::run(), ActivationQueryBase::activate(), or PreviewQueryBase::run()
+    that the runtime may call SearchQueryBase::run(), ActivationQueryBase::activate(), or PreviewQueryBase::run()
     \a after cancelled() was called. Your implementation of these methods should check whether the query is still
     valid and, if not, do nothing.
 
@@ -90,7 +90,7 @@ public:
     can happen at any time during query execution, your implementation should always test the return value
     of `push()`. If `push()` returns `false`, the query was either cancelled or exceeded its cardinality limit.
     Either way, there is no point in continuing to push more results because, once `push()` returns `false`,
-    the scopes run time discards all subsequent results for the query.
+    the scopes runtime discards all subsequent results for the query.
     */
     bool valid() const;
 
