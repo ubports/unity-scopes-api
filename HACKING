@@ -300,7 +300,7 @@ The tests include an ABI compliance test (for Wily and later). To run it:
 
 The test is also automatically run as part of the test suite.
 It takes several minutes to run . If you don't want to wait during local builds,
-set the cmake abi_compliance_test option to OFF to skip the check.
+set the cmake "slowtests" option to OFF to skip the check.
 
 The baseline ABI files for the test are in test/abi-compliance/abi_dumps.
 There is a separate directory for each architecture.
