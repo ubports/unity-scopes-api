@@ -25,6 +25,9 @@
 #include <unity/scopes/Runtime.h>
 #include <unity/scopes/PreviewReply.h>
 
+#include <boost/filesystem.hpp>
+
+using namespace boost;
 using namespace std;
 using namespace unity::scopes;
 
@@ -102,10 +105,11 @@ int main(int argc, char** argv)
     std::string scope_config = argc > 2 ? argv[2] : "FAIL";
     std::string rt_config = argc > 3 ? argv[3] : "FAIL";
     std::string unused_arg_2 = argc > 4 ? argv[4] : "FAIL";
+    filesystem::path abs_path_arg(argc > 5 ? argv[5] : "FAIL");
 
     // In order to test that custom exec splitting works, we check here that our arbitrary arguments
     // have been delivered to us as expected.
-    if (unused_arg_1 == "unused arg 1" && unused_arg_2 == "unused arg 2")
+    if (unused_arg_1 == "unused arg 1" && unused_arg_2 == "unused arg 2" && filesystem::exists(abs_path_arg))
     {
         MyScope scope;
         auto runtime = Runtime::create_scope_runtime("testscopeB", rt_config);
