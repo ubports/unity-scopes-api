@@ -93,8 +93,6 @@ Multi-Arch: same
 Pre-Depends: ${misc:Pre-Depends},
 Depends: ${misc:Depends},
          ${shlibs:Depends},
-Replaces: libunity-scopes-qt0.1.0,
-Conflicts: libunity-scopes-qt0.1.0,
 Description: Qt library for Unity scopes API
  Library that integrates classes based on Qt for convenience
 

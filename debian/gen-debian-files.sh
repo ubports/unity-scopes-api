@@ -67,7 +67,6 @@ qt_minor=$(echo $qt_full_version | cut -d'.' -f2)
 qt_major_minor="${qt_major}.${qt_minor}"
 
 vivid_soversion=$(expr $minor + 3)
-vivid_qt_soversion=$(expr $qt_minor)
 
 if [ "$distro" = "vivid" ]
 then
@@ -110,10 +109,6 @@ cat $warning $infile \
 \          libunity-scopes${vivid_soversion}," \
            -e "/Conflicts: libunity-scopes0,/a\
 \           libunity-scopes${vivid_soversion}," \
-           -e "/Replaces: libunity-scopes-qt0.1.0,/a\
-\          libunity-scopes-qt${vivid_qt_soversion}," \
-           -e "/Conflicts: libunity-scopes-qt0.1.0,/a\
-\           libunity-scopes-qt${vivid_qt_soversion}," \
         "$outfile"
 }
 
