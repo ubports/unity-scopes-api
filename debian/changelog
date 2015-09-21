@@ -1,3 +1,12 @@
+unity-scopes-api (1.0.2-0ubuntu1) UNRELEASED; urgency=medium
+
+  * Loop through each argument of the custom scope runner command and ensure
+    that all path arguments are absolute.
+  * Protect all JsonCppNode::get_node() methods with a "if (!root_) throw;"
+    check (Fixes LP: #1494796).
+
+ -- Pawel Stolowski <pawel.stolowski@canonical.com>  Mon, 21 Sep 2015 15:29:03 +0200
+
 unity-scopes-api (1.0.1+15.10.20150915.1-0ubuntu1) wily; urgency=medium
 
   [ Michi Henning ]
