@@ -185,8 +185,8 @@ else()
     option(Werror "Treat warnings as errors" OFF)
 endif()
 
-# Some tests are slow, so make it possible not to run them
-# during day-to-day development.
+# Some tests are slow, so make it possible not to run them during day-to-day development.
+# The default for this *must* stay ON, otherwise the tests won't run in Jenkins.
 option(slowtests "Run slow tests" ON)
 
 if (${Werror})
