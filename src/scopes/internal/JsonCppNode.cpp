@@ -279,6 +279,11 @@ JsonNodeInterface::SPtr JsonCppNode::get_node() const
 
 JsonNodeInterface::SPtr JsonCppNode::get_node(std::string const& node_name) const
 {
+    if (!root_)
+    {
+        throw unity::LogicException("Current node is empty");
+    }
+
     if (!root_.isMember(node_name))
     {
         throw unity::LogicException("Node " + node_name + " does not exist");
@@ -290,6 +295,11 @@ JsonNodeInterface::SPtr JsonCppNode::get_node(std::string const& node_name) cons
 
 JsonNodeInterface::SPtr JsonCppNode::get_node(unsigned int node_index) const
 {
+    if (!root_)
+    {
+        throw unity::LogicException("Current node is empty");
+    }
+
     if (root_.type() != Json::arrayValue)
     {
         throw unity::LogicException("Root node is not an array");
