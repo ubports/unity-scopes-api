@@ -96,6 +96,7 @@ The following widget types are recognized by Unity:
 \arg \c comment-input
 \arg \c comment
 \arg \c expandable
+\arg \c table
 
 \subsection audio audio widget
 
@@ -446,6 +447,29 @@ List of attributes:
     w2.add_attribute_value("text", Variant("A text"));
     expandable.add_widget(w1);
     expandable.add_widget(w2);
+    ...
+\endcode
+
+\subsection table table widget
+
+The table widget is used to show a table with labels and values.
+When used inside an Expandable widget, the topmost 3 rows are shown until it's expanded.
+
+List of attributes:
+\arg \c title A string specifying the title to be shown on top
+\arg \c values An array with one element per row. Each element is an array of two strings: label and value
+
+\code
+    PreviewWidget table("details", "table");
+    table.add_attribute_value("title", Variant("This is a table widget"));
+
+    VariantArray values {
+        Variant{VariantArray{Variant{_("Version number")}, Variant{"0.83b"}}},
+        Variant{VariantArray{Variant{_("Last updated")}, Variant{"2015-01-15"}}},
+        Variant{VariantArray{Variant{_("First released")}, Variant{"2013-12-16"}}},
+        Variant{VariantArray{Variant{_("Size")}, Variant{"11.3 MiB"}}},
+    };
+    table.add_attribute_value("values", Variant(values));
     ...
 \endcode
 */
