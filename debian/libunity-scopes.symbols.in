@@ -1050,7 +1050,7 @@ libunity-scopes.so.@UNITY_SCOPES_SOVERSION@ libunity-scopes@UNITY_SCOPES_SOVERSI
  (c++)"virtual thunk to unity::scopes::SearchReply::~SearchReply()@Base" 0.4.0+14.04.20140312.1
  (c++)"virtual thunk to unity::scopes::TimeoutException::self() const@Base" 0.4.0+14.04.20140312.1
  (c++)"virtual thunk to unity::scopes::TimeoutException::~TimeoutException()@Base" 0.4.0+14.04.20140312.1
- (c++)"unity::scopes::internal::convert_exec_rel_to_abs(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, boost::filesystem::path const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" @replaceme
+ (c++)"unity::scopes::internal::convert_exec_rel_to_abs(std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, boost::filesystem::path const&, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@Base" 0replaceme
  (c++)"vtable for unity::scopes::AbstractScopeBase@Base" 0.6.0+14.10.20140804.1
  (c++)"vtable for unity::scopes::ActionMetadata@Base" 0.6.0+14.10.20140804.1
  (c++)"vtable for unity::scopes::ActivationListenerBase@Base" 0.4.0+14.04.20140312.1
