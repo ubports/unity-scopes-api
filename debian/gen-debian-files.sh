@@ -27,7 +27,8 @@
 # - libunity-scopes-dev.install
 # - libunity-scopes${soversion}.scope.click-hook
 # - libunity-scopes${soversion}.symbols (for Vivid only)
-# - shlibs (for Wily and later only)
+# - shlibs.libunity-scopes-${full_version}.shlibs (for Wily and later only)
+# - shlibs.libunity-scopes-qt-${qt_full_version}.shlibs (for Wily and later only)
 # - libunity-scopes-qt${qt_soversion}.install
 # - libunity-scopes-qt-dev.install
 # - libunity-scopes-qt${qt_soversion}.symbols (for Vivid only)
@@ -144,14 +145,19 @@ then
     outfile="${dir}"/libunity-scopes-qt${qt_soversion}.symbols
     sed "s/@UNITY_SCOPES_QT_SOVERSION@/${qt_soversion}/g" "$infile" >"$outfile"
 else
-    # Single shlibs file for both libunity-scopes and libunity-scopes-qt.
-    infile="${dir}"/shlibs.in
-    outfile="${dir}"/shlibs
+    infile="${dir}"/libunity-scopes.shlibs.in
+    outfile="${dir}"/libunity-scopes-${full_version}.shlibs
     warning_msg "$infile"
     cat $warning "$infile" \
         | sed -e "s/@UNITY_SCOPES_SOVERSION@/${soversion}/g" \
-              -e "s/@UNITY_SCOPES_QT_SOVERSION@/${qt_soversion}/g" \
               -e "s/@UNITY_SCOPES_MAJOR_MINOR@/${major_minor}/g" \
+            >"$outfile"
+
+    infile="${dir}"/libunity-scopes-qt.shlibs.in
+    outfile="${dir}"/libunity-scopes-qt${qt_full_version}.shlibs
+    warning_msg "$infile"
+    cat $warning "$infile" \
+        | sed -e "s/@UNITY_SCOPES_QT_SOVERSION@/${qt_soversion}/g" \
               -e "s/@UNITY_SCOPES_QT_MAJOR_MINOR@/${qt_major_minor}/g" \
             >"$outfile"
 fi
