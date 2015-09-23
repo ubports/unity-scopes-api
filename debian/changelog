@@ -1,3 +1,18 @@
+unity-scopes-api (1.0.2+15.10.20150921-0ubuntu1) wily; urgency=medium
+
+  [ Pawel Stolowski ]
+  * Loop through each argument of the custom scope runner command and ensure
+    that all path arguments are absolute.
+  * Protect all JsonCppNode::get_node() methods with a "if (!root_) throw;"
+    check (Fixes LP: #1494796).
+  * Merged devel.
+
+  [ CI Train Bot ]
+  * debian/libunity-scopes.symbols.in: update to released version.
+  * New rebuild forced.
+
+ -- Pawel Stolowski <ci-train-bot@canonical.com>  Mon, 21 Sep 2015 13:32:17 +0000
+
 unity-scopes-api (1.0.1+15.10.20150915.1-0ubuntu1) wily; urgency=medium
 
   [ Michi Henning ]
