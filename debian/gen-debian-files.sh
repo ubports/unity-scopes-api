@@ -45,40 +45,30 @@
 
 set -e  # Fail if any command fails.
 
-[ $# -ne 0 ] && {
-    echo "usage: $(basename $0)" >&2
+progname=$(basename $0)
+
+[ $# -ne 1 ] && {
+    echo "usage: $progname path-to-debian-dir" >&2
     exit 1
 }
-dir=./debian
+dir=$1
 
-# Set soversions depending on whether we are running on vivid or wily and later.
+# Dump version numbers into files and initialize vars from those files.
 
-distro=$(lsb_release -c -s)
-echo "gen-debian-files: detected distribution: $distro"
+sh ${dir}/get-versions.sh ${dir}
 
-full_version=$(cat "${dir}"/VERSION)
-qt_full_version=$(cat "${dir}"/QT-VERSION)
+pwd
+ls ${dir}
+full_version=$(cat "${dir}"/libunity-scopes.full-version)
+qt_full_version=$(cat "${dir}"/libunity-scopes-qt.full-version)
 
-major=$(echo $full_version | cut -d'.' -f1)
-minor=$(echo $full_version | cut -d'.' -f2)
-major_minor="${major}.${minor}"
+major_minor=$(cat "${dir}"/libunity-scopes.major-minor-version)
+qt_major_minor=$(cat "${dir}"/libunity-scopes-qt.major-minor-version)
 
-qt_major=$(echo $qt_full_version | cut -d'.' -f1)
-qt_minor=$(echo $qt_full_version | cut -d'.' -f2)
-qt_major_minor="${qt_major}.${qt_minor}"
+soversion=$(cat "${dir}"/libunity-scopes.soversion)
+qt_soversion=$(cat "${dir}"/libunity-scopes-qt.soversion)
 
-vivid_soversion=$(expr $minor + 3)
-
-if [ "$distro" = "vivid" ]
-then
-    soversion=$vivid_soversion
-    qt_soversion=${qt_minor}
-else
-    soversion="${major}.${minor}"
-    qt_soversion="${qt_major}.${qt_minor}"
-fi
-[ -n $soversion ]
-[ -n $qt_soversion ]
+vivid_soversion=$(cat "${dir}"/libunity-scopes.vivid-soversion)
 
 warning=$(mktemp -t gen-debian-files-msg.XXX)
 
