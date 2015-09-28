@@ -55,8 +55,6 @@ dir=$1
 
 sh ${dir}/get-versions.sh ${dir}
 
-pwd
-ls ${dir}
 full_version=$(cat "${dir}"/libunity-scopes.full-version)
 qt_full_version=$(cat "${dir}"/libunity-scopes-qt.full-version)
 
