@@ -37,7 +37,6 @@ dir=$1
 # us to easily pick them up from both gen-debian-files.sh and CMakeLists.txt.
 
 distro=$(lsb_release -c -s)
-echo "${progname}: detected distribution: $distro"
 
 full_version=$(cat "${dir}"/VERSION)
 qt_full_version=$(cat "${dir}"/QT-VERSION)
