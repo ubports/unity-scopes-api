@@ -24,12 +24,10 @@
 #
 # - control
 # - libunity-scopes${soversion}.install
-# - libunity-scopes-dev.install
 # - libunity-scopes${soversion}.scope.click-hook
 # - shlibs.libunity-scopes-${full_version}.shlibs (for Wily and later only)
 # - shlibs.libunity-scopes-qt-${qt_full_version}.shlibs (for Wily and later only)
 # - libunity-scopes-qt${qt_soversion}.install
-# - libunity-scopes-qt-dev.install
 #
 # For all but control, this is a straight substition and/or renaming exercise for each file.
 # For control, if building on Wily or later, we also fix the "Replaces:" and "Conflicts:"
@@ -107,13 +105,6 @@ outfile="${dir}"/libunity-scopes${soversion}.install
 warning_msg "$infile"
 cat $warning "$infile" >"$outfile"
 
-# Install file for dev package
-infile="${dir}"/libunity-scopes-dev.install.in
-outfile="${dir}"/libunity-scopes-dev.install
-warning_msg "$infile"
-cat $warning "$infile" \
-    | sed "s/@UNITY_SCOPES_SOVERSION@/${soversion}/" >"$outfile"
-
 # Install file for click hook
 infile="${dir}"/libunity-scopes.scope.click-hook.in
 outfile="${dir}"/libunity-scopes${soversion}.scope.click-hook
@@ -142,12 +133,5 @@ infile="${dir}"/libunity-scopes-qt.install.in
 outfile="${dir}"/libunity-scopes-qt${qt_soversion}.install
 warning_msg "$infile"
 cat $warning "$infile" >"$outfile"
-
-# Install file for qt dev package
-infile="${dir}"/libunity-scopes-qt-dev.install.in
-outfile="${dir}"/libunity-scopes-qt-dev.install
-warning_msg "$infile"
-cat $warning $infile \
-    | sed "s/@UNITY_SCOPES_QT_SOVERSION@/${qt_soversion}/" >"$outfile"
 
 exit 0
