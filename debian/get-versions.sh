@@ -27,11 +27,13 @@ set -e  # Fail if any command fails.
 
 progname=$(basename $0)
 
-[ $# -ne 1 ] && {
-    echo "usage: $progname path-to-debian-dir" >&2
+[ $# -lt 1 -o $# -gt 2 ] && {
+    echo "usage: $progname path-to-debian-dir [output-dir]" >&2
     exit 1
 }
 dir=$1
+output_dir=`pwd`
+[ $# -eq 2 ] && output_dir=$2
 
 # Write the various version numbers into a bunch of files. This allows
 # us to easily pick them up from both gen-debian-files.sh and CMakeLists.txt.
@@ -64,17 +66,17 @@ fi
 [ -n $soversion ]
 [ -n $qt_soversion ]
 
-echo ${full_version} >${dir}/libunity-scopes.full-version
-echo ${major} >${dir}/libunity-scopes.major-version
-echo ${minor} >${dir}/libunity-scopes.minor-version
-echo ${micro} >${dir}/libunity-scopes.micro-version
-echo ${major_minor} >${dir}/libunity-scopes.major-minor-version
-echo ${soversion} >${dir}/libunity-scopes.soversion
-echo ${vivid_soversion} >${dir}/libunity-scopes.vivid-soversion
+echo ${full_version} >${output_dir}/libunity-scopes.full-version
+echo ${major} >${output_dir}/libunity-scopes.major-version
+echo ${minor} >${output_dir}/libunity-scopes.minor-version
+echo ${micro} >${output_dir}/libunity-scopes.micro-version
+echo ${major_minor} >${output_dir}/libunity-scopes.major-minor-version
+echo ${soversion} >${output_dir}/libunity-scopes.soversion
+echo ${vivid_soversion} >${output_dir}/libunity-scopes.vivid-soversion
 
-echo ${qt_full_version} >${dir}/libunity-scopes-qt.full-version
-echo ${qt_major} >${dir}/libunity-scopes-qt.major-version
-echo ${qt_minor} >${dir}/libunity-scopes-qt.minor-version
-echo ${qt_micro} >${dir}/libunity-scopes-qt.micro-version
-echo ${qt_major_minor} >${dir}/libunity-scopes-qt.major-minor-version
-echo ${qt_soversion} >${dir}/libunity-scopes-qt.soversion
+echo ${qt_full_version} >${output_dir}/libunity-scopes-qt.full-version
+echo ${qt_major} >${output_dir}/libunity-scopes-qt.major-version
+echo ${qt_minor} >${output_dir}/libunity-scopes-qt.minor-version
+echo ${qt_micro} >${output_dir}/libunity-scopes-qt.micro-version
+echo ${qt_major_minor} >${output_dir}/libunity-scopes-qt.major-minor-version
+echo ${qt_soversion} >${output_dir}/libunity-scopes-qt.soversion

@@ -48,25 +48,26 @@ progname=$(basename $0)
     exit 1
 }
 dir=$1
+version_dir=$(mktemp -d)
 
 # Dump version numbers into files and initialize vars from those files.
 
-sh ${dir}/get-versions.sh ${dir}
+sh ${dir}/get-versions.sh ${dir} ${version_dir}
 
-full_version=$(cat "${dir}"/libunity-scopes.full-version)
-qt_full_version=$(cat "${dir}"/libunity-scopes-qt.full-version)
+full_version=$(cat "${version_dir}"/libunity-scopes.full-version)
+qt_full_version=$(cat "${version_dir}"/libunity-scopes-qt.full-version)
 
-major_minor=$(cat "${dir}"/libunity-scopes.major-minor-version)
-qt_major_minor=$(cat "${dir}"/libunity-scopes-qt.major-minor-version)
+major_minor=$(cat "${version_dir}"/libunity-scopes.major-minor-version)
+qt_major_minor=$(cat "${version_dir}"/libunity-scopes-qt.major-minor-version)
 
-soversion=$(cat "${dir}"/libunity-scopes.soversion)
-qt_soversion=$(cat "${dir}"/libunity-scopes-qt.soversion)
+soversion=$(cat "${version_dir}"/libunity-scopes.soversion)
+qt_soversion=$(cat "${version_dir}"/libunity-scopes-qt.soversion)
 
-vivid_soversion=$(cat "${dir}"/libunity-scopes.vivid-soversion)
+vivid_soversion=$(cat "${version_dir}"/libunity-scopes.vivid-soversion)
 
 warning=$(mktemp -t gen-debian-files-msg.XXX)
 
-trap "rm $warning" 0 INT TERM QUIT
+trap "rm -fr $warning $version_dir" 0 INT TERM QUIT
 
 warning_msg()
 {

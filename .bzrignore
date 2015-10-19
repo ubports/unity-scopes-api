@@ -7,6 +7,3 @@
 /.settings
 /.pydevproject
 *.user
-
-# Files generated during configuration
-/debian/libunity-scopes*.*version
