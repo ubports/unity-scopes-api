@@ -323,6 +323,11 @@ them by category. If you do, this prevents incremental rendering, and the user s
 until your scope has processed _all_ results. To create a positive user experience,
 your scope should push results as soon as possible.
 
+The UI uses categories to incrementally render the display after a refresh of search results. This relies
+on categories staying the same from query to query. If your scope has, say, a "News" category, you need
+to make sure that the category ID and name stay the same from query to query. In particular, do _not_
+create category IDs that are artificially unique per query (such as by appending a sequence number).
+
 When you create a category, you can provide a \link unity::scopes::CategoryRenderer \endlink instance.
 The category renderer determines the visual appearance of the results in that category (such as
 display in a grid or in a carousel layout).

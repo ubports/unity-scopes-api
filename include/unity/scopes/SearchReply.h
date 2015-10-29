@@ -90,6 +90,10 @@ public:
 
     \return The category instance
     \throws unity::scopes::InvalidArgumentException if category with that id has already been registered.
+
+    \note The UI uses category IDs for incremental rendering when refreshing search results. For this to work
+    correctly, you need to make sure that you use the same category ID for different queries if the search
+    results apply to the same category as for a previous search.
     */
     virtual Category::SCPtr register_category(std::string const& id,
                                               std::string const& title,
