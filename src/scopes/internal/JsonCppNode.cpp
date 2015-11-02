@@ -284,6 +284,10 @@ JsonNodeInterface::SPtr JsonCppNode::get_node(std::string const& node_name) cons
         throw unity::LogicException("Current node is empty");
     }
 
+    if (root_.type() != Json::objectValue)
+    {
+        throw unity::LogicException("Root node is not an object");
+    }
     if (!root_.isMember(node_name))
     {
         throw unity::LogicException("Node " + node_name + " does not exist");
