@@ -481,7 +481,14 @@ SearchHandle::UPtr SmartScopesClient::search(SearchReplyHandler const& handler,
         // store the leftover data from the handle_chunk call into tmp_data
         *tmp_data = handle_chunk(data, [this, handler](const std::string& line)
         {
-            handle_line(line, handler);
+            try
+            {
+                handle_line(line, handler);
+            }
+            catch (unity::Exception const& e)
+            {
+                BOOST_LOG_SEV(logger_, Logger::Error) << "SmartScopesClient.search(): Failed to parse line: " << e.what();
+            }
         });
     }, headers);
 
@@ -548,7 +555,14 @@ PreviewHandle::UPtr SmartScopesClient::preview(PreviewReplyHandler const& handle
         // store the leftover data from the handle_chunk call into tmp_data
         *tmp_data = handle_chunk(data, [this, handler](const std::string& line)
         {
-            handle_line(line, handler);
+            try
+            {
+                handle_line(line, handler);
+            }
+            catch (unity::Exception const& e)
+            {
+                BOOST_LOG_SEV(logger_, Logger::Error) << "SmartScopesClient.preview(): Failed to parse line: " << e.what();
+            }
         });
     }, headers);
 
