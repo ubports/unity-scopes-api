@@ -44,7 +44,7 @@ public:
     static SwitchFilter::SPtr create(VariantMap const& var);
 
 protected:
-    void validate_display_hints(int hints) const override;
+    void validate_display_hints() const override;
     std::string filter_type() const override;
     void serialize(VariantMap& var) const override;
     void deserialize(VariantMap const& var);

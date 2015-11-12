@@ -42,7 +42,7 @@ public:
     static RadioButtonsFilter::SPtr create(VariantMap const& var);
 
 protected:
-    void validate_display_hints(int hints) const override;
+    void validate_display_hints() const override;
 };
 
 } // namespace internal

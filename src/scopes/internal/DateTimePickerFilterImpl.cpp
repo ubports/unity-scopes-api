@@ -181,11 +181,11 @@ bool DateTimePickerFilterImpl::is_valid_date(std::chrono::system_clock::time_poi
     return ((m_min == nullptr || date >= *m_min - std::chrono::seconds(1)) && (m_max == nullptr || date < *m_max + std::chrono::seconds(1)));
 }
 
-void DateTimePickerFilterImpl::validate_display_hints(int hints) const
+void DateTimePickerFilterImpl::validate_display_hints() const
 {
-    if (hints & FilterBase::DisplayHints::Primary)
+    if (display_hints() & FilterBase::DisplayHints::Primary)
     {
-        throw unity::InvalidArgumentException("set_display_hints(): Primary navigation flag is not supported by " + filter_type() + " filters");
+        throw unity::InvalidArgumentException("DateTimePickerFilter::set_display_hints(): Primary navigation flag is not supported by this filter type");
     }
 }
 
@@ -249,7 +249,9 @@ void DateTimePickerFilterImpl::deserialize(VariantMap const& var)
 
 DateTimePickerFilter::SPtr DateTimePickerFilterImpl::create(VariantMap const& var)
 {
-    return std::shared_ptr<DateTimePickerFilter>(new DateTimePickerFilter(new DateTimePickerFilterImpl(var)));
+    auto filter = std::shared_ptr<DateTimePickerFilter>(new DateTimePickerFilter(new DateTimePickerFilterImpl(var)));
+    filter->fwd()->validate_display_hints();
+    return filter;
 }
 
 std::string DateTimePickerFilterImpl::filter_type() const

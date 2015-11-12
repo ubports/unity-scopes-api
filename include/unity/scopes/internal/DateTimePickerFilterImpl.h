@@ -68,7 +68,7 @@ public:
     static std::chrono::system_clock::time_point to_timepoint(int64_t seconds_from_epoch);
 
 protected:
-    void validate_display_hints(int hints) const override;
+    void validate_display_hints() const override;
     void serialize(VariantMap& var) const override;
     void deserialize(VariantMap const& var);
     std::string filter_type() const override;

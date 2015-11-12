@@ -62,7 +62,9 @@ ValueSliderFilterImpl::ValueSliderFilterImpl(VariantMap const& var)
 
 ValueSliderFilter::SPtr ValueSliderFilterImpl::create(VariantMap const& var)
 {
-    return std::shared_ptr<ValueSliderFilter>(new ValueSliderFilter(new ValueSliderFilterImpl(var)));
+    auto filter = std::shared_ptr<ValueSliderFilter>(new ValueSliderFilter(new ValueSliderFilterImpl(var)));
+    filter->fwd()->validate_display_hints();
+    return filter;
 }
 
 void ValueSliderFilterImpl::set_default_value(double val)
@@ -142,11 +144,11 @@ void ValueSliderFilterImpl::update_state(FilterState& filter_state, std::string 
     state[filter_id] = Variant(value);
 }
 
-void ValueSliderFilterImpl::validate_display_hints(int hints) const
+void ValueSliderFilterImpl::validate_display_hints() const
 {
-    if (hints & FilterBase::DisplayHints::Primary)
+    if (display_hints() & FilterBase::DisplayHints::Primary)
     {
-        throw unity::InvalidArgumentException("set_display_hints(): Primary navigation flag is not supported by " + filter_type() + " filters");
+        throw unity::InvalidArgumentException("ValueSliderFilter::set_display_hints(): primary navigation flag is not supported by this filter type");
     }
 }
 

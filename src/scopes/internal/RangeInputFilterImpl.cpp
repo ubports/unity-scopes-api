@@ -47,7 +47,9 @@ RangeInputFilterImpl::RangeInputFilterImpl(VariantMap const& var)
 
 RangeInputFilter::SPtr RangeInputFilterImpl::create(VariantMap const& var)
 {
-    return std::shared_ptr<RangeInputFilter>(new RangeInputFilter(new RangeInputFilterImpl(var)));
+    auto filter = std::shared_ptr<RangeInputFilter>(new RangeInputFilter(new RangeInputFilterImpl(var)));
+    filter->fwd()->validate_display_hints();
+    return filter;
 }
 
 std::string RangeInputFilterImpl::start_label() const
@@ -191,11 +193,11 @@ void RangeInputFilterImpl::deserialize(VariantMap const& var)
     unit_label_ = it->second.get_string();
 }
 
-void RangeInputFilterImpl::validate_display_hints(int hints) const
+void RangeInputFilterImpl::validate_display_hints() const
 {
-    if (hints & FilterBase::DisplayHints::Primary)
+    if (display_hints() & FilterBase::DisplayHints::Primary)
     {
-        throw unity::InvalidArgumentException("set_display_hints(): Primary navigation flag is not supported by " + filter_type() + " filters");
+        throw unity::InvalidArgumentException("RangeInputFilter::set_display_hints(): primary navigation flag is not supported by this filter type");
     }
 }
 

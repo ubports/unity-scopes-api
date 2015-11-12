@@ -50,7 +50,7 @@ public:
     void update_state(FilterState& filter_state, FilterOption::SCPtr option, bool active) const;
     static void update_state(FilterState& filter_state, std::string const& filter_id, std::string const& option_id, bool value);
     static OptionSelectorFilter::SPtr create(VariantMap const& var);
-    void validate_display_hints(int hints) const override;
+    void validate_display_hints() const override;
 
 protected:
     void serialize(VariantMap& var) const override;

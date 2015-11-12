@@ -47,7 +47,7 @@ public:
     static VariantArray serialize_filters(Filters const& filters);
     static Filters deserialize_filters(VariantArray const& var);
     static void validate_filters(Filters const& filters);
-    virtual void validate_display_hints(int hints) const = 0;
+    virtual void validate_display_hints() const = 0;
 
 protected:
     virtual void serialize(VariantMap& var) const = 0;

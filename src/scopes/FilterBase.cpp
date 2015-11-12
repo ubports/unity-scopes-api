@@ -46,7 +46,7 @@ FilterBase::~FilterBase() = default;
 void FilterBase::set_display_hints(int hints)
 {
     p->set_display_hints(hints);
-    p->validate_display_hints(hints);
+    p->validate_display_hints();
 }
 
 std::string FilterBase::id() const

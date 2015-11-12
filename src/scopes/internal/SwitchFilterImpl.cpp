@@ -53,7 +53,9 @@ std::string SwitchFilterImpl::label() const
 
 SwitchFilter::SPtr SwitchFilterImpl::create(VariantMap const& var)
 {
-    return std::shared_ptr<SwitchFilter>(new SwitchFilter(new SwitchFilterImpl(var)));
+    auto filter = std::shared_ptr<SwitchFilter>(new SwitchFilter(new SwitchFilterImpl(var)));
+    filter->fwd()->validate_display_hints();
+    return filter;
 }
 
 bool SwitchFilterImpl::is_on(FilterState const& filter_state) const
@@ -92,11 +94,11 @@ std::string SwitchFilterImpl::filter_type() const
     return "switch";
 }
 
-void SwitchFilterImpl::validate_display_hints(int hints) const
+void SwitchFilterImpl::validate_display_hints() const
 {
-    if (hints & FilterBase::DisplayHints::Primary)
+    if (display_hints() & FilterBase::DisplayHints::Primary)
     {
-        throw unity::InvalidArgumentException("set_display_hints(): Primary navigation flag is not supported by " + filter_type() + " filters");
+        throw unity::InvalidArgumentException("SwitchFilter::set_display_hints(): primary navigation flag is not supported by this filter type");
     }
 }
 

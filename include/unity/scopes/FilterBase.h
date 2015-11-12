@@ -64,6 +64,7 @@ public:
      \brief Sets display hints for the Shell UI.
 
      \param hints A combination of DisplayHints for this filter.
+     \throws unity::InvalidArgumentException if given hints value is unsupported by current filter type.
     */
     void set_display_hints(int hints);
 
