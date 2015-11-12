@@ -51,6 +51,7 @@ public:
     static void update_state(FilterState& filter_state, std::string const& filter_id, Variant const& start_value, Variant const& end_value);
 
     std::string filter_type() const override;
+    void validate_display_hints(int hints) const override;
 
     static RangeInputFilter::SPtr create(VariantMap const& var);
 

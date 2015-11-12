@@ -57,7 +57,7 @@ public:
     enum DisplayHints
     {
         Default = 0,    /**< Default value (no hint) */
-        Primary = 1     /**< Display this filter at the top of the screen, if possible */
+        Primary = 1     /**< Display this filter as a primary navigation, if possible. Currently only the OptionSelectorFilter can act as primary navigation. */
     };
 
     /**

@@ -40,6 +40,9 @@ public:
     FilterOption::SCPtr active_option(FilterState const& filter_state) const;
     std::string filter_type() const override;
     static RadioButtonsFilter::SPtr create(VariantMap const& var);
+
+protected:
+    void validate_display_hints(int hints) const override;
 };
 
 } // namespace internal

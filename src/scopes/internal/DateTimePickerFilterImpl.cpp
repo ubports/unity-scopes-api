@@ -181,6 +181,14 @@ bool DateTimePickerFilterImpl::is_valid_date(std::chrono::system_clock::time_poi
     return ((m_min == nullptr || date >= *m_min - std::chrono::seconds(1)) && (m_max == nullptr || date < *m_max + std::chrono::seconds(1)));
 }
 
+void DateTimePickerFilterImpl::validate_display_hints(int hints) const
+{
+    if (hints & FilterBase::DisplayHints::Primary)
+    {
+        throw unity::InvalidArgumentException("set_display_hints(): Primary navigation flag is not supported by " + filter_type() + " filters");
+    }
+}
+
 void DateTimePickerFilterImpl::serialize(VariantMap& var) const
 {
     var["mode"] = static_cast<int>(m_mode.to_ulong());

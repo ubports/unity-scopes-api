@@ -69,6 +69,15 @@ std::string RadioButtonsFilterImpl::filter_type() const
     return "radio_buttons";
 }
 
+void RadioButtonsFilterImpl::validate_display_hints(int hints) const
+{
+    OptionSelectorFilterImpl::validate_display_hints(hints);
+    if (hints & FilterBase::DisplayHints::Primary)
+    {
+        throw unity::InvalidArgumentException("set_display_hints(): Primary navigation flag is not supported by " + filter_type() + " filters");
+    }
+}
+
 RadioButtonsFilter::SPtr RadioButtonsFilterImpl::create(VariantMap const& var)
 {
     return std::shared_ptr<RadioButtonsFilter>(new RadioButtonsFilter(new RadioButtonsFilterImpl(var)));

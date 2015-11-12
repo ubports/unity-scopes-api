@@ -191,6 +191,14 @@ void RangeInputFilterImpl::deserialize(VariantMap const& var)
     unit_label_ = it->second.get_string();
 }
 
+void RangeInputFilterImpl::validate_display_hints(int hints) const
+{
+    if (hints & FilterBase::DisplayHints::Primary)
+    {
+        throw unity::InvalidArgumentException("set_display_hints(): Primary navigation flag is not supported by " + filter_type() + " filters");
+    }
+}
+
 } // namespace internal
 
 } // namespace scopes

@@ -52,6 +52,7 @@ public:
     void update_state(FilterState& filter_state, double value) const;
     static ValueSliderFilter::SPtr create(VariantMap const& var);
     static void update_state(FilterState& filter_state, std::string const& filter_id, double value);
+    void validate_display_hints(int hints) const override;
 
 protected:
     void serialize(VariantMap& var) const override;

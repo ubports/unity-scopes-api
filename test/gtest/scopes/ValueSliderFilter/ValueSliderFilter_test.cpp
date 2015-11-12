@@ -83,3 +83,9 @@ TEST(ValueSliderFilter, serialize)
     EXPECT_EQ(100.0f, filter1->max());
     EXPECT_EQ(ValueSliderFilter::SliderType::LessThan, filter1->slider_type());
 }
+
+TEST(ValueSliderFilter, display_hints)
+{
+    auto filter = ValueSliderFilter::create("f1", "Max size", "Less than %1", 1.0f, 100.0f);
+    EXPECT_THROW(filter->set_display_hints(FilterBase::DisplayHints::Primary), unity::InvalidArgumentException);
+}

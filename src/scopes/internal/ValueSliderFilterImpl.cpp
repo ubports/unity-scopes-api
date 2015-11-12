@@ -142,6 +142,14 @@ void ValueSliderFilterImpl::update_state(FilterState& filter_state, std::string 
     state[filter_id] = Variant(value);
 }
 
+void ValueSliderFilterImpl::validate_display_hints(int hints) const
+{
+    if (hints & FilterBase::DisplayHints::Primary)
+    {
+        throw unity::InvalidArgumentException("set_display_hints(): Primary navigation flag is not supported by " + filter_type() + " filters");
+    }
+}
+
 void ValueSliderFilterImpl::serialize(VariantMap& var) const
 {
     var["label"] = label_;

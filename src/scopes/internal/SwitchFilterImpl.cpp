@@ -92,6 +92,14 @@ std::string SwitchFilterImpl::filter_type() const
     return "switch";
 }
 
+void SwitchFilterImpl::validate_display_hints(int hints) const
+{
+    if (hints & FilterBase::DisplayHints::Primary)
+    {
+        throw unity::InvalidArgumentException("set_display_hints(): Primary navigation flag is not supported by " + filter_type() + " filters");
+    }
+}
+
 void SwitchFilterImpl::serialize(VariantMap& var) const
 {
     var["label"] = label_;
