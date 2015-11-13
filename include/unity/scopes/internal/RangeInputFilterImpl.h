@@ -35,12 +35,18 @@ using namespace experimental;
 class RangeInputFilterImpl : public FilterBaseImpl
 {
 public:
-    RangeInputFilterImpl(std::string const& id, std::string const& start_label, std::string const& end_label, std::string const& unit_label);
+    RangeInputFilterImpl(std::string const& id,
+            std::string const& start_prefix_label, std::string const& start_postfix_label,
+            std::string const& central_label,
+            std::string const& end_prefix_label, std::string const& end_postfix_label);
+
     RangeInputFilterImpl(VariantMap const& var);
 
-    std::string start_label() const;
-    std::string end_label() const;
-    std::string unit_label() const;
+    std::string start_prefix_label() const;
+    std::string start_postfix_label() const;
+    std::string end_prefix_label() const;
+    std::string end_postfix_label() const;
+    std::string central_label() const;
 
     bool has_start_value(FilterState const& filter_state) const;
     bool has_end_value(FilterState const& filter_state) const;
@@ -64,9 +70,11 @@ private:
     double get_value(FilterState const& filter_state, unsigned int index) const;
     static void check_type(Variant const& val, std::string const& filter_id, std::string const& varname);
 
-    std::string start_label_;
-    std::string end_label_;
-    std::string unit_label_;
+    std::string start_prefix_label_;
+    std::string start_postfix_label_;
+    std::string end_prefix_label_;
+    std::string end_postfix_label_;
+    std::string central_label_;
 };
 
 } // namespace internal

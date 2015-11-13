@@ -31,11 +31,16 @@ namespace scopes
 namespace internal
 {
 
-RangeInputFilterImpl::RangeInputFilterImpl(std::string const& id, std::string const& start_label, std::string const& end_label, std::string const& unit_label)
+RangeInputFilterImpl::RangeInputFilterImpl(std::string const& id,
+        std::string const& start_prefix_label, std::string const& start_postfix_label,
+        std::string const& central_label,
+        std::string const& end_prefix_label, std::string const& end_postfix_label)
     : FilterBaseImpl(id),
-      start_label_(start_label),
-      end_label_(end_label),
-      unit_label_(unit_label)
+      start_prefix_label_(start_prefix_label),
+      start_postfix_label_(start_postfix_label),
+      end_prefix_label_(end_prefix_label),
+      end_postfix_label_(end_postfix_label),
+      central_label_(central_label)
 {
 }
 
@@ -52,19 +57,29 @@ RangeInputFilter::SPtr RangeInputFilterImpl::create(VariantMap const& var)
     return filter;
 }
 
-std::string RangeInputFilterImpl::start_label() const
+std::string RangeInputFilterImpl::start_prefix_label() const
 {
-    return start_label_;
+    return start_prefix_label_;
 }
 
-std::string RangeInputFilterImpl::end_label() const
+std::string RangeInputFilterImpl::start_postfix_label() const
 {
-    return end_label_;
+    return start_postfix_label_;
 }
 
-std::string RangeInputFilterImpl::unit_label() const
+std::string RangeInputFilterImpl::end_prefix_label() const
 {
-    return unit_label_;
+    return end_prefix_label_;
+}
+
+std::string RangeInputFilterImpl::end_postfix_label() const
+{
+    return end_postfix_label_;
+}
+
+std::string RangeInputFilterImpl::central_label() const
+{
+    return central_label_;
 }
 
 bool RangeInputFilterImpl::has_value(FilterState const& filter_state, unsigned int index) const
@@ -178,19 +193,25 @@ std::string RangeInputFilterImpl::filter_type() const
 
 void RangeInputFilterImpl::serialize(VariantMap& var) const
 {
-    var["start_label"] = start_label_;
-    var["end_label"] = end_label_;
-    var["unit_label"] = unit_label_;
+    var["start_prefix_label"] = start_prefix_label_;
+    var["start_postfix_label"] = start_postfix_label_;
+    var["end_prefix_label"] = end_prefix_label_;
+    var["end_postfix_label"] = end_postfix_label_;
+    var["central_label"] = central_label_;
 }
 
 void RangeInputFilterImpl::deserialize(VariantMap const& var)
 {
-    auto it = find_or_throw("RangeInputFilterImpl::deserialize()", var, "start_label");
-    start_label_ = it->second.get_string();
-    it = find_or_throw("RangeInputFilterImpl::deserialize()", var, "end_label");
-    end_label_ = it->second.get_string();
-    it = find_or_throw("RangeInputFilterImpl::deserialize()", var, "unit_label");
-    unit_label_ = it->second.get_string();
+    auto it = find_or_throw("RangeInputFilterImpl::deserialize()", var, "start_prefix_label");
+    start_prefix_label_ = it->second.get_string();
+    it = find_or_throw("RangeInputFilterImpl::deserialize()", var, "start_postfix_label");
+    start_postfix_label_ = it->second.get_string();
+    it = find_or_throw("RangeInputFilterImpl::deserialize()", var, "end_prefix_label");
+    end_prefix_label_ = it->second.get_string();
+    it = find_or_throw("RangeInputFilterImpl::deserialize()", var, "end_postfix_label");
+    end_postfix_label_ = it->second.get_string();
+    it = find_or_throw("RangeInputFilterImpl::deserialize()", var, "central_label");
+    central_label_ = it->second.get_string();
 }
 
 void RangeInputFilterImpl::validate_display_hints() const

@@ -29,16 +29,18 @@ using namespace unity::scopes::internal;
 
 TEST(RangeInputFilter, basic)
 {
-    auto filter1 = RangeInputFilter::create("f1", "Min", "Max", "EUR");
+    auto filter1 = RangeInputFilter::create("f1", "Min", "MinPostfix", "Central", "Max", "MaxPostfix");
     EXPECT_EQ("f1", filter1->id());
-    EXPECT_EQ("Min", filter1->start_label());
-    EXPECT_EQ("Max", filter1->end_label());
-    EXPECT_EQ("EUR", filter1->unit_label());
+    EXPECT_EQ("Min", filter1->start_prefix_label());
+    EXPECT_EQ("MinPostfix", filter1->start_postfix_label());
+    EXPECT_EQ("Max", filter1->end_prefix_label());
+    EXPECT_EQ("MaxPostfix", filter1->end_postfix_label());
+    EXPECT_EQ("Central", filter1->central_label());
 }
 
 TEST(RangeInputFilter, state)
 {
-    auto filter1 = RangeInputFilter::create("f1", "Min", "Max", "EUR");
+    auto filter1 = RangeInputFilter::create("f1", "", "", "", "", "");
 
     FilterState fstate;
     EXPECT_FALSE(fstate.has_filter("f1"));
@@ -68,42 +70,46 @@ TEST(RangeInputFilter, state)
 
 TEST(RangeInputFilter, serialize_deserialize)
 {
-    auto filter1 = RangeInputFilter::create("f1", "Min", "Max", "EUR");
+    auto filter1 = RangeInputFilter::create("f1", "Min", "MinPostfix", "Central", "Max", "MaxPostfix");
     auto var = filter1->serialize();
-
-    EXPECT_EQ("f1", var["id"].get_string());
-    EXPECT_EQ("Min", var["start_label"].get_string());
-    EXPECT_EQ("Max", var["end_label"].get_string());
-    EXPECT_EQ("EUR", var["unit_label"].get_string());
-
-    EXPECT_EQ("f1", var["id"].get_string());
-    EXPECT_EQ("Min", var["start_label"].get_string());
-    EXPECT_EQ("Max", var["end_label"].get_string());
-    EXPECT_EQ("EUR", var["unit_label"].get_string());
 
     auto filter2 = internal::RangeInputFilterImpl::create(var);
 
     EXPECT_EQ("f1", filter2->id());
-    EXPECT_EQ("Min", filter2->start_label());
-    EXPECT_EQ("Max", filter2->end_label());
-    EXPECT_EQ("EUR", filter2->unit_label());
+    EXPECT_EQ("Min", filter2->start_prefix_label());
+    EXPECT_EQ("MinPostfix", filter2->start_postfix_label());
+    EXPECT_EQ("Max", filter2->end_prefix_label());
+    EXPECT_EQ("MaxPostfix", filter2->end_postfix_label());
+    EXPECT_EQ("Central", filter2->central_label());
 }
 
 TEST(RangeInputFilter, deserialize_exceptions)
 {
+    std::vector<std::string> attrs = {"id", "start_prefix_label", "start_postfix_label", "end_prefix_label", "end_postfix_label", "central_label"};
+    for (size_t i = 0; i<attrs.size(); i++)
+    {
+        // create variant with one of the mandatory attributes missing
+        VariantMap var;
+        for (size_t j = 0; j<attrs.size(); j++)
+        {
+            if (i != j)
+            {
+                var[attrs[i]] = "foo";
+            }
+        }
+        EXPECT_THROW(RangeInputFilterImpl::create(var), unity::scopes::NotFoundException);
+    }
+
     VariantMap var;
-    var["id"] = "f1";
-    EXPECT_THROW(internal::RangeInputFilterImpl::create(var), unity::scopes::NotFoundException);
-    var["start_label"] = "";
-    EXPECT_THROW(internal::RangeInputFilterImpl::create(var), unity::scopes::NotFoundException);
-    var["end_label"] = "";
-    EXPECT_THROW(internal::RangeInputFilterImpl::create(var), unity::scopes::NotFoundException);
-    var["unit_label"] = "";
-    EXPECT_NO_THROW(internal::RangeInputFilterImpl::create(var));
+    for (size_t i = 0; i<attrs.size(); i++)
+    {
+        var[attrs[i]] = "foo";
+    }
+    EXPECT_NO_THROW(RangeInputFilterImpl::create(var));
 }
 
 TEST(RangeInputFilter, display_hints)
 {
-    auto filter = RangeInputFilter::create("f1", "Min", "Max", "EUR");
+    auto filter = RangeInputFilter::create("f1", "", "", "", "", "");
     EXPECT_THROW(filter->set_display_hints(FilterBase::DisplayHints::Primary), unity::InvalidArgumentException);
 }

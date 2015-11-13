@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Canonical Ltd
+ * Copyright (C) 2015 Canonical Ltd
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License version 3 as
@@ -55,25 +55,32 @@ public:
     \param unit_label A display label for the unit of this range filter (e.g. currency name).
     \return Instance of RangeInputFilter.
     */
-    static RangeInputFilter::SPtr create(std::string const& id, std::string const& start_label, std::string const& end_label, std::string const& unit_label = "");
+    static RangeInputFilter::SPtr create(std::string const& id,
+            std::string const& start_prefix_label, std::string const& start_postfix_label,
+            std::string const& central_label,
+            std::string const& end_prefix_label, std::string const& end_postfix_label);
 
     /**
     \brief Get the label of start value.
     \return The label of start value.
     */
-    std::string start_label() const;
+    std::string start_prefix_label() const;
+
+    std::string start_postfix_label() const;
 
     /**
     \brief Get the label of end value.
     \return The label of end value.
     */
-    std::string end_label() const;
+    std::string end_prefix_label() const;
+
+    std::string end_postfix_label() const;
 
     /**
     \brief Get the label of unit for this filter..
     \return The label of unit.
     */
-    std::string unit_label() const;
+    std::string central_label() const;
 
     /**
     \brief Check if filter state holds a start value for this filter instance.
