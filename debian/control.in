@@ -1,12 +1,15 @@
 Source: unity-scopes-api
 Priority: optional
 Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
-Build-Depends: capnproto,
+Build-Depends: abi-compliance-checker,
+               capnproto,
                click-dev (>= 0.2.2),
                cmake,
                dbus-test-runner,
                debhelper (>= 9),
+               devscripts,
                doxygen,
+               exuberant-ctags,
                google-mock,
                graphviz,
                libaccounts-glib-dev,

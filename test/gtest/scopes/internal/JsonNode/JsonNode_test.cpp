@@ -81,6 +81,10 @@ TEST_F(JsonNodeTest, flat_values)
 
     EXPECT_FALSE(root_node_->has_node("lastName"));
     EXPECT_THROW(root_node_->get_node("lastName"), unity::Exception);
+
+    // Make sure that get_node() on inappropriate node type throws.
+    EXPECT_THROW(root_node_->get_node("human")->get_node("hello"), unity::Exception);
+    EXPECT_THROW(root_node_->get_node("human")->get_node(0), unity::Exception);
 }
 
 TEST_F(JsonNodeTest, array_values)

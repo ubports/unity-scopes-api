@@ -24,13 +24,10 @@
 #
 # - control
 # - libunity-scopes${soversion}.install
-# - libunity-scopes-dev.install
 # - libunity-scopes${soversion}.scope.click-hook
-# - libunity-scopes${soversion}.symbols (for Vivid only)
-# - shlibs (for Wily and later only)
+# - shlibs.libunity-scopes-${full_version}.shlibs (for Wily and later only)
+# - shlibs.libunity-scopes-qt-${qt_full_version}.shlibs (for Wily and later only)
 # - libunity-scopes-qt${qt_soversion}.install
-# - libunity-scopes-qt-dev.install
-# - libunity-scopes-qt${qt_soversion}.symbols (for Vivid only)
 #
 # For all but control, this is a straight substition and/or renaming exercise for each file.
 # For control, if building on Wily or later, we also fix the "Replaces:" and "Conflicts:"
@@ -44,44 +41,33 @@
 
 set -e  # Fail if any command fails.
 
-[ $# -ne 0 ] && {
-    echo "usage: $(basename $0)" >&2
+progname=$(basename $0)
+
+[ $# -ne 1 ] && {
+    echo "usage: $progname path-to-debian-dir" >&2
     exit 1
 }
-dir=./debian
+dir=$1
+version_dir=$(mktemp -d)
 
-# Set soversions depending on whether we are running on vivid or wily and later.
+# Dump version numbers into files and initialize vars from those files.
 
-distro=$(lsb_release -c -s)
-echo "gen-debian-files: detected distribution: $distro"
+sh ${dir}/get-versions.sh ${dir} ${version_dir}
 
-full_version=$(cat "${dir}"/VERSION)
-qt_full_version=$(cat "${dir}"/QT-VERSION)
+full_version=$(cat "${version_dir}"/libunity-scopes.full-version)
+qt_full_version=$(cat "${version_dir}"/libunity-scopes-qt.full-version)
 
-major=$(echo $full_version | cut -d'.' -f1)
-minor=$(echo $full_version | cut -d'.' -f2)
-major_minor="${major}.${minor}"
+major_minor=$(cat "${version_dir}"/libunity-scopes.major-minor-version)
+qt_major_minor=$(cat "${version_dir}"/libunity-scopes-qt.major-minor-version)
 
-qt_major=$(echo $qt_full_version | cut -d'.' -f1)
-qt_minor=$(echo $qt_full_version | cut -d'.' -f2)
-qt_major_minor="${qt_major}.${qt_minor}"
+soversion=$(cat "${version_dir}"/libunity-scopes.soversion)
+qt_soversion=$(cat "${version_dir}"/libunity-scopes-qt.soversion)
 
-vivid_soversion=$(expr $minor + 3)
-
-if [ "$distro" = "vivid" ]
-then
-    soversion=$vivid_soversion
-    qt_soversion=${qt_minor}
-else
-    soversion="${major}.${minor}"
-    qt_soversion="${qt_major}.${qt_minor}"
-fi
-[ -n $soversion ]
-[ -n $qt_soversion ]
+vivid_soversion=$(cat "${version_dir}"/libunity-scopes.vivid-soversion)
 
 warning=$(mktemp -t gen-debian-files-msg.XXX)
 
-trap "rm $warning" 0 INT TERM QUIT
+trap "rm -fr $warning $version_dir" 0 INT TERM QUIT
 
 warning_msg()
 {
@@ -120,53 +106,33 @@ outfile="${dir}"/libunity-scopes${soversion}.install
 warning_msg "$infile"
 cat $warning "$infile" >"$outfile"
 
-# Install file for dev package
-infile="${dir}"/libunity-scopes-dev.install.in
-outfile="${dir}"/libunity-scopes-dev.install
-warning_msg "$infile"
-cat $warning "$infile" \
-    | sed "s/@UNITY_SCOPES_SOVERSION@/${soversion}/" >"$outfile"
-
 # Install file for click hook
 infile="${dir}"/libunity-scopes.scope.click-hook.in
 outfile="${dir}"/libunity-scopes${soversion}.scope.click-hook
 warning_msg "$infile"
 cat $warning "$infile" >"$outfile"
 
-# Symbols file for vivid or shlibs file for wily and later
-if [ "$distro" = "vivid" ]
-then
-    infile="${dir}"/libunity-scopes.symbols.in
-    outfile="${dir}"/libunity-scopes${soversion}.symbols
-    sed "s/@UNITY_SCOPES_SOVERSION@/${soversion}/g" "$infile" >"$outfile"
+# Shlibs file
+infile="${dir}"/libunity-scopes.shlibs.in
+outfile="${dir}"/libunity-scopes-${full_version}.shlibs
+warning_msg "$infile"
+cat $warning "$infile" \
+    | sed -e "s/@UNITY_SCOPES_SOVERSION@/${soversion}/g" \
+          -e "s/@UNITY_SCOPES_MAJOR_MINOR@/${major_minor}/g" \
+        >"$outfile"
 
-    infile="${dir}"/libunity-scopes-qt.symbols.in
-    outfile="${dir}"/libunity-scopes-qt${qt_soversion}.symbols
-    sed "s/@UNITY_SCOPES_QT_SOVERSION@/${qt_soversion}/g" "$infile" >"$outfile"
-else
-    # Single shlibs file for both libunity-scopes and libunity-scopes-qt.
-    infile="${dir}"/shlibs.in
-    outfile="${dir}"/shlibs
-    warning_msg "$infile"
-    cat $warning "$infile" \
-        | sed -e "s/@UNITY_SCOPES_SOVERSION@/${soversion}/g" \
-              -e "s/@UNITY_SCOPES_QT_SOVERSION@/${qt_soversion}/g" \
-              -e "s/@UNITY_SCOPES_MAJOR_MINOR@/${major_minor}/g" \
-              -e "s/@UNITY_SCOPES_QT_MAJOR_MINOR@/${qt_major_minor}/g" \
-            >"$outfile"
-fi
+infile="${dir}"/libunity-scopes-qt.shlibs.in
+outfile="${dir}"/libunity-scopes-qt${qt_full_version}.shlibs
+warning_msg "$infile"
+cat $warning "$infile" \
+    | sed -e "s/@UNITY_SCOPES_QT_SOVERSION@/${qt_soversion}/g" \
+          -e "s/@UNITY_SCOPES_QT_MAJOR_MINOR@/${qt_major_minor}/g" \
+        >"$outfile"
 
 # Install file for qt binary package
 infile="${dir}"/libunity-scopes-qt.install.in
 outfile="${dir}"/libunity-scopes-qt${qt_soversion}.install
 warning_msg "$infile"
 cat $warning "$infile" >"$outfile"
-
-# Install file for qt dev package
-infile="${dir}"/libunity-scopes-qt-dev.install.in
-outfile="${dir}"/libunity-scopes-qt-dev.install
-warning_msg "$infile"
-cat $warning $infile \
-    | sed "s/@UNITY_SCOPES_QT_SOVERSION@/${qt_soversion}/" >"$outfile"
 
 exit 0

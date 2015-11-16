@@ -46,7 +46,9 @@ OptionSelectorFilterImpl::OptionSelectorFilterImpl(std::string const& id, std::s
 
 OptionSelectorFilter::SPtr OptionSelectorFilterImpl::create(VariantMap const& var)
 {
-    return std::shared_ptr<OptionSelectorFilter>(new OptionSelectorFilter(new OptionSelectorFilterImpl(var)));
+    auto filter = std::shared_ptr<OptionSelectorFilter>(new OptionSelectorFilter(new OptionSelectorFilterImpl(var)));
+    filter->fwd()->validate_display_hints();
+    return filter;
 }
 
 OptionSelectorFilterImpl::OptionSelectorFilterImpl(VariantMap const& var)
@@ -135,6 +137,14 @@ FilterOption::SCPtr OptionSelectorFilterImpl::add_option(std::string const& id, 
 int OptionSelectorFilterImpl::num_of_options() const
 {
     return options_.size();
+}
+
+void OptionSelectorFilterImpl::validate_display_hints() const
+{
+    if ((display_hints() & FilterBase::DisplayHints::Primary) && multi_select_)
+    {
+        throw unity::InvalidArgumentException("OptionSelectorFilter::set_display_hints(): primary navigation flag cannot be enabled with multi-selection");
+    }
 }
 
 std::list<FilterOption::SCPtr> OptionSelectorFilterImpl::options() const

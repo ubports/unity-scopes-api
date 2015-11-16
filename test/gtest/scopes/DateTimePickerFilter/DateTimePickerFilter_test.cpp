@@ -123,3 +123,10 @@ TEST(DateTimePickerFilter, serialize)
     EXPECT_TRUE(filter1->maximum() - filter2->maximum() < std::chrono::seconds(1));
     EXPECT_EQ(filter1->mode(), filter2->mode());
 }
+
+TEST(DateTimePickerFilter, display_hints)
+{
+    DateTimePickerFilter::Mode mode(DateTimePickerFilter::Hours|DateTimePickerFilter::Minutes);
+    auto filter = DateTimePickerFilter::create("f1", mode);
+    EXPECT_THROW(filter->set_display_hints(FilterBase::DisplayHints::Primary), unity::InvalidArgumentException);
+}

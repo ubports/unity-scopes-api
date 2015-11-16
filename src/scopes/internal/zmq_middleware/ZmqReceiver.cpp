@@ -22,6 +22,8 @@
 #include <cstdint>
 #include <stdexcept>
 
+#include <string.h>
+
 using namespace std;
 
 namespace unity

@@ -1,8 +1,9 @@
 add_subdirectory(gtest)
-if(${slowtests})
-  add_subdirectory(headers)
-endif()
 add_subdirectory(copyright)
 add_subdirectory(whitespace)
 add_subdirectory(autopkg)
-add_subdirectory(abi-compliance)
+
+if(${slowtests})
+    add_subdirectory(headers)
+    add_subdirectory(abi-compliance)  # Keep this test last because it's really slow.
+endif()

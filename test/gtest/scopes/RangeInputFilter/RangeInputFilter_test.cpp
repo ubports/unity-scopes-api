@@ -101,3 +101,9 @@ TEST(RangeInputFilter, deserialize_exceptions)
     var["unit_label"] = "";
     EXPECT_NO_THROW(internal::RangeInputFilterImpl::create(var));
 }
+
+TEST(RangeInputFilter, display_hints)
+{
+    auto filter = RangeInputFilter::create("f1", "Min", "Max", "EUR");
+    EXPECT_THROW(filter->set_display_hints(FilterBase::DisplayHints::Primary), unity::InvalidArgumentException);
+}
