@@ -39,6 +39,10 @@ namespace experimental
 
 /**
 \brief A range filter which allows a start and end value to be entered by user, and any of them is optional.
+
+RangeInputFilter is composed of two input boxes which accept numeric values. Any of them is optional. It can have
+up to five labels: two labels for start value (prefix or postfix label, displayed left or right to the input box, respectively),
+two labels for end value and a single label displayed inbetween both input boxes.
 */
 class UNITY_API RangeInputFilter : public FilterBase
 {
@@ -61,19 +65,27 @@ public:
             std::string const& end_prefix_label, std::string const& end_postfix_label);
 
     /**
-    \brief Get the label of start value.
-    \return The label of start value.
+    \brief Get the prefix label of start value.
+    \return The prefix label of start value.
     */
     std::string start_prefix_label() const;
 
+    /**
+    \brief Get the postfix label of start value.
+    \return The postfix label of start value.
+    */
     std::string start_postfix_label() const;
 
     /**
-    \brief Get the label of end value.
+    \brief Get the prefix label of end value.
     \return The label of end value.
     */
     std::string end_prefix_label() const;
 
+    /**
+    \brief Get the postfix label of end value.
+    \return The label of end value.
+    */
     std::string end_postfix_label() const;
 
     /**
