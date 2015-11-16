@@ -70,3 +70,9 @@ TEST(RadioButtonsFilter, selection)
     EXPECT_TRUE(fstate.has_filter("f1"));
     EXPECT_EQ(nullptr, filter1->active_option(fstate));
 }
+
+TEST(RadioButtonsFilter, display_hints)
+{
+    auto filter = RadioButtonsFilter::create("f1", "Options");
+    EXPECT_THROW(filter->set_display_hints(FilterBase::DisplayHints::Primary), unity::InvalidArgumentException);
+}

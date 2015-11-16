@@ -54,3 +54,9 @@ TEST(SwitchFilter, serialize_deserialize)
     EXPECT_EQ("f1", filter2->id());
     EXPECT_EQ("Latest", filter2->label());
 }
+
+TEST(SwitchFilter, display_hints)
+{
+    auto filter = SwitchFilter::create("f1", "Latest");
+    EXPECT_THROW(filter->set_display_hints(FilterBase::DisplayHints::Primary), unity::InvalidArgumentException);
+}

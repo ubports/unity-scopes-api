@@ -117,23 +117,44 @@ TEST(OptionSelectorFilter, multi_selection)
 
 TEST(OptionSelectorFilter, serialize)
 {
-    auto filter1 = OptionSelectorFilter::create("f1", "Options", true);
-    filter1->set_display_hints(FilterBase::DisplayHints::Primary);
-    filter1->add_option("1", "Option 1");
-    filter1->add_option("2", "Option 2");
+    {
+        auto filter1 = OptionSelectorFilter::create("f1", "Options", false);
+        filter1->set_display_hints(FilterBase::DisplayHints::Primary);
+        filter1->add_option("1", "Option 1");
+        filter1->add_option("2", "Option 2");
 
-    auto var = filter1->serialize();
-    EXPECT_EQ("f1", var["id"].get_string());
-    EXPECT_EQ("option_selector", var["filter_type"].get_string());
-    EXPECT_EQ("Options", var["label"].get_string());
-    EXPECT_EQ(FilterBase::DisplayHints::Primary, static_cast<FilterBase::DisplayHints>(var["display_hints"].get_int()));
+        auto var = filter1->serialize();
+        EXPECT_EQ("f1", var["id"].get_string());
+        EXPECT_EQ("option_selector", var["filter_type"].get_string());
+        EXPECT_EQ(false, var["multi_select"].get_bool());
+        EXPECT_EQ("Options", var["label"].get_string());
+        EXPECT_EQ(FilterBase::DisplayHints::Primary, static_cast<FilterBase::DisplayHints>(var["display_hints"].get_int()));
 
-    auto optarr = var["options"].get_array();
-    EXPECT_EQ(2u, optarr.size());
-    EXPECT_EQ("1", optarr[0].get_dict()["id"].get_string());
-    EXPECT_EQ("Option 1", optarr[0].get_dict()["label"].get_string());
-    EXPECT_EQ("2", optarr[1].get_dict()["id"].get_string());
-    EXPECT_EQ("Option 2", optarr[1].get_dict()["label"].get_string());
+        auto optarr = var["options"].get_array();
+        EXPECT_EQ(2u, optarr.size());
+        EXPECT_EQ("1", optarr[0].get_dict()["id"].get_string());
+        EXPECT_EQ("Option 1", optarr[0].get_dict()["label"].get_string());
+        EXPECT_EQ("2", optarr[1].get_dict()["id"].get_string());
+        EXPECT_EQ("Option 2", optarr[1].get_dict()["label"].get_string());
+    }
+    {
+        auto filter1 = OptionSelectorFilter::create("f1", "Options", true);
+        filter1->add_option("1", "Option 1");
+        filter1->add_option("2", "Option 2");
+
+        auto var = filter1->serialize();
+        EXPECT_EQ("f1", var["id"].get_string());
+        EXPECT_EQ(true, var["multi_select"].get_bool());
+        EXPECT_EQ("option_selector", var["filter_type"].get_string());
+        EXPECT_EQ("Options", var["label"].get_string());
+
+        auto optarr = var["options"].get_array();
+        EXPECT_EQ(2u, optarr.size());
+        EXPECT_EQ("1", optarr[0].get_dict()["id"].get_string());
+        EXPECT_EQ("Option 1", optarr[0].get_dict()["label"].get_string());
+        EXPECT_EQ("2", optarr[1].get_dict()["id"].get_string());
+        EXPECT_EQ("Option 2", optarr[1].get_dict()["label"].get_string());
+    }
 }
 
 TEST(OptionSelectorFilter, deserialize)
@@ -178,4 +199,11 @@ TEST(OptionSelectorFilter, deserialize)
         EXPECT_EQ(1u, filter.options().size());
         EXPECT_EQ("1", filter.options().front()->id());
     }
+}
+
+TEST(OptionSelectorFilter, display_hints)
+{
+    auto filter = OptionSelectorFilter::create("f1", "Options", true);
+    // primary flag and multi-selection can't be combined
+    EXPECT_THROW(filter->set_display_hints(FilterBase::DisplayHints::Primary), unity::InvalidArgumentException);
 }
