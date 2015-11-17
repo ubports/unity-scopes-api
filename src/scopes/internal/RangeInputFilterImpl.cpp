@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Canonical Ltd
+ * Copyright (C) 2015 Canonical Ltd
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License version 3 as
@@ -159,7 +159,9 @@ double RangeInputFilterImpl::end_value(FilterState const& filter_state) const
 void RangeInputFilterImpl::check_type(Variant const& val, std::string const& filter_id, std::string const& varname)
 {
     if (val.which() == Variant::Type::Int || val.which() == Variant::Type::Double || val.is_null())
+    {
         return;
+    }
     std::stringstream err;
     err << "RangeInputFilterImpl::check_type(): Invalid variant type for " << varname << ", filter '" << filter_id << "'";
     throw unity::InvalidArgumentException(err.str());
