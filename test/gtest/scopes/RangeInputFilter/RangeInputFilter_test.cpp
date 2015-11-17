@@ -29,13 +29,26 @@ using namespace unity::scopes::internal;
 
 TEST(RangeInputFilter, basic)
 {
-    auto filter1 = RangeInputFilter::create("f1", "Min", "MinPostfix", "Central", "Max", "MaxPostfix");
-    EXPECT_EQ("f1", filter1->id());
-    EXPECT_EQ("Min", filter1->start_prefix_label());
-    EXPECT_EQ("MinPostfix", filter1->start_postfix_label());
-    EXPECT_EQ("Max", filter1->end_prefix_label());
-    EXPECT_EQ("MaxPostfix", filter1->end_postfix_label());
-    EXPECT_EQ("Central", filter1->central_label());
+    {
+        auto filter1 = RangeInputFilter::create("f1", "Min", "MinPostfix", "Central", "Max", "MaxPostfix");
+        EXPECT_EQ("f1", filter1->id());
+        EXPECT_EQ("Min", filter1->start_prefix_label());
+        EXPECT_EQ("MinPostfix", filter1->start_postfix_label());
+        EXPECT_EQ("Max", filter1->end_prefix_label());
+        EXPECT_EQ("MaxPostfix", filter1->end_postfix_label());
+        EXPECT_EQ("Central", filter1->central_label());
+    }
+    {
+        auto filter1 = RangeInputFilter::create("f1", Variant(10), Variant(20), "Min", "MinPostfix", "Central", "Max", "MaxPostfix");
+        EXPECT_EQ("f1", filter1->id());
+        EXPECT_EQ(10, filter1->default_start_value().get_int());
+        EXPECT_EQ(20, filter1->default_end_value().get_int());
+        EXPECT_EQ("Min", filter1->start_prefix_label());
+        EXPECT_EQ("MinPostfix", filter1->start_postfix_label());
+        EXPECT_EQ("Max", filter1->end_prefix_label());
+        EXPECT_EQ("MaxPostfix", filter1->end_postfix_label());
+        EXPECT_EQ("Central", filter1->central_label());
+    }
 }
 
 TEST(RangeInputFilter, state)
@@ -70,12 +83,14 @@ TEST(RangeInputFilter, state)
 
 TEST(RangeInputFilter, serialize_deserialize)
 {
-    auto filter1 = RangeInputFilter::create("f1", "Min", "MinPostfix", "Central", "Max", "MaxPostfix");
+    auto filter1 = RangeInputFilter::create("f1", Variant(10), Variant(20), "Min", "MinPostfix", "Central", "Max", "MaxPostfix");
     auto var = filter1->serialize();
 
     auto filter2 = internal::RangeInputFilterImpl::create(var);
 
     EXPECT_EQ("f1", filter2->id());
+    EXPECT_EQ(10, filter1->default_start_value().get_int());
+    EXPECT_EQ(20, filter1->default_end_value().get_int());
     EXPECT_EQ("Min", filter2->start_prefix_label());
     EXPECT_EQ("MinPostfix", filter2->start_postfix_label());
     EXPECT_EQ("Max", filter2->end_prefix_label());
@@ -85,7 +100,8 @@ TEST(RangeInputFilter, serialize_deserialize)
 
 TEST(RangeInputFilter, deserialize_exceptions)
 {
-    std::vector<std::string> attrs = {"id", "start_prefix_label", "start_postfix_label", "end_prefix_label", "end_postfix_label", "central_label"};
+    std::vector<std::string> attrs = {"id", "start_prefix_label", "start_postfix_label", "end_prefix_label", "end_postfix_label", "central_label",
+        "default_start_value", "default_end_value"};
     for (size_t i = 0; i<attrs.size(); i++)
     {
         // create variant with one of the mandatory attributes missing

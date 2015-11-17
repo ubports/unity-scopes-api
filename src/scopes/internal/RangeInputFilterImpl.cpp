@@ -32,10 +32,13 @@ namespace internal
 {
 
 RangeInputFilterImpl::RangeInputFilterImpl(std::string const& id,
+        Variant const& default_start_value, Variant const& default_end_value,
         std::string const& start_prefix_label, std::string const& start_postfix_label,
         std::string const& central_label,
         std::string const& end_prefix_label, std::string const& end_postfix_label)
     : FilterBaseImpl(id),
+      default_start_value_(default_start_value),
+      default_end_value_(default_end_value),
       start_prefix_label_(start_prefix_label),
       start_postfix_label_(start_postfix_label),
       end_prefix_label_(end_prefix_label),
@@ -80,6 +83,16 @@ std::string RangeInputFilterImpl::end_postfix_label() const
 std::string RangeInputFilterImpl::central_label() const
 {
     return central_label_;
+}
+
+Variant RangeInputFilterImpl::default_start_value() const
+{
+    return default_start_value_;
+}
+
+Variant RangeInputFilterImpl::default_end_value() const
+{
+    return default_end_value_;
 }
 
 bool RangeInputFilterImpl::has_value(FilterState const& filter_state, unsigned int index) const
@@ -193,6 +206,8 @@ std::string RangeInputFilterImpl::filter_type() const
 
 void RangeInputFilterImpl::serialize(VariantMap& var) const
 {
+    var["default_start_value"] = default_start_value_;
+    var["default_end_value"] = default_end_value_;
     var["start_prefix_label"] = start_prefix_label_;
     var["start_postfix_label"] = start_postfix_label_;
     var["end_prefix_label"] = end_prefix_label_;
@@ -212,6 +227,10 @@ void RangeInputFilterImpl::deserialize(VariantMap const& var)
     end_postfix_label_ = it->second.get_string();
     it = find_or_throw("RangeInputFilterImpl::deserialize()", var, "central_label");
     central_label_ = it->second.get_string();
+    it = find_or_throw("RangeInputFilterImpl::deserialize()", var, "default_start_value");
+    default_start_value_ = it->second;
+    it = find_or_throw("RangeInputFilterImpl::deserialize()", var, "default_end_value");
+    default_end_value_ = it->second;
 }
 
 void RangeInputFilterImpl::validate_display_hints() const

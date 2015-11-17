@@ -126,10 +126,14 @@ OptionSelectorFilter (FilterBase)
 
 RangeInputFilter
 ================
- 'id'           : string
- 'start_label'  : string
- 'end_label'    : string
- 'unit_label'   : string
+ 'id'                  : string
+ 'default_start_value' : variant (int, double, null)
+ 'default_end_value'   : variant (int, double, null)
+ 'start_prefix_label'  : string
+ 'start_postfix_label' : string
+ 'end_prefix_label'    : string
+ 'end_postfix_label'   : string
+ 'central_label'       : string
 
 Filters + FilterState
 =====================
