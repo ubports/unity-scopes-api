@@ -29,7 +29,10 @@ using namespace unity::scopes::internal;
 TEST(OptionSelectorFilter, basic)
 {
     auto filter1 = OptionSelectorFilter::create("f1", "Options", false);
+    EXPECT_EQ("", filter1->title());
+    filter1->set_title("My Filter");
     EXPECT_EQ("f1", filter1->id());
+    EXPECT_EQ("My Filter", filter1->title());
     EXPECT_EQ("Options", filter1->label());
     EXPECT_FALSE(filter1->multi_select());
     EXPECT_EQ(FilterBase::DisplayHints::Default, static_cast<FilterBase::DisplayHints>(filter1->display_hints()));
@@ -139,11 +142,13 @@ TEST(OptionSelectorFilter, serialize)
     }
     {
         auto filter1 = OptionSelectorFilter::create("f1", "Options", true);
+        filter1->set_title("My Filter");
         filter1->add_option("1", "Option 1");
         filter1->add_option("2", "Option 2");
 
         auto var = filter1->serialize();
         EXPECT_EQ("f1", var["id"].get_string());
+        EXPECT_EQ("My Filter", var["title"].get_string());
         EXPECT_EQ(true, var["multi_select"].get_bool());
         EXPECT_EQ("option_selector", var["filter_type"].get_string());
         EXPECT_EQ("Options", var["label"].get_string());
@@ -181,6 +186,7 @@ TEST(OptionSelectorFilter, deserialize)
     }
     {
         var["id"] = "f1";
+        var["title"] = "My Filter";
         var["filter_type"] = "option_selector";
         var["label"] = "Filter 1";
         var["multi_select"] = true;
@@ -194,6 +200,7 @@ TEST(OptionSelectorFilter, deserialize)
         internal::OptionSelectorFilterImpl filter(var);
 
         EXPECT_EQ("f1", filter.id());
+        EXPECT_EQ("My Filter", filter.title());
         EXPECT_EQ("Filter 1", filter.label());
         EXPECT_TRUE(filter.multi_select());
         EXPECT_EQ(1u, filter.options().size());

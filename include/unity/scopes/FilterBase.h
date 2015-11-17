@@ -95,6 +95,18 @@ public:
     /// @cond
     virtual ~FilterBase();
 
+    /**
+    \brief Set an optional title of this filter.
+    \param title The title.
+    */
+    void set_title(std::string const& title);
+
+    /**
+    \brief Get the optional title of this filter.
+    \return Filter title (can be empty).
+    */
+    std::string title() const;
+
 protected:
     FilterBase(internal::FilterBaseImpl *pimpl);
     std::unique_ptr<internal::FilterBaseImpl> p;

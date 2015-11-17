@@ -40,6 +40,8 @@ public:
     virtual ~FilterBaseImpl();
     void set_display_hints(int hints);
     std::string id() const;
+    void set_title(std::string const& title);
+    std::string title() const;
     int display_hints() const;
     VariantMap serialize() const;
     virtual std::string filter_type() const = 0;
@@ -56,6 +58,7 @@ protected:
 
 private:
     std::string id_;
+    std::string title_;
     int display_hints_;
 };
 

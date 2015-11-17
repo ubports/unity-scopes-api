@@ -54,6 +54,12 @@ FilterBaseImpl::FilterBaseImpl(VariantMap const& var)
 {
     auto it = find_or_throw("FilterBase()", var, "id");
     id_ = it->second.get_string();
+    it = var.find("title");
+    if (it != var.end())
+    {
+        title_ = it->second.get_string();
+    }
+
     it = var.find("display_hints");
     if (it != var.end())
     {
@@ -98,10 +104,24 @@ int FilterBaseImpl::display_hints() const
     return display_hints_;
 }
 
+void FilterBaseImpl::set_title(std::string const& title)
+{
+    title_ = title;
+}
+
+std::string FilterBaseImpl::title() const
+{
+    return title_;
+}
+
 VariantMap FilterBaseImpl::serialize() const
 {
     VariantMap vm;
     vm["id"] = id_;
+    if (title_.size() > 0)
+    {
+        vm["title"] = title_;
+    }
     if (display_hints_ != FilterBase::DisplayHints::Default)
     {
         vm["display_hints"] = static_cast<int>(display_hints_);
