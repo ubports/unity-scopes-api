@@ -129,7 +129,7 @@ TEST(OptionSelectorFilter, serialize)
         auto var = filter1->serialize();
         EXPECT_EQ("f1", var["id"].get_string());
         EXPECT_EQ("option_selector", var["filter_type"].get_string());
-        EXPECT_EQ(false, var["multi_select"].get_bool());
+        EXPECT_FALSE(var["multi_select"].get_bool());
         EXPECT_EQ("Options", var["label"].get_string());
         EXPECT_EQ(FilterBase::DisplayHints::Primary, static_cast<FilterBase::DisplayHints>(var["display_hints"].get_int()));
 
@@ -149,7 +149,7 @@ TEST(OptionSelectorFilter, serialize)
         auto var = filter1->serialize();
         EXPECT_EQ("f1", var["id"].get_string());
         EXPECT_EQ("My Filter", var["title"].get_string());
-        EXPECT_EQ(true, var["multi_select"].get_bool());
+        EXPECT_TRUE(var["multi_select"].get_bool());
         EXPECT_EQ("option_selector", var["filter_type"].get_string());
         EXPECT_EQ("Options", var["label"].get_string());
 
