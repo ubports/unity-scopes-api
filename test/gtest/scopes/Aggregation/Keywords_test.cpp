@@ -119,15 +119,15 @@ public:
     {
         // Create an empty config directory for scope A
         boost::system::error_code ec;
-        boost::filesystem::remove_all(TEST_RUNTIME_PATH "/A", ec);
-        boost::filesystem::create_directory(TEST_RUNTIME_PATH "/A", ec);
+        boost::filesystem::remove_all(TEST_RUNTIME_PATH "/scopes/A", ec);
+        boost::filesystem::create_directory(TEST_RUNTIME_PATH "/scopes/A", ec);
     }
 
     ~RaiiConfigDir()
     {
         // Remove the config directory for scope A
         boost::system::error_code ec;
-        boost::filesystem::remove_all(TEST_RUNTIME_PATH "/A", ec);
+        boost::filesystem::remove_all(TEST_RUNTIME_PATH "/scopes/A", ec);
     }
 };
 
@@ -146,10 +146,10 @@ TEST_F(KeywordsTest, subsearch_disabled_child)
     // Create an empty config directory for scope A
     RaiiConfigDir config_dir;
 
-    system("cat >A.cmd << EOF\nB\nC\nD\nEOF");
-    system(">B.cmd");
-    system(">C.cmd");
-    system(">D.cmd");
+    system("cat >scopes/A.cmd << EOF\nB\nC\nD\nEOF");
+    system(">scopes/B.cmd");
+    system(">scopes/C.cmd");
+    system(">scopes/D.cmd");
     auto receiver = make_shared<CountReceiver>();
 
     scope()->search("A", SearchMetadata("unused", "unused"), receiver);
@@ -249,10 +249,10 @@ TEST_F(KeywordsTest, subsearch_with_keywords)
     // Create an empty config directory for scope A
     RaiiConfigDir config_dir;
 
-    system("cat >A.cmd << EOF\nB\nC\nD\nEOF");
-    system(">B.cmd");
-    system(">C.cmd");
-    system(">D.cmd");
+    system("cat >scopes/A.cmd << EOF\nB\nC\nD\nEOF");
+    system(">scopes/B.cmd");
+    system(">scopes/C.cmd");
+    system(">scopes/D.cmd");
     auto receiver = make_shared<CountReceiver>();
 
     // Provide test keywords via search metadata so that the test scope can insert them
