@@ -116,9 +116,9 @@ private:
 
 TEST_F(LoopDetectionTest, no_error)
 {
-    system("cat >scopes/A.cmd << EOF\nB\nC\nEOF");
-    system(">scopes/B.cmd");
-    system(">scopes/C.cmd");
+    system("cat >A.cmd << EOF\nB\nC\nEOF");
+    system(">B.cmd");
+    system(">C.cmd");
     auto receiver = make_shared<CountReceiver>();
     scope()->search("A", SearchMetadata("unused", "unused"), receiver);
     receiver->wait_until_finished();
@@ -132,10 +132,10 @@ TEST_F(LoopDetectionTest, no_error)
 
 TEST_F(LoopDetectionTest, diamond)
 {
-    system("cat >scopes/A.cmd << EOF\nB\nC\nEOF");
-    system("cat >scopes/B.cmd << EOF\nD\nEOF");
-    system("cat >scopes/C.cmd << EOF\nD\nEOF");
-    system(">scopes/D.cmd");
+    system("cat >A.cmd << EOF\nB\nC\nEOF");
+    system("cat >B.cmd << EOF\nD\nEOF");
+    system("cat >C.cmd << EOF\nD\nEOF");
+    system(">D.cmd");
     auto receiver = make_shared<CountReceiver>();
     scope()->search("A", SearchMetadata("unused", "unused"), receiver);
     receiver->wait_until_finished();
@@ -151,7 +151,7 @@ TEST_F(LoopDetectionTest, diamond)
 
 TEST_F(LoopDetectionTest, immediate_loop)
 {
-    system("cat >scopes/A.cmd << EOF\nA\nEOF");
+    system("cat >A.cmd << EOF\nA\nEOF");
     auto receiver = make_shared<CountReceiver>();
     scope()->search("A", SearchMetadata("unused", "unused"), receiver);
     receiver->wait_until_finished();
@@ -163,9 +163,9 @@ TEST_F(LoopDetectionTest, immediate_loop)
 
 TEST_F(LoopDetectionTest, intermediate_loop)
 {
-    system("cat >scopes/A.cmd << EOF\nB\nEOF");
-    system("cat >scopes/B.cmd << EOF\nC\nEOF");
-    system("cat >scopes/C.cmd << EOF\nA\nEOF");
+    system("cat >A.cmd << EOF\nB\nEOF");
+    system("cat >B.cmd << EOF\nC\nEOF");
+    system("cat >C.cmd << EOF\nA\nEOF");
     auto receiver = make_shared<CountReceiver>();
     scope()->search("A", SearchMetadata("unused", "unused"), receiver);
     receiver->wait_until_finished();
@@ -179,10 +179,10 @@ TEST_F(LoopDetectionTest, intermediate_loop)
 
 TEST_F(LoopDetectionTest, repeated_search_on_leaf)
 {
-    system("cat >scopes/A.cmd << EOF\nB\nC\nD\nEOF");
-    system("cat >scopes/B.cmd << EOF\nD\nD\nEOF");
-    system("cat >scopes/C.cmd << EOF\nD\nEOF");
-    system(">scopes/D.cmd");
+    system("cat >A.cmd << EOF\nB\nC\nD\nEOF");
+    system("cat >B.cmd << EOF\nD\nD\nEOF");
+    system("cat >C.cmd << EOF\nD\nEOF");
+    system(">D.cmd");
     auto receiver = make_shared<CountReceiver>();
     scope()->search("A", SearchMetadata("unused", "unused"), receiver);
     receiver->wait_until_finished();
@@ -197,10 +197,10 @@ TEST_F(LoopDetectionTest, repeated_search_on_leaf)
 
 TEST_F(LoopDetectionTest, repeated_search_on_aggregator)
 {
-    system("cat >scopes/A.cmd << EOF\nB\nEOF");
-    system("cat >scopes/B.cmd << EOF\nC\nC\nEOF");
-    system(">scopes/C.cmd << EOF\nD\nEOF");
-    system(">scopes/D.cmd");
+    system("cat >A.cmd << EOF\nB\nEOF");
+    system("cat >B.cmd << EOF\nC\nC\nEOF");
+    system(">C.cmd << EOF\nD\nEOF");
+    system(">D.cmd");
     auto receiver = make_shared<CountReceiver>();
     scope()->search("A", SearchMetadata("unused", "unused"), receiver);
     receiver->wait_until_finished();

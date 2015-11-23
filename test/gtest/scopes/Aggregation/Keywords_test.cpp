@@ -112,22 +112,22 @@ private:
     ScopeProxy scope_;
 };
 
-class RaiiConfigDir
+class RaiiCacheDir
 {
 public:
-    RaiiConfigDir()
+    RaiiCacheDir()
     {
-        // Create an empty config directory for scope A
+        // Create an empty cache directory for scope A
         boost::system::error_code ec;
-        boost::filesystem::remove_all(TEST_RUNTIME_PATH "/scopes/A", ec);
-        boost::filesystem::create_directory(TEST_RUNTIME_PATH "/scopes/A", ec);
+        boost::filesystem::remove_all(TEST_CACHE_PATH "/unconfined/A", ec);
+        boost::filesystem::create_directory(TEST_CACHE_PATH "/unconfined/A", ec);
     }
 
-    ~RaiiConfigDir()
+    ~RaiiCacheDir()
     {
-        // Remove the config directory for scope A
+        // Remove the cache directory for scope A
         boost::system::error_code ec;
-        boost::filesystem::remove_all(TEST_RUNTIME_PATH "/scopes/A", ec);
+        boost::filesystem::remove_all(TEST_CACHE_PATH "/unconfined/A", ec);
     }
 };
 
@@ -143,13 +143,13 @@ public:
 
 TEST_F(KeywordsTest, subsearch_disabled_child)
 {
-    // Create an empty config directory for scope A
-    RaiiConfigDir config_dir;
+    // Create an empty cache directory for scope A
+    RaiiCacheDir cache_dir;
 
-    system("cat >scopes/A.cmd << EOF\nB\nC\nD\nEOF");
-    system(">scopes/B.cmd");
-    system(">scopes/C.cmd");
-    system(">scopes/D.cmd");
+    system("cat >A.cmd << EOF\nB\nC\nD\nEOF");
+    system(">B.cmd");
+    system(">C.cmd");
+    system(">D.cmd");
     auto receiver = make_shared<CountReceiver>();
 
     scope()->search("A", SearchMetadata("unused", "unused"), receiver);
@@ -246,13 +246,13 @@ TEST_F(KeywordsTest, subsearch_disabled_child)
 
 TEST_F(KeywordsTest, subsearch_with_keywords)
 {
-    // Create an empty config directory for scope A
-    RaiiConfigDir config_dir;
+    // Create an empty cache directory for scope A
+    RaiiCacheDir cache_dir;
 
-    system("cat >scopes/A.cmd << EOF\nB\nC\nD\nEOF");
-    system(">scopes/B.cmd");
-    system(">scopes/C.cmd");
-    system(">scopes/D.cmd");
+    system("cat >A.cmd << EOF\nB\nC\nD\nEOF");
+    system(">B.cmd");
+    system(">C.cmd");
+    system(">D.cmd");
     auto receiver = make_shared<CountReceiver>();
 
     // Provide test keywords via search metadata so that the test scope can insert them
