@@ -222,7 +222,7 @@ void SettingsDB::process_all_docs()
                     {
                         if (e.error() == EACCES) // very unlikely; only if permissions changed after we acquired the lock
                         {
-                            throw e;
+                            throw;
                         }
                         throw ResourceException(e.what());
                     }
@@ -244,7 +244,7 @@ void SettingsDB::process_all_docs()
     {
         if (e.error() == EACCES)
         {
-            throw e;
+            throw;
         }
 
         // Failure in obtaining the lock shouldn't be reported to the scope, it's not fatal;

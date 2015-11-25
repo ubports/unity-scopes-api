@@ -594,7 +594,6 @@ string RuntimeImpl::find_cache_dir() const
     string dir = cache_dir_ + "/" + confinement_type();
     if (!confined())  // Avoid apparmor noise
     {
-        string dir = cache_dir_ + "/" + confinement_type();
         make_directories(cache_dir_, 0700);
     }
     // A confined scope is allowed to create this dir.
