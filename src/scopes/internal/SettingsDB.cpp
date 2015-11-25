@@ -92,7 +92,7 @@ SettingsDB::UPtr SettingsDB::create_from_ini_file(string const& db_path,
         SettingsSchema::UPtr schema = IniSettingsSchema::create(ini_file_path);
         return create_from_schema(db_path, *schema, logger);
     }
-    catch (exception const& e)
+    catch (exception const&)
     {
         throw ResourceException("SettingsDB::create_from_ini_file(): schema = " + ini_file_path + ", db = " + db_path);
     }
@@ -108,7 +108,7 @@ SettingsDB::UPtr SettingsDB::create_from_json_string(string const& db_path,
         auto schema = JsonSettingsSchema::create(json_string);
         return create_from_schema(db_path, *schema, logger);
     }
-    catch (exception const& e)
+    catch (exception const&)
     {
         throw ResourceException("SettingsDB::create_from_json_string(): cannot parse schema, db = " + db_path);
     }
@@ -173,7 +173,7 @@ void SettingsDB::process_doc_(string const& id, IniParser const& p)
             {
                 values_[id] = Variant(stod(value));
             }
-            catch (invalid_argument & e)
+            catch (invalid_argument const&)
             {
             }
         }
@@ -182,7 +182,7 @@ void SettingsDB::process_doc_(string const& id, IniParser const& p)
             values_[id] = Variant(p.get_string(GROUP_NAME, id));
         }
     }
-    catch (LogicException & e)
+    catch (LogicException const&)
     {
     }
 }

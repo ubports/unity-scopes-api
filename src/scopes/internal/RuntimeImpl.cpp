@@ -136,7 +136,7 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
         app_dir_ = config.app_directory();
         config_dir_ = config.config_directory();
     }
-    catch (unity::Exception const& e)
+    catch (unity::Exception const&)
     {
         destroy();
         string msg = "Cannot instantiate run time for " + (scope_id.empty() ? "client" : scope_id) +
