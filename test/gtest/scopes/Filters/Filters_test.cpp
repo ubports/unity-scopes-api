@@ -25,6 +25,7 @@
 #include <unity/scopes/RatingFilter.h>
 #include <unity/scopes/SwitchFilter.h>
 #include <unity/scopes/ValueSliderFilter.h>
+#include <unity/scopes/ValueSliderLabels.h>
 #include <unity/scopes/SearchMetadata.h>
 #include <unity/UnityExceptions.h>
 #include <gtest/gtest.h>
@@ -214,7 +215,7 @@ TEST(Filters, deserialize)
     }
 
     {
-        ValueSliderFilter::SPtr filter1 = ValueSliderFilter::create("f1", "Max size", "Less than %f", 0.0f, 100.0f);
+        ValueSliderFilter::SPtr filter1 = ValueSliderFilter::create("f1", 0, 100, 100, ValueSliderLabels("Min", "Max"));
         auto var = filter1->serialize();
 
         auto f = FilterBase::deserialize(var);

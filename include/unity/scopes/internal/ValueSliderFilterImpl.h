@@ -20,6 +20,7 @@
 
 #include <unity/scopes/internal/FilterBaseImpl.h>
 #include <unity/scopes/ValueSliderFilter.h>
+#include <unity/scopes/ValueSliderLabels.h>
 
 namespace unity
 {
@@ -37,36 +38,31 @@ using namespace experimental;
 class ValueSliderFilterImpl : public FilterBaseImpl
 {
 public:
-    ValueSliderFilterImpl(std::string const& id, std::string const& label, std::string const& label_template, double min, double max);
+    ValueSliderFilterImpl(std::string const& id, int min, int max, int default_value, ValueSliderLabels const& labels);
     ValueSliderFilterImpl(VariantMap const& var);
-    void set_slider_type(ValueSliderFilter::SliderType tp);
-    ValueSliderFilter::SliderType slider_type() const;
-    void set_default_value(double val);
-    std::string label() const;
-    double min() const;
-    double max() const;
-    double default_value() const;
+    void set_default_value(int val);
+    int min() const;
+    int max() const;
+    int default_value() const;
     std::string value_label_template() const;
     bool has_value(FilterState const& filter_state) const;
-    double value(FilterState const& filter_state) const;
-    void update_state(FilterState& filter_state, double value) const;
+    int value(FilterState const& filter_state) const;
+    void update_state(FilterState& filter_state, int value) const;
     static ValueSliderFilter::SPtr create(VariantMap const& var);
-    static void update_state(FilterState& filter_state, std::string const& filter_id, double value);
+    static void update_state(FilterState& filter_state, std::string const& filter_id, int value);
     void validate_display_hints() const override;
 
 protected:
     void serialize(VariantMap& var) const override;
     void deserialize(VariantMap const& var);
     std::string filter_type() const override;
-    void check_range(double val) const;
+    void check_range(int val) const;
 
 private:
-    std::string label_;
     std::string label_template_;
-    ValueSliderFilter::SliderType slider_type_;
-    double default_val_;
-    double min_;
-    double max_;
+    int min_;
+    int max_;
+    int default_val_;
 };
 
 } // namespace internal
