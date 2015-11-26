@@ -49,10 +49,8 @@ core::posix::ChildProcess Executor::exec(const std::string& fn,
                     case ENOENT:
                     case EACCES:
                         throw std::runtime_error("AppArmor profile does not exist");
-                        break;
                     case EINVAL:
                         throw std::runtime_error("AppArmor interface not available");
-                        break;
                     default:
                         throw std::runtime_error("Unknown AppArmor error");
                 }

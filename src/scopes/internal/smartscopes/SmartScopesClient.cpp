@@ -339,7 +339,7 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
                         {
                             scope.keywords.emplace(keyword.get_string());
                         }
-                        catch (unity::LogicException const& e)
+                        catch (unity::LogicException const&)
                         {
                             BOOST_LOG(logger_)
                                 << "SmartScopesClient.get_remote_scopes(): Scope: \"" << scope.id
@@ -854,7 +854,7 @@ void SmartScopesClient::wait_for_preview(unsigned int preview_id)
         query_result->wait();
         query_result->get(); // may throw on error
     }
-    catch (std::exception const& e)
+    catch (std::exception const&)
     {
         BOOST_LOG(logger_)
             << "SmartScopesClient.get_preview_results(): Failed to retrieve preview results for query "

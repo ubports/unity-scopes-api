@@ -90,7 +90,7 @@ string from_percent_encoding(string const& str)
                         result << static_cast<char>(k);
                         valid = true;
                     }
-                    catch (logic_error const& e) // covers both invalid_argument and out_of_range
+                    catch (logic_error const&) // covers both invalid_argument and out_of_range
                     {
                         stringstream err;
                         err << "from_percent_encoding(): unsupported conversion of '" << hexnum << "'";

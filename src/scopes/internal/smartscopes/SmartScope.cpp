@@ -117,7 +117,7 @@ void SmartQuery::run(SearchReplyProxy const& reply)
         {
             reply->register_category(category->id, category->title, category->icon, rdr);
         }
-        catch (std::exception const& e)
+        catch (std::exception const&)
         {
             BOOST_LOG(this->ss_client_->logger())
                 << "SmartScope: failed to register category: \"" << category->id

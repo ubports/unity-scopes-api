@@ -82,53 +82,44 @@ static const char* GROUP_NAME = "General";
 
 }  // namespace
 
-SettingsDB::UPtr SettingsDB::create_from_ini_file(string const& db_path,
-                                                  string const& ini_file_path,
-                                                  boost::log::sources::severity_channel_logger_mt<>& logger)
+SettingsDB::UPtr SettingsDB::create_from_ini_file(string const& db_path, string const& ini_file_path)
 {
     // Parse schema
     try
     {
         SettingsSchema::UPtr schema = IniSettingsSchema::create(ini_file_path);
-        return create_from_schema(db_path, *schema, logger);
+        return create_from_schema(db_path, *schema);
     }
-    catch (exception const& e)
+    catch (exception const&)
     {
         throw ResourceException("SettingsDB::create_from_ini_file(): schema = " + ini_file_path + ", db = " + db_path);
     }
 }
 
-SettingsDB::UPtr SettingsDB::create_from_json_string(string const& db_path,
-                                                     string const& json_string,
-                                                     boost::log::sources::severity_channel_logger_mt<>& logger)
+SettingsDB::UPtr SettingsDB::create_from_json_string(string const& db_path, string const& json_string)
 {
     // Parse schema
     try
     {
         auto schema = JsonSettingsSchema::create(json_string);
-        return create_from_schema(db_path, *schema, logger);
+        return create_from_schema(db_path, *schema);
     }
-    catch (exception const& e)
+    catch (exception const&)
     {
         throw ResourceException("SettingsDB::create_from_json_string(): cannot parse schema, db = " + db_path);
     }
 }
 
-SettingsDB::UPtr SettingsDB::create_from_schema(string const& db_path,
-                                                SettingsSchema const& schema,
-                                                boost::log::sources::severity_channel_logger_mt<>& logger)
+SettingsDB::UPtr SettingsDB::create_from_schema(string const& db_path, SettingsSchema const& schema)
 {
-    return UPtr(new SettingsDB(db_path, move(schema), logger));
+    return UPtr(new SettingsDB(db_path, move(schema)));
 }
 
-SettingsDB::SettingsDB(string const& db_path,
-                       SettingsSchema const& schema,
-                       boost::log::sources::severity_channel_logger_mt<>& logger)
+SettingsDB::SettingsDB(string const& db_path, SettingsSchema const& schema)
     : db_path_(db_path)
     , last_write_time_nsec_(-1)
     , last_write_time_sec_(-1)
     , last_write_inode_(0)
-    , logger_(logger)
 {
     // Initialize the def_map_ so we can look things
     // up quickly.
@@ -173,7 +164,7 @@ void SettingsDB::process_doc_(string const& id, IniParser const& p)
             {
                 values_[id] = Variant(stod(value));
             }
-            catch (invalid_argument & e)
+            catch (invalid_argument const&)
             {
             }
         }
@@ -182,7 +173,7 @@ void SettingsDB::process_doc_(string const& id, IniParser const& p)
             values_[id] = Variant(p.get_string(GROUP_NAME, id));
         }
     }
-    catch (LogicException & e)
+    catch (LogicException const&)
     {
     }
 }
@@ -222,7 +213,7 @@ void SettingsDB::process_all_docs()
                     {
                         if (e.error() == EACCES) // very unlikely; only if permissions changed after we acquired the lock
                         {
-                            throw e;
+                            throw;
                         }
                         throw ResourceException(e.what());
                     }
@@ -244,7 +235,7 @@ void SettingsDB::process_all_docs()
     {
         if (e.error() == EACCES)
         {
-            throw e;
+            throw;
         }
 
         // Failure in obtaining the lock shouldn't be reported to the scope, it's not fatal;

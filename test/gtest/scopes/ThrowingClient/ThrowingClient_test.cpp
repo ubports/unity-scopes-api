@@ -100,7 +100,7 @@ public:
         }
     }
 
-    virtual void info(OperationInfo const& /* op_info */)
+    virtual void info(OperationInfo const& /* op_info */) override
     {
         lock_guard<mutex> lock(mutex_);
 

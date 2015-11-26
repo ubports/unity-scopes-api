@@ -653,7 +653,7 @@ void OnlineAccountClientImpl::main_loop_thread()
         g_main_loop_run(main_loop_.get());
     }
     // LCOV_EXCL_START
-    catch (std::exception const& e)
+    catch (std::exception const&)
     {
         std::lock_guard<std::mutex> lock(mutex_);
         thread_exception_ = std::current_exception();

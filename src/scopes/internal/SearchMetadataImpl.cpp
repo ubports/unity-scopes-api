@@ -56,7 +56,7 @@ SearchMetadataImpl::SearchMetadataImpl(VariantMap const& var)
         it = find_or_throw("SearchMetadataImpl()", var, "location");
         location_ = Location(it->second.get_dict());
     }
-    catch (std::exception &e)
+    catch (std::exception const&)
     {
     }
 
@@ -71,7 +71,7 @@ SearchMetadataImpl::SearchMetadataImpl(VariantMap const& var)
         }
         aggregated_keywords_ = keywords_s;
     }
-    catch (std::exception &e)
+    catch (std::exception const&)
     {
     }
 }
