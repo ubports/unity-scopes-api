@@ -82,15 +82,13 @@ static const char* GROUP_NAME = "General";
 
 }  // namespace
 
-SettingsDB::UPtr SettingsDB::create_from_ini_file(string const& db_path,
-                                                  string const& ini_file_path,
-                                                  boost::log::sources::severity_channel_logger_mt<>& logger)
+SettingsDB::UPtr SettingsDB::create_from_ini_file(string const& db_path, string const& ini_file_path)
 {
     // Parse schema
     try
     {
         SettingsSchema::UPtr schema = IniSettingsSchema::create(ini_file_path);
-        return create_from_schema(db_path, *schema, logger);
+        return create_from_schema(db_path, *schema);
     }
     catch (exception const&)
     {
@@ -98,15 +96,13 @@ SettingsDB::UPtr SettingsDB::create_from_ini_file(string const& db_path,
     }
 }
 
-SettingsDB::UPtr SettingsDB::create_from_json_string(string const& db_path,
-                                                     string const& json_string,
-                                                     boost::log::sources::severity_channel_logger_mt<>& logger)
+SettingsDB::UPtr SettingsDB::create_from_json_string(string const& db_path, string const& json_string)
 {
     // Parse schema
     try
     {
         auto schema = JsonSettingsSchema::create(json_string);
-        return create_from_schema(db_path, *schema, logger);
+        return create_from_schema(db_path, *schema);
     }
     catch (exception const&)
     {
@@ -114,21 +110,16 @@ SettingsDB::UPtr SettingsDB::create_from_json_string(string const& db_path,
     }
 }
 
-SettingsDB::UPtr SettingsDB::create_from_schema(string const& db_path,
-                                                SettingsSchema const& schema,
-                                                boost::log::sources::severity_channel_logger_mt<>& logger)
+SettingsDB::UPtr SettingsDB::create_from_schema(string const& db_path, SettingsSchema const& schema)
 {
-    return UPtr(new SettingsDB(db_path, move(schema), logger));
+    return UPtr(new SettingsDB(db_path, move(schema)));
 }
 
-SettingsDB::SettingsDB(string const& db_path,
-                       SettingsSchema const& schema,
-                       boost::log::sources::severity_channel_logger_mt<>& logger)
+SettingsDB::SettingsDB(string const& db_path, SettingsSchema const& schema)
     : db_path_(db_path)
     , last_write_time_nsec_(-1)
     , last_write_time_sec_(-1)
     , last_write_inode_(0)
-    , logger_(logger)
 {
     // Initialize the def_map_ so we can look things
     // up quickly.

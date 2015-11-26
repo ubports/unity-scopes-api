@@ -382,7 +382,7 @@ void RuntimeImpl::run_scope(ScopeBase* scope_base,
         boost::system::error_code ec;
         if (boost::filesystem::exists(settings_schema, ec))
         {
-            shared_ptr<SettingsDB> db(SettingsDB::create_from_ini_file(settings_db, settings_schema, logger()));
+            shared_ptr<SettingsDB> db(SettingsDB::create_from_ini_file(settings_db, settings_schema));
             scope_base->p->set_settings_db(db);
         }
         else
