@@ -20,7 +20,10 @@
 
 #include <string>
 #include <list>
+#include <memory>
 #include <unity/SymbolExport.h>
+#include <unity/scopes/internal/ValueSliderLabelsImpl.h>
+#include <unity/scopes/Variant.h>
 
 namespace unity
 {
@@ -28,22 +31,30 @@ namespace unity
 namespace scopes
 {
 
-class FilterState;
-
 namespace internal
 {
-class ValueSliderLabelsImpl;
 class ValueSliderFilterImpl;
+class ValueSliderLabelsImpl;
 }
 
 namespace experimental
 {
 
+typedef std::pair<int, std::string> ValueLabelPair;
+typedef std::list<ValueLabelPair> ValueLabelPairList;
+
 class UNITY_API ValueSliderLabels
 {
 public:
-    typedef std::pair<int, std::string> ValueLabelPair;
-    typedef std::list<ValueLabelPair> ValueLabelPairList;
+    /**@name Copy and assignment
+    Copy and assignment (move and non-move versions) have the usual value semantics.
+    */
+    //{@
+    ValueSliderLabels(ValueSliderLabels const& other);
+    ValueSliderLabels(ValueSliderLabels&&);
+    ValueSliderLabels& operator=(ValueSliderLabels const& other);
+    ValueSliderLabels& operator=(ValueSliderLabels&&);
+    //@}
 
     ValueSliderLabels(std::string const& min_label, std::string const& max_label);
     ValueSliderLabels(std::string const& min_label, std::string const& max_label, ValueLabelPairList const& extra_labels);
@@ -51,9 +62,12 @@ public:
     std::string min_label() const;
     std::string max_label() const;
     ValueLabelPairList extra_labels() const;
+    VariantMap serialize() const;
 
 private:
-    ValueSliderLabels(internal::ValueSliderLabelsImpl*);
+    ValueSliderLabels(internal::ValueSliderLabelsImpl* pimpl);
+    ValueSliderLabels(VariantMap const& var);
+    std::unique_ptr<internal::ValueSliderLabelsImpl> p;
     friend class internal::ValueSliderLabelsImpl;
     friend class internal::ValueSliderFilterImpl;
 };

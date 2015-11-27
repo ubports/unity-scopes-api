@@ -48,6 +48,7 @@ public:
     bool has_value(FilterState const& filter_state) const;
     int value(FilterState const& filter_state) const;
     void update_state(FilterState& filter_state, int value) const;
+    ValueSliderLabels const& labels() const;
     static ValueSliderFilter::SPtr create(VariantMap const& var);
     static void update_state(FilterState& filter_state, std::string const& filter_id, int value);
     void validate_display_hints() const override;
@@ -63,6 +64,7 @@ private:
     int min_;
     int max_;
     int default_val_;
+    std::unique_ptr<ValueSliderLabels> labels_;
 };
 
 } // namespace internal

@@ -63,6 +63,11 @@ std::string ValueSliderFilter::value_label_template() const
     return fwd()->value_label_template();
 }
 
+ValueSliderLabels const& ValueSliderFilter::labels() const
+{
+    return fwd()->labels();
+}
+
 bool ValueSliderFilter::has_value(FilterState const& filter_state) const
 {
     return fwd()->has_value(filter_state);

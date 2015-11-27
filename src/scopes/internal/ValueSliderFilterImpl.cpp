@@ -36,7 +36,8 @@ ValueSliderFilterImpl::ValueSliderFilterImpl(std::string const& id, int min, int
     : FilterBaseImpl(id),
       min_(min),
       max_(max),
-      default_val_(default_value)
+      default_val_(default_value),
+      labels_(new ValueSliderLabels(labels))
 {
     if (min < 0 || min >= max)
     {
@@ -78,6 +79,13 @@ int ValueSliderFilterImpl::min() const
 int ValueSliderFilterImpl::max() const
 {
     return max_;
+}
+
+ValueSliderLabels const& ValueSliderFilterImpl::labels() const
+{
+    // labels_ pointer is guaranteed to be initialized either by the regular ctor or when deserialized from a variant
+    assert(labels_);
+    return *labels_;
 }
 
 std::string ValueSliderFilterImpl::value_label_template() const
@@ -135,6 +143,7 @@ void ValueSliderFilterImpl::serialize(VariantMap& var) const
     var["min"] = Variant(min_);
     var["max"] = Variant(max_);
     var["default"] = Variant(default_val_);
+    var["labels"] = Variant(labels_->serialize());
 }
 
 void ValueSliderFilterImpl::deserialize(VariantMap const& var)
@@ -147,6 +156,8 @@ void ValueSliderFilterImpl::deserialize(VariantMap const& var)
     max_ = it->second.get_int();
     it = find_or_throw("ValueSliderFilterImpl::deserialize()", var, "default");
     default_val_ = it->second.get_int();
+    it = find_or_throw("ValueSliderFilterImpl::deserialize()", var, "labels");
+    labels_.reset(new ValueSliderLabels(it->second.get_dict()));
 }
 
 std::string ValueSliderFilterImpl::filter_type() const

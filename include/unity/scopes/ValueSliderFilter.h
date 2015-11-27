@@ -128,6 +128,13 @@ public:
     int value(FilterState const& filter_state) const;
 
     /**
+     \brief Get value labeles for this slider filter.
+
+     \return the value labels.
+     */
+    ValueSliderLabels const& labels() const;
+
+    /**
     \brief Sets value of this filter instance in filter state object.
 
     This is meant to be used to modify a FilterState received with a search request before sending it back to the client (UI shell).

@@ -19,6 +19,7 @@
 #pragma once
 
 #include <unity/scopes/ValueSliderLabels.h>
+#include <unity/scopes/Variant.h>
 
 namespace unity
 {
@@ -29,17 +30,24 @@ namespace scopes
 namespace internal
 {
 
-using namespace experimental;
-
 class ValueSliderLabelsImpl
 {
 public:
     ValueSliderLabelsImpl(std::string const& min_label, std::string const& max_label);
-    ValueSliderLabelsImpl(std::string const& min_label, std::string const& max_label, ValueSliderLabels::ValueLabelPairList const& extra_labels);
+    ValueSliderLabelsImpl(std::string const& min_label, std::string const& max_label, std::list<std::pair<int, std::string>> const& extra_labels);
+    ValueSliderLabelsImpl(VariantMap const& var);
+    ValueSliderLabelsImpl(ValueSliderLabelsImpl const&) = default;
 
     std::string min_label() const;
     std::string max_label() const;
-    ValueSliderLabels::ValueLabelPairList extra_labels() const;
+    std::list<std::pair<int, std::string>> extra_labels() const;
+    VariantMap serialize() const;
+    void deserialize(VariantMap const& var);
+
+private:
+    std::string min_label_;
+    std::string max_label_;
+    std::list<std::pair<int, std::string>> extra_labels_;
 };
 
 }
