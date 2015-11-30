@@ -22,7 +22,6 @@
 #include <list>
 #include <memory>
 #include <unity/SymbolExport.h>
-#include <unity/scopes/internal/ValueSliderLabelsImpl.h>
 #include <unity/scopes/Variant.h>
 
 namespace unity

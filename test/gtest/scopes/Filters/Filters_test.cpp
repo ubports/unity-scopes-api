@@ -20,6 +20,7 @@
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/ScopeImpl.h>
 #include <unity/scopes/internal/FilterBaseImpl.h>
+#include <unity/scopes/internal/ValueSliderLabelsImpl.h>
 #include <unity/scopes/FilterOption.h>
 #include <unity/scopes/RadioButtonsFilter.h>
 #include <unity/scopes/RatingFilter.h>

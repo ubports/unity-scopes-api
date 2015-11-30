@@ -17,6 +17,7 @@
 */
 
 #include <unity/scopes/ValueSliderLabels.h>
+#include <unity/scopes/internal/ValueSliderLabelsImpl.h>
 
 namespace unity
 {

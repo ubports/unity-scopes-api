@@ -21,6 +21,7 @@
 #include <unity/scopes/internal/FilterBaseImpl.h>
 #include <unity/scopes/ValueSliderFilter.h>
 #include <unity/scopes/ValueSliderLabels.h>
+#include <unity/scopes/internal/ValueSliderLabelsImpl.h>
 
 namespace unity
 {
