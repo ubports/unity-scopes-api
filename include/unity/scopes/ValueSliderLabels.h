@@ -42,7 +42,7 @@ namespace experimental
 typedef std::pair<int, std::string> ValueLabelPair;
 typedef std::list<ValueLabelPair> ValueLabelPairList;
 
-class UNITY_API ValueSliderLabels
+class UNITY_API ValueSliderLabels final
 {
 public:
     /**@name Copy and assignment
@@ -53,6 +53,7 @@ public:
     ValueSliderLabels(ValueSliderLabels&&);
     ValueSliderLabels& operator=(ValueSliderLabels const& other);
     ValueSliderLabels& operator=(ValueSliderLabels&&);
+    ~ValueSliderLabels();
     //@}
 
     ValueSliderLabels(std::string const& min_label, std::string const& max_label);

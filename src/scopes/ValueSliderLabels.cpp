@@ -65,6 +65,8 @@ ValueSliderLabels& ValueSliderLabels::operator=(ValueSliderLabels const& other)
 ValueSliderLabels::ValueSliderLabels(ValueSliderLabels&&) = default;
 ValueSliderLabels& ValueSliderLabels::operator=(ValueSliderLabels&&) = default;
 
+ValueSliderLabels::~ValueSliderLabels() = default;
+
 std::string ValueSliderLabels::min_label() const
 {
     return p->min_label();
