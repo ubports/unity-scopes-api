@@ -34,7 +34,7 @@ ValueSliderLabelsImpl::ValueSliderLabelsImpl(std::string const& min_label, std::
 {
 }
 
-ValueSliderLabelsImpl::ValueSliderLabelsImpl(std::string const& min_label, std::string const& max_label, std::list<std::pair<int, std::string>> const& extra_labels)
+ValueSliderLabelsImpl::ValueSliderLabelsImpl(std::string const& min_label, std::string const& max_label, std::vector<std::pair<int, std::string>> const& extra_labels)
     : min_label_(min_label),
       max_label_(max_label),
       extra_labels_(extra_labels)
@@ -56,7 +56,7 @@ std::string ValueSliderLabelsImpl::max_label() const
     return max_label_;
 }
 
-std::list<std::pair<int, std::string>> ValueSliderLabelsImpl::extra_labels() const
+std::vector<std::pair<int, std::string>> ValueSliderLabelsImpl::extra_labels() const
 {
     return extra_labels_;
 }

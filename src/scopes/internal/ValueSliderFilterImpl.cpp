@@ -45,6 +45,13 @@ ValueSliderFilterImpl::ValueSliderFilterImpl(std::string const& id, int min, int
         err << "ValueSliderFilterImpl::ValueSliderFilterImpl(): invalid min or max value for filter '" << id << "', min is " << min << ", max is " << max;
         throw LogicException(err.str());
     }
+    if (default_value < min || default_value > max)
+    {
+        std::stringstream err;
+        err << "ValueSliderFilterImpl::ValueSliderFilterImpl(): invalid default value for filter '" << id << "', " << default_value << " not in " << min << "-"
+            << max << " range";
+        throw LogicException(err.str());
+    }
 }
 
 ValueSliderFilterImpl::ValueSliderFilterImpl(VariantMap const& var)

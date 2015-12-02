@@ -40,7 +40,7 @@ namespace experimental
 {
 
 typedef std::pair<int, std::string> ValueLabelPair;
-typedef std::list<ValueLabelPair> ValueLabelPairList;
+typedef std::vector<ValueLabelPair> ValueLabelPairList;
 
 class UNITY_API ValueSliderLabels final
 {
