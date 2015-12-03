@@ -45,7 +45,6 @@ public:
     int min() const;
     int max() const;
     int default_value() const;
-    std::string value_label_template() const;
     bool has_value(FilterState const& filter_state) const;
     int value(FilterState const& filter_state) const;
     void update_state(FilterState& filter_state, int value) const;
@@ -61,7 +60,6 @@ protected:
     void check_range(int val) const;
 
 private:
-    std::string label_template_;
     int min_;
     int max_;
     int default_val_;

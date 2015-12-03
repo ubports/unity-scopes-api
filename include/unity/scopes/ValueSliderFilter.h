@@ -41,8 +41,9 @@ class ValueSliderLabels;
 /**
 \brief A value slider filter that allows for selecting a value within given range.
 
-The ValueSliderFilter displays a static label, such as "Maximum size" and a slider that
-allows for selecting a value within range defined by minimum and maximum values.
+The ValueSliderFilter allows for selecting a value within range defined by minimum and maximum values.
+Both minimum and maximum values can have labels and in addition, the scope may provide extra labels
+to mark other values from that range - these label will serve as a guidance to the user.
 */
 class UNITY_API ValueSliderFilter : public FilterBase
 {
@@ -77,11 +78,6 @@ public:
     void set_default_value(int val);
 
     /**
-      \brief Set the template for current value "bubble", showed for current slider value in the shell UI.
-     */
-    void set_value_label_template(std::string const& label_template);
-
-    /**
      \brief Get the default value of this filter.
 
      The default value will be used by the shell if no value is present for this filter in the
@@ -104,13 +100,6 @@ public:
     \return maximum value
     */
     int max() const;
-
-    /**
-     \brief Get the value label template of this filter.
-
-     \return The value label template.
-     */
-    std::string value_label_template() const;
 
     /**
     \brief Check if filter state object holds a value of this filter.

@@ -58,11 +58,6 @@ int ValueSliderFilter::max() const
     return fwd()->max();
 }
 
-std::string ValueSliderFilter::value_label_template() const
-{
-    return fwd()->value_label_template();
-}
-
 ValueSliderLabels const& ValueSliderFilter::labels() const
 {
     return fwd()->labels();

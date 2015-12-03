@@ -95,11 +95,6 @@ ValueSliderLabels const& ValueSliderFilterImpl::labels() const
     return *labels_;
 }
 
-std::string ValueSliderFilterImpl::value_label_template() const
-{
-    return label_template_;
-}
-
 bool ValueSliderFilterImpl::has_value(FilterState const& filter_state) const
 {
     return filter_state.has_filter(id()) && FilterBaseImpl::get(filter_state, id()).which() == Variant::Type::Int;
@@ -146,7 +141,6 @@ void ValueSliderFilterImpl::validate_display_hints() const
 
 void ValueSliderFilterImpl::serialize(VariantMap& var) const
 {
-    var["label_template"] = label_template_;
     var["min"] = Variant(min_);
     var["max"] = Variant(max_);
     var["default"] = Variant(default_val_);
@@ -155,9 +149,7 @@ void ValueSliderFilterImpl::serialize(VariantMap& var) const
 
 void ValueSliderFilterImpl::deserialize(VariantMap const& var)
 {
-    auto it = find_or_throw("ValueSliderFilterImpl::deserialize()", var, "label_template");
-    label_template_ = it->second.get_string();
-    it = find_or_throw("ValueSliderFilterImpl::deserialize()", var, "min");
+    auto it = find_or_throw("ValueSliderFilterImpl::deserialize()", var, "min");
     min_ = it->second.get_int();
     it = find_or_throw("ValueSliderFilterImpl::deserialize()", var, "max");
     max_ = it->second.get_int();
