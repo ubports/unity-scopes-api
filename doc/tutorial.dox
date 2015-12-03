@@ -410,6 +410,74 @@ Note that it is possible for a call to `cancelled()` to arrive before the scopes
 (because `cancelled()` and `run()` are called by different threads and, therefore, can be dispatched out of order).
 
 
+\paragraph filters Filters
+
+Scopes API offers support for filter widgets, which provide means for filtering search results based on user input other than search query string
+alone. Filter widgets need to be defined by creating appropriate filters inside the overriden SearchQueryBase::run() method, and then pushed
+to the UI similiar to how results are pushed. It is recommended to push filters early before search results are pushed for best user experience.
+
+Here is an example of how filters can be created:
+
+\code{.cpp}
+void run(SearchReplyProxy const& reply)
+{
+    OptionSelectorFilter::UPtr filter1 = OptionSelectorFilter::create("brand", "Brand");
+    filter1->add_option("audi", "Audi");
+    filter1->add_option("bmw", "BMW");
+
+    RangeInputFilter::SPtr filter2 = RangeInputFilter::create("price", Variant(0.0f), Variant::null(), "Min", "", "", "Max", "");
+    ValueSliderFilter::SPtr filter3 = ValueSliderFilter::create("horsepower", 1, 135, 50, ValueSliderLabels("Min", "Max"));
+
+    Filters filters;
+    filters.push_back(filter1);
+    filters.push_back(filter2);
+    filters.push_back(filter3);
+
+    reply->push(filters, query().filter_state());
+
+    // push search results here
+\endcode
+
+Scopes are free to change filters at any time - with every execution of search the scope can omit any of the previously visible filters or add new ones, if that
+makes sense for particular use cases.
+
+Filters act only as UI widgets - it is the responsibility of the scope to check their state and actually apply them to search results. The current value of a filter
+becomes just another parameter of the search query that needs to be taken into account in the implementation of search handling inside run().
+
+To examine current state of the filters, pass the instance of unity::scopes::FilterState received with search query to respective methods of
+the filters. For example:
+
+\code{.cpp}
+void run(SearchReplyProxy const& reply)
+{
+    // filter creation code omitted here
+    auto state = query().filter_state();
+    int search_start = 0;
+    int search_end = 1000;
+    if (rangefilter->has_start_value(state)) {
+        search_start = rangefilter->start_value(state);
+    }
+    if (rangefilter->has_end_value(state)) {
+        search_end = rangefilter->end_value(state);
+    }
+
+    // apply search_start and search_end to search logic
+\endcode
+
+The scope may nominate a single filter to act as "primary navigation". This is only possible if departments are not used at the same time (in which case departments
+become a primary navigation tool). Also, only a single-selection OptionSelectorFilter can currently be promoted to be primary navigation. To do this, set the display
+hints to FilterBase::DisplayHints::Primary:
+
+\code{.cpp}
+OptionSelectorFilter::UPtr filter1 = OptionSelectorFilter::create("brand", "Brand");
+filter1->set_display_hints(FilterBase::DisplayHints::Primary);
+filter1->add_option("audi", "Audi");
+\endcode
+
+When a filter becomes a primary navigation filter, it gets displayed in the search box drop-down, below recent searches, so it's readily available for quick access.
+Also, currently selected option is displayed as a "brick" in the search box, hinting the user about the context of current search. All the other filters can be
+revealed via the filters panel icon.
+
 \paragraph handlingpreview Handling previews
 
 Your scope is responsible for handling preview requests for results it has returned; you implement this by overriding
