@@ -65,7 +65,7 @@ public:
      \return Instance of ValueSliderFilter.
      \throws unity::LogicException on invalid (min, max) range or erronous value_labels.
     */
-    static ValueSliderFilter::UPtr create(std::string const& id, int min, int max, int default_value, ValueSliderLabels const& value_labels);
+    static ValueSliderFilter::UPtr create(std::string const& id, double min, double max, double default_value, ValueSliderLabels const& value_labels);
 
     /**
      \brief Change the default value of this filter.
@@ -75,7 +75,7 @@ public:
 
      \param val The new default value.
     */
-    void set_default_value(int val);
+    void set_default_value(double val);
 
     /**
      \brief Get the default value of this filter.
@@ -85,21 +85,21 @@ public:
 
      \return The default value
     */
-    int default_value() const;
+    double default_value() const;
 
     /**
      \brief Get the minimum allowed value.
 
      \return mimimum value
     */
-    int min() const;
+    double min() const;
 
     /**
     \brief Get the maximum allowed value.
 
     \return maximum value
     */
-    int max() const;
+    double max() const;
 
     /**
     \brief Check if filter state object holds a value of this filter.
@@ -114,7 +114,7 @@ public:
      \return value of this filter
      \throws unity::scopes::NotFoundException if value is not present in state object.
     */
-    int value(FilterState const& filter_state) const;
+    double value(FilterState const& filter_state) const;
 
     /**
      \brief Get value labeles for this slider filter.
@@ -130,7 +130,7 @@ public:
 
     \throws unity::LogicException if value is out of (min, max) range.
     */
-    void update_state(FilterState& filter_state, int value) const;
+    void update_state(FilterState& filter_state, double value) const;
 
     /**
     \brief Sets value of this filter instance in filter state object, without having an instance of ValueSliderFilter.
@@ -138,7 +138,7 @@ public:
     Updates an instance of FilterState, without the need for an ValueSliderFilter instance. This is meant
     to be used when creating a canned Query that references another scope.
     */
-    static void update_state(FilterState& filter_state, std::string const& filter_id, int value);
+    static void update_state(FilterState& filter_state, std::string const& filter_id, double value);
 
 private:
     ValueSliderFilter(internal::ValueSliderFilterImpl*);

@@ -55,7 +55,7 @@ TEST(ValueSliderFilter, basic)
     }
     {
         EXPECT_THROW(ValueSliderFilter::create("f1", 10, 1, 1, ValueSliderLabels("Min", "Max")), unity::LogicException);
-        EXPECT_THROW(ValueSliderFilter::create("f1", -1, 10, 1, ValueSliderLabels("Min", "Max")), unity::LogicException);
+        EXPECT_THROW(ValueSliderFilter::create("f1", 10, 10, 1, ValueSliderLabels("Min", "Max")), unity::LogicException);
         EXPECT_THROW(ValueSliderFilter::create("f1", 1, 10, 20, ValueSliderLabels("Min", "Max")), unity::LogicException);
     }
 }

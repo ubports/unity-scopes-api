@@ -32,14 +32,14 @@ namespace scopes
 namespace internal
 {
 
-ValueSliderFilterImpl::ValueSliderFilterImpl(std::string const& id, int min, int max, int default_value, ValueSliderLabels const& labels)
+ValueSliderFilterImpl::ValueSliderFilterImpl(std::string const& id, double min, double max, double default_value, ValueSliderLabels const& labels)
     : FilterBaseImpl(id),
       min_(min),
       max_(max),
       default_val_(default_value),
       labels_(new ValueSliderLabels(labels))
 {
-    if (min < 0 || min >= max)
+    if (min >= max)
     {
         std::stringstream err;
         err << "ValueSliderFilterImpl::ValueSliderFilterImpl(): invalid min or max value for filter '" << id << "', min is " << min << ", max is " << max;
@@ -67,23 +67,23 @@ ValueSliderFilter::SPtr ValueSliderFilterImpl::create(VariantMap const& var)
     return filter;
 }
 
-void ValueSliderFilterImpl::set_default_value(int val)
+void ValueSliderFilterImpl::set_default_value(double val)
 {
     check_range(val);
     default_val_ = val;
 }
 
-int ValueSliderFilterImpl::default_value() const
+double ValueSliderFilterImpl::default_value() const
 {
     return default_val_;
 }
 
-int ValueSliderFilterImpl::min() const
+double ValueSliderFilterImpl::min() const
 {
     return min_;
 }
 
-int ValueSliderFilterImpl::max() const
+double ValueSliderFilterImpl::max() const
 {
     return max_;
 }
@@ -97,16 +97,16 @@ ValueSliderLabels const& ValueSliderFilterImpl::labels() const
 
 bool ValueSliderFilterImpl::has_value(FilterState const& filter_state) const
 {
-    return filter_state.has_filter(id()) && FilterBaseImpl::get(filter_state, id()).which() == Variant::Type::Int;
+    return filter_state.has_filter(id()) && FilterBaseImpl::get(filter_state, id()).which() == Variant::Type::Double;
 }
 
-int ValueSliderFilterImpl::value(FilterState const& filter_state) const
+double ValueSliderFilterImpl::value(FilterState const& filter_state) const
 {
     if (filter_state.has_filter(id()))
     {
         try
         {
-            int val = FilterBaseImpl::get(filter_state, id()).get_int(); // this can throw if of different type
+            auto val = FilterBaseImpl::get(filter_state, id()).get_double(); // this can throw if of different type
             check_range(val);
             return val;
         }
@@ -119,13 +119,13 @@ int ValueSliderFilterImpl::value(FilterState const& filter_state) const
     throw NotFoundException("ValueSliderFilterImpl::get_value(): value is not set for filter", id());
 }
 
-void ValueSliderFilterImpl::update_state(FilterState& filter_state, int value) const
+void ValueSliderFilterImpl::update_state(FilterState& filter_state, double value) const
 {
     check_range(value);
     update_state(filter_state, id(), value);
 }
 
-void ValueSliderFilterImpl::update_state(FilterState& filter_state, std::string const& filter_id, int value)
+void ValueSliderFilterImpl::update_state(FilterState& filter_state, std::string const& filter_id, double value)
 {
     VariantMap& state = FilterBaseImpl::get(filter_state);
     state[filter_id] = Variant(value);
@@ -150,11 +150,11 @@ void ValueSliderFilterImpl::serialize(VariantMap& var) const
 void ValueSliderFilterImpl::deserialize(VariantMap const& var)
 {
     auto it = find_or_throw("ValueSliderFilterImpl::deserialize()", var, "min");
-    min_ = it->second.get_int();
+    min_ = it->second.get_double();
     it = find_or_throw("ValueSliderFilterImpl::deserialize()", var, "max");
-    max_ = it->second.get_int();
+    max_ = it->second.get_double();
     it = find_or_throw("ValueSliderFilterImpl::deserialize()", var, "default");
-    default_val_ = it->second.get_int();
+    default_val_ = it->second.get_double();
     it = find_or_throw("ValueSliderFilterImpl::deserialize()", var, "labels");
     labels_.reset(new ValueSliderLabels(it->second.get_dict()));
 }
@@ -164,7 +164,7 @@ std::string ValueSliderFilterImpl::filter_type() const
     return "value_slider";
 }
 
-void ValueSliderFilterImpl::check_range(int val) const
+void ValueSliderFilterImpl::check_range(double val) const
 {
     if (val < min_ || val > max_)
     {

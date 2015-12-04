@@ -34,20 +34,20 @@ class ValueSliderLabelsImpl
 {
 public:
     ValueSliderLabelsImpl(std::string const& min_label, std::string const& max_label);
-    ValueSliderLabelsImpl(std::string const& min_label, std::string const& max_label, std::vector<std::pair<int, std::string>> const& extra_labels);
+    ValueSliderLabelsImpl(std::string const& min_label, std::string const& max_label, std::vector<std::pair<double, std::string>> const& extra_labels);
     ValueSliderLabelsImpl(VariantMap const& var);
     ValueSliderLabelsImpl(ValueSliderLabelsImpl const&) = default;
 
     std::string min_label() const;
     std::string max_label() const;
-    std::vector<std::pair<int, std::string>> extra_labels() const;
+    std::vector<std::pair<double, std::string>> extra_labels() const;
     VariantMap serialize() const;
     void deserialize(VariantMap const& var);
 
 private:
     std::string min_label_;
     std::string max_label_;
-    std::vector<std::pair<int, std::string>> extra_labels_;
+    std::vector<std::pair<double, std::string>> extra_labels_;
 };
 
 }

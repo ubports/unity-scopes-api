@@ -39,30 +39,30 @@ using namespace experimental;
 class ValueSliderFilterImpl : public FilterBaseImpl
 {
 public:
-    ValueSliderFilterImpl(std::string const& id, int min, int max, int default_value, ValueSliderLabels const& labels);
+    ValueSliderFilterImpl(std::string const& id, double min, double max, double default_value, ValueSliderLabels const& labels);
     ValueSliderFilterImpl(VariantMap const& var);
-    void set_default_value(int val);
-    int min() const;
-    int max() const;
-    int default_value() const;
+    void set_default_value(double val);
+    double min() const;
+    double max() const;
+    double default_value() const;
     bool has_value(FilterState const& filter_state) const;
-    int value(FilterState const& filter_state) const;
-    void update_state(FilterState& filter_state, int value) const;
+    double value(FilterState const& filter_state) const;
+    void update_state(FilterState& filter_state, double value) const;
     ValueSliderLabels const& labels() const;
     static ValueSliderFilter::SPtr create(VariantMap const& var);
-    static void update_state(FilterState& filter_state, std::string const& filter_id, int value);
+    static void update_state(FilterState& filter_state, std::string const& filter_id, double value);
     void validate_display_hints() const override;
 
 protected:
     void serialize(VariantMap& var) const override;
     void deserialize(VariantMap const& var);
     std::string filter_type() const override;
-    void check_range(int val) const;
+    void check_range(double val) const;
 
 private:
-    int min_;
-    int max_;
-    int default_val_;
+    double min_;
+    double max_;
+    double default_val_;
     std::unique_ptr<ValueSliderLabels> labels_;
 };
 

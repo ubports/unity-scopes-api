@@ -39,7 +39,7 @@ class ValueSliderLabelsImpl;
 namespace experimental
 {
 
-typedef std::pair<int, std::string> ValueLabelPair;
+typedef std::pair<double, std::string> ValueLabelPair;
 typedef std::vector<ValueLabelPair> ValueLabelPairList;
 
 class UNITY_API ValueSliderLabels final

@@ -18,6 +18,7 @@
 
 #include <unity/scopes/internal/ValueSliderLabelsImpl.h>
 #include <unity/scopes/internal/Utils.h>
+#include <unity/UnityExceptions.h>
 
 namespace unity
 {
@@ -34,7 +35,7 @@ ValueSliderLabelsImpl::ValueSliderLabelsImpl(std::string const& min_label, std::
 {
 }
 
-ValueSliderLabelsImpl::ValueSliderLabelsImpl(std::string const& min_label, std::string const& max_label, std::vector<std::pair<int, std::string>> const& extra_labels)
+ValueSliderLabelsImpl::ValueSliderLabelsImpl(std::string const& min_label, std::string const& max_label, std::vector<std::pair<double, std::string>> const& extra_labels)
     : min_label_(min_label),
       max_label_(max_label),
       extra_labels_(extra_labels)
@@ -56,7 +57,7 @@ std::string ValueSliderLabelsImpl::max_label() const
     return max_label_;
 }
 
-std::vector<std::pair<int, std::string>> ValueSliderLabelsImpl::extra_labels() const
+std::vector<std::pair<double, std::string>> ValueSliderLabelsImpl::extra_labels() const
 {
     return extra_labels_;
 }
@@ -88,7 +89,11 @@ void ValueSliderLabelsImpl::deserialize(VariantMap const& var)
         auto const va = it->second.get_array();
         for (auto it = va.begin(); it != va.end();)
         {
-            int const value = (it++)->get_int();
+            auto const value = (it++)->get_double();
+            if (it == va.end())
+            {
+                throw unity::InvalidArgumentException("ValueSliderLabels::deserialize(): invalid value-label array");
+            }
             std::string const label = (it++)->get_string();
             extra_labels_.push_back(std::make_pair<>(value, label));
         }
