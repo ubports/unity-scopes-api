@@ -136,6 +136,9 @@ private:
     ServantMap servants_;
     ServantMap dflt_servants_;
     mutable std::mutex map_mutex_;
+
+    // Dummy logger for testing
+    std::unique_ptr<unity::scopes::internal::Logger> test_logger_;
 };
 
 } // namespace zmq_middleware
