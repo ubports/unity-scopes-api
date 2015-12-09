@@ -88,15 +88,14 @@ void create_dir(string const& dir, mode_t mode)
 
 } // namespace
 
-// Some tests use a nullptr for the run time, so we use a different logger in that case.
-BOOST_LOG_INLINE_GLOBAL_LOGGER_DEFAULT(zmqmiddleware_test_logger, boost::log::sources::severity_channel_logger_mt<>)
-
 ZmqMiddleware::ZmqMiddleware(string const& server_name, RuntimeImpl* runtime, string const& configfile) :
     MiddlewareBase(runtime),
     server_name_(server_name),
     state_(Created),
     shutdown_flag_(false),
-    logger_(runtime ? runtime->logger() : zmqmiddleware_test_logger::get())
+    // Some tests use a nullptr for the run time, so we use a different logger in that case.
+    test_logger_(runtime ? nullptr : new Logger("ZmqMiddleware_test_logger")),
+    logger_(runtime ? runtime->logger() : *test_logger_)
 {
     assert(!server_name.empty());
 

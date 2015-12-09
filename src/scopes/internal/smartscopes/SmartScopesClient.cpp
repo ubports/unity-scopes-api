@@ -55,9 +55,6 @@ static const std::string c_scopes_cache_dir = homedir() + "/.cache/unity-scopes/
 static const std::string c_scopes_cache_filename = "remote-scopes.json";
 static const std::string c_partner_id_file = "/custom/partner-id";
 
-// Some of the tests don't have a runtime, so we use a separate logger in that case.
-BOOST_LOG_INLINE_GLOBAL_LOGGER_DEFAULT(test_logger, boost::log::sources::severity_channel_logger_mt<>)
-
 using namespace unity::scopes;
 using namespace unity::scopes::internal::smartscopes;
 
@@ -116,7 +113,9 @@ SmartScopesClient::SmartScopesClient(HttpClientInterface::SPtr http_client,
                                      std::string const& partner_id_path)
     : http_client_(http_client)
     , json_node_(json_node)
-    , logger_(runtime ? runtime->logger() : test_logger::get())
+    // Some of the tests don't have a runtime, so we use a separate logger in that case.
+    , test_logger_(runtime ? nullptr : new Logger("SmartScopesClient_test"))
+    , logger_(runtime ? runtime->logger() : *test_logger_)
     , have_latest_cache_(false)
     , query_counter_(0)
     , partner_file_(partner_id_path)

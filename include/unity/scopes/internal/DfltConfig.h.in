@@ -57,7 +57,7 @@ static constexpr int DFLT_ZMQ_CHILDSCOPES_TIMEOUT = 2000;  // milliseconds
 static constexpr char const* DFLT_HOME_CACHE_SUBDIR = ".local/share/unity-scopes";
 static constexpr char const* DFLT_HOME_APP_SUBDIR = ".local/share";
 static constexpr char const* DFLT_HOME_CONFIG_SUBDIR = ".config/unity-scopes";
-static constexpr char const* DFLT_HOME_LOG_SUBDIR = ".local/share/unity-scopes";
+static constexpr char const* DFLT_HOME_LOG_SUBDIR = "";
 
 static constexpr int DFLT_MAX_LOG_FILE_SIZE = 512 * 1024;       // bytes, individual file size
 static constexpr int DFLT_MAX_LOG_DIR_SIZE = 2 * 1024 * 1024;   // bytes, sum of file sizes

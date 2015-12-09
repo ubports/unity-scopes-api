@@ -2,6 +2,8 @@ unity-scopes-api (1.0.2-0ubuntu1) UNRELEASED; urgency=medium
 
   * Changed version number generation to use a common script. Removed
     symbols files because we are no using abi-compliance-checker.
+  * Replaced global dummy loggers for testing with heap-allocated
+    instances to avoid crash due to global destructor ordering (LP: #1472755).
 
  -- Michi Henning <michi.henning@canonical.com>  Mon, 28 Sep 2015 15:42:14 +1000
 
