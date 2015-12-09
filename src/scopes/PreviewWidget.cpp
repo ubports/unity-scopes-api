@@ -139,6 +139,7 @@ List of attributes:
 
 \arg \c source A URI pointing to the video
 \arg \c screenshot A URI pointing to a screenshot of the video (optional)
+\arg \c shareData An optional dictionary for making this video shareable with Content Hub. See \link contentsharing content sharing\endlink below.
 
 \code{.cpp}
 {
@@ -158,6 +159,7 @@ List of attributes:
 \arg \c source A URI pointing to the image
 \arg \c zoomable A boolean specifying whether the image is zoomable (default: \c false)
 \arg \c fallback A fallback image to be used if the image URI cannot be retrieved (default: none)
+\arg \c shareData An optional dictionary for making this image shareable with Content Hub. See \link contentsharing content sharing\endlink below.
 
 \code{.cpp}
 {
@@ -472,6 +474,30 @@ List of attributes:
     table.add_attribute_value("values", Variant(values));
     ...
 \endcode
+
+\subsection contentsharing Content sharing
+
+Some widgets support content sharing with the special shareData attribute. When the widget is tapped (clicked), data (image, video etc.)
+can be shared with Content hub.
+
+The shareData attribute is a dictionary (VariantMap) that needs to contain the following keys:
+
+\arg \c uri A single uri to share or an array of uris.
+\arg \c contentType A name of the content type known to Content hub, e.g. "links", "pictures", "videos". Please refef to Content hub documentation
+for information on supported content types.
+
+Here is an example of a shareable image:
+
+\code
+    PreviewWidget image("img", "image");
+    image.add_attribute_value("source", Variant("http://www.example.org/graphics.png"));
+
+    VariantMap share_data;
+    share_data["uri"] = Variant("http://www.example.org/graphics_big.png");
+    share_data["contentType"] = Variant("pictures");
+    image.add_attribute_value("shareData", share_data);
+\endcode
+
 */
 
 //! @cond
