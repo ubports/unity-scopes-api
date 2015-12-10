@@ -82,15 +82,18 @@ TEST(ValueSliderFilter, state)
 
 TEST(ValueSliderFilter, serialize)
 {
-    auto filter1 = ValueSliderFilter::create("f1", 1, 100, 100, ValueSliderLabels("Min", "Max"));
+    auto filter1 = ValueSliderFilter::create("f1", 1, 100, 100, ValueSliderLabels("Min", "Max", {{10, "Ten"}}));
     auto var = filter1->serialize();
 
     auto filter2 = internal::ValueSliderFilterImpl::create(var);
-    EXPECT_EQ("f1", filter1->id());
-    EXPECT_EQ("Min", filter1->labels().min_label());
-    EXPECT_EQ("Max", filter1->labels().max_label());
-    EXPECT_EQ(1, filter1->min());
-    EXPECT_EQ(100, filter1->max());
+    EXPECT_EQ("f1", filter2->id());
+    EXPECT_EQ("Min", filter2->labels().min_label());
+    EXPECT_EQ("Max", filter2->labels().max_label());
+    EXPECT_EQ(1, filter2->labels().extra_labels().size());
+    EXPECT_EQ(10, filter2->labels().extra_labels()[0].first);
+    EXPECT_EQ("Ten", filter2->labels().extra_labels()[0].second);
+    EXPECT_EQ(1, filter2->min());
+    EXPECT_EQ(100, filter2->max());
 }
 
 TEST(ValueSliderFilter, display_hints)
