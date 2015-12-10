@@ -478,7 +478,7 @@ List of attributes:
 \subsection contentsharing Content sharing
 
 Some widgets support content sharing with the special share-data attribute. When the widget is tapped (clicked), data (image, video etc.)
-can be shared with Content hub.
+can be shared with Content Hub.
 
 The share-data attribute is a dictionary (VariantMap) that needs to contain the following keys:
 
