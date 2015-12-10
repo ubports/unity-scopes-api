@@ -94,6 +94,7 @@ public:
 
     /// @cond
     virtual ~FilterBase();
+    /// @endcond
 
     /**
     \brief Set an optional title of this filter.
@@ -108,6 +109,7 @@ public:
     std::string title() const;
 
 protected:
+    /// @cond
     FilterBase(internal::FilterBaseImpl *pimpl);
     std::unique_ptr<internal::FilterBaseImpl> p;
     /// @endcond
