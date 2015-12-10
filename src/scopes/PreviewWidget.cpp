@@ -482,8 +482,8 @@ can be shared with Content hub.
 
 The share-data attribute is a dictionary (VariantMap) that needs to contain the following keys:
 
-\arg \c uri A single uri to share or an array of uris.
-\arg \c content-type A name of the content type known to Content hub, e.g. "links", "pictures", "videos". Please refer to Content hub documentation
+\arg \c uri A single URI to share or an array of URIs.
+\arg \c content-type A name of the content type known to Content Hub, e.g. "links", "pictures", "videos". Please refer to Content Hub documentation
 for information on supported content types.
 
 Here is an example of a shareable image:
