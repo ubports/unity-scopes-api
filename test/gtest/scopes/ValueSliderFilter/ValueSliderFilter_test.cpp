@@ -58,6 +58,21 @@ TEST(ValueSliderFilter, basic)
         EXPECT_THROW(ValueSliderFilter::create("f1", 10, 10, 1, ValueSliderLabels("Min", "Max")), unity::LogicException);
         EXPECT_THROW(ValueSliderFilter::create("f1", 1, 10, 20, ValueSliderLabels("Min", "Max")), unity::LogicException);
     }
+    {
+        // empty extra label
+        EXPECT_THROW(ValueSliderFilter::create("f1", 1, 100, 50, ValueSliderLabels("Min", "Max", {{10, ""}})), unity::LogicException);
+
+        // duplicated extra label
+        EXPECT_THROW(ValueSliderFilter::create("f1", 1, 100, 50, ValueSliderLabels("Min", "Max", {{10, "Ten"}, {50, "Ten"}})), unity::LogicException);
+
+        // extra label value out of range
+        EXPECT_THROW(ValueSliderFilter::create("f1", -100, 100, 50, ValueSliderLabels("Min", "Max", {{-200, "-200"}, {50, "50"}})), unity::LogicException);
+        // extra label value wrong order
+        EXPECT_THROW(ValueSliderFilter::create("f1", -100, 100, 50, ValueSliderLabels("Min", "Max", {{50, "50"}, {-50, "-50"}})), unity::LogicException);
+
+        // extra label value duplicated
+        EXPECT_THROW(ValueSliderFilter::create("f1", -100, 100, 50, ValueSliderLabels("Min", "Max", {{50, "50"}, {50, "50"}})), unity::LogicException);
+    }
 }
 
 TEST(ValueSliderFilter, state)

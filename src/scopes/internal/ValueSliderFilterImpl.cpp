@@ -52,6 +52,7 @@ ValueSliderFilterImpl::ValueSliderFilterImpl(std::string const& id, double min, 
             << max << " range";
         throw LogicException(err.str());
     }
+    labels_->p->validate(min_, max_);
 }
 
 ValueSliderFilterImpl::ValueSliderFilterImpl(VariantMap const& var)
@@ -157,6 +158,7 @@ void ValueSliderFilterImpl::deserialize(VariantMap const& var)
     default_val_ = it->second.get_double();
     it = find_or_throw("ValueSliderFilterImpl::deserialize()", var, "labels");
     labels_.reset(new ValueSliderLabels(it->second.get_dict()));
+    labels_->p->validate(min_, max_);
 }
 
 std::string ValueSliderFilterImpl::filter_type() const
