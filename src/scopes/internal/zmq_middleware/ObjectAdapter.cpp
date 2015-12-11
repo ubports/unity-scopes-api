@@ -56,15 +56,6 @@ namespace
 
 char const* pump_suffix = "-pump";
 
-// Some tests use a nullptr for the run time, so we use different loggers in that case.
-
-BOOST_LOG_INLINE_GLOBAL_LOGGER_DEFAULT(oa_test_logger, boost::log::sources::severity_channel_logger_mt<>)
-
-BOOST_LOG_INLINE_GLOBAL_LOGGER_CTOR_ARGS(
-    oa_test_ipc_logger,
-    boost::log::sources::severity_channel_logger_mt<>,
-    ((boost::log::keywords::severity = Logger::Trace, boost::log::keywords::channel = "IPC")))
-
 }  // namespace
 
 ObjectAdapter::ObjectAdapter(ZmqMiddleware& mw, string const& name, string const& endpoint, RequestMode m,
@@ -75,7 +66,9 @@ ObjectAdapter::ObjectAdapter(ZmqMiddleware& mw, string const& name, string const
     mode_(m),
     pool_size_(pool_size),
     idle_timeout_(idle_timeout != -1 ? idle_timeout : zmqpp::poller::wait_forever),
-    state_(Inactive)
+    state_(Inactive),
+    // Some tests use a nullptr for the run time, so we use different loggers in that case.
+    test_logger_(mw.runtime() ? nullptr : new Logger("ObjectAdapter_test_logger"))
 {
     assert(!name.empty());
     assert(!endpoint.empty());
@@ -862,12 +855,12 @@ void ObjectAdapter::store_exception(MiddlewareException& ex)
 
 boost::log::sources::severity_channel_logger_mt<>& ObjectAdapter::logger() const
 {
-    return mw_.runtime() ? mw_.runtime()->logger() : oa_test_logger::get();
+    return mw_.runtime() ? mw_.runtime()->logger() : *test_logger_;
 }
 
 boost::log::sources::severity_channel_logger_mt<>& ObjectAdapter::ipc_logger() const
 {
-    return mw_.runtime() ? mw_.runtime()->logger(Logger::Channel::IPC) : oa_test_ipc_logger::get();
+    return mw_.runtime() ? mw_.runtime()->logger(Logger::Channel::IPC) : *test_logger_;
 }
 
 void ObjectAdapter::trace_dispatch(Current const& c)

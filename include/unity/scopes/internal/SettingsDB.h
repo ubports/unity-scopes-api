@@ -18,7 +18,6 @@
 
 #pragma once
 
-#include <unity/scopes/internal/Logger.h>
 #include <unity/scopes/internal/SettingsSchema.h>
 #include <unity/scopes/Variant.h>
 #include <unity/util/DefinesPtrs.h>
@@ -47,15 +46,9 @@ public:
     NONCOPYABLE(SettingsDB);
     UNITY_DEFINES_PTRS(SettingsDB);
 
-    static UPtr create_from_ini_file(std::string const& db_path,
-                                     std::string const& ini_file_path,
-                                     boost::log::sources::severity_channel_logger_mt<>& logger);
-    static UPtr create_from_json_string(std::string const& db_path,
-                                        std::string const& json_string,
-                                        boost::log::sources::severity_channel_logger_mt<>& logger);
-    static UPtr create_from_schema(std::string const& db_path,
-                                   unity::scopes::internal::SettingsSchema const& schema,
-                                   boost::log::sources::severity_channel_logger_mt<>& logger);
+    static UPtr create_from_ini_file(std::string const& db_path, std::string const& ini_file_path);
+    static UPtr create_from_json_string(std::string const& db_path, std::string const& json_string);
+    static UPtr create_from_schema(std::string const& db_path, unity::scopes::internal::SettingsSchema const& schema);
 
     ~SettingsDB() = default;
 
@@ -65,9 +58,7 @@ public:
     VariantMap settings();  // Returns the current settings (checking the DB each time).
 
 private:
-    SettingsDB(std::string const& db_path,
-               unity::scopes::internal::SettingsSchema const& schema,
-               boost::log::sources::severity_channel_logger_mt<>& logger);
+    SettingsDB(std::string const& db_path, unity::scopes::internal::SettingsSchema const& schema);
 
     void process_doc_(std::string const& id, unity::util::IniParser const& parer);
     void process_all_docs();
@@ -80,7 +71,6 @@ private:
     VariantArray definitions_;                       // Returned by SettingsSchema
     std::map<std::string, Variant> def_map_;  // Allows fast access to the Variants in definitions_
     unity::scopes::VariantMap values_;
-    boost::log::sources::severity_channel_logger_mt<>& logger_;
 };
 
 }  // namespace internal

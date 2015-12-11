@@ -72,7 +72,7 @@ void SearchReplyImpl::register_departments(Department::SCPtr const& parent)
     {
         DepartmentImpl::validate_departments(parent, current_department_);
     }
-    catch (unity::LogicException const &e)
+    catch (unity::LogicException const&)
     {
         throw unity::LogicException("SearchReplyImpl::register_departments(): Failed to validate departments");
     }
@@ -172,7 +172,7 @@ bool SearchReplyImpl::push(unity::scopes::Filters const& filters, unity::scopes:
     {
         internal::FilterBaseImpl::validate_filters(filters);
     }
-    catch (unity::LogicException const &e)
+    catch (unity::LogicException const&)
     {
         throw unity::LogicException("SearchReplyImpl::push(): Failed to validate filters");
     }
