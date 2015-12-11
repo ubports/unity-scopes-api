@@ -120,13 +120,16 @@ The following keys are recognized:
   Setting this value explicitly to the empty string disables file logging and forces
   all log entries to go to stderr.
 
-  The default value is $HOME/.local/share/unity-scopes.
+  The default value is the empty string.
+
+  If you set this value, you must set it to a directory that is writable to
+  confined scopes. We suggest $HOME/.cache/unity-scopes.
 
   Note that the actual logs are written into subdirectories of this
-  directory. Specifically:
-
-  $HOME/.local/share/unity-scopes/leaf-net/<scope_id>/logs (for confined scopes)
-  and $HOME/.local/share/unity-scopes/unconfined/<scope_id>/logs (for unconfined scopes).
+  directory. Assuming LogDir is set to $HOME/.cache/unity-scopes,
+  the subdirectories are
+  $HOME/.cache/unity-scopes/leaf-net/<scope_id>/logs (for confined scopes) and
+  $HOME/.cache/unity-scopes/unconfined/<scope_id>/logs (for unconfined scopes).
 
   The environment variable UNITY_SCOPES_LOGDIR overrides this key.
   Setting this variable explicitly to the empty string disables file logging and forces
