@@ -63,7 +63,7 @@ std::vector<std::pair<double, std::string>> ValueSliderLabelsImpl::extra_labels(
     return extra_labels_;
 }
 
-void ValueSliderLabelsImpl::validate(double min, double max)
+void ValueSliderLabelsImpl::validate(double min, double max) const
 {
     if (min >= max)
     {

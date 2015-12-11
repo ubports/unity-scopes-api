@@ -44,7 +44,7 @@ public:
     VariantMap serialize() const;
     void deserialize(VariantMap const& var);
 
-    void validate(double min, double max);
+    void validate(double min, double max) const;
 
 private:
     std::string min_label_;
