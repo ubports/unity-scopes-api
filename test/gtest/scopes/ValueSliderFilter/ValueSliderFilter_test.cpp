@@ -59,6 +59,18 @@ TEST(ValueSliderFilter, basic)
         EXPECT_THROW(ValueSliderFilter::create("f1", 1, 10, 20, ValueSliderLabels("Min", "Max")), unity::LogicException);
     }
     {
+        // extra label is the same as min label
+        EXPECT_THROW(ValueSliderFilter::create("f1", 1, 100, 100, ValueSliderLabels("Min", "Max", {{10, "Min"}})), unity::LogicException);
+
+        // extra label is the same as max label
+        EXPECT_THROW(ValueSliderFilter::create("f1", 1, 100, 100, ValueSliderLabels("Min", "Max", {{10, "Max"}})), unity::LogicException);
+
+        // extra label's value is the same as min value
+        EXPECT_THROW(ValueSliderFilter::create("f1", 1, 100, 100, ValueSliderLabels("Min", "Max", {{1, "1"}})), unity::LogicException);
+
+        // extra label's value is the same as max value
+        EXPECT_THROW(ValueSliderFilter::create("f1", 1, 100, 100, ValueSliderLabels("Min", "Max", {{100, "100"}})), unity::LogicException);
+
         // empty extra label
         EXPECT_THROW(ValueSliderFilter::create("f1", 1, 100, 50, ValueSliderLabels("Min", "Max", {{10, ""}})), unity::LogicException);
 

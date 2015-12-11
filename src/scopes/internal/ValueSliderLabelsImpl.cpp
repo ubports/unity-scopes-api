@@ -90,6 +90,12 @@ void ValueSliderLabelsImpl::validate(double min, double max)
             err << "ValueSliderLabelsImpl::validate(): extra label for value " << p.first << " cannot be empty";
             throw LogicException(err.str());
         }
+        if (p.second == min_label_ || p.second == max_label_)
+        {
+            std::stringstream err;
+            err << "ValueSliderLabelsImpl::validate(): extra label for value " << p.first << " must not be equal to min or max labels";
+            throw LogicException(err.str());
+        }
         if (label_lut.find(p.second) != label_lut.end())
         {
             std::stringstream err;
@@ -98,6 +104,13 @@ void ValueSliderLabelsImpl::validate(double min, double max)
         }
         label_lut.insert(p.second);
         last_value = p.first;
+    }
+
+    if (max <= last_value)
+    {
+        std::stringstream err;
+        err << "ValueSliderLabelsImpl::validate(): the value of last extra label must not be greater than the maximum value " << max;
+        throw LogicException(err.str());
     }
 }
 
