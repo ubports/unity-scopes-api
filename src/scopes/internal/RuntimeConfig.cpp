@@ -143,6 +143,7 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
             }
         }
 
+#if 0
         try
         {
             // If explicitly set to the empty string, we succeed here.
@@ -160,6 +161,9 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
                 throw_ex("No " + log_dir_key + " configured and failed to get default");
             }
         }
+#else
+        log_directory_ = get_optional_string(runtime_config_group, log_dir_key);
+#endif
 
         // Check if we have an override for the log directory.
         char const* logdir = getenv("UNITY_SCOPES_LOGDIR");

@@ -239,6 +239,7 @@ TEST_F(RuntimeConfigTest, exceptions)
                      e.what());
     }
 
+#if 0
     try
     {
         unsetenv("HOME");
@@ -258,6 +259,7 @@ TEST_F(RuntimeConfigTest, exceptions)
                        "        unity::LogicException: Could not get string value \\(.+/NoLogDir.ini, .*");
         EXPECT_TRUE(boost::regex_match(e.what(), r)) << e.what();
     }
+#endif
 
     try
     {
