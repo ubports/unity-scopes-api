@@ -78,7 +78,6 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
         cache_directory_ = default_cache_directory();
         app_directory_ = default_app_directory();
         config_directory_ = default_config_directory();
-        log_directory_ = default_log_directory();
     }
     else
     {
@@ -143,23 +142,7 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
             }
         }
 
-        try
-        {
-            // If explicitly set to the empty string, we succeed here.
-            log_directory_ = parser()->get_string(runtime_config_group, log_dir_key);
-        }
-        catch (LogicException const&)
-        {
-            // Use default value.
-            try
-            {
-                log_directory_ = default_log_directory();
-            }
-            catch (ResourceException const&)
-            {
-                throw_ex("No " + log_dir_key + " configured and failed to get default");
-            }
-        }
+        log_directory_ = get_optional_string(runtime_config_group, log_dir_key);
 
         // Check if we have an override for the log directory.
         char const* logdir = getenv("UNITY_SCOPES_LOGDIR");
