@@ -27,6 +27,8 @@
 #include <boost/algorithm/string/split.hpp>
 #include <unity/UnityExceptions.h>
 
+#include <iostream>  // TODO: remove this
+
 using namespace std;
 
 namespace unity
@@ -163,6 +165,7 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
         }
 #else
         log_directory_ = get_optional_string(runtime_config_group, log_dir_key);
+        cerr << "log_directory_: " << log_directory_ << endl;
 #endif
 
         // Check if we have an override for the log directory.
