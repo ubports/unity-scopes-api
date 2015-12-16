@@ -93,7 +93,6 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
         // Now that we have the config, change the logger to log to a file.
         // If log_dir is set to the empty string, continue logging to std::clog.
         log_dir_ = config.log_directory();
-        cerr << "log_dir_: " << log_dir_ << endl;
         if (!log_dir_.empty())
         {
             logger_->set_log_file(find_log_dir(log_file_basename) + "/" + log_file_basename,

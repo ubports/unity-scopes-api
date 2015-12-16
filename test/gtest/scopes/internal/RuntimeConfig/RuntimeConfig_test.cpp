@@ -239,28 +239,6 @@ TEST_F(RuntimeConfigTest, exceptions)
                      e.what());
     }
 
-#if 0
-    try
-    {
-        unsetenv("HOME");
-
-        RuntimeConfig c(TEST_DIR "/NoLogDir.ini");
-        FAIL();
-    }
-    catch (ConfigException const& e)
-    {
-        // Using regex here because error message returned by glib changed from Utopic to Vivid.
-        // The final .* takes care of the difference. Note that, instead of using TEST_DIR, we
-        // use .+. That's because, when building with bzr bd, we end up with a '+' in the path,
-        // and that is a regex metacharacter, causing the match to fail.
-        boost::regex r("unity::scopes::ConfigException: \".+/NoLogDir.ini\": "
-                       "No LogDir configured and failed to get default:\\n"
-                       "    unity::ResourceException: RuntimeConfig::default_log_directory\\(\\): \\$HOME not set:\\n"
-                       "        unity::LogicException: Could not get string value \\(.+/NoLogDir.ini, .*");
-        EXPECT_TRUE(boost::regex_match(e.what(), r)) << e.what();
-    }
-#endif
-
     try
     {
         unsetenv("HOME");
