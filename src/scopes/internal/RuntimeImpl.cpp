@@ -91,8 +91,7 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
         }
 
         // Now that we have the config, change the logger to log to a file.
-        // If log_dir was explicitly set to the empty string, continue
-        // logging to std::clog.
+        // If log_dir is set to the empty string, continue logging to std::clog.
         log_dir_ = config.log_directory();
         if (!log_dir_.empty())
         {
@@ -614,6 +613,8 @@ string RuntimeImpl::find_app_dir() const
 
 string RuntimeImpl::find_log_dir(string const& id) const
 {
+    assert(!log_dir_.empty());
+
     // Create the cache_dir_/<confinement-type>/<id> directories if they don't exist.
     string dir = log_dir_ + "/" + confinement_type();
     if (!confined())  // Avoid apparmore noise
