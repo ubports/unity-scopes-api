@@ -52,7 +52,7 @@ bool PreviewReplyImpl::register_layout(unity::scopes::ColumnLayoutList const& la
     {
         ColumnLayoutImpl::validate_layouts(layouts);
     }
-    catch (unity::LogicException const &e)
+    catch (unity::LogicException const&)
     {
         throw unity::LogicException("PreviewReplyImpl::register_layout(): Failed to validate layouts");
     }

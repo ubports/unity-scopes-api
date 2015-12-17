@@ -77,7 +77,6 @@ SearchQueryBase::UPtr EchoScope::search(CannedQuery const& query, SearchMetadata
 PreviewQueryBase::UPtr EchoScope::preview(Result const& /* result */, ActionMetadata const& /* metadata */)
 {
     abort();
-    return nullptr;
 }
 
 extern "C"

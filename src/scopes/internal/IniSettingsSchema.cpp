@@ -56,8 +56,6 @@ public:
             Variant const& default_value);
     ~Setting() = default;
 
-    string id() const;
-
     enum Type { BooleanT, ListT, NumberT, StringT };
 
     Variant to_schema_definition();
@@ -240,7 +238,7 @@ void Setting::set_value(Type expected_type)
             }
         }
     }
-    catch (LogicException const& e)
+    catch (LogicException const&)
     {
         throw ResourceException(string("IniSettingsSchema(): invalid value type for \"") + dflt_val_key + "\" definition, "
                                 "setting = \"" + id_ + "\"");
@@ -276,7 +274,7 @@ IniSettingsSchema::IniSettingsSchema(string const& ini_file)
             definitions_.push_back(s.to_schema_definition());
         }
     }
-    catch (std::exception const& e)
+    catch (std::exception const&)
     {
         throw ResourceException("IniSettingsSchema(): cannot parse settings file \"" + ini_file + "\"");
     }

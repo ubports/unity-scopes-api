@@ -134,6 +134,7 @@ private:
     std::condition_variable state_changed_;
     mutable std::mutex state_mutex_;            // Protects state_
     std::atomic_bool shutdown_flag_;
+    std::unique_ptr<unity::scopes::internal::Logger> test_logger_;
     boost::log::sources::severity_channel_logger_mt<>& logger_;
 
     int64_t twoway_timeout_;                    // Default timeout for twoway invocations

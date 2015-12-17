@@ -81,15 +81,13 @@ void write_db(const string& src)
     ::close(fd);
 }
 
-BOOST_LOG_INLINE_GLOBAL_LOGGER_DEFAULT(test_logger, boost::log::sources::severity_channel_logger_mt<>)
-
 TEST(SettingsDB, basic)
 {
     auto schema = TEST_SRC_DIR "/schema.ini";
 
     {
         unlink(db_name.c_str());
-        auto db = SettingsDB::create_from_ini_file(db_name, schema, test_logger::get());
+        auto db = SettingsDB::create_from_ini_file(db_name, schema);
 
         // If db doesn't exist, default values are returned.
         EXPECT_EQ(4, db->settings().size());
@@ -165,7 +163,7 @@ TEST(SettingsDB, basic)
 
         // This schema does not specify a default value for location and unit.
         auto schema = TEST_SRC_DIR "/no_default_schema.ini";
-        auto db = SettingsDB::create_from_ini_file(db_name, schema, test_logger::get());
+        auto db = SettingsDB::create_from_ini_file(db_name, schema);
 
         // Check that we now can see only the other two values. (DB doesn't exist yet.)
         EXPECT_EQ(2, db->settings().size());
@@ -188,7 +186,7 @@ TEST(SettingsDB, basic)
 
         // This schema does not specify a default value for location and unit.
         auto schema = TEST_SRC_DIR "/no_default_schema.ini";
-        auto db = SettingsDB::create_from_ini_file(db_name, schema, test_logger::get());
+        auto db = SettingsDB::create_from_ini_file(db_name, schema);
 
         // Add records to supply the values.
         write_db("db_loctemp.ini");
@@ -218,7 +216,7 @@ TEST(SettingsDB, chinese_characters)
 
     {
         unlink(db_name.c_str());
-        auto db = SettingsDB::create_from_ini_file(db_name, schema, test_logger::get());
+        auto db = SettingsDB::create_from_ini_file(db_name, schema);
 
         // If db doesn't exist, default values are returned.
         EXPECT_EQ(1, db->settings().size());
@@ -237,7 +235,7 @@ TEST(SettingsDB, delete_db)
 
     {
         unlink(db_name.c_str());
-        auto db = SettingsDB::create_from_ini_file(db_name, schema, test_logger::get());
+        auto db = SettingsDB::create_from_ini_file(db_name, schema);
 
         // If db doesn't exist, default values are returned.
         EXPECT_EQ(4, db->settings().size());
@@ -288,7 +286,7 @@ TEST(SettingsDB, from_json_string)
 
     {
         unlink(db_name.c_str());
-        auto db = SettingsDB::create_from_json_string(db_name, ok_schema, test_logger::get());
+        auto db = SettingsDB::create_from_json_string(db_name, ok_schema);
 
         // If db doesn't exist, default values are returned.
         EXPECT_EQ(1, db->settings().size());
@@ -305,7 +303,7 @@ TEST(SettingsDB, exceptions)
 {
     try
     {
-        auto db = SettingsDB::create_from_ini_file("unused", "no_such_file", test_logger::get());
+        auto db = SettingsDB::create_from_ini_file("unused", "no_such_file");
         FAIL();
     }
     catch (ResourceException const& e)
@@ -318,7 +316,7 @@ TEST(SettingsDB, exceptions)
 
     try
     {
-        auto db = SettingsDB::create_from_json_string("unused", "syntax error", test_logger::get());
+        auto db = SettingsDB::create_from_json_string("unused", "syntax error");
         FAIL();
     }
     catch (ResourceException const& e)
@@ -334,7 +332,7 @@ TEST(SettingsDB, exceptions)
         // Open DB that doesn't exist yet.
         unlink(db_name.c_str());
         auto schema = TEST_SRC_DIR "/schema.ini";
-        auto db = SettingsDB::create_from_ini_file(db_name, schema, test_logger::get());
+        auto db = SettingsDB::create_from_ini_file(db_name, schema);
 
         // Add a record, which creates the DB
         write_db("db_location.ini");
@@ -363,7 +361,7 @@ TEST(SettingsDB, exceptions)
         write_db("db_location_munich.ini");
 
         auto schema = TEST_SRC_DIR "/schema.ini";
-        auto db = SettingsDB::create_from_ini_file(db_name, schema, test_logger::get());
+        auto db = SettingsDB::create_from_ini_file(db_name, schema);
 
         EXPECT_EQ(4, db->settings().size());
         EXPECT_EQ("Munich", db->settings()["locationSetting"].get_string());

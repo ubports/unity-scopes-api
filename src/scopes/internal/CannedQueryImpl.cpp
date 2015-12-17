@@ -232,7 +232,7 @@ std::string CannedQueryImpl::decode_or_throw(std::string const& value, std::stri
     {
         return from_percent_encoding(value);
     }
-    catch (InvalidArgumentException const& e)
+    catch (InvalidArgumentException const&)
     {
         std::stringstream err;
         err << "Failed to decode key '" << key_name << "' of uri '" << uri << "'";
