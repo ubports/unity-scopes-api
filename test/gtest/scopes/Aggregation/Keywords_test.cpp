@@ -112,22 +112,22 @@ private:
     ScopeProxy scope_;
 };
 
-class RaiiCacheDir
+class RaiiConfigDir
 {
 public:
-    RaiiCacheDir()
+    RaiiConfigDir()
     {
-        // Create an empty cache directory for scope A
+        // Create an empty config directory for scope A
         boost::system::error_code ec;
-        boost::filesystem::remove_all(TEST_CACHE_PATH "/unconfined/A", ec);
-        boost::filesystem::create_directory(TEST_CACHE_PATH "/unconfined/A", ec);
+        boost::filesystem::remove_all(TEST_RUNTIME_PATH "/A", ec);
+        boost::filesystem::create_directory(TEST_RUNTIME_PATH "/A", ec);
     }
 
-    ~RaiiCacheDir()
+    ~RaiiConfigDir()
     {
-        // Remove the cache directory for scope A
+        // Remove the config directory for scope A
         boost::system::error_code ec;
-        boost::filesystem::remove_all(TEST_CACHE_PATH "/unconfined/A", ec);
+        boost::filesystem::remove_all(TEST_RUNTIME_PATH "/A", ec);
     }
 };
 
@@ -143,8 +143,8 @@ public:
 
 TEST_F(KeywordsTest, subsearch_disabled_child)
 {
-    // Create an empty cache directory for scope A
-    RaiiCacheDir cache_dir;
+    // Create an empty config directory for scope A
+    RaiiConfigDir config_dir;
 
     system("cat >A.cmd << EOF\nB\nC\nD\nEOF");
     system(">B.cmd");
@@ -246,8 +246,8 @@ TEST_F(KeywordsTest, subsearch_disabled_child)
 
 TEST_F(KeywordsTest, subsearch_with_keywords)
 {
-    // Create an empty cache directory for scope A
-    RaiiCacheDir cache_dir;
+    // Create an empty config directory for scope A
+    RaiiConfigDir config_dir;
 
     system("cat >A.cmd << EOF\nB\nC\nD\nEOF");
     system(">B.cmd");
