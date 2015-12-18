@@ -1,12 +1,16 @@
-unity-scopes-api (1.0.2-0ubuntu1) UNRELEASED; urgency=medium
+unity-scopes-api (1.0.2+16.04.20151218.2-0ubuntu1) xenial; urgency=medium
 
+  [ Michi Henning ]
   * Changed version number generation to use a common script. Removed
     symbols files because we are now using abi-compliance-checker.
 
   * Replaced global dummy loggers for testing with heap-allocated
     instances to avoid crash due to global destructor ordering (LP: #1472755).
 
- -- Michi Henning <michi.henning@canonical.com>  Mon, 28 Sep 2015 15:42:14 +1000
+  [ CI Train Bot ]
+  * No-change rebuild.
+
+ -- Pawel Stolowski <ci-train-bot@canonical.com>  Fri, 18 Dec 2015 11:42:03 +0000
 
 unity-scopes-api (1.0.2+15.10.20151009-0ubuntu1) wily; urgency=medium
 
