@@ -185,8 +185,8 @@ else()
     option(Werror "Treat warnings as errors" OFF)
 endif()
 
-# Some tests are slow, so make it possible not to run them
-# during day-to-day development.
+# Some tests are slow, so make it possible not to run them during day-to-day development.
+# The default for this *must* stay ON, otherwise the tests won't run in Jenkins.
 option(slowtests "Run slow tests" ON)
 
 if (${Werror})
@@ -210,64 +210,53 @@ else()
     message(FATAL_ERROR "Invalid SANITIZER setting: ${SANITIZER}")
 endif()
 
-# Scopes library name. Also used as a prefix in various places, and as a subdirectory
+# Scopes library names. Also used as a prefix in various places, and as a subdirectory
 # name for installed files. Changing this will also require corresponding changes
 # to the debian files.
 set(UNITY_SCOPES_LIB unity-scopes)
+set(UNITY_SCOPES_QT_LIB unity-scopes-qt)
 
-# Check the distribution we are building for.
-execute_process(COMMAND lsb_release -c -s OUTPUT_VARIABLE DISTRIBUTION OUTPUT_STRIP_TRAILING_WHITESPACE)
+# Run debian/get-versions.sh to get the version and soversion numbers for each library.
+execute_process(COMMAND mktemp -d OUTPUT_VARIABLE version_dir OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND sh ${CMAKE_SOURCE_DIR}/debian/get-versions.sh ${CMAKE_SOURCE_DIR}/debian ${version_dir})
 
-# Read API versions. from VERSION file. The version is in the form <major>.<minor>.<micro>.
-
-file(READ debian/VERSION UNITY_SCOPES_FULL_VERSION)
+# Set versions for libunity-scopes.
+file(READ ${version_dir}/lib${UNITY_SCOPES_LIB}.full-version UNITY_SCOPES_FULL_VERSION)
 string(STRIP ${UNITY_SCOPES_FULL_VERSION} UNITY_SCOPES_FULL_VERSION)
+file(READ ${version_dir}/lib${UNITY_SCOPES_LIB}.major-version UNITY_SCOPES_MAJOR)
+string(STRIP ${UNITY_SCOPES_MAJOR} UNITY_SCOPES_MAJOR)
+file(READ ${version_dir}/lib${UNITY_SCOPES_LIB}.minor-version UNITY_SCOPES_MINOR)
+string(STRIP ${UNITY_SCOPES_MINOR} UNITY_SCOPES_MINOR)
+file(READ ${version_dir}/lib${UNITY_SCOPES_LIB}.micro-version UNITY_SCOPES_MICRO)
+string(STRIP ${UNITY_SCOPES_MICRO} UNITY_SCOPES_MICRO)
+file(READ ${version_dir}/lib${UNITY_SCOPES_LIB}.major-minor-version UNITY_SCOPES_MAJOR_MINOR)
+string(STRIP ${UNITY_SCOPES_MAJOR_MINOR} UNITY_SCOPES_MAJOR_MINOR)
+file(READ ${version_dir}/lib${UNITY_SCOPES_LIB}.soversion UNITY_SCOPES_SOVERSION)
+string(STRIP ${UNITY_SCOPES_SOVERSION} UNITY_SCOPES_SOVERSION)
 
-file(READ debian/QT-VERSION UNITY_SCOPES_QT_FULL_VERSION)
+# Set versions for libunity-scopes-qt.
+file(READ ${version_dir}/lib${UNITY_SCOPES_QT_LIB}.full-version UNITY_SCOPES_QT_FULL_VERSION)
 string(STRIP ${UNITY_SCOPES_QT_FULL_VERSION} UNITY_SCOPES_QT_FULL_VERSION)
-
-# Parse out the three components.
-STRING(REGEX MATCHALL "[0-9]+" full_version_components ${UNITY_SCOPES_FULL_VERSION})
-LIST(GET full_version_components 0 UNITY_SCOPES_MAJOR)
-LIST(GET full_version_components 1 UNITY_SCOPES_MINOR)
-LIST(GET full_version_components 2 UNITY_SCOPES_MICRO)
-
-# Again, for the Qt library.
-STRING(REGEX MATCHALL "[0-9]+" full_version_components ${UNITY_SCOPES_QT_FULL_VERSION})
-LIST(GET full_version_components 0 UNITY_SCOPES_QT_MAJOR)
-LIST(GET full_version_components 1 UNITY_SCOPES_QT_MINOR)
-LIST(GET full_version_components 2 UNITY_SCOPES_QT_MICRO)
-
-# For vivid, we maintain a separate soversion sequence. The
-# soversion is 3 for 1.0.x and increments by 1 every
-# the minor or major version is updated.
-# For wily and later, the scopes library SOVERSION is <major>.<minor>.
-# UNITY_SCOPES_SOVERSION_SYM_SUFFIX is used in Version.h.in to set the suffix
-# for the unity_scope_create_v<suffix> function.
+file(READ ${version_dir}/lib${UNITY_SCOPES_QT_LIB}.major-version UNITY_SCOPES_QT_MAJOR)
+string(STRIP ${UNITY_SCOPES_QT_MAJOR} UNITY_SCOPES_QT_MAJOR)
+file(READ ${version_dir}/lib${UNITY_SCOPES_QT_LIB}.minor-version UNITY_SCOPES_QT_MINOR)
+string(STRIP ${UNITY_SCOPES_QT_MINOR} UNITY_SCOPES_QT_MINOR)
+file(READ ${version_dir}/lib${UNITY_SCOPES_QT_LIB}.micro-version UNITY_SCOPES_QT_MICRO)
+string(STRIP ${UNITY_SCOPES_QT_MICRO} UNITY_SCOPES_QT_MICRO)
+file(READ ${version_dir}/lib${UNITY_SCOPES_QT_LIB}.major-minor-version UNITY_SCOPES_QT_MAJOR_MINOR)
+string(STRIP ${UNITY_SCOPES_QT_MAJOR_MINOR} UNITY_SCOPES_QT_MAJOR_MINOR)
+file(READ ${version_dir}/lib${UNITY_SCOPES_QT_LIB}.soversion UNITY_SCOPES_QT_SOVERSION)
+string(STRIP ${UNITY_SCOPES_QT_SOVERSION} UNITY_SCOPES_QT_SOVERSION)
 
 if(NOT ${UNITY_SCOPES_MAJOR} EQUAL 1)
-    message(FATAL_ERROR "Change in major version number. You need to adjust gen-debian-files.sh and the calculation of UNITY_SCOPES_SOVERSION")
+    message(FATAL_ERROR "Change in major version number. You need to adjust get-versions.sh and gen-debian-files.sh")
 endif()
 
 if(NOT ${UNITY_SCOPES_QT_MAJOR} EQUAL 0)
-    message(FATAL_ERROR "Change in Qt major version number. You need to adjust gen-debian-files.sh and the calculation of UNITY_SCOPES_QT_SOVERSION")
+    message(FATAL_ERROR "Change in Qt major version number. You need to adjust get-versions.sh and gen-debian-files.sh")
 endif()
 
-if(${DISTRIBUTION} MATCHES "vivid")
-    math(EXPR UNITY_SCOPES_SOVERSION "${UNITY_SCOPES_MINOR} + 3")
-    set(UNITY_SCOPES_SOVERSION_SYM_SUFFIX ${UNITY_SCOPES_SOVERSION})
-    set(UNITY_SCOPES_QT_SOVERSION ${UNITY_SCOPES_QT_MINOR})
-else()
-    set(UNITY_SCOPES_SOVERSION "${UNITY_SCOPES_MAJOR}.${UNITY_SCOPES_MINOR}")
-    set(UNITY_SCOPES_SOVERSION_SYM_SUFFIX ${UNITY_SCOPES_MAJOR}_${UNITY_SCOPES_MINOR})
-    set(UNITY_SCOPES_QT_SOVERSION "${UNITY_SCOPES_QT_MAJOR}.${UNITY_SCOPES_QT_MINOR}")
-endif()
-set(UNITY_SCOPES_MAJOR_MINOR "${UNITY_SCOPES_MAJOR}.${UNITY_SCOPES_MINOR}")
-set(UNITY_SCOPES_QT_MAJOR_MINOR "${UNITY_SCOPES_QT_SOVERSION}")
-
-# For the Qt library, SOVERSION is <major>.<minor>.
-
-# Version for testing, with all symbols visible
+# Library for testing, with all symbols visible
 set(UNITY_SCOPES_TEST_LIB ${UNITY_SCOPES_LIB}-test)
 
 # All the libraries we need to link a normal executable that uses Unity scopes

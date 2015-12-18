@@ -1,5 +1,4 @@
-configure_file(scope-A.map.in scope-A.map)
-set(symbol_map "${CMAKE_CURRENT_BINARY_DIR}/scope-A.map")
+set(symbol_map "${CMAKE_CURRENT_SOURCE_DIR}/scope-A.map")
 
 add_library(scope-A MODULE scope-A.cpp)
 # Add_dependencies should be used sparingly. In this case we need the global

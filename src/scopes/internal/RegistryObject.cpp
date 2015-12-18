@@ -47,14 +47,13 @@ namespace scopes
 namespace internal
 {
 
-// Substitute logger for testing. (Some of tests mock out the middleware and run time.)
-BOOST_LOG_INLINE_GLOBAL_LOGGER_DEFAULT(registry_object_test_logger, boost::log::sources::severity_channel_logger_mt<>)
-
 RegistryObject::RegistryObject(core::posix::ChildProcess::DeathObserver& death_observer,
                                Executor::SPtr const& executor,
                                MiddlewareBase::SPtr middleware,
                                bool generate_desktop_files)
-    : logger_(middleware ? middleware->runtime()->logger() : registry_object_test_logger::get()),
+    // Substitute logger for testing. (Some of tests mock out the middleware and run time.)
+    : test_logger_(middleware ? nullptr : new Logger("RegistryObject_test")),
+      logger_(middleware ? middleware->runtime()->logger() : *test_logger_),
       death_observer_(death_observer),
       death_observer_connection_
       {

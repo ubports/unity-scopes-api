@@ -127,7 +127,7 @@ void ReplyImpl::error(exception_ptr ex)
     {
         fwd()->finished(CompletionDetails(CompletionDetails::Error, error_message));  // Oneway, can't block
     }
-    catch (std::exception const& e)
+    catch (std::exception const&)
     {
         BOOST_LOG(mw_proxy_->mw_base()->runtime()->logger())
             << "ReplyImpl::error(): exception from finished(): " << error_message;

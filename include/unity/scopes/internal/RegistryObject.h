@@ -135,6 +135,7 @@ private:
     };
 
 private:
+    std::unique_ptr<unity::scopes::internal::Logger> test_logger_;
     boost::log::sources::severity_channel_logger_mt<>& logger_;
 
     core::posix::ChildProcess::DeathObserver& death_observer_;

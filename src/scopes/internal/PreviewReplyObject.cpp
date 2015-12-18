@@ -67,7 +67,7 @@ bool PreviewReplyObject::process_data(VariantMap const& data)
         {
             ColumnLayoutImpl::validate_layouts(list);
         }
-        catch (unity::LogicException const &e)
+        catch (unity::LogicException const&)
         {
             throw unity::LogicException("PreviewReplyObject::process_data(): Failed to validate layouts");
         }

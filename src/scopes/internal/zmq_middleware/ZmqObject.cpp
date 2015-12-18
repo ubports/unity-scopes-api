@@ -50,8 +50,6 @@ namespace
     std::mutex shared_mutex;
 }
 
-#define MONITOR_ENDPOINT "ipc:///tmp/scopes-monitor"
-
 ZmqObjectProxy::ZmqObjectProxy(ZmqMiddleware* mw_base,
                                string const& endpoint,
                                string const& identity,

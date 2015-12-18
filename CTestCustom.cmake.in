@@ -22,4 +22,5 @@ SET(CTEST_CUSTOM_MEMCHECK_IGNORE
     clean-public-unity-scopes-qt-headers
     IsolatedScopeBenchmark                      # Runs too slowly and crashes valgrind 3.10.0 with g++-4.9
     copyright
-    whitespace)
+    whitespace
+    check-abi-compliance)

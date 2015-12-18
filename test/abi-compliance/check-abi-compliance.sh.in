@@ -1,0 +1,57 @@
+#!/bin/sh
+
+#
+# Copyright (C) 2015 Canonical Ltd
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License version 3 as
+# published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Authored by: Michi Henning <michi.henning@canonical.com>
+#
+
+# Script to check whether the ABI is still intact.
+#
+# The base ABI (for version <x>.<y>.0) is kept in libunity-scopes_<x>.<y>.0.abi.tar.gz.
+# If the micro version is non-zero, we run abi-compliance-checker to compare the two versions.
+# If there are any complaints, we print an error message ane return non-zero status.
+
+progname=$(basename $0)
+
+distro=$(lsb_release -c -s)
+[ "$distro" = "vivid" ] && {
+    echo "${progname}: Distribution is ${distro}, skipping ABI compliance check."
+    exit 0
+}
+
+libname=lib@UNITY_SCOPES_LIB@
+
+base_abi=@CMAKE_CURRENT_SOURCE_DIR@/abi_dumps/@CMAKE_LIBRARY_ARCHITECTURE@/${libname}_@UNITY_SCOPES_MAJOR_MINOR@.0.abi.tar.gz
+cur_abi=@CMAKE_CURRENT_BINARY_DIR@/abi_dumps/${libname}/${libname}_@UNITY_SCOPES_FULL_VERSION@.abi.tar.gz
+
+# Compare against the base ABI.
+abi-compliance-checker -lib ${libname} -old $base_abi -new $cur_abi
+
+status=$?
+report=@CMAKE_CURRENT_BINARY_DIR@/compat_reports/${libname}/1.0.0_to_@UNITY_SCOPES_FULL_VERSION@/compat_report.html
+[ -e $report ] && {
+    echo "${progname}: Compatibility report generated to $report"
+}
+
+[ $status -ne 0 ] && {
+    [ $status -eq 1 ] && {
+        echo "${progname}: ERROR: Incompatible ABI!" >&2
+    }
+    echo "${progname}: ERROR: abi-compliance-checker returned exit status $status" >&2
+    exit 1
+}
+
+exit 0

@@ -55,9 +55,6 @@ static const std::string c_scopes_cache_dir = homedir() + "/.cache/unity-scopes/
 static const std::string c_scopes_cache_filename = "remote-scopes.json";
 static const std::string c_partner_id_file = "/custom/partner-id";
 
-// Some of the tests don't have a runtime, so we use a separate logger in that case.
-BOOST_LOG_INLINE_GLOBAL_LOGGER_DEFAULT(test_logger, boost::log::sources::severity_channel_logger_mt<>)
-
 using namespace unity::scopes;
 using namespace unity::scopes::internal::smartscopes;
 
@@ -116,7 +113,9 @@ SmartScopesClient::SmartScopesClient(HttpClientInterface::SPtr http_client,
                                      std::string const& partner_id_path)
     : http_client_(http_client)
     , json_node_(json_node)
-    , logger_(runtime ? runtime->logger() : test_logger::get())
+    // Some of the tests don't have a runtime, so we use a separate logger in that case.
+    , test_logger_(runtime ? nullptr : new Logger("SmartScopesClient_test"))
+    , logger_(runtime ? runtime->logger() : *test_logger_)
     , have_latest_cache_(false)
     , query_counter_(0)
     , partner_file_(partner_id_path)
@@ -339,7 +338,7 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
                         {
                             scope.keywords.emplace(keyword.get_string());
                         }
-                        catch (unity::LogicException const& e)
+                        catch (unity::LogicException const&)
                         {
                             BOOST_LOG(logger_)
                                 << "SmartScopesClient.get_remote_scopes(): Scope: \"" << scope.id
@@ -481,7 +480,14 @@ SearchHandle::UPtr SmartScopesClient::search(SearchReplyHandler const& handler,
         // store the leftover data from the handle_chunk call into tmp_data
         *tmp_data = handle_chunk(data, [this, handler](const std::string& line)
         {
-            handle_line(line, handler);
+            try
+            {
+                handle_line(line, handler);
+            }
+            catch (unity::Exception const& e)
+            {
+                BOOST_LOG_SEV(logger_, Logger::Error) << "SmartScopesClient.search(): Failed to parse line: " << e.what();
+            }
         });
     }, headers);
 
@@ -548,7 +554,14 @@ PreviewHandle::UPtr SmartScopesClient::preview(PreviewReplyHandler const& handle
         // store the leftover data from the handle_chunk call into tmp_data
         *tmp_data = handle_chunk(data, [this, handler](const std::string& line)
         {
-            handle_line(line, handler);
+            try
+            {
+                handle_line(line, handler);
+            }
+            catch (unity::Exception const& e)
+            {
+                BOOST_LOG_SEV(logger_, Logger::Error) << "SmartScopesClient.preview(): Failed to parse line: " << e.what();
+            }
         });
     }, headers);
 
@@ -840,7 +853,7 @@ void SmartScopesClient::wait_for_preview(unsigned int preview_id)
         query_result->wait();
         query_result->get(); // may throw on error
     }
-    catch (std::exception const& e)
+    catch (std::exception const&)
     {
         BOOST_LOG(logger_)
             << "SmartScopesClient.get_preview_results(): Failed to retrieve preview results for query "

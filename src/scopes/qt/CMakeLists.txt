@@ -62,8 +62,7 @@ CHECK_CXX_SOURCE_COMPILES("#ifdef __clang__\n#else\n#error \"Not clang.\"\n#endi
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
 
 
-set(UNITY_SCOPES_QT unity-scopes-qt)
-set(UNITY_SCOPES_QT_TEST ${UNITY_SCOPES_QT}-test)
+set(UNITY_SCOPES_QT_TEST ${UNITY_SCOPES_QT_LIB}-test)
 
 find_package(PkgConfig REQUIRED)
 find_package(Threads REQUIRED)
@@ -83,7 +82,7 @@ include_directories(
 )
 
 add_library(
-    ${UNITY_SCOPES_QT} SHARED
+    ${UNITY_SCOPES_QT_LIB} SHARED
     ${SCOPES_QT_SRC}
 )
 
@@ -93,7 +92,7 @@ add_library(
 )
 
 qt5_use_modules(
-    ${UNITY_SCOPES_QT}
+    ${UNITY_SCOPES_QT_LIB}
 
     Core
 )
@@ -107,7 +106,7 @@ qt5_use_modules(
 #set(LIBS unity-scopes-qt)
 
 target_link_libraries(
-    ${UNITY_SCOPES_QT}
+    ${UNITY_SCOPES_QT_LIB}
     ${UNITY_SCOPES_LIB}
     net-cpp
 )
@@ -118,7 +117,7 @@ target_link_libraries(
     net-cpp
 )
 
-set_target_properties(${UNITY_SCOPES_QT} PROPERTIES
+set_target_properties(${UNITY_SCOPES_QT_LIB} PROPERTIES
     VERSION ${UNITY_SCOPES_QT_FULL_VERSION}
     SOVERSION ${UNITY_SCOPES_QT_SOVERSION})
 
@@ -137,16 +136,16 @@ set_target_properties(${UNITY_SCOPES_QT_TEST} PROPERTIES LINK_FLAGS "${ldflags}"
 
 # export the library name so the unit test can access
 set(TESTLIBS_QT ${UNITY_SCOPES_QT_TEST} CACHE STRING "Qt test library with internal symbols visible" FORCE)
-set(LIB_QT ${UNITY_SCOPES_QT} CACHE STRING "Qt library" FORCE)
+set(LIB_QT ${UNITY_SCOPES_QT_LIB} CACHE STRING "Qt library" FORCE)
 
 
 # We compile with all symbols visible by default.
-set(symbol_map "${CMAKE_SOURCE_DIR}/src/scopes/qt/${UNITY_SCOPES_QT}.map")
-set_target_properties(${UNITY_SCOPES_QT} PROPERTIES
+set(symbol_map "${CMAKE_SOURCE_DIR}/src/scopes/qt/${UNITY_SCOPES_QT_LIB}.map")
+set_target_properties(${UNITY_SCOPES_QT_LIB} PROPERTIES
                       LINK_FLAGS "${ldflags} -Wl,--version-script,${symbol_map}")
-set_target_properties(${UNITY_SCOPES_QT} PROPERTIES LINK_DEPENDS ${symbol_map})
+set_target_properties(${UNITY_SCOPES_QT_LIB} PROPERTIES LINK_DEPENDS ${symbol_map})
 
-install(TARGETS ${UNITY_SCOPES_QT} LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+install(TARGETS ${UNITY_SCOPES_QT_LIB} LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
 
 #
