@@ -387,6 +387,12 @@ void RuntimeImpl::run_scope(ScopeBase* scope_base,
         {
             scope_base->p->set_settings_db(nullptr);
         }
+
+        // Configure the child scopes repository
+        string child_scopes_repo = config_dir + "/child-scopes.json";
+
+        auto repo = make_shared<ChildScopesRepository>(child_scopes_repo, logger());
+        scope_base->p->set_child_scopes_repo(repo);
     }
 
     scope_base->p->set_registry(registry_);
@@ -394,12 +400,7 @@ void RuntimeImpl::run_scope(ScopeBase* scope_base,
     scope_base->p->set_app_directory(find_app_dir());
     scope_base->p->set_tmp_directory(find_tmp_dir());
 
-    {
-        // Configure the child scopes repository
-        string child_scopes_repo = scope_base->cache_directory() + "/child-scopes.json";
-        auto repo = make_shared<ChildScopesRepository>(child_scopes_repo, logger());
-        scope_base->p->set_child_scopes_repo(repo);
-    }
+    // TODO: redirect log messages to scope-specific file.
 
     try
     {
