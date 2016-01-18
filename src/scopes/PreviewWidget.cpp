@@ -178,7 +178,7 @@ The gallery widget displays a set of images.
 List of attributes:
 
 \arg \c sources An array of image URIs
-\arg \c fallback A fallback image to be used if an image URI is empty or cannot be resolved (default: none)
+\arg \c fallback A fallback image to be used if an image URI is empty or cannot be retrieved (default: none)
 
 \code{.cpp}
 {
