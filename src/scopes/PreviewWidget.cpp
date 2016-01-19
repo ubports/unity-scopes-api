@@ -158,7 +158,7 @@ List of attributes:
 
 \arg \c source A URI pointing to the image
 \arg \c zoomable A boolean specifying whether the image is zoomable (default: \c false)
-\arg \c fallback A fallback image to be used if the image URI cannot be retrieved (default: none)
+\arg \c fallback A fallback image to be used if the image URI is empty or cannot be retrieved (default: none)
 \arg \c share-data An optional dictionary for making this image shareable with Content Hub. See \link contentsharing content sharing\endlink below.
 
 \code{.cpp}
@@ -178,7 +178,7 @@ The gallery widget displays a set of images.
 List of attributes:
 
 \arg \c sources An array of image URIs
-\arg \c fallback A fallback image to be used if an image URI cannot be resolved (default: none)
+\arg \c fallback A fallback image to be used if an image URI is empty or cannot be retrieved (default: none)
 
 \code{.cpp}
 {
@@ -203,7 +203,7 @@ List of attributes:
 \arg \c title A string specifying the title
 \arg \c subtitle A string specifying the subtitle
 \arg \c mascot A URI specifying the mascot
-\arg \c fallback A fallback image to be used if the mascot URI cannot be retrieved (default: none)
+\arg \c fallback A fallback image to be used if the mascot URI is empty or cannot be retrieved (default: none)
 \arg \c emblem A URI specifying the emblem
 
 \code{.cpp}
