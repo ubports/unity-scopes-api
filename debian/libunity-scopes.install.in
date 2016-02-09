@@ -6,3 +6,4 @@ usr/lib/*/unity-scopes/scoperunner
 usr/lib/*/unity-scopes/smartscopesproxy
 usr/share/upstart/sessions/*.conf
 usr/share/apport/package-hooks/*.py
+usr/lib/*/unity-scopes/*.xml
