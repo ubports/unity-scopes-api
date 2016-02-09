@@ -5,7 +5,6 @@ set(abi_dump_cmd /bin/sh ${CMAKE_CURRENT_BINARY_DIR}/gen-abi-dump.sh)
 set(abi_check_cmd /bin/sh ${CMAKE_CURRENT_BINARY_DIR}/check-abi-compliance.sh)
 set(abi_dump_file ${CMAKE_CURRENT_BINARY_DIR}/lib${UNITY_SCOPES_LIB}_${UNITY_SCOPES_FULL_VERSION}.abi.xml)
 set(abi_report ${CMAKE_CURRENT_BINARY_DIR}/lib${UNITY_SCOPES_LIB}_${UNITY_SCOPES_FULL_VERSION}_abi-report.txt)
-message(${abi_report})
 
 add_custom_command(
     OUTPUT ${abi_dump_file}

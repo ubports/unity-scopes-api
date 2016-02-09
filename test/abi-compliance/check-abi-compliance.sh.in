@@ -45,12 +45,12 @@ cur_abi=${libname}_@UNITY_SCOPES_FULL_VERSION@.abi.xml
 report=${libname}_@UNITY_SCOPES_FULL_VERSION@_abi-report.txt
 
 # Compare against the base ABI.
-abidiff ${base_abi} ${cur_abi} >${report}
+abidiff ${base_abi} ${cur_abi} >${report} 2>&1
 status=$?
 
 [ $status -ge 8 ] && {
     echo "${progname}: ERROR: Incompatible ABI!" >&2
-    cat ${report}
+    cat ${report} >&2
 }
 
 [ $status -eq 0 ] && rm -f $report
