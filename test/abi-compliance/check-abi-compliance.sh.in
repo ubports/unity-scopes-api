@@ -20,8 +20,8 @@
 
 # Script to check whether the ABI is still intact.
 #
-# The base ABI (for version <x>.<y>.0) is kept in libunity-scopes_<x>.<y>.0.abi.tar.gz.
-# If the micro version is non-zero, we run abi-compliance-checker to compare the two versions.
+# The base ABI (for version <x>.<y>.0) is kept in libunity-scopes_<x>.<y>.0.abi.xml.gz.
+# If the micro version is non-zero, we run abidiff to compare the two versions.
 # If there are any complaints, we print an error message ane return non-zero status.
 
 progname=$(basename $0)
@@ -32,26 +32,27 @@ distro=$(lsb_release -c -s)
     exit 0
 }
 
-libname=lib@UNITY_SCOPES_LIB@
+[ @UNITY_SCOPES_MICRO@ -eq 0 ] && exit 0
 
-base_abi=@CMAKE_CURRENT_SOURCE_DIR@/abi_dumps/@CMAKE_LIBRARY_ARCHITECTURE@/${libname}_@UNITY_SCOPES_MAJOR_MINOR@.0.abi.tar.gz
-cur_abi=@CMAKE_CURRENT_BINARY_DIR@/abi_dumps/${libname}/${libname}_@UNITY_SCOPES_FULL_VERSION@.abi.tar.gz
+libname=lib@UNITY_SCOPES_LIB@
+base_abi_dir=@CMAKE_CURRENT_SOURCE_DIR@/abi_dumps/@CMAKE_LIBRARY_ARCHITECTURE@
+base_abi=${libname}_@UNITY_SCOPES_MAJOR_MINOR@.0.abi.xml
+
+cp ${base_abi_dir}/${base_abi}.gz .
+gunzip -f ${base_abi}.gz
+
+cur_abi=${libname}_@UNITY_SCOPES_FULL_VERSION@.abi.xml
+report=${libname}_@UNITY_SCOPES_FULL_VERSION@_abi-report.txt
 
 # Compare against the base ABI.
-abi-compliance-checker -lib ${libname} -old $base_abi -new $cur_abi
-
+abidiff ${base_abi} ${cur_abi} >${report}
 status=$?
-report=@CMAKE_CURRENT_BINARY_DIR@/compat_reports/${libname}/1.0.0_to_@UNITY_SCOPES_FULL_VERSION@/compat_report.html
-[ -e $report ] && {
-    echo "${progname}: Compatibility report generated to $report"
+
+[ $status -ge 8 ] && {
+    echo "${progname}: ERROR: Incompatible ABI!" >&2
+    cat ${report}
 }
 
-[ $status -ne 0 ] && {
-    [ $status -eq 1 ] && {
-        echo "${progname}: ERROR: Incompatible ABI!" >&2
-    }
-    echo "${progname}: ERROR: abi-compliance-checker returned exit status $status" >&2
-    exit 1
-}
+[ $status -eq 0 ] && rm -f $report
 
-exit 0
+exit $status

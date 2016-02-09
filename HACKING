@@ -299,7 +299,7 @@ The tests include an ABI compliance test (for Wily and later). To run it:
     $ make test
 
 The test is also automatically run as part of the test suite.
-It takes several minutes to run . If you don't want to wait during local builds,
+It takes a while to run. If you don't want to wait during local builds,
 set the cmake "slowtests" option to OFF to skip the check.
 
 The baseline ABI files for the test are in test/abi-compliance/abi_dumps.
@@ -312,12 +312,6 @@ that installs the ABI dump in, say, /usr/lib. Then throw
 the branch at a silo to get it built for all architectures.
 Once all the packages are built, you can extract the ABI dump
 files and add them to the corresponding directory in the source tree.
-
-The abi-compliance-checker tool produces a report in
-
-    test/abi-compliance/compat_reports/libunity-scopes.so/[version]_to_[version]/compat_report.html
-
-The report provides a nicely layed-out page with all the details.
 
 Autopkg test suite
 ------------------
