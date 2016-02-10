@@ -52,11 +52,25 @@ report=${libname}_@UNITY_SCOPES_FULL_VERSION@_abi-report.txt
 abidiff ${base_abi} ${cur_abi} >${report} 2>&1
 status=$?
 
+# Incompatible changes found.
 [ $status -ge 8 ] && {
     echo "${progname}: ERROR: Incompatible ABI!" >&2
     cat ${report} >&2
+    exit $status
 }
 
-[ $status -eq 0 ] && rm -f $report
+# Compatible changes found.
+[ $status -ge 4 ] && {
+    echo "${progname}: ABI is compatible with changes, see $report for details." >&2
+    exit 0
+}
 
+# All went fine.
+[ $status -eq 0 ] && {
+    rm -f $report
+    exit 0
+}
+
+# Some other error
+echo "${progname}: Unexpected error, see $report for details." >&2
 exit $status
