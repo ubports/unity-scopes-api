@@ -21,5 +21,3 @@ add_custom_command(
 add_custom_target(check-abi DEPENDS ${abi_report})
 
 add_test(check-abi-compliance ${CMAKE_MAKE_PROGRAM} check-abi)
-
-install(FILES ${abi_dump_file} DESTINATION ${LIB_INSTALL_PREFIX})
