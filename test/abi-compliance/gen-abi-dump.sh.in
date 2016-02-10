@@ -20,6 +20,7 @@
 
 # Script to dump the current ABI.
 
+set -x
 libname=lib@UNITY_SCOPES_LIB@
 cur_abi=@CMAKE_CURRENT_BINARY_DIR@/${libname}_@UNITY_SCOPES_FULL_VERSION@.abi.xml
 

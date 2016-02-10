@@ -24,6 +24,10 @@
 # If the micro version is non-zero, we run abidiff to compare the two versions.
 # If there are any complaints, we print an error message ane return non-zero status.
 
+set -x
+echo "build type: " "@CMAKE_BUILD_TYPE@"
+echo "flags: " "@CMAKE_CXX_FLAGS@"
+echo "debug flags: " "@CMAKE_CXX_FLAGS_DEBUG@"
 progname=$(basename $0)
 
 distro=$(lsb_release -c -s)

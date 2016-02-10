@@ -9,7 +9,7 @@ set(abi_report ${CMAKE_CURRENT_BINARY_DIR}/lib${UNITY_SCOPES_LIB}_${UNITY_SCOPES
 add_custom_command(
     OUTPUT ${abi_dump_file}
     COMMAND ${abi_dump_cmd}
-    DEPENDS ${UNITY_SCOPES_LIB})
+    DEPENDS ${CMAKE_BINARY_DIR}/lib${UNITY_SCOPES_LIB}.so)
 
 add_custom_target(gen-abi-dump DEPENDS ${abi_dump_file})
 
