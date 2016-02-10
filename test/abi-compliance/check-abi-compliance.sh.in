@@ -28,6 +28,7 @@ set -x
 echo "build type: " "@CMAKE_BUILD_TYPE@"
 echo "flags: " "@CMAKE_CXX_FLAGS@"
 echo "debug flags: " "@CMAKE_CXX_FLAGS_DEBUG@"
+exit 0
 progname=$(basename $0)
 
 distro=$(lsb_release -c -s)
