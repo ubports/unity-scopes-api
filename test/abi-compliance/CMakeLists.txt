@@ -14,11 +14,12 @@ add_custom_command(
 add_custom_target(gen-abi-dump DEPENDS ${abi_dump_file})
 
 add_custom_command(
-    OUTPUT ${abi_report}
+    OUTPUT run_always
     COMMAND ${abi_check_cmd}
     DEPENDS ${abi_dump_file})
+set_source_files_properties(run_always PROPERTIES SYMBOLIC true)
 
-add_custom_target(check-abi DEPENDS ${abi_report})
+add_custom_target(check-abi DEPENDS run_always)
 
 add_test(check-abi-compliance ${CMAKE_MAKE_PROGRAM} check-abi)
 
