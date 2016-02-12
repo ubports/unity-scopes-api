@@ -49,10 +49,10 @@ report=${libname}_@UNITY_SCOPES_FULL_VERSION@_abi-report.txt
 info_file=$(mktemp)
 readelf --debug-dump=info @CMAKE_BINARY_DIR@/${libname}.so >$info_file
 [ $? -ne 0 ] && exit 1
-[ -s $info ]
+[ -s $info_file ]
 no_debug_info=$?
 rm -f $info_file
-[ no_debug_info ] && {
+[ $no_debug_info -eq 1 ] && {
     echo "${progname}: Skipping ABI test because ${libname}.so was compiled without -g"
     exit 0
 }
