@@ -62,7 +62,7 @@ status=$?
     cat ${report} >&2
     exit 8
 }
-exit 0  # TODO
+exit $status  # TODO
 
 # Incompatible changes found.
 [ $status -ge 8 ] && {
