@@ -1,2 +1,11 @@
 [suppress_function]
-    change_kind = all
+    name_regexp = boost::.*
+    change_kind = added-function
+
+[suppress_function]
+    name_regexp = std::.*
+    change_kind = added-function
+
+[suppress_function]
+    name_regexp = unity::scopes::testing::.*
+    change_kind = added-function

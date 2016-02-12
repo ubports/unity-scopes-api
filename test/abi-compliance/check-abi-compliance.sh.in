@@ -45,15 +45,18 @@ cur_abi=${libname}_@UNITY_SCOPES_FULL_VERSION@.abi.xml
 report=${libname}_@UNITY_SCOPES_FULL_VERSION@_abi-report.txt
 
 # Compare against the base ABI.
-# TODO: Suppressions current do not work with abidiff for added files, so we use a work-around
-#       to suppress all harmless changes for now, and check whether we got empty output instead.
-#abidiff --suppressions ${CMAKE_CURRENT_SOURCE_DIR}/suppressions ${base_abi} ${cur_abi} >${report} 2>&1
+# TODO: Suppressions currently do not work in all cases with abidiff for added
+#       functions, so, as a a work-around, to suppress all harmless changes for now,
+#       we check whether we got empty output instead.
+set -x
+#abidiff --no-unreferenced-symbols --suppressions @CMAKE_CURRENT_SOURCE_DIR@/suppressions \
+#    ${base_abi} ${cur_abi} >${report} 2>&1
 abidiff --no-unreferenced-symbols --changed-fns --deleted-fns --deleted-vars --changed-vars \
     ${base_abi} ${cur_abi} >${report} 2>&1
 status=$?
 
-# TODO: The exit status test below is not reliable with 1.0.rc2 (https://sourceware.org/bugzilla/show_bug.cgi?id=19596).
-#       We rely on the report size for the time being.
+# TODO: Exit status test is not reliable with 1.0.rc2 (https://sourceware.org/bugzilla/show_bug.cgi?id=19596).
+#       We instead rely on the report size for the time being.
 [ $status -ge 4 -a -s $report ] && {
     echo "${progname}: ERROR: Incompatible ABI!" >&2
     cat ${report} >&2
