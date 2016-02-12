@@ -18,6 +18,7 @@ add_custom_command(
     COMMAND ${abi_check_cmd}
     DEPENDS ${abi_dump_file})
 set_source_files_properties(run_always PROPERTIES SYMBOLIC true)
+set_directory_properties(PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${abi_report})
 
 add_custom_target(check-abi DEPENDS run_always)
 
