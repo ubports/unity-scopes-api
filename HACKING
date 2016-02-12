@@ -293,7 +293,7 @@ When incrementing the minor or major version number, follow these steps:
 ABI compliance test
 -------------------
 
-The tests include an ABI compliance test (for Wily and later). To run it:
+The tests include an ABI compliance test (for xenial and later). To run it:
 
     $ cd test/abi-compliance
     $ make test
