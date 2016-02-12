@@ -24,6 +24,7 @@
 # If the micro version is non-zero, we run abidiff to compare the two versions.
 # If there are any complaints, we print an error message ane return non-zero status.
 
+set -x
 progname=$(basename $0)
 
 distro=$(lsb_release -c -s)
@@ -44,11 +45,22 @@ gunzip -f ${base_abi}.gz
 cur_abi=${libname}_@UNITY_SCOPES_FULL_VERSION@.abi.xml
 report=${libname}_@UNITY_SCOPES_FULL_VERSION@_abi-report.txt
 
+# If the current lib doesn't contain debug info, we can't run the test.
+info_file=$(mktemp)
+readelf --debug-dump=info @CMAKE_BINARY_DIR@/${libname}.so >$info_file
+[ $? -ne 0 ] && exit 1
+[ -s $info ]
+no_debug_info=$?
+rm -f $info_file
+[ no_debug_info ] && {
+    echo "${progname}: Skipping ABI test because ${libname}.so was compiled without -g"
+    exit 0
+}
+
 # Compare against the base ABI.
 # TODO: Suppressions currently do not work in all cases with abidiff for added
 #       functions, so, as a a work-around, to suppress all harmless changes for now,
 #       we check whether we got empty output instead.
-set -x
 #abidiff --no-unreferenced-symbols --suppressions @CMAKE_CURRENT_SOURCE_DIR@/suppressions \
 #    ${base_abi} ${cur_abi} >${report} 2>&1
 abidiff --no-unreferenced-symbols --changed-fns --deleted-fns --deleted-vars --changed-vars \
