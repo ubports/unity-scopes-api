@@ -6,7 +6,7 @@
 export DPKG_GENSYMBOLS_CHECK_LEVEL=4
 
 # Skip tests on the archs they are known to be flaky with current configuration
-testskip_architectures := powerpc ppc64el
+#testskip_architectures := powerpc ppc64el
 
 %:
 	dh $@ --parallel --fail-missing --with click
