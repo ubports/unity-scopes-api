@@ -374,9 +374,6 @@ target_link_libraries(${UNITY_SCOPES_TEST_LIB} ${OTHER_LIBS})
 # Only the normal library gets installed.
 install(TARGETS ${UNITY_SCOPES_LIB} LIBRARY DESTINATION ${LIB_INSTALL_PREFIX})
 
-# TODO: Teporary hack to get the abi dumps.
-install(FILES ${CMAKE_BINARY_DIR}/test/abi-compliance/libunity-scopes_1.0.3.abi.xml DESTINATION ${LIB_INSTALL_PREFIX})
-
 # Enable coverage testing
 
 if (cmake_build_type_lower MATCHES coverage)
