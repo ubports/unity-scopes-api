@@ -313,6 +313,9 @@ the branch at a silo to get it built for all architectures.
 Once all the packages are built, you can extract the ABI dump
 files and add them to the corresponding directory in the source tree.
 
+The abi compliance test produces a report in
+libunity-scopes_<current-version>_abi-report.txt if anything unusual is detected.
+
 Autopkg test suite
 ------------------
 
