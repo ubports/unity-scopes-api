@@ -83,7 +83,7 @@ exit $status  # TODO
 # Possibly incompatible changes found.
 [ $status -ge 4 ] && {
     echo "${progname}: ABI has possibly incompatible changes, see $report for details."
-    exit 0
+    exit $status
 }
 
 # All went fine.
