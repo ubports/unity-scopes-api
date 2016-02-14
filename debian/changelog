@@ -1,3 +1,20 @@
+unity-scopes-api (1.0.3+16.04.20160209-0ubuntu2) UNRELEASED; urgency=medium
+
+  [ Michi Henning ]
+  * Changed ABI compliance testing to use abigail.
+
+ -- Michi Henning <michi.henning@canonical.com>  Mon, 15 Feb 2016 07:45:13 +1000
+
+unity-scopes-api (1.0.3+16.04.20160209-0ubuntu1) xenial; urgency=medium
+
+  [ Michi Henning ]
+  * Bumped micro version.
+
+  [ CI Train Bot ]
+  * No-change rebuild.
+
+ -- Rodney Dawes <ci-train-bot@canonical.com>  Tue, 09 Feb 2016 15:15:15 +0000
+
 unity-scopes-api (1.0.3) UNRELEASED; urgency=medium
 
   [ Michi Henning ]
