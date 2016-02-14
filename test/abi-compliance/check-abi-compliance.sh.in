@@ -45,6 +45,7 @@ cur_abi=${libname}_@UNITY_SCOPES_FULL_VERSION@.abi.xml
 report=${libname}_@UNITY_SCOPES_FULL_VERSION@_abi-report.txt
 
 # If the current lib doesn't contain debug info, we can't run the test.
+# TODO: See https://sourceware.org/bugzilla/show_bug.cgi?id=19621
 info_file=$(mktemp)
 readelf --debug-dump=info @CMAKE_BINARY_DIR@/${libname}.so >$info_file
 [ $? -ne 0 ] && exit 1
