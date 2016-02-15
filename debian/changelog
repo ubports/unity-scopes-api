@@ -1,3 +1,13 @@
+unity-scopes-api (1.0.3+16.04.20160209-0ubuntu1) xenial; urgency=medium
+
+  [ Michi Henning ]
+  * Bumped micro version.
+
+  [ CI Train Bot ]
+  * No-change rebuild.
+
+ -- Rodney Dawes <ci-train-bot@canonical.com>  Tue, 09 Feb 2016 15:15:15 +0000
+
 unity-scopes-api (1.0.2+16.04.20151218.2-0ubuntu1) xenial; urgency=medium
 
   [ Michi Henning ]
