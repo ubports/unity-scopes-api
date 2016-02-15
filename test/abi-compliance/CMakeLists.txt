@@ -15,13 +15,12 @@ add_custom_command(
 add_custom_target(gen-abi-dump DEPENDS ${abi_dump_file})
 
 add_custom_command(
-    OUTPUT run_always
+    OUTPUT run_always ${abi_report}
     COMMAND ${abi_check_cmd}
     DEPENDS ${abi_dump_file} ${suppressions})
 set_source_files_properties(run_always
     PROPERTIES SYMBOLIC true)
 set_directory_properties(PROPERTIES
-    ADDITIONAL_MAKE_CLEAN_FILES ${abi_report}
     ADDITIONAL_MAKE_CLEAN_FILES ${abi_baseline_dump})
 
 add_custom_target(check-abi DEPENDS run_always)
