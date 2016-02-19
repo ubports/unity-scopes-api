@@ -36,9 +36,6 @@ class ValueSliderFilterImpl;
 class ValueSliderLabelsImpl;
 }
 
-namespace experimental
-{
-
 typedef std::pair<double, std::string> ValueLabelPair;
 typedef std::vector<ValueLabelPair> ValueLabelPairList;
 
@@ -96,8 +93,6 @@ private:
     friend class internal::ValueSliderLabelsImpl;
     friend class internal::ValueSliderFilterImpl;
 };
-
-} // namespace experimental
 
 } // namespace scopes
 

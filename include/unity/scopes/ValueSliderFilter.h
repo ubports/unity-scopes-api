@@ -33,9 +33,6 @@ namespace internal
 class ValueSliderFilterImpl;
 }
 
-namespace experimental
-{
-
 class ValueSliderLabels;
 
 /**
@@ -145,8 +142,6 @@ private:
     internal::ValueSliderFilterImpl* fwd() const;
     friend class internal::ValueSliderFilterImpl;
 };
-
-} // namespace experimental
 
 } // namespace scopes
 

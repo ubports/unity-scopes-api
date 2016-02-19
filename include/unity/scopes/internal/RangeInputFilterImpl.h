@@ -30,8 +30,6 @@ namespace scopes
 namespace internal
 {
 
-using namespace experimental;
-
 class RangeInputFilterImpl : public FilterBaseImpl
 {
 public:

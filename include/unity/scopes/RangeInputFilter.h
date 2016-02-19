@@ -34,9 +34,6 @@ namespace internal
 class RangeInputFilterImpl;
 }
 
-namespace experimental
-{
-
 /**
 \brief A range filter which allows a start and end value to be entered by user, and any of them is optional.
 
@@ -198,8 +195,6 @@ private:
     internal::RangeInputFilterImpl* fwd() const;
     friend class internal::RangeInputFilterImpl;
 };
-
-} // namespace experimental
 
 } // namespace scopes
 

@@ -25,9 +25,6 @@ namespace unity
 namespace scopes
 {
 
-namespace experimental
-{
-
 ValueSliderLabels::ValueSliderLabels(internal::ValueSliderLabelsImpl* pimpl)
     : p(pimpl)
 {
@@ -85,8 +82,6 @@ ValueLabelPairList ValueSliderLabels::extra_labels() const
 VariantMap ValueSliderLabels::serialize() const
 {
     return p->serialize();
-}
-
 }
 
 }

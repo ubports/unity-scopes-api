@@ -25,9 +25,6 @@ namespace unity
 namespace scopes
 {
 
-namespace experimental
-{
-
 ValueSliderFilter::ValueSliderFilter(internal::ValueSliderFilterImpl *impl)
     : FilterBase(impl)
 {
@@ -87,8 +84,6 @@ internal::ValueSliderFilterImpl* ValueSliderFilter::fwd() const
 {
     return dynamic_cast<internal::ValueSliderFilterImpl*>(p.get());
 }
-
-} // namespace experimental
 
 } // namespace scopes
 
