@@ -39,12 +39,6 @@ ValueSliderFilterImpl::ValueSliderFilterImpl(std::string const& id, double min, 
       default_val_(default_value),
       labels_(new ValueSliderLabels(labels))
 {
-    if (min >= max)
-    {
-        std::stringstream err;
-        err << "ValueSliderFilterImpl::ValueSliderFilterImpl(): invalid min or max value for filter '" << id << "', min is " << min << ", max is " << max;
-        throw InvalidArgumentException(err.str());
-    }
     if (default_value < min || default_value > max)
     {
         std::stringstream err;

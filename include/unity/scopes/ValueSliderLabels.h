@@ -46,7 +46,7 @@ typedef std::vector<ValueLabelPair> ValueLabelPairList;
 \brief Labels used by a ValueSliderFilter.
 
 The ValueSliderLabels objects holds labels for a ValueSliderFilter. At the very least labels for minimum and maximum
-values need to be provided. In additon, an arbitrary number of extra labels can be defined to mark values between minimum and maximum values.
+values need to be provided. In addition, an arbitrary number of extra labels can be defined to mark values between minimum and maximum values.
 */
 class UNITY_API ValueSliderLabels final
 {
