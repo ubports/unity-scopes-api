@@ -71,13 +71,13 @@ void ActivationQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& inf
     }
     catch (std::exception const& e)
     {
-        info.mw->runtime()->logger() << "ActivationQueryBase::activate(): " << e.what();
+        info.mw->runtime()->logger()() << "ActivationQueryBase::activate(): " << e.what();
         reply_->finished(CompletionDetails(CompletionDetails::Error,
                                            string("ActivationQueryBase::activate(): ") + e.what()));
     }
     catch (...)
     {
-        info.mw->runtime()->logger() << "ActivationQueryBase::activate(): unknown exception";
+        info.mw->runtime()->logger()() << "ActivationQueryBase::activate(): unknown exception";
         reply_->finished(CompletionDetails(CompletionDetails::Error,
                                            "ActivationQueryBase::activate(): unknown exception"));
     }

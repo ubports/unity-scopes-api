@@ -24,9 +24,7 @@
 #include <array>
 #include <atomic>
 #include <iostream>
-#include <memory>
 #include <sstream>
-#include <vector>
 
 namespace unity
 {
@@ -43,52 +41,33 @@ enum class LoggerChannel { DefaultChannel, IPC, LastChannelEnum_ };
 
 class Logger;
 
-class LogStreamWriter final
+class LogStream : public std::ostringstream
 {
 public:
-    NONCOPYABLE(LogStreamWriter);
-    UNITY_DEFINES_PTRS(LogStreamWriter);
+    NONCOPYABLE(LogStream);
+    UNITY_DEFINES_PTRS(LogStream);
 
-    LogStreamWriter(LogStreamWriter&&) = default;
-    LogStreamWriter& operator=(LogStreamWriter&&) = default;
+    // We need an explicit move constructor because basic_ios does not have a move
+    // constructor. Instead, it has protected move() method that ostringstream calls
+    // ass part if its move constructor.
+    LogStream(LogStream&& other)
+        : std::ostringstream(std::move(other))
+        , outstream_(other.outstream_)
+    {
+    }
 
-    LogStreamWriter();
-    LogStreamWriter(std::ostream& log_stream, std::string const& id, LoggerSeverity s, LoggerChannel c);
-    ~LogStreamWriter();
+    LogStream& operator=(LogStream&&) = delete;  // Move assignment is impossible to to reference member.
 
-    std::ostream& stream();
+    LogStream();
+    LogStream(std::ostream& outstream, std::string const& id, LoggerSeverity s, LoggerChannel c);
+    ~LogStream();
 
 private:
-    std::string const& id_;
-    std::ostream& log_stream_;
+    std::string const id_;
+    std::ostream& outstream_;
     LoggerSeverity severity_;
     LoggerChannel channel_;
-    std::unique_ptr<std::ostream> buf_;
 };
-
-LogStreamWriter operator<<(LogStreamWriter&&, bool);
-LogStreamWriter operator<<(LogStreamWriter&&, short);
-LogStreamWriter operator<<(LogStreamWriter&&, unsigned short);
-LogStreamWriter operator<<(LogStreamWriter&&, int);
-LogStreamWriter operator<<(LogStreamWriter&&, unsigned int);
-LogStreamWriter operator<<(LogStreamWriter&&, long);
-LogStreamWriter operator<<(LogStreamWriter&&, unsigned long);
-LogStreamWriter operator<<(LogStreamWriter&&, long long);
-LogStreamWriter operator<<(LogStreamWriter&&, unsigned long long);
-LogStreamWriter operator<<(LogStreamWriter&&, float);
-LogStreamWriter operator<<(LogStreamWriter&&, double);
-LogStreamWriter operator<<(LogStreamWriter&&, long double);
-LogStreamWriter operator<<(LogStreamWriter&&, char);
-LogStreamWriter operator<<(LogStreamWriter&&, signed char);
-LogStreamWriter operator<<(LogStreamWriter&&, unsigned char);
-LogStreamWriter operator<<(LogStreamWriter&&, char const*);
-LogStreamWriter operator<<(LogStreamWriter&&, signed char const*);
-LogStreamWriter operator<<(LogStreamWriter&&, unsigned char const*);
-LogStreamWriter operator<<(LogStreamWriter&&, std::string const&);
-LogStreamWriter operator<<(LogStreamWriter&&, void const*);
-LogStreamWriter operator<<(LogStreamWriter&&, std::ostream& (*)(std::ostream&));
-LogStreamWriter operator<<(LogStreamWriter&&, std::ios& (*)(std::ios&));
-LogStreamWriter operator<<(LogStreamWriter&&, std::ios_base& (*)(std::ios_base&));
 
 class Logger
 {
@@ -101,26 +80,24 @@ public:
 
     // Instantiate a logger that logs to the given stream.
     Logger(std::string const& id, std::ostream& outstream = std::clog);
-    ~Logger();
 
-    // Returns default writer
-    operator LogStreamWriter();
+    // Returns default writer for severity Error on the default channel.
+    LogStream operator()();
 
     // Returns writer for specified severity.
-    LogStreamWriter operator()(LoggerSeverity s);
+    LogStream operator()(LoggerSeverity s);
 
     // Returns writer for specified channel.
-    LogStreamWriter operator()(LoggerChannel c);
+    LogStream operator()(LoggerChannel c);
 
     LoggerSeverity set_severity_threshold(LoggerSeverity s);
 
     bool set_channel(LoggerChannel c, bool enable);
     bool set_channel(std::string channel_name, bool enable);
-    void enable_channels(std::vector<std::string> const& names);
 
 private:
-    std::string const scope_id_;
-    std::ostream& log_stream_;
+    std::string const id_;
+    std::ostream& outstream_;
     std::atomic<LoggerSeverity> severity_threshold_;
     std::array<std::atomic_bool, int(LoggerChannel::LastChannelEnum_)> enabled_;
 };

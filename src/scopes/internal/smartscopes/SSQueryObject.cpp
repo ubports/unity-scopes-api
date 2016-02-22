@@ -95,7 +95,7 @@ void SSQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& info) noexc
         std::lock_guard<std::mutex> lock(queries_mutex_);
 
         query_it->second->q_pushable = false;
-        info.mw->runtime()->logger() << "SSQueryObject::run(): " << e.what();
+        info.mw->runtime()->logger()() << "SSQueryObject::run(): " << e.what();
         reply->finished(CompletionDetails(CompletionDetails::Error, e.what()));  // Oneway, can't block
     }
     catch (...)
@@ -103,7 +103,7 @@ void SSQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& info) noexc
         std::lock_guard<std::mutex> lock(queries_mutex_);
 
         query_it->second->q_pushable = false;
-        info.mw->runtime()->logger() << "SSQueryObject::run(): unknown exception";
+        info.mw->runtime()->logger()() << "SSQueryObject::run(): unknown exception";
         reply->finished(CompletionDetails(CompletionDetails::Error, "unknown exception"));  // Oneway, can't block
     }
 

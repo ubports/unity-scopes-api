@@ -30,169 +30,32 @@ TEST(Logger, basic)
     {
         ostringstream s;
         Logger l("me", s);
+        l() << "";
+        EXPECT_TRUE(s.str().empty());
+    }
+
+    {
+        ostringstream s;
+        Logger l("me", s);
         bool v = false;
-        l << v;
+        l() << v;
         EXPECT_TRUE(boost::ends_with(s.str(), "] ERROR: me: 0\n")) << s.str();
     }
 
     {
         ostringstream s;
         Logger l("me", s);
-        short v = -1;
-        l << v;
-        EXPECT_TRUE(boost::ends_with(s.str(), "] ERROR: me: -1\n")) << s.str();
-    }
-
-    {
-        ostringstream s;
-        Logger l("me", s);
-        unsigned short v = 1;
-        l << v;
-        EXPECT_TRUE(boost::ends_with(s.str(), "] ERROR: me: 1\n")) << s.str();
-    }
-
-    {
-        ostringstream s;
-        Logger l("me", s);
-        int v = -1;
-        l << v;
-        EXPECT_TRUE(boost::ends_with(s.str(), "] ERROR: me: -1\n")) << s.str();
-    }
-
-    {
-        ostringstream s;
-        Logger l("me", s);
-        unsigned int v = 1;
-        l << v;
-        EXPECT_TRUE(boost::ends_with(s.str(), "] ERROR: me: 1\n")) << s.str();
-    }
-
-    {
-        ostringstream s;
-        Logger l("me", s);
-        long v = -1;
-        l << v;
-        EXPECT_TRUE(boost::ends_with(s.str(), "] ERROR: me: -1\n")) << s.str();
-    }
-
-    {
-        ostringstream s;
-        Logger l("me", s);
-        unsigned long v = 1;
-        l << v;
-        EXPECT_TRUE(boost::ends_with(s.str(), "] ERROR: me: 1\n")) << s.str();
-    }
-
-    {
-        ostringstream s;
-        Logger l("me", s);
-        long long v = -1;
-        l << v;
-        EXPECT_TRUE(boost::ends_with(s.str(), "] ERROR: me: -1\n")) << s.str();
-    }
-
-    {
-        ostringstream s;
-        Logger l("me", s);
-        unsigned long long v = 1;
-        l << v;
-        EXPECT_TRUE(boost::ends_with(s.str(), "] ERROR: me: 1\n")) << s.str();
-    }
-
-    {
-        ostringstream s;
-        Logger l("me", s);
-        float v = 2.0;
-        l << v;
-        EXPECT_TRUE(boost::ends_with(s.str(), "] ERROR: me: 2\n")) << s.str();
-    }
-
-    {
-        ostringstream s;
-        Logger l("me", s);
-        double v = 3.0;
-        l << v;
-        EXPECT_TRUE(boost::ends_with(s.str(), "] ERROR: me: 3\n")) << s.str();
-    }
-
-    {
-        ostringstream s;
-        Logger l("me", s);
-        long double v = 4.0;
-        l << v;
-        EXPECT_TRUE(boost::ends_with(s.str(), "] ERROR: me: 4\n")) << s.str();
-    }
-
-    {
-        ostringstream s;
-        Logger l("me", s);
-        char v = 'a';
-        l << v;
-        EXPECT_TRUE(boost::ends_with(s.str(), "] ERROR: me: a\n")) << s.str();
-    }
-
-    {
-        ostringstream s;
-        Logger l("me", s);
-        signed char v = 'b';
-        l << v;
-        EXPECT_TRUE(boost::ends_with(s.str(), "] ERROR: me: b\n")) << s.str();
-    }
-
-    {
-        ostringstream s;
-        Logger l("me", s);
-        unsigned char v = 'c';
-        l << v;
-        EXPECT_TRUE(boost::ends_with(s.str(), "] ERROR: me: c\n")) << s.str();
-    }
-
-    {
-        ostringstream s;
-        Logger l("me", s);
         char const* v = "cs";
-        l << v;
+        l() << v;
         EXPECT_TRUE(boost::ends_with(s.str(), "] ERROR: me: cs\n")) << s.str();
     }
 
     {
         ostringstream s;
         Logger l("me", s);
-        signed char const v[] = { 's', 'c', 's', '\0' };
-        l << v;
-        EXPECT_TRUE(boost::ends_with(s.str(), "] ERROR: me: scs\n")) << s.str();
-    }
-
-    {
-        ostringstream s;
-        Logger l("me", s);
-        unsigned char const v[] = { 'u', 'c', 's', '\0' };
-        l << v;
-        EXPECT_TRUE(boost::ends_with(s.str(), "] ERROR: me: ucs\n")) << s.str();
-    }
-
-    {
-        ostringstream s;
-        Logger l("me", s);
         string v = "s";
-        l << v;
-        EXPECT_TRUE(boost::ends_with(s.str(), "] ERROR: me: s\n")) << s.str();
-    }
-
-    {
-        ostringstream s;
-        Logger l("me", s);
-        void* v = reinterpret_cast<void*>(0x99);
-        l << v;
-        EXPECT_TRUE(boost::ends_with(s.str(), "] ERROR: me: 0x99\n")) << s.str();
-    }
-
-    // TODO: missing two overloads here.
-    {
-        ostringstream s;
-        Logger l("me", s);
-        l << hex << 15;
-        EXPECT_TRUE(boost::ends_with(s.str(), "] ERROR: me: f\n")) << s.str();
+        l() << v << " " << 5 << "xyz";
+        EXPECT_TRUE(boost::ends_with(s.str(), "] ERROR: me: s 5xyz\n")) << s.str();
     }
 }
 
@@ -203,7 +66,7 @@ TEST(Logger, severity)
         Logger l("me", s);
 
         l.set_severity_threshold(LoggerSeverity::Fatal);
-        l << "blah blah";
+        l() << "blah blah";
         EXPECT_TRUE(s.str().empty()) << s.str();
 
         l(LoggerSeverity::Error) << "hello";
@@ -231,8 +94,7 @@ TEST(Logger, channel)
         l(LoggerChannel::IPC) << "y";
         EXPECT_TRUE(boost::ends_with(s.str(), "] IPC: me: there\n")) << s.str();
 
-        vector<string> channels{ "IPC" };
-        l.enable_channels(channels);
+        EXPECT_FALSE(l.set_channel("IPC", true));
         l(LoggerChannel::IPC) << "x";
         EXPECT_TRUE(boost::ends_with(s.str(), "] IPC: me: x\n")) << s.str();
     }
@@ -244,32 +106,24 @@ TEST(Logger, bad_channel)
         ostringstream s;
         Logger l("me", s);
 
-        vector<string> channels{ "", "IPC", "wrong" };
         try
         {
-            l.enable_channels(channels);
+            l.set_channel("", true);
             FAIL();
         }
         catch (unity::InvalidArgumentException const& e)
         {
-            EXPECT_STREQ("", e.what());
+            EXPECT_STREQ("unity::InvalidArgumentException: Logger::set_channel(): invalid channel name: \"\"", e.what());
         }
-        catch (std::exception const& e)
+
+        try
         {
-            EXPECT_STREQ("", e.what());
-        }
-        catch (...)
-        {
+            l.set_channel("xyz", true);
             FAIL();
         }
-
-#if 0
-        l(LoggerChannel::IPC) << "hi";
-        EXPECT_TRUE(s.str().empty()) << s.str();
-
-        EXPECT_FALSE(l.set_channel("IPC", true));
-        l(LoggerChannel::IPC) << "there";
-        EXPECT_TRUE(boost::ends_with(s.str(), "] IPC: me: there\n")) << s.str();
-#endif
+        catch (unity::InvalidArgumentException const& e)
+        {
+            EXPECT_STREQ("unity::InvalidArgumentException: Logger::set_channel(): invalid channel name: \"xyz\"", e.what());
+        }
     }
 }

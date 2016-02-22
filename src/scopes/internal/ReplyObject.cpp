@@ -135,7 +135,7 @@ void ReplyObject::push(VariantMap const& result) noexcept
     // Safe to call finished now if something went wrong or cardinality was exceeded.
     if (!error.empty())
     {
-        runtime_->logger() << "ReplyObject::push(): " << error;
+        runtime_->logger()() << "ReplyObject::push(): " << error;
         finished(CompletionDetails(CompletionDetails::Error, error));
     }
     else if (stop)
@@ -183,11 +183,11 @@ void ReplyObject::finished(CompletionDetails const& details) noexcept
     }
     catch (std::exception const& e)
     {
-        runtime_->logger() << "ReplyObject::finished(): " << e.what();
+        runtime_->logger()() << "ReplyObject::finished(): " << e.what();
     }
     catch (...)
     {
-        runtime_->logger() << "ReplyObject::finished(): unknown exception";
+        runtime_->logger()() << "ReplyObject::finished(): unknown exception";
     }
 
     // Disconnect self from middleware, if this hasn't happened yet.
@@ -219,11 +219,11 @@ void ReplyObject::info(OperationInfo const& op_info) noexcept
     }
     catch (std::exception const& e)
     {
-        runtime_->logger() << "ReplyObject::info(): " << e.what();
+        runtime_->logger()() << "ReplyObject::info(): " << e.what();
     }
     catch (...)
     {
-        runtime_->logger() << "ReplyObject::info(): unknown exception";
+        runtime_->logger()() << "ReplyObject::info(): unknown exception";
     }
 }
 

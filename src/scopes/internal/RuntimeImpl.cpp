@@ -81,13 +81,16 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
         RuntimeConfig config(configfile);
 
         // Configure trace channels.
-        try
+        for (auto const& c : config.trace_channels())
         {
-            logger_->enable_channels(config.trace_channels());
-        }
-        catch (...)
-        {
-            throw InvalidArgumentException("Runtime(): invalid trace channel name(s)");
+            try
+            {
+                logger_->set_channel(c, true);
+            }
+            catch (...)
+            {
+                throw InvalidArgumentException("Runtime(): invalid trace channel name");
+            }
         }
 
 #if 0
@@ -142,7 +145,7 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
         string msg = "Cannot instantiate run time for " + (scope_id.empty() ? "client" : scope_id) +
                      ", config file: " + configfile;
         ConfigException ex(msg);
-        logger() << ex.what();
+        logger()() << ex.what();
         throw ex;
     }
 }
@@ -155,11 +158,11 @@ RuntimeImpl::~RuntimeImpl()
     }
     catch (std::exception const& e) // LCOV_EXCL_LINE
     {
-        logger() << "~RuntimeImpl(): " << e.what();
+        logger()() << "~RuntimeImpl(): " << e.what();
     }
     catch (...) // LCOV_EXCL_LINE
     {
-        logger() << "~RuntimeImpl(): unknown exception";
+        logger()() << "~RuntimeImpl(): unknown exception";
     }
 }
 

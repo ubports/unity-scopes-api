@@ -121,7 +121,7 @@ void ReplyImpl::error(exception_ptr ex)
     {
         error_message = "unknown exception";
     }
-    mw_proxy_->mw_base()->runtime()->logger() << "ReplyImpl::error(): " << error_message;
+    mw_proxy_->mw_base()->runtime()->logger()() << "ReplyImpl::error(): " << error_message;
 
     try
     {
@@ -129,7 +129,7 @@ void ReplyImpl::error(exception_ptr ex)
     }
     catch (std::exception const&)
     {
-        mw_proxy_->mw_base()->runtime()->logger() << "ReplyImpl::error(): exception from finished(): " << error_message;
+        mw_proxy_->mw_base()->runtime()->logger()() << "ReplyImpl::error(): exception from finished(): " << error_message;
     }
 }
 
@@ -146,7 +146,7 @@ void ReplyImpl::info(OperationInfo const& op_info)
     }
     catch (std::exception const& e)
     {
-        mw_proxy_->mw_base()->runtime()->logger() << "ReplyImpl::error(): exception from info(): " << e.what();
+        mw_proxy_->mw_base()->runtime()->logger()() << "ReplyImpl::error(): exception from info(): " << e.what();
     }
 }
 

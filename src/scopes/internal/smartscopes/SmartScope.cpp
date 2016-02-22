@@ -94,7 +94,7 @@ void SmartQuery::run(SearchReplyProxy const& reply)
         }
         catch (std::exception const& e)
         {
-            ss_client_->logger()
+            ss_client_->logger()()
                 << "SmartScope::run(): Failed to register filters for scope '" << filters_data.scope_id
                 << "': " << e.what();
         }
@@ -106,7 +106,7 @@ void SmartQuery::run(SearchReplyProxy const& reply)
         }
         catch (std::exception const& e)
         {
-            ss_client_->logger()
+            ss_client_->logger()()
                 << "SmartScope::run(): Failed to set filter state for scope '" << filters_data.scope_id
                 << "': " << e.what();
         }
@@ -119,7 +119,7 @@ void SmartQuery::run(SearchReplyProxy const& reply)
         }
         catch (std::exception const&)
         {
-            this->ss_client_->logger()
+            this->ss_client_->logger()()
                 << "SmartScope: failed to register category: \"" << category->id
                 << "\" for scope \"" << scope_id_ << "\" and query: \"" << query_.query_string() << "\"";
         }
@@ -142,7 +142,7 @@ void SmartQuery::run(SearchReplyProxy const& reply)
         }
         else
         {
-            this->ss_client_->logger()
+            this->ss_client_->logger()()
                 << "SmartScope: result for query: \"" << scope_id_ << "\": \"" << query_.query_string()
                 << "\" returned an invalid cat_id. Skipping result.";
         }
@@ -155,7 +155,7 @@ void SmartQuery::run(SearchReplyProxy const& reply)
         }
         catch (std::exception const& e)
         {
-            this->ss_client_->logger()
+            this->ss_client_->logger()()
                 << "SmartScope::run(): Failed to register departments for scope '" << scope_id_ << "': " << e.what();
         }
     };

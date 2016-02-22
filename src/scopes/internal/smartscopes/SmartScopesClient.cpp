@@ -195,8 +195,8 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
         }
         catch (std::exception const& e)
         {
-            logger_ << "SmartScopesClient.get_remote_scopes(): failed to read "
-                    << partner_file_ << ": " << e.what();
+            logger_() << "SmartScopesClient.get_remote_scopes(): failed to read "
+                      << partner_file_ << ": " << e.what();
         }
 
         std::mutex reponse_mutex;
@@ -212,12 +212,12 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
     }
     catch (std::exception const& e)
     {
-        logger_ << "SmartScopesClient.get_remote_scopes(): Failed to retrieve remote scopes from uri: "
-                << url_ << c_remote_scopes_resource << ": " << e.what();
+        logger_() << "SmartScopesClient.get_remote_scopes(): Failed to retrieve remote scopes from uri: "
+                  << url_ << c_remote_scopes_resource << ": " << e.what();
 
         if (caching_enabled)
         {
-            logger_ << "SmartScopesClient.get_remote_scopes(): Using remote scopes from cache";
+            logger_() << "SmartScopesClient.get_remote_scopes(): Using remote scopes from cache";
 
             response_str = read_cache();
             if (response_str.empty())
@@ -244,8 +244,8 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
     }
     catch (std::exception const& e)
     {
-        logger_ << "SmartScopesClient.get_remote_scopes() Failed to parse json response from uri: "
-                << url_ << c_remote_scopes_resource << ": " << e.what();
+        logger_() << "SmartScopesClient.get_remote_scopes() Failed to parse json response from uri: "
+                  << url_ << c_remote_scopes_resource << ": " << e.what();
         throw;
     }
 
@@ -260,7 +260,7 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
 
             if (!child_node->has_node("id"))
             {
-                logger_ << "SmartScopesClient.get_remote_scopes(): Skipping scope with no id";
+                logger_() << "SmartScopesClient.get_remote_scopes(): Skipping scope with no id";
                 continue;
             }
 
@@ -272,14 +272,14 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
             {
                 if (!child_node->has_node(field))
                 {
-                    logger_ << "SmartScopesClient.get_remote_scopes(): Scope: \"" << scope.id
-                            << "\" has no \"" << field << "\" field";
+                    logger_() << "SmartScopesClient.get_remote_scopes(): Scope: \"" << scope.id
+                              << "\" has no \"" << field << "\" field";
                     err = true;
                 }
             }
             if (err)
             {
-                logger_ << "SmartScopesClient.get_remote_scopes(): Skipping scope: \"" << scope.id << "\"";
+                logger_() << "SmartScopesClient.get_remote_scopes(): Skipping scope: \"" << scope.id << "\"";
                 continue;
             }
 
@@ -318,8 +318,8 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
             scope.version = child_node->has_node("version") ? child_node->get_node("version")->as_int() : 0;
             if (scope.version < 0)
             {
-                logger_ << "SmartScopesClient.get_remote_scopes(): Scope: \"" << scope.id
-                        << "\" returned a negative \"version\" value, skipping scope";
+                logger_() << "SmartScopesClient.get_remote_scopes(): Scope: \"" << scope.id
+                          << "\" returned a negative \"version\" value, skipping scope";
                 continue;
             }
 
@@ -337,15 +337,15 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
                         }
                         catch (unity::LogicException const&)
                         {
-                            logger_ << "SmartScopesClient.get_remote_scopes(): Scope: \"" << scope.id
-                                    << "\" returned a non-string keyword";
+                            logger_() << "SmartScopesClient.get_remote_scopes(): Scope: \"" << scope.id
+                                      << "\" returned a non-string keyword";
                         }
                     }
                 }
                 else
                 {
-                    logger_ << "SmartScopesClient.get_remote_scopes(): Scope: \"" << scope.id
-                            << "\" returned an invalid value type for \"keywords\"";
+                    logger_() << "SmartScopesClient.get_remote_scopes(): Scope: \"" << scope.id
+                              << "\" returned an invalid value type for \"keywords\"";
                 }
             }
 
@@ -353,15 +353,15 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
         }
         catch (std::exception const& e)
         {
-            logger_ << "SmartScopesClient.get_remote_scopes(): Skipping scope: \""
-                    << scope.id << "\" due to a json parsing failure: " << e.what();
+            logger_() << "SmartScopesClient.get_remote_scopes(): Skipping scope: \""
+                      << scope.id << "\" due to a json parsing failure: " << e.what();
         }
     }
 
     if (remote_scopes.empty())
     {
-        logger_ << "SmartScopesClient.get_remote_scopes(): No valid remote scopes retrieved from uri: "
-                << url_ << c_remote_scopes_resource;
+        logger_() << "SmartScopesClient.get_remote_scopes(): No valid remote scopes retrieved from uri: "
+                  << url_ << c_remote_scopes_resource;
     }
     else if (!using_cache)
     {
@@ -373,8 +373,8 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
             }
             catch (std::exception const& e)
             {
-                logger_ << "SmartScopesClient.get_remote_scopes(): Failed to write to cache file: "
-                        << c_scopes_cache_dir << c_scopes_cache_filename << ": " << e.what();
+                logger_() << "SmartScopesClient.get_remote_scopes(): Failed to write to cache file: "
+                          << c_scopes_cache_dir << c_scopes_cache_filename << ": " << e.what();
             }
         }
 
@@ -476,7 +476,7 @@ SearchHandle::UPtr SmartScopesClient::search(SearchReplyHandler const& handler,
             }
             catch (unity::Exception const& e)
             {
-                logger_ << "SmartScopesClient.search(): Failed to parse line: " << e.what();
+                logger_() << "SmartScopesClient.search(): Failed to parse line: " << e.what();
             }
         });
     }, headers);
@@ -550,7 +550,7 @@ PreviewHandle::UPtr SmartScopesClient::preview(PreviewReplyHandler const& handle
             }
             catch (unity::Exception const& e)
             {
-                logger_ << "SmartScopesClient.preview(): Failed to parse line: " << e.what();
+                logger_() << "SmartScopesClient.preview(): Failed to parse line: " << e.what();
             }
         });
     }, headers);
@@ -579,7 +579,7 @@ std::string SmartScopesClient::handle_chunk(const std::string& chunk, std::funct
         }
         catch (std::exception const &e)
         {
-            logger_ << "SmartScopesClient.handle_chunk(): Failed to parse line: " << e.what();
+            logger_() << "SmartScopesClient.handle_chunk(): Failed to parse line: " << e.what();
         }
         newline_pos = endline_pos + 1;
         endline_pos = chunk.find(separator, newline_pos);
@@ -739,8 +739,8 @@ void SmartScopesClient::wait_for_search(unsigned int search_id)
     }
     catch (std::exception const& e)
     {
-        logger_ << "SmartScopesClient.get_search_results(): Failed to retrieve search results for query "
-                << search_id << ": " << e.what();
+        logger_() << "SmartScopesClient.get_search_results(): Failed to retrieve search results for query "
+                  << search_id << ": " << e.what();
         throw;
     }
 
@@ -787,8 +787,8 @@ std::shared_ptr<DepartmentInfo> SmartScopesClient::parse_departments(JsonNodeInt
             catch (std::exception const& e)
             {
                 // error in one subdepartment is not critical - just ignore it
-                logger_ << "SmartScopesClient::parse_departments(): Error parsing subdepartment of department '"
-                        << dep->label << "': " << e.what();
+                logger_() << "SmartScopesClient::parse_departments(): Error parsing subdepartment of department '"
+                          << dep->label << "': " << e.what();
             }
         }
         if(subdeps->size() > 0 && dep->subdepartments.size() == 0)
@@ -843,8 +843,8 @@ void SmartScopesClient::wait_for_preview(unsigned int preview_id)
     }
     catch (std::exception const&)
     {
-        logger_ << "SmartScopesClient.get_preview_results(): Failed to retrieve preview results for query "
-                << preview_id;
+        logger_() << "SmartScopesClient.get_preview_results(): Failed to retrieve preview results for query "
+                  << preview_id;
         throw;
     }
 
@@ -958,8 +958,8 @@ std::string SmartScopesClient::stringify_settings(VariantMap const& settings)
             setting_valid = true;
             break;
         default:
-            logger_ << "SmartScopesClient.stringify_settings(): Ignoring unsupported Variant type for "
-                    << "settings value: \"" << setting.first << "\"";
+            logger_() << "SmartScopesClient.stringify_settings(): Ignoring unsupported Variant type for "
+                      << "settings value: \"" << setting.first << "\"";
         }
 
         // If we have constructed a valid id:value string, append it to result_str

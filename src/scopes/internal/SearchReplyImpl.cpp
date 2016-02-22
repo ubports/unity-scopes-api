@@ -289,13 +289,13 @@ void SearchReplyImpl::write_cached_results() noexcept
     catch (std::exception const& e)
     {
         ::unlink(tmp_path.c_str());
-        mw_proxy_->mw_base()->runtime()->logger() << "SearchReply::write_cached_results(): " << e.what();
+        mw_proxy_->mw_base()->runtime()->logger()() << "SearchReply::write_cached_results(): " << e.what();
     }
     // LCOV_EXCL_START
     catch (...)
     {
         ::unlink(tmp_path.c_str());
-        mw_proxy_->mw_base()->runtime()->logger() << "SearchReply::write_cached_results(): unknown exception";
+        mw_proxy_->mw_base()->runtime()->logger()() << "SearchReply::write_cached_results(): unknown exception";
     }
     // LCOV_EXCL_STOP
 }
@@ -398,13 +398,13 @@ void SearchReplyImpl::push_surfacing_results_from_cache() noexcept
     }
     catch (std::exception const& e)
     {
-        mw_proxy_->mw_base()->runtime()->logger()
+        mw_proxy_->mw_base()->runtime()->logger()()
             << "SearchReply::push_surfacing_results_from_cache() (file = " + cache_path + "): " << e.what();
     }
     // LCOV_EXCL_START
     catch (...)
     {
-        mw_proxy_->mw_base()->runtime()->logger()
+        mw_proxy_->mw_base()->runtime()->logger()()
             << "SearchReply::push_surfacing_results_from_cache() (file = " + cache_path + "): unknown exception";
     }
     // LCOV_EXCL_STOP

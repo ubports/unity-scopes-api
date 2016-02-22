@@ -128,7 +128,7 @@ void QueryObject::run(MWReplyProxy const& reply, InvokeInfo const& info) noexcep
             lock_guard<mutex> lock(mutex_);
             pushable_ = false;
         }
-        info.mw->runtime()->logger() << "QueryBase::run(): " << e.what();
+        info.mw->runtime()->logger()() << "QueryBase::run(): " << e.what();
         reply_->finished(CompletionDetails(CompletionDetails::Error, string("QueryBase::run(): ") + e.what()));
     }
     catch (...)
@@ -137,7 +137,7 @@ void QueryObject::run(MWReplyProxy const& reply, InvokeInfo const& info) noexcep
             lock_guard<mutex> lock(mutex_);
             pushable_ = false;
         }
-        info.mw->runtime()->logger() << "QueryBase::run(): unknown exception";
+        info.mw->runtime()->logger()() << "QueryBase::run(): unknown exception";
         reply_->finished(CompletionDetails(CompletionDetails::Error, "QueryBase::run(): unknown exception"));
     }
 }
@@ -171,7 +171,7 @@ void QueryObject::cancel(InvokeInfo const& info)
     }
     catch (std::exception const& e)
     {
-        info.mw->runtime()->logger() << "QueryBase::cancelled(): " << e.what();
+        info.mw->runtime()->logger()() << "QueryBase::cancelled(): " << e.what();
         // Deliberately no error completion here. On the client side, we short-cut the cancelled()
         // callback locally, which unregisters the servant for the cancel message and assumes that
         // cancellation will work, passing a Cancelled status, even if cancellation throws in the scope.
@@ -182,7 +182,7 @@ void QueryObject::cancel(InvokeInfo const& info)
     }
     catch (...)
     {
-        info.mw->runtime()->logger() << "QueryBase::cancelled(): unknown exception";
+        info.mw->runtime()->logger()() << "QueryBase::cancelled(): unknown exception";
         // Same caveat as for std::exception here.
         reply_->finished(CompletionDetails(CompletionDetails::Cancelled, ""));
     }

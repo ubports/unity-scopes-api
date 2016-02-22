@@ -79,7 +79,7 @@ bool ChildScopesRepository::write_repo(ChildScopeList const& child_scopes_list)
     std::ofstream repo_file(repo_file_path_);
     if (repo_file.fail())
     {
-        logger_ << "ChildScopesRepository::write_repo(): Failed to open file: \"" << repo_file_path_ << "\"";
+        logger_() << "ChildScopesRepository::write_repo(): Failed to open file: \"" << repo_file_path_ << "\"";
         return false;
     }
 
@@ -140,13 +140,13 @@ ChildScopeEnabledMap ChildScopesRepository::json_to_list(std::string const& chil
     }
     catch (std::exception const& e)
     {
-        logger_ << "ChildScopesRepository::json_to_list(): Exception thrown while reading json string: " << e.what();
+        logger_() << "ChildScopesRepository::json_to_list(): Exception thrown while reading json string: " << e.what();
         return ChildScopeEnabledMap();
     }
     if (json_node.type() != JsonCppNode::Array)
     {
-        logger_ << "ChildScopesRepository::json_to_list(): Root node of json string is not an array:"
-                << std::endl << child_scopes_json;
+        logger_() << "ChildScopesRepository::json_to_list(): Root node of json string is not an array:"
+                  << std::endl << child_scopes_json;
         return ChildScopeEnabledMap();
     }
 
@@ -158,8 +158,8 @@ ChildScopeEnabledMap ChildScopesRepository::json_to_list(std::string const& chil
         if (!child_node->has_node("id") ||
             !child_node->has_node("enabled"))
         {
-            logger_ << "ChildScopesRepository::json_to_list(): Child node is missing a required field. "
-                    << "Skipping child node:" << std::endl << child_node->to_json_string();
+            logger_() << "ChildScopesRepository::json_to_list(): Child node is missing a required field. "
+                     << "Skipping child node:" << std::endl << child_node->to_json_string();
             continue;
         }
         auto id_node = child_node->get_node("id");
@@ -168,9 +168,9 @@ ChildScopeEnabledMap ChildScopesRepository::json_to_list(std::string const& chil
         if (id_node->type() != JsonCppNode::String ||
             enabled_node->type() != JsonCppNode::Bool)
         {
-            logger_ << "ChildScopesRepository::json_to_list(): "
-                    << "Child node contains an invalid value type. Skipping child node:"
-                    << std::endl << child_node->to_json_string();
+            logger_() << "ChildScopesRepository::json_to_list(): "
+                      << "Child node contains an invalid value type. Skipping child node:"
+                      << std::endl << child_node->to_json_string();
             continue;
         }
 

@@ -17,12 +17,9 @@ global:
         unity::scopes::internal::Executor::*;
         unity::scopes::internal::IniSettingsSchema::*;
         unity::scopes::internal::JsonSettingsSchema::*;
-        unity::scopes::internal::Logger*;
-        unity::scopes::internal::LogStreamWriter::*;
         unity::scopes::internal::make_directories*;
         unity::scopes::internal::MiddlewareBase::*;
         unity::scopes::internal::MiddlewareFactory::*;
-        unity::scopes::internal::operator<<(unity::scopes::internal::LogStreamWriter&&,*;
         unity::scopes::internal::RegistryConfig::*;
         unity::scopes::internal::RegistryObject::*;
         unity::scopes::internal::RuntimeConfig::*;

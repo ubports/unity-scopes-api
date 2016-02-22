@@ -94,7 +94,7 @@ void PreviewQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& info) 
             lock_guard<mutex> lock(mutex_);
             pushable_ = false;
         }
-        info.mw->runtime()->logger() << "PreviewQueryBase::run(): " << e.what();
+        info.mw->runtime()->logger()() << "PreviewQueryBase::run(): " << e.what();
         reply_->finished(CompletionDetails(CompletionDetails::Error, string("PreviewQueryBase::run(): ") + e.what()));
     }
     catch (...)
@@ -103,7 +103,7 @@ void PreviewQueryObject::run(MWReplyProxy const& reply, InvokeInfo const& info) 
             lock_guard<mutex> lock(mutex_);
             pushable_ = false;
         }
-        info.mw->runtime()->logger() << "PreviewQueryBase::run(): unknown exception";
+        info.mw->runtime()->logger()() << "PreviewQueryBase::run(): unknown exception";
         reply_->finished(CompletionDetails(CompletionDetails::Error, "PreviewQueryBase::run(): unknown exception"));
     }
 }

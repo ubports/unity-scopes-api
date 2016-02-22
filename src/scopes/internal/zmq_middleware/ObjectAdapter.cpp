@@ -84,12 +84,12 @@ ObjectAdapter::~ObjectAdapter()
     }
     catch (std::exception const& e)
     {
-        logger() << "~ObjectAdapter(): exception from shutdown(): " << e.what();
+        logger()() << "~ObjectAdapter(): exception from shutdown(): " << e.what();
     }
     // LCOV_EXCL_START
     catch (...)
     {
-        logger() << "~ObjectAdapter(): unknown exception from shutdown()";
+        logger()() << "~ObjectAdapter(): unknown exception from shutdown()";
     }
     // LCOV_EXCL_STOP
 
@@ -101,12 +101,12 @@ ObjectAdapter::~ObjectAdapter()
     }
     catch (std::exception const& e)
     {
-        logger() << "~ObjectAdapter(): exception from wait_for_shutdown(): " << e.what();
+        logger()() << "~ObjectAdapter(): exception from wait_for_shutdown(): " << e.what();
     }
     // LCOV_EXCL_START
     catch (...)
     {
-        logger() << "~ObjectAdapter(): unknown exception from wait_for_shutdown()";
+        logger()() << "~ObjectAdapter(): unknown exception from wait_for_shutdown()";
     }
     // LCOV_EXCL_STOP
 }
@@ -727,8 +727,8 @@ void ObjectAdapter::dispatch(zmqpp::socket& pump, string const& client_address)
             }
             else
             {
-                logger() << "ObjectAdapter: invalid oneway message header "
-                         << "(id: " << current.id << ", adapter: " << name_ << ", op: " << current.op_name << ")";
+                logger()() << "ObjectAdapter: invalid oneway message header "
+                           << "(id: " << current.id << ", adapter: " << name_ << ", op: " << current.op_name << ")";
             }
             return;
         }
@@ -748,8 +748,8 @@ void ObjectAdapter::dispatch(zmqpp::socket& pump, string const& client_address)
             }
             else
             {
-                logger() << "ObjectAdapter: twoway invocation sent to oneway adapter "
-                         << "(id: " << current.id << ", adapter: " << name_ << ", op: " << current.op_name << ")";
+                logger()() << "ObjectAdapter: twoway invocation sent to oneway adapter "
+                           << "(id: " << current.id << ", adapter: " << name_ << ", op: " << current.op_name << ")";
             }
             return;
         }
@@ -770,7 +770,7 @@ void ObjectAdapter::dispatch(zmqpp::socket& pump, string const& client_address)
         }
         else
         {
-            logger() << s.str();
+            logger()() << s.str();
         }
         return;
     }
