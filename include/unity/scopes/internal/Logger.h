@@ -52,13 +52,12 @@ public:
     // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=54316
     // We simulate the move with a copy and clear.
     LogStream(LogStream&& other)
-        : std::ostringstream(std::move(other))
-        , id_(std::move(other.id_))
+        : id_(std::move(other.id_))
         , outstream_(other.outstream_)
         , severity_(other.severity_)
         , channel_(other.channel_)
     {
-        *this << other.rdbuf();
+        *this << other.str();
         other.str("");
         other.clear();
     }

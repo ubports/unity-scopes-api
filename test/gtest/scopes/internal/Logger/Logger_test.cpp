@@ -131,8 +131,10 @@ TEST(Logger, move)
 
             LogStream ls2(move(ls));
             EXPECT_TRUE(s.str().empty());
+            ls2 << " blah";
+            EXPECT_TRUE(s.str().empty());
         }
-        EXPECT_TRUE(boost::ends_with(s.str(), "] ERROR: me: added\n")) << s.str();
+        EXPECT_TRUE(boost::ends_with(s.str(), "] ERROR: me: added blah\n")) << s.str();
     }
 }
 

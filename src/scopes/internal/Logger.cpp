@@ -160,7 +160,7 @@ string get_time()
     struct tm result;
     localtime_r(&curr_t, &result);
 
-    // Should use put_time(&result, "%F %T') here, but gcc 4.9 doesn't provide it.
+    // Should use std::put_time(&result, "%F %T') here, but gcc 4.9 doesn't provide it.
     char buf[]{"yyyy-mm-dd hh:mm:ss"};
     strftime(buf, sizeof(buf), "%F %T", &result);
     stringstream s;
@@ -177,15 +177,13 @@ LogStream::~LogStream()
     {
         return;
     }
-
     // Something was logged. Accumulate all the details in an output string.
     string prefix = channel_ != LoggerChannel::DefaultChannel
                         ? channel_names[int(channel_)].first
                         : severities[int(severity_)];
     string output = "[" + get_time() + "] " + prefix + ": " + id_ + ": " + msg + "\n";
 
-    // Write the output string with a single inserter, so if different threads
-    // log concurrently, we don't get interleaved output.
+    // Write contents with a single insertion to avoid interleaving of messages from different threads.
     outstream_ << output;
 }
 
