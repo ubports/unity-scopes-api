@@ -50,9 +50,13 @@ public:
 #if __GNUC__ == 4
     // gcc 4.9 doesn't have a move constructor for ostringstream:
     // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=54316
-    // We simulate the move with a copy.
+    // We simulate the move with a copy and clear.
     LogStream(LogStream&& other)
-        : outstream_(other.outstream_)
+        : std::ostringstream(std::move(other))
+        , id_(std::move(other.id_))
+        , outstream_(other.outstream_)
+        , severity_(other.severity_)
+        , channel_(other.channel_)
     {
         *this << other.rdbuf();
         other.str("");
@@ -64,7 +68,10 @@ public:
     // as part if its move constructor.
     LogStream(LogStream&& other)
         : std::ostringstream(std::move(other))
+        , id_(std::move(other.id_))
         , outstream_(other.outstream_)
+        , severity_(other.severity_)
+        , channel_(other.channel_)
     {
     }
 #endif
@@ -88,7 +95,18 @@ public:
     NONCOPYABLE(Logger);
     UNITY_DEFINES_PTRS(Logger);
 
-    Logger(Logger&&) = default;
+    // We need an explicit move constructor because atomics are not movable.
+    Logger(Logger&& other)
+        : id_(move(other.id_))
+        , outstream_(other.outstream_)
+    {
+        severity_threshold_.exchange(other.severity_threshold_);
+        for (unsigned i = 0; i < other.enabled_.size(); ++i)
+        {
+            enabled_[i].exchange(other.enabled_[i]);
+        }
+    }
+
     Logger& operator=(Logger&&) = delete;  // Move assignment is impossible due to reference member.
 
     // Instantiate a logger that logs to the given stream.

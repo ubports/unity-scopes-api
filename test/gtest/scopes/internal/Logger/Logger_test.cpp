@@ -100,6 +100,42 @@ TEST(Logger, channel)
     }
 }
 
+TEST(Logger, move)
+{
+    // Logger move constructor.
+    {
+        ostringstream s;
+
+        Logger l("me", s);
+        l.set_channel("IPC", true);
+        l.set_severity_threshold(LoggerSeverity::Warning);
+        l(LoggerSeverity::Warning) << "hi";
+        EXPECT_TRUE(boost::ends_with(s.str(), "] WARNING: me: hi\n")) << s.str();
+
+        Logger l2(move(l));
+        EXPECT_TRUE(l2.set_channel("IPC", false));
+        l(LoggerSeverity::Warning) << "again";
+        EXPECT_TRUE(boost::ends_with(s.str(), "] WARNING: me: again\n")) << s.str();
+        EXPECT_EQ(LoggerSeverity::Warning, l2.set_severity_threshold(LoggerSeverity::Error));
+    }
+
+    // LogStream move constructor.
+    {
+        ostringstream s;
+
+        Logger l("me", s);
+        {
+            LogStream ls(l());
+            ls << "added";
+            EXPECT_TRUE(s.str().empty());
+
+            LogStream ls2(move(ls));
+            EXPECT_TRUE(s.str().empty());
+        }
+        EXPECT_TRUE(boost::ends_with(s.str(), "] ERROR: me: added\n")) << s.str();
+    }
+}
+
 TEST(Logger, bad_channel)
 {
     {
