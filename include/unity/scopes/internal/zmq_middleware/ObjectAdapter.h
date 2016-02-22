@@ -109,8 +109,8 @@ private:
 
     void store_exception(scopes::MiddlewareException& ex);
 
-    boost::log::sources::severity_channel_logger_mt<>& logger() const;
-    boost::log::sources::severity_channel_logger_mt<>& ipc_logger() const;
+    unity::scopes::internal::Logger& logger() const;
+    //unity::scopes::internal::Logger& ipc_logger() const;
 
     void trace_dispatch(Current const& c);
     void trace_response();

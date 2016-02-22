@@ -20,18 +20,13 @@
 
 #include <unity/util/DefinesPtrs.h>
 #include <unity/util/NonCopyable.h>
-#include <unity/util/ResourcePtr.h>
 
-#define BOOST_LOG_DYN_LINK
-
-#include <boost/log/sinks.hpp>
-#include <boost/log/sources/global_logger_storage.hpp>
-#include <boost/log/sources/record_ostream.hpp>
-#include <boost/log/sources/severity_channel_logger.hpp>
-#include <boost/log/utility/value_ref.hpp>
-
+#include <array>
 #include <atomic>
-#include <unordered_map>
+#include <iostream>
+#include <memory>
+#include <sstream>
+#include <vector>
 
 namespace unity
 {
@@ -42,18 +37,58 @@ namespace scopes
 namespace internal
 {
 
-namespace
+enum class LoggerSeverity { Info, Warning, Error, Fatal, Trace };
+
+enum class LoggerChannel { DefaultChannel, IPC, LastChannelEnum_ };
+
+class Logger;
+
+class LogStreamWriter final
 {
+public:
+    NONCOPYABLE(LogStreamWriter);
+    UNITY_DEFINES_PTRS(LogStreamWriter);
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmissing-field-initializers"
+    LogStreamWriter(LogStreamWriter&&) = default;
+    LogStreamWriter& operator=(LogStreamWriter&&) = default;
 
-BOOST_LOG_ATTRIBUTE_KEYWORD(severity, "Severity", int)
-BOOST_LOG_ATTRIBUTE_KEYWORD(channel, "Channel", std::string)
+    LogStreamWriter();
+    LogStreamWriter(std::ostream& log_stream, std::string const& id, LoggerSeverity s, LoggerChannel c);
+    ~LogStreamWriter();
 
-#pragma GCC diagnostic pop
+    std::ostream& stream();
 
-}
+private:
+    std::string const& id_;
+    std::ostream& log_stream_;
+    LoggerSeverity severity_;
+    LoggerChannel channel_;
+    std::unique_ptr<std::ostream> buf_;
+};
+
+LogStreamWriter operator<<(LogStreamWriter&&, bool);
+LogStreamWriter operator<<(LogStreamWriter&&, short);
+LogStreamWriter operator<<(LogStreamWriter&&, unsigned short);
+LogStreamWriter operator<<(LogStreamWriter&&, int);
+LogStreamWriter operator<<(LogStreamWriter&&, unsigned int);
+LogStreamWriter operator<<(LogStreamWriter&&, long);
+LogStreamWriter operator<<(LogStreamWriter&&, unsigned long);
+LogStreamWriter operator<<(LogStreamWriter&&, long long);
+LogStreamWriter operator<<(LogStreamWriter&&, unsigned long long);
+LogStreamWriter operator<<(LogStreamWriter&&, float);
+LogStreamWriter operator<<(LogStreamWriter&&, double);
+LogStreamWriter operator<<(LogStreamWriter&&, long double);
+LogStreamWriter operator<<(LogStreamWriter&&, char);
+LogStreamWriter operator<<(LogStreamWriter&&, signed char);
+LogStreamWriter operator<<(LogStreamWriter&&, unsigned char);
+LogStreamWriter operator<<(LogStreamWriter&&, char const*);
+LogStreamWriter operator<<(LogStreamWriter&&, signed char const*);
+LogStreamWriter operator<<(LogStreamWriter&&, unsigned char const*);
+LogStreamWriter operator<<(LogStreamWriter&&, std::string const&);
+LogStreamWriter operator<<(LogStreamWriter&&, void const*);
+LogStreamWriter operator<<(LogStreamWriter&&, std::ostream& (*)(std::ostream&));
+LogStreamWriter operator<<(LogStreamWriter&&, std::ios& (*)(std::ios&));
+LogStreamWriter operator<<(LogStreamWriter&&, std::ios_base& (*)(std::ios_base&));
 
 class Logger
 {
@@ -61,57 +96,33 @@ public:
     NONCOPYABLE(Logger);
     UNITY_DEFINES_PTRS(Logger);
 
-    // Instantiate a logger that logs to std::clog.
-    Logger(std::string const& id);
+    Logger(Logger&&) = default;
+    Logger& operator=(Logger&) = default;
+
+    // Instantiate a logger that logs to the given stream.
+    Logger(std::string const& id, std::ostream& outstream = std::clog);
     ~Logger();
 
-    enum Channel
-    {
-        IPC,
-        LastChannelEnum_
-    };
+    // Returns default writer
+    operator LogStreamWriter();
 
-    // Returns default logger (no channel)
-    operator boost::log::sources::severity_channel_logger_mt<>&();
+    // Returns writer for specified severity.
+    LogStreamWriter operator()(LoggerSeverity s);
 
-    // Returns logger for specified channel.
-    boost::log::sources::severity_channel_logger_mt<>& operator()(Channel c);
+    // Returns writer for specified channel.
+    LogStreamWriter operator()(LoggerChannel c);
 
-    void set_log_file(std::string const& path, int rotation_size, int dir_size);
+    LoggerSeverity set_severity_threshold(LoggerSeverity s);
 
-    enum Severity { Info, Warning, Error, Fatal, Trace };
-    Severity set_severity_threshold(Severity s);
-
-    bool set_channel(Channel c, bool enable);
+    bool set_channel(LoggerChannel c, bool enable);
     bool set_channel(std::string channel_name, bool enable);
     void enable_channels(std::vector<std::string> const& names);
 
 private:
-    bool filter(boost::log::value_ref<int, tag::severity> const& level,
-                boost::log::value_ref<std::string, tag::channel> const& channel);
-
-    void formatter(boost::log::record_view const& rec,
-                   boost::log::formatting_ostream& strm);
-
-    std::string scope_id_;  // immutable
-
-    boost::log::sources::severity_channel_logger_mt<> logger_;  // Default logger, no channel, immutable
-
-    std::atomic<Severity> severity_;
-
-    typedef boost::log::sinks::asynchronous_sink<boost::log::sinks::text_ostream_backend> ClogSinkT;
-    typedef boost::shared_ptr<ClogSinkT> ClogSinkPtr;
-    ClogSinkPtr clog_sink_;
-
-    typedef boost::log::sinks::asynchronous_sink<boost::log::sinks::text_file_backend> FileSinkT;
-    typedef boost::shared_ptr<FileSinkT> FileSinkPtr;
-    FileSinkPtr file_sink_;
-
-    typedef std::pair<boost::log::sources::severity_channel_logger_mt<>, std::atomic_bool> ChannelData;
-    typedef std::unordered_map<std::string, ChannelData> ChannelMap;
-    ChannelMap channel_loggers_;  // immutable
-
-    std::mutex mutex_;  // Protects clog_sink_ and file_sink_
+    std::string const scope_id_;
+    std::ostream& log_stream_;
+    std::atomic<LoggerSeverity> severity_threshold_;
+    std::array<std::atomic_bool, int(LoggerChannel::LastChannelEnum_)> enabled_;
 };
 
 } // namespace internal

@@ -90,6 +90,7 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
             throw InvalidArgumentException("Runtime(): invalid trace channel name(s)");
         }
 
+#if 0
         // Now that we have the config, change the logger to log to a file.
         // If log_dir is set to the empty string, continue logging to std::clog.
         log_dir_ = config.log_directory();
@@ -99,6 +100,7 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
                                   config.max_log_file_size(),
                                   config.max_log_dir_size());
         }
+#endif
 
         string default_middleware = config.default_middleware();
         string middleware_configfile = config.default_middleware_configfile();
@@ -119,7 +121,7 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
 
         if (registry_configfile_.empty() || registry_identity_.empty())
         {
-            BOOST_LOG_SEV(logger(), Logger::Warning) << "no registry configured";
+            logger()(LoggerSeverity::Warning) << "no registry configured";
             registry_identity_ = "";
         }
         else
@@ -140,7 +142,7 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
         string msg = "Cannot instantiate run time for " + (scope_id.empty() ? "client" : scope_id) +
                      ", config file: " + configfile;
         ConfigException ex(msg);
-        BOOST_LOG(logger()) << ex.what();
+        logger() << ex.what();
         throw ex;
     }
 }
@@ -153,11 +155,11 @@ RuntimeImpl::~RuntimeImpl()
     }
     catch (std::exception const& e) // LCOV_EXCL_LINE
     {
-        BOOST_LOG(logger()) << "~RuntimeImpl(): " << e.what();
+        logger() << "~RuntimeImpl(): " << e.what();
     }
     catch (...) // LCOV_EXCL_LINE
     {
-        BOOST_LOG(logger()) << "~RuntimeImpl(): unknown exception";
+        logger() << "~RuntimeImpl(): unknown exception";
     }
 }
 
@@ -311,15 +313,17 @@ ThreadSafeQueue<future<void>>::SPtr RuntimeImpl::future_queue() const
     return future_queue_;  // Immutable
 }
 
-boost::log::sources::severity_channel_logger_mt<>& RuntimeImpl::logger() const
+internal::Logger& RuntimeImpl::logger() const
 {
     return *logger_;
 }
 
-boost::log::sources::severity_channel_logger_mt<>& RuntimeImpl::logger(Logger::Channel channel) const
+#if 0
+internal::Logger& RuntimeImpl::logger(LoggerChannel channel) const
 {
     return (*logger_)(channel);
 }
+#endif
 
 namespace
 {
