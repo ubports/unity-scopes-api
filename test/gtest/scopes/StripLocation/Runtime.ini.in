@@ -5,4 +5,3 @@ Default.Middleware = Zmq
 Zmq.ConfigFile = @CMAKE_CURRENT_BINARY_DIR@/Zmq.ini
 Smartscopes.Registry.Identity =
 ConfigDir = @CMAKE_CURRENT_BINARY_DIR@/config
-LogDir=
