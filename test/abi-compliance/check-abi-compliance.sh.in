@@ -20,10 +20,11 @@
 
 # Script to check whether the ABI is still intact.
 #
-# The base ABI (for version <x>.<y>.0) is kept in libunity-scopes_<x>.<y>.0.abi.tar.gz.
-# If the micro version is non-zero, we run abi-compliance-checker to compare the two versions.
+# The base ABI (for version <x>.<y>.0) is kept in libunity-scopes_<x>.<y>.0.abi.xml.gz.
+# If the micro version is non-zero, we run abidiff to compare the two versions.
 # If there are any complaints, we print an error message ane return non-zero status.
 
+set -x
 progname=$(basename $0)
 
 distro=$(lsb_release -c -s)
@@ -32,26 +33,63 @@ distro=$(lsb_release -c -s)
     exit 0
 }
 
-libname=lib@UNITY_SCOPES_LIB@
+[ @UNITY_SCOPES_MICRO@ -eq 0 ] && exit 0
 
-base_abi=@CMAKE_CURRENT_SOURCE_DIR@/abi_dumps/@CMAKE_LIBRARY_ARCHITECTURE@/${libname}_@UNITY_SCOPES_MAJOR_MINOR@.0.abi.tar.gz
-cur_abi=@CMAKE_CURRENT_BINARY_DIR@/abi_dumps/${libname}/${libname}_@UNITY_SCOPES_FULL_VERSION@.abi.tar.gz
+libname=lib@UNITY_SCOPES_LIB@
+base_abi_dir=@CMAKE_CURRENT_SOURCE_DIR@/abi_dumps/@CMAKE_LIBRARY_ARCHITECTURE@
+base_abi=${libname}_@UNITY_SCOPES_MAJOR_MINOR@.0.abi.xml
+
+gunzip -c ${base_abi_dir}/${base_abi}.gz >${base_abi}
+
+cur_abi=${libname}_@UNITY_SCOPES_FULL_VERSION@.abi.xml
+report=${libname}_@UNITY_SCOPES_FULL_VERSION@_abi-report.txt
+
+# If the current lib doesn't contain debug info, we can't run the test.
+# TODO: See https://sourceware.org/bugzilla/show_bug.cgi?id=19621
+info_file=$(mktemp)
+readelf --debug-dump=info @CMAKE_BINARY_DIR@/${libname}.so >$info_file
+[ $? -ne 0 ] && exit 1
+[ -s $info_file ]
+no_debug_info=$?
+rm -f $info_file
+[ $no_debug_info -eq 1 ] && {
+    echo "${progname}: Skipping ABI test because ${libname}.so was compiled without -g"
+    exit 0
+}
 
 # Compare against the base ABI.
-abi-compliance-checker -lib ${libname} -old $base_abi -new $cur_abi
-
+abidiff --no-unreferenced-symbols --suppressions @CMAKE_CURRENT_SOURCE_DIR@/suppressions \
+    ${base_abi} ${cur_abi} >${report} 2>&1
 status=$?
-report=@CMAKE_CURRENT_BINARY_DIR@/compat_reports/${libname}/1.0.0_to_@UNITY_SCOPES_FULL_VERSION@/compat_report.html
-[ -e $report ] && {
-    echo "${progname}: Compatibility report generated to $report"
+
+# TODO: Exit status test is not reliable with 1.0.rc2 (https://sourceware.org/bugzilla/show_bug.cgi?id=19596).
+#       We instead rely on the report size for the time being. When suppressions are used, and there are
+#       no problems, the report still contains three lines of summary, so we fail if there are more than
+#       three lines.
+num_lines=$(wc -l <${report})
+[ $num_lines -gt 3 ] && {
+    echo "${progname}: ERROR: Incompatible ABI!" >&2
+    cat ${report} >&2
+    exit 8
+}
+exit $status  # TODO
+
+# Incompatible changes found.
+[ $status -ge 8 ] && {
+    echo "${progname}: ERROR: Incompatible ABI!" >&2
+    cat ${report} >&2
+    exit $status
 }
 
-[ $status -ne 0 ] && {
-    [ $status -eq 1 ] && {
-        echo "${progname}: ERROR: Incompatible ABI!" >&2
-    }
-    echo "${progname}: ERROR: abi-compliance-checker returned exit status $status" >&2
-    exit 1
+# Possibly incompatible changes found.
+[ $status -ge 4 ] && {
+    echo "${progname}: ABI has possibly incompatible changes, see $report for details."
+    exit $status
 }
 
-exit 0
+# All went fine.
+[ $status -eq 0 ] && exit 0
+
+# Some other error
+echo "${progname}: Unexpected error, see $report for details." >&2
+exit $status
