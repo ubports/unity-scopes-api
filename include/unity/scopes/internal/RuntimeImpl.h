@@ -54,7 +54,6 @@ public:
     ThreadPool::SPtr async_pool() const;
     ThreadSafeQueue<std::future<void>>::SPtr future_queue() const;
     unity::scopes::internal::Logger& logger() const;
-    //unity::scopes::internal::Logger& logger(LoggerChannel channel) const;
     void run_scope(ScopeBase* scope_base,
                    std::string const& scope_ini_file,
                    std::promise<void> ready_promise = std::promise<void>());

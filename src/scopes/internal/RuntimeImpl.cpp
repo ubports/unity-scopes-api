@@ -93,18 +93,6 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
             }
         }
 
-#if 0
-        // Now that we have the config, change the logger to log to a file.
-        // If log_dir is set to the empty string, continue logging to std::clog.
-        log_dir_ = config.log_directory();
-        if (!log_dir_.empty())
-        {
-            logger_->set_log_file(find_log_dir(log_file_basename) + "/" + log_file_basename,
-                                  config.max_log_file_size(),
-                                  config.max_log_dir_size());
-        }
-#endif
-
         string default_middleware = config.default_middleware();
         string middleware_configfile = config.default_middleware_configfile();
         middleware_factory_.reset(new MiddlewareFactory(this));
@@ -320,13 +308,6 @@ internal::Logger& RuntimeImpl::logger() const
 {
     return *logger_;
 }
-
-#if 0
-internal::Logger& RuntimeImpl::logger(LoggerChannel channel) const
-{
-    return (*logger_)(channel);
-}
-#endif
 
 namespace
 {

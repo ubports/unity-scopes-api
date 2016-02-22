@@ -110,7 +110,6 @@ private:
     void store_exception(scopes::MiddlewareException& ex);
 
     unity::scopes::internal::Logger& logger() const;
-    //unity::scopes::internal::Logger& ipc_logger() const;
 
     void trace_dispatch(Current const& c);
     void trace_response();
