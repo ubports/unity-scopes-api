@@ -160,8 +160,11 @@ string get_time()
     struct tm result;
     localtime_r(&curr_t, &result);
 
+    // Should use put_time(&result, "%F %T') here, but gcc 4.9 doesn't provide it.
+    char buf[]{"yyyy-mm-dd hh:mm:ss"};
+    strftime(buf, sizeof(buf), "%F %T", &result);
     stringstream s;
-    s << put_time(&result, "%F %T.") << setw(3) << setfill('0') << millisecs;
+    s << buf << "." << setw(3) << setfill('0') << millisecs;
     return s.str();
 }
 
