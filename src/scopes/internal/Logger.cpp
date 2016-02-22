@@ -115,6 +115,9 @@ LoggerSeverity Logger::set_severity_threshold(LoggerSeverity s)
     return severity_threshold_.exchange(s);
 }
 
+namespace
+{
+
 // Null streambuf implementation that always reports success.
 // This allows the operator<<() functions to inject into a stream without
 // having to check in each function whether we actually want to log something.
@@ -128,9 +131,11 @@ class NullBuf : public std::basic_streambuf<cT, traits>
     }
 };
 
-static string null_id;
+static string const null_id;
 static NullBuf<char> null_buf;
 static ostream null_stream(&null_buf);
+
+}  // namespace
 
 LogStream::LogStream()  // Doesn't log anything
     : id_(null_id)
