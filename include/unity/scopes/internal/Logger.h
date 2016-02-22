@@ -47,16 +47,29 @@ public:
     NONCOPYABLE(LogStream);
     UNITY_DEFINES_PTRS(LogStream);
 
+#if __GNUC__ == 4
+    // gcc 4.9 doesn't have a move constructor for ostringstream:
+    // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=54316
+    // We simulate the move with a copy.
+    LogStream(LogStream&& other)
+        : outstream_(other.outstream_)
+    {
+        *this << other.rdbuf();
+        other.str("");
+        other.clear();
+    }
+#else
     // We need an explicit move constructor because basic_ios does not have a move
-    // constructor. Instead, it has protected move() method that ostringstream calls
-    // ass part if its move constructor.
+    // constructor. Instead, it has a protected move() method that ostringstream calls
+    // as part if its move constructor.
     LogStream(LogStream&& other)
         : std::ostringstream(std::move(other))
         , outstream_(other.outstream_)
     {
     }
+#endif
 
-    LogStream& operator=(LogStream&&) = delete;  // Move assignment is impossible to to reference member.
+    LogStream& operator=(LogStream&&) = delete;  // Move assignment is impossible due to reference member.
 
     LogStream();
     LogStream(std::ostream& outstream, std::string const& id, LoggerSeverity s, LoggerChannel c);
@@ -76,7 +89,7 @@ public:
     UNITY_DEFINES_PTRS(Logger);
 
     Logger(Logger&&) = default;
-    Logger& operator=(Logger&) = default;
+    Logger& operator=(Logger&&) = delete;  // Move assignment is impossible due to reference member.
 
     // Instantiate a logger that logs to the given stream.
     Logger(std::string const& id, std::ostream& outstream = std::clog);
