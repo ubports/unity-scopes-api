@@ -34,7 +34,7 @@ class ScopesWatcher : public DirWatcher
 public:
     ScopesWatcher(unity::scopes::internal::RegistryObject::SPtr registry,
                   std::function<void(std::pair<std::string, std::string> const&)> ini_added_callback,
-                  boost::log::sources::severity_channel_logger_mt<>& logger);
+                  unity::scopes::internal::Logger& logger);
 
     ~ScopesWatcher();
 
@@ -43,7 +43,7 @@ public:
 private:
     unity::scopes::internal::RegistryObject::SPtr const registry_;
     std::function<void(std::pair<std::string, std::string> const&)> const ini_added_callback_;
-    boost::log::sources::severity_channel_logger_mt<>& logger_;
+    unity::scopes::internal::Logger& logger_;
     std::map<std::string, std::string> sdir_to_ini_map_;
     std::map<std::string, std::set<std::string>> idir_to_sdirs_map_;
     std::mutex mutex_;

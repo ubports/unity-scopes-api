@@ -1,5 +1,0 @@
-[Runtime]
-CacheDir = cachedir
-AppDir = appdir
-ConfigDir = configdir
-LogDir = logdir
