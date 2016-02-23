@@ -1,0 +1,36 @@
+# See https://sourceware.org/libabigail/manual/libabigail-concepts.html#suppression-specifications
+# for details on suppressions.
+
+# TODO: The allows_other_aliases is currently needed due to a bug in abigail 1.0.rc2.
+#       Once a newer version becomes available, they can be removed.
+#       https://sourceware.org/bugzilla/show_bug.cgi?id=19619
+
+# Suppressions for template functions that are instantiated due to new
+# types that were added since the baseline.
+
+[suppress_function]
+    name_regexp = boost::.*
+    change_kind = all
+    allow_other_aliases = false
+
+[suppress_function]
+    name_regexp = std::.*
+    change_kind = all
+    allow_other_aliases = false
+
+[suppress_function]
+    name_regexp = unity::scopes::testing::.*
+    change_kind = all
+    allow_other_aliases = false
+
+# We don't care about any changes in the internal namespace. The tests verify that
+# no public header includes an internal header, so we can be sure that any changes
+# to the internal namespace cannot affect the ABI.
+
+[suppress_function]
+    name_regexp = unity::scopes::internal::.*
+    change_kind = all
+    allow_other_aliases = false
+
+[suppress_type]
+    name_regexp = unity::scopes::internal::.*
