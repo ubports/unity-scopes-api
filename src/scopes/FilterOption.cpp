@@ -44,6 +44,11 @@ std::string FilterOption::label() const
     return p->label();
 }
 
+bool FilterOption::default_value() const
+{
+    return p->default_value();
+}
+
 } // namespace scopes
 
 } // namespace unity
