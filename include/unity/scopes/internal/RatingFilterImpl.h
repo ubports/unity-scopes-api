@@ -31,6 +31,8 @@ namespace internal
 {
 
 using namespace experimental;
+// FIXME: reconsider using FilterOption and RadioButtonsFilterImpl as a base when moving this filter out from experimental namespace,
+// the default values of individual FilterOption don't make much sense with RatingFilter.
 
 class RatingFilterImpl : public RadioButtonsFilterImpl
 {
@@ -38,7 +40,8 @@ public:
     RatingFilterImpl(std::string const& id, std::string const& label);
     RatingFilterImpl(std::string const& id, std::string const& label, int top_rating);
     RatingFilterImpl(VariantMap const& var);
-    FilterOption::SCPtr add_option(std::string const& id, std::string const& label) override;
+
+    FilterOption::SCPtr add_option(std::string const& id, std::string const& label, bool default_value = false) override;
     void set_on_icon(std::string const& on_icon);
     void set_off_icon(std::string const& off_icon);
     std::string on_icon() const;

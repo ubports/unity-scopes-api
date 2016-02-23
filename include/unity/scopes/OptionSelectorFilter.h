@@ -74,7 +74,9 @@ public:
     bool multi_select() const;
 
     /**
-    \brief Add a new option to this filter.
+    \brief Add a new option to this filter. The option is 'off' by default.
+
+    \throws unity::InvalidArgumentException on invalid id or label
     \return The new option instance.
     */
     FilterOption::SCPtr add_option(std::string const& id, std::string const& label);
@@ -113,6 +115,15 @@ public:
     to be used when creating a canned Query that references another scope.
     */
     static void update_state(FilterState& filter_state, std::string const& filter_id, std::string const& option_id, bool value);
+
+    /**
+    \brief Add a new option to this filter and provide its default value.
+
+    \throws unity::LogicException if multiple options with value of 'true' are provided for a single-selection OptionSelectorFilter.
+    \throws unity::InvalidArgumentException on invalid id or label
+    \return The new option instance.
+    */
+    FilterOption::SCPtr add_option(std::string const& id, std::string const& label, bool value);
 
 private:
     OptionSelectorFilter(internal::OptionSelectorFilterImpl*);
