@@ -35,10 +35,13 @@ public:
     FilterOptionImpl(std::string const& id, std::string const& label);
     std::string id() const;
     std::string label() const;
+    void set_default_value(bool default_value);
+    bool default_value() const;
 
 private:
     std::string id_;
     std::string label_;
+    bool default_value_;
 };
 
 } // namespace internal
