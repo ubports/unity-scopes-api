@@ -114,38 +114,6 @@ The following keys are recognized:
   The environment variable UNITY_SCOPES_CONFIG_DIR overrides this key (useful when running
   automated tests that should not overwrite any of the real configuration files).
 
-- LogDir
-
-  The parent directory under which the run time writes the scope log files.
-  Setting this value explicitly to the empty string disables file logging and forces
-  all log entries to go to stderr.
-
-  The default value is the empty string.
-
-  If you set this value, you must set it to a directory that is writable to
-  confined scopes. We suggest $HOME/.cache/unity-scopes.
-
-  Note that the actual logs are written into subdirectories of this
-  directory. Assuming LogDir is set to $HOME/.cache/unity-scopes,
-  the subdirectories are
-  $HOME/.cache/unity-scopes/leaf-net/<scope_id>/logs (for confined scopes) and
-  $HOME/.cache/unity-scopes/unconfined/<scope_id>/logs (for unconfined scopes).
-
-  The environment variable UNITY_SCOPES_LOGDIR overrides this key.
-  Setting this variable explicitly to the empty string disables file logging and forces
-  all log entries to go to stderr.
-
-- Log.MaxFileSize
-
-  The maximum size in bytes of an individual log file before it is rolled over.
-  The value must be at least 1024. The default value is 512 kB.
-
-- Log.MaxDirSize
-
-  The maximum size in bytes of the sum of sizes of all log files in the log directory
-  before they are deleted. The value must be greater than Log.MaxFileSize.
-  The default value is 2 MB.
-
 - Log.TraceChannels
 
   The names of channels for which to emit trace. This must be a semicolon-separated

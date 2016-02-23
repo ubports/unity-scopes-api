@@ -27,12 +27,13 @@
 
 #include <unity/util/NonCopyable.h>
 
-#include <string>
-#include <vector>
 #include <map>
 #include <memory>
 #include <mutex>
+#include <set>
+#include <string>
 #include <tuple>
+#include <vector>
 
 namespace unity
 {
@@ -204,7 +205,7 @@ public:
                                 std::string const& country = "",
                                 std::string const& user_agent_hdr = "");
 
-    boost::log::sources::severity_channel_logger_mt<>& logger() const;
+    unity::scopes::internal::Logger& logger() const;
 
 private:
     friend class SearchHandle;
@@ -232,7 +233,7 @@ private:
     HttpClientInterface::SPtr http_client_;
     JsonNodeInterface::SPtr json_node_;
     std::unique_ptr<unity::scopes::internal::Logger> test_logger_;
-    boost::log::sources::severity_channel_logger_mt<>& logger_;
+    unity::scopes::internal::Logger& logger_;
     std::string url_;
 
     std::map<unsigned int, HttpResponseHandle::SPtr> query_results_;

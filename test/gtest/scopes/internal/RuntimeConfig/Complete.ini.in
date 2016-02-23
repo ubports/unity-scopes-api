@@ -10,7 +10,4 @@ Reap.Interval = 100
 CacheDir = CacheD
 AppDir = AppD
 ConfigDir = ConfigD
-LogDir = LogD
-Log.MaxFileSize = 10000
-Log.MaxDirSize = 20000
 Log.TraceChannels = IPC

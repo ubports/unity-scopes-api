@@ -21,7 +21,7 @@
 # Script to dump the current ABI.
 
 libname=lib@UNITY_SCOPES_LIB@
-cur_abi=@CMAKE_CURRENT_BINARY_DIR@/abi_dumps/${libname}/${libname}_@UNITY_SCOPES_FULL_VERSION@.abi.tar.gz
+cur_abi=@CMAKE_CURRENT_BINARY_DIR@/${libname}_@UNITY_SCOPES_FULL_VERSION@.abi.xml
 
 distro=$(lsb_release -c -s)
 [ "$distro" = "vivid" ] && {
@@ -30,6 +30,6 @@ distro=$(lsb_release -c -s)
 }
 
 # Dump the current ABI.
-abi-compliance-checker -lib ${libname} -dump @CMAKE_CURRENT_BINARY_DIR@/abi.xml
+abidw --out-file ${cur_abi} @CMAKE_BINARY_DIR@/${libname}.so
 
 exit $?
