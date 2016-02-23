@@ -50,6 +50,46 @@ TEST(OptionSelectorFilter, basic)
     EXPECT_EQ("Option 2", opts.back()->label());
 }
 
+TEST(OptionSelectorFilter, default_values)
+{
+    // single-selection
+    {
+        auto filter1 = OptionSelectorFilter::create("f1", "Options", false);
+
+        filter1->add_option("1", "Option 1", true);
+        EXPECT_THROW(filter1->add_option("2", "Option 2", true), unity::LogicException); // only one option enabled by default with single-selection
+        filter1->add_option("2", "Option 2");
+
+        auto opts = filter1->options();
+        EXPECT_EQ(2u, opts.size());
+        EXPECT_EQ("1", opts.front()->id());
+        EXPECT_EQ(true, opts.front()->default_value());
+        EXPECT_EQ("2", opts.back()->id());
+        EXPECT_EQ(false, opts.back()->default_value());
+    }
+
+    // multi-selection
+    {
+        auto filter1 = OptionSelectorFilter::create("f1", "Options", true);
+
+        filter1->add_option("1", "Option 1", true);
+        filter1->add_option("2", "Option 2", false);
+        filter1->add_option("3", "Option 3", true);
+
+        auto opts = filter1->options();
+        EXPECT_EQ(3u, opts.size());
+        auto it = opts.begin();
+        EXPECT_EQ("1", (*it)->id());
+        EXPECT_EQ(true, (*it)->default_value());
+        ++it;
+        EXPECT_EQ("2", (*it)->id());
+        EXPECT_EQ(false, (*it)->default_value());
+        ++it;
+        EXPECT_EQ("3", (*it)->id());
+        EXPECT_EQ(true, (*it)->default_value());
+    }
+}
+
 TEST(OptionSelectorFilter, display_hints_range_check)
 {
     auto filter1 = OptionSelectorFilter::create("f1", "Options", false);

@@ -64,20 +64,20 @@ public:
     {
         // Create an empty config directory for TestScope
         system::error_code ec;
-        filesystem::create_directory(TEST_CACHE_PATH "/unconfined/TestScope", ec);
+        filesystem::create_directory(TEST_RUNTIME_PATH "/TestScope", ec);
     }
 
     void remove_config_dir()
     {
         // Remove the config directory for TestScope
         system::error_code ec;
-        filesystem::remove_all(TEST_CACHE_PATH "/unconfined/TestScope", ec);
+        filesystem::remove_all(TEST_RUNTIME_PATH "/TestScope", ec);
     }
 
     void write_empty_config()
     {
         // open repository for output
-        std::ofstream repo_file(TEST_CACHE_PATH "/unconfined/TestScope/child-scopes.json");
+        std::ofstream repo_file(TEST_RUNTIME_PATH "/TestScope/child-scopes.json");
         repo_file << "";
         repo_file.close();
     }
@@ -85,7 +85,7 @@ public:
     void write_corrupt_config()
     {
         // open repository for output
-        std::ofstream repo_file(TEST_CACHE_PATH "unconfined/TestScope/child-scopes.json");
+        std::ofstream repo_file(TEST_RUNTIME_PATH "/TestScope/child-scopes.json");
         repo_file << "ag;hasd;glasd;glkasdhg;klasdf;k;";
         repo_file.close();
     }
@@ -93,7 +93,7 @@ public:
     void write_partially_corrupt_config()
     {
         // open repository for output
-        std::ofstream repo_file(TEST_CACHE_PATH "/unconfined/TestScope/child-scopes.json");
+        std::ofstream repo_file(TEST_RUNTIME_PATH "/TestScope/child-scopes.json");
         repo_file << R"([{"id":"ScopeB","enabled":true},{"id":"ScopeB"},{"id":"ScopeC","enabled":"false"}])";
         repo_file.close();
     }
@@ -233,12 +233,14 @@ TEST_F(ChildScopesTest, no_config_dir)
     // Start TestScope
     start_test_scope();
 
-    // Set some enabled states (should succeed, dir will be created)
+    // Set some enabled states (should fail)
     ChildScopeList list;
-    EXPECT_TRUE(test_scope->set_child_scopes(list));
+    list.emplace_back(ChildScope{"ScopeA", test_metadata(), false});
+    list.emplace_back(ChildScope{"ScopeB", test_metadata(), false});
+    list.emplace_back(ChildScope{"ScopeC", test_metadata(), true});
+    EXPECT_FALSE(test_scope->set_child_scopes(list));
 
     // 1st TestScope::find_child_scopes() returns: "A,B,C"
-    // Must all be enabled, since that is the default.
     ChildScopeList return_list = test_scope->child_scopes();
     ASSERT_EQ(3, return_list.size());
     EXPECT_EQ("ScopeA", return_list[0].id);
