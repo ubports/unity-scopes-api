@@ -20,18 +20,11 @@
 
 #include <unity/util/DefinesPtrs.h>
 #include <unity/util/NonCopyable.h>
-#include <unity/util/ResourcePtr.h>
 
-#define BOOST_LOG_DYN_LINK
-
-#include <boost/log/sinks.hpp>
-#include <boost/log/sources/global_logger_storage.hpp>
-#include <boost/log/sources/record_ostream.hpp>
-#include <boost/log/sources/severity_channel_logger.hpp>
-#include <boost/log/utility/value_ref.hpp>
-
+#include <array>
 #include <atomic>
-#include <unordered_map>
+#include <iostream>
+#include <sstream>
 
 namespace unity
 {
@@ -42,18 +35,58 @@ namespace scopes
 namespace internal
 {
 
-namespace
+enum class LoggerSeverity { Info, Warning, Error, Fatal, Trace };
+
+enum class LoggerChannel { DefaultChannel, IPC, LastChannelEnum_ };
+
+class Logger;
+
+class LogStream : public std::ostringstream
 {
+public:
+    NONCOPYABLE(LogStream);
+    UNITY_DEFINES_PTRS(LogStream);
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmissing-field-initializers"
+#if __GNUC__ == 4
+    // gcc 4.9 doesn't have a move constructor for ostringstream:
+    // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=54316
+    // We simulate the move with a copy and clear.
+    LogStream(LogStream&& other)
+        : id_(std::move(other.id_))
+        , outstream_(other.outstream_)
+        , severity_(other.severity_)
+        , channel_(other.channel_)
+    {
+        *this << other.str();
+        other.str("");
+        other.clear();
+    }
+#else
+    // We need an explicit move constructor because basic_ios does not have a move
+    // constructor. Instead, it has a protected move() method that ostringstream calls
+    // as part if its move constructor.
+    LogStream(LogStream&& other)
+        : std::ostringstream(std::move(other))
+        , id_(std::move(other.id_))
+        , outstream_(other.outstream_)
+        , severity_(other.severity_)
+        , channel_(other.channel_)
+    {
+    }
+#endif
 
-BOOST_LOG_ATTRIBUTE_KEYWORD(severity, "Severity", int)
-BOOST_LOG_ATTRIBUTE_KEYWORD(channel, "Channel", std::string)
+    LogStream& operator=(LogStream&&) = delete;  // Move assignment is impossible due to reference member.
 
-#pragma GCC diagnostic pop
+    LogStream();
+    LogStream(std::ostream& outstream, std::string const& id, LoggerSeverity s, LoggerChannel c);
+    ~LogStream();
 
-}
+private:
+    std::string const id_;
+    std::ostream& outstream_;
+    LoggerSeverity severity_;
+    LoggerChannel channel_;
+};
 
 class Logger
 {
@@ -61,57 +94,42 @@ public:
     NONCOPYABLE(Logger);
     UNITY_DEFINES_PTRS(Logger);
 
-    // Instantiate a logger that logs to std::clog.
-    Logger(std::string const& id);
-    ~Logger();
-
-    enum Channel
+    // We need an explicit move constructor because atomics are not movable.
+    Logger(Logger&& other)
+        : id_(move(other.id_))
+        , outstream_(other.outstream_)
     {
-        IPC,
-        LastChannelEnum_
-    };
+        severity_threshold_.exchange(other.severity_threshold_);
+        for (unsigned i = 0; i < other.enabled_.size(); ++i)
+        {
+            enabled_[i].exchange(other.enabled_[i]);
+        }
+    }
 
-    // Returns default logger (no channel)
-    operator boost::log::sources::severity_channel_logger_mt<>&();
+    Logger& operator=(Logger&&) = delete;  // Move assignment is impossible due to reference member.
 
-    // Returns logger for specified channel.
-    boost::log::sources::severity_channel_logger_mt<>& operator()(Channel c);
+    // Instantiate a logger that logs to the given stream.
+    Logger(std::string const& id, std::ostream& outstream = std::clog);
 
-    void set_log_file(std::string const& path, int rotation_size, int dir_size);
+    // Returns default writer for severity Error on the default channel.
+    LogStream operator()();
 
-    enum Severity { Info, Warning, Error, Fatal, Trace };
-    Severity set_severity_threshold(Severity s);
+    // Returns writer for specified severity.
+    LogStream operator()(LoggerSeverity s);
 
-    bool set_channel(Channel c, bool enable);
+    // Returns writer for specified channel.
+    LogStream operator()(LoggerChannel c);
+
+    LoggerSeverity set_severity_threshold(LoggerSeverity s);
+
+    bool set_channel(LoggerChannel c, bool enable);
     bool set_channel(std::string channel_name, bool enable);
-    void enable_channels(std::vector<std::string> const& names);
 
 private:
-    bool filter(boost::log::value_ref<int, tag::severity> const& level,
-                boost::log::value_ref<std::string, tag::channel> const& channel);
-
-    void formatter(boost::log::record_view const& rec,
-                   boost::log::formatting_ostream& strm);
-
-    std::string scope_id_;  // immutable
-
-    boost::log::sources::severity_channel_logger_mt<> logger_;  // Default logger, no channel, immutable
-
-    std::atomic<Severity> severity_;
-
-    typedef boost::log::sinks::asynchronous_sink<boost::log::sinks::text_ostream_backend> ClogSinkT;
-    typedef boost::shared_ptr<ClogSinkT> ClogSinkPtr;
-    ClogSinkPtr clog_sink_;
-
-    typedef boost::log::sinks::asynchronous_sink<boost::log::sinks::text_file_backend> FileSinkT;
-    typedef boost::shared_ptr<FileSinkT> FileSinkPtr;
-    FileSinkPtr file_sink_;
-
-    typedef std::pair<boost::log::sources::severity_channel_logger_mt<>, std::atomic_bool> ChannelData;
-    typedef std::unordered_map<std::string, ChannelData> ChannelMap;
-    ChannelMap channel_loggers_;  // immutable
-
-    std::mutex mutex_;  // Protects clog_sink_ and file_sink_
+    std::string const id_;
+    std::ostream& outstream_;
+    std::atomic<LoggerSeverity> severity_threshold_;
+    std::array<std::atomic_bool, int(LoggerChannel::LastChannelEnum_)> enabled_;
 };
 
 } // namespace internal

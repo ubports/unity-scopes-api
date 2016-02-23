@@ -48,7 +48,7 @@ public:
         Directory
     };
 
-    DirWatcher(boost::log::sources::severity_channel_logger_mt<>& logger);
+    DirWatcher(unity::scopes::internal::Logger& logger);
     virtual ~DirWatcher();
 
     void add_watch(std::string const& path);
@@ -73,7 +73,7 @@ private:
     std::mutex mutex_;
     ThreadState thread_state_;
     std::exception_ptr thread_exception_;
-    boost::log::sources::severity_channel_logger_mt<>& logger_;
+    unity::scopes::internal::Logger& logger_;
 
     void watch_thread();
     virtual void watch_event(EventType, FileType, std::string const&) = 0;
