@@ -210,8 +210,7 @@ QueryCtrlProxy SearchQueryBaseImpl::check_for_query_loop(ScopeProxy const& scope
         // scope_impl can be nullptr if we use a mock scope: TypedScopeFixture<testing::Scope>
         if (scope_impl)
         {
-            auto logger = scope_impl->runtime()->logger();
-            BOOST_LOG_SEV(logger, Logger::Warning)
+            scope_impl->runtime()->logger()(LoggerSeverity::Warning)
                 << "query loop for query \"" << canned_query_.query_string()
                 << "\", client: " << get<0>(tuple)
                 << ", aggregator: " << get<1>(tuple)

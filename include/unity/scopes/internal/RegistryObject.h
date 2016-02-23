@@ -100,7 +100,7 @@ private:
 
         ScopeProcess(ScopeExecData exec_data,
                      std::weak_ptr<MWPublisher> const& publisher,
-                     boost::log::sources::severity_channel_logger_mt<>& logger);
+                     unity::scopes::internal::Logger& logger);
         ~ScopeProcess();
 
         ProcessState state() const;
@@ -131,12 +131,12 @@ private:
         core::posix::ChildProcess process_ = core::posix::ChildProcess::invalid();
         std::weak_ptr<MWPublisher> reg_publisher_; // weak_ptr, so processes don't hold publisher alive
         bool manually_started_;
-        boost::log::sources::severity_channel_logger_mt<>& logger_;
+        unity::scopes::internal::Logger& logger_;
     };
 
 private:
     std::unique_ptr<unity::scopes::internal::Logger> test_logger_;
-    boost::log::sources::severity_channel_logger_mt<>& logger_;
+    unity::scopes::internal::Logger& logger_;
 
     core::posix::ChildProcess::DeathObserver& death_observer_;
     core::ScopedConnection death_observer_connection_;

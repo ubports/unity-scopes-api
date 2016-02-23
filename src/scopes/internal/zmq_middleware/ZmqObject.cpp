@@ -319,7 +319,7 @@ string ZmqObjectProxy::decode_request_(capnp::MessageBuilder& request)
 
 void ZmqObjectProxy::trace_request_(capnp::MessageBuilder& request)
 {
-    BOOST_LOG(mw_base()->runtime()->logger(Logger::IPC))
+    mw_base()->runtime()->logger()(LoggerChannel::IPC)
         << "sending request: "
         << decode_request_(request);
 }
@@ -332,7 +332,7 @@ string ZmqObjectProxy::decode_reply_(capnp::MessageBuilder& request, capnp::Mess
 
 void ZmqObjectProxy::trace_reply_(capnp::MessageBuilder& request, capnp::MessageReader& reply)
 {
-    BOOST_LOG(mw_base()->runtime()->logger(Logger::IPC))
+    mw_base()->runtime()->logger()(LoggerChannel::IPC)
         << "received reply: "
         << decode_reply_(request, reply);
 }
