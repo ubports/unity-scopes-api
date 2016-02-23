@@ -1,3 +1,10 @@
+unity-scopes-api (1.0.3+16.04.20160209-0ubuntu2) UNRELEASED; urgency=medium
+
+  [ Michi Henning ]
+  * Changed ABI compliance testing to use abigail.
+
+ -- Michi Henning <michi.henning@canonical.com>  Mon, 15 Feb 2016 07:45:13 +1000
+
 unity-scopes-api (1.0.3+16.04.20160209-0ubuntu1) xenial; urgency=medium
 
   [ Michi Henning ]
@@ -7,6 +14,13 @@ unity-scopes-api (1.0.3+16.04.20160209-0ubuntu1) xenial; urgency=medium
   * No-change rebuild.
 
  -- Rodney Dawes <ci-train-bot@canonical.com>  Tue, 09 Feb 2016 15:15:15 +0000
+
+unity-scopes-api (1.0.3) UNRELEASED; urgency=medium
+
+  [ Michi Henning ]
+  * Changed ABI compliance check to use abigail instead of abi-compliance-checker.
+
+ -- Michi Henning <michi.henning@canonical.com>  Tue, 09 Feb 2016 17:07:10 +1000
 
 unity-scopes-api (1.0.2+16.04.20151218.2-0ubuntu1) xenial; urgency=medium
 

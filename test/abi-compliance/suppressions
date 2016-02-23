@@ -1,0 +1,21 @@
+# Suppressions for template functions that are instantiated due to new
+# types that were added since the baseline.
+
+# TODO: The allows_other_aliases is currently needed due to a bug in abigail 1.0.rc2.
+#       One a newer version becomes available, they can be removed.
+#       https://sourceware.org/bugzilla/show_bug.cgi?id=19619
+
+[suppress_function]
+    name_regexp = boost::.*
+    change_kind = added-function
+    allow_other_aliases = false
+
+[suppress_function]
+    name_regexp = std::.*
+    change_kind = added-function
+    allow_other_aliases = false
+
+[suppress_function]
+    name_regexp = unity::scopes::testing::.*
+    change_kind = added-function
+    allow_other_aliases = false
