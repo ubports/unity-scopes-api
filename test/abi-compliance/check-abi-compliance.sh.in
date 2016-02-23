@@ -62,6 +62,8 @@ abidiff --no-unreferenced-symbols --suppressions @CMAKE_CURRENT_SOURCE_DIR@/supp
     ${base_abi} ${cur_abi} >${report} 2>&1
 status=$?
 
+[ $status -ne 0 -a $status -lt 8 ] && exit $status
+
 # TODO: Exit status test is not reliable with 1.0.rc2 (https://sourceware.org/bugzilla/show_bug.cgi?id=19596).
 #       We instead rely on the report size for the time being. When suppressions are used, and there are
 #       no problems, the report still contains three lines of summary, so we fail if there are more than
@@ -72,7 +74,7 @@ num_lines=$(wc -l <${report})
     cat ${report} >&2
     exit 8
 }
-exit $status  # TODO
+exit 0  # TODO
 
 # Incompatible changes found.
 [ $status -ge 8 ] && {
