@@ -22,6 +22,7 @@
 #include <unity/scopes/FilterBase.h>
 #include <unity/scopes/FilterGroup.h>
 #include <string>
+#include <map>
 
 namespace unity
 {
@@ -45,11 +46,13 @@ public:
     std::string title() const;
     int display_hints() const;
     void add_to_filter_group(FilterGroup::SCPtr const& group);
+    FilterGroup::SCPtr filter_group() const;
     VariantMap serialize() const;
     virtual std::string filter_type() const = 0;
     static FilterBase::SCPtr deserialize(VariantMap const& var);
     static VariantArray serialize_filters(Filters const& filters);
-    static Filters deserialize_filters(VariantArray const& var);
+    static Filters deserialize_filters(VariantArray const& var, std::map<std::string,
+            FilterGroup::SCPtr> const& groups = std::map<std::string, FilterGroup::SCPtr>());
     static void validate_filters(Filters const& filters);
     virtual void validate_display_hints() const = 0;
 

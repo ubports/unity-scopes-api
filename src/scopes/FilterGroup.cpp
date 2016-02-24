@@ -30,9 +30,9 @@ FilterGroup::FilterGroup(internal::FilterGroupImpl *pimpl)
 {
 }
 
-FilterGroup::SCPtr FilterGroup::create(std::string const& label)
+FilterGroup::SCPtr FilterGroup::create(std::string const& id, std::string const& label)
 {
-    return std::shared_ptr<FilterGroup>(new FilterGroup(new internal::FilterGroupImpl(label)));
+    return std::shared_ptr<FilterGroup>(new FilterGroup(new internal::FilterGroupImpl(id, label)));
 }
 
 std::string FilterGroup::label() const
@@ -40,6 +40,12 @@ std::string FilterGroup::label() const
     return p->label();
 }
 
+std::string FilterGroup::id() const
+{
+    return p->id();
+}
+
+FilterGroup::FilterGroup() = default;
 FilterGroup::~FilterGroup() = default;
 
 } // namespace scopes

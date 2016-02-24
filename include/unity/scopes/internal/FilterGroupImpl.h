@@ -19,6 +19,9 @@
 #pragma once
 
 #include <string>
+#include <map>
+#include <unity/scopes/Variant.h>
+#include <unity/scopes/FilterBase.h>
 
 namespace unity
 {
@@ -33,10 +36,14 @@ namespace internal
 class FilterGroupImpl
 {
 public:
-    FilterGroupImpl(std::string const& label);
+    FilterGroupImpl(std::string const& id, std::string const& label);
+    std::string id() const;
     std::string label() const;
+    static VariantArray serialize_filter_groups(Filters const& filters);
+    static std::map<std::string, FilterGroup::SCPtr> deserialize_filter_groups(VariantArray const& var);
 
 private:
+    std::string id_;
     std::string label_;
 };
 

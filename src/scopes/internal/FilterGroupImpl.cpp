@@ -19,7 +19,8 @@
 #include <unity/scopes/internal/FilterGroupImpl.h>
 #include <unity/UnityExceptions.h>
 #include <unity/scopes/FilterState.h>
-#include <algorithm>
+#include <unity/scopes/internal/Utils.h>
+#include <unordered_set>
 
 namespace unity
 {
@@ -30,14 +31,53 @@ namespace scopes
 namespace internal
 {
 
-FilterGroupImpl::FilterGroupImpl(std::string const& label)
-    : label_(label)
+FilterGroupImpl::FilterGroupImpl(std::string const& id, std::string const& label)
+    : id_(id),
+      label_(label)
 {
+}
+
+std::string FilterGroupImpl::id() const
+{
+    return id_;
 }
 
 std::string FilterGroupImpl::label() const
 {
     return label_;
+}
+
+VariantArray FilterGroupImpl::serialize_filter_groups(Filters const& filters)
+{
+    std::unordered_set<FilterGroup::SCPtr> group_lookup;
+    VariantArray va;
+    for (auto const& filter: filters)
+    {
+        auto grp = filter->filter_group();
+        if (grp && group_lookup.find(grp) != group_lookup.end())
+        {
+            group_lookup.insert(grp);
+            VariantMap grpvar;
+            grpvar["id"] = grp->id();
+            grpvar["label"] = grp->label();
+            va.push_back(Variant(grpvar));
+        }
+    }
+    return va;
+}
+
+std::map<std::string, FilterGroup::SCPtr> FilterGroupImpl::deserialize_filter_groups(VariantArray const& var)
+{
+    std::map<std::string, FilterGroup::SCPtr> groups;
+    for (auto it = var.begin(); it != var.end(); it++)
+    {
+        auto const grvar = it->get_dict();
+        auto const id = find_or_throw("FilterGroup::deserialize_filter_groups", grvar, "id")->second.get_string();
+        auto const label = find_or_throw("FilterGroup::deserialize_filter_groups", grvar, "label")->second.get_string();
+        auto group = FilterGroup::create(id, label);
+        groups[id] = group;
+    }
+    return groups;
 }
 
 } // namespace internal

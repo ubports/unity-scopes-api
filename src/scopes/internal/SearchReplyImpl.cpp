@@ -24,6 +24,7 @@
 #include <unity/scopes/internal/DepartmentImpl.h>
 #include <unity/scopes/internal/FilterBaseImpl.h>
 #include <unity/scopes/internal/FilterStateImpl.h>
+#include <unity/scopes/internal/FilterGroupImpl.h>
 #include <unity/scopes/internal/MWReply.h>
 #include <unity/scopes/internal/QueryObjectBase.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
@@ -189,6 +190,11 @@ bool SearchReplyImpl::push(unity::scopes::Filters const& filters, unity::scopes:
     }
 
     VariantMap var;
+    auto filter_groups = internal::FilterGroupImpl::serialize_filter_groups(filters);
+    if (filter_groups.size())
+    {
+        var["filter_groups"] = filter_groups;
+    }
     var["filters"] = internal::FilterBaseImpl::serialize_filters(filters);
     var["filter_state"] = filter_state.serialize();
     return ReplyImpl::push(var);

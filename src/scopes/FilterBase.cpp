@@ -74,6 +74,11 @@ std::string FilterBase::filter_type() const
     return p->filter_type();
 }
 
+FilterGroup::SCPtr FilterBase::filter_group() const
+{
+    return p->filter_group();
+}
+
 } // namespace scopes
 
 } // namespace unity

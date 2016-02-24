@@ -52,7 +52,14 @@ public:
 
      \return An instance of WidgetGroup.
      */
-    static FilterGroup::SCPtr create(std::string const& label);
+    static FilterGroup::SCPtr create(std::string const& id, std::string const& label);
+
+    /**
+     \brief Get the id of the widget group.
+
+     \return The identifier.
+    */
+    std::string id() const;
 
     /**
      \brief Get the label of the widget group.
@@ -63,9 +70,11 @@ public:
 
 private:
     /// @cond
-    FilterGroup() = delete;
+    FilterGroup();
     FilterGroup(internal::FilterGroupImpl *pimpl);
     std::unique_ptr<internal::FilterGroupImpl> p;
+
+    friend class internal::FilterGroupImpl;
     /// @endcond
 };
 
