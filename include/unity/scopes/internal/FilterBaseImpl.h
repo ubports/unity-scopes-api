@@ -20,6 +20,7 @@
 
 #include <unity/scopes/Variant.h>
 #include <unity/scopes/FilterBase.h>
+#include <unity/scopes/internal/FilterGroup.h>
 #include <string>
 
 namespace unity
@@ -43,6 +44,7 @@ public:
     void set_title(std::string const& title);
     std::string title() const;
     int display_hints() const;
+    void add_to_filter_group(FilterGroup::SCPtr const& group);
     VariantMap serialize() const;
     virtual std::string filter_type() const = 0;
     static FilterBase::SCPtr deserialize(VariantMap const& var);
