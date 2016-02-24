@@ -20,7 +20,7 @@
 
 #include <unity/scopes/Variant.h>
 #include <unity/scopes/FilterBase.h>
-#include <unity/scopes/internal/FilterGroup.h>
+#include <unity/scopes/FilterGroup.h>
 #include <string>
 
 namespace unity
@@ -62,6 +62,7 @@ private:
     std::string id_;
     std::string title_;
     int display_hints_;
+    FilterGroup::SCPtr filter_group_;
 };
 
 } // namespace internal

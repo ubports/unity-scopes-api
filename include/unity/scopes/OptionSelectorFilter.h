@@ -21,6 +21,7 @@
 #include <unity/scopes/FilterBase.h>
 #include <unity/scopes/FilterOption.h>
 #include <unity/scopes/Variant.h>
+#include <unity/scopes/FilterGroup.h>
 #include <string>
 #include <list>
 #include <set>
@@ -124,6 +125,20 @@ public:
     \return The new option instance.
     */
     FilterOption::SCPtr add_option(std::string const& id, std::string const& label, bool value);
+
+    /**
+    \brief Creates an OpionSelectorFilter inside a FilterGroup.
+    \param id A unique identifier for the filter that can be used to identify it later among several filters.
+    \param label A display label for the filter.
+    \param group A filter group this filter should be added to.
+    \param multi_select If true, the filter permits more than option to be selected; otherwise, only a single
+    option can be selected.
+    \throws unity::InvalidArgumentException on invalid null group.
+
+    \note The multi-selection cannot be combined with unity::scopes::FilterBase::DisplayHints::Primary flag set via
+    unity::scopes::FilterBase::set_display_hints().
+    */
+    static OptionSelectorFilter::UPtr create(std::string const& id, std::string const& label, FilterGroup::SCPtr& group, bool multi_select = false);
 
 private:
     OptionSelectorFilter(internal::OptionSelectorFilterImpl*);

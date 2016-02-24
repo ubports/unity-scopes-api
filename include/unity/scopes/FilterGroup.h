@@ -39,12 +39,14 @@ namespace internal
 */
 class FilterGroup
 {
+public:
     /// @cond
     NONCOPYABLE(FilterGroup);
     UNITY_DEFINES_PTRS(FilterGroup);
+
+    virtual ~FilterGroup();
     /// @endcond
 
-public:
     /**
      \brief Create a WidgetGroup.
 
@@ -58,10 +60,6 @@ public:
      \return The label.
     */
     std::string label() const;
-
-    /// @cond
-    virtual ~FilterGroup();
-    /// @endcond
 
 private:
     /// @cond
