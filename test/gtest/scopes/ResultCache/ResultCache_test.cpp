@@ -228,12 +228,6 @@ TEST_F(CacheScopeTest, non_surfacing_query2)
 
 TEST_F(CacheScopeTest, push_from_cache)
 {
-    {
-        auto receiver = make_shared<Receiver>();
-        scope()->search("", SearchMetadata("unused", "unused"), receiver);
-        receiver->wait_until_finished();
-    }
-
     auto receiver = make_shared<Receiver>();
     scope()->search("", SearchMetadata("unused", "unused"), receiver);
     receiver->wait_until_finished();
@@ -265,6 +259,14 @@ TEST_F(CacheScopeTest, push_from_cache)
 
 TEST_F(CacheScopeTest, push_from_cache_with_filter_group)
 {
+    ::unlink(TEST_RUNTIME_PATH "/unconfined/AlwaysPushFromCacheScope/.surfacing_cache");
+
+    {
+        auto receiver = make_shared<Receiver>();
+        scope_with_filter_groups()->search("", SearchMetadata("unused", "unused"), receiver);
+        receiver->wait_until_finished();
+    }
+
     auto receiver = make_shared<Receiver>();
     scope_with_filter_groups()->search("", SearchMetadata("unused", "unused"), receiver);
     receiver->wait_until_finished();
