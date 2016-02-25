@@ -84,10 +84,26 @@ public:
      */
     ValueSliderLabels(std::string const& min_label, std::string const& max_label, ValueLabelPairList const& extra_labels);
 
+    /**
+     \brief Get the label for the minimum value of the filter.
+     \return The label for minimum value
+     */
     std::string min_label() const;
+
+    /**
+     \brief Get the label for the maximum value of the filter.
+     \return The label for maximum value
+     */
     std::string max_label() const;
+
+    /**
+     \brief Get the labels for intermediate values of the filter.
+     */
     ValueLabelPairList extra_labels() const;
+
+    /// @cond
     VariantMap serialize() const;
+    /// @endcond
 
 private:
     ValueSliderLabels(internal::ValueSliderLabelsImpl* pimpl);
