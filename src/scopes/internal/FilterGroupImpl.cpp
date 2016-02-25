@@ -54,7 +54,7 @@ VariantArray FilterGroupImpl::serialize_filter_groups(Filters const& filters)
     for (auto const& filter: filters)
     {
         auto grp = filter->filter_group();
-        if (grp && group_lookup.find(grp) != group_lookup.end())
+        if (grp && group_lookup.find(grp) == group_lookup.end())
         {
             group_lookup.insert(grp);
             VariantMap grpvar;
