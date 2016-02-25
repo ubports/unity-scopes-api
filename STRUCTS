@@ -105,6 +105,11 @@ FilterState (returned by serialize())
 =====================================
   filter_id   : Variant (arbitrary, depends on filter type)
 
+FilterGroup
+===========
+  'id'    : string
+  'label' : string
+
 FilterOption
 ============
  'id'     : string
@@ -115,6 +120,7 @@ OptionSelectorFilter
  'id'           : string
  'filter_type'  : string
  'display_hints': int, optional
+ 'filter_group' : string, optional
 
 OptionSelectorFilter (FilterBase)
 =================================
@@ -134,6 +140,7 @@ RangeInputFilter
  'end_prefix_label'    : string
  'end_postfix_label'   : string
  'central_label'       : string
+ 'filter_group' : string, optional
 
 Filters + FilterState
 =====================
