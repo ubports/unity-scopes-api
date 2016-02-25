@@ -19,6 +19,7 @@
 #pragma once
 
 #include <unity/scopes/FilterBase.h>
+#include <unity/scopes/FilterGroup.h>
 
 namespace unity
 {
@@ -63,6 +64,22 @@ public:
      \throws unity::LogicException on invalid (min, max) range or erronous value_labels.
     */
     static ValueSliderFilter::UPtr create(std::string const& id, double min, double max, double default_value, ValueSliderLabels const& value_labels);
+
+    /**
+     \brief Create ValueSliderFilter inside a FilterGroup.
+
+     Creates ValueSliderFilter of ValueSliderFilter::SliderType::LessThan type.
+
+     \param id A unique identifier for the filter that can be used to identify it later among several filters.
+     \param min The minimum allowed value
+     \param max The maximum allowed value
+     \param default_value The default value of this filter, from the min..max range.
+     \param value_labels The labels for min and max values as well as optional extra labels.
+     \param group A filter group this filter should be added to.
+     \return Instance of ValueSliderFilter.
+     \throws unity::LogicException on invalid (min, max) range or erronous value_labels.
+    */
+    static ValueSliderFilter::UPtr create(std::string const& id, double min, double max, double default_value, ValueSliderLabels const& value_labels, FilterGroup::SCPtr const& group);
 
     /**
      \brief Change the default value of this filter.

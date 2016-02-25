@@ -20,7 +20,6 @@
 #include <unity/UnityExceptions.h>
 #include <unity/scopes/FilterState.h>
 #include <unity/scopes/internal/Utils.h>
-#include <unordered_set>
 
 namespace unity
 {
@@ -49,18 +48,29 @@ std::string FilterGroupImpl::label() const
 
 VariantArray FilterGroupImpl::serialize_filter_groups(Filters const& filters)
 {
-    std::unordered_set<FilterGroup::SCPtr> group_lookup;
+    std::map<std::string, FilterGroup::SCPtr> group_lookup;
     VariantArray va;
     for (auto const& filter: filters)
     {
         auto grp = filter->filter_group();
-        if (grp && group_lookup.find(grp) == group_lookup.end())
+        if (grp)
         {
-            group_lookup.insert(grp);
-            VariantMap grpvar;
-            grpvar["id"] = grp->id();
-            grpvar["label"] = grp->label();
-            va.push_back(Variant(grpvar));
+            auto it = group_lookup.find(grp->id());
+            if (it == group_lookup.end())
+            {
+                group_lookup[grp->id()] = grp;
+                VariantMap grpvar;
+                grpvar["id"] = grp->id();
+                grpvar["label"] = grp->label();
+                va.push_back(Variant(grpvar));
+            }
+            else
+            {
+                if (it->second != grp)
+                {
+                    throw unity::LogicException("FilterGroupImpl::serialize_filter_groups(): duplicate FilterGroup definitions for group id '" + grp->id() + "'");
+                }
+            }
         }
     }
     return va;

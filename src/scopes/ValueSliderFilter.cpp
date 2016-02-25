@@ -35,6 +35,13 @@ ValueSliderFilter::UPtr ValueSliderFilter::create(std::string const& id, double 
     return std::unique_ptr<ValueSliderFilter>(new ValueSliderFilter(new internal::ValueSliderFilterImpl(id, min, max, default_value, labels)));
 }
 
+ValueSliderFilter::UPtr ValueSliderFilter::create(std::string const& id, double min, double max, double default_value, ValueSliderLabels const& labels, FilterGroup::SCPtr const& group)
+{
+    auto filter = std::unique_ptr<ValueSliderFilter>(new ValueSliderFilter(new internal::ValueSliderFilterImpl(id, min, max, default_value, labels)));
+    filter->p->add_to_filter_group(group);
+    return filter;
+}
+
 void ValueSliderFilter::set_default_value(double val)
 {
     fwd()->set_default_value(val);

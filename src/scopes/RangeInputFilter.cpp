@@ -52,6 +52,41 @@ RangeInputFilter::SPtr RangeInputFilter::create(std::string const& id,
                     end_prefix_label, end_postfix_label)));
 }
 
+RangeInputFilter::SPtr RangeInputFilter::create(std::string const& id,
+        std::string const& start_prefix_label, std::string const& start_postfix_label,
+        std::string const& central_label,
+        std::string const& end_prefix_label, std::string const& end_postfix_label,
+        FilterGroup::SCPtr const& group
+        )
+{
+    auto filter = std::shared_ptr<RangeInputFilter>(new RangeInputFilter(new internal::RangeInputFilterImpl(id,
+                    Variant::null(), Variant::null(),
+                    start_prefix_label, start_postfix_label,
+                    central_label,
+                    end_prefix_label, end_postfix_label)));
+    filter->p->add_to_filter_group(group);
+    return filter;
+}
+
+RangeInputFilter::SPtr RangeInputFilter::create(std::string const& id,
+        Variant const& default_start_value,
+        Variant const& default_end_value,
+        std::string const& start_prefix_label, std::string const& start_postfix_label,
+        std::string const& central_label,
+        std::string const& end_prefix_label, std::string const& end_postfix_label,
+        FilterGroup::SCPtr const& group
+        )
+{
+    auto filter = std::shared_ptr<RangeInputFilter>(new RangeInputFilter(new internal::RangeInputFilterImpl(id,
+                    default_start_value, default_end_value,
+                    start_prefix_label, start_postfix_label,
+                    central_label,
+                    end_prefix_label, end_postfix_label)));
+    filter->p->add_to_filter_group(group);
+    return filter;
+}
+
+
 RangeInputFilter::RangeInputFilter(internal::RangeInputFilterImpl* impl)
     : FilterBase(impl)
 {
