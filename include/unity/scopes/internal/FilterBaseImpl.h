@@ -51,8 +51,7 @@ public:
     virtual std::string filter_type() const = 0;
     static FilterBase::SCPtr deserialize(VariantMap const& var);
     static VariantArray serialize_filters(Filters const& filters);
-    static Filters deserialize_filters(VariantArray const& var, std::map<std::string,
-            FilterGroup::SCPtr> const& groups = std::map<std::string, FilterGroup::SCPtr>());
+    static Filters deserialize_filters(VariantArray const& var, std::map<std::string, FilterGroup::SCPtr> const& groups);
     static void validate_filters(Filters const& filters);
     virtual void validate_display_hints() const = 0;
 

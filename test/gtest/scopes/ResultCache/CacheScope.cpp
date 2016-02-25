@@ -23,6 +23,7 @@
 #include <unity/scopes/ScopeBase.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/scopes/SearchReply.h>
+#include <unity/scopes/FilterGroup.h>
 
 #include <boost/filesystem.hpp>
 #include <unity/UnityExceptions.h>
@@ -57,6 +58,8 @@ public:
 
     virtual void run(SearchReplyProxy const& reply) override
     {
+        bool const use_group = (id_ == "CacheScopeWithFilterGroups");
+
         if (id_ == "AlwaysPushFromCacheScope")
         {
             // So we get coverage on pushing from cache before a cache file exists.
@@ -68,7 +71,7 @@ public:
         {
             // If there is a cache file, we use it to push.
             boost::system::error_code ec;
-            if (boost::filesystem::exists(TEST_RUNTIME_PATH "/unconfined/CacheScope/.surfacing_cache", ec))
+            if (boost::filesystem::exists(TEST_RUNTIME_PATH "/unconfined/" + id_ + "/.surfacing_cache", ec))
             {
                 reply->push_surfacing_results_from_cache();
                 // We do this twice, to get coverage on the double-call guard.
@@ -89,7 +92,16 @@ public:
         reply->register_departments(move(depts));
 
         Filters filters;
-        OptionSelectorFilter::SPtr filter = OptionSelectorFilter::create("f1", "Choose an option", false);
+        OptionSelectorFilter::SPtr filter;
+        if (use_group)
+        {
+            filter = OptionSelectorFilter::create("f1", "Choose an option", FilterGroup::create("g1", "Group"), false);
+        }
+        else
+        {
+            filter = OptionSelectorFilter::create("f1", "Choose an option", false);
+        }
+
         filter->add_option("o1", "Option 1");
         auto active_opt = filter->add_option("o2", "Option 2");
         FilterState fstate;

@@ -85,7 +85,7 @@ void FilterBaseImpl::add_to_filter_group(FilterGroup::SCPtr const& group)
 {
     // Filter can only belong to one group. The API guarantees this by only allowing group to be passed at Filter's construction time,
     // so this assert should never be reached.
-    assert(filter_group_);
+    assert(filter_group_ == nullptr);
     if (!group)
     {
         throw unity::InvalidArgumentException("FilterBaseImpl::add_to_filter_group(): invalid null group");

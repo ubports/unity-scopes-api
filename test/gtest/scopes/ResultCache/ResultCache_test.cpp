@@ -119,6 +119,8 @@ public:
         scope_ = meta.proxy();
         meta = reg->get_metadata("AlwaysPushFromCacheScope");
         always_push_from_cache_scope_ = meta.proxy();
+        meta = reg->get_metadata("CacheScopeWithFilterGroups");
+        scope_with_filter_groups_ = meta.proxy();
     }
 
     ScopeProxy scope() const
@@ -131,10 +133,16 @@ public:
         return always_push_from_cache_scope_;
     }
 
+    ScopeProxy scope_with_filter_groups() const
+    {
+        return scope_with_filter_groups_;
+    }
+
 private:
     Runtime::UPtr runtime_;
     ScopeProxy scope_;
     ScopeProxy always_push_from_cache_scope_;
+    ScopeProxy scope_with_filter_groups_;
 };
 
 TEST_F(CacheScopeTest, push_from_cache_without_cache_file)
@@ -220,6 +228,12 @@ TEST_F(CacheScopeTest, non_surfacing_query2)
 
 TEST_F(CacheScopeTest, push_from_cache)
 {
+    {
+        auto receiver = make_shared<Receiver>();
+        scope()->search("", SearchMetadata("unused", "unused"), receiver);
+        receiver->wait_until_finished();
+    }
+
     auto receiver = make_shared<Receiver>();
     scope()->search("", SearchMetadata("unused", "unused"), receiver);
     receiver->wait_until_finished();
@@ -236,6 +250,7 @@ TEST_F(CacheScopeTest, push_from_cache)
     ASSERT_EQ(1, filters.size());
     auto f = *filters.begin();
     EXPECT_EQ("option_selector", f->filter_type());
+    EXPECT_EQ(nullptr, f->filter_group());
     auto osf = dynamic_pointer_cast<OptionSelectorFilter const>(f);
     ASSERT_TRUE(osf != nullptr);
     EXPECT_EQ("Choose an option", osf->label());
@@ -246,6 +261,40 @@ TEST_F(CacheScopeTest, push_from_cache)
     // Cache file must still be there.
     boost::system::error_code ec;
     EXPECT_TRUE(boost::filesystem::exists(TEST_RUNTIME_PATH "/unconfined/CacheScope/.surfacing_cache", ec));
+}
+
+TEST_F(CacheScopeTest, push_from_cache_with_filter_group)
+{
+    auto receiver = make_shared<Receiver>();
+    scope_with_filter_groups()->search("", SearchMetadata("unused", "unused"), receiver);
+    receiver->wait_until_finished();
+
+    auto r = receiver->result();
+    ASSERT_TRUE(r != nullptr);
+    EXPECT_EQ(r->title(), "");
+    EXPECT_EQ(r->value("int64value").get_int(), 1);
+    EXPECT_EQ(r->value("int64value2").get_int64_t(), INT64_MAX);
+    auto d = receiver->dept();
+    EXPECT_EQ(d->id(), "");
+    auto sd = *d->subdepartments().begin();
+    EXPECT_EQ(sd->id(), "sub");
+    auto filters = receiver->filters();
+    ASSERT_EQ(1, filters.size());
+    auto f = *filters.begin();
+    EXPECT_EQ("option_selector", f->filter_type());
+    ASSERT_TRUE(f->filter_group() != nullptr);
+    EXPECT_EQ("g1", f->filter_group()->id());
+    EXPECT_EQ("Group", f->filter_group()->label());
+    auto osf = dynamic_pointer_cast<OptionSelectorFilter const>(f);
+    ASSERT_TRUE(osf != nullptr);
+    EXPECT_EQ("Choose an option", osf->label());
+    auto fs = receiver->filter_state();
+    EXPECT_TRUE(fs.has_filter("f1"));
+    EXPECT_TRUE(osf->has_active_option(fs));
+
+    // Cache file must still be there.
+    boost::system::error_code ec;
+    EXPECT_TRUE(boost::filesystem::exists(TEST_RUNTIME_PATH "/unconfined/CacheScopeWithFilterGroups/.surfacing_cache", ec));
 }
 
 TEST_F(CacheScopeTest, push_non_empty_from_cache)

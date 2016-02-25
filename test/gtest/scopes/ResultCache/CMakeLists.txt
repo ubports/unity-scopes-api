@@ -16,7 +16,7 @@ add_test(ResultCache ResultCache_test)
 
 set(SCOPE_DIR "${CMAKE_CURRENT_BINARY_DIR}/scopes")
 
-foreach (scope CacheScope AlwaysPushFromCacheScope)
+foreach (scope CacheScope AlwaysPushFromCacheScope CacheScopeWithFilterGroups)
     file(MAKE_DIRECTORY "${SCOPE_DIR}/${scope}")
     configure_file(CacheScope.ini.in ${SCOPE_DIR}/${scope}/${scope}.ini)
     add_library(${scope} MODULE CacheScope.cpp)

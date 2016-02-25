@@ -143,6 +143,9 @@ TEST(Filters, scope)
         auto selector = std::dynamic_pointer_cast<const OptionSelectorFilter>(filters.front());
         EXPECT_EQ(2u, selector->options().size());
         EXPECT_EQ(0u, selector->active_options(filter_state).size());
+        EXPECT_TRUE(selector->filter_group() != nullptr);
+        EXPECT_EQ("g1", selector->filter_group()->id());
+        EXPECT_EQ("Group", selector->filter_group()->label());
 
         auto option1 = selector->options().front();
         selector->update_state(filter_state, option1, true); // activate filter option

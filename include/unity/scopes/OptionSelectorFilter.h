@@ -138,7 +138,7 @@ public:
     \note The multi-selection cannot be combined with unity::scopes::FilterBase::DisplayHints::Primary flag set via
     unity::scopes::FilterBase::set_display_hints().
     */
-    static OptionSelectorFilter::UPtr create(std::string const& id, std::string const& label, FilterGroup::SCPtr& group, bool multi_select = false);
+    static OptionSelectorFilter::UPtr create(std::string const& id, std::string const& label, FilterGroup::SCPtr const& group, bool multi_select = false);
 
 private:
     OptionSelectorFilter(internal::OptionSelectorFilterImpl*);

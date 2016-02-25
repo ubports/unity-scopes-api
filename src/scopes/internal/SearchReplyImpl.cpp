@@ -275,7 +275,7 @@ void SearchReplyImpl::write_cached_results() noexcept
         auto filter_groups = internal::FilterGroupImpl::serialize_filter_groups(cached_filters_);
         if (filter_groups.size())
         {
-            vm["filter_groups"] = filter_groups;
+            vm["filter_groups"] = move(filter_groups);
         }
 
         vm["filters"] = move(filters);
