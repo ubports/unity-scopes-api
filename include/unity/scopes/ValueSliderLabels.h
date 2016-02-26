@@ -1,8 +1,3 @@
-/*
- * Copyright (C) 2015 Canonical Ltd
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License version 3 as
  * published by the Free Software Foundation.
  *
  * This program is distributed in the hope that it will be useful,
@@ -36,8 +31,10 @@ class ValueSliderFilterImpl;
 class ValueSliderLabelsImpl;
 }
 
+/// @cond
 typedef std::pair<double, std::string> ValueLabelPair;
 typedef std::vector<ValueLabelPair> ValueLabelPairList;
+/// @endcond
 
 /**
 \brief Labels used by a ValueSliderFilter.
