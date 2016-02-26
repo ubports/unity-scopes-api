@@ -53,9 +53,11 @@ public:
     /**
     \brief Creates a RangeInputFilter.
     \param id A unique identifier for the filter that can be used to identify it later among several filters.
-    \param start_label A display label for the input box of start value (can be empty).
-    \param end_label A display label for the input box of end value (can be empty).
-    \param unit_label A display label for the unit of this range filter (e.g. currency name).
+    \param start_prefix_label A display label for the input box of start value, displayed to the left (can be empty).
+    \param start_postifx_label A display label for the input box of start value, displayed to the right (can be empty).
+    \param central_label A display label displayed between the two input boxes (can be empty).
+    \param end_prefix_label A display label for the input box of end value, displayed to the left (can be empty).
+    \param end_postfix_label A display label for the input box of end value, displayed to the right (can be empty).
     \return Instance of RangeInputFilter.
     */
     static RangeInputFilter::SPtr create(std::string const& id,
@@ -68,9 +70,11 @@ public:
     \param id A unique identifier for the filter that can be used to identify it later among several filters.
     \param default_start_value A default start value (double, int or null).
     \param default_end_value A default end value (double, int or null).
-    \param start_label A display label for the input box of start value (can be empty).
-    \param end_label A display label for the input box of end value (can be empty).
-    \param unit_label A display label for the unit of this range filter (e.g. currency name).
+    \param start_prefix_label A display label for the input box of start value, displayed to the left (can be empty).
+    \param start_postifx_label A display label for the input box of start value, displayed to the right (can be empty).
+    \param central_label A display label displayed between the two input boxes (can be empty).
+    \param end_prefix_label A display label for the input box of end value, displayed to the left (can be empty).
+    \param end_postfix_label A display label for the input box of end value, displayed to the right (can be empty).
     \return Instance of RangeInputFilter.
     */
     static RangeInputFilter::SPtr create(std::string const& id,
@@ -83,9 +87,11 @@ public:
     /**
     \brief Creates a RangeInputFilter inside a FilterGroup.
     \param id A unique identifier for the filter that can be used to identify it later among several filters.
-    \param start_label A display label for the input box of start value (can be empty).
-    \param end_label A display label for the input box of end value (can be empty).
-    \param unit_label A display label for the unit of this range filter (e.g. currency name).
+    \param start_prefix_label A display label for the input box of start value, displayed to the left (can be empty).
+    \param start_postifx_label A display label for the input box of start value, displayed to the right (can be empty).
+    \param central_label A display label displayed between the two input boxes (can be empty).
+    \param end_prefix_label A display label for the input box of end value, displayed to the left (can be empty).
+    \param end_postfix_label A display label for the input box of end value, displayed to the right (can be empty).
     \param group A filter group this filter should be added to.
     \return Instance of RangeInputFilter.
     */
@@ -97,11 +103,11 @@ public:
     /**
     \brief Creates a RangeInputFilter with specific default values for start and end, inside a FilterGroup.
     \param id A unique identifier for the filter that can be used to identify it later among several filters.
-    \param default_start_value A default start value (double, int or null).
-    \param default_end_value A default end value (double, int or null).
-    \param start_label A display label for the input box of start value (can be empty).
-    \param end_label A display label for the input box of end value (can be empty).
-    \param unit_label A display label for the unit of this range filter (e.g. currency name).
+    \param start_prefix_label A display label for the input box of start value, displayed to the left (can be empty).
+    \param start_postifx_label A display label for the input box of start value, displayed to the right (can be empty).
+    \param central_label A display label displayed between the two input boxes (can be empty).
+    \param end_prefix_label A display label for the input box of end value, displayed to the left (can be empty).
+    \param end_postfix_label A display label for the input box of end value, displayed to the right (can be empty).
     \param group A filter group this filter should be added to.
     \return Instance of RangeInputFilter.
     */
