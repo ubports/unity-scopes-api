@@ -25,10 +25,16 @@ namespace unity
 namespace scopes
 {
 
+/// @cond
 FilterGroup::FilterGroup(internal::FilterGroupImpl *pimpl)
     : p(pimpl)
 {
 }
+
+FilterGroup::FilterGroup() = default;
+FilterGroup::~FilterGroup() = default;
+
+/// @endcond
 
 FilterGroup::SCPtr FilterGroup::create(std::string const& id, std::string const& label)
 {
@@ -44,9 +50,6 @@ std::string FilterGroup::id() const
 {
     return p->id();
 }
-
-FilterGroup::FilterGroup() = default;
-FilterGroup::~FilterGroup() = default;
 
 } // namespace scopes
 

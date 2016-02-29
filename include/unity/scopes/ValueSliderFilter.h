@@ -61,7 +61,7 @@ public:
      \param default_value The default value of this filter, from the min..max range.
      \param value_labels The labels for min and max values as well as optional extra labels.
      \return Instance of ValueSliderFilter.
-     \throws unity::LogicException on invalid (min, max) range or erronous value_labels.
+     \throws unity::LogicException on invalid (min, max) range or erroneous value_labels.
     */
     static ValueSliderFilter::UPtr create(std::string const& id, double min, double max, double default_value, ValueSliderLabels const& value_labels);
 
@@ -77,7 +77,7 @@ public:
      \param value_labels The labels for min and max values as well as optional extra labels.
      \param group A filter group this filter should be added to.
      \return Instance of ValueSliderFilter.
-     \throws unity::LogicException on invalid (min, max) range or erronous value_labels.
+     \throws unity::LogicException on invalid (min, max) range or erroneous value_labels.
     */
     static ValueSliderFilter::UPtr create(std::string const& id, double min, double max, double default_value, ValueSliderLabels const& value_labels, FilterGroup::SCPtr const& group);
 
