@@ -5,5 +5,5 @@ add_subdirectory(autopkg)
 
 if(${slowtests})
     add_subdirectory(headers)
-    add_subdirectory(abi-compliance)
+#   add_subdirectory(abi-compliance)
 endif()
