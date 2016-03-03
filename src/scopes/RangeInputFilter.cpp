@@ -29,9 +29,30 @@ namespace scopes
 namespace experimental
 {
 
-RangeInputFilter::SPtr RangeInputFilter::create(std::string const& id, std::string const& start_label, std::string const& end_label, std::string const& unit_label)
+RangeInputFilter::SPtr RangeInputFilter::create(std::string const& id,
+        std::string const& start_prefix_label, std::string const& start_postfix_label,
+        std::string const& central_label,
+        std::string const& end_prefix_label, std::string const& end_postfix_label)
 {
-    return std::shared_ptr<RangeInputFilter>(new RangeInputFilter(new internal::RangeInputFilterImpl(id, start_label, end_label, unit_label)));
+    return std::shared_ptr<RangeInputFilter>(new RangeInputFilter(new internal::RangeInputFilterImpl(id,
+                    Variant::null(), Variant::null(),
+                    start_prefix_label, start_postfix_label,
+                    central_label,
+                    end_prefix_label, end_postfix_label)));
+}
+
+RangeInputFilter::SPtr RangeInputFilter::create(std::string const& id,
+        Variant const& default_start_value,
+        Variant const& default_end_value,
+        std::string const& start_prefix_label, std::string const& start_postfix_label,
+        std::string const& central_label,
+        std::string const& end_prefix_label, std::string const& end_postfix_label)
+{
+    return std::shared_ptr<RangeInputFilter>(new RangeInputFilter(new internal::RangeInputFilterImpl(id,
+                    default_start_value, default_end_value,
+                    start_prefix_label, start_postfix_label,
+                    central_label,
+                    end_prefix_label, end_postfix_label)));
 }
 
 RangeInputFilter::RangeInputFilter(internal::RangeInputFilterImpl* impl)
@@ -39,19 +60,39 @@ RangeInputFilter::RangeInputFilter(internal::RangeInputFilterImpl* impl)
 {
 }
 
-std::string RangeInputFilter::start_label() const
+std::string RangeInputFilter::start_prefix_label() const
 {
-    return fwd()->start_label();
+    return fwd()->start_prefix_label();
 }
 
-std::string RangeInputFilter::end_label() const
+std::string RangeInputFilter::start_postfix_label() const
 {
-    return fwd()->end_label();
+    return fwd()->start_postfix_label();
 }
 
-std::string RangeInputFilter::unit_label() const
+std::string RangeInputFilter::end_prefix_label() const
 {
-    return fwd()->unit_label();
+    return fwd()->end_prefix_label();
+}
+
+std::string RangeInputFilter::end_postfix_label() const
+{
+    return fwd()->end_postfix_label();
+}
+
+std::string RangeInputFilter::central_label() const
+{
+    return fwd()->central_label();
+}
+
+Variant RangeInputFilter::default_start_value() const
+{
+    return fwd()->default_start_value();
+}
+
+Variant RangeInputFilter::default_end_value() const
+{
+    return fwd()->default_end_value();
 }
 
 bool RangeInputFilter::has_start_value(FilterState const& filter_state) const

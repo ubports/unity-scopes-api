@@ -47,7 +47,12 @@ bool OptionSelectorFilter::multi_select() const
 
 FilterOption::SCPtr OptionSelectorFilter::add_option(std::string const& id, std::string const& label)
 {
-    return fwd()->add_option(id, label);
+    return fwd()->add_option(id, label, false);
+}
+
+FilterOption::SCPtr OptionSelectorFilter::add_option(std::string const& id, std::string const& label, bool value)
+{
+    return fwd()->add_option(id, label, value);
 }
 
 std::list<FilterOption::SCPtr> OptionSelectorFilter::options() const
