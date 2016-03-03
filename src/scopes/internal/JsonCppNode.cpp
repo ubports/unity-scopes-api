@@ -53,6 +53,8 @@ Json::Value JsonCppNode::from_variant(Variant const& var)
     {
         case Variant::Type::Int:
             return Json::Value(var.get_int());
+        case Variant::Type::Int64:
+            return Json::Value(static_cast<Json::Int64>(var.get_int64_t()));
         case Variant::Type::Bool:
             return Json::Value(var.get_bool());
         case Variant::Type::String:
@@ -82,7 +84,7 @@ Json::Value JsonCppNode::from_variant(Variant const& var)
         default:
             {
                 std::ostringstream s;
-                s << "json_to_variant(): unsupported json type ";
+                s << "JsonCppNode::from_variant(): unsupported variant type ";
                 s << static_cast<int>(var.which());
                 throw unity::LogicException(s.str());
             }
@@ -117,7 +119,12 @@ Variant JsonCppNode::to_variant(Json::Value const& value)
             return Variant(value.asString());
         case Json::ValueType::intValue:
         case Json::ValueType::uintValue:
-            return Variant(value.asInt()); // this can throw std::runtime_error from jsoncpp if unsigned int to int conversion is not possible
+            // this can throw std::runtime_error from jsoncpp if unsigned int to int conversion is not possible
+            if (value.isInt())
+            {
+                return Variant(value.asInt());
+            }
+            return Variant(static_cast<int64_t>(value.asInt64()));
         case Json::ValueType::realValue:
             return Variant(value.asDouble());
         case Json::ValueType::booleanValue:
@@ -125,7 +132,7 @@ Variant JsonCppNode::to_variant(Json::Value const& value)
         default:
             {
                 std::ostringstream s;
-                s << "json_to_variant(): unsupported json type ";
+                s << "JsonCppNode::to_variant(): unsupported json type ";
                 s << static_cast<int>(value.type());
                 throw unity::LogicException(s.str());
             }
@@ -257,6 +264,11 @@ bool JsonCppNode::has_node(std::string const& node_name) const
         throw unity::LogicException("Current node is empty");
     }
 
+    if (root_.type() != Json::objectValue)
+    {
+        throw unity::LogicException("Root node is not an object");
+    }
+
     return root_.isMember(node_name);
 }
 
@@ -272,6 +284,15 @@ JsonNodeInterface::SPtr JsonCppNode::get_node() const
 
 JsonNodeInterface::SPtr JsonCppNode::get_node(std::string const& node_name) const
 {
+    if (!root_)
+    {
+        throw unity::LogicException("Current node is empty");
+    }
+
+    if (root_.type() != Json::objectValue)
+    {
+        throw unity::LogicException("Root node is not an object");
+    }
     if (!root_.isMember(node_name))
     {
         throw unity::LogicException("Node " + node_name + " does not exist");
@@ -283,6 +304,11 @@ JsonNodeInterface::SPtr JsonCppNode::get_node(std::string const& node_name) cons
 
 JsonNodeInterface::SPtr JsonCppNode::get_node(unsigned int node_index) const
 {
+    if (!root_)
+    {
+        throw unity::LogicException("Current node is empty");
+    }
+
     if (root_.type() != Json::arrayValue)
     {
         throw unity::LogicException("Root node is not an array");

@@ -16,7 +16,8 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/scope-registry.conf DESTINATION ${CMAK
 
 # apport package hook
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libunity-scopes.py libunity-scopes${UNITY_SCOPES_SOVERSION}.py COPYONLY)
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libunity-scopes${UNITY_SCOPES_SOVERSION}.py DESTINATION /usr/share/apport/package-hooks)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libunity-scopes${UNITY_SCOPES_SOVERSION}.py
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/apport/package-hooks)
 
 # Empty directory for scopes to put their conf files into
 # If we start install our own conf files here, this can be
@@ -24,3 +25,6 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libunity-scopes${UNITY_SCOPES_SOVERSIO
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${UNITY_SCOPES_LIB})
 install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${UNITY_SCOPES_LIB}
 DESTINATION ${CMAKE_INSTALL_LIBDIR})
+
+add_custom_target(pkgversion ALL COMMAND dpkg-parsechangelog -l${CMAKE_SOURCE_DIR}/debian/changelog --show-field version > ${CMAKE_CURRENT_BINARY_DIR}/version)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/version DESTINATION ${CMAKE_INSTALL_LOCALSTATEDIR}/lib/libunity-scopes)

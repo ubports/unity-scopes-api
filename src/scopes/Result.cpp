@@ -119,6 +119,11 @@ Variant const& Result::operator[](std::string const& key) const
     return p->value(key);
 }
 
+bool Result::operator==(Result const& other) const
+{
+    return p->compare(other.p.get());
+}
+
 std::string Result::uri() const noexcept
 {
     return p->uri();

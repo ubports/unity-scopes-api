@@ -109,8 +109,7 @@ private:
 
     void store_exception(scopes::MiddlewareException& ex);
 
-    boost::log::sources::severity_channel_logger_mt<>& logger() const;
-    boost::log::sources::severity_channel_logger_mt<>& ipc_logger() const;
+    unity::scopes::internal::Logger& logger() const;
 
     void trace_dispatch(Current const& c);
     void trace_response();
@@ -136,6 +135,9 @@ private:
     ServantMap servants_;
     ServantMap dflt_servants_;
     mutable std::mutex map_mutex_;
+
+    // Dummy logger for testing
+    std::unique_ptr<unity::scopes::internal::Logger> test_logger_;
 };
 
 } // namespace zmq_middleware

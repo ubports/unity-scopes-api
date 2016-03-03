@@ -217,6 +217,11 @@ public:
     /**
     \brief Get the value of an attribute.
 
+    Note: if int64_t value has been stored in the Result but it doesn't exceed maxium range of 32 bit integer and if results come
+    from the cache (see SearchReply::push_surfacing_results_from_cache()), then the value may be made available as 32 bit int;
+    therefore the code should always check the type of returned Variant and depending on that use Variant::get_int() or
+    Variant::get_int_64_t() when dealing with 64-bit integers. This is not needed when using 32 bit integers only.
+
     \param key The attribute name.
     \return The attribute value.
     \throws unity::InvalidArgumentException if given attribute hasn't been set.
@@ -234,6 +239,12 @@ public:
     \return True if this result is an online account login result.
     */
     bool is_account_login_result() const;
+
+    /**
+    \brief Compare result.
+    \return True if results have all attributes equal.
+    */
+    bool operator==(Result const& other) const;
 
     /// @cond
 protected:

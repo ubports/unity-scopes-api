@@ -18,70 +18,68 @@
  *   Pete Woods <pete.woods@canonical.com>
  */
 
-#define BOOST_NO_CXX11_SCOPED_ENUMS // We need this to successfully link against Boost when calling
-                                    // copy_file. See https://svn.boost.org/trac/boost/ticket/6779
-#include <boost/filesystem/operations.hpp>
-
-#undef BOOST_NO_CXX11_SCOPED_ENUMS
 #include <unity/scopes/internal/SettingsDB.h>
 
 #include <unity/UnityExceptions.h>
 
 #include <boost/regex.hpp>  // Use Boost implementation until http://gcc.gnu.org/bugzilla/show_bug.cgi?id=53631 is fixed.
 #include <gtest/gtest.h>
+#include <fcntl.h>
 #include <ctime>
-
+#include <thread>
 
 using namespace unity;
 using namespace unity::scopes::internal;
 using namespace std;
-using namespace boost::filesystem;
 
 string const db_name = TEST_BIN_DIR "/foo.ini";
 
 void write_db(const string& src)
 {
-    copy_file(string(TEST_SRC_DIR) + "/" + src, db_name, copy_option::overwrite_if_exists);
-}
+    // make sure the next write doesn't happen too fast or otherwise modification time of settings db
+    // will be the same and change will not be detected by SettingsDB. Note, this is not an issue with
+    // real use cases when settings are modified by the UI (and SettingsDB uses nanosecond-based mtime).
+    std::this_thread::sleep_for(std::chrono::milliseconds(1100));
 
-#define TRY_EXPECT_EQ(expected, actual) \
-{ \
-  auto now = chrono::system_clock::now(); \
-  auto later = now + chrono::seconds(10); \
-  while (now < later) \
-  { \
-    if ((expected) == (actual)) \
-    { \
-        break; \
-    } \
-    this_thread::sleep_for(chrono::milliseconds(10)); \
-    now = chrono::system_clock::now(); \
-  } \
-  EXPECT_EQ((expected), (actual)); \
-}
+    int fd = ::open(db_name.c_str(), O_WRONLY|O_CREAT, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP);
+    if (fd == -1)
+    {
+        FAIL() << "Couldn't open file " << db_name << ", errno: " << errno;
+    }
 
-#define TRY_EXPECT_TRUE(expr) \
-{ \
-  auto now = chrono::system_clock::now(); \
-  auto later = now + chrono::seconds(10); \
-  while (now < later) \
-  { \
-    if (expr) \
-    { \
-        break; \
-    } \
-    this_thread::sleep_for(chrono::milliseconds(10)); \
-    now = chrono::system_clock::now(); \
-  } \
-  EXPECT_TRUE(expr); \
-}
+    struct flock fl;
+    fl.l_whence = SEEK_SET;
+    fl.l_start = 0;
+    fl.l_len = 0;
+    fl.l_type = F_WRLCK;
+    fl.l_pid = getpid();
 
-#define TRY_EXPECT_FALSE(expr) \
-{ \
-  TRY_EXPECT_TRUE(!(expr)); \
-}
+    if (::fcntl(fd, F_SETLKW, &fl) != 0)
+    {
+        FAIL() << "Couldn't get write lock for " << db_name << ", errno: " << errno;
+    }
 
-BOOST_LOG_INLINE_GLOBAL_LOGGER_DEFAULT(test_logger, boost::log::sources::severity_channel_logger_mt<>)
+    string pth = string(TEST_SRC_DIR) + "/" + src;
+    int fd2 = ::open(pth.c_str(), O_RDONLY);
+    if (fd2 == -1)
+    {
+        FAIL() << "Failed to open input file " << pth;
+    }
+
+    // copy the file
+    int n = 0;
+    char buf[1024];
+    while ((n = ::read(fd2, buf, 1024)) > 0)
+    {
+        int rc = ::write(fd, buf, n);
+        if (rc != n)
+        {
+            FAIL() << "Write returned " << rc << ", expected " << n << " (" << db_name << ", errno: " << errno << ")";
+        }
+    }
+    ::close(fd2);
+    ::close(fd);
+}
 
 TEST(SettingsDB, basic)
 {
@@ -89,7 +87,7 @@ TEST(SettingsDB, basic)
 
     {
         unlink(db_name.c_str());
-        auto db = SettingsDB::create_from_ini_file(db_name, schema, test_logger::get());
+        auto db = SettingsDB::create_from_ini_file(db_name, schema);
 
         // If db doesn't exist, default values are returned.
         EXPECT_EQ(4, db->settings().size());
@@ -121,7 +119,7 @@ TEST(SettingsDB, basic)
         // Change the location.
         write_db("db_location.ini");
         EXPECT_EQ(4, db->settings().size());
-        TRY_EXPECT_EQ("New York", db->settings()["locationSetting"].get_string());
+        EXPECT_EQ("New York", db->settings()["locationSetting"].get_string());
         EXPECT_EQ(1, db->settings()["unitTempSetting"].get_int());
         EXPECT_EQ(23, db->settings()["ageSetting"].get_double());
         EXPECT_TRUE(db->settings()["enabledSetting"].get_bool());
@@ -130,7 +128,7 @@ TEST(SettingsDB, basic)
         write_db("db_loctemp.ini");
         EXPECT_EQ(4, db->settings().size());
         EXPECT_EQ("New York", db->settings()["locationSetting"].get_string());
-        TRY_EXPECT_EQ(0, db->settings()["unitTempSetting"].get_int());
+        EXPECT_EQ(0, db->settings()["unitTempSetting"].get_int());
         EXPECT_EQ(23, db->settings()["ageSetting"].get_double());
         EXPECT_TRUE(db->settings()["enabledSetting"].get_bool());
 
@@ -139,7 +137,7 @@ TEST(SettingsDB, basic)
         EXPECT_EQ(4, db->settings().size());
         EXPECT_EQ("New York", db->settings()["locationSetting"].get_string());
         EXPECT_EQ(0, db->settings()["unitTempSetting"].get_int());
-        TRY_EXPECT_EQ(42.0, db->settings()["ageSetting"].get_double());
+        EXPECT_EQ(42.0, db->settings()["ageSetting"].get_double());
         EXPECT_TRUE(db->settings()["enabledSetting"].get_bool());
 
         // Call settings again. This causes state_changed_ in the implementation
@@ -157,7 +155,7 @@ TEST(SettingsDB, basic)
         EXPECT_EQ("New York", db->settings()["locationSetting"].get_string());
         EXPECT_EQ(0, db->settings()["unitTempSetting"].get_int());
         EXPECT_EQ(42, db->settings()["ageSetting"].get_double());
-        TRY_EXPECT_FALSE(db->settings()["enabledSetting"].get_bool());
+        EXPECT_FALSE(db->settings()["enabledSetting"].get_bool());
     }
 
     {
@@ -165,7 +163,7 @@ TEST(SettingsDB, basic)
 
         // This schema does not specify a default value for location and unit.
         auto schema = TEST_SRC_DIR "/no_default_schema.ini";
-        auto db = SettingsDB::create_from_ini_file(db_name, schema, test_logger::get());
+        auto db = SettingsDB::create_from_ini_file(db_name, schema);
 
         // Check that we now can see only the other two values. (DB doesn't exist yet.)
         EXPECT_EQ(2, db->settings().size());
@@ -177,7 +175,7 @@ TEST(SettingsDB, basic)
 
         // Check that they are correct
         EXPECT_EQ(4, db->settings().size());
-        TRY_EXPECT_EQ("New York", db->settings()["locationSetting"].get_string());
+        EXPECT_EQ("New York", db->settings()["locationSetting"].get_string());
         EXPECT_EQ(0, db->settings()["unitTempSetting"].get_int());
         EXPECT_EQ(23, db->settings()["ageSetting"].get_double());
         EXPECT_TRUE(db->settings()["enabledSetting"].get_bool());
@@ -188,14 +186,14 @@ TEST(SettingsDB, basic)
 
         // This schema does not specify a default value for location and unit.
         auto schema = TEST_SRC_DIR "/no_default_schema.ini";
-        auto db = SettingsDB::create_from_ini_file(db_name, schema, test_logger::get());
+        auto db = SettingsDB::create_from_ini_file(db_name, schema);
 
         // Add records to supply the values.
         write_db("db_loctemp.ini");
 
         // Check that they are correct.
         EXPECT_EQ(4, db->settings().size());
-        TRY_EXPECT_EQ("New York", db->settings()["locationSetting"].get_string());
+        EXPECT_EQ("New York", db->settings()["locationSetting"].get_string());
         EXPECT_EQ(0, db->settings()["unitTempSetting"].get_int());
         EXPECT_EQ(23, db->settings()["ageSetting"].get_double());
         EXPECT_TRUE(db->settings()["enabledSetting"].get_bool());
@@ -205,7 +203,7 @@ TEST(SettingsDB, basic)
 
         // Check that nothing has changed.
         EXPECT_EQ(4, db->settings().size());
-        TRY_EXPECT_EQ("Paris", db->settings()["locationSetting"].get_string());
+        EXPECT_EQ("Paris", db->settings()["locationSetting"].get_string());
         EXPECT_EQ(0, db->settings()["unitTempSetting"].get_int());
         EXPECT_EQ(23, db->settings()["ageSetting"].get_double());
         EXPECT_TRUE(db->settings()["enabledSetting"].get_bool());
@@ -218,7 +216,7 @@ TEST(SettingsDB, chinese_characters)
 
     {
         unlink(db_name.c_str());
-        auto db = SettingsDB::create_from_ini_file(db_name, schema, test_logger::get());
+        auto db = SettingsDB::create_from_ini_file(db_name, schema);
 
         // If db doesn't exist, default values are returned.
         EXPECT_EQ(1, db->settings().size());
@@ -227,7 +225,7 @@ TEST(SettingsDB, chinese_characters)
         // Change the location.
         write_db("db_chinese_location.ini");
         EXPECT_EQ(1, db->settings().size());
-        TRY_EXPECT_EQ("丈", db->settings()["locationSetting"].get_string());
+        EXPECT_EQ("丈", db->settings()["locationSetting"].get_string());
     }
 }
 
@@ -237,7 +235,7 @@ TEST(SettingsDB, delete_db)
 
     {
         unlink(db_name.c_str());
-        auto db = SettingsDB::create_from_ini_file(db_name, schema, test_logger::get());
+        auto db = SettingsDB::create_from_ini_file(db_name, schema);
 
         // If db doesn't exist, default values are returned.
         EXPECT_EQ(4, db->settings().size());
@@ -251,7 +249,7 @@ TEST(SettingsDB, delete_db)
 
         // Settings should be updated.
         EXPECT_EQ(4, db->settings().size());
-        TRY_EXPECT_EQ("New York", db->settings()["locationSetting"].get_string());
+        EXPECT_EQ("New York", db->settings()["locationSetting"].get_string());
         EXPECT_EQ(0, db->settings()["unitTempSetting"].get_int());
         EXPECT_EQ(42, db->settings()["ageSetting"].get_double());
         EXPECT_FALSE(db->settings()["enabledSetting"].get_bool());
@@ -261,7 +259,7 @@ TEST(SettingsDB, delete_db)
 
         // Default values should come back.
         EXPECT_EQ(4, db->settings().size());
-        TRY_EXPECT_EQ("London", db->settings()["locationSetting"].get_string());
+        EXPECT_EQ("London", db->settings()["locationSetting"].get_string());
         EXPECT_EQ(1, db->settings()["unitTempSetting"].get_int());
         EXPECT_EQ(23, db->settings()["ageSetting"].get_double());
         EXPECT_TRUE(db->settings()["enabledSetting"].get_bool());
@@ -288,7 +286,7 @@ TEST(SettingsDB, from_json_string)
 
     {
         unlink(db_name.c_str());
-        auto db = SettingsDB::create_from_json_string(db_name, ok_schema, test_logger::get());
+        auto db = SettingsDB::create_from_json_string(db_name, ok_schema);
 
         // If db doesn't exist, default values are returned.
         EXPECT_EQ(1, db->settings().size());
@@ -297,7 +295,7 @@ TEST(SettingsDB, from_json_string)
         // Change the location.
         write_db("db_location_json.ini");
         EXPECT_EQ(1, db->settings().size());
-        TRY_EXPECT_EQ("New York", db->settings()["location"].get_string());
+        EXPECT_EQ("New York", db->settings()["location"].get_string());
     }
 }
 
@@ -305,7 +303,7 @@ TEST(SettingsDB, exceptions)
 {
     try
     {
-        auto db = SettingsDB::create_from_ini_file("unused", "no_such_file", test_logger::get());
+        auto db = SettingsDB::create_from_ini_file("unused", "no_such_file");
         FAIL();
     }
     catch (ResourceException const& e)
@@ -318,7 +316,7 @@ TEST(SettingsDB, exceptions)
 
     try
     {
-        auto db = SettingsDB::create_from_json_string("unused", "syntax error", test_logger::get());
+        auto db = SettingsDB::create_from_json_string("unused", "syntax error");
         FAIL();
     }
     catch (ResourceException const& e)
@@ -334,7 +332,7 @@ TEST(SettingsDB, exceptions)
         // Open DB that doesn't exist yet.
         unlink(db_name.c_str());
         auto schema = TEST_SRC_DIR "/schema.ini";
-        auto db = SettingsDB::create_from_ini_file(db_name, schema, test_logger::get());
+        auto db = SettingsDB::create_from_ini_file(db_name, schema);
 
         // Add a record, which creates the DB
         write_db("db_location.ini");
@@ -349,9 +347,9 @@ TEST(SettingsDB, exceptions)
         db->settings();
         FAIL();
     }
-    catch (SyscallException const& e)
+    catch (FileException const& e)
     {
-        boost::regex r("unity::SyscallException: SettingsDB::add_watch\\(\\): failed to add watch for path: \".*\". inotify_add_watch\\(\\) failed. \\(fd = [0-9]+, path = .*\\) \\(errno = 13\\)");
+        boost::regex r("unity::FileException: Couldn't open file .* \\(errno = 13\\)");
         EXPECT_TRUE(boost::regex_match(e.what(), r)) << e.what();
     }
 
@@ -363,17 +361,19 @@ TEST(SettingsDB, exceptions)
         write_db("db_location_munich.ini");
 
         auto schema = TEST_SRC_DIR "/schema.ini";
-        auto db = SettingsDB::create_from_ini_file(db_name, schema, test_logger::get());
+        auto db = SettingsDB::create_from_ini_file(db_name, schema);
 
         EXPECT_EQ(4, db->settings().size());
-        TRY_EXPECT_EQ("Munich", db->settings()["locationSetting"].get_string());
+        EXPECT_EQ("Munich", db->settings()["locationSetting"].get_string());
+
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(1100));
 
         // Clobber the DB.
         if (system((string("cat >") + db_name + " <<EOF\nx\nEOF" + db_name).c_str()) < 0)
         {
             FAIL();
         }
-        usleep(100000);
 
         // Call settings(), which will fail.
         db->settings();

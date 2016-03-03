@@ -60,7 +60,7 @@ else()
 endif()
 
 include(FindPkgConfig)
-find_package(Boost COMPONENTS system filesystem regex serialization thread log REQUIRED)
+find_package(Boost COMPONENTS system filesystem regex serialization thread REQUIRED)
 pkg_check_modules(UNITY_API libunity-api>=0.1.3 REQUIRED)
 pkg_check_modules(PROCESS_CPP process-cpp>=1.0.1 REQUIRED)
 pkg_check_modules(APPARMOR REQUIRED libapparmor REQUIRED)
@@ -185,8 +185,8 @@ else()
     option(Werror "Treat warnings as errors" OFF)
 endif()
 
-# Some tests are slow, so make it possible not to run them
-# during day-to-day development.
+# Some tests are slow, so make it possible not to run them during day-to-day development.
+# The default for this *must* stay ON, otherwise the tests won't run in Jenkins.
 option(slowtests "Run slow tests" ON)
 
 if (${Werror})
@@ -210,18 +210,53 @@ else()
     message(FATAL_ERROR "Invalid SANITIZER setting: ${SANITIZER}")
 endif()
 
-# Scopes library name. Also used as a prefix in various places, and as a subdirectory
+# Scopes library names. Also used as a prefix in various places, and as a subdirectory
 # name for installed files. Changing this will also require corresponding changes
 # to the debian files.
 set(UNITY_SCOPES_LIB unity-scopes)
+set(UNITY_SCOPES_QT_LIB unity-scopes-qt)
 
-# API version
-set(UNITY_SCOPES_MAJOR 0)
-set(UNITY_SCOPES_MINOR 6)
-set(UNITY_SCOPES_MICRO 18)
-set(UNITY_SCOPES_SOVERSION 3)
+# Run debian/get-versions.sh to get the version and soversion numbers for each library.
+execute_process(COMMAND mktemp -d OUTPUT_VARIABLE version_dir OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND sh ${CMAKE_SOURCE_DIR}/debian/get-versions.sh ${CMAKE_SOURCE_DIR}/debian ${version_dir})
 
-# Version for testing, with all symbols visible
+# Set versions for libunity-scopes.
+file(READ ${version_dir}/lib${UNITY_SCOPES_LIB}.full-version UNITY_SCOPES_FULL_VERSION)
+string(STRIP ${UNITY_SCOPES_FULL_VERSION} UNITY_SCOPES_FULL_VERSION)
+file(READ ${version_dir}/lib${UNITY_SCOPES_LIB}.major-version UNITY_SCOPES_MAJOR)
+string(STRIP ${UNITY_SCOPES_MAJOR} UNITY_SCOPES_MAJOR)
+file(READ ${version_dir}/lib${UNITY_SCOPES_LIB}.minor-version UNITY_SCOPES_MINOR)
+string(STRIP ${UNITY_SCOPES_MINOR} UNITY_SCOPES_MINOR)
+file(READ ${version_dir}/lib${UNITY_SCOPES_LIB}.micro-version UNITY_SCOPES_MICRO)
+string(STRIP ${UNITY_SCOPES_MICRO} UNITY_SCOPES_MICRO)
+file(READ ${version_dir}/lib${UNITY_SCOPES_LIB}.major-minor-version UNITY_SCOPES_MAJOR_MINOR)
+string(STRIP ${UNITY_SCOPES_MAJOR_MINOR} UNITY_SCOPES_MAJOR_MINOR)
+file(READ ${version_dir}/lib${UNITY_SCOPES_LIB}.soversion UNITY_SCOPES_SOVERSION)
+string(STRIP ${UNITY_SCOPES_SOVERSION} UNITY_SCOPES_SOVERSION)
+
+# Set versions for libunity-scopes-qt.
+file(READ ${version_dir}/lib${UNITY_SCOPES_QT_LIB}.full-version UNITY_SCOPES_QT_FULL_VERSION)
+string(STRIP ${UNITY_SCOPES_QT_FULL_VERSION} UNITY_SCOPES_QT_FULL_VERSION)
+file(READ ${version_dir}/lib${UNITY_SCOPES_QT_LIB}.major-version UNITY_SCOPES_QT_MAJOR)
+string(STRIP ${UNITY_SCOPES_QT_MAJOR} UNITY_SCOPES_QT_MAJOR)
+file(READ ${version_dir}/lib${UNITY_SCOPES_QT_LIB}.minor-version UNITY_SCOPES_QT_MINOR)
+string(STRIP ${UNITY_SCOPES_QT_MINOR} UNITY_SCOPES_QT_MINOR)
+file(READ ${version_dir}/lib${UNITY_SCOPES_QT_LIB}.micro-version UNITY_SCOPES_QT_MICRO)
+string(STRIP ${UNITY_SCOPES_QT_MICRO} UNITY_SCOPES_QT_MICRO)
+file(READ ${version_dir}/lib${UNITY_SCOPES_QT_LIB}.major-minor-version UNITY_SCOPES_QT_MAJOR_MINOR)
+string(STRIP ${UNITY_SCOPES_QT_MAJOR_MINOR} UNITY_SCOPES_QT_MAJOR_MINOR)
+file(READ ${version_dir}/lib${UNITY_SCOPES_QT_LIB}.soversion UNITY_SCOPES_QT_SOVERSION)
+string(STRIP ${UNITY_SCOPES_QT_SOVERSION} UNITY_SCOPES_QT_SOVERSION)
+
+if(NOT ${UNITY_SCOPES_MAJOR} EQUAL 1)
+    message(FATAL_ERROR "Change in major version number. You need to adjust get-versions.sh and gen-debian-files.sh")
+endif()
+
+if(NOT ${UNITY_SCOPES_QT_MAJOR} EQUAL 0)
+    message(FATAL_ERROR "Change in Qt major version number. You need to adjust get-versions.sh and gen-debian-files.sh")
+endif()
+
+# Library for testing, with all symbols visible
 set(UNITY_SCOPES_TEST_LIB ${UNITY_SCOPES_LIB}-test)
 
 # All the libraries we need to link a normal executable that uses Unity scopes
@@ -235,7 +270,7 @@ set(LIB_INSTALL_PREFIX lib/${CMAKE_LIBRARY_ARCHITECTURE})
 set(LIBDIR ${CMAKE_INSTALL_LIBDIR})
 
 set(LIBSUBDIR ${LIBDIR}/${UNITY_SCOPES_LIB}})
-set(HDR_INSTALL_DIR include/${UNITY_SCOPES_LIB}-${UNITY_SCOPES_MAJOR})
+set(HDR_INSTALL_DIR include/${UNITY_SCOPES_LIB}-${UNITY_SCOPES_SOVERSION})
 
 #####################################################################
 # Enable code coverage calculation with gcov/gcovr/lcov
@@ -304,14 +339,14 @@ set_target_properties(${UNITY_SCOPES_LIB_OBJ} PROPERTIES COMPILE_FLAGS "-fPIC")
 # Use the object files to make the normal library.
 add_library(${UNITY_SCOPES_LIB} SHARED $<TARGET_OBJECTS:${UNITY_SCOPES_LIB_OBJ}>)
 set_target_properties(${UNITY_SCOPES_LIB} PROPERTIES
-    VERSION "${UNITY_SCOPES_MAJOR}.${UNITY_SCOPES_MINOR}.${UNITY_SCOPES_MICRO}"
+    VERSION ${UNITY_SCOPES_FULL_VERSION}
     SOVERSION ${UNITY_SCOPES_SOVERSION}
 )
 
 # Use the object files to make the test library.
 add_library(${UNITY_SCOPES_TEST_LIB} SHARED $<TARGET_OBJECTS:${UNITY_SCOPES_LIB_OBJ}>)
 set_target_properties(${UNITY_SCOPES_TEST_LIB} PROPERTIES
-    VERSION "${UNITY_SCOPES_MAJOR}.${UNITY_SCOPES_MINOR}.${UNITY_SCOPES_MICRO}"
+    VERSION ${UNITY_SCOPES_FULL_VERSION}
     SOVERSION ${UNITY_SCOPES_SOVERSION}
 )
 

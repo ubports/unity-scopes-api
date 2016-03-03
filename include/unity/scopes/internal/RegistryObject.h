@@ -29,7 +29,6 @@
 #include <condition_variable>
 #include <mutex>
 #include <thread>
-#include <chrono>
 
 namespace unity
 {
@@ -101,7 +100,7 @@ private:
 
         ScopeProcess(ScopeExecData exec_data,
                      std::weak_ptr<MWPublisher> const& publisher,
-                     boost::log::sources::severity_channel_logger_mt<>& logger);
+                     unity::scopes::internal::Logger& logger);
         ~ScopeProcess();
 
         ProcessState state() const;
@@ -132,11 +131,12 @@ private:
         core::posix::ChildProcess process_ = core::posix::ChildProcess::invalid();
         std::weak_ptr<MWPublisher> reg_publisher_; // weak_ptr, so processes don't hold publisher alive
         bool manually_started_;
-        boost::log::sources::severity_channel_logger_mt<>& logger_;
+        unity::scopes::internal::Logger& logger_;
     };
 
 private:
-    boost::log::sources::severity_channel_logger_mt<>& logger_;
+    std::unique_ptr<unity::scopes::internal::Logger> test_logger_;
+    unity::scopes::internal::Logger& logger_;
 
     core::posix::ChildProcess::DeathObserver& death_observer_;
     core::ScopedConnection death_observer_connection_;
@@ -153,12 +153,6 @@ private:
     mutable std::mutex mutex_;
 
     MWPublisher::SPtr publisher_;
-    std::thread publisher_notify_thread_;
-    std::condition_variable publisher_notify_cond_;
-    std::chrono::system_clock::time_point publisher_notify_timepoint_;
-    bool publisher_notify_reset_timer_;
-    bool publisher_notify_exit_;
-
     MWSubscriber::SPtr ss_list_update_subscriber_;
     std::shared_ptr<core::ScopedConnection> ss_list_update_connection_;
     bool generate_desktop_files_;

@@ -43,7 +43,7 @@ public:
     NONCOPYABLE(ChildScopesRepository);
 
     ChildScopesRepository(std::string const& repo_file_path,
-                          boost::log::sources::severity_channel_logger_mt<>& logger);
+                          unity::scopes::internal::Logger& logger);
 
     ChildScopeList child_scopes(ChildScopeList const& child_scopes_defaulted);
     bool set_child_scopes(ChildScopeList const& child_scopes);
@@ -56,7 +56,7 @@ private:
     ChildScopeEnabledMap json_to_list(std::string const& child_scopes_json);
 
     std::string const repo_file_path_;
-    boost::log::sources::severity_channel_logger_mt<>& logger_;
+    unity::scopes::internal::Logger& logger_;
 
     std::mutex mutex_;
     ChildScopeEnabledMap cached_repo_;

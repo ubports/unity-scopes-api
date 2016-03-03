@@ -76,22 +76,6 @@ The following keys are recognized:
 
   The default value is 10 seconds.
 
-- Process.Timeout
-
-  This parameter determines how the registry will wait for a scope
-  to start and stop. The registry waits for at most Process.Timeout
-  milliseconds before it concludes that a scope failed to initialize
-  or terminate correctly. If a scope does not respond
-  within the allotted time, it is killed with SIGKILL.
-
-  Only values in the range 10 to 15000 milliseconds are accepted.
-
-  The default value is 4000 milliseconds.
-
-  Note that this value must be less than Locate.Timeout in the [<Middleware>]
-  config group, otherwise the middleware can prematurely conclude that
-  a locate() request failed to start a scope.
-
 - CacheDir
 
   The parent directory under which a scope can write scope-specific data files
@@ -127,34 +111,8 @@ The following keys are recognized:
 
   The default value is $HOME/.cache/unity-scopes.
 
-- LogDir
-
-  The parent directory under which the run time writes the scope log files.
-  Setting this value explicitly to the empty string disables file logging and forces
-  all log entries to go to stderr.
-
-  The default value is $HOME/.local/share/unity-scopes.
-
-  Note that the actual logs are written into subdirectories of this
-  directory. Specifically:
-
-  $HOME/.local/share/unity-scopes/leaf-net/<scope_id>/logs (for confined scopes)
-  and $HOME/.local/share/unity-scopes/unconfined/<scope_id>/logs (for unconfined scopes).
-
-  The environment variable UNITY_SCOPES_LOGDIR overrides this key.
-  Setting this variable explicitly to the empty string disables file logging and forces
-  all log entries to go to stderr.
-
-- Log.MaxFileSize
-
-  The maximum size in bytes of an individual log file before it is rolled over.
-  The value must be at least 1024. The default value is 512 kB.
-
-- Log.MaxDirSize
-
-  The maximum size in bytes of the sum of sizes of all log files in the log directory
-  before they are deleted. The value must be greater than Log.MaxFileSize.
-  The default value is 2 MB.
+  The environment variable UNITY_SCOPES_CONFIG_DIR overrides this key (useful when running
+  automated tests that should not overwrite any of the real configuration files).
 
 - Log.TraceChannels
 
@@ -303,6 +261,22 @@ The following keys are recognized:
 
   The default value is "$HOME/.local/share/unity-scopes".
 
+- Process.Timeout
+
+  This parameter determines how long the registry will wait for a scope
+  to start and stop. The registry waits for at most Process.Timeout
+  milliseconds before it concludes that a scope failed to initialize
+  or terminate correctly. If a scope does not respond
+  within the allotted time, it is killed with SIGKILL.
+
+  Only values in the range 10 to 15000 milliseconds are accepted.
+
+  The default value is 4000 milliseconds.
+
+  Note that this value must be less than Locate.Timeout in the [<Middleware>]
+  config group, otherwise the middleware can prematurely conclude that
+  a locate() request failed to start a scope.
+
 
 Smartscopes.ini
 --------------
@@ -378,6 +352,8 @@ The following keys are recognized in the ScopeConfig group:
 
   Note: make sure there are no trailing spaces following
   the ids, as they will be preserved.
+
+  This option is deprecated, please reimplement ScopeBase::find_child_scopes() instead.
 
 - Invisible (undocumented)
 

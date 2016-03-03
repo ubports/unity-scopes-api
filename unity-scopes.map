@@ -13,9 +13,12 @@ global:
         virtual?thunk?to?unity::scopes::[!iu]*;
         vtable?for?unity::scopes::utility::[!i]*;
         vtable?for?unity::scopes::[!iu]*;
+        unity::scopes::internal::convert_exec_rel_to_abs*;
         unity::scopes::internal::Executor::*;
         unity::scopes::internal::IniSettingsSchema::*;
         unity::scopes::internal::JsonSettingsSchema::*;
+        unity::scopes::internal::Logger*;
+        unity::scopes::internal::LogStream::*;
         unity::scopes::internal::make_directories*;
         unity::scopes::internal::MiddlewareBase::*;
         unity::scopes::internal::MiddlewareFactory::*;

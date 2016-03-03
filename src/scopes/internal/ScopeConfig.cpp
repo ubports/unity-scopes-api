@@ -28,6 +28,7 @@
 #include <algorithm>
 #include <sstream>
 #include <string>
+#include <iostream>
 
 using namespace std;
 
@@ -214,6 +215,7 @@ ScopeConfig::ScopeConfig(string const& configfile) :
     try
     {
         child_scope_ids_ = parser()->get_string_array(scope_config_group, child_scope_ids_key);
+        cerr << "Warning: the " << child_scope_ids_key << " option is deprecated. Please reimplement ScopeBase::find_child_scopes() instead." << endl;
     }
     catch (LogicException const&)
     {

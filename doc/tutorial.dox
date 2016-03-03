@@ -171,20 +171,20 @@ public:
 }
 \endcode
 
-The scopes run time calls \link unity::scopes::ScopeBase::start() start()\endlink once prior to
+The scopes runtime calls \link unity::scopes::ScopeBase::start() start()\endlink once prior to
 sending any queries. You can use it to perform one-time initialization for your scope. Note that you should
 not perform any lengthy operations in `start()`. Your implementation must return as quickly as possible
 (in a fraction of the second), so do not, for example, make synchronous network requests as part of `start()`.
 
 The scope ID passed to `start()` is taken from the name your scope's `.ini` configuration file.
 
-The scopes run time calls \link unity::scopes::ScopeBase::stop() stop()\endlink to inform your scope
+The scopes runtime calls \link unity::scopes::ScopeBase::stop() stop()\endlink to inform your scope
 that it should shut down. You can use this method to perform any one-time clean-up.
 
-Prior to sending any queries, the scopes run time calls \link unity::scopes::ScopeBase::run() run()\endlink if your `start()` method
+Prior to sending any queries, the scopes runtime calls \link unity::scopes::ScopeBase::run() run()\endlink if your `start()` method
 completed successfully (did not throw an exception). The `run()` method
 is called by a separate thread that you can use for your own purposes, for example, to run an event loop.
-The scopes run time has no further interest in this thread, but you must ensure that, if you do not return
+The scopes runtime has no further interest in this thread, but you must ensure that, if you do not return
 from `run()`, you must return from `run()` in response to a call to `stop()`.
 
 For typical and simple cases, you can ignore `run()`.
@@ -215,7 +215,7 @@ the current locale string, the form factor, and the query cardinality.
 
 Cardinality is the maximum number of results expected from a query (a value of 0 indicates no limit). For optimal performance,
 do not return more results than indicated by the cardinality. If you more than the requested number of results, you are
-wasting resources. (The scopes run time ignores the additional results.)
+wasting resources. (The scopes runtime ignores the additional results.)
 
 \paragraph handlingaggregation Handling aggregation
 
@@ -291,7 +291,7 @@ otherwise no cached results will be pushed. (`push_surfacing_results_from_cache(
 
 You must implement a class that derives from \link unity::scopes::SearchQueryBase SearchQueryBase\endlink and return
 an instance of this class from `search()`.
-Your class must implement a \link unity::scopes::SearchQueryBase::run run()\endlink method. The scopes run time calls
+Your class must implement a \link unity::scopes::SearchQueryBase::run run()\endlink method. The scopes runtime calls
 `run()` to execute the query.
 
 The \link unity::scopes::SearchReplyProxy SearchReplyProxy\endlink that is passed to `run()` is an invocation
@@ -322,6 +322,11 @@ Do _not_ wait for all results for a query to arrive in an attempt to buffer them
 them by category. If you do, this prevents incremental rendering, and the user sees nothing
 until your scope has processed _all_ results. To create a positive user experience,
 your scope should push results as soon as possible.
+
+The UI uses categories to incrementally render the display after a refresh of search results. This relies
+on categories staying the same from query to query. If your scope has, say, a "News" category, you need
+to make sure that the category ID and name stay the same from query to query. In particular, do _not_
+create category IDs that are artificially unique per query (such as by appending a sequence number).
 
 When you create a category, you can provide a \link unity::scopes::CategoryRenderer \endlink instance.
 The category renderer determines the visual appearance of the results in that category (such as
@@ -366,7 +371,7 @@ return more results, the UI shows a spinner or similar, to indicate that the que
 
 It is possible for you to return from `run()` _without_ having the query complete automatically. The life time
 of the query is controlled not only by `run()`, but also by the life time of the `SearchReplyProxy` that is passed
-to `run()`. The scopes run time monitors the reply proxy and informs the UI that the query is complete when
+to `run()`. The scopes runtime monitors the reply proxy and informs the UI that the query is complete when
 _either_ `run()` returns _or_ the last reply proxy for the query goes out of scope. This allows you to, for example,
 pass the reply proxy to a different thread that pushes results (as you might want to do if you need to run a
 separate event loop). That thread can then also react to query cancellation. The important point is that, if
@@ -384,7 +389,7 @@ However, the second query will not start until _after_ the previous query has co
 
 \note _Query cancellation happens frequently, and it is important for your scope to react quickly to cancellation!_
 
-The scopes run time provides several ways for your implementation to react to cancellation:
+The scopes runtime provides several ways for your implementation to react to cancellation:
 
 <ul>
 <li>A `false` return value from `SearchReply::push`. If `push` returns `false`, there is no point in continuing to
@@ -392,16 +397,16 @@ provide more results.
 <li>You can poll for cancellation by calling \link unity::scopes::QueryBase::valid QueryBase::valid()\endlink. `valid()`
 returns `false` once a query is cancelled or has exceeded its cardinality limit.
 <li>Your query implementation class must override the \link unity::scopes::QueryBase::cancelled QueryBase::cancelled()\endlink
-method. The scopes run time calls `cancelled()` if the UI has cancelled the query. (Note that calls to `cancelled()` are
+method. The scopes runtime calls `cancelled()` if the UI has cancelled the query. (Note that calls to `cancelled()` are
 made by a separate thread.)
 </ul>
 
 Testing the return value from `push()` is reasonable only if you know that results for your scope will
 arrive quickly (no more than 0.1 seconds apart). Otherwise, you should push results asynchronously from
 a separate thread and arrange for the query to complete (return from `run()`) in response to the scopes
-run time calling `cancelled()`.
+runtime calling `cancelled()`.
 
-Note that it is possible for a call to `cancelled()` to arrive before the scopes run time has called `run()`
+Note that it is possible for a call to `cancelled()` to arrive before the scopes runtime has called `run()`
 (because `cancelled()` and `run()` are called by different threads and, therefore, can be dispatched out of order).
 
 
@@ -421,7 +426,7 @@ public:
 \endcode
 
 This method must return an instance derived from unity::scopes::PreviewQueryBase. Like `search()`, `preview()` is a factory method;
-the scopes run time initiates the actual preview by calling \link unity::scopes::PreviewQueryBase::run run()\endlink on the instance you
+the scopes runtime initiates the actual preview by calling \link unity::scopes::PreviewQueryBase::run run()\endlink on the instance you
 return. Your `run()` method is responsible for gathering preview data (from
 local or remote sources) and passing it to the UI along with the definition of the visual appearance of the preview by calling
 \link unity::scopes::PreviewReply::push push()\endlink on the reply proxy that is passed to `run()`. (This is analogous to returning
@@ -687,12 +692,12 @@ say, a remote web service.
 
 To receive results from its child scopes, your scope must implement a class that derives from
 \link unity::scopes::SearchListenerBase SearchListenerBase\endlink. You provide an instance
-of this class to each sub-query; the scopes run time invokes callback methods on this class
+of this class to each sub-query; the scopes runtime invokes callback methods on this class
 to let you know when a new result or status update arrives, and when a query completes.
 
 \paragraph childscopes Finding child scopes
 
-To send queries to its child scopes, your scope must obtain a proxy for each child scope. The scopes run time
+To send queries to its child scopes, your scope must obtain a proxy for each child scope. The scopes runtime
 runs a registry process. The job of the registry (among other things) is to provide information about available
 scopes (whether they are local scopes or remote scopes in the Smartscopes server).
 
@@ -752,7 +757,7 @@ This method requires a handle to the child scope to query (either via proxy or C
 that will receive the query results.
 
 \note `subsearch()` is identical to
-\link unity::scopes::ScopeBase::search search()\endlink but, for `subsearch()`, the scopes run time transparently
+\link unity::scopes::ScopeBase::search search()\endlink but, for `subsearch()`, the scopes runtime transparently
 forwards query cancellation to child scopes, so your implementation of \link unity::scopes::QueryBase::cancelled QueryBase::cancelled()\endlink
 does not need to forward cancellation to its children.
 (However, your query class still needs to react to cancellation and should terminate the current query
@@ -813,7 +818,7 @@ void MyQuery::run(SearchReplyProxy const& upstream_reply)
 \endcode
 
 Note that the `subsearch()` call is asynchronous and returns immediately. Despite this, your `MyQuery` instance is kept alive
-because the scopes run time does not delete it until the child query has completed. (The run time tracks the `reply` proxy
+because the scopes runtime does not delete it until the child query has completed. (The runtime tracks the `reply` proxy
 for the query and holds the query alive until it receives a finished message from the child scope.)
 
 \paragraph receiver Receiving sub-query results
@@ -915,6 +920,43 @@ void MyReceiver::push(CategorisedResult original_result)
 }
 \endcode
 
+\subsection threading Threading model
+
+It is important to understand how the runtime uses threads to call methods on scopes and clients.
+The runtime maintains a number of threads that each call one or more methods. Methods in the same
+group are always called by the same thread. This means that methods in the same group do not run concurrently,
+but methods in different groups _do_ run concurrently. If you share state between methods in
+different groups, you _must_ synchronize access to that state, otherwise your code will suffer from
+race conditions.
+
+The following lists shows how methods are grouped. Each group has a single dedicated dispatch thread.
+
+<ul>
+<li>\link UNITY_SCOPE_CREATE_FUNCTION()\endlink,
+\link unity::scopes::ScopeBase::start() ScopeBase::start()\endlink,
+\link unity::scopes::ScopeBase::stop() ScopeBase::stop()\endlink, and
+\link UNITY_SCOPE_DESTROY_FUNCTION()\endlink.
+<li>\link unity::scopes::ScopeBase::search() ScopeBase::search()\endlink,
+\link unity::scopes::ScopeBase::preview() ScopeBase::preview()\endlink, and
+\link unity::scopes::ScopeBase::perform_action() ScopeBase::perform_action()\endlink.
+<li>\link unity::scopes::SearchQueryBase::run() SearchQueryBase::run()\endlink,
+\link unity::scopes::PreviewQueryBase::run() PreviewQueryBase::run()\endlink, and
+\link unity::scopes::ActivationQueryBase::activate() ActivationQueryBase::activate()\endlink.
+<li>\link unity::scopes::QueryBase::cancelled() QueryBase::cancelled()\endlink.
+<li>\link unity::scopes::SearchListenerBase::push() SearchListenerBase::push()\endlink,
+\link unity::scopes::PreviewListenerBase::push() PreviewListenerBase::push()\endlink,
+\link unity::scopes::ActivationListenerBase::activated() ActivationListenerBase::activated()\endlink,
+\link unity::scopes::ListenerBase::finished() ListenerBase::finished()\endlink,
+\link unity::scopes::ListenerBase::info() ListenerBase::info()\endlink.
+</ul>
+For your scope implementation, keep in mind that `cancelled()` is _not_ called by
+the same thread that called, for example, `search()` or `run()`. This means that any state you
+established in `search()` or `run()` must be synchronized if you use that state in `cancelled()`.
+
+Similar considerations apply for aggregating scopes, which act as both client and server: you must
+synchronize any state that is shared between the client side and the server side. For example,
+you must synchronize state established in `search()` and accessed from `push()` or `finished()`.
+
 \subsection scopesettings Settings
 
 A scope can provide for simple customizations, such as allowing the user to configure an email address or
@@ -1015,7 +1057,7 @@ entry is absent from the map.
 
 When you use settings in your scope implementation, do not cache the values and re-use them
 for a different query. If you do, any setting changes made by the user will not take effect until
-your scope is re-started by the run time. (Because the user cannot know when that happens, this
+your scope is re-started by the runtime. (Because the user cannot know when that happens, this
 can be highly confusing.) Instead, call `settings()` each time you need to use the value
 of a setting. That way, your scope will react to any change made by the user as soon as it receives another
 query.
@@ -1419,7 +1461,7 @@ tutorial document for more detail on using keywords in your scope.
 
 \subsection scopetool The scope tool
 
-The Unity Scope Tool is a stand-alone redering tool that allows you
+The Unity Scope Tool is a stand-alone rendering tool that allows you
 to see how the dash will render your scope.
 
 You can install the tool from the Ubuntu archive using:
@@ -1442,7 +1484,7 @@ you can just copy the JSON definition back into your scope
 (see unity::scopes::CategoryRenderer::CategoryRenderer()).
 
 The scope-tool supports a few command line arguments:
-\arg by default (without any arguments) it will communicate with all scopes
+\arg By default (without any arguments) it will communicate with all scopes
 installed on the system and available on the smart scopes server.
 \arg When a path to a scope configuration file is provided, only that scope is
 initialized, but you can either pass multiple configuration files or

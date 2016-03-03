@@ -50,8 +50,6 @@ namespace
     std::mutex shared_mutex;
 }
 
-#define MONITOR_ENDPOINT "ipc:///tmp/scopes-monitor"
-
 ZmqObjectProxy::ZmqObjectProxy(ZmqMiddleware* mw_base,
                                string const& endpoint,
                                string const& identity,
@@ -190,7 +188,13 @@ void ZmqObjectProxy::invoke_oneway_(capnp::MessageBuilder& request)
 
 ZmqObjectProxy::TwowayOutParams ZmqObjectProxy::invoke_twoway_(capnp::MessageBuilder& request)
 {
-    return invoke_twoway_(request, timeout_);
+    return invoke_twoway_(request, timeout_, mw_base()->locate_timeout());
+}
+
+ZmqObjectProxy::TwowayOutParams ZmqObjectProxy::invoke_twoway_(capnp::MessageBuilder& request,
+                                                               int64_t twoway_timeout)
+{
+    return invoke_twoway_(request, twoway_timeout, mw_base()->locate_timeout());
 }
 
 ZmqObjectProxy::TwowayOutParams ZmqObjectProxy::invoke_twoway_(capnp::MessageBuilder& request,
@@ -206,19 +210,13 @@ ZmqObjectProxy::TwowayOutParams ZmqObjectProxy::invoke_twoway_(capnp::MessageBui
 
     // If a registry is configured and this object is not a registry itself,
     // attempt to locate the scope before invoking it.
-    if (!this_is_registry && !this_is_ss_registry)
+    if (registry_proxy && !this_is_registry && !this_is_ss_registry)
     {
         try
         {
             ObjectProxy new_proxy;
-            if (locate_timeout != -1)
-            {
-                new_proxy = registry_proxy->locate(identity(), locate_timeout);
-            }
-            else
-            {
-                new_proxy = registry_proxy->locate(identity());
-            }
+            new_proxy = registry_proxy->locate(identity(), locate_timeout);
+
             // update our proxy with the newly received data
             // (we need to first store values in local variables outside of the mutex,
             // otherwise we will deadlock on the following ZmqObjectProxy methods)
@@ -250,15 +248,12 @@ ZmqObjectProxy::TwowayOutParams ZmqObjectProxy::invoke_twoway_(capnp::MessageBui
 
 ZmqObjectProxy::TwowayOutParams ZmqObjectProxy::invoke_twoway__(capnp::MessageBuilder& request, int64_t timeout)
 {
-    RequestMode mode;
     std::string endpoint;
     {
         lock_guard<mutex> lock(shared_mutex);
-        mode = mode_;
         endpoint = endpoint_;
+        assert(mode_ == RequestMode::Twoway);
     }
-
-    assert(mode == RequestMode::Twoway);
 
     zmqpp::socket s(*mw_base()->context(), zmqpp::socket_type::request);
     // Allow some linger time so we don't hang indefinitely if the other end disappears.
@@ -324,7 +319,7 @@ string ZmqObjectProxy::decode_request_(capnp::MessageBuilder& request)
 
 void ZmqObjectProxy::trace_request_(capnp::MessageBuilder& request)
 {
-    BOOST_LOG(mw_base()->runtime()->logger(Logger::IPC))
+    mw_base()->runtime()->logger()(LoggerChannel::IPC)
         << "sending request: "
         << decode_request_(request);
 }
@@ -337,7 +332,7 @@ string ZmqObjectProxy::decode_reply_(capnp::MessageBuilder& request, capnp::Mess
 
 void ZmqObjectProxy::trace_reply_(capnp::MessageBuilder& request, capnp::MessageReader& reply)
 {
-    BOOST_LOG(mw_base()->runtime()->logger(Logger::IPC))
+    mw_base()->runtime()->logger()(LoggerChannel::IPC)
         << "received reply: "
         << decode_reply_(request, reply);
 }

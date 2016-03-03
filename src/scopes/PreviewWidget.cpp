@@ -87,12 +87,16 @@ The following widget types are recognized by Unity:
 \arg \c gallery
 \arg \c header
 \arg \c actions
+\arg \c icon-actions
 \arg \c progress
 \arg \c text
 \arg \c rating-input
 \arg \c rating-edit
 \arg \c reviews
+\arg \c comment-input
+\arg \c comment
 \arg \c expandable
+\arg \c table
 
 \subsection audio audio widget
 
@@ -135,6 +139,7 @@ List of attributes:
 
 \arg \c source A URI pointing to the video
 \arg \c screenshot A URI pointing to a screenshot of the video (optional)
+\arg \c share-data An optional dictionary for making this video shareable with Content Hub. See \link contentsharing content sharing\endlink below.
 
 \code{.cpp}
 {
@@ -153,7 +158,8 @@ List of attributes:
 
 \arg \c source A URI pointing to the image
 \arg \c zoomable A boolean specifying whether the image is zoomable (default: \c false)
-\arg \c fallback A fallback image to be used if the image URI cannot be retrieved (default: none)
+\arg \c fallback A fallback image to be used if the image URI is empty or cannot be retrieved (default: none)
+\arg \c share-data An optional dictionary for making this image shareable with Content Hub. See \link contentsharing content sharing\endlink below.
 
 \code{.cpp}
 {
@@ -172,7 +178,7 @@ The gallery widget displays a set of images.
 List of attributes:
 
 \arg \c sources An array of image URIs
-\arg \c fallback A fallback image to be used if an image URI cannot be resolved (default: none)
+\arg \c fallback A fallback image to be used if an image URI is empty or cannot be retrieved (default: none)
 
 \code{.cpp}
 {
@@ -197,7 +203,7 @@ List of attributes:
 \arg \c title A string specifying the title
 \arg \c subtitle A string specifying the subtitle
 \arg \c mascot A URI specifying the mascot
-\arg \c fallback A fallback image to be used if the mascot URI cannot be retrieved (default: none)
+\arg \c fallback A fallback image to be used if the mascot URI is empty or cannot be retrieved (default: none)
 \arg \c emblem A URI specifying the emblem
 
 \code{.cpp}
@@ -241,6 +247,17 @@ You can construct composite attributes with unity::scopes::VariantBuilder:
     ...
 }
 \endcode
+
+\subsection icon-actions icon-actions widget
+
+The icon-actions widget displays one or more buttons represented by icons and/or labels. It's similar to actions widget, but uses different layout.
+Every button can provide an optional temporary icon to be displayed immediately after user taps it.
+
+List of attributes:
+
+\arg \c actions A composite attribute containing an array of tuples, where each tuple has at least
+these fields: \c id (a mandatory string that is passed to unity::scopes::ScopeBase::activate_preview_action()),
+\c label (optional string), \c icon (optional URI, required if label is missing), \c temporaryIcon (optional URI).
 
 \subsection progress progress widget
 
@@ -378,6 +395,39 @@ You can construct composite attributes with unity::scopes::VariantBuilder:
 }
 \endcode
 
+\subsection comment-input comment-input widget
+
+The comment-input widget allows users to add comments. It displays an input box along with "Send" button.
+
+When a user presses the "Send" button, the scope receives a preview
+action activation with the id \c "commented".  The actual comment
+can be accessed via unity::scopes::ActionMetadata::scope_data.
+The scope data will be a VariantMap with the \c "comment" field holding
+the text entered by the user.
+
+List of attributes:
+
+\arg \c submit-label String for the label of the submit button (optional, uses "Submit" by default).
+
+\code{.cpp}
+{
+    PreviewWidget w1("cmt", "comment-input");
+
+    w1.add_attribute_value("submit-label", Variant("Comment it!"));
+    ...
+}
+\endcode
+
+\subsection comment comment widget
+
+The comment widget shows an avatar, author name, subtitle and a comment text.
+
+List of attributes:
+\arg \c source URI for an avatar icon (optional)
+\arg \c author A string specifying the author of the comment (mandatory)
+\arg \c subtitle A string for the subtitle (optional)
+\arg \c comment A string for the comment text (mandatory)
+
 \subsection expandable expandable widget
 
 The expandable widget is used to group several widgets into an expandable pane.
@@ -401,6 +451,53 @@ List of attributes:
     expandable.add_widget(w2);
     ...
 \endcode
+
+\subsection table table widget
+
+The table widget is used to show a table with labels and values.
+When used inside an Expandable widget, the topmost 3 rows are shown until it's expanded.
+
+List of attributes:
+\arg \c title A string specifying the title to be shown on top
+\arg \c values An array with one element per row. Each element is an array of two strings: label and value
+
+\code
+    PreviewWidget table("details", "table");
+    table.add_attribute_value("title", Variant("This is a table widget"));
+
+    VariantArray values {
+        Variant{VariantArray{Variant{_("Version number")}, Variant{"0.83b"}}},
+        Variant{VariantArray{Variant{_("Last updated")}, Variant{"2015-01-15"}}},
+        Variant{VariantArray{Variant{_("First released")}, Variant{"2013-12-16"}}},
+        Variant{VariantArray{Variant{_("Size")}, Variant{"11.3 MiB"}}},
+    };
+    table.add_attribute_value("values", Variant(values));
+    ...
+\endcode
+
+\subsection contentsharing Content sharing
+
+Some widgets support content sharing with the special share-data attribute. When the widget is tapped (clicked), data (image, video etc.)
+can be shared with Content Hub.
+
+The share-data attribute is a dictionary (VariantMap) that needs to contain the following keys:
+
+\arg \c uri A single URI to share or an array of URIs.
+\arg \c content-type A name of the content type known to Content Hub, e.g. "links", "pictures", "videos". Please refer to Content Hub documentation
+for information on supported content types.
+
+Here is an example of a shareable image:
+
+\code
+    PreviewWidget image("img", "image");
+    image.add_attribute_value("source", Variant("http://www.example.org/graphics.png"));
+
+    VariantMap share_data;
+    share_data["uri"] = Variant("http://www.example.org/graphics_big.png");
+    share_data["content-type"] = Variant("pictures");
+    image.add_attribute_value("share-data", share_data);
+\endcode
+
 */
 
 //! @cond

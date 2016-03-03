@@ -58,13 +58,19 @@ def compare_syms(old_file, new_file):
     #
     old_regex = re.compile(r'^ (\(.*\))"(.*)" (.*)$')
 
+    # Regex to match lines that are not empty or a comment, so we can skip over
+    # any initial comments in the file.
+    real_line_regex = re.compile(r'^[^\s#]')
+
     old_syms = {}                                   # Dictionary containing symbol -> ( tag, version )
     with open(old_file, encoding='utf=8') as file:
-        line = file.readline()                      # Get first line, which is the library name and version
-        version_regex = re.compile(r'.*#MINVER#$')  # Sanity check
+        line = file.readline()
+        while not real_line_regex.match(line):
+            line = file.readline()
+        version_regex = re.compile(r'.*#MINVER#$')  # Sanity check, we must be on the initial line now
         mo = version_regex.match(line)
         if not mo:
-            raise Exception('Expected #MINVER# on line 1: ' + old_file + ': ' + line)
+            raise Exception('Expected #MINVER# on first non-comment line: ' + old_file + ': ' + line)
 
         for line in file:
             mo = old_regex.match(line)
@@ -125,8 +131,8 @@ def compare_syms(old_file, new_file):
 FILES = [
             ('./debian/lib@UNITY_SCOPES_LIB@@UNITY_SCOPES_SOVERSION@.symbols',
              './debian/lib@UNITY_SCOPES_LIB@@UNITY_SCOPES_SOVERSION@/DEBIAN/symbols'),
-            ('./debian/libunity-scopes-qt.symbols',
-             './debian/libunity-scopes-qt/DEBIAN/symbols')
+            ('./debian/libunity-scopes-qt@UNITY_SCOPES_QT_SOVERSION@.symbols',
+             './debian/libunity-scopes-qt@UNITY_SCOPES_QT_SOVERSION@/DEBIAN/symbols')
         ]
 
 def run():

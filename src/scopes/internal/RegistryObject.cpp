@@ -37,7 +37,6 @@ using namespace std;
 
 static const char* c_debug_dbus_started_cmd = "dbus-send --type=method_call --dest=com.ubuntu.SDKAppLaunch /ScopeRegistryCallback com.ubuntu.SDKAppLaunch.ScopeLoaded";
 static const char* c_debug_dbus_stopped_cmd = "dbus-send --type=method_call --dest=com.ubuntu.SDKAppLaunch /ScopeRegistryCallback com.ubuntu.SDKAppLaunch.ScopeStopped";
-static const std::chrono::seconds removal_notification_delay(5);
 
 namespace unity
 {
@@ -48,14 +47,13 @@ namespace scopes
 namespace internal
 {
 
-// Substitute logger for testing. (Some of tests mock out the middleware and run time.)
-BOOST_LOG_INLINE_GLOBAL_LOGGER_DEFAULT(registry_object_test_logger, boost::log::sources::severity_channel_logger_mt<>)
-
 RegistryObject::RegistryObject(core::posix::ChildProcess::DeathObserver& death_observer,
                                Executor::SPtr const& executor,
                                MiddlewareBase::SPtr middleware,
                                bool generate_desktop_files)
-    : logger_(middleware ? middleware->runtime()->logger() : registry_object_test_logger::get()),
+    // Substitute logger for testing. (Some of tests mock out the middleware and run time.)
+    : test_logger_(middleware ? nullptr : new Logger("RegistryObject_test")),
+      logger_(middleware ? middleware->runtime()->logger() : *test_logger_),
       death_observer_(death_observer),
       death_observer_connection_
       {
@@ -74,8 +72,6 @@ RegistryObject::RegistryObject(core::posix::ChildProcess::DeathObserver& death_o
           })
       },
       executor_(executor),
-      publisher_notify_reset_timer_(false),
-      publisher_notify_exit_(false),
       generate_desktop_files_(generate_desktop_files)
 {
     if (middleware)
@@ -95,21 +91,17 @@ RegistryObject::RegistryObject(core::posix::ChildProcess::DeathObserver& death_o
         }
         catch (std::exception const& e)
         {
-            BOOST_LOG(logger_) << "RegistryObject(): failed to create registry publisher: " << e.what();
+            logger_() << "RegistryObject(): failed to create registry publisher: " << e.what();
         }
     }
 }
 
 RegistryObject::~RegistryObject()
 {
-    if (publisher_notify_thread_.joinable())
     {
-        {
-            lock_guard<decltype(mutex_)> lock(mutex_);
-            publisher_notify_exit_ = true;
-            publisher_notify_cond_.notify_one();
-        }
-        publisher_notify_thread_.join();
+        // The destructor may be called from an arbitrary
+        // thread, so we need a full fence here.
+        lock_guard<decltype(mutex_)> lock(mutex_);
     }
 
     // kill all scope processes
@@ -128,7 +120,7 @@ RegistryObject::~RegistryObject()
         }
         catch(std::exception const& e)
         {
-            BOOST_LOG(logger_) << "RegistryObject::~RegistryObject(): " << e.what();
+            logger_() << "RegistryObject::~RegistryObject(): " << e.what();
         }
     }
 }
@@ -162,7 +154,7 @@ ScopeMetadata RegistryObject::get_metadata(std::string const& scope_id) const
         }
         catch (std::exception const& e)
         {
-            BOOST_LOG(logger_) << "cannot get metadata from remote registry: " << e.what();
+            logger_() << "cannot get metadata from remote registry: " << e.what();
         }
     }
 
@@ -190,7 +182,7 @@ MetadataMap RegistryObject::list() const
         }
         catch (std::exception const& e)
         {
-            BOOST_LOG(logger_) << "cannot get scopes list from remote registry: " << e.what();
+            logger_() << "cannot get scopes list from remote registry: " << e.what();
         }
     }
 
@@ -329,34 +321,8 @@ bool RegistryObject::remove_local_scope(std::string const& scope_id)
 
     if (publisher_ && erased)
     {
-        // Send a blank message to subscribers to inform them that the registry has been updated.
-        // Delay notification so that scope is not seen as removed and then added when updated.
-        lock_guard<decltype(mutex_)> lock(mutex_);
-
-        if (!publisher_notify_thread_.joinable())
-        {
-            publisher_notify_timepoint_ = chrono::system_clock::now() + removal_notification_delay;
-            publisher_notify_thread_ = thread([this]
-            {
-                unique_lock<decltype(mutex_)> lock(mutex_);
-                while (!publisher_notify_exit_)
-                {
-                    auto pred = [this]
-                    {
-                        return publisher_notify_exit_ || publisher_notify_reset_timer_;
-                    };
-                    if (!publisher_notify_cond_.wait_until(lock, publisher_notify_timepoint_, pred)) // pred is false, but timeout reached
-                    {
-                        publisher_->send_message("");
-                        publisher_notify_timepoint_ = chrono::system_clock::time_point::max();
-                    }
-                    publisher_notify_reset_timer_ = false;
-                }
-            });
-        }
-        publisher_notify_reset_timer_ = true;
-        publisher_notify_timepoint_ = chrono::system_clock::now() + removal_notification_delay;
-        publisher_notify_cond_.notify_one();
+        // Send a blank message to subscribers to inform them that the registry has been updated
+        publisher_->send_message("");
     }
 
     if (ex)
@@ -411,8 +377,7 @@ void RegistryObject::on_state_received(std::string const& scope_id, StateReceive
                 it->second->update_state(ScopeProcess::ProcessState::Stopping);
                 break;
             default:
-                BOOST_LOG(logger_)
-                    << "RegistryObject::on_state_received(): unknown state received from scope: " << scope_id;
+                logger_() << "RegistryObject::on_state_received(): unknown state received from scope: " << scope_id;
         }
     }
     // simply ignore states from scopes the registry does not know about
@@ -497,7 +462,7 @@ void RegistryObject::ss_list_update()
 
 RegistryObject::ScopeProcess::ScopeProcess(ScopeExecData exec_data,
                                            std::weak_ptr<MWPublisher> const& publisher,
-                                           boost::log::sources::severity_channel_logger_mt<>& logger)
+                                           unity::scopes::internal::Logger& logger)
     : exec_data_(exec_data)
     , reg_publisher_(publisher)
     , manually_started_(false)
@@ -513,7 +478,7 @@ RegistryObject::ScopeProcess::~ScopeProcess()
     }
     catch(std::exception const& e)
     {
-        BOOST_LOG(logger_) << "RegistryObject::ScopeProcess::~ScopeProcess(): " << e.what();
+        logger_() << "RegistryObject::ScopeProcess::~ScopeProcess(): " << e.what();
     }
 }
 
@@ -552,16 +517,15 @@ void RegistryObject::ScopeProcess::exec(
     {
         if (!wait_for_state(lock, ScopeProcess::Stopped))
         {
-            BOOST_LOG(logger_)
-                << "RegistryObject::ScopeProcess::exec(): Force killing process. Scope: \""
-                << exec_data_.scope_id << "\" did not stop after " << exec_data_.timeout_ms << " ms.";
+            logger_() << "RegistryObject::ScopeProcess::exec(): Force killing process. Scope: \""
+                      << exec_data_.scope_id << "\" did not stop after " << exec_data_.timeout_ms << " ms.";
             try
             {
                 kill(lock);
             }
             catch(std::exception const& e)
             {
-                BOOST_LOG(logger_) << "RegistryObject::ScopeProcess::exec(): kill() failed: " << e.what();
+                logger_() << "RegistryObject::ScopeProcess::exec(): kill() failed: " << e.what();
             }
         }
     }
@@ -633,15 +597,15 @@ void RegistryObject::ScopeProcess::exec(
         }
         catch(std::exception const& e)
         {
-            BOOST_LOG(logger_) << "RegistryObject::ScopeProcess::exec(): kill() failed: " << e.what();
+            logger_() << "RegistryObject::ScopeProcess::exec(): kill() failed: " << e.what();
         }
         throw unity::ResourceException("RegistryObject::ScopeProcess::exec(): exec aborted. Scope: \""
                                        + exec_data_.scope_id + "\" took longer than "
                                        + std::to_string(exec_data_.timeout_ms) + " ms to start.");
     }
 
-    BOOST_LOG_SEV(logger_, Logger::Info)
-        << "RegistryObject::ScopeProcess::exec(): Process for scope: \"" << exec_data_.scope_id << "\" started";
+    logger_(LoggerSeverity::Info) << "RegistryObject::ScopeProcess::exec(): Process for scope: \""
+                                  << exec_data_.scope_id << "\" started";
 
     // 4. add the scope process to the death observer
     death_observer.add(process_);
@@ -660,9 +624,8 @@ bool RegistryObject::ScopeProcess::on_process_death(pid_t pid)
     // check if this is the process reported to have died
     if (pid == process_.pid())
     {
-        BOOST_LOG_SEV(logger_, Logger::Info)
-            << "RegistryObject::ScopeProcess::on_process_death(): Process for scope: \"" << exec_data_.scope_id
-            << "\" exited";
+        logger_(LoggerSeverity::Info) << "RegistryObject::ScopeProcess::on_process_death(): Process for scope: \""
+                                      << exec_data_.scope_id << "\" exited";
         clear_handle_unlocked();
         return true;
     }
@@ -693,9 +656,8 @@ void RegistryObject::ScopeProcess::update_state_unlocked(ProcessState new_state)
 
         if (state_ != Starting)
         {
-            BOOST_LOG_SEV(logger_, Logger::Info)
-                << "RegistryObject::ScopeProcess: Process for scope: \"" << exec_data_.scope_id
-                << "\" started manually";
+            logger_(LoggerSeverity::Info) << "RegistryObject::ScopeProcess: Process for scope: \""
+                                          << exec_data_.scope_id << "\" started manually";
 
             manually_started_ = true;
         }
@@ -710,9 +672,8 @@ void RegistryObject::ScopeProcess::update_state_unlocked(ProcessState new_state)
 
         if (state_ != Stopping)
         {
-            BOOST_LOG(logger_)
-                << "RegistryObject::ScopeProcess: Scope: \"" << exec_data_.scope_id
-                << "\" closed unexpectedly. Either the process crashed or was killed forcefully.";
+            logger_() << "RegistryObject::ScopeProcess: Scope: \"" << exec_data_.scope_id
+                      << "\" closed unexpectedly. Either the process crashed or was killed forcefully.";
         }
     }
     else if (new_state == Stopping && manually_started_)
@@ -723,9 +684,8 @@ void RegistryObject::ScopeProcess::update_state_unlocked(ProcessState new_state)
             reg_publisher->send_message("stopped", exec_data_.scope_id);
         }
 
-        BOOST_LOG(logger_)
-            << "RegistryObject::ScopeProcess: Manually started process for scope: \""
-            << exec_data_.scope_id << "\" exited";
+        logger_() << "RegistryObject::ScopeProcess: Manually started process for scope: \""
+                  << exec_data_.scope_id << "\" exited";
 
         new_state = Stopped;
         manually_started_ = false;
@@ -736,9 +696,17 @@ void RegistryObject::ScopeProcess::update_state_unlocked(ProcessState new_state)
 
 bool RegistryObject::ScopeProcess::wait_for_state(std::unique_lock<std::mutex>& lock, ProcessState state) const
 {
-    return state_change_cond_.wait_for(lock,
-                                       std::chrono::milliseconds(exec_data_.timeout_ms),
-                                       [this, &state]{return state_ == state;});
+    if (exec_data_.timeout_ms == -1)
+    {
+        state_change_cond_.wait(lock, [this, &state]{return state_ == state;});
+        return true;
+    }
+    else
+    {
+        return state_change_cond_.wait_for(lock,
+                                           std::chrono::milliseconds(exec_data_.timeout_ms),
+                                           [this, &state]{return state_ == state;});
+    }
 }
 
 void RegistryObject::ScopeProcess::kill(std::unique_lock<std::mutex>& lock)
@@ -757,10 +725,9 @@ void RegistryObject::ScopeProcess::kill(std::unique_lock<std::mutex>& lock)
         {
             std::error_code ec;
 
-            BOOST_LOG(logger_)
-                << "RegistryObject::ScopeProcess::kill(): Scope: \"" << exec_data_.scope_id
-                << "\" took longer than " << exec_data_.timeout_ms << " ms to exit gracefully. "
-                << "Killing the process instead.";
+            logger_() << "RegistryObject::ScopeProcess::kill(): Scope: \"" << exec_data_.scope_id
+                      << "\" took longer than " << exec_data_.timeout_ms << " ms to exit gracefully. "
+                    << "Killing the process instead.";
 
             // scope is taking too long to close, send kill signal
             process_.send_signal(core::posix::Signal::sig_kill, ec);
@@ -771,8 +738,7 @@ void RegistryObject::ScopeProcess::kill(std::unique_lock<std::mutex>& lock)
     }
     catch (std::exception const&)
     {
-        BOOST_LOG(logger_)
-            << "RegistryObject::ScopeProcess::kill(): Failed to kill scope: \"" << exec_data_.scope_id << "\"";
+        logger_() << "RegistryObject::ScopeProcess::kill(): Failed to kill scope: \"" << exec_data_.scope_id << "\"";
 
         // clear the process handle
         // even on error, the previous handle will be unrecoverable at this point
@@ -847,10 +813,9 @@ void RegistryObject::ScopeProcess::publish_state_change(ProcessState scope_state
             started_message += " string:" + exec_data_.scope_id + " uint64:" + std::to_string(process_.pid());
             if (safe_system_call(started_message) != 0)
             {
-                BOOST_LOG(logger_)
-                    << "RegistryObject::ScopeProcess::publish_state_change(): "
-                       "Failed to execute SDK DBus ScopeLoaded callback "
-                       "(Scope ID: " << exec_data_.scope_id << ")";
+                logger_() << "RegistryObject::ScopeProcess::publish_state_change(): "
+                             "Failed to execute SDK DBus ScopeLoaded callback "
+                             "(Scope ID: " << exec_data_.scope_id << ")";
             }
         }
     }
@@ -868,10 +833,9 @@ void RegistryObject::ScopeProcess::publish_state_change(ProcessState scope_state
             stopped_message += " string:" + exec_data_.scope_id;
             if (safe_system_call(stopped_message) != 0)
             {
-                BOOST_LOG(logger_)
-                    << "RegistryObject::ScopeProcess::publish_state_change(): "
-                       "Failed to execute SDK DBus ScopeStopped callback "
-                       "(Scope ID: " << exec_data_.scope_id << ")";
+                logger_() << "RegistryObject::ScopeProcess::publish_state_change(): "
+                             "Failed to execute SDK DBus ScopeStopped callback "
+                             "(Scope ID: " << exec_data_.scope_id << ")";
             }
         }
     }

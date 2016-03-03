@@ -39,9 +39,9 @@ class RuntimeImpl;
 }
 
 /**
-\brief The main object for query originators to access the scopes run time.
+\brief The main object for query originators to access the scopes runtime.
 
-All interactions with the scopes run time require a Runtime object to be instantiated first. The Runtime instance
+All interactions with the scopes runtime require a Runtime object to be instantiated first. The Runtime instance
 controls the overall life cycle; once a Runtime instance goes out of scope, the application must not make further
 calls on any instance obtained via the destroyed Runtime.
 
@@ -60,10 +60,10 @@ public:
     /// @endcond
 
     /**
-    \brief Instantiates the scopes run time for a client with the given (optional) configuration file.
+    \brief Instantiates the scopes runtime for a client with the given (optional) configuration file.
 
-    The life time of the run time is under control of the caller. Letting the returned `unique_ptr` go out
-    of scope shuts down the run time.
+    The life time of the runtime is under control of the caller. Letting the returned `unique_ptr` go out
+    of scope shuts down the runtime.
 
     You _must not_ create a Runtime instance until after `main()` is entered, and you _must_ destroy it
     before leaving `main()` (either by explicitly calling destroy(), or by letting the returned
@@ -77,7 +77,7 @@ public:
     static UPtr create(std::string const& configfile = "");
 
     /**
-    \brief Create a run time for a scope.
+    \brief Create a runtime for a scope.
 
            This method is provided for custom scoperunner implementations,
            for example, for scopes written in Go.
@@ -85,14 +85,14 @@ public:
     \param scope_id The unique ID of the scope. If scope_id is empty, a
     unique ID is used. Calling `create_scope_runtime("", "Runtime.ini")` is
     equivalent to calling `create("Runtime.ini")`.
-    \param configfile The path to the run time .ini file. If empty,
+    \param configfile The path to the runtime .ini file. If empty,
     the default configuration is used.
-    \return A `unique_ptr` to the run time instance.
+    \return A `unique_ptr` to the runtime instance.
     */
     static UPtr create_scope_runtime(std::string const& scope_id, std::string const& configfile = "");
 
     /**
-    \brief Shuts down the run time, reclaiming all associated resources.
+    \brief Shuts down the runtime, reclaiming all associated resources.
 
     Calling destroy() is optional; the destructor implicitly calls destroy() if it was not called explicitly.
     However, no exceptions are thrown by the destructor. If you want to log or handle any exceptions during

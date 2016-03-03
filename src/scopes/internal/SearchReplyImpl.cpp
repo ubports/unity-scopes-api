@@ -30,8 +30,12 @@
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
 #include <unity/util/FileIO.h>
+#include <unity/util/ResourcePtr.h>
+
+#include <cassert>
 
 #include <stdlib.h>
+#include <unistd.h>
 
 using namespace std;
 
@@ -72,7 +76,7 @@ void SearchReplyImpl::register_departments(Department::SCPtr const& parent)
     {
         DepartmentImpl::validate_departments(parent, current_department_);
     }
-    catch (unity::LogicException const &e)
+    catch (unity::LogicException const&)
     {
         throw unity::LogicException("SearchReplyImpl::register_departments(): Failed to validate departments");
     }
@@ -172,7 +176,7 @@ bool SearchReplyImpl::push(unity::scopes::Filters const& filters, unity::scopes:
     {
         internal::FilterBaseImpl::validate_filters(filters);
     }
-    catch (unity::LogicException const &e)
+    catch (unity::LogicException const&)
     {
         throw unity::LogicException("SearchReplyImpl::push(): Failed to validate filters");
     }
@@ -223,7 +227,7 @@ void SearchReplyImpl::write_cached_results() noexcept
     {
         // Open a temporary file for writing.
         tmp_path = mw_proxy_->mw_base()->runtime()->cache_directory() + "/" + cache_file_name + "XXXXXX";
-        auto opener = [tmp_path]()
+        auto opener = [&tmp_path]()
         {
             int tmp_fd = mkstemp(const_cast<char*>(tmp_path.c_str()));
             if (tmp_fd == -1)
@@ -232,7 +236,7 @@ void SearchReplyImpl::write_cached_results() noexcept
             }
             return tmp_fd;
         };
-        auto closer = [tmp_path](int fd)
+        auto closer = [&tmp_path](int fd)
         {
             if (::close(fd) == -1)
             {
@@ -285,15 +289,13 @@ void SearchReplyImpl::write_cached_results() noexcept
     catch (std::exception const& e)
     {
         ::unlink(tmp_path.c_str());
-        BOOST_LOG(mw_proxy_->mw_base()->runtime()->logger())
-            << "SearchReply::write_cached_results(): " << e.what();
+        mw_proxy_->mw_base()->runtime()->logger()() << "SearchReply::write_cached_results(): " << e.what();
     }
     // LCOV_EXCL_START
     catch (...)
     {
         ::unlink(tmp_path.c_str());
-        BOOST_LOG(mw_proxy_->mw_base()->runtime()->logger())
-            << "SearchReply::write_cached_results(): unknown exception";
+        mw_proxy_->mw_base()->runtime()->logger()() << "SearchReply::write_cached_results(): unknown exception";
     }
     // LCOV_EXCL_STOP
 }
@@ -396,13 +398,13 @@ void SearchReplyImpl::push_surfacing_results_from_cache() noexcept
     }
     catch (std::exception const& e)
     {
-        BOOST_LOG(mw_proxy_->mw_base()->runtime()->logger())
+        mw_proxy_->mw_base()->runtime()->logger()()
             << "SearchReply::push_surfacing_results_from_cache() (file = " + cache_path + "): " << e.what();
     }
     // LCOV_EXCL_START
     catch (...)
     {
-        BOOST_LOG(mw_proxy_->mw_base()->runtime()->logger())
+        mw_proxy_->mw_base()->runtime()->logger()()
             << "SearchReply::push_surfacing_results_from_cache() (file = " + cache_path + "): unknown exception";
     }
     // LCOV_EXCL_STOP

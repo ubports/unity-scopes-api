@@ -84,7 +84,7 @@ MWQueryCtrlProxy ScopeObject::query(MWReplyProxy const& reply,
         if (!query_base)
         {
             string msg = "Scope \"" + mw_base->runtime()->scope_id() + "\" returned nullptr from " + method + "()";
-            BOOST_LOG(mw_base->runtime()->logger()) << msg;
+            mw_base->runtime()->logger()() << msg;
             throw ResourceException(msg);
         }
         query_base->p->set_settings_db(scope_base_->p->settings_db());
@@ -92,7 +92,7 @@ MWQueryCtrlProxy ScopeObject::query(MWReplyProxy const& reply,
     catch (...)
     {
         string msg = "Scope \"" + mw_base->runtime()->scope_id() + "\" threw an exception from " + method + "()";
-        BOOST_LOG(mw_base->runtime()->logger()) << msg;
+        mw_base->runtime()->logger()() << msg;
         throw ResourceException(msg);
     }
 
@@ -130,7 +130,7 @@ MWQueryCtrlProxy ScopeObject::query(MWReplyProxy const& reply,
         catch (...)
         {
         }
-        BOOST_LOG(mw_base->runtime()->logger()) << "ScopeObject::query(): " << e.what();
+        mw_base->runtime()->logger()() << "ScopeObject::query(): " << e.what();
         throw;
     }
     catch (...)
@@ -142,7 +142,7 @@ MWQueryCtrlProxy ScopeObject::query(MWReplyProxy const& reply,
         catch (...)
         {
         }
-        BOOST_LOG(mw_base->runtime()->logger()) << "ScopeObject::query(): unknown exception";
+        mw_base->runtime()->logger()() << "ScopeObject::query(): unknown exception";
         throw;
     }
     return ctrl_proxy;

@@ -28,6 +28,7 @@
 #include <unity/scopes/internal/ScopeMetadataImpl.h>
 #include <unity/scopes/internal/ScopeImpl.h>
 #include <unity/scopes/internal/UniqueID.h>
+#include <unity/scopes/internal/Utils.h>
 #include <unity/scopes/internal/zmq_middleware/ZmqRegistry.h>
 #include <unity/scopes/SearchMetadata.h>
 #include <unity/scopes/ScopeExceptions.h>
@@ -35,9 +36,11 @@
 
 #pragma push_macro("BOOST_RANGE_ENABLE_CONCEPT_ASSERT")
 
+#include <boost/version.hpp>
+
 #if BOOST_VERSION / 100000 == 1
-#    if ((BOOST_VERSION / 100) % 1000) == 57
-#        define BOOST_RANGE_ENABLE_CONCEPT_ASSERT 0  // Iterator requirements are too strict with boost 1.57.
+#    if ((BOOST_VERSION / 100) % 1000) == 57 || ((BOOST_VERSION / 100) % 1000) == 58
+#        define BOOST_RANGE_ENABLE_CONCEPT_ASSERT 0  // Iterator requirements are too strict with boost 1.57/1.58.
 #    endif
 # endif
 
@@ -465,42 +468,6 @@ public:
         return count_child_procs() - start_process_count;
     }
 
-    string convert_custom_exec(fs::path const& scope_dir, string const& custom_exec)
-    {
-        string result;
-
-        vector<string> split;
-        boost::split(split, custom_exec, boost::is_space());
-        fs::path program(split.front());
-        if (program.is_relative())
-        {
-            // First look inside the arch-specific directory
-            if (fs::exists(scope_dir / DEB_HOST_MULTIARCH / program))
-            {
-                // Join the full command, not just the program path
-                result = (scope_dir / DEB_HOST_MULTIARCH / custom_exec).native();
-            }
-            // Next try in the non arch-aware directory
-            else if (fs::exists(scope_dir / program))
-            {
-                // Join the full command, not just the program path
-                result = (scope_dir / custom_exec).native();
-            }
-            else
-            {
-                throw unity::InvalidArgumentException(
-                        "Nonexistent scope runner '" + custom_exec
-                                + "' executable for scope");
-            }
-        }
-        else
-        {
-            result = custom_exec;
-        }
-
-        return result;
-    }
-
     ScopeProxy start_testscopeB()
     {
         std::string test_scope_id = "testscopeB";
@@ -519,7 +486,7 @@ public:
 
         RegistryObject::ScopeExecData exec_data;
         exec_data.scope_id = test_scope_id;
-        exec_data.custom_exec = convert_custom_exec(REGISTRY_TEST_DIR "/scopes/testscopeB", sc.scope_runner());
+        exec_data.custom_exec = convert_exec_rel_to_abs(test_scope_id, REGISTRY_TEST_DIR "/scopes/testscopeB", sc.scope_runner());
         exec_data.runtime_config = runtime_ini;
         exec_data.scope_config = test_scope_config;
         exec_data.timeout_ms = process_timeout;

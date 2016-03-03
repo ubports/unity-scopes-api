@@ -51,7 +51,7 @@ public:
     /// @endcond
 
     /**
-    \brief Called once by the scopes run time after the final result for a request was sent.
+    \brief Called once by the scopes runtime after the final result for a request was sent.
 
     Calls to finished() are made by an arbitrary thread.
 
@@ -62,7 +62,7 @@ public:
     virtual void finished(CompletionDetails const& details) = 0;
 
     /**
-    \brief Called by the scopes run time each time a scope reports additional information about the
+    \brief Called by the scopes runtime each time a scope reports additional information about the
     reply to a query.
 
     More than one info() call can arrive during processing of a single query.

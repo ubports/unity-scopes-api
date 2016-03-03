@@ -53,9 +53,6 @@ const string reap_interval_key = "Reap.Interval";
 const string cache_dir_key = "CacheDir";
 const string app_dir_key = "AppDir";
 const string config_dir_key = "ConfigDir";
-const string log_dir_key = "LogDir";
-const string max_log_file_size_key = "Log.MaxFileSize";
-const string max_log_dir_size_key = "Log.MaxDirSize";
 const string trace_channels_key = "Log.TraceChannels";
 
 }  // namespace
@@ -73,12 +70,9 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
         default_middleware_configfile_ = DFLT_ZMQ_MIDDLEWARE_INI;
         reap_expiry_ = DFLT_REAP_EXPIRY;
         reap_interval_ = DFLT_REAP_INTERVAL;
-        max_log_file_size_ = DFLT_MAX_LOG_FILE_SIZE;
-        max_log_dir_size_ = DFLT_MAX_LOG_DIR_SIZE;
         cache_directory_ = default_cache_directory();
         app_directory_ = default_app_directory();
         config_directory_ = default_config_directory();
-        log_directory_ = default_log_directory();
     }
     else
     {
@@ -108,7 +102,7 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
             {
                 cache_directory_ = default_cache_directory();
             }
-            catch (ResourceException const& e)
+            catch (ResourceException const&)
             {
                 throw_ex("No " + cache_dir_key + " configured and failed to get default");
             }
@@ -121,62 +115,26 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
             {
                 app_directory_ = default_app_directory();
             }
-            catch (ResourceException const& e)
+            catch (ResourceException const&)
             {
                 throw_ex("No " + app_dir_key + " configured and failed to get default");
             }
         }
 
-        config_directory_ = get_optional_string(runtime_config_group, config_dir_key);
+        // UNITY_SCOPES_CONFIG_DIR env var can be used to override the value of ConfigDir key of Runtime.ini
+        char const* scopes_cfg_dir_override = getenv("UNITY_SCOPES_CONFIG_DIR");
+        config_directory_ = (scopes_cfg_dir_override != nullptr && *scopes_cfg_dir_override != '\0') ?
+            string(scopes_cfg_dir_override) : get_optional_string(runtime_config_group, config_dir_key);
         if (config_directory_.empty())
         {
             try
             {
                 config_directory_ = default_config_directory();
             }
-            catch (ResourceException const& e)
+            catch (ResourceException const&)
             {
                 throw_ex("No " + config_dir_key + " configured and failed to get default");
             }
-        }
-
-        try
-        {
-            // If explicitly set to the empty string, we succeed here.
-            log_directory_ = parser()->get_string(runtime_config_group, log_dir_key);
-        }
-        catch (LogicException const&)
-        {
-            // Use default value.
-            try
-            {
-                log_directory_ = default_log_directory();
-            }
-            catch (ResourceException const& e)
-            {
-                throw_ex("No " + log_dir_key + " configured and failed to get default");
-            }
-        }
-
-        // Check if we have an override for the log directory.
-        char const* logdir = getenv("UNITY_SCOPES_LOGDIR");
-        if (logdir)
-        {
-            log_directory_ = logdir;
-        }
-
-        max_log_file_size_ = get_optional_int(runtime_config_group, max_log_file_size_key, DFLT_MAX_LOG_FILE_SIZE);
-        if (max_log_file_size_ < 1024)
-        {
-            throw_ex("Illegal value (" + to_string(max_log_file_size_) + ") for " + max_log_file_size_key
-                     + ": value must be > 1024");
-        }
-
-        max_log_dir_size_ = get_optional_int(runtime_config_group, max_log_dir_size_key, DFLT_MAX_LOG_DIR_SIZE);
-        if (max_log_dir_size_ <= max_log_file_size_)
-        {
-            throw_ex("Illegal value (" + to_string(max_log_dir_size_) + ") for " + max_log_dir_size_key
-                     + ": value must be > " + max_log_file_size_key + " (" + to_string(max_log_file_size_) + ")");
         }
 
         try
@@ -212,9 +170,6 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
                                                 cache_dir_key,
                                                 app_dir_key,
                                                 config_dir_key,
-                                                log_dir_key,
-                                                max_log_file_size_key,
-                                                max_log_dir_size_key,
                                                 trace_channels_key
                                              }
                                           }
@@ -281,21 +236,6 @@ string RuntimeConfig::config_directory() const
     return config_directory_;
 }
 
-string RuntimeConfig::log_directory() const
-{
-    return log_directory_;
-}
-
-int RuntimeConfig::max_log_file_size() const
-{
-    return max_log_file_size_;
-}
-
-int RuntimeConfig::max_log_dir_size() const
-{
-    return max_log_dir_size_;
-}
-
 vector<string> RuntimeConfig::trace_channels() const
 {
     return trace_channels_;
@@ -329,19 +269,6 @@ string RuntimeConfig::default_config_directory()
         throw ResourceException("RuntimeConfig::default_config_directory(): $HOME not set");
     }
     return string(home) + "/" + DFLT_HOME_CONFIG_SUBDIR;
-}
-
-string RuntimeConfig::default_log_directory()
-{
-    char const* home = getenv("HOME");
-    if (!home || *home == '\0')
-    {
-        throw ResourceException("RuntimeConfig::default_log_directory(): $HOME not set");
-    }
-    string dir = string(home) + "/" + DFLT_HOME_LOG_SUBDIR;
-    make_directories(dir, 0700);
-
-    return dir;
 }
 
 } // namespace internal

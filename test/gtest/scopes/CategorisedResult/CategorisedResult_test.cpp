@@ -105,6 +105,38 @@ TEST(CategorisedResult, indexop)
     }
 }
 
+TEST(CategorisedResult, compare)
+{
+    CategoryRegistry reg;
+    CategoryRenderer rdr;
+    auto cat = reg.register_category("1", "title", "icon", nullptr, rdr);
+
+    {
+        CategorisedResult result1(cat);
+        result1.set_uri("uri a");
+        result1.set_title("title a");
+        result1.set_art("icon a");
+        result1["common"] = "o";
+
+        CategorisedResult result2(cat);
+        result2.set_uri("uri a");
+        result2.set_title("title a");
+        result2.set_art("icon a");
+        result2["common"] = "o";
+
+        EXPECT_TRUE(result1 == result2);
+
+        CategorisedResult result3(cat);
+        result3.set_uri("uri b");
+        result3.set_title("title a");
+        result3.set_art("icon a");
+        result3["common"] = "o";
+
+        EXPECT_FALSE(result1 == result3);
+        EXPECT_FALSE(result2 == result3);
+    }
+}
+
 TEST(CategorisedResult, copy)
 {
     CategoryRegistry reg;

@@ -73,8 +73,7 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
             log_file_basename = "client";  // Don't make lots of log files named like c-c4c758b100000000.
         }
 
-        // Until we know where the scope's cache directory is,
-        // we use a logger that logs to std::clog.
+        // By default, we use a logger that writes to std::clog.
         logger_.reset(new Logger(scope_id_));
 
         // Create the middleware factory and get the registry identity and config filename.
@@ -82,24 +81,16 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
         RuntimeConfig config(configfile);
 
         // Configure trace channels.
-        try
+        for (auto const& c : config.trace_channels())
         {
-            logger_->enable_channels(config.trace_channels());
-        }
-        catch (...)
-        {
-            throw InvalidArgumentException("Runtime(): invalid trace channel name(s)");
-        }
-
-        // Now that we have the config, change the logger to log to a file.
-        // If log_dir was explicitly set to the empty string, continue
-        // logging to std::clog.
-        log_dir_ = config.log_directory();
-        if (!log_dir_.empty())
-        {
-            logger_->set_log_file(find_log_dir(log_file_basename) + "/" + log_file_basename,
-                                  config.max_log_file_size(),
-                                  config.max_log_dir_size());
+            try
+            {
+                logger_->set_channel(c, true);
+            }
+            catch (...)
+            {
+                throw InvalidArgumentException("Runtime(): invalid trace channel name");
+            }
         }
 
         string default_middleware = config.default_middleware();
@@ -121,7 +112,7 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
 
         if (registry_configfile_.empty() || registry_identity_.empty())
         {
-            BOOST_LOG_SEV(logger(), Logger::Warning) << "no registry configured";
+            logger()(LoggerSeverity::Warning) << "no registry configured";
             registry_identity_ = "";
         }
         else
@@ -136,13 +127,13 @@ RuntimeImpl::RuntimeImpl(string const& scope_id, string const& configfile)
         app_dir_ = config.app_directory();
         config_dir_ = config.config_directory();
     }
-    catch (unity::Exception const& e)
+    catch (unity::Exception const&)
     {
         destroy();
         string msg = "Cannot instantiate run time for " + (scope_id.empty() ? "client" : scope_id) +
                      ", config file: " + configfile;
         ConfigException ex(msg);
-        BOOST_LOG(logger()) << ex.what();
+        logger()() << ex.what();
         throw ex;
     }
 }
@@ -155,11 +146,11 @@ RuntimeImpl::~RuntimeImpl()
     }
     catch (std::exception const& e) // LCOV_EXCL_LINE
     {
-        BOOST_LOG(logger()) << "~RuntimeImpl(): " << e.what();
+        logger()() << "~RuntimeImpl(): " << e.what();
     }
     catch (...) // LCOV_EXCL_LINE
     {
-        BOOST_LOG(logger()) << "~RuntimeImpl(): unknown exception";
+        logger()() << "~RuntimeImpl(): unknown exception";
     }
 }
 
@@ -313,14 +304,9 @@ ThreadSafeQueue<future<void>>::SPtr RuntimeImpl::future_queue() const
     return future_queue_;  // Immutable
 }
 
-boost::log::sources::severity_channel_logger_mt<>& RuntimeImpl::logger() const
+internal::Logger& RuntimeImpl::logger() const
 {
     return *logger_;
-}
-
-boost::log::sources::severity_channel_logger_mt<>& RuntimeImpl::logger(Logger::Channel channel) const
-{
-    return (*logger_)(channel);
 }
 
 namespace
@@ -382,7 +368,7 @@ void RuntimeImpl::run_scope(ScopeBase* scope_base,
         boost::system::error_code ec;
         if (boost::filesystem::exists(settings_schema, ec))
         {
-            shared_ptr<SettingsDB> db(SettingsDB::create_from_ini_file(settings_db, settings_schema, logger()));
+            shared_ptr<SettingsDB> db(SettingsDB::create_from_ini_file(settings_db, settings_schema));
             scope_base->p->set_settings_db(db);
         }
         else
@@ -595,8 +581,7 @@ string RuntimeImpl::find_cache_dir() const
     string dir = cache_dir_ + "/" + confinement_type();
     if (!confined())  // Avoid apparmor noise
     {
-        string dir = cache_dir_ + "/" + confinement_type();
-        make_directories(cache_dir_, 0700);
+        make_directories(dir, 0700);
     }
     // A confined scope is allowed to create this dir.
     dir += "/" + demangled_id(scope_id_);
@@ -617,6 +602,9 @@ string RuntimeImpl::find_app_dir() const
 
 string RuntimeImpl::find_log_dir(string const& id) const
 {
+    assert(!log_dir_.empty());
+
+    // Create the cache_dir_/<confinement-type>/<id> directories if they don't exist.
     string dir = log_dir_ + "/" + confinement_type();
     if (!confined())  // Avoid apparmore noise
     {

@@ -1,0 +1,1 @@
+libunity-scopes @UNITY_SCOPES_SOVERSION@ libunity-scopes@UNITY_SCOPES_SOVERSION@ (>= @UNITY_SCOPES_MAJOR_MINOR@)
