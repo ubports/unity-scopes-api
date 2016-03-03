@@ -593,7 +593,7 @@ builder.add_tuple({
         {"temporaryIcon", Variant("flagOn")},
         {"label", Variant("Flag this result")},
 });
-res["social_attributes"] = builder.end();
+res["social-actions"] = builder.end();
 \endcode
 
 The attributes of result actions are as follows:
@@ -653,7 +653,7 @@ class MyActivation : public ActivationQueryBase
                     {"label", Variant("I don't like it")},
             });
             builder.add_tuple({ ... })
-            updatedRes["social_attributes"] = builder_end();
+            updatedRes["social-actions"] = builder_end();
             return ActivationResponse(updatedRes);
         }
 
