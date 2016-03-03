@@ -40,7 +40,7 @@ class RangeInputFilterImpl;
 
 RangeInputFilter is composed of two input boxes which accept numeric values. Any of them is optional. It can have
 up to five labels: two labels for start value (prefix or postfix label, displayed left or right to the input box, respectively),
-two labels for end value and a single label displayed inbetween both input boxes.
+two labels for end value and a single label displayed in between both input boxes.
 The filter may provide defaults for start and end values. Default values are used by the UI if user didn't enter values.
 */
 class UNITY_API RangeInputFilter : public FilterBase

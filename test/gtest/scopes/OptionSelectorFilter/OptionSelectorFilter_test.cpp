@@ -108,11 +108,18 @@ TEST(OptionSelectorFilter, single_selection)
     EXPECT_FALSE(fstate.has_filter("f1"));
     EXPECT_FALSE(filter1->has_active_option(fstate));
 
+    // for filter state to be present, but no option is active
+    filter1->update_state(fstate, option1, false);
+    EXPECT_TRUE(fstate.has_filter("f1"));
+    EXPECT_FALSE(filter1->has_active_option(fstate));
+    auto active = filter1->active_options(fstate);
+    EXPECT_EQ(0u, active.size());
+
     // enable option1
     filter1->update_state(fstate, option1, true);
     EXPECT_TRUE(fstate.has_filter("f1"));
     EXPECT_TRUE(filter1->has_active_option(fstate));
-    auto active = filter1->active_options(fstate);
+    active = filter1->active_options(fstate);
     EXPECT_EQ(1u, active.size());
     EXPECT_TRUE(active.find(option1) != active.end());
 

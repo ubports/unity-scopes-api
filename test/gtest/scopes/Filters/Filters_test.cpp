@@ -25,6 +25,7 @@
 #include <unity/scopes/RadioButtonsFilter.h>
 #include <unity/scopes/RangeInputFilter.h>
 #include <unity/scopes/RatingFilter.h>
+#include <unity/scopes/RangeInputFilter.h>
 #include <unity/scopes/SwitchFilter.h>
 #include <unity/scopes/ValueSliderFilter.h>
 #include <unity/scopes/ValueSliderLabels.h>
@@ -177,6 +178,18 @@ TEST(Filters, deserialize)
         auto f = FilterBase::deserialize(var);
         EXPECT_TRUE(std::dynamic_pointer_cast<OptionSelectorFilter const>(f) != nullptr);
         EXPECT_EQ("option_selector", f->filter_type());
+
+        const Filters filters {filter1};
+        EXPECT_NO_THROW(internal::FilterBaseImpl::validate_filters(filters));
+    }
+
+    {
+        RangeInputFilter::SPtr filter1 = RangeInputFilter::create("f1", Variant(1.0f), Variant(20.0f), "A", "B", "C", "D", "E");
+        auto var = filter1->serialize();
+
+        auto f = FilterBase::deserialize(var);
+        EXPECT_TRUE(std::dynamic_pointer_cast<RangeInputFilter const>(f) != nullptr);
+        EXPECT_EQ("range_input", f->filter_type());
 
         const Filters filters {filter1};
         EXPECT_NO_THROW(internal::FilterBaseImpl::validate_filters(filters));
