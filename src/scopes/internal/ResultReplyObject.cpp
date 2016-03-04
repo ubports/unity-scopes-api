@@ -24,6 +24,7 @@
 #include <unity/scopes/internal/CategorisedResultImpl.h>
 #include <unity/scopes/internal/DepartmentImpl.h>
 #include <unity/scopes/FilterBase.h>
+#include <unity/scopes/internal/FilterGroupImpl.h>
 #include <unity/scopes/internal/FilterBaseImpl.h>
 #include <unity/scopes/internal/FilterStateImpl.h>
 #include <unity/UnityExceptions.h>
@@ -65,7 +66,14 @@ bool ResultReplyObject::process_data(VariantMap const& data)
     auto it = data.find("filters");
     if (it != data.end())
     {
-        Filters const filters = FilterBaseImpl::deserialize_filters(it->second.get_array());
+        auto itgr = data.find("filter_groups");
+        std::map<std::string, FilterGroup::SCPtr> groups;
+        if (itgr != data.end())
+        {
+            groups = FilterGroupImpl::deserialize_filter_groups(itgr->second.get_array());
+        }
+
+        Filters const filters = FilterBaseImpl::deserialize_filters(it->second.get_array(), groups);
         it = data.find("filter_state");
         if (it != data.end())
         {

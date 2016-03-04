@@ -23,6 +23,7 @@
 #include <unity/scopes/internal/ValueSliderLabelsImpl.h>
 #include <unity/scopes/FilterOption.h>
 #include <unity/scopes/RadioButtonsFilter.h>
+#include <unity/scopes/RangeInputFilter.h>
 #include <unity/scopes/RatingFilter.h>
 #include <unity/scopes/RangeInputFilter.h>
 #include <unity/scopes/SwitchFilter.h>
@@ -144,6 +145,9 @@ TEST(Filters, scope)
         auto selector = std::dynamic_pointer_cast<const OptionSelectorFilter>(filters.front());
         EXPECT_EQ(2u, selector->options().size());
         EXPECT_EQ(0u, selector->active_options(filter_state).size());
+        EXPECT_TRUE(selector->filter_group() != nullptr);
+        EXPECT_EQ("g1", selector->filter_group()->id());
+        EXPECT_EQ("Group", selector->filter_group()->label());
 
         auto option1 = selector->options().front();
         selector->update_state(filter_state, option1, true); // activate filter option
@@ -244,6 +248,31 @@ TEST(Filters, deserialize)
         // invalid data (no filter_type)
         VariantMap var;
         EXPECT_THROW(FilterBase::deserialize(var), unity::LogicException);
+    }
+}
+
+TEST(Filters, filter_group)
+{
+    {
+        auto grp1 = FilterGroup::create("g1", "Group 1");
+        auto grp2 = FilterGroup::create("g2", "Group 2");
+        FilterBase::SPtr filter1 = OptionSelectorFilter::create("f1", "Options", grp1, false);
+        FilterBase::SPtr filter2 = RangeInputFilter::create("f2", "a", "b", "c", "d", "e", grp1);
+        FilterBase::SPtr filter3 = ValueSliderFilter::create("f3", 1, 100, 100, ValueSliderLabels("Min", "Max"), grp1);
+        FilterBase::SPtr filter4 = RangeInputFilter::create("f4", Variant(1.0f), Variant(10.0f), "a", "b", "c", "d", "e", grp2);
+
+        EXPECT_TRUE(filter1->filter_group() != nullptr);
+        EXPECT_TRUE(filter2->filter_group() != nullptr);
+        EXPECT_TRUE(filter3->filter_group() != nullptr);
+        EXPECT_EQ(filter1->filter_group(), filter2->filter_group());
+        EXPECT_EQ(filter1->filter_group(), filter3->filter_group());
+        EXPECT_EQ("g1", filter1->filter_group()->id());
+        EXPECT_EQ("Group 1", filter1->filter_group()->label());
+
+        EXPECT_TRUE(filter4->filter_group() != nullptr);
+        EXPECT_EQ("g2", filter4->filter_group()->id());
+        EXPECT_EQ("Group 2", filter4->filter_group()->label());
+
     }
 }
 

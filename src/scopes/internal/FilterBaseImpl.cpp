@@ -81,6 +81,23 @@ FilterBaseImpl::FilterBaseImpl(VariantMap const& var)
 
 FilterBaseImpl::~FilterBaseImpl() = default;
 
+void FilterBaseImpl::add_to_filter_group(FilterGroup::SCPtr const& group)
+{
+    // Filter can only belong to one group. The API guarantees this by only allowing group to be passed at Filter's construction time,
+    // so this assert should never be reached.
+    assert(filter_group_ == nullptr);
+    if (!group)
+    {
+        throw unity::InvalidArgumentException("FilterBaseImpl::add_to_filter_group(): invalid null group");
+    }
+    filter_group_ = group;
+}
+
+FilterGroup::SCPtr FilterBaseImpl::filter_group() const
+{
+    return filter_group_;
+}
+
 void FilterBaseImpl::set_display_hints(int hints)
 {
     // note: make sure all_flags is updated whenever new values are added to the DisplayHints enum
@@ -127,6 +144,10 @@ VariantMap FilterBaseImpl::serialize() const
         vm["display_hints"] = static_cast<int>(display_hints_);
     }
     vm["filter_type"] = filter_type();
+    if (filter_group_)
+    {
+        vm["filter_group"] = filter_group_->id();
+    }
     serialize(vm);
     return vm;
 }
@@ -190,12 +211,28 @@ VariantArray FilterBaseImpl::serialize_filters(Filters const& filters)
     return var;
 }
 
-Filters FilterBaseImpl::deserialize_filters(VariantArray const& var)
+Filters FilterBaseImpl::deserialize_filters(VariantArray const& var, std::map<std::string, FilterGroup::SCPtr> const& groups)
 {
     Filters filters;
     for (auto const& f: var)
     {
-        filters.push_back(FilterBaseImpl::deserialize(f.get_dict()));
+        auto const data = f.get_dict();
+        auto filter = FilterBaseImpl::deserialize(data);
+        auto grit = data.find("filter_group");
+        if (grit != data.end())
+        {
+            auto const group_id = grit->second.get_string();
+            auto it = groups.find(group_id);
+            if (it != groups.end())
+            {
+                filter->p->add_to_filter_group(it->second);
+            }
+            else
+            {
+                throw unity::LogicException("FilterBaseImpl::deserialize_filters(): Invalid group '" + group_id + "' for filter '" + filter->id() + "'");
+            }
+        }
+        filters.push_back(filter);
     }
     return filters;
 }

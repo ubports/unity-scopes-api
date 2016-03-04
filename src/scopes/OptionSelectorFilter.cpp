@@ -35,6 +35,13 @@ OptionSelectorFilter::UPtr OptionSelectorFilter::create(std::string const& id, s
     return std::unique_ptr<OptionSelectorFilter>(new OptionSelectorFilter(new internal::OptionSelectorFilterImpl(id, label, multi_select)));
 }
 
+OptionSelectorFilter::UPtr OptionSelectorFilter::create(std::string const& id, std::string const& label, FilterGroup::SCPtr const& group, bool multi_select)
+{
+    auto filter = std::unique_ptr<OptionSelectorFilter>(new OptionSelectorFilter(new internal::OptionSelectorFilterImpl(id, label, multi_select)));
+    filter->p->add_to_filter_group(group);
+    return filter;
+}
+
 std::string OptionSelectorFilter::label() const
 {
     return fwd()->label();

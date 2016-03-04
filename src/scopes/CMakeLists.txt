@@ -22,6 +22,7 @@ set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/Department.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/DateTimePickerFilter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/FilterBase.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/FilterGroup.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/FilterOption.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/FilterState.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Link.cpp

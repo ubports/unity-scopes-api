@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Canonical Ltd
+ * Copyright (C) 2016 Canonical Ltd
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License version 3 as
@@ -36,11 +36,10 @@ class ValueSliderFilterImpl;
 class ValueSliderLabelsImpl;
 }
 
-namespace experimental
-{
-
+/// @cond
 typedef std::pair<double, std::string> ValueLabelPair;
 typedef std::vector<ValueLabelPair> ValueLabelPairList;
+/// @endcond
 
 /**
 \brief Labels used by a ValueSliderFilter.
@@ -112,8 +111,6 @@ private:
     friend class internal::ValueSliderLabelsImpl;
     friend class internal::ValueSliderFilterImpl;
 };
-
-} // namespace experimental
 
 } // namespace scopes
 

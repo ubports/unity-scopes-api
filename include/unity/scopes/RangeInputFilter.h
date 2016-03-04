@@ -20,6 +20,7 @@
 
 #include <unity/scopes/FilterBase.h>
 #include <unity/scopes/Variant.h>
+#include <unity/scopes/FilterGroup.h>
 
 namespace unity
 {
@@ -33,9 +34,6 @@ namespace internal
 {
 class RangeInputFilterImpl;
 }
-
-namespace experimental
-{
 
 /**
 \brief A range filter which allows a start and end value to be entered by user, and any of them is optional.
@@ -55,9 +53,11 @@ public:
     /**
     \brief Creates a RangeInputFilter.
     \param id A unique identifier for the filter that can be used to identify it later among several filters.
-    \param start_label A display label for the input box of start value (can be empty).
-    \param end_label A display label for the input box of end value (can be empty).
-    \param unit_label A display label for the unit of this range filter (e.g. currency name).
+    \param start_prefix_label A display label for the input box of start value, displayed to the left (can be empty).
+    \param start_postfix_label A display label for the input box of start value, displayed to the right (can be empty).
+    \param central_label A display label displayed between the two input boxes (can be empty).
+    \param end_prefix_label A display label for the input box of end value, displayed to the left (can be empty).
+    \param end_postfix_label A display label for the input box of end value, displayed to the right (can be empty).
     \return Instance of RangeInputFilter.
     */
     static RangeInputFilter::SPtr create(std::string const& id,
@@ -70,9 +70,11 @@ public:
     \param id A unique identifier for the filter that can be used to identify it later among several filters.
     \param default_start_value A default start value (double, int or null).
     \param default_end_value A default end value (double, int or null).
-    \param start_label A display label for the input box of start value (can be empty).
-    \param end_label A display label for the input box of end value (can be empty).
-    \param unit_label A display label for the unit of this range filter (e.g. currency name).
+    \param start_prefix_label A display label for the input box of start value, displayed to the left (can be empty).
+    \param start_postfix_label A display label for the input box of start value, displayed to the right (can be empty).
+    \param central_label A display label displayed between the two input boxes (can be empty).
+    \param end_prefix_label A display label for the input box of end value, displayed to the left (can be empty).
+    \param end_postfix_label A display label for the input box of end value, displayed to the right (can be empty).
     \return Instance of RangeInputFilter.
     */
     static RangeInputFilter::SPtr create(std::string const& id,
@@ -81,6 +83,41 @@ public:
             std::string const& start_prefix_label, std::string const& start_postfix_label,
             std::string const& central_label,
             std::string const& end_prefix_label, std::string const& end_postfix_label);
+
+    /**
+    \brief Creates a RangeInputFilter inside a FilterGroup.
+    \param id A unique identifier for the filter that can be used to identify it later among several filters.
+    \param start_prefix_label A display label for the input box of start value, displayed to the left (can be empty).
+    \param start_postfix_label A display label for the input box of start value, displayed to the right (can be empty).
+    \param central_label A display label displayed between the two input boxes (can be empty).
+    \param end_prefix_label A display label for the input box of end value, displayed to the left (can be empty).
+    \param end_postfix_label A display label for the input box of end value, displayed to the right (can be empty).
+    \param group A filter group this filter should be added to.
+    \return Instance of RangeInputFilter.
+    */
+    static RangeInputFilter::SPtr create(std::string const& id,
+            std::string const& start_prefix_label, std::string const& start_postfix_label,
+            std::string const& central_label,
+            std::string const& end_prefix_label, std::string const& end_postfix_label, FilterGroup::SCPtr const& group);
+
+    /**
+    \brief Creates a RangeInputFilter with specific default values for start and end, inside a FilterGroup.
+    \param id A unique identifier for the filter that can be used to identify it later among several filters.
+    \param start_prefix_label A display label for the input box of start value, displayed to the left (can be empty).
+    \param start_postfix_label A display label for the input box of start value, displayed to the right (can be empty).
+    \param central_label A display label displayed between the two input boxes (can be empty).
+    \param end_prefix_label A display label for the input box of end value, displayed to the left (can be empty).
+    \param end_postfix_label A display label for the input box of end value, displayed to the right (can be empty).
+    \param group A filter group this filter should be added to.
+    \return Instance of RangeInputFilter.
+    */
+    static RangeInputFilter::SPtr create(std::string const& id,
+            Variant const& default_start_value,
+            Variant const& default_end_value,
+            std::string const& start_prefix_label, std::string const& start_postfix_label,
+            std::string const& central_label,
+            std::string const& end_prefix_label, std::string const& end_postfix_label,
+            FilterGroup::SCPtr const& group);
 
     /**
     \brief Get the prefix label of start value.
@@ -198,8 +235,6 @@ private:
     internal::RangeInputFilterImpl* fwd() const;
     friend class internal::RangeInputFilterImpl;
 };
-
-} // namespace experimental
 
 } // namespace scopes
 

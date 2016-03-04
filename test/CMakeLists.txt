@@ -5,5 +5,6 @@ add_subdirectory(autopkg)
 
 if(${slowtests})
     add_subdirectory(headers)
-#   add_subdirectory(abi-compliance)
+# Temporarily disabled due to abigail bugs
+#add_subdirectory(abi-compliance)
 endif()

@@ -20,6 +20,7 @@
 
 #include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/Category.h>
+#include <unity/scopes/FilterGroup.h>
 #include <unity/scopes/OptionSelectorFilter.h>
 #include <unity/scopes/ScopeBase.h>
 #include <unity/scopes/SearchReply.h>
@@ -43,7 +44,7 @@ public:
     virtual void run(SearchReplyProxy const& reply) override
     {
         Filters filters;
-        OptionSelectorFilter::SPtr filter = OptionSelectorFilter::create("f1", "Choose an option", false);
+        OptionSelectorFilter::SPtr filter = OptionSelectorFilter::create("f1", "Choose an option", FilterGroup::create("g1", "Group"), false);
         filter->add_option("o1", "Option 1");
         filter->add_option("o2", "Option 2");
         filters.push_back(filter);

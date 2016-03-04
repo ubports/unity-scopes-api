@@ -34,8 +34,6 @@ class FilterState;
 namespace internal
 {
 
-using namespace experimental;
-
 class ValueSliderFilterImpl : public FilterBaseImpl
 {
 public:
