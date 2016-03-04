@@ -857,7 +857,7 @@ for more details.)
 \paragraph inlineplayback Inline music playback
 
 Results which represent music (songs, albums etc.) can contain an extra data about audio content and can then be played directly from the Dash.
-Such results have a "play" button overlayed on them. To create results that support this functionality two conditions must be met:
+Such results have a "play" button overlaid on them. To create results that support this functionality two conditions must be met:
 <ul>
 <li>Category renderer definition must contain the "quick-preview-type" key with the value of "audio" in the "template" section;
 <li>Results in the respective category must contain a "quick-preview-data" attribute, each of them is a dictionary with the extra playback data described
