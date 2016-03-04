@@ -39,19 +39,14 @@ ValueSliderFilterImpl::ValueSliderFilterImpl(std::string const& id, double min, 
       default_val_(default_value),
       labels_(new ValueSliderLabels(labels))
 {
-    if (min >= max)
-    {
-        std::stringstream err;
-        err << "ValueSliderFilterImpl::ValueSliderFilterImpl(): invalid min or max value for filter '" << id << "', min is " << min << ", max is " << max;
-        throw LogicException(err.str());
-    }
     if (default_value < min || default_value > max)
     {
         std::stringstream err;
         err << "ValueSliderFilterImpl::ValueSliderFilterImpl(): invalid default value for filter '" << id << "', " << default_value << " not in " << min << "-"
             << max << " range";
-        throw LogicException(err.str());
+        throw InvalidArgumentException(err.str());
     }
+    labels_->p->validate(min_, max_);
 }
 
 ValueSliderFilterImpl::ValueSliderFilterImpl(VariantMap const& var)
@@ -157,6 +152,7 @@ void ValueSliderFilterImpl::deserialize(VariantMap const& var)
     default_val_ = it->second.get_double();
     it = find_or_throw("ValueSliderFilterImpl::deserialize()", var, "labels");
     labels_.reset(new ValueSliderLabels(it->second.get_dict()));
+    labels_->p->validate(min_, max_);
 }
 
 std::string ValueSliderFilterImpl::filter_type() const
@@ -170,7 +166,7 @@ void ValueSliderFilterImpl::check_range(double val) const
     {
         std::stringstream err;
         err << "ValueSliderFilterImpl::check_range(): value " << val << " outside of allowed range (" << min_ << ", " << max_ << ")";
-        throw LogicException(err.str());
+        throw InvalidArgumentException(err.str());
     }
 }
 

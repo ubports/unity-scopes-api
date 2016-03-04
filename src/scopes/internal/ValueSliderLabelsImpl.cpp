@@ -19,6 +19,7 @@
 #include <unity/scopes/internal/ValueSliderLabelsImpl.h>
 #include <unity/scopes/internal/Utils.h>
 #include <unity/UnityExceptions.h>
+#include <unordered_set>
 
 namespace unity
 {
@@ -60,6 +61,57 @@ std::string ValueSliderLabelsImpl::max_label() const
 std::vector<std::pair<double, std::string>> ValueSliderLabelsImpl::extra_labels() const
 {
     return extra_labels_;
+}
+
+void ValueSliderLabelsImpl::validate(double min, double max) const
+{
+    if (min >= max)
+    {
+        std::stringstream err;
+        err << "ValueSliderLabelsImpl::validate(): invalid range " << min << ", " << max;
+        throw InvalidArgumentException(err.str());
+    }
+
+    double last_value = min;
+    std::unordered_set<std::string> label_lut;
+
+    // check that values of extra labels grow, i.e. v1 < v2 < v3 ... and lables are unique and not empty
+    for (auto const &p: extra_labels_)
+    {
+        if (p.first <= last_value)
+        {
+            std::stringstream err;
+            err << "ValueSliderLabelsImpl::validate(): value " << p.first << " for extra label '" << p.second << "' must be greater than previous value";
+            throw InvalidArgumentException(err.str());
+        }
+        if (p.second == "")
+        {
+            std::stringstream err;
+            err << "ValueSliderLabelsImpl::validate(): extra label for value " << p.first << " cannot be empty";
+            throw InvalidArgumentException(err.str());
+        }
+        if (p.second == min_label_ || p.second == max_label_)
+        {
+            std::stringstream err;
+            err << "ValueSliderLabelsImpl::validate(): extra label for value " << p.first << " must not be equal to min or max labels";
+            throw InvalidArgumentException(err.str());
+        }
+        if (label_lut.find(p.second) != label_lut.end())
+        {
+            std::stringstream err;
+            err << "ValueSliderLabelsImpl::validate(): multiple definitions of label '" << p.second << "'";
+            throw InvalidArgumentException(err.str());
+        }
+        label_lut.insert(p.second);
+        last_value = p.first;
+    }
+
+    if (max <= last_value)
+    {
+        std::stringstream err;
+        err << "ValueSliderLabelsImpl::validate(): the value of last extra label must not be greater than the maximum value " << max;
+        throw InvalidArgumentException(err.str());
+    }
 }
 
 VariantMap ValueSliderLabelsImpl::serialize() const
