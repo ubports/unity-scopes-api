@@ -43,6 +43,9 @@ def response(environ, start_response):
     if environ['PATH_INFO'] == '/demo/search' and environ['QUERY_STRING'].find('test_user_agent_header') >= 0:
         return [search_response + '\r\n{"result": {"cat_id": "cat1", "art": "https://dash.ubuntu.com/imgs/cat.png", "uri": "URI", "title": "' + environ['HTTP_USER_AGENT'] + '"}}']
 
+    if environ['PATH_INFO'] == '/demo/search' and environ['QUERY_STRING'].find('filter_groups') >= 0:
+        return [search_response2]
+
     if environ['PATH_INFO'] == '/demo/search' and environ['QUERY_STRING'] != '':
         return [search_response]
 
@@ -168,6 +171,13 @@ search_response = '\
 {"result": {"cat_id": "cat1", "art": "https://dash.ubuntu.com/imgs/amazon.png", "uri": "URI", "title": "Stuff"}}\r\n\
 {"result": {"cat_id": "cat1", "icon": "https://dash.ubuntu.com/imgs/google.png", "uri": "URI2", "title": "Things"}}\r\n\
 {"result": {"cat_id": "cat2", "art": "https://dash.ubuntu.com/imgs/cat_fail.png", "uri": "URI3", "title": "Category Fail"}}'
+
+search_response2 = '\
+{"filter_groups": [{"id":"g1", "label":"Group 1"}]}\r\n\
+{"filters": [{"display_hints": "primary", "multi_select": false, "id": "sorting_primary_filter", "filter_type": "option_selector", "filter_group":"g1", "label": "Label", "options": [{"id": "titlerank", "label": "Title rank"}, {"id": "salesrank", "label": "Reversed title rank"}]}]}\r\n\
+{"filter_state": {"sorting_primary_filter": ["salesrank"]}}\r\n\
+{"category": {"render_template": "{}", "id": "cat1", "title": "Category 1"}}\r\n\
+{"result": {"cat_id": "cat1", "art": "https://dash.ubuntu.com/imgs/amazon.png", "uri": "URI", "title": "Stuff"}}'
 
 preview_response = '\
 {"columns": [[["widget_id_A", "widget_id_B", "widget_id_C"]], [["widget_id_A"], ["widget_id_B", "widget_id_C"]], [["widget_id_A"], ["widget_id_B"], ["widget_id_C"]]]}\r\n\

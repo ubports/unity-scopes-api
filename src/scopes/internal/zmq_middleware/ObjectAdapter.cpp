@@ -84,12 +84,12 @@ ObjectAdapter::~ObjectAdapter()
     }
     catch (std::exception const& e)
     {
-        BOOST_LOG(logger()) << "~ObjectAdapter(): exception from shutdown(): " << e.what();
+        logger()() << "~ObjectAdapter(): exception from shutdown(): " << e.what();
     }
     // LCOV_EXCL_START
     catch (...)
     {
-        BOOST_LOG(logger()) << "~ObjectAdapter(): unknown exception from shutdown()";
+        logger()() << "~ObjectAdapter(): unknown exception from shutdown()";
     }
     // LCOV_EXCL_STOP
 
@@ -101,12 +101,12 @@ ObjectAdapter::~ObjectAdapter()
     }
     catch (std::exception const& e)
     {
-        BOOST_LOG(logger()) << "~ObjectAdapter(): exception from wait_for_shutdown(): " << e.what();
+        logger()() << "~ObjectAdapter(): exception from wait_for_shutdown(): " << e.what();
     }
     // LCOV_EXCL_START
     catch (...)
     {
-        BOOST_LOG(logger()) << "~ObjectAdapter(): unknown exception from wait_for_shutdown()";
+        logger()() << "~ObjectAdapter(): unknown exception from wait_for_shutdown()";
     }
     // LCOV_EXCL_STOP
 }
@@ -727,9 +727,8 @@ void ObjectAdapter::dispatch(zmqpp::socket& pump, string const& client_address)
             }
             else
             {
-                BOOST_LOG(logger())
-                    << "ObjectAdapter: invalid oneway message header "
-                     << "(id: " << current.id << ", adapter: " << name_ << ", op: " << current.op_name << ")";
+                logger()() << "ObjectAdapter: invalid oneway message header "
+                           << "(id: " << current.id << ", adapter: " << name_ << ", op: " << current.op_name << ")";
             }
             return;
         }
@@ -749,9 +748,8 @@ void ObjectAdapter::dispatch(zmqpp::socket& pump, string const& client_address)
             }
             else
             {
-                BOOST_LOG(logger())
-                    << "ObjectAdapter: twoway invocation sent to oneway adapter "
-                    << "(id: " << current.id << ", adapter: " << name_ << ", op: " << current.op_name << ")";
+                logger()() << "ObjectAdapter: twoway invocation sent to oneway adapter "
+                           << "(id: " << current.id << ", adapter: " << name_ << ", op: " << current.op_name << ")";
             }
             return;
         }
@@ -772,7 +770,7 @@ void ObjectAdapter::dispatch(zmqpp::socket& pump, string const& client_address)
         }
         else
         {
-            BOOST_LOG(logger()) << s.str();
+            logger()() << s.str();
         }
         return;
     }
@@ -810,7 +808,7 @@ void ObjectAdapter::dispatch(zmqpp::socket& pump, string const& client_address)
     servant->safe_dispatch_(current, in_params, r); // noexcept
     if (mode_ == RequestMode::Twoway)
     {
-        BOOST_LOG(ipc_logger()) << decode_status(b.getRoot<capnproto::Response>());
+        logger()(LoggerChannel::IPC) << decode_status(b.getRoot<capnproto::Response>());
         pump.send(client_address, zmqpp::socket::send_more);
         pump.send("", zmqpp::socket::send_more);
         sender.send(b.getSegmentsForOutput());
@@ -853,19 +851,14 @@ void ObjectAdapter::store_exception(MiddlewareException& ex)
     state_changed_.notify_all();
 }
 
-boost::log::sources::severity_channel_logger_mt<>& ObjectAdapter::logger() const
+unity::scopes::internal::Logger& ObjectAdapter::logger() const
 {
     return mw_.runtime() ? mw_.runtime()->logger() : *test_logger_;
 }
 
-boost::log::sources::severity_channel_logger_mt<>& ObjectAdapter::ipc_logger() const
-{
-    return mw_.runtime() ? mw_.runtime()->logger(Logger::Channel::IPC) : *test_logger_;
-}
-
 void ObjectAdapter::trace_dispatch(Current const& c)
 {
-    BOOST_LOG(ipc_logger())
+    logger()(LoggerChannel::IPC)
         << "received request: "
         << "op = " << c.op_name
         << ", id = " << c.id

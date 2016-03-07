@@ -21,6 +21,7 @@
 #include <unity/scopes/FilterBase.h>
 #include <unity/scopes/FilterOption.h>
 #include <unity/scopes/Variant.h>
+#include <unity/scopes/FilterGroup.h>
 #include <string>
 #include <list>
 #include <set>
@@ -74,7 +75,9 @@ public:
     bool multi_select() const;
 
     /**
-    \brief Add a new option to this filter.
+    \brief Add a new option to this filter. The option is 'off' by default.
+
+    \throws unity::InvalidArgumentException on invalid id or label
     \return The new option instance.
     */
     FilterOption::SCPtr add_option(std::string const& id, std::string const& label);
@@ -113,6 +116,29 @@ public:
     to be used when creating a canned Query that references another scope.
     */
     static void update_state(FilterState& filter_state, std::string const& filter_id, std::string const& option_id, bool value);
+
+    /**
+    \brief Add a new option to this filter and provide its default value.
+
+    \throws unity::LogicException if multiple options with value of 'true' are provided for a single-selection OptionSelectorFilter.
+    \throws unity::InvalidArgumentException on invalid id or label
+    \return The new option instance.
+    */
+    FilterOption::SCPtr add_option(std::string const& id, std::string const& label, bool value);
+
+    /**
+    \brief Creates an OpionSelectorFilter inside a FilterGroup.
+    \param id A unique identifier for the filter that can be used to identify it later among several filters.
+    \param label A display label for the filter.
+    \param group A filter group this filter should be added to.
+    \param multi_select If true, the filter permits more than option to be selected; otherwise, only a single
+    option can be selected.
+    \throws unity::InvalidArgumentException on invalid null group.
+
+    \note The multi-selection cannot be combined with unity::scopes::FilterBase::DisplayHints::Primary flag set via
+    unity::scopes::FilterBase::set_display_hints().
+    */
+    static OptionSelectorFilter::UPtr create(std::string const& id, std::string const& label, FilterGroup::SCPtr const& group, bool multi_select = false);
 
 private:
     OptionSelectorFilter(internal::OptionSelectorFilterImpl*);

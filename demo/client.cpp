@@ -478,7 +478,6 @@ int main(int argc, char* argv[])
         shared_ptr<Receiver> reply(new Receiver(result_index));
 
         SearchMetadata metadata("C", "desktop");
-        metadata.set_cardinality(10);
         auto ctrl = meta.proxy()->search(search_string, department_id, filter_state, metadata, reply); // May raise TimeoutException
         cout << "client: created query" << endl;
         reply->wait_until_finished();

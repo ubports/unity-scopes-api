@@ -260,6 +260,67 @@ TEST_F(SmartScopesClientTest, search)
     EXPECT_EQ(active_option->id(), "salesrank");
 }
 
+TEST_F(SmartScopesClientTest, filter_groups)
+{
+    std::vector<SearchResult> results;
+    std::shared_ptr<DepartmentInfo> dept;
+    Filters filters;
+    FilterState filter_state;
+    std::vector<std::shared_ptr<SearchCategory>> categories;
+
+    SearchReplyHandler handler;
+    handler.filters_handler = [&filters](Filters const &f) {
+        filters = f;
+    };
+    handler.filter_state_handler = [&filter_state](FilterState const& s) {
+        filter_state = s;
+    };
+    handler.category_handler = [&categories](std::shared_ptr<SearchCategory> const& cat) {
+        categories.push_back(cat);
+    };
+    handler.result_handler = [&results](SearchResult const& result) {
+        results.push_back(result);
+    };
+    handler.departments_handler = [&dept](std::shared_ptr<DepartmentInfo> const& deptinfo) {
+        dept = deptinfo;
+    };
+
+    auto search_handle = ssc_->search(handler, sss_url_ + "/demo", "filter_groups", "", "session_id", 0, "platform", VariantMap(), VariantMap(), "en_US", LocationInfo(), "ThisIsUserAgentHeader");
+    search_handle->wait();
+
+    ASSERT_EQ(1u, results.size());
+    ASSERT_EQ(1u, categories.size());
+
+    EXPECT_EQ("URI", results[0].uri);
+    EXPECT_EQ("cat1", categories[0]->id);
+
+    EXPECT_EQ(nullptr, nullptr);
+
+    // check filters
+    EXPECT_FALSE(filters.empty());
+    EXPECT_EQ(filters.size(), 1);
+    auto filter1 = filters.front();
+    auto option_filter = std::dynamic_pointer_cast<const OptionSelectorFilter>(filter1);
+    EXPECT_TRUE(option_filter != nullptr);
+    auto grp = option_filter->filter_group();
+    EXPECT_TRUE(grp != nullptr);
+    EXPECT_EQ("g1", grp->id());
+    EXPECT_EQ("Group 1", grp->label());
+    EXPECT_EQ(option_filter->label(), "Label");
+    EXPECT_EQ(option_filter->id(), "sorting_primary_filter");
+    EXPECT_EQ(option_filter->display_hints(), FilterBase::DisplayHints::Primary);
+    EXPECT_EQ(option_filter->multi_select(), false);
+
+    auto options = option_filter->options();
+    EXPECT_EQ(options.size(), 2);
+
+    EXPECT_TRUE(option_filter->has_active_option(filter_state));
+    auto active_options = option_filter->active_options(filter_state);
+    EXPECT_FALSE(active_options.empty());
+    auto active_option = *(active_options.begin());
+    EXPECT_EQ(active_option->id(), "salesrank");
+}
+
 TEST_F(SmartScopesClientTest, userAgentHeader)
 {
     std::vector<SearchResult> results;

@@ -19,6 +19,7 @@
 #pragma once
 
 #include <unity/scopes/FilterBase.h>
+#include <unity/scopes/FilterGroup.h>
 
 namespace unity
 {
@@ -33,16 +34,14 @@ namespace internal
 class ValueSliderFilterImpl;
 }
 
-namespace experimental
-{
+class ValueSliderLabels;
 
 /**
 \brief A value slider filter that allows for selecting a value within given range.
 
-The ValueSliderFilter displays a static label, such as "Maximum size" and a slider that
-allows for selecting a value within range defined by minimum and maximum values. The currently
-selected value gets displayed using a label template provided by scope, e.g. "Less than %1 MB",
-resulting in labels such as "Less than 40.5 MB".
+The ValueSliderFilter allows for selecting a value within range defined by minimum and maximum values.
+Both minimum and maximum values can have labels and in addition, the scope may provide extra labels
+to mark other values from that range - these label will serve as a guidance to the user.
 */
 class UNITY_API ValueSliderFilter : public FilterBase
 {
@@ -52,61 +51,51 @@ public:
     /// @endcond
 
     /**
-     \brief The type of value slider.
-
-     The type should be set according to the behaviour of the filter:
-     ValueSliderFilter::SliderType::LessThan should be used if values lesser than selected value are to be returned, otherwise
-     ValueSliderFilter::SliderType::MoreThan should be used.
-     Note: the selected type is a display hint for the Shell only. It's up to the scope to set it properly and actually follow
-     it on search.
-     */
-    enum SliderType
-    {
-        LessThan, /**< Scope will search for values lesser than selected value */
-        MoreThan  /**< Scope will search for values greater than selected value */
-    };
-
-    /**
      \brief Create ValueSliderFilter.
 
      Creates ValueSliderFilter of ValueSliderFilter::SliderType::LessThan type.
 
      \param id A unique identifier for the filter that can be used to identify it later among several filters.
-     \param label The label for the filter
-     \param label_template The template for value label, e.g. "Less than %1"
      \param min The minimum allowed value
      \param max The maximum allowed value
+     \param default_value The default value of this filter, from the min..max range.
+     \param value_labels The labels for min and max values as well as optional extra labels.
      \return Instance of ValueSliderFilter.
-     \throws unity::LogicException on invalid (min, max) range.
+     \throws unity::LogicException on invalid (min, max) range or erroneous value_labels.
     */
-    static ValueSliderFilter::UPtr create(std::string const& id, std::string const& label, std::string const& label_template, double min, double max);
+    static ValueSliderFilter::UPtr create(std::string const& id, double min, double max, double default_value, ValueSliderLabels const& value_labels);
 
     /**
-     \brief Change the type of this filter.
+     \brief Create ValueSliderFilter inside a FilterGroup.
 
-     \param tp The type of slider filter.
-     */
-    void set_slider_type(SliderType tp);
+     Creates ValueSliderFilter of ValueSliderFilter::SliderType::LessThan type.
+
+     \param id A unique identifier for the filter that can be used to identify it later among several filters.
+     \param min The minimum allowed value
+     \param max The maximum allowed value
+     \param default_value The default value of this filter, from the min..max range.
+     \param value_labels The labels for min and max values as well as optional extra labels.
+     \param group A filter group this filter should be added to.
+     \return Instance of ValueSliderFilter.
+     \throws unity::LogicException on invalid (min, max) range or erroneous value_labels.
+    */
+    static ValueSliderFilter::UPtr create(std::string const& id, double min, double max, double default_value, ValueSliderLabels const& value_labels, FilterGroup::SCPtr const& group);
 
     /**
      \brief Change the default value of this filter.
 
-     The default value of this filter is by default the maximum value allowed. This value is used when calling unity::scopes::ValueSliderFilter::value_label()
-     and there is no state for this filter in unity::scopes::FilterState.
+     The default value will be used by the shell if no value is present for this filter in the
+     unity::scopes::FilterState (no value has been set by the user).
 
      \param val The new default value.
     */
     void set_default_value(double val);
 
     /**
-     \brief Get the type of this filter.
-
-     \return The type of slider filter.
-     */
-    SliderType slider_type() const;
-
-    /**
      \brief Get the default value of this filter.
+
+     The default value will be used by the shell if no value is present for this filter in the
+     unity::scopes::FilterState (no value has been set by the user).
 
      \return The default value
     */
@@ -127,20 +116,6 @@ public:
     double max() const;
 
     /**
-    \brief Get the label of this filter.
-
-    \return The label
-    */
-    std::string label() const;
-
-    /**
-     \brief Get the value label template of this filter.
-
-     \return The value label template.
-     */
-    std::string value_label_template() const;
-
-    /**
     \brief Check if filter state object holds a value of this filter.
 
     \return true if filter_state has a value of this filter.
@@ -154,6 +129,13 @@ public:
      \throws unity::scopes::NotFoundException if value is not present in state object.
     */
     double value(FilterState const& filter_state) const;
+
+    /**
+     \brief Get value labeles for this slider filter.
+
+     \return the value labels.
+     */
+    ValueSliderLabels const& labels() const;
 
     /**
     \brief Sets value of this filter instance in filter state object.
@@ -177,8 +159,6 @@ private:
     internal::ValueSliderFilterImpl* fwd() const;
     friend class internal::ValueSliderFilterImpl;
 };
-
-} // namespace experimental
 
 } // namespace scopes
 

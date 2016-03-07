@@ -32,26 +32,21 @@ namespace scopes
 namespace internal
 {
 
-ValueSliderFilterImpl::ValueSliderFilterImpl(std::string const& id, std::string const& label, std::string const& label_template, double min, double max)
+ValueSliderFilterImpl::ValueSliderFilterImpl(std::string const& id, double min, double max, double default_value, ValueSliderLabels const& labels)
     : FilterBaseImpl(id),
-      label_(label),
-      label_template_(label_template),
-      slider_type_(ValueSliderFilter::SliderType::LessThan),
       min_(min),
-      max_(max)
+      max_(max),
+      default_val_(default_value),
+      labels_(new ValueSliderLabels(labels))
 {
-    if (label.empty())
-    {
-        throw InvalidArgumentException("ValueSliderFilterImpl(): Invalid empty label string");
-    }
-
-    if (min < 0 || min >= max)
+    if (default_value < min || default_value > max)
     {
         std::stringstream err;
-        err << "ValueSliderFilterImpl::ValueSliderFilterImpl(): invalid min or max value for filter '" << id << "', min is " << min << ", max is " << max;
-        throw LogicException(err.str());
+        err << "ValueSliderFilterImpl::ValueSliderFilterImpl(): invalid default value for filter '" << id << "', " << default_value << " not in " << min << "-"
+            << max << " range";
+        throw InvalidArgumentException(err.str());
     }
-    default_val_ = max;
+    labels_->p->validate(min_, max_);
 }
 
 ValueSliderFilterImpl::ValueSliderFilterImpl(VariantMap const& var)
@@ -73,16 +68,6 @@ void ValueSliderFilterImpl::set_default_value(double val)
     default_val_ = val;
 }
 
-void ValueSliderFilterImpl::set_slider_type(ValueSliderFilter::SliderType tp)
-{
-    slider_type_ = tp;
-}
-
-ValueSliderFilter::SliderType ValueSliderFilterImpl::slider_type() const
-{
-    return slider_type_;
-}
-
 double ValueSliderFilterImpl::default_value() const
 {
     return default_val_;
@@ -98,14 +83,11 @@ double ValueSliderFilterImpl::max() const
     return max_;
 }
 
-std::string ValueSliderFilterImpl::label() const
+ValueSliderLabels const& ValueSliderFilterImpl::labels() const
 {
-    return label_;
-}
-
-std::string ValueSliderFilterImpl::value_label_template() const
-{
-    return label_template_;
+    // labels_ pointer is guaranteed to be initialized either by the regular ctor or when deserialized from a variant
+    assert(labels_);
+    return *labels_;
 }
 
 bool ValueSliderFilterImpl::has_value(FilterState const& filter_state) const
@@ -119,7 +101,7 @@ double ValueSliderFilterImpl::value(FilterState const& filter_state) const
     {
         try
         {
-            double val = FilterBaseImpl::get(filter_state, id()).get_double(); // this can throw if of different type
+            auto val = FilterBaseImpl::get(filter_state, id()).get_double(); // this can throw if of different type
             check_range(val);
             return val;
         }
@@ -154,28 +136,23 @@ void ValueSliderFilterImpl::validate_display_hints() const
 
 void ValueSliderFilterImpl::serialize(VariantMap& var) const
 {
-    var["label"] = label_;
-    var["label_template"] = label_template_;
     var["min"] = Variant(min_);
     var["max"] = Variant(max_);
     var["default"] = Variant(default_val_);
-    var["slider_type"] = static_cast<int>(slider_type_);
+    var["labels"] = Variant(labels_->serialize());
 }
 
 void ValueSliderFilterImpl::deserialize(VariantMap const& var)
 {
-    auto it = find_or_throw("ValueSliderFilterImpl::deserialize()", var, "label");
-    label_ = it->second.get_string();
-    it = find_or_throw("ValueSliderFilterImpl::deserialize()", var, "label_template");
-    label_template_ = it->second.get_string();
-    it = find_or_throw("ValueSliderFilterImpl::deserialize()", var, "min");
+    auto it = find_or_throw("ValueSliderFilterImpl::deserialize()", var, "min");
     min_ = it->second.get_double();
     it = find_or_throw("ValueSliderFilterImpl::deserialize()", var, "max");
     max_ = it->second.get_double();
     it = find_or_throw("ValueSliderFilterImpl::deserialize()", var, "default");
     default_val_ = it->second.get_double();
-    it = find_or_throw("ValueSliderFilterImpl::deserialize()", var, "slider_type");
-    slider_type_ = static_cast<ValueSliderFilter::SliderType>(it->second.get_int());
+    it = find_or_throw("ValueSliderFilterImpl::deserialize()", var, "labels");
+    labels_.reset(new ValueSliderLabels(it->second.get_dict()));
+    labels_->p->validate(min_, max_);
 }
 
 std::string ValueSliderFilterImpl::filter_type() const
@@ -189,7 +166,7 @@ void ValueSliderFilterImpl::check_range(double val) const
     {
         std::stringstream err;
         err << "ValueSliderFilterImpl::check_range(): value " << val << " outside of allowed range (" << min_ << ", " << max_ << ")";
-        throw LogicException(err.str());
+        throw InvalidArgumentException(err.str());
     }
 }
 

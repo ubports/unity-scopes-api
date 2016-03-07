@@ -49,8 +49,12 @@ The most important part of a category definition is the unity::scopes::CategoryR
 
 As specified by the \c "category-layout" key of the \c "template" dictionary, Unity will render results associated with this category in a grid layout. The \c "components" dictionary specifies which result fields are used by Unity. In case of this definition, each tile of the grid will map the "title" field from the result (set also by the call to unity::scopes::Result::set_title()) as title for the grid tile, and "art" field from the result (see unity::scopes::Result::set_art()) as the icon for the grid tile.
 
-To sum up, the \c "template" dictionary contains information to determine the correct renderer and its parameters, and the \c "components" dictionary contains mapping specifying which fields of the results are used by the renderer, where keys of the dictionary are understood by Unity and values specify either field name of the results directly (<tt>{"title": "album_name"}</tt> would mean that Unity will use <tt>result["album_name"]</tt> as a title for the grid tile), or the value can specify extra hints for the renderer as well as the result field name and a fallback image
-(<tt>{"art": {"field": "icon", "aspect-ratio": 1.3, "fallback": "file:///path_to_fallback_image}}</tt>).
+To sum up, the \c "template" dictionary contains information to determine the correct renderer and its parameters, and the \c "components" dictionary contains a mapping that specifies which fields of the results are used by the renderer.
+The keys of the dictionary are understood by Unity and the values specify a field name of the results. For example, <tt>{"title": "album_name"}</tt> means that Unity will use <tt>result["album_name"]</tt> as a title for the grid tile.r
+
+A value also can specify extra hints for the renderer, such as the result field name and a fallback image. For example,
+<tt>{"art": {"field": "icon", "aspect-ratio": 1.3, "fallback": "file:///path_to_fallback_image}}</tt>.
+The fallback image is shown by Unity if no image URL is provided by the result, but the card requires an image. The fallback image is also shown if the result provides an empty URL for an image, the image does not load due to an error, or if loading results in an empty image. If a result does not specify a fallback image and the actual image is empty or cannot be loaded, Unity substitutes a generic fallback image.
 
 \section jsonschema1 JSON structure (v1)
 
