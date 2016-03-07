@@ -653,7 +653,7 @@ class MyActivation : public ActivationQueryBase
                     {"label", Variant("I don't like it")},
             });
             builder.add_tuple({ ... })
-            updatedRes["social-actions"] = builder_end();
+            updatedRes["social-actions"] = builder.end();
             return ActivationResponse(updatedRes);
         }
 
