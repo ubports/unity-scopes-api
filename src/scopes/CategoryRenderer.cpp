@@ -69,6 +69,7 @@ When using <tt>{"schema-version": 1}</tt>, the following keys are understood:
 \arg \c collapsed-rows Number of result rows displayed while the category is collapsed; possible values: any non-negative integer, where 0 fully expands the category (only affects grid and vertical journal)
 \arg \c card-background Background color for the cards; string; URI in the format \verbatim color:///#rrggbb \endverbatim or \verbatim color:///color_name
 \endverbatim or \verbatim gradient:///#rrggbb/#rrggbb \endverbatim or an image URI (will be stretched)
+\arg \c quick-preview-type The type of media content represented by result cards, for use with inline playback; the only currently supported type is "audio".
 
 \subsection components1 components keys
 
@@ -83,6 +84,8 @@ When using <tt>{"schema-version": 1}</tt>, the following keys are understood:
 \arg \c background Card background URI, can override the default specified in the card-background field of the template section (same format as for card-background)
 \arg \c attributes Array of dictionaries specifying text and an optional icon (keys: "value", "icon")
 \arg \c overlay-color Color of overlay for templates with overlay
+\arg \c quick-preview-data A dictionary with the following keys: \c "uri" (an uri of audio stream or file), \c "duration" (duration in seconds), \c "playlist"
+(an array of uris of additional songs to be played in the background).
 
 \section example Example
 
