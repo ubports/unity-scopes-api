@@ -671,7 +671,7 @@ The data assigned to "quick-preview-data" attribute of a Result needs to contain
 <ul>
 <li>uri - a playable uri of a media file (path of a local file, or http uri).
 <li>duration - the duration of the media file, in seconds.
-<li>playlist - an array of uris of additional songs, e.g. songs from same album; they will be played in the sequence when the main
+<li>playlist - an array of uris of additional songs, e.g. songs from same album; they will be played in sequence when the main
 song denoted by 'uri' finishes.
 </ul>
 
