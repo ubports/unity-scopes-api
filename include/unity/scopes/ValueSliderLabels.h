@@ -36,16 +36,22 @@ class ValueSliderFilterImpl;
 class ValueSliderLabelsImpl;
 }
 
-/// @cond
+/**
+\brief A value and its corresponding label.
+*/
 typedef std::pair<double, std::string> ValueLabelPair;
+
+/**
+\brief A sequence of value-label pairs.
+*/
 typedef std::vector<ValueLabelPair> ValueLabelPairList;
-/// @endcond
 
 /**
 \brief Labels used by a ValueSliderFilter.
 
-The ValueSliderLabels objects holds labels for a ValueSliderFilter. At the very least labels for minimum and maximum
-values need to be provided. In addition, an arbitrary number of extra labels can be defined to mark values between minimum and maximum values.
+The ValueSliderLabels class holds labels for a ValueSliderFilter. Labels for the minimum and maximum
+values must be provided. In addition, an arbitrary number of extra labels can be defined; these labels
+mark intermediate values between the minimum and maximum value.
 */
 class UNITY_API ValueSliderLabels final
 {
@@ -62,18 +68,17 @@ public:
     //@}
 
     /**
-      \brief Create ValueSliderLabels object with labels for minimum and maximum values only.
+      \brief Create a ValueSliderLabels instance with labels for minimum and maximum values only.
 
-      \throws unity::InvalidArgumentException on invalid (empty or duplicated) labels.
+      \throws unity::InvalidArgumentException for invalid (empty or duplicated) labels.
      */
     ValueSliderLabels(std::string const& min_label, std::string const& max_label);
 
     /**
-      \brief Create ValueSliderLabels object with labels for minimum and maximum, as well as extra labels.
+      \brief Create a ValueSliderLabels instance with labels for minimum and maximum, as well as extra labels.
 
-      Create ValueSliderLabels object with labels for minimum, maximum and values between minimum and maximum.
-      Note that these extra labels act only as a guidance for the user (i.e. they do not limit the available choices)
-      and also Unity shell is free to omit some or all of them depending on the available screen space.
+      Note that any extra labels act only as a guidance for the user (i.e. they do not limit the available choices).
+      The Unity shell is free to omit some or all of the labels depending on the available screen space.
 
       \param min_label The label for minimum value of the associated ValueSliderFilter filter.
       \param max_label The label for maximum value of the associated ValueSliderFilter filter.
@@ -85,13 +90,13 @@ public:
 
     /**
      \brief Get the label for the minimum value of the filter.
-     \return The label for minimum value
+     \return The label for the minimum value
      */
     std::string min_label() const;
 
     /**
      \brief Get the label for the maximum value of the filter.
-     \return The label for maximum value
+     \return The label for the maximum value
      */
     std::string max_label() const;
 

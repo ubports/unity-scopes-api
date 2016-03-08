@@ -79,10 +79,12 @@ ValueLabelPairList ValueSliderLabels::extra_labels() const
     return p->extra_labels();
 }
 
+/// @cond
 VariantMap ValueSliderLabels::serialize() const
 {
     return p->serialize();
 }
+/// @endcond
 
 }
 

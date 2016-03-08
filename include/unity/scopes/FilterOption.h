@@ -64,7 +64,7 @@ public:
 
     /**
      \brief Return the default value of this filter option.
-     \return default value
+     \return The default value.
     */
     bool default_value() const;
 

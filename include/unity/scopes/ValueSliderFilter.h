@@ -37,10 +37,10 @@ class ValueSliderFilterImpl;
 class ValueSliderLabels;
 
 /**
-\brief A value slider filter that allows for selecting a value within given range.
+\brief A value slider filter that allows for selecting a value within a given range.
 
-The ValueSliderFilter allows for selecting a value within range defined by minimum and maximum values.
-Both minimum and maximum values can have labels and in addition, the scope may provide extra labels
+The ValueSliderFilter allows for selecting a value within a range defined by minimum and maximum values.
+Both minimum and maximum values can have labels and, in addition, the scope may provide extra labels
 to mark other values from that range - these label will serve as a guidance to the user.
 */
 class UNITY_API ValueSliderFilter : public FilterBase
@@ -55,7 +55,7 @@ public:
 
      Creates ValueSliderFilter of ValueSliderFilter::SliderType::LessThan type.
 
-     \param id A unique identifier for the filter that can be used to identify it later among several filters.
+     \param id A unique identifier for the filter that can be used to later identify it among several filters.
      \param min The minimum allowed value
      \param max The maximum allowed value
      \param default_value The default value of this filter, from the min..max range.
@@ -70,7 +70,7 @@ public:
 
      Creates ValueSliderFilter of ValueSliderFilter::SliderType::LessThan type.
 
-     \param id A unique identifier for the filter that can be used to identify it later among several filters.
+     \param id A unique identifier for the filter that can be used to later identify it among several filters.
      \param min The minimum allowed value
      \param max The maximum allowed value
      \param default_value The default value of this filter, from the min..max range.

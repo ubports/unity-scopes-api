@@ -52,7 +52,7 @@ public:
 
     /**
     \brief Creates an OpionSelectorFilter.
-    \param id A unique identifier for the filter that can be used to identify it later among several filters.
+    \param id A unique identifier for the filter that can be used to later identify it among several filters.
     \param label A display label for the filter.
     \param multi_select If true, the filter permits more than option to be selected; otherwise, only a single
     option can be selected.
@@ -128,7 +128,7 @@ public:
 
     /**
     \brief Creates an OpionSelectorFilter inside a FilterGroup.
-    \param id A unique identifier for the filter that can be used to identify it later among several filters.
+    \param id A unique identifier for the filter that can be used to later identify it among several filters.
     \param label A display label for the filter.
     \param group A filter group this filter should be added to.
     \param multi_select If true, the filter permits more than option to be selected; otherwise, only a single

@@ -50,7 +50,7 @@ public:
 
     /**
     \brief Creates a SwitchFilter
-    \param id A unique identifier for the filter that can be used to identify it later among several filters.
+    \param id A unique identifier for the filter that can be used to later identify it among several filters.
     \param label A display label for the filter.
     \return SwitchFilter instance
     */
