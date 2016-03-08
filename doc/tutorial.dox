@@ -657,6 +657,70 @@ extern "C"
 }
 \endcode
 
+\paragraph inlineplayback Inline music playback
+
+Results which represent music (songs, albums etc.) can contain an extra data about audio content and can then be played directly from the Dash.
+Such results have a "play" button overlaid on them. To create results that support this functionality two conditions must be met:
+<ul>
+<li>Category renderer definition must contain the "quick-preview-type" key with the value of "audio" in the "template" section;
+<li>Results in the respective category must contain a "quick-preview-data" attribute, each of them is a dictionary with the extra playback data described
+below.
+</ul>
+
+The data assigned to "quick-preview-data" attribute of a Result needs to contain the following keys:
+<ul>
+<li>uri - a playable uri of a media file (path of a local file, or http uri).
+<li>duration - the duration of the media file, in seconds.
+<li>playlist - an array of uris of additional songs, e.g. songs from same album; they will be played in sequence when the main
+song denoted by 'uri' finishes.
+</ul>
+
+Here is an example of a category renderer for inline playback, which uses component mapping to map quick-preview-data to audio-data attribute of a result:
+\code{.cpp}
+static const char CATEGORY_RENDERER[] = R"(
+{
+  "schema-version": 1,
+  "template": {
+    "category-layout": "grid",
+    "card-size": "large",
+    "card-layout" : "horizontal",
+    "quick-preview-type" : "audio"
+  },
+  "components": {
+    "title": "title",
+    "art": {
+      "field": "art"
+    },
+    "subtitle": "artist",
+    "quick-preview-data": {
+        "field": "audio-data"
+    }
+  }
+}
+)";
+\endcode
+
+A sample code that creates a result card representing a song and all songs from same album in a background playlist may look this way:
+\code{.cpp}
+
+CategorisedResult res(category);
+res.set_uri(uri);
+res.set_title(media.getTitle());
+...
+
+VariantMap inline_playback_data;
+inline_playback_data["uri"] = uri;
+inline_playback_data["duration"] = song_duration_in_seconds;
+VariantArray playlist;
+for (const std::string& song: album_songs)
+{
+    playlist.push_back(Variant(song.getUri()));
+}
+inline_playback_data["playlist"] = playlist;
+res["audio-data"] = inline_playback_data;
+
+\endcode
+
 \subsubsection aggscope Case 2: An aggregating scope
 
 Aggregating scopes are scopes that collect results from other scopes and possibly consolidate, modify, or re-categorise
