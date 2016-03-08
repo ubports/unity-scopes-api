@@ -55,7 +55,7 @@ public:
     \brief Creates RadioButtonsFilter filter.
 
     Creates an empty RadioButtonsFilter filter. Use unity::scopes::RadioButtonsFilter::add_option() to add options to it.
-    \param id A unique identifier for the filter that can be used to identify it later among several filters.
+    \param id A unique identifier for the filter that can be used to later identify it among several filters.
     \param label A display label for this filter
     \return Instance of RadioButtonsFilter
     */
