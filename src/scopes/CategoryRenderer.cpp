@@ -85,7 +85,7 @@ When using <tt>{"schema-version": 1}</tt>, the following keys are understood:
 \arg \c attributes Array of dictionaries specifying text and an optional icon (keys: "value", "icon")
 \arg \c overlay-color Color of overlay for templates with overlay
 \arg \c quick-preview-data A dictionary with the following keys: \c "uri" (an uri of audio stream or file), \c "duration" (duration in seconds), \c "playlist"
-(an array of uris of additional songs to be played in the background).
+(an array of uris of additional songs to be played in sequence when the main song finishes).
 
 \section example Example
 
