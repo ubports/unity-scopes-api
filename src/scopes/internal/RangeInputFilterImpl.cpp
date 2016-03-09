@@ -142,18 +142,48 @@ double RangeInputFilterImpl::get_value(FilterState const& filter_state, unsigned
         {
         }
     }
-    throw unity::scopes::NotFoundException("RangeInputFilterImpl::get_value(): invalid index for filter '" + id() + "'",
+    throw NotFoundException("RangeInputFilterImpl::get_value(): invalid index for filter '" + id() + "'",
                                            std::to_string(index));
 }
 
 double RangeInputFilterImpl::start_value(FilterState const& filter_state) const
 {
-    return get_value(filter_state, 0);
+    try
+    {
+        return get_value(filter_state, 0);
+    }
+    catch (unity::scopes::NotFoundException const&)
+    {
+        if (default_start_value_.which() == Variant::Type::Double)
+        {
+            return default_start_value_.get_double();
+        }
+        if (default_end_value_.which() == Variant::Type::Int)
+        {
+            return default_start_value_.get_int();
+        }
+    }
+    throw NotFoundException("RangeInputFilterImpl::start_value(): start value is not set for filter", id());
 }
 
 double RangeInputFilterImpl::end_value(FilterState const& filter_state) const
 {
-    return get_value(filter_state, 1);
+    try
+    {
+        return get_value(filter_state, 1);
+    }
+    catch (unity::scopes::NotFoundException const&)
+    {
+        if (default_end_value_.which() == Variant::Type::Double)
+        {
+            return default_end_value_.get_double();
+        }
+        if (default_end_value_.which() == Variant::Type::Int)
+        {
+            return default_end_value_.get_int();
+        }
+    }
+    throw NotFoundException("RangeInputFilterImpl::end_value(): end value is not set for filter", id());
 }
 
 void RangeInputFilterImpl::check_type(Variant const& val, std::string const& filter_id, std::string const& varname)

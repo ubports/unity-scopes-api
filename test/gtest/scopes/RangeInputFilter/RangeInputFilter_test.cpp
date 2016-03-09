@@ -17,6 +17,7 @@
  */
 
 #include <gtest/gtest.h>
+#include <cmath>
 #include <unity/scopes/FilterState.h>
 #include <unity/scopes/RangeInputFilter.h>
 #include <unity/scopes/internal/RangeInputFilterImpl.h>
@@ -52,32 +53,70 @@ TEST(RangeInputFilter, basic)
 
 TEST(RangeInputFilter, state)
 {
-    auto filter1 = RangeInputFilter::create("f1", "", "", "", "", "");
+    {
+        auto filter1 = RangeInputFilter::create("f1", Variant(10.0f), Variant(20.0f), "", "", "", "", "");
 
-    FilterState fstate;
-    EXPECT_FALSE(fstate.has_filter("f1"));
+        FilterState fstate;
+        EXPECT_FALSE(fstate.has_filter("f1"));
+        EXPECT_FALSE(filter1->has_start_value(fstate));
+        EXPECT_FALSE(filter1->has_end_value(fstate));
 
-    filter1->update_state(fstate, Variant::null(), Variant::null());
-    EXPECT_FALSE(fstate.has_filter("f1"));
-    EXPECT_FALSE(filter1->has_start_value(fstate));
-    EXPECT_FALSE(filter1->has_end_value(fstate));
+        EXPECT_TRUE(std::abs(filter1->start_value(fstate) - 10.0f) < 0.0001f);
+        EXPECT_TRUE(std::abs(filter1->end_value(fstate) - 20.0f) < 0.0001f);
+    }
 
-    EXPECT_THROW(filter1->start_value(fstate), unity::scopes::NotFoundException);
-    EXPECT_THROW(filter1->end_value(fstate), unity::scopes::NotFoundException);
+    {
+        auto filter1 = RangeInputFilter::create("f1", Variant(5), Variant(10), "", "", "", "", "");
 
-    filter1->update_state(fstate, Variant(5), Variant::null());
-    EXPECT_TRUE(fstate.has_filter("f1"));
-    EXPECT_TRUE(filter1->has_start_value(fstate));
-    EXPECT_EQ(5.0f, filter1->start_value(fstate));
-    EXPECT_FALSE(filter1->has_end_value(fstate));
+        FilterState fstate;
+        EXPECT_FALSE(fstate.has_filter("f1"));
+        EXPECT_FALSE(filter1->has_start_value(fstate));
+        EXPECT_FALSE(filter1->has_end_value(fstate));
 
-    filter1->update_state(fstate, Variant(5), Variant(6.5f));
-    EXPECT_TRUE(filter1->has_start_value(fstate));
-    EXPECT_EQ(5.0f, filter1->start_value(fstate));
-    EXPECT_TRUE(filter1->has_end_value(fstate));
-    EXPECT_EQ(6.5f, filter1->end_value(fstate));
+        EXPECT_TRUE(std::abs(filter1->start_value(fstate) - 5) < 0.0001f);
+        EXPECT_TRUE(std::abs(filter1->end_value(fstate) - 10) < 0.0001f);
+    }
 
-    EXPECT_THROW(filter1->update_state(fstate, Variant(5), Variant(0.5f)), unity::LogicException);
+    {
+        auto filter1 = RangeInputFilter::create("f1", Variant::null(), Variant::null(), "", "", "", "", "");
+
+        FilterState fstate;
+        EXPECT_FALSE(fstate.has_filter("f1"));
+        EXPECT_FALSE(filter1->has_start_value(fstate));
+        EXPECT_FALSE(filter1->has_end_value(fstate));
+
+        EXPECT_THROW(filter1->start_value(fstate), NotFoundException);
+        EXPECT_THROW(filter1->end_value(fstate), NotFoundException);
+    }
+
+    {
+        auto filter1 = RangeInputFilter::create("f1", "", "", "", "", "");
+
+        FilterState fstate;
+        EXPECT_FALSE(fstate.has_filter("f1"));
+
+        filter1->update_state(fstate, Variant::null(), Variant::null());
+        EXPECT_FALSE(fstate.has_filter("f1"));
+        EXPECT_FALSE(filter1->has_start_value(fstate));
+        EXPECT_FALSE(filter1->has_end_value(fstate));
+
+        EXPECT_THROW(filter1->start_value(fstate), unity::scopes::NotFoundException);
+        EXPECT_THROW(filter1->end_value(fstate), unity::scopes::NotFoundException);
+
+        filter1->update_state(fstate, Variant(5), Variant::null());
+        EXPECT_TRUE(fstate.has_filter("f1"));
+        EXPECT_TRUE(filter1->has_start_value(fstate));
+        EXPECT_EQ(5.0f, filter1->start_value(fstate));
+        EXPECT_FALSE(filter1->has_end_value(fstate));
+
+        filter1->update_state(fstate, Variant(5), Variant(6.5f));
+        EXPECT_TRUE(filter1->has_start_value(fstate));
+        EXPECT_EQ(5.0f, filter1->start_value(fstate));
+        EXPECT_TRUE(filter1->has_end_value(fstate));
+        EXPECT_EQ(6.5f, filter1->end_value(fstate));
+
+        EXPECT_THROW(filter1->update_state(fstate, Variant(5), Variant(0.5f)), unity::LogicException);
+    }
 }
 
 TEST(RangeInputFilter, serialize_deserialize)
