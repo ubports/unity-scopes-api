@@ -97,7 +97,11 @@ public:
 
     /**
     \brief Get active options from an instance of FilterState for this filter.
-    \return The set of selected filter options.
+
+    Returns active options. The set may be empty if user de-selected all options. However, if there is no state
+    recorded for this filter in the filter_state instance, then all the options enabled by default will be returned.
+
+    \return The set of selected filter options (or options enabled by default if the filter is not present in the filter_state).
     */
     std::set<FilterOption::SCPtr> active_options(FilterState const& filter_state) const;
 
