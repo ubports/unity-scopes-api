@@ -94,6 +94,22 @@ public:
                         std::string const& provider_name,
                         MainLoopSelect main_loop_select = CreateInternalMainLoop);
 
+    /**
+    \brief Create OnlineAccountClient for the specified account service.
+    \param service_name The name of the service (E.g. "com.ubuntu.scopes.youtube_youtube").
+    \param service_type The type of service (E.g. "sharing").
+    \param provider_name The name of the service provider (E.g. "google").
+    \param auth_params Authentication parameters; this can be used to pass the
+    OAuth client keys, for example.
+    \param main_loop_select Indicates whether or not an external main loop exists
+                            (see OnlineAccountClient::MainLoopSelect).
+    */
+    OnlineAccountClient(std::string const& service_name,
+                        std::string const& service_type,
+                        std::string const& provider_name,
+                        VariantMap const& auth_params,
+                        MainLoopSelect main_loop_select = CreateInternalMainLoop);
+
     /// @cond
     ~OnlineAccountClient();
     /// @endcond

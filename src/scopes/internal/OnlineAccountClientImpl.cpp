@@ -131,6 +131,19 @@ static void service_login_cb(GObject* source, GAsyncResult* result, void* user_d
     info->account_client->callback(info, error ? error->message : "");
 }
 
+static GVariant *variant_to_gvariant(const Variant &v)
+{
+    switch (v.which()) {
+    case Variant::Int: return g_variant_new_int32(v.get_int());
+    case Variant::Bool: return g_variant_new_boolean(v.get_bool());
+    case Variant::String: return g_variant_new_string(v.get_string().c_str());
+    case Variant::Double: return g_variant_new_double(v.get_double());
+    default:
+        std::cerr << "variant_to_gvariant(): unsupported type " << v.serialize_json() << std::endl;
+        return nullptr;
+    }
+}
+
 static void service_update_cb(AgAccountService* account_service, gboolean enabled, AccountInfo* info)
 {
     std::unique_lock<std::mutex> info_lock(info->mutex);
@@ -177,6 +190,13 @@ static void service_update_cb(AgAccountService* account_service, gboolean enable
             g_variant_builder_add(&builder, "{sv}",
                                   SIGNON_SESSION_DATA_UI_POLICY,
                                   g_variant_new_int32(SIGNON_POLICY_NO_USER_INTERACTION));
+        }
+
+        for (const auto &param: info->account_client->auth_params())
+        {
+            g_variant_builder_add(&builder, "{sv}",
+                                  param.first.c_str(),
+                                  variant_to_gvariant(param.second));
         }
 
         info->auth_params.reset(
@@ -249,10 +269,12 @@ static void account_deleted_cb(AgManager*, AgAccountId account_id, OnlineAccount
 OnlineAccountClientImpl::OnlineAccountClientImpl(std::string const& service_name,
                                                  std::string const& service_type,
                                                  std::string const& provider_name,
+                                                 VariantMap const& auth_params,
                                                  OnlineAccountClient::MainLoopSelect main_loop_select)
     : service_name_(service_name)
     , service_type_(service_type)
     , provider_name_(provider_name)
+    , auth_params_(auth_params)
     , main_loop_select_(main_loop_select)
     , main_loop_is_running_(main_loop_select != OnlineAccountClient::CreateInternalMainLoop)
 {
@@ -458,6 +480,7 @@ void OnlineAccountClientImpl::register_account_login_item(Result& result,
     account_details_map["service_name"] = service_name_;
     account_details_map["service_type"] = service_type_;
     account_details_map["provider_name"] = provider_name_;
+    account_details_map["auth_params"] = auth_params_;
     account_details_map["login_passed_action"] = static_cast<int>(login_passed_action);
     account_details_map["login_failed_action"] = static_cast<int>(login_failed_action);
 
@@ -473,6 +496,7 @@ void OnlineAccountClientImpl::register_account_login_item(PreviewWidget& widget,
     account_details_map["service_name"] = service_name_;
     account_details_map["service_type"] = service_type_;
     account_details_map["provider_name"] = provider_name_;
+    account_details_map["auth_params"] = auth_params_;
     account_details_map["login_passed_action"] = static_cast<int>(login_passed_action);
     account_details_map["login_failed_action"] = static_cast<int>(login_failed_action);
 

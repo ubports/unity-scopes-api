@@ -59,6 +59,7 @@ public:
     OnlineAccountClientImpl(std::string const& service_name,
                             std::string const& service_type,
                             std::string const& provider_name,
+                            VariantMap const& auth_params,
                             OnlineAccountClient::MainLoopSelect main_loop_select);
     ~OnlineAccountClientImpl();
 
@@ -87,6 +88,7 @@ public:
 
     std::shared_ptr<AgManager> manager();
     std::string service_name();
+    VariantMap const& auth_params() const { return auth_params_; }
     std::shared_ptr<GMainContext> main_loop_context();
 
     void callback(AccountInfo* info, std::string const& error = "");
@@ -99,6 +101,7 @@ private:
     std::string const service_name_;
     std::string const service_type_;
     std::string const provider_name_;
+    VariantMap const auth_params_;
     OnlineAccountClient::MainLoopSelect const main_loop_select_;
 
     std::mutex callback_mutex_;
