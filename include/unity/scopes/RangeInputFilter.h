@@ -189,16 +189,16 @@ public:
     /**
      \brief Get the start value for this filter instance.
 
-     \return The start value.
-     \throws unity::scopes::NotFoundException if no start value is set.
+     \return The start value or the default start value if not null.
+     \throws unity::scopes::NotFoundException if the start value is not set and the default start value is null.
      */
     double start_value(FilterState const& filter_state) const;
 
     /**
      \brief Get end value for this filter instance.
 
-     \return The end value.
-     \throws unity::scopes::NotFoundException if no end value is set.
+     \return The end value or the default end value if not null.
+     \throws unity::scopes::NotFoundException if the end value is not set and the default end value is null.
      */
     double end_value(FilterState const& filter_state) const;
 

@@ -200,6 +200,17 @@ std::set<FilterOption::SCPtr> OptionSelectorFilterImpl::active_options(FilterSta
             // via a canned query from another scope, we shouldn't break this scope on it.
         }
     }
+    else
+    {
+        // we don't have this filter in the state object, so give defaults back
+        for (auto const& opt: options_)
+        {
+            if (opt->default_value())
+            {
+                opts.insert(opt);
+            }
+        }
+    }
     return opts;
 }
 
