@@ -17,7 +17,6 @@
  */
 
 #include <gtest/gtest.h>
-#include <cmath>
 #include <unity/scopes/FilterState.h>
 #include <unity/scopes/ValueSliderFilter.h>
 #include <unity/scopes/ValueSliderLabels.h>
@@ -93,7 +92,7 @@ TEST(ValueSliderFilter, state)
         FilterState fstate;
         auto filter1 = ValueSliderFilter::create("f1", 1, 100, 100, ValueSliderLabels("Min", "Max"));
         EXPECT_FALSE(filter1->has_value(fstate));
-        EXPECT_TRUE(std::abs(filter1->value(fstate) - 100.0f) < 0.00001f);
+        EXPECT_DOUBLE_EQ(100.0f, filter1->value(fstate));
     }
 
     {
