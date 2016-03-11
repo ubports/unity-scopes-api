@@ -92,7 +92,7 @@ TEST(ValueSliderFilter, state)
         FilterState fstate;
         auto filter1 = ValueSliderFilter::create("f1", 1, 100, 100, ValueSliderLabels("Min", "Max"));
         EXPECT_FALSE(filter1->has_value(fstate));
-        EXPECT_THROW(filter1->value(fstate), unity::scopes::NotFoundException);
+        EXPECT_DOUBLE_EQ(100.0f, filter1->value(fstate));
     }
 
     {

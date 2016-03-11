@@ -111,7 +111,7 @@ double ValueSliderFilterImpl::value(FilterState const& filter_state) const
             // via a canned query from another scope, we shouldn't break this scope on it.
         }
     }
-    throw NotFoundException("ValueSliderFilterImpl::get_value(): value is not set for filter", id());
+    return default_val_;
 }
 
 void ValueSliderFilterImpl::update_state(FilterState& filter_state, double value) const

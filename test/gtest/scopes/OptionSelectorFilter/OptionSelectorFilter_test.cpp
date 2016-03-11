@@ -56,7 +56,7 @@ TEST(OptionSelectorFilter, default_values)
     {
         auto filter1 = OptionSelectorFilter::create("f1", "Options", false);
 
-        filter1->add_option("1", "Option 1", true);
+        auto option1 = filter1->add_option("1", "Option 1", true);
         EXPECT_THROW(filter1->add_option("2", "Option 2", true), unity::LogicException); // only one option enabled by default with single-selection
         filter1->add_option("2", "Option 2");
 
@@ -66,6 +66,13 @@ TEST(OptionSelectorFilter, default_values)
         EXPECT_EQ(true, opts.front()->default_value());
         EXPECT_EQ("2", opts.back()->id());
         EXPECT_EQ(false, opts.back()->default_value());
+
+        FilterState state;
+        // the option enabled by default is returned
+        EXPECT_EQ(1u, filter1->active_options(state).size());
+        EXPECT_EQ("1", (*filter1->active_options(state).begin())->id());
+        filter1->update_state(state, option1, false);
+        EXPECT_EQ(0u, filter1->active_options(state).size());
     }
 
     // multi-selection
