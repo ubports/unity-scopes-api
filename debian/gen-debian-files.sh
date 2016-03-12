@@ -43,11 +43,13 @@ set -e  # Fail if any command fails.
 
 progname=$(basename $0)
 
-[ $# -ne 1 ] && {
-    echo "usage: $progname path-to-debian-dir" >&2
+[ $# -gt 1 ] && {
+    echo "usage: $progname [path-to-debian-dir]" >&2
     exit 1
 }
 dir=$1
+[ -n "$dir" ] || dir="./debian"
+
 version_dir=$(mktemp -d)
 
 # Dump version numbers into files and initialize vars from those files.
