@@ -92,7 +92,7 @@ cat $warning $infile \
     | sed -e "s/@UNITY_SCOPES_SOVERSION@/${soversion}/" \
           -e "s/@UNITY_SCOPES_QT_SOVERSION@/${qt_soversion}/" >"$outfile"
 
-[ "$distro" != "vivid" ] && {
+[ "$SERIES" != "vivid" ] && {
     sed -i -e "/Replaces: libunity-scopes0,/a\
 \          libunity-scopes${vivid_soversion}," \
            -e "/Conflicts: libunity-scopes0,/a\
