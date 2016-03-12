@@ -52,25 +52,34 @@ progname=$(basename $0)
 dir=$1
 [ -n "$dir" ] || dir="./debian"
 
-version_dir="./tmp.versions"
-mkdir --parents "$version_dir"
+# Only call lsb_release if $SERIES isn't already set
+[ -n "$SERIES" ] || SERIES=$(lsb_release -c -s)
 
-# Dump version numbers into files and initialize vars from those files.
+export UNITY_SCOPES_MAJOR_VERSION=$(cat "$dir/VERSION.MAJOR")
+export UNITY_SCOPES_MINOR_VERSION=$(cat "$dir/VERSION.MINOR")
+export UNITY_SCOPES_MICRO_VERSION=$(cat "$dir/VERSION.MICRO")
 
-sh ${dir}/get-versions.sh ${dir} ${version_dir}
+export UNITY_SCOPES_QT_MAJOR_VERSION=$(cat "$dir/QT-VERSION.MAJOR")
+export UNITY_SCOPES_QT_MINOR_VERSION=$(cat "$dir/QT-VERSION.MINOR")
+export UNITY_SCOPES_QT_MICRO_VERSION=$(cat "$dir/QT-VERSION.MICRO")
 
-export UNITY_SCOPES_FULL_VERSION=$(cat "$version_dir/libunity-scopes.full-version")
-export UNITY_SCOPES_QT_FULL_VERSION=$(cat "$version_dir/libunity-scopes-qt.full-version")
+export UNITY_SCOPES_MAJOR_MINOR="$UNITY_SCOPES_MAJOR_VERSION.$UNITY_SCOPES_MINOR_VERSION"
+export UNITY_SCOPES_QT_MAJOR_MINOR="$UNITY_SCOPES_QT_MAJOR_VERSION.$UNITY_SCOPES_QT_MINOR_VERSION"
 
-export UNITY_SCOPES_MAJOR_MINOR=$(cat "$version_dir/libunity-scopes.major-minor-version")
-export UNITY_SCOPES_QT_MAJOR_MINOR=$(cat "$version_dir/libunity-scopes-qt.major-minor-version")
+export UNITY_SCOPES_FULL_VERSION="$UNITY_SCOPES_MAJOR_MINOR.$UNITY_SCOPES_MICRO_VERSION"
+export UNITY_SCOPES_QT_FULL_VERSION="$UNITY_SCOPES_QT_MAJOR_MINOR.$UNITY_SCOPES_QT_MICRO_VERSION"
 
-export UNITY_SCOPES_SOVERSION=$(cat "$version_dir/libunity-scopes.soversion")
-export UNITY_SCOPES_QT_SOVERSION=$(cat "$version_dir/libunity-scopes-qt.soversion")
+if [ "$SERIES" = "vivid" ]
+then
+    export UNITY_SCOPES_SOVERSION=$(expr "$UNITY_SCOPES_MINOR_VERSION" + 3)
+    export UNITY_SCOPES_QT_SOVERSION="$UNITY_SCOPES_QT_MINOR"
+else
+    export UNITY_SCOPES_SOVERSION="$UNITY_SCOPES_MAJOR_MINOR"
+    export UNITY_SCOPES_QT_SOVERSION="$UNITY_SCOPES_QT_MAJOR_MINOR"
+fi
+[ -n "$UNITY_SCOPES_SOVERSION" ]
+[ -n "$UNITY_SCOPES_QT_SOVERSION" ]
 
-export UNITY_SCOPES_VIVID_SOVERSION=$(cat "$version_dir/libunity-scopes.vivid-soversion")
-
-trap "rm -fr $version_dir" 0 INT TERM QUIT
 
 process()
 {
