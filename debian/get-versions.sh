@@ -38,8 +38,6 @@ output_dir=`pwd`
 # Write the various version numbers into a bunch of files. This allows
 # us to easily pick them up from both gen-debian-files.sh and CMakeLists.txt.
 
-distro=$(lsb_release -c -s)
-
 full_version=$(cat "${dir}"/VERSION)
 qt_full_version=$(cat "${dir}"/QT-VERSION)
 
@@ -55,7 +53,10 @@ qt_major_minor="${qt_major}.${qt_minor}"
 
 vivid_soversion=$(expr $minor + 3)
 
-if [ "$distro" = "vivid" ]
+# Only call lsb_release if $SERIES isn't already set
+[ -n "$SERIES" ] || SERIES=$(lsb_release -c -s)
+
+if [ "$SERIES" = "vivid" ]
 then
     soversion=$vivid_soversion
     qt_soversion=${qt_minor}
@@ -63,8 +64,6 @@ else
     soversion="${major}.${minor}"
     qt_soversion="${qt_major}.${qt_minor}"
 fi
-[ -n $soversion ]
-[ -n $qt_soversion ]
 
 echo ${full_version} >${output_dir}/libunity-scopes.full-version
 echo ${major} >${output_dir}/libunity-scopes.major-version
