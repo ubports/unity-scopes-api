@@ -64,6 +64,8 @@ else
     soversion="${major}.${minor}"
     qt_soversion="${qt_major}.${qt_minor}"
 fi
+[ -n "$soversion" ]
+[ -n "$qt_soversion" ]
 
 echo ${full_version} >${output_dir}/libunity-scopes.full-version
 echo ${major} >${output_dir}/libunity-scopes.major-version
