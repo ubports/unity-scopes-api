@@ -41,6 +41,8 @@
 
 set -e  # Fail if any command fails.
 
+set -x  # FIXME: just for testing
+
 progname=$(basename $0)
 
 [ $# -gt 1 ] && {
