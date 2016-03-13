@@ -42,7 +42,7 @@ public:
     OptionSelectorFilterImpl(VariantMap const& var);
     std::string label() const;
     bool multi_select() const;
-    virtual FilterOption::SCPtr add_option(std::string const& id, std::string const& label);
+    virtual FilterOption::SCPtr add_option(std::string const& id, std::string const& label, bool default_value = false);
     std::list<FilterOption::SCPtr> options() const;
     int num_of_options() const;
     std::set<FilterOption::SCPtr> active_options(FilterState const& filter_state) const;

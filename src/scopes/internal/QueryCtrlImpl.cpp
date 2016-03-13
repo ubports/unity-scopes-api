@@ -78,7 +78,7 @@ void QueryCtrlImpl::cancel()
     }
     catch (std::exception const& e)
     {
-        BOOST_LOG(reply_proxy_->mw_base()->runtime()->logger()) << e.what();
+        reply_proxy_->mw_base()->runtime()->logger()() << e.what();
     }
 }
 

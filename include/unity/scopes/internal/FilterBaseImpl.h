@@ -20,7 +20,9 @@
 
 #include <unity/scopes/Variant.h>
 #include <unity/scopes/FilterBase.h>
+#include <unity/scopes/FilterGroup.h>
 #include <string>
+#include <map>
 
 namespace unity
 {
@@ -40,12 +42,16 @@ public:
     virtual ~FilterBaseImpl();
     void set_display_hints(int hints);
     std::string id() const;
+    void set_title(std::string const& title);
+    std::string title() const;
     int display_hints() const;
+    void add_to_filter_group(FilterGroup::SCPtr const& group);
+    FilterGroup::SCPtr filter_group() const;
     VariantMap serialize() const;
     virtual std::string filter_type() const = 0;
     static FilterBase::SCPtr deserialize(VariantMap const& var);
     static VariantArray serialize_filters(Filters const& filters);
-    static Filters deserialize_filters(VariantArray const& var);
+    static Filters deserialize_filters(VariantArray const& var, std::map<std::string, FilterGroup::SCPtr> const& groups);
     static void validate_filters(Filters const& filters);
     virtual void validate_display_hints() const = 0;
 
@@ -56,7 +62,9 @@ protected:
 
 private:
     std::string id_;
+    std::string title_;
     int display_hints_;
+    FilterGroup::SCPtr filter_group_;
 };
 
 } // namespace internal

@@ -37,10 +37,10 @@ class FilterBaseImpl;
 }
 
 /**
-\brief Captures state of multiple filters.
+\brief Stores the state of multiple filters.
 
-State can be examined by passing an instance of FilterState to
-appropriate methods of filters (FilterBase implementations).
+The state can be examined by passing an instance of FilterState to
+the appropriate methods of classes derived from FilterBase.
 */
 
 class FilterState final

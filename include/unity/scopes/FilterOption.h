@@ -62,6 +62,12 @@ public:
     ~FilterOption();
     /// @endcond
 
+    /**
+     \brief Return the default value of this filter option.
+     \return The default value.
+    */
+    bool default_value() const;
+
 private:
     FilterOption(std::string const& id, std::string const& label);
     std::unique_ptr<internal::FilterOptionImpl> p;
