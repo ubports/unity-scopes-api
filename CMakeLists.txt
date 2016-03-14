@@ -216,44 +216,37 @@ endif()
 set(UNITY_SCOPES_LIB unity-scopes)
 set(UNITY_SCOPES_QT_LIB unity-scopes-qt)
 
-# Run debian/get-versions.sh to get the version and soversion numbers for each library.
-execute_process(COMMAND mktemp -d OUTPUT_VARIABLE version_dir OUTPUT_STRIP_TRAILING_WHITESPACE)
-execute_process(COMMAND sh ${CMAKE_SOURCE_DIR}/debian/get-versions.sh ${CMAKE_SOURCE_DIR}/debian ${version_dir})
-
 # Set versions for libunity-scopes.
-file(READ ${version_dir}/lib${UNITY_SCOPES_LIB}.full-version UNITY_SCOPES_FULL_VERSION)
-string(STRIP ${UNITY_SCOPES_FULL_VERSION} UNITY_SCOPES_FULL_VERSION)
-file(READ ${version_dir}/lib${UNITY_SCOPES_LIB}.major-version UNITY_SCOPES_MAJOR)
+set(DEBIAN_DIR ${CMAKE_SOURCE_DIR}/debian)
+file(READ ${DEBIAN_DIR}/VERSION.MAJOR UNITY_SCOPES_MAJOR)
 string(STRIP ${UNITY_SCOPES_MAJOR} UNITY_SCOPES_MAJOR)
-file(READ ${version_dir}/lib${UNITY_SCOPES_LIB}.minor-version UNITY_SCOPES_MINOR)
+file(READ ${DEBIAN_DIR}/VERSION.MINOR UNITY_SCOPES_MINOR)
 string(STRIP ${UNITY_SCOPES_MINOR} UNITY_SCOPES_MINOR)
-file(READ ${version_dir}/lib${UNITY_SCOPES_LIB}.micro-version UNITY_SCOPES_MICRO)
+file(READ ${DEBIAN_DIR}/VERSION.MICRO UNITY_SCOPES_MICRO)
 string(STRIP ${UNITY_SCOPES_MICRO} UNITY_SCOPES_MICRO)
-file(READ ${version_dir}/lib${UNITY_SCOPES_LIB}.major-minor-version UNITY_SCOPES_MAJOR_MINOR)
-string(STRIP ${UNITY_SCOPES_MAJOR_MINOR} UNITY_SCOPES_MAJOR_MINOR)
-file(READ ${version_dir}/lib${UNITY_SCOPES_LIB}.soversion UNITY_SCOPES_SOVERSION)
-string(STRIP ${UNITY_SCOPES_SOVERSION} UNITY_SCOPES_SOVERSION)
+
+set(UNITY_SCOPES_MAJOR_MINOR ${UNITY_SCOPES_MAJOR}.${UNITY_SCOPES_MINOR})
+set(UNITY_SCOPES_FULL_VERSION ${UNITY_SCOPES_MAJOR_MINOR}.${UNITY_SCOPES_MICRO})
+set(UNITY_SCOPES_SOVERSION ${UNITY_SCOPES_MAJOR_MINOR})
 
 # Set versions for libunity-scopes-qt.
-file(READ ${version_dir}/lib${UNITY_SCOPES_QT_LIB}.full-version UNITY_SCOPES_QT_FULL_VERSION)
-string(STRIP ${UNITY_SCOPES_QT_FULL_VERSION} UNITY_SCOPES_QT_FULL_VERSION)
-file(READ ${version_dir}/lib${UNITY_SCOPES_QT_LIB}.major-version UNITY_SCOPES_QT_MAJOR)
+file(READ ${DEBIAN_DIR}/QT-VERSION.MAJOR UNITY_SCOPES_QT_MAJOR)
 string(STRIP ${UNITY_SCOPES_QT_MAJOR} UNITY_SCOPES_QT_MAJOR)
-file(READ ${version_dir}/lib${UNITY_SCOPES_QT_LIB}.minor-version UNITY_SCOPES_QT_MINOR)
+file(READ ${DEBIAN_DIR}/QT-VERSION.MINOR UNITY_SCOPES_QT_MINOR)
 string(STRIP ${UNITY_SCOPES_QT_MINOR} UNITY_SCOPES_QT_MINOR)
-file(READ ${version_dir}/lib${UNITY_SCOPES_QT_LIB}.micro-version UNITY_SCOPES_QT_MICRO)
+file(READ ${DEBIAN_DIR}/QT-VERSION.MICRO UNITY_SCOPES_QT_MICRO)
 string(STRIP ${UNITY_SCOPES_QT_MICRO} UNITY_SCOPES_QT_MICRO)
-file(READ ${version_dir}/lib${UNITY_SCOPES_QT_LIB}.major-minor-version UNITY_SCOPES_QT_MAJOR_MINOR)
-string(STRIP ${UNITY_SCOPES_QT_MAJOR_MINOR} UNITY_SCOPES_QT_MAJOR_MINOR)
-file(READ ${version_dir}/lib${UNITY_SCOPES_QT_LIB}.soversion UNITY_SCOPES_QT_SOVERSION)
-string(STRIP ${UNITY_SCOPES_QT_SOVERSION} UNITY_SCOPES_QT_SOVERSION)
+
+set(UNITY_SCOPES_QT_MAJOR_MINOR ${UNITY_SCOPES_QT_MAJOR}.${UNITY_SCOPES_QT_MINOR})
+set(UNITY_SCOPES_QT_FULL_VERSION ${UNITY_SCOPES_QT_MAJOR_MINOR}.${UNITY_SCOPES_QT_MICRO})
+set(UNITY_SCOPES_QT_SOVERSION ${UNITY_SCOPES_QT_MAJOR_MINOR})
 
 if(NOT ${UNITY_SCOPES_MAJOR} EQUAL 1)
-    message(FATAL_ERROR "Change in major version number. You need to adjust get-versions.sh and gen-debian-files.sh")
+    message(FATAL_ERROR "Change in major version number. You need to adjust bileto_pre_release_hook")
 endif()
 
 if(NOT ${UNITY_SCOPES_QT_MAJOR} EQUAL 0)
-    message(FATAL_ERROR "Change in Qt major version number. You need to adjust get-versions.sh and gen-debian-files.sh")
+    message(FATAL_ERROR "Change in Qt major version number. You need to adjust bileto_pre_release_hook")
 endif()
 
 # Library for testing, with all symbols visible
