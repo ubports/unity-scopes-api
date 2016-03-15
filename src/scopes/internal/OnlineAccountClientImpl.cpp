@@ -87,8 +87,8 @@ static OnlineAccountClient::ServiceStatus info_to_details(AccountInfo* info, std
     service_status.service_authenticated = access_token ? info->service_enabled : false;
     service_status.client_id = client_id ? client_id : "";
     service_status.client_secret = client_secret ? client_secret : "";
-    service_status.access_token = access_token ? access_token : "";
-    service_status.token_secret = token_secret ? token_secret : "";
+    service_status.access_token = (info->service_enabled && access_token) ? access_token : "";
+    service_status.token_secret = (info->service_enabled && token_secret) ? token_secret : "";
     service_status.error = error;
 
     return service_status;

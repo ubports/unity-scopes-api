@@ -491,7 +491,7 @@ TEST_F(OnlineAccountClientTest, service_update_callback)
     disabled_status.service_authenticated = false;
     disabled_status.client_id = "abcXYZ";
     disabled_status.client_secret = "lj3i8iorep0w03994jwjef0j";
-    disabled_status.access_token = "ABCxyz";
+    disabled_status.access_token = "";
     disabled_status.token_secret = "";
     disabled_status.error = "";
 
