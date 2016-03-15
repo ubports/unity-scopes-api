@@ -22,7 +22,6 @@
 #include <unity/util/FileIO.h>
 
 #include <gtest/gtest.h>
-#include <jsoncpp/json/json.h>
 
 using namespace unity;
 using namespace unity::scopes;
