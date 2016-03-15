@@ -8,6 +8,12 @@ unity-scopes-api (1.0.4-0ubuntu1) UNRELEASED; urgency=medium
 
  -- Pawel Stolowski <pawel.stolowski@canonical.com>  Mon, 11 Jan 2016 12:06:29 +0100
 
+unity-scopes-api (1.0.3+16.04.20160209-0ubuntu2) xenial; urgency=medium
+
+  * No-change rebuild for zeromq3 transition.
+
+ -- Matthias Klose <doko@ubuntu.com>  Mon, 14 Mar 2016 22:39:01 +0100
+
 unity-scopes-api (1.0.3+16.04.20160209-0ubuntu1) xenial; urgency=medium
 
   [ Michi Henning ]
