@@ -23,7 +23,10 @@
 #include <unity/scopes/internal/gobj_memory.h>
 #include <unity/scopes/Variant.h>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"
 #include <json-glib/json-glib.h>
+#pragma GCC diagnostic pop
 
 namespace unity
 {

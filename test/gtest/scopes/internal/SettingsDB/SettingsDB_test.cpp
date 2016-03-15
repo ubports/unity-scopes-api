@@ -22,6 +22,7 @@
 
 #include <unity/UnityExceptions.h>
 
+#include <boost/algorithm/string.hpp>
 #include <boost/regex.hpp>  // Use Boost implementation until http://gcc.gnu.org/bugzilla/show_bug.cgi?id=53631 is fixed.
 #include <gtest/gtest.h>
 #include <fcntl.h>
@@ -321,10 +322,9 @@ TEST(SettingsDB, exceptions)
     }
     catch (ResourceException const& e)
     {
-        EXPECT_STREQ("unity::ResourceException: SettingsDB::create_from_json_string(): cannot parse schema, db = unused:\n"
-                     "    unity::ResourceException: JsonSettingsSchema(): cannot parse schema: * Line 1, Column 1\n"
-                     "  Syntax error: value, object or array expected.\n",
-                     e.what());
+        EXPECT_TRUE(boost::starts_with(e.what(),
+                    "unity::ResourceException: SettingsDB::create_from_json_string(): cannot parse "
+                    "schema, db = unused:")) << e.what();
     }
 
     try

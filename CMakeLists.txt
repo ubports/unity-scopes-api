@@ -71,7 +71,6 @@ pkg_check_modules(LIBSIGNON libsignon-glib REQUIRED)
 pkg_check_modules(ZMQLIB libzmq REQUIRED)
 pkg_check_modules(NET_CPP net-cpp>=1.2.0 REQUIRED)
 pkg_check_modules(JSON_GLIB json-glib-1.0 REQUIRED)
-pkg_check_modules(JSONCPP jsoncpp REQUIRED) #  TODO: Remove this!
 
 find_library(ZMQPPLIB zmqpp)
 if(NOT ZMQPPLIB)
@@ -143,7 +142,6 @@ set(OTHER_INCLUDE_DIRS ${OTHER_INCLUDE_DIRS} ${UNITY_API_INCLUDE_DIRS} ${Boost_I
                        ${LIBACCOUNTS_INCLUDE_DIRS} ${LIBSIGNON_INCLUDE_DIRS} ${NET_CPP_INCLUDE_DIRS})
 set(OTHER_LIBS ${OTHER_LIBS} ${UNITY_API_LDFLAGS} ${APPARMOR_LDFLAGS} ${LIBACCOUNTS_LIBRARIES}
                ${LIBSIGNON_LIBRARIES} ${Boost_LIBRARIES} ${JSON_GLIB_LDFLAGS} ${PROCESS_CPP_LDFLAGS}
-               ${JSONCPP_LDFLAGS}
                ${ZMQPPLIB} ${ZMQLIB_LDFLAGS} ${CAPNPLIB} ${KJLIB} ${DLLIB} ${NET_CPP_LDFLAGS} pthread)
 
 # Standard install paths

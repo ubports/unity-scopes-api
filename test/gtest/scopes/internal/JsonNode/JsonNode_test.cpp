@@ -192,34 +192,42 @@ TEST_F(JsonNodeTest, nested_values)
 
 TEST_F(JsonNodeTest, from_variant)
 {
-    VariantArray va({Variant(1), Variant(2), Variant(true)});
-    VariantMap vm;
-    vm["foo"] = "bar";
-    vm["baz"] = 1;
-    vm["boo"] = 2.0f;
-    vm["zee"] = true;
-    vm["wee"] = Variant(va);
+    {
+        VariantArray va({Variant(1), Variant(2), Variant(true)});
+        VariantMap vm;
+        vm["foo"] = "bar";
+        vm["baz"] = 1;
+        vm["boo"] = 2.0f;
+        vm["zee"] = true;
+        vm["wee"] = Variant(va);
 
-    Variant var(vm);
-    JsonCppNode node(var);
-    EXPECT_EQ(JsonNodeInterface::Object, node.type());
-    EXPECT_EQ("bar", node.get_node("foo")->as_string());
-    EXPECT_EQ(JsonNodeInterface::String, node.get_node("foo")->type());
-    EXPECT_EQ(1, node.get_node("baz")->as_int());
-    EXPECT_EQ(JsonNodeInterface::Real, node.get_node("boo")->type());
-    EXPECT_TRUE(node.get_node("boo")->as_double() - 2.0f < 0.00001f);
-    EXPECT_EQ(JsonNodeInterface::Bool, node.get_node("zee")->type());
-    EXPECT_TRUE(node.get_node("zee")->as_bool());
-    EXPECT_EQ(JsonNodeInterface::Array, node.get_node("wee")->type());
-    EXPECT_EQ(1, node.get_node("wee")->get_node(0)->as_int());
-    EXPECT_EQ(2, node.get_node("wee")->get_node(1)->as_int());
-    EXPECT_TRUE(node.get_node("wee")->get_node(2)->as_bool());
+        Variant var(vm);
+        JsonCppNode node(var);
+        EXPECT_EQ(JsonNodeInterface::Object, node.type());
+        EXPECT_EQ("bar", node.get_node("foo")->as_string());
+        EXPECT_EQ(JsonNodeInterface::String, node.get_node("foo")->type());
+        EXPECT_EQ(1, node.get_node("baz")->as_int());
+        EXPECT_EQ(JsonNodeInterface::Real, node.get_node("boo")->type());
+        EXPECT_TRUE(node.get_node("boo")->as_double() - 2.0f < 0.00001f);
+        EXPECT_EQ(JsonNodeInterface::Bool, node.get_node("zee")->type());
+        EXPECT_TRUE(node.get_node("zee")->as_bool());
+        EXPECT_EQ(JsonNodeInterface::Array, node.get_node("wee")->type());
+        EXPECT_EQ(1, node.get_node("wee")->get_node(0)->as_int());
+        EXPECT_EQ(2, node.get_node("wee")->get_node(1)->as_int());
+        EXPECT_TRUE(node.get_node("wee")->get_node(2)->as_bool());
+    }
 
-    node.read_json("1");
-    EXPECT_EQ(1, node.to_variant().get_int());
+    {
+        Variant var(1);
+        JsonCppNode node(var);
+        EXPECT_EQ(1, node.to_variant().get_int());
+    }
 
-    node.read_json("2147483648");  // > 2^31 - 1
-    EXPECT_EQ(2147483648, node.to_variant().get_int64_t());
+    {
+        Variant var(2147483648);  // > 2^31 - 1
+        JsonCppNode node(var);
+        EXPECT_EQ(2147483648, node.to_variant().get_int64_t());
+    }
 
     JsonCppNode null_node((Variant()));
     EXPECT_EQ(JsonNodeInterface::Null, null_node.type());
