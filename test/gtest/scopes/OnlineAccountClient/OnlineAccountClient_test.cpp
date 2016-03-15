@@ -58,7 +58,9 @@ public:
         setenv("AG_SERVICE_TYPES", TEST_DATA_DIR, false);
         setenv("AG_PROVIDERS", TEST_DATA_DIR, false);
 
-        oa_client_.reset(new OnlineAccountClient("TestService", "sharing", "TestProvider", main_loop_select));
+        VariantMap params;
+        params["ClientId"] = "abcXYZ";
+        oa_client_.reset(new OnlineAccountClient("TestService", "sharing", "TestProvider", params, main_loop_select));
 
         manager_ = oa_client_->p->manager();
         main_loop_context_ = oa_client_->p->main_loop_context();
@@ -295,13 +297,61 @@ public:
         : OnlineAccountClientTest(OnlineAccountClient::RunInExternalMainLoop) {}
 };
 
+class SignondMock
+{
+public:
+    SignondMock()
+        : mock_(dbus_test_dbus_mock_new("com.google.code.AccountsSSO.SingleSignOn"))
+    {
+        DbusTestDbusMockObject* authService =
+            dbus_test_dbus_mock_get_object(mock_,
+                                           "/com/google/code/AccountsSSO/SingleSignOn",
+                                           "com.google.code.AccountsSSO.SingleSignOn.AuthService",
+                                           NULL);
+
+        dbus_test_dbus_mock_object_add_method(mock_, authService,
+                                              "getAuthSessionObjectPath",
+                                              G_VARIANT_TYPE("(us)"),
+                                              G_VARIANT_TYPE("s"),
+                                              "ret = '/AuthSession'",
+                                              NULL);
+
+        DbusTestDbusMockObject* authSession =
+            dbus_test_dbus_mock_get_object(mock_,
+                                           "/AuthSession",
+                                           "com.google.code.AccountsSSO.SingleSignOn.AuthSession",
+                                           NULL);
+
+        static const char* const process_code =
+            "data = dict(args[0])\n"
+            "if 'ClientId' in data:\n"
+            "    data['AccessToken'] = data['ClientId'].swapcase()\n"
+            "ret = data\n";
+        dbus_test_dbus_mock_object_add_method(mock_, authSession,
+                                              "process",
+                                              G_VARIANT_TYPE("(a{sv}s)"),
+                                              G_VARIANT_TYPE("a{sv}"),
+                                              process_code,
+                                              NULL);
+    }
+
+    DbusTestTask* task() const { return DBUS_TEST_TASK(mock_); }
+
+private:
+    DbusTestDbusMock* mock_;
+};
+
 } // namespace testing
 } // namespace scopes
 } // namespace unity
 
 TEST_F(OnlineAccountClientTest, register_account_login_result)
 {
-    OnlineAccountClient oa_client("test_service_name", "test_service_type", "test_provider");
+    VariantMap params;
+    params["ClientId"] = "abc";
+    params["Timeout"] = 200;
+    params["UseSSL"] = true;
+    OnlineAccountClient oa_client("test_service_name", "test_service_type", "test_provider", params);
 
     CategoryRegistry reg;
     auto cat = reg.register_category("1", "title", "icon", nullptr, CategoryRenderer());
@@ -319,6 +369,7 @@ TEST_F(OnlineAccountClientTest, register_account_login_result)
     EXPECT_NE(details.end(), details.find("service_name"));
     EXPECT_NE(details.end(), details.find("service_type"));
     EXPECT_NE(details.end(), details.find("provider_name"));
+    EXPECT_NE(details.end(), details.find("auth_params"));
     EXPECT_NE(details.end(), details.find("login_passed_action"));
     EXPECT_NE(details.end(), details.find("login_failed_action"));
 
@@ -326,6 +377,10 @@ TEST_F(OnlineAccountClientTest, register_account_login_result)
     EXPECT_EQ("test_service_name", details.at("service_name").get_string());
     EXPECT_EQ("test_service_type", details.at("service_type").get_string());
     EXPECT_EQ("test_provider", details.at("provider_name").get_string());
+    VariantMap actual_params = details.at("auth_params").get_dict();
+    EXPECT_EQ("abc", actual_params.at("ClientId").get_string());
+    EXPECT_EQ(200, actual_params.at("Timeout").get_int());
+    EXPECT_EQ(true, actual_params.at("UseSSL").get_bool());
     EXPECT_EQ(OnlineAccountClient::InvalidateResults, static_cast<OnlineAccountClient::PostLoginAction>(details.at("login_passed_action").get_int()));
     EXPECT_EQ(OnlineAccountClient::DoNothing, static_cast<OnlineAccountClient::PostLoginAction>(details.at("login_failed_action").get_int()));
 }
@@ -423,20 +478,20 @@ TEST_F(OnlineAccountClientTest, service_update_callback)
     OnlineAccountClient::ServiceStatus enabled_status;
     enabled_status.account_id = 1;
     enabled_status.service_enabled = true;
-    enabled_status.service_authenticated = false;
-    enabled_status.client_id = "69842936499-sdflkbhslufhgrjamwlicefhb.apps.test.com";
+    enabled_status.service_authenticated = true;
+    enabled_status.client_id = "abcXYZ";
     enabled_status.client_secret = "lj3i8iorep0w03994jwjef0j";
-    enabled_status.access_token = "";
+    enabled_status.access_token = "ABCxyz";
     enabled_status.token_secret = "";
-    enabled_status.error = "GDBus.Error:com.google.code.AccountsSSO.SingleSignOn.Error.MethodNotKnown: Authentication method is not known.";
+    enabled_status.error = "";
 
     OnlineAccountClient::ServiceStatus disabled_status;
     disabled_status.account_id = 1;
     disabled_status.service_enabled = false;
     disabled_status.service_authenticated = false;
-    disabled_status.client_id = "69842936499-sdflkbhslufhgrjamwlicefhb.apps.test.com";
+    disabled_status.client_id = "abcXYZ";
     disabled_status.client_secret = "lj3i8iorep0w03994jwjef0j";
-    disabled_status.access_token = "";
+    disabled_status.access_token = "ABCxyz";
     disabled_status.token_secret = "";
     disabled_status.error = "";
 
@@ -505,7 +560,11 @@ int main(int argc, char **argv)
 {
     std::shared_ptr<DbusTestService> dbus_test_service;
     dbus_test_service.reset(dbus_test_service_new(nullptr), g_object_unref);
-    dbus_test_service_run(dbus_test_service.get());
+
+    unity::scopes::testing::SignondMock signondMock;
+    dbus_test_service_add_task(dbus_test_service.get(), signondMock.task());
+
+    dbus_test_service_start_tasks(dbus_test_service.get());
 
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
