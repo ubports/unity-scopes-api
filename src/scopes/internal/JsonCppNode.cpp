@@ -113,9 +113,7 @@ JsonNode* variant_to_node(Variant const& var)
         }
         default:
         {
-            string msg = "JsonCppNode::from_variant(): unsupported variant type "
-                         + to_string(static_cast<int>(var.which()));
-            throw unity::LogicException(msg);
+            abort();  // LCOV_EXCL_LINE  // Impossible
         }
     }
     return node_guard.release();
@@ -123,7 +121,7 @@ JsonNode* variant_to_node(Variant const& var)
 
 }  // namespace
 
-JsonCppNode::JsonCppNode(const Variant& var)
+JsonCppNode::JsonCppNode(Variant const& var)
     : root_(variant_to_node(var), json_node_free)
 {
 }
@@ -193,11 +191,11 @@ Variant node_to_variant(JsonNode* node)
                 case G_TYPE_BOOLEAN:
                     return Variant(bool(json_node_get_boolean(node)));
                 default:
-                    abort();  // Impossible
+                    abort();  // LCOV_EXCL_LINE  // Impossible
             }
         }
         default:
-            abort();  // Impossible
+            abort();  // LCOV_EXCL_LINE  // Impossible
     }
 }
 
@@ -297,14 +295,14 @@ JsonNodeInterface::NodeType JsonCppNode::type() const
                 case G_TYPE_BOOLEAN:
                     return Bool;
                 default:
-                    abort();  // Impossible
+                    abort();  // LCOV_EXCL_LINE  // Impossible
             }
         }
         default:
-            abort();  // Impossible
+            abort();  // LCOV_EXCL_LINE  // Impossible
     }
 
-    abort();  // NOTREACHED
+    abort();  // LCOV_EXCL_LINE
 }
 
 string JsonCppNode::as_string() const
