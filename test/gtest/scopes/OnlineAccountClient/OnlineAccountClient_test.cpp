@@ -351,6 +351,8 @@ TEST_F(OnlineAccountClientTest, register_account_login_result)
     params["ClientId"] = "abc";
     params["Timeout"] = 200;
     params["UseSSL"] = true;
+    params["Humidity"] = 0.3;
+    params["Unsupported"] = VariantMap();
     OnlineAccountClient oa_client("test_service_name", "test_service_type", "test_provider", params);
 
     CategoryRegistry reg;
@@ -381,6 +383,8 @@ TEST_F(OnlineAccountClientTest, register_account_login_result)
     EXPECT_EQ("abc", actual_params.at("ClientId").get_string());
     EXPECT_EQ(200, actual_params.at("Timeout").get_int());
     EXPECT_EQ(true, actual_params.at("UseSSL").get_bool());
+    EXPECT_EQ(0.3, actual_params.at("Humidity").get_double());
+    EXPECT_NE(actual_params.end(), actual_params.find("Unsupported"));
     EXPECT_EQ(OnlineAccountClient::InvalidateResults, static_cast<OnlineAccountClient::PostLoginAction>(details.at("login_passed_action").get_int()));
     EXPECT_EQ(OnlineAccountClient::DoNothing, static_cast<OnlineAccountClient::PostLoginAction>(details.at("login_failed_action").get_int()));
 }
