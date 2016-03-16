@@ -32,6 +32,7 @@ Build-Depends: abi-compliance-checker,
                lttng-tools,
                pkg-config,
                python3:any,
+               python3-dbusmock,
                python-tornado,
                valgrind,
 Standards-Version: 3.9.6
