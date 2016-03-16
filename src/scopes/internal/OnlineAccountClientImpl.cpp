@@ -139,7 +139,7 @@ static GVariant *variant_to_gvariant(const Variant &v)
     case Variant::String: return g_variant_new_string(v.get_string().c_str());
     case Variant::Double: return g_variant_new_double(v.get_double());
     default:
-        std::cerr << "variant_to_gvariant(): unsupported type " << v.serialize_json() << std::endl;
+        std::cerr << "variant_to_gvariant(): unsupported type " << v.serialize_json();
         return nullptr;
     }
 }
