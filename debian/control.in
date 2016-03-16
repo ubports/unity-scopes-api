@@ -1,7 +1,8 @@
 Source: unity-scopes-api
 Priority: optional
 Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
-Build-Depends: abi-compliance-checker,
+Build-Depends: abigail-tools | libabigail-tools,
+               binutils,
                capnproto,
                click-dev (>= 0.2.2),
                cmake,
@@ -15,9 +16,9 @@ Build-Depends: abi-compliance-checker,
                libaccounts-glib-dev,
                libapparmor-dev,
                libboost-filesystem-dev,
-               libboost-log-dev,
                libboost-regex-dev,
                libboost-serialization-dev,
+               libboost-thread-dev,
                libcapnp-dev (>= 0.4.0),
                libdbustest1-dev,
                libjsoncpp-dev,

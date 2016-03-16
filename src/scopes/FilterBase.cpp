@@ -54,6 +54,16 @@ std::string FilterBase::id() const
     return p->id();
 }
 
+void FilterBase::set_title(std::string const& title)
+{
+    p->set_title(title);
+}
+
+std::string FilterBase::title() const
+{
+    return p->title();
+}
+
 int FilterBase::display_hints() const
 {
     return p->display_hints();
@@ -62,6 +72,11 @@ int FilterBase::display_hints() const
 std::string FilterBase::filter_type() const
 {
     return p->filter_type();
+}
+
+FilterGroup::SCPtr FilterBase::filter_group() const
+{
+    return p->filter_group();
 }
 
 } // namespace scopes

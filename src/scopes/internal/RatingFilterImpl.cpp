@@ -58,7 +58,7 @@ RatingFilterImpl::RatingFilterImpl(VariantMap const& var)
 {
 }
 
-FilterOption::SCPtr RatingFilterImpl::add_option(std::string const& id, std::string const& label)
+FilterOption::SCPtr RatingFilterImpl::add_option(std::string const& id, std::string const& label, bool /* default_value */)
 {
     if (num_of_options() < max_rating)
     {

@@ -234,22 +234,27 @@ There are no version numbers defined in any of the MakeLists.txt files.
 Instead, to change the version number, you must edit the following
 files:
 
-  - VERSION
+  - VERSION.MAJOR
+  - VERSION.MINOR
+  - VERSION.MICRO
 
-    The full version number for libunity-scopes, for example, 1.0.0.
+    Each file contains a single integer representing a portion of the 
+    libunity-scopes version.
 
-  - QT-VERSION
+  - QT-VERSION.MAJOR
+  - QT-VERSION.MINOR
+  - QT-VERSION.MICRO
 
-    The full version number for libunity-scopes-qt, for example, 0.1.0.
+    The full version number parts for libunity-scopes-qt, one integer per file.
 
   - *If* the soname changes, you need to add the outdated
     versions to the "Replaces:" and "Conflicts:" entries
     in control and control.in. (You need an extra
-    entry for each Vivid and Wily. See gen-debian-files.sh
+    entry for each Vivid and Wily. See bileto_pre_release_hook
     for the sed scripts that append a line to the stanza
     if the soname is changed. This also may apply
     if the soname of the Qt library changes, in which case
-    gen-debian-files.sh needs a corresponding update.
+    bileto_pre_release_hook needs a corresponding update.
 
 The soversion for each library is derived from the corresponding
 version file so, unless the soversion changes, you don't need to
@@ -281,7 +286,7 @@ number.)
 When incrementing the minor or major version number, follow these steps:
 
 1) Edit one or more of the version files, control, and control.in as
-   described above. Also verify that debian/gen-debian-files.sh correctly
+   described above. Also verify that debian/bileto_pre_release_hook correctly
    updates the "Replaces:" and "Conflicts:" entries.
 
 2) Add an entry to debian/changelog with the new version number (for Wily).
@@ -293,13 +298,13 @@ When incrementing the minor or major version number, follow these steps:
 ABI compliance test
 -------------------
 
-The tests include an ABI compliance test (for Wily and later). To run it:
+The tests include an ABI compliance test (for xenial and later). To run it:
 
     $ cd test/abi-compliance
     $ make test
 
 The test is also automatically run as part of the test suite.
-It takes several minutes to run . If you don't want to wait during local builds,
+It takes a while to run. If you don't want to wait during local builds,
 set the cmake "slowtests" option to OFF to skip the check.
 
 The baseline ABI files for the test are in test/abi-compliance/abi_dumps.
@@ -313,11 +318,8 @@ the branch at a silo to get it built for all architectures.
 Once all the packages are built, you can extract the ABI dump
 files and add them to the corresponding directory in the source tree.
 
-The abi-compliance-checker tool produces a report in
-
-    test/abi-compliance/compat_reports/libunity-scopes.so/[version]_to_[version]/compat_report.html
-
-The report provides a nicely layed-out page with all the details.
+The abi compliance test produces a report in
+libunity-scopes_<current-version>_abi-report.txt if anything unusual is detected.
 
 Autopkg test suite
 ------------------

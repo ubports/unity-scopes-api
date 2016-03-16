@@ -77,7 +77,7 @@ public:
 
      Creates DateTimePickerFilter with given id and mode.
 
-     \param id A unique identifier for the filter that can be used to identify it later among several filters.
+     \param id A unique identifier for the filter that can be used to later identify it among several filters.
      \param mode Mode flags that configure values displayed by the filter in the UI.
     */
     static DateTimePickerFilter::UPtr create(std::string const& id, Mode mode);
