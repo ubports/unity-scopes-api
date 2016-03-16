@@ -194,9 +194,9 @@ static void service_update_cb(AgAccountService* account_service, gboolean enable
 
         for (const auto &param: info->account_client->auth_params())
         {
-            g_variant_builder_add(&builder, "{sv}",
-                                  param.first.c_str(),
-                                  variant_to_gvariant(param.second));
+            GVariant* value = variant_to_gvariant(param.second);
+            if (!value) continue;
+            g_variant_builder_add(&builder, "{sv}", param.first.c_str(), value);
         }
 
         info->auth_params.reset(
