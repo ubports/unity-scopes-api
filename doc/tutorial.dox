@@ -1253,6 +1253,11 @@ The first thing we need to do is instantiate a unity::scopes::OnlineAccountClien
 specify our account service name, service type, and provider name (These correspond to the values of the "service_id",
 "type", and "provider" entries in your .service file).
 
+The constructor accepts a fourth optional parameter which can be used to specify a dictionary of authentication data,
+whose contents will complement (or override) those authentication parameters specified in the `<template>` element of
+the \link oa_service `.service` file\endlink. It can be used in those rare cases where the authentication parameters are
+known only at runtime.
+
 Via this object we can get the statuses of all account services, set a callback for status updates, and register
 results and widgets that require authorization (See: unity::scopes::OnlineAccountClient class documentation for more
 detail).
