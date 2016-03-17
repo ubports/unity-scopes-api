@@ -60,7 +60,7 @@ public:
     \brief Creates RatingFilter widget.
 
     Creates an empty RatingFilter widget. Use unity::scopes::RatingFilter::add_option() to add rating options to it.
-    \param id A unique identifier for the filter that can be used to identify it later among several filters.
+    \param id A unique identifier for the filter that can be used to later identify it among several filters.
     \param label A display label for this filter
     \return Instance of RatingFilter
     */
@@ -75,7 +75,7 @@ public:
     "1+", "2+" etc., except for that last label, which is just the number (no plus sign). The maximum top_rating
     allowed is 10.
 
-    \param id A unique identifier for the filter that can be used to identify it later among several filters.
+    \param id A unique identifier for the filter that can be used to later identify it among several filters.
     \param label A display label for this filter
     \param top_rating The maximum rating allowed.
     \return Instance of RatingFilter

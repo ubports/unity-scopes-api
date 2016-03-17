@@ -35,7 +35,7 @@ namespace scoperegistry
 
 ScopesWatcher::ScopesWatcher(RegistryObject::SPtr registry,
                              std::function<void(std::pair<std::string, std::string> const&)> ini_added_callback,
-                             boost::log::sources::severity_channel_logger_mt<>& logger)
+                             Logger& logger)
     : DirWatcher(logger)
     , registry_(registry)
     , ini_added_callback_(ini_added_callback)
@@ -60,7 +60,7 @@ void ScopesWatcher::add_install_dir(std::string const& dir)
         catch (unity::LogicException const&) {} // Ignore already exists exception
         catch (unity::SyscallException const& e)
         {
-            BOOST_LOG(logger_) << "ScopesWatcher::add_install_dir(): parent dir watch: " << e.what();
+            logger_() << "ScopesWatcher::add_install_dir(): parent dir watch: " << e.what();
         }
 
         // Create a new entry for this install dir into idir_to_sdirs_map_
@@ -101,11 +101,11 @@ void ScopesWatcher::add_install_dir(std::string const& dir)
     }
     catch (unity::ResourceException const& e)
     {
-        BOOST_LOG(logger_) << "ScopesWatcher::add_install_dir(): install dir watch: " << e.what();
+        logger_() << "ScopesWatcher::add_install_dir(): install dir watch: " << e.what();
     }
     catch (unity::SyscallException const& e)
     {
-        BOOST_LOG(logger_) << "ScopesWatcher::add_install_dir(): install dir watch: " << e.what();
+        logger_() << "ScopesWatcher::add_install_dir(): install dir watch: " << e.what();
     }
 }
 
@@ -196,13 +196,13 @@ void ScopesWatcher::add_scope_dir(std::string const& dir)
 
             // New config found, execute callback
             ini_added_callback_(config);
-            BOOST_LOG_SEV(logger_, Logger::Info)
-                << "ScopesWatcher: scope: \"" << config.first << "\" installed to: \"" << dir << "\"";
+            logger_(LoggerSeverity::Info) << "ScopesWatcher: scope: \"" << config.first
+                                          << "\" installed to: \"" << dir << "\"";
         }
     }
     catch (std::exception const& e)
     {
-        BOOST_LOG(logger_) << "scoperegistry: add_scope_dir(): " << e.what();
+        logger_() << "scoperegistry: add_scope_dir(): " << e.what();
     }
 }
 
@@ -227,8 +227,8 @@ void ScopesWatcher::remove_scope_dir(std::string const& dir)
         filesystem::path p(ini_path);
         std::string scope_id = p.stem().native();
         registry_->remove_local_scope(scope_id);
-        BOOST_LOG_SEV(logger_, Logger::Info)
-            << "ScopesWatcher: scope: \"" << scope_id << "\" uninstalled from: \"" << dir << "\"";
+        logger_(LoggerSeverity::Info) << "ScopesWatcher: scope: \"" << scope_id
+                                      << "\" uninstalled from: \"" << dir << "\"";
     }
 
     // Remove the watch for this directory
@@ -273,8 +273,8 @@ void ScopesWatcher::watch_event(DirWatcher::EventType event_type,
             {
                 sdir_to_ini_map_[parent_path] = path;
                 ini_added_callback_(std::make_pair(scope_id, path));
-                BOOST_LOG_SEV(logger_, Logger::Info)
-                    << "scopeswatcher: scope: \"" << scope_id << "\" .ini installed: \"" << path << "\"";
+                logger_(LoggerSeverity::Info) << "scopeswatcher: scope: \"" << scope_id
+                                              << "\" .ini installed: \"" << path << "\"";
             }
         }
         // a .ini has been removed
@@ -282,9 +282,8 @@ void ScopesWatcher::watch_event(DirWatcher::EventType event_type,
         {
             sdir_to_ini_map_.erase(parent_path);
             registry_->remove_local_scope(scope_id);
-            BOOST_LOG_SEV(logger_, Logger::Info)
-                << "scopeswatcher: scope: \"" << scope_id << "\" .ini uninstalled: \""
-                << path << "\"";
+            logger_(LoggerSeverity::Info) << "scopeswatcher: scope: \"" << scope_id
+                                          << "\" .ini uninstalled: \"" << path << "\"";
         }
     }
     else
@@ -317,7 +316,7 @@ void ScopesWatcher::watch_event(DirWatcher::EventType event_type,
         {
             bool is_inside_install_dir;
             {
-                std::lock_guard<std::mutex> lock(mutex);
+                std::lock_guard<std::mutex> lock(mutex_);
                 is_inside_install_dir = idir_to_sdirs_map_.find(parent_dir(path)) != idir_to_sdirs_map_.end();
             }
 

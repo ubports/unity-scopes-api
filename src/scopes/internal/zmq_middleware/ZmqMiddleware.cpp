@@ -562,7 +562,7 @@ MWQueryCtrlProxy ZmqMiddleware::add_query_ctrl_object(QueryCtrlObjectBase::SPtr 
     }
     catch (std::exception const& e)  // Can happen during shutdown
     {
-        BOOST_LOG(logger_) << "exception in add_query_ctrl_object(): " << e.what();
+        logger_() << "exception in add_query_ctrl_object(): " << e.what();
         throw;
     }
     return proxy;
@@ -582,7 +582,7 @@ void ZmqMiddleware::add_dflt_query_ctrl_object(QueryCtrlObjectBase::SPtr const& 
     }
     catch (std::exception const& e)  // Can happen during shutdown
     {
-        BOOST_LOG(logger_) << "exception in add_dflt_query_ctrl_object(): " << e.what();
+        logger_() << "exception in add_dflt_query_ctrl_object(): " << e.what();
         throw;
     }
 }
@@ -604,7 +604,7 @@ MWQueryProxy ZmqMiddleware::add_query_object(QueryObjectBase::SPtr const& query)
     }
     catch (std::exception const& e)  // Can happen during shutdown
     {
-        BOOST_LOG(logger_) << "exception in add_query_object(): " << e.what();
+        logger_() << "exception in add_query_object(): " << e.what();
         throw;
     }
     return proxy;
@@ -624,7 +624,7 @@ void ZmqMiddleware::add_dflt_query_object(QueryObjectBase::SPtr const& query)
     }
     catch (std::exception const& e)  // Can happen during shutdown
     {
-        BOOST_LOG(logger_) << "exception in add_dflt_query_object(): " << e.what();
+        logger_() << "exception in add_dflt_query_object(): " << e.what();
         throw;
     }
 }
@@ -648,7 +648,7 @@ MWRegistryProxy ZmqMiddleware::add_registry_object(string const& identity, Regis
     }
     catch (std::exception const& e)  // Can happen during shutdown
     {
-        BOOST_LOG(logger_) << "exception in add_registry_object(): " << e.what();
+        logger_() << "exception in add_registry_object(): " << e.what();
         throw;
     }
     return proxy;
@@ -671,7 +671,7 @@ MWReplyProxy ZmqMiddleware::add_reply_object(ReplyObjectBase::SPtr const& reply)
     }
     catch (std::exception const& e)  // Can happen during shutdown
     {
-        BOOST_LOG(logger_) << "exception in add_reply_object(): " << e.what();
+        logger_() << "exception in add_reply_object(): " << e.what();
         throw;
     }
     return proxy;
@@ -695,7 +695,7 @@ MWScopeProxy ZmqMiddleware::add_scope_object(string const& identity, ScopeObject
     }
     catch (std::exception const& e)  // Can happen during shutdown
     {
-        BOOST_LOG(logger_) << "exception in add_scope_object(): " << e.what();
+        logger_() << "exception in add_scope_object(): " << e.what();
         throw;
     }
     return proxy;
@@ -715,7 +715,7 @@ void ZmqMiddleware::add_dflt_scope_object(ScopeObjectBase::SPtr const& scope)
     }
     catch (std::exception const& e)  // Can happen during shutdown
     {
-        BOOST_LOG(logger_) << "exception in add_dflt_scope_object(): " << e.what();
+        logger_() << "exception in add_dflt_scope_object(): " << e.what();
         throw;
     }
 }
@@ -740,7 +740,7 @@ MWStateReceiverProxy ZmqMiddleware::add_state_receiver_object(std::string const&
     }
     catch (std::exception const& e)  // Can happen during shutdown
     {
-        BOOST_LOG(logger_) << "exception in add_state_receiver_object(): " << e.what();
+        logger_() << "exception in add_state_receiver_object(): " << e.what();
         throw;
     }
     return proxy;

@@ -20,6 +20,7 @@
 
 #include <unity/scopes/FilterBase.h>
 #include <unity/scopes/FilterState.h>
+#include <unity/scopes/FilterGroup.h>
 #include <unity/scopes/internal/JsonNodeInterface.h>
 #include <unity/scopes/internal/Logger.h>
 #include <unity/scopes/internal/smartscopes/HttpClientInterface.h>
@@ -27,12 +28,13 @@
 
 #include <unity/util/NonCopyable.h>
 
-#include <string>
-#include <vector>
 #include <map>
 #include <memory>
 #include <mutex>
+#include <set>
+#include <string>
 #include <tuple>
+#include <vector>
 
 namespace unity
 {
@@ -152,6 +154,8 @@ struct SearchReplyHandler
     std::function<void(std::shared_ptr<DepartmentInfo> const&)> departments_handler;
     std::function<void(Filters const&)> filters_handler;
     std::function<void(FilterState const&)> filter_state_handler;
+
+    std::map<std::string, FilterGroup::SCPtr> filter_groups;
 };
 
 struct PreviewReplyHandler
@@ -179,7 +183,7 @@ public:
 
     bool get_remote_scopes(std::vector<RemoteScope>& scopes, std::string const& locale = "", bool caching_enabled = true);
 
-    SearchHandle::UPtr search(SearchReplyHandler const& handler,
+    SearchHandle::UPtr search(SearchReplyHandler& handler,
                               std::string const& base_url,
                               std::string const& query,
                               std::string const& department_id,
@@ -204,7 +208,7 @@ public:
                                 std::string const& country = "",
                                 std::string const& user_agent_hdr = "");
 
-    boost::log::sources::severity_channel_logger_mt<>& logger() const;
+    unity::scopes::internal::Logger& logger() const;
 
 private:
     friend class SearchHandle;
@@ -213,11 +217,12 @@ private:
     void wait_for_search(unsigned int search_id);
     void wait_for_preview(unsigned int preview_id);
     std::shared_ptr<DepartmentInfo> parse_departments(JsonNodeInterface::SPtr node);
-    Filters parse_filters(JsonNodeInterface::SPtr node);
+    std::map<std::string, FilterGroup::SCPtr> parse_filter_groups(JsonNodeInterface::SPtr node);
+    Filters parse_filters(JsonNodeInterface::SPtr node, std::map<std::string, FilterGroup::SCPtr> const& filter_groups);
     FilterState parse_filter_state(JsonNodeInterface::SPtr node);
 
     std::string handle_chunk(const std::string& chunk, std::function<void(const std::string&)> line_handler);
-    void handle_line(std::string const& json, SearchReplyHandler const& handler);
+    void handle_line(std::string const& json, SearchReplyHandler& handler);
     void handle_line(std::string const& json, PreviewReplyHandler const& handler);
 
     std::vector<std::string> extract_json_stream(std::string const& json_stream);
@@ -232,7 +237,7 @@ private:
     HttpClientInterface::SPtr http_client_;
     JsonNodeInterface::SPtr json_node_;
     std::unique_ptr<unity::scopes::internal::Logger> test_logger_;
-    boost::log::sources::severity_channel_logger_mt<>& logger_;
+    unity::scopes::internal::Logger& logger_;
     std::string url_;
 
     std::map<unsigned int, HttpResponseHandle::SPtr> query_results_;

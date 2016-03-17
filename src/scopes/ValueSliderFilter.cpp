@@ -25,32 +25,26 @@ namespace unity
 namespace scopes
 {
 
-namespace experimental
-{
-
 ValueSliderFilter::ValueSliderFilter(internal::ValueSliderFilterImpl *impl)
     : FilterBase(impl)
 {
 }
 
-ValueSliderFilter::UPtr ValueSliderFilter::create(std::string const& id, std::string const& label, std::string const& label_template, double min, double max)
+ValueSliderFilter::UPtr ValueSliderFilter::create(std::string const& id, double min, double max, double default_value, ValueSliderLabels const& labels)
 {
-    return std::unique_ptr<ValueSliderFilter>(new ValueSliderFilter(new internal::ValueSliderFilterImpl(id, label, label_template, min, max)));
+    return std::unique_ptr<ValueSliderFilter>(new ValueSliderFilter(new internal::ValueSliderFilterImpl(id, min, max, default_value, labels)));
 }
 
-void ValueSliderFilter::set_slider_type(SliderType tp)
+ValueSliderFilter::UPtr ValueSliderFilter::create(std::string const& id, double min, double max, double default_value, ValueSliderLabels const& labels, FilterGroup::SCPtr const& group)
 {
-    fwd()->set_slider_type(tp);
+    auto filter = std::unique_ptr<ValueSliderFilter>(new ValueSliderFilter(new internal::ValueSliderFilterImpl(id, min, max, default_value, labels)));
+    filter->p->add_to_filter_group(group);
+    return filter;
 }
 
 void ValueSliderFilter::set_default_value(double val)
 {
     fwd()->set_default_value(val);
-}
-
-ValueSliderFilter::SliderType ValueSliderFilter::slider_type() const
-{
-    return fwd()->slider_type();
 }
 
 double ValueSliderFilter::default_value() const
@@ -68,14 +62,9 @@ double ValueSliderFilter::max() const
     return fwd()->max();
 }
 
-std::string ValueSliderFilter::label() const
+ValueSliderLabels const& ValueSliderFilter::labels() const
 {
-    return fwd()->label();
-}
-
-std::string ValueSliderFilter::value_label_template() const
-{
-    return fwd()->value_label_template();
+    return fwd()->labels();
 }
 
 bool ValueSliderFilter::has_value(FilterState const& filter_state) const
@@ -102,8 +91,6 @@ internal::ValueSliderFilterImpl* ValueSliderFilter::fwd() const
 {
     return dynamic_cast<internal::ValueSliderFilterImpl*>(p.get());
 }
-
-} // namespace experimental
 
 } // namespace scopes
 

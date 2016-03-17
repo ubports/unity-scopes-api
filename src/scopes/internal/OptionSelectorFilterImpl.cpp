@@ -17,6 +17,7 @@
 */
 
 #include <unity/scopes/internal/OptionSelectorFilterImpl.h>
+#include <unity/scopes/internal/FilterOptionImpl.h>
 #include <unity/scopes/FilterState.h>
 #include <unity/scopes/ScopeExceptions.h>
 #include <unity/UnityExceptions.h>
@@ -75,6 +76,10 @@ void OptionSelectorFilterImpl::serialize(VariantMap& var) const
         VariantMap vm;
         vm["id"] = opt->id();
         vm["label"] = opt->label();
+        if (opt->default_value())
+        {
+            vm["default"] = Variant(true);
+        }
         ops.push_back(Variant(vm));
     }
     var["label"] = label_;
@@ -111,7 +116,14 @@ void OptionSelectorFilterImpl::deserialize(VariantMap const& var)
         auto opt_id = it->second.get_string();
         it = optvar.find("label");
         throw_on_missing(it, optvar.end(), "option label");
-        add_option(opt_id, it->second.get_string());
+        auto const label = it->second.get_string();
+        bool default_val = false;
+        it = optvar.find("default");
+        if (it != optvar.end() && it->second.get_bool())
+        {
+            default_val = true;
+        }
+        add_option(opt_id, label, default_val);
     }
 }
 
@@ -120,18 +132,23 @@ std::string OptionSelectorFilterImpl::filter_type() const
     return "option_selector";
 }
 
-FilterOption::SCPtr OptionSelectorFilterImpl::add_option(std::string const& id, std::string const& label)
+FilterOption::SCPtr OptionSelectorFilterImpl::add_option(std::string const& id, std::string const& label, bool default_value)
 {
-    try
+    auto opt = std::shared_ptr<FilterOption>(new FilterOption(id, label));
+    // if it's not a multi-selection filter, then there can only be a single option selected by default
+    if (default_value && !multi_select_)
     {
-        auto opt = std::shared_ptr<FilterOption>(new FilterOption(id, label));
-        options_.push_back(opt);
-        return opt;
+        for (auto const& o: options_)
+        {
+            if (o->default_value())
+            {
+                throw unity::LogicException("OptionSelectorFilter::add_option(): only one option with default value 'true' allowed for a single-selection OptionSelectorFilter");
+            }
+        }
     }
-    catch (...)
-    {
-        throw ResourceException("OptionSelectorFilter(): cannot create FilterOption");
-    }
+    opt->p->set_default_value(default_value);
+    options_.push_back(opt);
+    return opt;
 }
 
 int OptionSelectorFilterImpl::num_of_options() const
@@ -181,6 +198,17 @@ std::set<FilterOption::SCPtr> OptionSelectorFilterImpl::active_options(FilterSta
         {
             // ignore all errors here - we could be getting an incorrect value for this filter
             // via a canned query from another scope, we shouldn't break this scope on it.
+        }
+    }
+    else
+    {
+        // we don't have this filter in the state object, so give defaults back
+        for (auto const& opt: options_)
+        {
+            if (opt->default_value())
+            {
+                opts.insert(opt);
+            }
         }
     }
     return opts;

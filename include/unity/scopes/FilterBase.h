@@ -21,6 +21,7 @@
 #include <unity/util/NonCopyable.h>
 #include <unity/scopes/Variant.h>
 #include <unity/util/DefinesPtrs.h>
+#include <unity/scopes/FilterGroup.h>
 #include <memory>
 #include <list>
 
@@ -94,10 +95,33 @@ public:
 
     /// @cond
     virtual ~FilterBase();
+    /// @endcond
+
+    /**
+    \brief Set an optional title of this filter.
+    \param title The title.
+    */
+    void set_title(std::string const& title);
+
+    /**
+    \brief Get the optional title of this filter.
+    \return Filter title (can be empty).
+    */
+    std::string title() const;
+
+    /**
+     \brief Get the filter group this filter belongs to.
+
+     \return The filter group (or null)
+    */
+    FilterGroup::SCPtr filter_group() const;
 
 protected:
+    /// @cond
     FilterBase(internal::FilterBaseImpl *pimpl);
     std::unique_ptr<internal::FilterBaseImpl> p;
+
+    friend class internal::FilterBaseImpl;
     /// @endcond
 };
 
