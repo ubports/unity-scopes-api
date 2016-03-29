@@ -29,7 +29,16 @@ OnlineAccountClient::OnlineAccountClient(std::string const& service_name,
                                          std::string const& service_type,
                                          std::string const& provider_name,
                                          MainLoopSelect main_loop_select)
-    : p(new internal::OnlineAccountClientImpl(service_name, service_type, provider_name, main_loop_select))
+    : p(new internal::OnlineAccountClientImpl(service_name, service_type, provider_name, VariantMap(), main_loop_select))
+{
+}
+
+OnlineAccountClient::OnlineAccountClient(std::string const& service_name,
+                                         std::string const& service_type,
+                                         std::string const& provider_name,
+                                         VariantMap const& auth_params,
+                                         MainLoopSelect main_loop_select)
+    : p(new internal::OnlineAccountClientImpl(service_name, service_type, provider_name, auth_params, main_loop_select))
 {
 }
 

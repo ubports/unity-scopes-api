@@ -87,8 +87,8 @@ static OnlineAccountClient::ServiceStatus info_to_details(AccountInfo* info, std
     service_status.service_authenticated = access_token ? info->service_enabled : false;
     service_status.client_id = client_id ? client_id : "";
     service_status.client_secret = client_secret ? client_secret : "";
-    service_status.access_token = access_token ? access_token : "";
-    service_status.token_secret = token_secret ? token_secret : "";
+    service_status.access_token = (info->service_enabled && access_token) ? access_token : "";
+    service_status.token_secret = (info->service_enabled && token_secret) ? token_secret : "";
     service_status.error = error;
 
     return service_status;
@@ -129,6 +129,19 @@ static void service_login_cb(GObject* source, GAsyncResult* result, void* user_d
 
     info_lock.unlock();
     info->account_client->callback(info, error ? error->message : "");
+}
+
+static GVariant *variant_to_gvariant(const Variant &v)
+{
+    switch (v.which()) {
+    case Variant::Int: return g_variant_new_int32(v.get_int());
+    case Variant::Bool: return g_variant_new_boolean(v.get_bool());
+    case Variant::String: return g_variant_new_string(v.get_string().c_str());
+    case Variant::Double: return g_variant_new_double(v.get_double());
+    default:
+        std::cerr << "variant_to_gvariant(): unsupported type " << v.serialize_json();
+        return nullptr;
+    }
 }
 
 static void service_update_cb(AgAccountService* account_service, gboolean enabled, AccountInfo* info)
@@ -177,6 +190,13 @@ static void service_update_cb(AgAccountService* account_service, gboolean enable
             g_variant_builder_add(&builder, "{sv}",
                                   SIGNON_SESSION_DATA_UI_POLICY,
                                   g_variant_new_int32(SIGNON_POLICY_NO_USER_INTERACTION));
+        }
+
+        for (const auto &param: info->account_client->auth_params())
+        {
+            GVariant* value = variant_to_gvariant(param.second);
+            if (!value) continue;
+            g_variant_builder_add(&builder, "{sv}", param.first.c_str(), value);
         }
 
         info->auth_params.reset(
@@ -249,10 +269,12 @@ static void account_deleted_cb(AgManager*, AgAccountId account_id, OnlineAccount
 OnlineAccountClientImpl::OnlineAccountClientImpl(std::string const& service_name,
                                                  std::string const& service_type,
                                                  std::string const& provider_name,
+                                                 VariantMap const& auth_params,
                                                  OnlineAccountClient::MainLoopSelect main_loop_select)
     : service_name_(service_name)
     , service_type_(service_type)
     , provider_name_(provider_name)
+    , auth_params_(auth_params)
     , main_loop_select_(main_loop_select)
     , main_loop_is_running_(main_loop_select != OnlineAccountClient::CreateInternalMainLoop)
 {
@@ -458,6 +480,7 @@ void OnlineAccountClientImpl::register_account_login_item(Result& result,
     account_details_map["service_name"] = service_name_;
     account_details_map["service_type"] = service_type_;
     account_details_map["provider_name"] = provider_name_;
+    account_details_map["auth_params"] = auth_params_;
     account_details_map["login_passed_action"] = static_cast<int>(login_passed_action);
     account_details_map["login_failed_action"] = static_cast<int>(login_failed_action);
 
@@ -473,6 +496,7 @@ void OnlineAccountClientImpl::register_account_login_item(PreviewWidget& widget,
     account_details_map["service_name"] = service_name_;
     account_details_map["service_type"] = service_type_;
     account_details_map["provider_name"] = provider_name_;
+    account_details_map["auth_params"] = auth_params_;
     account_details_map["login_passed_action"] = static_cast<int>(login_passed_action);
     account_details_map["login_failed_action"] = static_cast<int>(login_failed_action);
 
