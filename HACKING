@@ -234,22 +234,27 @@ There are no version numbers defined in any of the MakeLists.txt files.
 Instead, to change the version number, you must edit the following
 files:
 
-  - VERSION
+  - VERSION.MAJOR
+  - VERSION.MINOR
+  - VERSION.MICRO
 
-    The full version number for libunity-scopes, for example, 1.0.0.
+    Each file contains a single integer representing a portion of the 
+    libunity-scopes version.
 
-  - QT-VERSION
+  - QT-VERSION.MAJOR
+  - QT-VERSION.MINOR
+  - QT-VERSION.MICRO
 
-    The full version number for libunity-scopes-qt, for example, 0.1.0.
+    The full version number parts for libunity-scopes-qt, one integer per file.
 
   - *If* the soname changes, you need to add the outdated
     versions to the "Replaces:" and "Conflicts:" entries
     in control and control.in. (You need an extra
-    entry for each Vivid and Wily. See gen-debian-files.sh
+    entry for each Vivid and Wily. See bileto_pre_release_hook
     for the sed scripts that append a line to the stanza
     if the soname is changed. This also may apply
     if the soname of the Qt library changes, in which case
-    gen-debian-files.sh needs a corresponding update.
+    bileto_pre_release_hook needs a corresponding update.
 
 The soversion for each library is derived from the corresponding
 version file so, unless the soversion changes, you don't need to
@@ -281,7 +286,7 @@ number.)
 When incrementing the minor or major version number, follow these steps:
 
 1) Edit one or more of the version files, control, and control.in as
-   described above. Also verify that debian/gen-debian-files.sh correctly
+   described above. Also verify that debian/bileto_pre_release_hook correctly
    updates the "Replaces:" and "Conflicts:" entries.
 
 2) Add an entry to debian/changelog with the new version number (for Wily).
