@@ -115,7 +115,7 @@ else()
         message(WARNING "Cannot find dos2unix: formatcode target will not be available")
     else()
         # Some time after clang-format-3.6, someone finally decided to install the versioned
-        # /usr/bin/clang-format binary name as /usr/bin/clang-format (without out version suffix).
+        # /usr/bin/clang-format binary name as /usr/bin/clang-format (without the version suffix).
         find_program(CLANG_FORMAT_COMMAND NAMES clang-format clang-format-3.6 clang-format-3.5)
         if (NOT CLANG_FORMAT_COMMAND)
             message(WARNING "Cannot find clang-format >= clang-format-3.5: formatcode target will not be available")
