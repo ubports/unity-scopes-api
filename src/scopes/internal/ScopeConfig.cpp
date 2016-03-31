@@ -67,7 +67,6 @@ namespace
     const string fg_color_key = "ForegroundColor";
     const string bg_color_key = "BackgroundColor";
     const string shape_images_key = "ShapeImages";
-    const string category_header_bg_key = "CategoryHeaderBackground";
     const string preview_button_color_key = "PreviewButtonColor";
     const string logo_overlay_color_key = "LogoOverlayColor";
     const string pageheader_logo_key = "PageHeader.Logo";
@@ -317,7 +316,6 @@ ScopeConfig::ScopeConfig(string const& configfile) :
                fg_color_key,
                bg_color_key,
                shape_images_key,
-               category_header_bg_key,
                preview_button_color_key,
                logo_overlay_color_key,
                pageheader_logo_key,
