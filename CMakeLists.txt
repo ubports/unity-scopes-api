@@ -229,7 +229,16 @@ string(STRIP ${UNITY_SCOPES_MICRO} UNITY_SCOPES_MICRO)
 
 set(UNITY_SCOPES_MAJOR_MINOR ${UNITY_SCOPES_MAJOR}.${UNITY_SCOPES_MINOR})
 set(UNITY_SCOPES_FULL_VERSION ${UNITY_SCOPES_MAJOR_MINOR}.${UNITY_SCOPES_MICRO})
-set(UNITY_SCOPES_SOVERSION ${UNITY_SCOPES_MAJOR_MINOR})
+
+execute_process(COMMAND lsb_release -c -s OUTPUT_VARIABLE SERIES)
+string(STRIP ${SERIES} SERIES)
+if (${SERIES} STREQUAL "vivid")
+    # For backward compatibility. On Vivid, the soname started counting at 3: libunity-scopes.so.3.
+    math(EXPR UNITY_SCOPES_SOVERSION "${UNITY_SCOPES_MINOR} + 3")
+else()
+    # For Wily and later, the soname is libunity-scopes.so.<maj>.<min>, e.g. libunity-scopes.so.1.0.
+    set(UNITY_SCOPES_SOVERSION ${UNITY_SCOPES_MAJOR_MINOR})
+endif()
 
 # Set versions for libunity-scopes-qt.
 file(READ ${DEBIAN_DIR}/QT-VERSION.MAJOR UNITY_SCOPES_QT_MAJOR)
