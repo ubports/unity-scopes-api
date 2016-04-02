@@ -1,3 +1,17 @@
+unity-scopes-api (1.0.4+16.04.20160402.4-0ubuntu1) xenial; urgency=medium
+
+  [ Marcus Tomlinson ]
+  * Simplify debian/control munging. Look for clang-format as opposed to
+    clang-format-3.x. Added missing initializations to TypedScopeFixture
+    (Bug #1542906). Allow clients to specify authentication parameters
+    (Bug #1554040). (LP: #1554040, #1542906)
+
+  [ Michi Henning ]
+  * Fixed incorrect generation of Replaces: and Conflicts: entries in
+    debian/control for xenial. Fixed incorrect library soname for vivid.
+
+ -- Marcus Tomlinson <marcus.tomlinson@canonical.com>  Sat, 02 Apr 2016 03:24:17 +0000
+
 unity-scopes-api (1.0.4+16.04.20160317-0ubuntu1) xenial; urgency=medium
 
   [ Pawel Stolowski ]
