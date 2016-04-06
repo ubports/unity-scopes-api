@@ -41,10 +41,10 @@ namespace
 static array<string, 5> const severities = {{"INFO", "WARNING", "ERROR", "FATAL", "TRACE"}};
 
 static array<pair<string, LoggerChannel>, int(LoggerChannel::LastChannelEnum_)> const channel_names =
-{
+{ {
     pair<string, LoggerChannel>{"", LoggerChannel::DefaultChannel},
     pair<string, LoggerChannel>{"IPC", LoggerChannel::IPC}
-};
+} };
 
 }  // namespace
 

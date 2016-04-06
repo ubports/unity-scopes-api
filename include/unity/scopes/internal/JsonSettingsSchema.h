@@ -49,7 +49,7 @@ public:
     void add_location_setting() override;
 
 private:
-    JsonSettingsSchema(std::string const& ini_file);
+    JsonSettingsSchema(std::string const& json_string);
 
     JsonSettingsSchema();
 

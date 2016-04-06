@@ -19,10 +19,10 @@
 #include <unity/scopes/internal/JsonSettingsSchema.h>
 
 #include <unity/scopes/internal/DfltConfig.h>
+#include <unity/scopes/internal/JsonCppNode.h>
 
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/filesystem.hpp>
-#include <jsoncpp/json/json.h>
 #include <unity/UnityExceptions.h>
 
 #include <set>
@@ -52,7 +52,7 @@ class Setting final
 public:
     NONCOPYABLE(Setting);
 
-    Setting(Json::Value const& v);
+    Setting(Variant const& v);
     Setting(string const& id,
             string const& type,
             string const& display_name,
@@ -68,13 +68,13 @@ public:
 
 private:
 
-    Json::Value get_mandatory(Json::Value const& v, Json::StaticString const& key, Json::ValueType expected_type) const;
-    void set_default_value(Json::Value const& v, Type expected_type);
-    Variant get_bool_default(Json::Value const& v) const;
-    Variant get_enum_default(Json::Value const& v);
-    Variant get_double_default(Json::Value const& v) const;
-    Variant get_string_default(Json::Value const& v) const;
-    void set_enumerators(Json::Value const& v);
+    Variant get_mandatory(Variant const& v, string const& key, Variant::Type expected_type) const;
+    void set_default_value(Variant const& v, Type expected_type);
+    Variant get_bool_default(Variant const& v) const;
+    Variant get_enum_default(Variant const& v);
+    Variant get_double_default(Variant const& v) const;
+    Variant get_string_default(Variant const& v) const;
+    void set_enumerators(Variant const& v);
 
     string id_;
     string type_;
@@ -90,32 +90,32 @@ static const map<string, Setting::Type> VALID_TYPES {
                                                       { "string",  Setting::StringT },
                                                     };
 
-Setting::Setting(Json::Value const& v)
+Setting::Setting(Variant const& v)
 {
-    assert(v.isObject());
+    assert(v.which() == Variant::Type::Dict);
 
-    static auto const id_key = Json::StaticString("id");
-    static auto const type_key = Json::StaticString("type");
-    static auto const display_name_key = Json::StaticString("displayName");
+    static string const id_key = "id";
+    static string const type_key = "type";
+    static string const display_name_key = "displayName";
 
-    id_ = get_mandatory(v, id_key, Json::stringValue).asString();
+    id_ = get_mandatory(v, id_key, Variant::Type::String).get_string();
     if (id_.empty())
     {
-        throw ResourceException(string("JsonSettingsSchema(): invalid empty \"") + id_key.c_str() + "\" definition");
+        throw ResourceException(string("JsonSettingsSchema(): invalid empty \"") + id_key + "\" definition");
     }
 
-    auto v_type = get_mandatory(v, type_key, Json::stringValue);
-    string type_string = v_type.asString();
+    auto v_type = get_mandatory(v, type_key, Variant::Type::String);
+    string type_string = v_type.get_string();
     auto const it = VALID_TYPES.find(type_string);
     if (it == VALID_TYPES.end())
     {
-        throw ResourceException(string("JsonSettingsSchema(): invalid \"") + type_key.c_str() + "\" setting: \""
-                                       + type_string + "\", " "id = \"" + id_ + "\"");
+        throw ResourceException(string("JsonSettingsSchema(): invalid \"") + type_key + "\" definition: \""
+                                + type_string + "\", " "id = \"" + id_ + "\"");
     }
     type_ = it->first;
     set_default_value(v, it->second);
 
-    display_name_ = get_mandatory(v, display_name_key, Json::stringValue).asString();
+    display_name_ = get_mandatory(v, display_name_key, Variant::Type::String).get_string();
 }
 
 Setting::Setting(string const& id,
@@ -131,11 +131,7 @@ Setting::Setting(string const& id,
     assert(!id.empty());
 
     auto const it = VALID_TYPES.find(type);
-    if (it == VALID_TYPES.end())
-    {
-        throw ResourceException(string("JsonSettingsSchema(): invalid \"type\" definition: \"")
-                                + type + "\", setting = \"" + id_ + "\"");
-    }
+    assert(it != VALID_TYPES.end());
     type_ = it->first;
 }
 
@@ -158,35 +154,33 @@ Variant Setting::to_schema_definition()
     return Variant(schema);
 }
 
-Json::Value Setting::get_mandatory(Json::Value const& v,
-                                   Json::StaticString const& key,
-                                   Json::ValueType expected_type) const
+Variant Setting::get_mandatory(Variant const& v, string const& key, Variant::Type expected_type) const
 {
-    assert(v.isObject());
-    auto val = v[key];
-    if (val.isNull())
+    assert(v.which() == Variant::Type::Dict);
+    auto val = v.get_dict()[key];
+    if (val.is_null())
     {
-        throw ResourceException(string("JsonSettingsSchema(): missing \"") + key.c_str() + "\" definition"
-                                       + (!id_.empty() ? ", id = \"" + id_ + "\"" : string()));
+        throw ResourceException(string("JsonSettingsSchema(): missing \"") + key + "\" definition"
+                                + (!id_.empty() ? ", id = \"" + id_ + "\"" : string()));
     }
-    if (val.type() != expected_type)
+    if (val.which() != expected_type)
     {
-        throw ResourceException(string("JsonSettingsSchema(): invalid value type for \"") + key.c_str() + "\" definition, "
-                                       + "id = \"" + id_ + "\"");
+        throw ResourceException(string("JsonSettingsSchema(): invalid value type for \"") + key
+                                + "\" definition, " + "id = \"" + id_ + "\"");
     }
     return val;
 }
 
-static auto const parameters_key = Json::StaticString("parameters");
+static string const parameters_key = "parameters";
 
-void Setting::set_default_value(Json::Value const& v, Type expected_type)
+void Setting::set_default_value(Variant const& v, Type expected_type)
 {
-    auto v_param = v[parameters_key];
-    if (v_param.isNull())
+    auto v_param = v.get_dict()[parameters_key];
+    if (v_param.is_null())
     {
         return;
     }
-    else if (!v_param.isObject())
+    else if (v_param.which() != Variant::Type::Dict)
     {
         throw ResourceException("JsonSettingsSchema(): expected value of type object for \"parameters\", id = \"" + id_ + "\"");
     }
@@ -219,124 +213,120 @@ void Setting::set_default_value(Json::Value const& v, Type expected_type)
     }
 }
 
-static auto const dflt_key = Json::StaticString("defaultValue");
+static string const dflt_key = "defaultValue";
 
-Variant Setting::get_bool_default(Json::Value const& v) const
+Variant Setting::get_bool_default(Variant const& v) const
 {
-    if (v.isNull())  // No "parameters" key
-    {
-        return Variant();
-    }
-    auto v_dflt = v[dflt_key];
-    if (v_dflt.isNull())
+    assert(!v.is_null());
+
+    auto v_dflt = v.get_dict()[dflt_key];
+    if (v_dflt.is_null())
     {
         return Variant();  // No "defaultValue" key
     }
-    if (!v_dflt.isBool())
+    if (v_dflt.which() != Variant::Type::Bool)
     {
-        throw ResourceException(string("JsonSettingsSchema(): invalid value type for \"") + dflt_key.c_str()
-                                       + "\" definition, id = \"" + id_ + "\"");
+        throw ResourceException(string("JsonSettingsSchema(): invalid value type for \"") + dflt_key
+                                + "\" definition, id = \"" + id_ + "\"");
     }
-    return Variant(v_dflt.asBool());
+    return v_dflt;
 }
 
-Variant Setting::get_double_default(Json::Value const& v) const
+Variant Setting::get_double_default(Variant const& v) const
 {
-    if (v.isNull())  // No "parameters" key
-    {
-        return Variant();
-    }
-    auto v_dflt = v[dflt_key];
-    if (v_dflt.isNull())
+    assert(!v.is_null());
+
+    auto v_dflt = v.get_dict()[dflt_key];
+    if (v_dflt.is_null())
     {
         return Variant();  // No "defaultValue" key
     }
-    if (!v_dflt.isNumeric())
+    switch (v_dflt.which())
     {
-        throw ResourceException(string("JsonSettingsSchema(): invalid value type for \"") + dflt_key.c_str()
-                                       + "\" definition, id = \"" + id_ + "\"");
+        case Variant::Type::Int:
+            return Variant(double(v_dflt.get_int()));
+        case Variant::Type::Int64:
+            return Variant(double(v_dflt.get_int64_t()));
+        case Variant::Type::Double:
+            return v_dflt;
+        default:
+            throw ResourceException(string("JsonSettingsSchema(): invalid value type for \"") + dflt_key
+                                    + "\" definition, id = \"" + id_ + "\"");
     }
-    return Variant(v_dflt.asDouble());
 }
 
-Variant Setting::get_enum_default(Json::Value const& v)
+Variant Setting::get_enum_default(Variant const& v)
 {
-    assert(v.isObject());
+    assert(v.which() == Variant::Type::Dict);
 
-    if (v.isNull())  // No "parameters" key
-    {
-        throw ResourceException(string("JsonSettingsSchema(): missing \"") + parameters_key.c_str()
-                                       + "\" definition, id = \"" + id_ + "\"");
-    }
-    auto v_dflt = v[dflt_key];
-    if (v_dflt.isNull())
+    auto v_dflt = v.get_dict()[dflt_key];
+    if (v_dflt.is_null())
     {
         return Variant();  // No "defaultValue" key
     }
-    if (!v_dflt.isInt())
+    if (v_dflt.which() != Variant::Type::Int)
     {
-        throw ResourceException(string("JsonSettingsSchema(): invalid value type for \"") + dflt_key.c_str()
-                                       + "\" definition, id = \"" + id_ + "\"");
+        throw ResourceException(string("JsonSettingsSchema(): invalid value type for \"") + dflt_key
+                                + "\" definition, id = \"" + id_ + "\"");
     }
 
-    static auto const values_key = Json::StaticString("values");
+    static string const values_key = "values";
 
-    auto v_vals = v[values_key];
-    if (!v_vals.isArray())
+    auto v_vals = v.get_dict()[values_key];
+    if (v_vals.which() != Variant::Type::Array)
     {
-        throw ResourceException(string("JsonSettingsSchema(): invalid value type for \"") + values_key.c_str()
-                                       + "\" definition, id = \"" + id_ + "\"");
+        throw ResourceException(string("JsonSettingsSchema(): invalid value type for \"") + values_key
+                                + "\" definition, id = \"" + id_ + "\"");
     }
-    if (v_vals.size() < 1)
+    if (v_vals.get_array().size() == 0)
     {
-        throw ResourceException(string("JsonSettingsSchema(): invalid empty \"") + values_key.c_str()
-                                       + "\" definition, id = \"" + id_ + "\"");
+        throw ResourceException(string("JsonSettingsSchema(): invalid empty \"") + values_key
+                                + "\" definition, id = \"" + id_ + "\"");
     }
 
     set_enumerators(v_vals);
 
-    auto val = v_dflt.asInt();
-    if (val < 0 || val >= static_cast<int>(v_vals.size()))
+    auto val = v_dflt.get_int();
+    if (val < 0 || val >= static_cast<int>(v_vals.get_array().size()))
     {
-        throw ResourceException(string("JsonSettingsSchema(): \"") + dflt_key.c_str()
-                                       + "\" out of range, id = \"" + id_ + "\"");
+        throw ResourceException(string("JsonSettingsSchema(): \"") + dflt_key
+                                + "\" out of range, id = \"" + id_ + "\"");
     }
-    return Variant(v_dflt.asInt());
+    return v_dflt;
 }
 
-Variant Setting::get_string_default(Json::Value const& v) const
+Variant Setting::get_string_default(Variant const& v) const
 {
-    if (v.isNull())  // No "parameters" key
-    {
-        return Variant();
-    }
-    auto v_dflt = v[dflt_key];
-    if (v_dflt.isNull())
+    assert(!v.is_null());
+
+    auto v_dflt = v.get_dict()[dflt_key];
+    if (v_dflt.is_null())
     {
         return Variant();  // No "defaultValue" key
     }
-    if (!v_dflt.isString())
+    if (v_dflt.which() != Variant::Type::String)
     {
-        throw ResourceException(string("JsonSettingsSchema(): invalid value type for \"") + dflt_key.c_str()
-                                       + "\" definition, id = \"" + id_ + "\"");
+        throw ResourceException(string("JsonSettingsSchema(): invalid value type for \"") + dflt_key
+                                + "\" definition, id = \"" + id_ + "\"");
     }
-    return Variant(v_dflt.asString());
+    return v_dflt;
 }
 
-void Setting::set_enumerators(Json::Value const& v)
+void Setting::set_enumerators(Variant const& v)
 {
-    assert(v.isArray());
+    assert(v.which() == Variant::Type::Array);
 
     set<string> enums_seen;
 
-    for (unsigned i = 0; i < v.size(); ++i)
+    VariantArray va = v.get_array();
+    for (unsigned i = 0; i < va.size(); ++i)
     {
-        Json::Value enumerator = v[i];
-        if (!enumerator.isString())
+        Variant enumerator = v.get_array()[i];
+        if (enumerator.which() != Variant::Type::String)
         {
             throw ResourceException(string("JsonSettingsSchema(): invalid enumerator type, id = \"") + id_ + "\"");
         }
-        string enum_str = enumerator.asString();
+        string enum_str = enumerator.get_string();
         if (enum_str.empty())
         {
             throw ResourceException(string("JsonSettingsSchema(): invalid empty enumerator, id = \"") + id_ + "\"");
@@ -347,7 +337,7 @@ void Setting::set_enumerators(Json::Value const& v)
                                     + "\", id = \"" + id_ + "\"");
         }
         enums_seen.insert(enum_str);
-        enumerators_.emplace_back(Variant(enum_str));
+        enumerators_.emplace_back(enumerator);
     }
 }
 
@@ -367,39 +357,36 @@ JsonSettingsSchema::JsonSettingsSchema(string const& json_string)
 {
     try
     {
-        Json::Value root;
-        Json::Reader reader;
-        if (!reader.parse(json_string, root))
+        JsonCppNode::SPtr root = make_shared<JsonCppNode>(json_string);
+
+        if (root->type() != JsonNodeInterface::Array)
         {
-            throw ResourceException("JsonSettingsSchema(): cannot parse schema: " + reader.getFormattedErrorMessages());
+            if (root->type() != JsonNodeInterface::Object || !root->has_node("settings"))
+            {
+                throw ResourceException("JsonSettingsSchema(): missing \"settings\" definition");
+            }
+            root = root->get_node("settings");
+            if (root->type() != JsonNodeInterface::Array)
+            {
+                throw ResourceException("JsonSettingsSchema(): value \"settings\" must be an array");
+            }
         }
 
-        if (!root.isArray())
-        {
-            root = root["settings"];
-        }
-        if (root.isNull())
-        {
-            throw ResourceException("JsonSettingsSchema(): missing \"settings\" definition");
-        }
-        if (!root.isArray())
-        {
-            throw ResourceException("JsonSettingsSchema(): value \"settings\" must be an array");
-        }
         set<string> seen_settings;
-        for (unsigned i = 0; i < root.size(); ++i)
+        for (int i = 0; i < root->size(); ++i)
         {
-            Setting s(root[i]);
+            Setting s(root->get_node(i)->to_variant());
             if (starts_with(s.id(), "internal."))
             {
-                throw ResourceException(string("JsonSettingsSchema(): invalid key \"") + s.id() + "\" prefixed with \"internal.\"");
+                throw ResourceException(string("JsonSettingsSchema(): invalid key \"") + s.id()
+                                        + "\" prefixed with \"internal.\"");
             }
             if (seen_settings.find(s.id()) != seen_settings.end())
             {
                 throw ResourceException("JsonSettingsSchema(): duplicate definition, id = \"" + s.id() + "\"");
             }
-            definitions_.push_back(s.to_schema_definition());
             seen_settings.insert(s.id());
+            definitions_.push_back(s.to_schema_definition());
         }
     }
     catch (ResourceException const&)

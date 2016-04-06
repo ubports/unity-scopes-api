@@ -42,7 +42,7 @@ public:
 
     enum NodeType
     {
-        Null, Array, Object, String, Int, UInt, Real, Bool
+        Null, Array, Object, String, Int, Real, Bool
     };
 
     JsonNodeInterface() = default;
@@ -58,8 +58,7 @@ public:
     virtual NodeType type() const = 0;
 
     virtual std::string as_string() const = 0;
-    virtual int as_int() const = 0;
-    virtual unsigned int as_uint() const = 0;
+    virtual int64_t as_int() const = 0;
     virtual double as_double() const = 0;
     virtual bool as_bool() const = 0;
 
