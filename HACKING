@@ -231,30 +231,31 @@ On Wily and later, the soversion is of the form <major>.<minor>.
 The version numbers for the libraries are generated from files
 in the debian directory. (See below for general rules on versioning.)
 There are no version numbers defined in any of the MakeLists.txt files.
-Instead, to change the version number, you must edit the following
+Instead, to change the version numbers, you must edit the following
 files:
 
-  - VERSION.MAJOR
-  - VERSION.MINOR
-  - VERSION.MICRO
+  - VERSION
 
-    Each file contains a single integer representing a portion of the 
-    libunity-scopes version.
+    The full version number for libunity-scopes.
 
-  - QT-VERSION.MAJOR
-  - QT-VERSION.MINOR
-  - QT-VERSION.MICRO
+  - QT-VERSION
 
-    The full version number parts for libunity-scopes-qt, one integer per file.
+    The full version number parts for libunity-scopes-qt.
 
   - *If* the soname changes, you need to add the outdated
     versions to the "Replaces:" and "Conflicts:" entries
     in control and control.in. (You need an extra
-    entry for each Vivid and Wily. See bileto_pre_release_hook
-    for the sed scripts that append a line to the stanza
-    if the soname is changed. This also may apply
+    entry for each Vivid and Wily/Xenial andlater. See
+    bileto_pre_release_hook for the sed scripts that append a
+    line to the stanza if the soname is changed. This also may apply
     if the soname of the Qt library changes, in which case
     bileto_pre_release_hook needs a corresponding update.
+
+The version files have the format
+
+    <major>.<minor>.<micro>
+
+All three numbers must be present.
 
 The soversion for each library is derived from the corresponding
 version file so, unless the soversion changes, you don't need to
