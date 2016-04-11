@@ -8,7 +8,6 @@ Changes in version 1.0.5
   - Added missing initializations to TypedScopeFixture (Bug #1542906).
   - Allow clients to specify authentication parameters (Bug #1554040).
   - Fixed incorrect generation of Replaces: and Conflicts: entries in debian/control for xenial.
-  - Fixed incorrect library soname for vivid.
 
 Changes in version 1.0.4
 ========================

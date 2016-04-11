@@ -14,7 +14,7 @@ unity-scopes-api (1.0.4+16.04.20160402.4-0ubuntu1) xenial; urgency=medium
 
   [ Michi Henning ]
   * Fixed incorrect generation of Replaces: and Conflicts: entries in
-    debian/control for xenial. Fixed incorrect library soname for vivid.
+    debian/control for xenial.
 
  -- Marcus Tomlinson <marcus.tomlinson@canonical.com>  Sat, 02 Apr 2016 03:24:17 +0000
 
