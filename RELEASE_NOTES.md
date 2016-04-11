@@ -35,7 +35,6 @@ Changes in version 1.0.1
 ========================
   - Consolidate debian packaging for Vivid and Wily, so we don't need to keep to separate series
     for the gcc 5 ABI break.
-  - debian/libunity-scopes.symbols.in: update to released version.
   - Add docs for the table widget
   - Added support for preview widget updates via ActivationResponse.
 
