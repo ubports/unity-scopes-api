@@ -1,6 +1,48 @@
 Release notes
 =============
 
+Changes in version 1.0.5
+========================
+  - Simplify debian/control munging.
+  - Look for clang-format as opposed to clang-format-3.x.
+  - Added missing initializations to TypedScopeFixture (Bug #1542906).
+  - Allow clients to specify authentication parameters (Bug #1554040).
+  - Fixed incorrect generation of Replaces: and Conflicts: entries in debian/control for xenial.
+  - Fixed incorrect library soname for vivid.
+
+Changes in version 1.0.4
+========================
+  - New RangeInputFilter.
+  - Changed ABI compliance testing to use abigail.
+
+Changes in version 1.0.3
+========================
+  - No-change rebuild for zeromq3 transition.
+
+Changes in version 1.0.2
+========================
+  - Changed version number generation to use a common script.
+  - Removed symbols files because we are now using abi-compliance-checker.
+  - Replaced global dummy loggers for testing with heap-allocated instances to avoid crash due to
+    global destructor ordering (LP: #1472755).
+  - Store scopes package version in /var/lib/.../version file for fast retrieval from the shell
+    plugin.
+  - Loop through each argument of the custom scope runner command and ensure that all path
+    arguments are absolute.
+  - Protect all JsonCppNode::get_node() methods with a "if (!root_) throw;" check (Bug #1494796).
+
+Changes in version 1.0.1
+========================
+  - Consolidate debian packaging for Vivid and Wily, so we don't need to keep to separate series
+    for the gcc 5 ABI break.
+  - debian/libunity-scopes.symbols.in: update to released version.
+  - Add docs for the table widget
+  - Added support for preview widget updates via ActivationResponse.
+
+Changes in version 1.0.0
+========================
+  - Changed package name and soname for toolchain update to gcc 5.0.
+
 Changes in version 0.6.20
 =========================
   - Support preview widget updates via ActivationResponse.
