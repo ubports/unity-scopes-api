@@ -66,11 +66,11 @@ pkg_check_modules(PROCESS_CPP process-cpp>=1.0.1 REQUIRED)
 pkg_check_modules(APPARMOR REQUIRED libapparmor REQUIRED)
 pkg_check_modules(LTTNG_UST lttng-ust REQUIRED)
 pkg_check_modules(LIBURCU_BP liburcu-bp REQUIRED)
-pkg_check_modules(JSONCPP jsoncpp REQUIRED)
 pkg_check_modules(LIBACCOUNTS libaccounts-glib REQUIRED)
 pkg_check_modules(LIBSIGNON libsignon-glib REQUIRED)
 pkg_check_modules(ZMQLIB libzmq REQUIRED)
 pkg_check_modules(NET_CPP net-cpp>=1.2.0 REQUIRED)
+pkg_check_modules(JSON_GLIB json-glib-1.0 REQUIRED)
 
 find_library(ZMQPPLIB zmqpp)
 if(NOT ZMQPPLIB)
@@ -115,7 +115,7 @@ else()
         message(WARNING "Cannot find dos2unix: formatcode target will not be available")
     else()
         # Some time after clang-format-3.6, someone finally decided to install the versioned
-        # /usr/bin/clang-format binary name as /usr/bin/clang-format (without out version suffix).
+        # /usr/bin/clang-format binary name as /usr/bin/clang-format (without the version suffix).
         find_program(CLANG_FORMAT_COMMAND NAMES clang-format clang-format-3.6 clang-format-3.5)
         if (NOT CLANG_FORMAT_COMMAND)
             message(WARNING "Cannot find clang-format >= clang-format-3.5: formatcode target will not be available")
@@ -140,10 +140,10 @@ add_definitions(
 )
 
 set(OTHER_INCLUDE_DIRS ${OTHER_INCLUDE_DIRS} ${UNITY_API_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS}
-                       ${JSONCPP_INCLUDE_DIRS} ${PROCESS_CPP_INCLUDE_DIRS} ${APPARMOR_INCLUDE_DIRS}
+                       ${JSON_GLIB_INCLUDE_DIRS} ${PROCESS_CPP_INCLUDE_DIRS} ${APPARMOR_INCLUDE_DIRS}
                        ${LIBACCOUNTS_INCLUDE_DIRS} ${LIBSIGNON_INCLUDE_DIRS} ${NET_CPP_INCLUDE_DIRS})
 set(OTHER_LIBS ${OTHER_LIBS} ${UNITY_API_LDFLAGS} ${APPARMOR_LDFLAGS} ${LIBACCOUNTS_LIBRARIES}
-               ${LIBSIGNON_LIBRARIES} ${Boost_LIBRARIES} ${JSONCPP_LDFLAGS} ${PROCESS_CPP_LDFLAGS}
+               ${LIBSIGNON_LIBRARIES} ${Boost_LIBRARIES} ${JSON_GLIB_LDFLAGS} ${PROCESS_CPP_LDFLAGS}
                ${ZMQPPLIB} ${ZMQLIB_LDFLAGS} ${CAPNPLIB} ${KJLIB} ${DLLIB} ${NET_CPP_LDFLAGS} pthread)
 
 # Standard install paths
@@ -218,26 +218,34 @@ endif()
 set(UNITY_SCOPES_LIB unity-scopes)
 set(UNITY_SCOPES_QT_LIB unity-scopes-qt)
 
-# Set versions for libunity-scopes.
 set(DEBIAN_DIR ${CMAKE_SOURCE_DIR}/debian)
-file(READ ${DEBIAN_DIR}/VERSION.MAJOR UNITY_SCOPES_MAJOR)
-string(STRIP ${UNITY_SCOPES_MAJOR} UNITY_SCOPES_MAJOR)
-file(READ ${DEBIAN_DIR}/VERSION.MINOR UNITY_SCOPES_MINOR)
-string(STRIP ${UNITY_SCOPES_MINOR} UNITY_SCOPES_MINOR)
-file(READ ${DEBIAN_DIR}/VERSION.MICRO UNITY_SCOPES_MICRO)
-string(STRIP ${UNITY_SCOPES_MICRO} UNITY_SCOPES_MICRO)
+
+# Set versions for libunity-scopes.
+file(READ ${DEBIAN_DIR}/VERSION version)
+string(REGEX MATCHALL "[0-9]+" version_list ${version})
+list(GET version_list 0 UNITY_SCOPES_MAJOR)
+list(GET version_list 1 UNITY_SCOPES_MINOR)
+list(GET version_list 2 UNITY_SCOPES_MICRO)
 
 set(UNITY_SCOPES_MAJOR_MINOR ${UNITY_SCOPES_MAJOR}.${UNITY_SCOPES_MINOR})
 set(UNITY_SCOPES_FULL_VERSION ${UNITY_SCOPES_MAJOR_MINOR}.${UNITY_SCOPES_MICRO})
-set(UNITY_SCOPES_SOVERSION ${UNITY_SCOPES_MAJOR_MINOR})
+
+execute_process(COMMAND lsb_release -c -s OUTPUT_VARIABLE SERIES)
+string(STRIP ${SERIES} SERIES)
+if (${SERIES} STREQUAL "vivid")
+    # For backward compatibility. On Vivid, the soname started counting at 3: libunity-scopes.so.3.
+    math(EXPR UNITY_SCOPES_SOVERSION "${UNITY_SCOPES_MINOR} + 3")
+else()
+    # For Wily and later, the soname is libunity-scopes.so.<maj>.<min>, e.g. libunity-scopes.so.1.0.
+    set(UNITY_SCOPES_SOVERSION ${UNITY_SCOPES_MAJOR_MINOR})
+endif()
 
 # Set versions for libunity-scopes-qt.
-file(READ ${DEBIAN_DIR}/QT-VERSION.MAJOR UNITY_SCOPES_QT_MAJOR)
-string(STRIP ${UNITY_SCOPES_QT_MAJOR} UNITY_SCOPES_QT_MAJOR)
-file(READ ${DEBIAN_DIR}/QT-VERSION.MINOR UNITY_SCOPES_QT_MINOR)
-string(STRIP ${UNITY_SCOPES_QT_MINOR} UNITY_SCOPES_QT_MINOR)
-file(READ ${DEBIAN_DIR}/QT-VERSION.MICRO UNITY_SCOPES_QT_MICRO)
-string(STRIP ${UNITY_SCOPES_QT_MICRO} UNITY_SCOPES_QT_MICRO)
+file(READ ${DEBIAN_DIR}/QT-VERSION version)
+string(REGEX MATCHALL "[0-9]+" version_list ${version})
+list(GET version_list 0 UNITY_SCOPES_QT_MAJOR)
+list(GET version_list 1 UNITY_SCOPES_QT_MINOR)
+list(GET version_list 2 UNITY_SCOPES_QT_MICRO)
 
 set(UNITY_SCOPES_QT_MAJOR_MINOR ${UNITY_SCOPES_QT_MAJOR}.${UNITY_SCOPES_QT_MINOR})
 set(UNITY_SCOPES_QT_FULL_VERSION ${UNITY_SCOPES_QT_MAJOR_MINOR}.${UNITY_SCOPES_QT_MICRO})

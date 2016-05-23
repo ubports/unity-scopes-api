@@ -212,9 +212,7 @@ unity::scopes::ScopeMetadata testing::ScopeMetadataBuilder::operator()() const
     if (p->is_aggregator)
         impl->set_is_aggregator(*p->is_aggregator);
 
-    return unity::scopes::internal::ScopeMetadataImpl::create(
-                std::move(
-                    std::unique_ptr<internal::ScopeMetadataImpl>{impl}));
+    return unity::scopes::internal::ScopeMetadataImpl::create(std::unique_ptr<internal::ScopeMetadataImpl>{impl});
 }
 
 /// @endcond

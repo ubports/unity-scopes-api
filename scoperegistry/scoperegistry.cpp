@@ -338,7 +338,6 @@ void add_local_scope(RegistryObject::SPtr const& registry,
         convert_relative_attribute(inner_map, "navigation-background", scope_dir);
         app_attrs["page-header"] = Variant(inner_map);
     }
-    convert_relative_attribute(app_attrs, "category-header-background", scope_dir);
     mi->set_appearance_attributes(app_attrs);
 
     mi->set_scope_directory(scope_dir.native());
