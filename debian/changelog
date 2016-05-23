@@ -1,3 +1,10 @@
+unity-scopes-api (1.0.6+16.10.20160520.3-0ubuntu1) yakkety; urgency=medium
+
+  [ CI Train Bot ]
+  * No-change rebuild.
+
+ -- Marcus Tomlinson <marcus.tomlinson@canonical.com>  Fri, 20 May 2016 14:55:39 +0000
+
 unity-scopes-api (1.0.5+16.04.20160413.1-0ubuntu2) yakkety; urgency=medium
 
   * No-change rebuild of latest xenial trunk against current archive.
