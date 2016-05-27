@@ -29,6 +29,12 @@ void JsonCppNode::init_from_string(string const& json_string)
 {
     if (json_string.empty())
     {
+        // make sure we reset the root back to json null value
+        // in case we get re-initialized with read_json
+        if (json_node_get_node_type(root_.get()) != JSON_NODE_NULL)
+        {
+            json_node_init_null(root_.get());
+        }
         return;
     }
 
