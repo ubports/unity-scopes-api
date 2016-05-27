@@ -54,7 +54,6 @@ TEST_F(JsonNodeTest, basic)
     {
     }
 
-    EXPECT_EQ(JsonNodeInterface::Null, root_node_->type());
     EXPECT_EQ(0, root_node_->size());
     EXPECT_EQ(JsonNodeInterface::Null, root_node_->type());
 
