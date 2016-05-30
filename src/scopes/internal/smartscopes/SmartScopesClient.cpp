@@ -669,7 +669,11 @@ void SmartScopesClient::handle_line(std::string const& json, SearchReplyHandler&
         {
             if (member == "icon")
             {
-                category->icon = child_node->get_node(member)->as_string();
+                auto node = child_node->get_node(member);
+                if (node->type() == JsonNodeInterface::NodeType::String)
+                {
+                    category->icon = node->as_string();
+                }
             }
             else if (member == "id")
             {
