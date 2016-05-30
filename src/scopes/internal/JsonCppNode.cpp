@@ -307,6 +307,10 @@ JsonNodeInterface::NodeType JsonCppNode::type() const
 
 string JsonCppNode::as_string() const
 {
+    if (JSON_NODE_HOLDS_NULL(root_.get()))
+    {
+        return string();
+    }
     if (!JSON_NODE_HOLDS_VALUE(root_.get()) || json_node_get_value_type(root_.get()) != G_TYPE_STRING)
     {
         throw unity::LogicException("Node does not contain a string value");
