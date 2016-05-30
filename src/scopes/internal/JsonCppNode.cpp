@@ -27,9 +27,9 @@ using namespace unity::scopes::internal;
 
 void JsonCppNode::init_from_string(string const& json_string)
 {
-    if (json_string.empty())
+    if (json_string.find_first_not_of(" \t\n") == std::string::npos)
     {
-        return;
+        throw unity::ResourceException("JsonCppNode(): empty string is not a valid JSON");
     }
 
     gobj_ptr<JsonParser> parser(json_parser_new());

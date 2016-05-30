@@ -45,11 +45,15 @@ protected:
 
 TEST_F(JsonNodeTest, basic)
 {
-    EXPECT_EQ(JsonNodeInterface::Null, root_node_->type());
-    EXPECT_EQ(0, root_node_->size());
-    EXPECT_EQ(JsonNodeInterface::Null, root_node_->type());
+    try
+    {
+        JsonCppNode node("");
+        FAIL();
+    }
+    catch (unity::ResourceException const&)
+    {
+    }
 
-    root_node_->read_json("");
     EXPECT_EQ(0, root_node_->size());
     EXPECT_EQ(JsonNodeInterface::Null, root_node_->type());
 
@@ -60,6 +64,9 @@ TEST_F(JsonNodeTest, basic)
     EXPECT_EQ(JsonNodeInterface::Int, root_node_->type());
     auto n = root_node_->get_node();
     EXPECT_EQ(42, n->as_int());
+
+    EXPECT_THROW(root_node_->read_json(""), unity::ResourceException);
+    EXPECT_THROW(root_node_->read_json("    "), unity::ResourceException);
 
     root_node_->clear();
     EXPECT_EQ(JsonNodeInterface::Null, root_node_->type());
