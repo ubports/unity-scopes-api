@@ -196,7 +196,7 @@ TEST(JsonSettingsSchema, exceptions)
     }
     catch (ResourceException const& e)
     {
-        EXPECT_STREQ("unity::ResourceException: JsonSettingsSchema(): missing \"settings\" definition", e.what());
+        EXPECT_STREQ("unity::ResourceException: JsonCppNode(): empty string is not a valid JSON", e.what());
     }
 
     try

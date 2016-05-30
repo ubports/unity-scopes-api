@@ -592,6 +592,11 @@ std::string SmartScopesClient::handle_chunk(const std::string& chunk, std::funct
 
 void SmartScopesClient::handle_line(std::string const& json, PreviewReplyHandler const& handler)
 {
+    if (json.empty())
+    {
+        return;
+    }
+
     JsonNodeInterface::SPtr root_node;
     JsonNodeInterface::SPtr child_node;
     {
@@ -640,6 +645,11 @@ void SmartScopesClient::handle_line(std::string const& json, PreviewReplyHandler
 
 void SmartScopesClient::handle_line(std::string const& json, SearchReplyHandler& handler)
 {
+    if (json.empty())
+    {
+        return;
+    }
+
     JsonNodeInterface::SPtr root_node;
     JsonNodeInterface::SPtr child_node;
 
