@@ -1,6 +1,7 @@
 add_subdirectory(CategoryRegistry)
 add_subdirectory(ConfigBase)
 add_subdirectory(DynamicLoader)
+add_subdirectory(gobj_ptr)
 add_subdirectory(IniSettingsSchema)
 add_subdirectory(JsonNode)
 add_subdirectory(JsonSettingsSchema)

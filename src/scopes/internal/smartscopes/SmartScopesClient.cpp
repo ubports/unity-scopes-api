@@ -19,6 +19,7 @@
 
 #include <unity/scopes/internal/FilterBaseImpl.h>
 #include <unity/scopes/internal/FilterStateImpl.h>
+#include <unity/scopes/internal/FilterGroupImpl.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/smartscopes/SmartScopesClient.h>
 #include <unity/scopes/internal/Utils.h>
@@ -389,7 +390,7 @@ bool SmartScopesClient::get_remote_scopes(std::vector<RemoteScope>& remote_scope
     return !using_cache;
 }
 
-SearchHandle::UPtr SmartScopesClient::search(SearchReplyHandler const& handler,
+SearchHandle::UPtr SmartScopesClient::search(SearchReplyHandler& handler,
                                              std::string const& base_url,
                                              std::string const& query,
                                              std::string const& department_id,
@@ -462,13 +463,13 @@ SearchHandle::UPtr SmartScopesClient::search(SearchReplyHandler const& handler,
     }
 
     auto tmp_data = std::make_shared<std::string>();
-    query_results_[search_id] = http_client_->get(search_uri.str(), [this, tmp_data, handler](std::string const& chunk)
+    query_results_[search_id] = http_client_->get(search_uri.str(), [this, tmp_data, &handler](std::string const& chunk)
     {
         // prepend any leftover data from the previous handle_chunk call
         std::string data = *tmp_data + (chunk.empty() ? "\n" : chunk);
 
         // store the leftover data from the handle_chunk call into tmp_data
-        *tmp_data = handle_chunk(data, [this, handler](const std::string& line)
+        *tmp_data = handle_chunk(data, [this, &handler](const std::string& line)
         {
             try
             {
@@ -591,6 +592,11 @@ std::string SmartScopesClient::handle_chunk(const std::string& chunk, std::funct
 
 void SmartScopesClient::handle_line(std::string const& json, PreviewReplyHandler const& handler)
 {
+    if (json.empty())
+    {
+        return;
+    }
+
     JsonNodeInterface::SPtr root_node;
     JsonNodeInterface::SPtr child_node;
     {
@@ -637,8 +643,13 @@ void SmartScopesClient::handle_line(std::string const& json, PreviewReplyHandler
     }
 }
 
-void SmartScopesClient::handle_line(std::string const& json, SearchReplyHandler const& handler)
+void SmartScopesClient::handle_line(std::string const& json, SearchReplyHandler& handler)
 {
+    if (json.empty())
+    {
+        return;
+    }
+
     JsonNodeInterface::SPtr root_node;
     JsonNodeInterface::SPtr child_node;
 
@@ -705,9 +716,13 @@ void SmartScopesClient::handle_line(std::string const& json, SearchReplyHandler 
         auto departments = parse_departments(root_node->get_node("departments"));
         handler.departments_handler(departments);
     }
+    else if (root_node->has_node("filter_groups"))
+    {
+        handler.filter_groups = parse_filter_groups(root_node->get_node("filter_groups"));
+    }
     else if (root_node->has_node("filters"))
     {
-        auto filters = parse_filters(root_node->get_node("filters"));
+        auto filters = parse_filters(root_node->get_node("filters"), handler.filter_groups);
         handler.filters_handler(filters);
     }
     else if (root_node->has_node("filter_state"))
@@ -801,14 +816,19 @@ std::shared_ptr<DepartmentInfo> SmartScopesClient::parse_departments(JsonNodeInt
     return dep;
 }
 
-Filters SmartScopesClient::parse_filters(JsonNodeInterface::SPtr node)
+Filters SmartScopesClient::parse_filters(JsonNodeInterface::SPtr node, std::map<std::string, FilterGroup::SCPtr> const& filter_groups)
 {
     if (node->type() != JsonNodeInterface::NodeType::Array)
     {
         throw LogicException("SmartScopesClient::parse_filters(): 'filters' attribute must be an array");
     }
 
-    return FilterBaseImpl::deserialize_filters(node->to_variant().get_array());
+    return FilterBaseImpl::deserialize_filters(node->to_variant().get_array(), filter_groups);
+}
+
+std::map<std::string, FilterGroup::SCPtr> SmartScopesClient::parse_filter_groups(JsonNodeInterface::SPtr node)
+{
+    return FilterGroupImpl::deserialize_filter_groups(node->to_variant().get_array());
 }
 
 FilterState SmartScopesClient::parse_filter_state(JsonNodeInterface::SPtr node)

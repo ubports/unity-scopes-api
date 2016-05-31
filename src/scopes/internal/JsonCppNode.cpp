@@ -14,316 +14,399 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Authored by: Marcus Tomlinson <marcus.tomlinson@canonical.com>
+ *              Michi Henning <michi.henning@canonical.com>
  */
 
 #include <unity/scopes/internal/JsonCppNode.h>
-#include <unity/UnityExceptions.h>
-#include <jsoncpp/json/reader.h>
-#include <jsoncpp/json/writer.h>
-#include <sstream>
 
+#include <unity/UnityExceptions.h>
+
+using namespace std;
 using namespace unity::scopes;
 using namespace unity::scopes::internal;
 
-JsonCppNode::JsonCppNode(std::string const& json_string)
+void JsonCppNode::init_from_string(string const& json_string)
 {
-    if (!json_string.empty())
+    if (json_string.find_first_not_of(" \t\n") == std::string::npos)
     {
-        read_json(json_string);
+        throw unity::ResourceException("JsonCppNode(): empty string is not a valid JSON");
     }
+
+    gobj_ptr<JsonParser> parser(json_parser_new());
+    GError *err = nullptr;
+    if (!json_parser_load_from_data(parser.get(), json_string.c_str(), json_string.size(), &err))
+    {
+        string msg = string("JsonCppNode(); parse error: ") + err->message;
+        g_error_free(err);
+        throw unity::ResourceException(msg);
+    }
+    root_.reset(json_node_copy(json_parser_get_root(parser.get())));
 }
 
-JsonCppNode::JsonCppNode(const Json::Value& root)
-    : root_(root)
+JsonCppNode::JsonCppNode()
+    : root_(json_node_alloc(), json_node_free)
+{
+    json_node_init_null(root_.get());
+}
+
+JsonCppNode::JsonCppNode(string const& json_string)
+    : JsonCppNode()
+{
+    init_from_string(json_string);
+}
+
+JsonCppNode::JsonCppNode(JsonNode* node)
+    : root_(json_node_copy(node), json_node_free)
 {
 }
 
-JsonCppNode::JsonCppNode(const Variant& var)
+namespace
 {
-    root_ = from_variant(var);
-}
 
-JsonCppNode::~JsonCppNode()
-{
-}
+// Allocates a new node for each value. Caller is responsible for deallocating the root node.
 
-Json::Value JsonCppNode::from_variant(Variant const& var)
+JsonNode* variant_to_node(Variant const& var)
 {
+    unique_ptr<JsonNode, decltype(&json_node_free)> node_guard(json_node_alloc(), json_node_free);
+    auto node = node_guard.get();
     switch (var.which())
     {
-        case Variant::Type::Int:
-            return Json::Value(var.get_int());
-        case Variant::Type::Int64:
-            return Json::Value(static_cast<Json::Int64>(var.get_int64_t()));
-        case Variant::Type::Bool:
-            return Json::Value(var.get_bool());
-        case Variant::Type::String:
-            return Json::Value(var.get_string());
-        case Variant::Type::Double:
-            return Json::Value(var.get_double());
-        case Variant::Type::Dict:
-            {
-                Json::Value val(Json::ValueType::objectValue);
-                for (auto const& v: var.get_dict())
-                {
-                    val[v.first] = from_variant(v.second);
-                }
-                return val;
-            }
-        case Variant::Type::Array:
-            {
-                Json::Value val(Json::ValueType::arrayValue);
-                for (auto const& v: var.get_array())
-                {
-                    val.append(from_variant(v));
-                }
-                return val;
-            }
         case Variant::Type::Null:
-            return Json::Value(Json::ValueType::nullValue);
-        default:
+            json_node_init_null(node);
+            break;
+        case Variant::Type::Array:
+        {
+            unique_ptr<JsonArray, decltype(&json_array_unref)> array(json_array_new(), json_array_unref);
+            for (auto const& v : var.get_array())
             {
-                std::ostringstream s;
-                s << "JsonCppNode::from_variant(): unsupported variant type ";
-                s << static_cast<int>(var.which());
-                throw unity::LogicException(s.str());
+                json_array_add_element(array.get(), variant_to_node(v));
             }
+            json_node_init_array(node, array.get());
+            break;
+        }
+        case Variant::Type::Dict:
+        {
+            unique_ptr<JsonObject, decltype(&json_object_unref)> object(json_object_new(), json_object_unref);
+            for (auto const& v : var.get_dict())
+            {
+                json_object_set_member(object.get(), v.first.c_str(), variant_to_node(v.second));
+            }
+            json_node_set_object(node, object.get());
+            break;
+        }
+        case Variant::Type::String:
+            json_node_init_string(node, var.get_string().c_str());
+            break;
+        case Variant::Type::Int:
+            json_node_init_int(node, int64_t(var.get_int()));
+            break;
+        case Variant::Type::Int64:
+            json_node_init_int(node, var.get_int64_t());
+            break;
+        case Variant::Type::Double:
+            json_node_init_double(node, var.get_double());
+            break;
+        case Variant::Type::Bool:
+        {
+            json_node_init_boolean(node, var.get_bool());
+            break;
+        }
+        default:
+        {
+            abort();  // LCOV_EXCL_LINE  // Impossible
+        }
+    }
+    return node_guard.release();
+}
+
+}  // namespace
+
+JsonCppNode::JsonCppNode(Variant const& var)
+    : root_(variant_to_node(var), json_node_free)
+{
+}
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+
+namespace
+{
+
+Variant node_to_variant(JsonNode* node);  // Mutual recursion, need forward declaration.
+
+extern "C"
+void add_to_array(JsonArray* /* array */, guint /* index */, JsonNode* element_node, gpointer user_data)
+{
+    VariantArray* va = reinterpret_cast<VariantArray*>(user_data);
+    va->push_back(node_to_variant(element_node));
+}
+
+extern "C"
+void add_to_map(JsonObject* /* object */, gchar const* member_name, JsonNode* member_node, gpointer user_data)
+{
+    VariantMap* vm = reinterpret_cast<VariantMap*>(user_data);
+    (*vm)[member_name] = node_to_variant(member_node);
+}
+
+Variant node_to_variant(JsonNode* node)
+{
+    switch (json_node_get_node_type(node))
+    {
+        case JSON_NODE_NULL:
+            return Variant::null();
+        case JSON_NODE_ARRAY:
+        {
+            VariantArray va;
+            auto array = json_node_get_array(node);
+            json_array_foreach_element(array, add_to_array, &va);
+            return Variant(va);
+        }
+        case JSON_NODE_OBJECT:
+        {
+            VariantMap vm;
+            auto object = json_node_get_object(node);
+            json_object_foreach_member(object, add_to_map, &vm);
+            return Variant(vm);
+        }
+        case JSON_NODE_VALUE:
+        {
+            switch (json_node_get_value_type(node))
+            {
+                case G_TYPE_STRING:
+                    return Variant(string(json_node_get_string(node)));
+                case G_TYPE_INT64:
+                {
+                    // HACK: If the value fits into a 32-bit int, return an Int
+                    //       variant. Otherwise, return an Int64 variant.
+                    int64_t val64 = json_node_get_int(node);
+                    if (val64 < INT32_MIN || val64 > INT32_MAX)
+                    {
+                        return Variant(val64);
+                    }
+                    int32_t val32 = val64;
+                    return Variant(val32);
+                }
+                case G_TYPE_DOUBLE:
+                    return Variant(json_node_get_double(node));
+                case G_TYPE_BOOLEAN:
+                    return Variant(bool(json_node_get_boolean(node)));
+                default:
+                    abort();  // LCOV_EXCL_LINE  // Impossible
+            }
+        }
+        default:
+            abort();  // LCOV_EXCL_LINE  // Impossible
     }
 }
 
-Variant JsonCppNode::to_variant(Json::Value const& value)
-{
-    switch (value.type())
-    {
-        case Json::ValueType::nullValue:
-            return Variant::null();
-        case Json::ValueType::arrayValue:
-            {
-                VariantArray arr;
-                for (unsigned int i=0; i<value.size(); ++i)
-                {
-                    arr.push_back(to_variant(value[i]));
-                }
-                return Variant(arr);
-            }
-        case Json::ValueType::objectValue:
-            {
-                VariantMap var;
-                for (auto const& m: value.getMemberNames())
-                {
-                    var[m] = to_variant(value[m]);
-                }
-                return Variant(var);
-            }
-        case Json::ValueType::stringValue:
-            return Variant(value.asString());
-        case Json::ValueType::intValue:
-        case Json::ValueType::uintValue:
-            // this can throw std::runtime_error from jsoncpp if unsigned int to int conversion is not possible
-            if (value.isInt())
-            {
-                return Variant(value.asInt());
-            }
-            return Variant(static_cast<int64_t>(value.asInt64()));
-        case Json::ValueType::realValue:
-            return Variant(value.asDouble());
-        case Json::ValueType::booleanValue:
-            return Variant(value.asBool());
-        default:
-            {
-                std::ostringstream s;
-                s << "JsonCppNode::to_variant(): unsupported json type ";
-                s << static_cast<int>(value.type());
-                throw unity::LogicException(s.str());
-            }
-    }
-}
+}  // namespace
 
 Variant JsonCppNode::to_variant() const
 {
-    return to_variant(root_);
+    return node_to_variant(root_.get());
 }
 
 void JsonCppNode::clear()
 {
-    root_.clear();
+    json_node_init_null(root_.get());
 }
 
-void JsonCppNode::read_json(std::string const& json_string)
+void JsonCppNode::read_json(string const& json_string)
 {
-    Json::Reader reader;
-    clear();
-
-    if (!reader.parse(json_string, root_))
-    {
-        throw unity::ResourceException("Failed to parse json string: " + reader.getFormattedErrorMessages());
-    }
+    init_from_string(json_string);
 }
 
-std::string JsonCppNode::to_json_string() const
+string JsonCppNode::to_json_string() const
 {
-    Json::FastWriter writer;
-    return writer.write(root_);
+    gobj_ptr<JsonGenerator> generator(json_generator_new());
+    json_generator_set_root(generator.get(), root_.get());
+
+    gsize len;
+    unique_ptr<gchar, decltype(&g_free)> data(json_generator_to_data(generator.get(), &len), g_free);
+    string result(data.get(), len);
+    result += '\n';
+    return result;
 }
 
 int JsonCppNode::size() const
 {
-    return root_.size();
+    switch (json_node_get_node_type(root_.get()))
+    {
+        case JSON_NODE_ARRAY:
+        {
+            auto array = json_node_get_array(root_.get());
+            return json_array_get_length(array);
+        }
+        case JSON_NODE_OBJECT:
+        {
+            auto object = json_node_get_object(root_.get());
+            return json_object_get_size(object);
+        }
+        default:
+            return 0;
+    }
 }
 
-std::vector<std::string> JsonCppNode::member_names() const
+namespace
 {
-    if (root_.type() != Json::objectValue)
+
+extern "C"
+void add_name(JsonObject* /* object */, gchar const* member_name, JsonNode* /* member_node */, gpointer user_data)
+{
+    vector<string>* names = reinterpret_cast<vector<string>*>(user_data);
+    names->push_back(member_name);
+}
+
+}
+
+vector<string> JsonCppNode::member_names() const
+{
+    if (!JSON_NODE_HOLDS_OBJECT(root_.get()))
     {
         throw unity::LogicException("Root node is not an object");
     }
-    return root_.getMemberNames();
+
+    vector<string> names;
+    auto object = json_node_get_object(root_.get());
+    json_object_foreach_member(object, add_name, &names);
+    return names;
 }
 
 JsonNodeInterface::NodeType JsonCppNode::type() const
 {
-    switch (root_.type())
+    switch (json_node_get_node_type(root_.get()))
     {
-        case Json::nullValue:
+        case JSON_NODE_NULL:
             return Null;
-        case Json::arrayValue:
+        case JSON_NODE_ARRAY:
             return Array;
-        case Json::objectValue:
+        case JSON_NODE_OBJECT:
             return Object;
-        case Json::stringValue:
-            return String;
-        case Json::intValue:
-            return Int;
-        case Json::uintValue:
-            return UInt;
-        case Json::realValue:
-            return Real;
-        case Json::booleanValue:
-            return Bool;
+        case JSON_NODE_VALUE:
+        {
+            switch (json_node_get_value_type(root_.get()))
+            {
+                case G_TYPE_STRING:
+                    return String;
+                case G_TYPE_INT64:
+                    return Int;
+                case G_TYPE_DOUBLE:
+                    return Real;
+                case G_TYPE_BOOLEAN:
+                    return Bool;
+                default:
+                    abort();  // LCOV_EXCL_LINE  // Impossible
+            }
+        }
         default:
-            break;
+            abort();  // LCOV_EXCL_LINE  // Impossible
     }
 
-    return Null;
+    abort();  // LCOV_EXCL_LINE
 }
 
-std::string JsonCppNode::as_string() const
+string JsonCppNode::as_string() const
 {
-    if (!root_.isConvertibleTo(Json::stringValue))
+    if (JSON_NODE_HOLDS_NULL(root_.get()))
+    {
+        return string();
+    }
+    if (!JSON_NODE_HOLDS_VALUE(root_.get()) || json_node_get_value_type(root_.get()) != G_TYPE_STRING)
     {
         throw unity::LogicException("Node does not contain a string value");
     }
 
-    return root_.asString();
+    return string(json_node_get_string(root_.get()));
 }
 
-int JsonCppNode::as_int() const
+int64_t JsonCppNode::as_int() const
 {
-    if (!root_.isConvertibleTo(Json::intValue))
+    if (!JSON_NODE_HOLDS_VALUE(root_.get()) || json_node_get_value_type(root_.get()) != G_TYPE_INT64)
     {
         throw unity::LogicException("Node does not contain an int value");
     }
 
-    return root_.asInt();
-}
-
-unsigned int JsonCppNode::as_uint() const
-{
-    if (!root_.isConvertibleTo(Json::uintValue))
-    {
-        throw unity::LogicException("Node does not contain a unsigned int value");
-    }
-
-    return root_.asUInt();
+    return json_node_get_int(root_.get());
 }
 
 double JsonCppNode::as_double() const
 {
-    if (!root_.isConvertibleTo(Json::realValue))
+    if (!JSON_NODE_HOLDS_VALUE(root_.get()) || json_node_get_value_type(root_.get()) != G_TYPE_DOUBLE)
     {
         throw unity::LogicException("Node does not contain a double value");
     }
 
-    return root_.asDouble();
+    return json_node_get_double(root_.get());
 }
 
 bool JsonCppNode::as_bool() const
 {
-    if (!root_.isConvertibleTo(Json::booleanValue))
+    if (!JSON_NODE_HOLDS_VALUE(root_.get()) || json_node_get_value_type(root_.get()) != G_TYPE_BOOLEAN)
     {
         throw unity::LogicException("Node does not contain a bool value");
     }
 
-    return root_.asBool();
+    return json_node_get_boolean(root_.get());
 }
 
-bool JsonCppNode::has_node(std::string const& node_name) const
+#pragma GCC diagnostic pop
+
+bool JsonCppNode::has_node(string const& node_name) const
 {
-    if (!root_)
+    if (JSON_NODE_HOLDS_NULL(root_.get()))
     {
         throw unity::LogicException("Current node is empty");
     }
 
-    if (root_.type() != Json::objectValue)
+    if (!JSON_NODE_HOLDS_OBJECT(root_.get()))
     {
         throw unity::LogicException("Root node is not an object");
     }
 
-    return root_.isMember(node_name);
+    return json_object_has_member(json_node_get_object(root_.get()), node_name.c_str());
 }
 
 JsonNodeInterface::SPtr JsonCppNode::get_node() const
 {
-    if (!root_)
+    if (JSON_NODE_HOLDS_NULL(root_.get()))
     {
         throw unity::LogicException("Current node is empty");
     }
 
-    return std::make_shared<JsonCppNode>(root_);
+    return make_shared<JsonCppNode>(root_.get());
 }
 
-JsonNodeInterface::SPtr JsonCppNode::get_node(std::string const& node_name) const
+JsonNodeInterface::SPtr JsonCppNode::get_node(string const& node_name) const
 {
-    if (!root_)
-    {
-        throw unity::LogicException("Current node is empty");
-    }
-
-    if (root_.type() != Json::objectValue)
-    {
-        throw unity::LogicException("Root node is not an object");
-    }
-    if (!root_.isMember(node_name))
+    if (!has_node(node_name))
     {
         throw unity::LogicException("Node " + node_name + " does not exist");
     }
 
-    const Json::Value& value_node = root_[node_name];
-    return std::make_shared<JsonCppNode>(value_node);
+    auto object = json_node_get_object(root_.get());
+    auto member = json_object_get_member(object, node_name.c_str());
+    return make_shared<JsonCppNode>(member);
 }
 
 JsonNodeInterface::SPtr JsonCppNode::get_node(unsigned int node_index) const
 {
-    if (!root_)
+    if (JSON_NODE_HOLDS_NULL(root_.get()))
     {
         throw unity::LogicException("Current node is empty");
     }
 
-    if (root_.type() != Json::arrayValue)
+    if (!JSON_NODE_HOLDS_ARRAY(root_.get()))
     {
         throw unity::LogicException("Root node is not an array");
     }
-    else if (node_index >= root_.size())
+
+    auto array = json_node_get_array(root_.get());
+    auto size = json_array_get_length(array);
+    if (node_index >= size)
     {
-        throw unity::LogicException("Invalid array index");
+        throw unity::LogicException("Invalid array index: " + to_string(node_index));
     }
 
-    const Json::Value& value_node = root_[node_index];
-
-    if (!value_node)
-    {
-        throw unity::LogicException("Node " + std::to_string(node_index) + " does not exist");
-    }
-
-    return std::make_shared <JsonCppNode> (value_node);
+    auto element = json_array_get_element(array, node_index);
+    return make_shared<JsonCppNode>(element);
 }

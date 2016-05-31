@@ -122,7 +122,6 @@ TEST(Registry, metadata)
     EXPECT_EQ("fg_color", attrs["foreground-color"].get_string());
     EXPECT_EQ("bg_color", attrs["background-color"].get_string());
     EXPECT_TRUE(attrs["shape-images"].get_bool());
-    EXPECT_EQ(TEST_SCOPE_A_PATH "/cat_header_bg_scheme", attrs["category-header-background"].get_string());
     EXPECT_EQ("preview_button_color", attrs["preview-button-color"].get_string());
     EXPECT_EQ("overlay_color", attrs["logo-overlay-color"].get_string());
     auto page_hdr = attrs["page-header"].get_dict();

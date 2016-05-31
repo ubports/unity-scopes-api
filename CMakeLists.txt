@@ -66,11 +66,11 @@ pkg_check_modules(PROCESS_CPP process-cpp>=1.0.1 REQUIRED)
 pkg_check_modules(APPARMOR REQUIRED libapparmor REQUIRED)
 pkg_check_modules(LTTNG_UST lttng-ust REQUIRED)
 pkg_check_modules(LIBURCU_BP liburcu-bp REQUIRED)
-pkg_check_modules(JSONCPP jsoncpp REQUIRED)
 pkg_check_modules(LIBACCOUNTS libaccounts-glib REQUIRED)
 pkg_check_modules(LIBSIGNON libsignon-glib REQUIRED)
 pkg_check_modules(ZMQLIB libzmq REQUIRED)
 pkg_check_modules(NET_CPP net-cpp>=1.2.0 REQUIRED)
+pkg_check_modules(JSON_GLIB json-glib-1.0 REQUIRED)
 
 find_library(ZMQPPLIB zmqpp)
 if(NOT ZMQPPLIB)
@@ -114,7 +114,9 @@ else()
     if (NOT DOS2UNIX_COMMAND)
         message(WARNING "Cannot find dos2unix: formatcode target will not be available")
     else()
-        find_program(CLANG_FORMAT_COMMAND NAMES clang-format-3.6 clang-format-3.5)
+        # Some time after clang-format-3.6, someone finally decided to install the versioned
+        # /usr/bin/clang-format binary name as /usr/bin/clang-format (without the version suffix).
+        find_program(CLANG_FORMAT_COMMAND NAMES clang-format clang-format-3.6 clang-format-3.5)
         if (NOT CLANG_FORMAT_COMMAND)
             message(WARNING "Cannot find clang-format >= clang-format-3.5: formatcode target will not be available")
         endif()
@@ -138,10 +140,10 @@ add_definitions(
 )
 
 set(OTHER_INCLUDE_DIRS ${OTHER_INCLUDE_DIRS} ${UNITY_API_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS}
-                       ${JSONCPP_INCLUDE_DIRS} ${PROCESS_CPP_INCLUDE_DIRS} ${APPARMOR_INCLUDE_DIRS}
+                       ${JSON_GLIB_INCLUDE_DIRS} ${PROCESS_CPP_INCLUDE_DIRS} ${APPARMOR_INCLUDE_DIRS}
                        ${LIBACCOUNTS_INCLUDE_DIRS} ${LIBSIGNON_INCLUDE_DIRS} ${NET_CPP_INCLUDE_DIRS})
 set(OTHER_LIBS ${OTHER_LIBS} ${UNITY_API_LDFLAGS} ${APPARMOR_LDFLAGS} ${LIBACCOUNTS_LIBRARIES}
-               ${LIBSIGNON_LIBRARIES} ${Boost_LIBRARIES} ${JSONCPP_LDFLAGS} ${PROCESS_CPP_LDFLAGS}
+               ${LIBSIGNON_LIBRARIES} ${Boost_LIBRARIES} ${JSON_GLIB_LDFLAGS} ${PROCESS_CPP_LDFLAGS}
                ${ZMQPPLIB} ${ZMQLIB_LDFLAGS} ${CAPNPLIB} ${KJLIB} ${DLLIB} ${NET_CPP_LDFLAGS} pthread)
 
 # Standard install paths
@@ -216,44 +218,45 @@ endif()
 set(UNITY_SCOPES_LIB unity-scopes)
 set(UNITY_SCOPES_QT_LIB unity-scopes-qt)
 
-# Run debian/get-versions.sh to get the version and soversion numbers for each library.
-execute_process(COMMAND mktemp -d OUTPUT_VARIABLE version_dir OUTPUT_STRIP_TRAILING_WHITESPACE)
-execute_process(COMMAND sh ${CMAKE_SOURCE_DIR}/debian/get-versions.sh ${CMAKE_SOURCE_DIR}/debian ${version_dir})
+set(DEBIAN_DIR ${CMAKE_SOURCE_DIR}/debian)
 
 # Set versions for libunity-scopes.
-file(READ ${version_dir}/lib${UNITY_SCOPES_LIB}.full-version UNITY_SCOPES_FULL_VERSION)
-string(STRIP ${UNITY_SCOPES_FULL_VERSION} UNITY_SCOPES_FULL_VERSION)
-file(READ ${version_dir}/lib${UNITY_SCOPES_LIB}.major-version UNITY_SCOPES_MAJOR)
-string(STRIP ${UNITY_SCOPES_MAJOR} UNITY_SCOPES_MAJOR)
-file(READ ${version_dir}/lib${UNITY_SCOPES_LIB}.minor-version UNITY_SCOPES_MINOR)
-string(STRIP ${UNITY_SCOPES_MINOR} UNITY_SCOPES_MINOR)
-file(READ ${version_dir}/lib${UNITY_SCOPES_LIB}.micro-version UNITY_SCOPES_MICRO)
-string(STRIP ${UNITY_SCOPES_MICRO} UNITY_SCOPES_MICRO)
-file(READ ${version_dir}/lib${UNITY_SCOPES_LIB}.major-minor-version UNITY_SCOPES_MAJOR_MINOR)
-string(STRIP ${UNITY_SCOPES_MAJOR_MINOR} UNITY_SCOPES_MAJOR_MINOR)
-file(READ ${version_dir}/lib${UNITY_SCOPES_LIB}.soversion UNITY_SCOPES_SOVERSION)
-string(STRIP ${UNITY_SCOPES_SOVERSION} UNITY_SCOPES_SOVERSION)
+file(READ ${DEBIAN_DIR}/VERSION version)
+string(REGEX MATCHALL "[0-9]+" version_list ${version})
+list(GET version_list 0 UNITY_SCOPES_MAJOR)
+list(GET version_list 1 UNITY_SCOPES_MINOR)
+list(GET version_list 2 UNITY_SCOPES_MICRO)
+
+set(UNITY_SCOPES_MAJOR_MINOR ${UNITY_SCOPES_MAJOR}.${UNITY_SCOPES_MINOR})
+set(UNITY_SCOPES_FULL_VERSION ${UNITY_SCOPES_MAJOR_MINOR}.${UNITY_SCOPES_MICRO})
+
+execute_process(COMMAND lsb_release -c -s OUTPUT_VARIABLE SERIES)
+string(STRIP ${SERIES} SERIES)
+if (${SERIES} STREQUAL "vivid")
+    # For backward compatibility. On Vivid, the soname started counting at 3: libunity-scopes.so.3.
+    math(EXPR UNITY_SCOPES_SOVERSION "${UNITY_SCOPES_MINOR} + 3")
+else()
+    # For Wily and later, the soname is libunity-scopes.so.<maj>.<min>, e.g. libunity-scopes.so.1.0.
+    set(UNITY_SCOPES_SOVERSION ${UNITY_SCOPES_MAJOR_MINOR})
+endif()
 
 # Set versions for libunity-scopes-qt.
-file(READ ${version_dir}/lib${UNITY_SCOPES_QT_LIB}.full-version UNITY_SCOPES_QT_FULL_VERSION)
-string(STRIP ${UNITY_SCOPES_QT_FULL_VERSION} UNITY_SCOPES_QT_FULL_VERSION)
-file(READ ${version_dir}/lib${UNITY_SCOPES_QT_LIB}.major-version UNITY_SCOPES_QT_MAJOR)
-string(STRIP ${UNITY_SCOPES_QT_MAJOR} UNITY_SCOPES_QT_MAJOR)
-file(READ ${version_dir}/lib${UNITY_SCOPES_QT_LIB}.minor-version UNITY_SCOPES_QT_MINOR)
-string(STRIP ${UNITY_SCOPES_QT_MINOR} UNITY_SCOPES_QT_MINOR)
-file(READ ${version_dir}/lib${UNITY_SCOPES_QT_LIB}.micro-version UNITY_SCOPES_QT_MICRO)
-string(STRIP ${UNITY_SCOPES_QT_MICRO} UNITY_SCOPES_QT_MICRO)
-file(READ ${version_dir}/lib${UNITY_SCOPES_QT_LIB}.major-minor-version UNITY_SCOPES_QT_MAJOR_MINOR)
-string(STRIP ${UNITY_SCOPES_QT_MAJOR_MINOR} UNITY_SCOPES_QT_MAJOR_MINOR)
-file(READ ${version_dir}/lib${UNITY_SCOPES_QT_LIB}.soversion UNITY_SCOPES_QT_SOVERSION)
-string(STRIP ${UNITY_SCOPES_QT_SOVERSION} UNITY_SCOPES_QT_SOVERSION)
+file(READ ${DEBIAN_DIR}/QT-VERSION version)
+string(REGEX MATCHALL "[0-9]+" version_list ${version})
+list(GET version_list 0 UNITY_SCOPES_QT_MAJOR)
+list(GET version_list 1 UNITY_SCOPES_QT_MINOR)
+list(GET version_list 2 UNITY_SCOPES_QT_MICRO)
+
+set(UNITY_SCOPES_QT_MAJOR_MINOR ${UNITY_SCOPES_QT_MAJOR}.${UNITY_SCOPES_QT_MINOR})
+set(UNITY_SCOPES_QT_FULL_VERSION ${UNITY_SCOPES_QT_MAJOR_MINOR}.${UNITY_SCOPES_QT_MICRO})
+set(UNITY_SCOPES_QT_SOVERSION ${UNITY_SCOPES_QT_MAJOR_MINOR})
 
 if(NOT ${UNITY_SCOPES_MAJOR} EQUAL 1)
-    message(FATAL_ERROR "Change in major version number. You need to adjust get-versions.sh and gen-debian-files.sh")
+    message(FATAL_ERROR "Change in major version number. You need to adjust bileto_pre_release_hook")
 endif()
 
 if(NOT ${UNITY_SCOPES_QT_MAJOR} EQUAL 0)
-    message(FATAL_ERROR "Change in Qt major version number. You need to adjust get-versions.sh and gen-debian-files.sh")
+    message(FATAL_ERROR "Change in Qt major version number. You need to adjust bileto_pre_release_hook")
 endif()
 
 # Library for testing, with all symbols visible

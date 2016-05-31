@@ -29,7 +29,10 @@ using namespace unity::scopes::internal;
 TEST(OptionSelectorFilter, basic)
 {
     auto filter1 = OptionSelectorFilter::create("f1", "Options", false);
+    EXPECT_EQ("", filter1->title());
+    filter1->set_title("My Filter");
     EXPECT_EQ("f1", filter1->id());
+    EXPECT_EQ("My Filter", filter1->title());
     EXPECT_EQ("Options", filter1->label());
     EXPECT_FALSE(filter1->multi_select());
     EXPECT_EQ(FilterBase::DisplayHints::Default, static_cast<FilterBase::DisplayHints>(filter1->display_hints()));
@@ -45,6 +48,53 @@ TEST(OptionSelectorFilter, basic)
     EXPECT_EQ("Option 1", opts.front()->label());
     EXPECT_EQ("2", opts.back()->id());
     EXPECT_EQ("Option 2", opts.back()->label());
+}
+
+TEST(OptionSelectorFilter, default_values)
+{
+    // single-selection
+    {
+        auto filter1 = OptionSelectorFilter::create("f1", "Options", false);
+
+        auto option1 = filter1->add_option("1", "Option 1", true);
+        EXPECT_THROW(filter1->add_option("2", "Option 2", true), unity::LogicException); // only one option enabled by default with single-selection
+        filter1->add_option("2", "Option 2");
+
+        auto opts = filter1->options();
+        EXPECT_EQ(2u, opts.size());
+        EXPECT_EQ("1", opts.front()->id());
+        EXPECT_EQ(true, opts.front()->default_value());
+        EXPECT_EQ("2", opts.back()->id());
+        EXPECT_EQ(false, opts.back()->default_value());
+
+        FilterState state;
+        // the option enabled by default is returned
+        EXPECT_EQ(1u, filter1->active_options(state).size());
+        EXPECT_EQ("1", (*filter1->active_options(state).begin())->id());
+        filter1->update_state(state, option1, false);
+        EXPECT_EQ(0u, filter1->active_options(state).size());
+    }
+
+    // multi-selection
+    {
+        auto filter1 = OptionSelectorFilter::create("f1", "Options", true);
+
+        filter1->add_option("1", "Option 1", true);
+        filter1->add_option("2", "Option 2", false);
+        filter1->add_option("3", "Option 3", true);
+
+        auto opts = filter1->options();
+        EXPECT_EQ(3u, opts.size());
+        auto it = opts.begin();
+        EXPECT_EQ("1", (*it)->id());
+        EXPECT_EQ(true, (*it)->default_value());
+        ++it;
+        EXPECT_EQ("2", (*it)->id());
+        EXPECT_EQ(false, (*it)->default_value());
+        ++it;
+        EXPECT_EQ("3", (*it)->id());
+        EXPECT_EQ(true, (*it)->default_value());
+    }
 }
 
 TEST(OptionSelectorFilter, display_hints_range_check)
@@ -65,11 +115,18 @@ TEST(OptionSelectorFilter, single_selection)
     EXPECT_FALSE(fstate.has_filter("f1"));
     EXPECT_FALSE(filter1->has_active_option(fstate));
 
+    // for filter state to be present, but no option is active
+    filter1->update_state(fstate, option1, false);
+    EXPECT_TRUE(fstate.has_filter("f1"));
+    EXPECT_FALSE(filter1->has_active_option(fstate));
+    auto active = filter1->active_options(fstate);
+    EXPECT_EQ(0u, active.size());
+
     // enable option1
     filter1->update_state(fstate, option1, true);
     EXPECT_TRUE(fstate.has_filter("f1"));
     EXPECT_TRUE(filter1->has_active_option(fstate));
-    auto active = filter1->active_options(fstate);
+    active = filter1->active_options(fstate);
     EXPECT_EQ(1u, active.size());
     EXPECT_TRUE(active.find(option1) != active.end());
 
@@ -126,7 +183,7 @@ TEST(OptionSelectorFilter, serialize)
         auto var = filter1->serialize();
         EXPECT_EQ("f1", var["id"].get_string());
         EXPECT_EQ("option_selector", var["filter_type"].get_string());
-        EXPECT_EQ(false, var["multi_select"].get_bool());
+        EXPECT_FALSE(var["multi_select"].get_bool());
         EXPECT_EQ("Options", var["label"].get_string());
         EXPECT_EQ(FilterBase::DisplayHints::Primary, static_cast<FilterBase::DisplayHints>(var["display_hints"].get_int()));
 
@@ -139,12 +196,14 @@ TEST(OptionSelectorFilter, serialize)
     }
     {
         auto filter1 = OptionSelectorFilter::create("f1", "Options", true);
+        filter1->set_title("My Filter");
         filter1->add_option("1", "Option 1");
         filter1->add_option("2", "Option 2");
 
         auto var = filter1->serialize();
         EXPECT_EQ("f1", var["id"].get_string());
-        EXPECT_EQ(true, var["multi_select"].get_bool());
+        EXPECT_EQ("My Filter", var["title"].get_string());
+        EXPECT_TRUE(var["multi_select"].get_bool());
         EXPECT_EQ("option_selector", var["filter_type"].get_string());
         EXPECT_EQ("Options", var["label"].get_string());
 
@@ -181,6 +240,7 @@ TEST(OptionSelectorFilter, deserialize)
     }
     {
         var["id"] = "f1";
+        var["title"] = "My Filter";
         var["filter_type"] = "option_selector";
         var["label"] = "Filter 1";
         var["multi_select"] = true;
@@ -194,6 +254,7 @@ TEST(OptionSelectorFilter, deserialize)
         internal::OptionSelectorFilterImpl filter(var);
 
         EXPECT_EQ("f1", filter.id());
+        EXPECT_EQ("My Filter", filter.title());
         EXPECT_EQ("Filter 1", filter.label());
         EXPECT_TRUE(filter.multi_select());
         EXPECT_EQ(1u, filter.options().size());

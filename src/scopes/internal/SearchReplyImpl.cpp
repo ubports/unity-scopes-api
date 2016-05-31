@@ -24,6 +24,7 @@
 #include <unity/scopes/internal/DepartmentImpl.h>
 #include <unity/scopes/internal/FilterBaseImpl.h>
 #include <unity/scopes/internal/FilterStateImpl.h>
+#include <unity/scopes/internal/FilterGroupImpl.h>
 #include <unity/scopes/internal/MWReply.h>
 #include <unity/scopes/internal/QueryObjectBase.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
@@ -189,6 +190,11 @@ bool SearchReplyImpl::push(unity::scopes::Filters const& filters, unity::scopes:
     }
 
     VariantMap var;
+    auto filter_groups = internal::FilterGroupImpl::serialize_filter_groups(filters);
+    if (filter_groups.size())
+    {
+        var["filter_groups"] = filter_groups;
+    }
     var["filters"] = internal::FilterBaseImpl::serialize_filters(filters);
     var["filter_state"] = filter_state.serialize();
     return ReplyImpl::push(var);
@@ -264,8 +270,17 @@ void SearchReplyImpl::write_cached_results() noexcept
         VariantMap vm;
         vm["departments"] = move(departments);
         vm["categories"] = move(categories);
+
+        // serialize filter groups if present
+        auto filter_groups = internal::FilterGroupImpl::serialize_filter_groups(cached_filters_);
+        if (filter_groups.size())
+        {
+            vm["filter_groups"] = move(filter_groups);
+        }
+
         vm["filters"] = move(filters);
         vm["filter_state"] = move(filter_state);
+
         vm["results"] = move(results);
         string const json = Variant(move(vm)).serialize_json();
 
@@ -385,7 +400,14 @@ void SearchReplyImpl::push_surfacing_results_from_cache() noexcept
             register_category(cp);
         }
 
-        auto filters = FilterBaseImpl::deserialize_filters(move(filter_array));
+        std::map<std::string, FilterGroup::SCPtr> groups;
+        it = vm.find("filter_groups");
+        if (it != vm.end())
+        {
+            groups = FilterGroupImpl::deserialize_filter_groups(it->second.get_array());
+        }
+
+        auto filters = FilterBaseImpl::deserialize_filters(move(filter_array), groups);
         auto filter_state = FilterStateImpl::deserialize(move(filter_state_dict));
         push(filters, filter_state);
 

@@ -19,8 +19,14 @@
 #pragma once
 
 #include <unity/scopes/internal/JsonNodeInterface.h>
-#include <jsoncpp/json/value.h>
+
+#include <unity/scopes/internal/gobj_memory.h>
 #include <unity/scopes/Variant.h>
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#include <json-glib/json-glib.h>
+#pragma GCC diagnostic pop
 
 namespace unity
 {
@@ -34,10 +40,11 @@ namespace internal
 class JsonCppNode : public JsonNodeInterface
 {
 public:
-    explicit JsonCppNode(std::string const& json_string = "");
-    explicit JsonCppNode(const Json::Value& root);
-    explicit JsonCppNode(const Variant& var);
-    ~JsonCppNode();
+    JsonCppNode();
+    JsonCppNode(std::string const& json_string);
+    explicit JsonCppNode(JsonNode* root);
+    explicit JsonCppNode(Variant const& var);
+    ~JsonCppNode() = default;
 
     void clear() override;
     void read_json(std::string const& json_string) override;
@@ -49,8 +56,7 @@ public:
     NodeType type() const override;
 
     std::string as_string() const override;
-    int as_int() const override;
-    unsigned int as_uint() const override;
+    int64_t as_int() const override;
     double as_double() const override;
     bool as_bool() const override;
 
@@ -61,9 +67,10 @@ public:
     JsonNodeInterface::SPtr get_node(unsigned int node_index) const override;
 
 private:
-    static Json::Value from_variant(Variant const& var);
-    static Variant to_variant(Json::Value const &val);
-    Json::Value root_;
+    void init_from_string(std::string const& jscon_string);
+
+    typedef std::unique_ptr<JsonNode, decltype(&json_node_free)> NodePtr;
+    NodePtr root_;
 };
 
 } // namespace internal

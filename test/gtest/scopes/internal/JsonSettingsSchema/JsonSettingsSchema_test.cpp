@@ -22,7 +22,6 @@
 #include <unity/util/FileIO.h>
 
 #include <gtest/gtest.h>
-#include <jsoncpp/json/json.h>
 
 using namespace unity;
 using namespace unity::scopes;
@@ -153,6 +152,41 @@ TEST(JsonSettingsSchema, basic)
     EXPECT_EQ(Variant(), defs[10].get_dict()["defaultValue"]);
 }
 
+TEST(JsonSettingsSchema, integer_sizes)
+{
+    char const* schema = R"delimiter(
+    {
+        "settings":
+        [
+            {
+                "id": "double_temp",
+                "displayName": "floating-point default",
+                "type": "number",
+                "parameters": {
+                    "defaultValue": 3.14
+                }
+            },
+            {
+                "id": "too_old",
+                "displayName": "won't fit into 32 bits",
+                "type": "number",
+                "parameters": {
+                    "defaultValue": 2147483648
+                }
+            }
+        ]
+    }
+    )delimiter";
+
+    auto s = JsonSettingsSchema::create(schema);
+
+    auto defs = s->definitions();
+    EXPECT_EQ(2, defs.size());
+
+    EXPECT_EQ(3.14, defs[0].get_dict()["defaultValue"].get_double());
+    EXPECT_EQ(2147483648, defs[1].get_dict()["defaultValue"].get_double());
+}
+
 TEST(JsonSettingsSchema, exceptions)
 {
     try
@@ -162,9 +196,7 @@ TEST(JsonSettingsSchema, exceptions)
     }
     catch (ResourceException const& e)
     {
-        EXPECT_STREQ("unity::ResourceException: JsonSettingsSchema(): cannot parse schema: * Line 1, Column 1\n"
-                     "  Syntax error: value, object or array expected.\n",
-                     e.what());
+        EXPECT_STREQ("unity::ResourceException: JsonCppNode(): empty string is not a valid JSON", e.what());
     }
 
     try
@@ -335,7 +367,7 @@ TEST(JsonSettingsSchema, exceptions)
     }
     catch (ResourceException const& e)
     {
-        EXPECT_STREQ("unity::ResourceException: JsonSettingsSchema(): invalid \"type\" setting: "
+        EXPECT_STREQ("unity::ResourceException: JsonSettingsSchema(): invalid \"type\" definition: "
                      "\"no_such_type\", id = \"x\"",
                      e.what());
     }

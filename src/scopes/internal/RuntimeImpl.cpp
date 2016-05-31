@@ -366,7 +366,7 @@ void RuntimeImpl::run_scope(ScopeBase* scope_base,
         string settings_schema = scope_dir.native() + "/" + scope_id_ + "-settings.ini";
 
         boost::system::error_code ec;
-        if (boost::filesystem::exists(settings_schema, ec))
+        if (boost::filesystem::exists(settings_schema, ec) && boost::filesystem::file_size(settings_schema) > 0)
         {
             shared_ptr<SettingsDB> db(SettingsDB::create_from_ini_file(settings_db, settings_schema));
             scope_base->p->set_settings_db(db);

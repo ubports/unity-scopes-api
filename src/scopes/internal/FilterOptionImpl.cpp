@@ -31,7 +31,8 @@ namespace internal
 
 FilterOptionImpl::FilterOptionImpl(std::string const& id, std::string const& label)
     : id_(id),
-      label_(label)
+      label_(label),
+      default_value_(false)
 {
     if (id_.empty())
     {
@@ -51,6 +52,16 @@ std::string FilterOptionImpl::id() const
 std::string FilterOptionImpl::label() const
 {
     return label_;
+}
+
+void FilterOptionImpl::set_default_value(bool default_value)
+{
+    default_value_ = default_value;
+}
+
+bool FilterOptionImpl::default_value() const
+{
+    return default_value_;
 }
 
 } // namespace internal
