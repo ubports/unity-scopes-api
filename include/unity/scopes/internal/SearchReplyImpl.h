@@ -80,6 +80,8 @@ public:
 
     virtual void push_surfacing_results_from_cache() noexcept override;
 
+    virtual bool push(unity::scopes::Filters const& filters) override;
+
 private:
     bool push(Category::SCPtr category);
     void write_cached_results() noexcept;
@@ -94,7 +96,6 @@ private:
 
     Department::SCPtr cached_departments_;
     unity::scopes::Filters cached_filters_;
-    unity::scopes::FilterState cached_filter_state_;
     std::vector<unity::scopes::CategorisedResult> cached_results_;
     std::mutex mutex_;
 };

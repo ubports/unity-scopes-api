@@ -78,6 +78,7 @@ public:
     std::string to_string() override;
 
     void flush();
+    bool push(unity::scopes::Filters const& filters) override;
 
 private:
     std::mutex mutex_;

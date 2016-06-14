@@ -96,9 +96,18 @@ public:
     /**
     \brief Called once by the scopes to send all the filters and their state.
 
+    \deprecated Please override push(Filters& const) method instead. This method will be removed in future releases.
+
     The default implementation does nothing.
     */
     virtual void push(Filters const& filters, FilterState const& filter_state);
+
+    /**
+    \brief Called once by the scopes to send all the filters and their state.
+
+    The default implementation does nothing.
+    */
+    virtual void push(Filters const& filters);
 
 protected:
     /// @cond

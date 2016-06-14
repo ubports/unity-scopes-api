@@ -74,16 +74,11 @@ bool ResultReplyObject::process_data(VariantMap const& data)
         }
 
         Filters const filters = FilterBaseImpl::deserialize_filters(it->second.get_array(), groups);
-        it = data.find("filter_state");
-        if (it != data.end())
-        {
-            auto filter_state = FilterStateImpl::deserialize(it->second.get_dict());
-            receiver_->push(filters, filter_state);
-        }
-        else
-        {
-            throw InvalidArgumentException("ResultReplyObject::push(): filters present but missing filter_state data");
-        }
+
+        // temporarily support both variants of push until the one supporting filter state gets dropped.
+        FilterState filter_state;
+        receiver_->push(filters, filter_state);
+        receiver_->push(filters);
     }
 
     it = data.find("category");
