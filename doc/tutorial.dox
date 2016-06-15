@@ -636,6 +636,102 @@ for all results that should trigger a
 call to your `activate()` method. Your implementation of `activate()` should follow the same guidelines as for
 `perform_action()` (except that widget and action identifiers do not apply to result activation).
 
+\paragraph resultaction Handling result action activation
+
+Search results can embed simple action buttons (icons) in their cards. When the user taps an action icon, the scope gets notified and can update
+the affected result card to reflect the new state. A typical use case for this is to offer "social" actions, such as thumbs up/down buttons.
+
+The following snippet demonstrates how two actions can be added to a \link unity::scopes::CategorisedResult CategorisedResult\endlink:
+
+\code
+CategorisedResult res(cat);
+res.set_uri("myuri");
+res.set_title("My Title");
+
+// Add result actions
+VariantBuilder builder;
+builder.add_tuple({
+        {"id", Variant("thumbsup")},
+        {"icon", Variant("thOff")},
+        {"temporaryIcon", Variant("thOn")},
+        {"label", Variant("I like it")},
+});
+builder.add_tuple({
+        {"id", Variant("flag")},
+        {"icon", Variant("flag")},
+        {"temporaryIcon", Variant("flagOn")},
+        {"label", Variant("Flag this result")},
+});
+res["social-actions"] = builder.end();
+\endcode
+
+The attributes of result actions are as follows:
+<ul>
+<li>id - unique action identifier that will be reported to the scope.
+<li>icon - the icon for the action button.
+<li>temporaryIcon (optional) - defines an icon that will be shown immediately when the user taps the button, before the scope reacts to the action.
+<li>label - the text shown next to the icon.
+</ul>
+
+To respond to activation of result actions, your scope must implement
+\link unity::scopes::ScopeBase::activate_result_action ScopeBase::activate_result_action\endlink:
+
+\code{.cpp}
+class MyScope : public ScopeBase
+{
+    ...
+    ActivationQueryBase::UPtr activate_result_action(Result const& result,
+            ActionMetadata const& metadata,
+            std::string const& action_id) override;
+    ...
+}
+\endcode
+
+Like `search()` and `preview()`, `activate_result_action()` is a factory method. It must return an
+instance that derives from \link unity::scopes::ActivationQueryBase ActivationQueryBase\endlink.
+Your derived class must implement the \link unity::scopes::ActivationQueryBase::activate activate()\endlink method,
+whose job it is to respond to the activation (that is, the user pressing action button). `activate` must return
+an \link unity::scopes::ActivationResponse ActivationResponse\endlink, which tells the UI how it should
+behave in response to the result action activation. For result actions the typical and recommended behavior is to update the card
+for the result whose action was activated.
+
+For example, here is how to update the actions of an affected card in response to a "thumbsup" action, so that tapping the "thumbsup" action button replaces that
+button with "thumbsdown":
+
+\code{.cpp}
+class MyActivation : public ActivationQueryBase
+{
+    MyActivation(Result const& result, unity::scopes::ActionMetadata const& metadata, std::string const& action_id) :
+        ActivationQueryBase(result, metadata, action_id)
+    {
+    }
+
+    virtual ActivationResponse activate() override
+    {
+        if (action_id() == "thumbsup")
+        {
+            // ... update backend data for 'thumbs up' action ...
+
+            // get the affect result and update it
+            Result updatedRes(result());
+            VariantBuilder builder;
+            builder.add_tuple({
+                    {"id", Variant("thumbsdown")},
+                    {"icon", Variant("thOn")},
+                    {"temporaryIcon", Variant("thOff")},
+                    {"label", Variant("I don't like it")},
+            });
+            builder.add_tuple({ ... })
+            updatedRes["social-actions"] = builder.end();
+            return ActivationResponse(updatedRes);
+        }
+
+        if (action_id() == "thumbsdown")
+        ...
+    }
+};
+\endcode
+
 \paragraph export Exporting a scope
 
 Your scope must be compiled into a `.so` shared library and, to be successfully
