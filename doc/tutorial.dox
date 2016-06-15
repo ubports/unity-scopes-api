@@ -638,8 +638,8 @@ call to your `activate()` method. Your implementation of `activate()` should fol
 
 \paragraph resultaction Handling result action activation
 
-Search results can embed simple action buttons (icons) in their cards. When user taps an action icon, the scope gets notified and can update
-the affected result card to reflect the new state. Typical use case for this is to offer "social" actions, such as thumb up/down buttons.
+Search results can embed simple action buttons (icons) in their cards. When the user taps an action icon, the scope gets notified and can update
+the affected result card to reflect the new state. A typical use case for this is to offer "social" actions, such as thumbs up/down buttons.
 
 The following snippet demonstrates how two actions can be added to a \link unity::scopes::CategorisedResult CategorisedResult\endlink:
 
@@ -668,9 +668,9 @@ res["social-actions"] = builder.end();
 The attributes of result actions are as follows:
 <ul>
 <li>id - unique action identifier that will be reported to the scope.
-<li>icon - the icon for action button.
-<li>temporaryIcon - optional, defines an icon that will be shown immediately when user taps the button, before scope reacts to the action.
-<li>label - the text to shown next to the icon.
+<li>icon - the icon for the action button.
+<li>temporaryIcon (optional) - defines an icon that will be shown immediately when the user taps the button, before the scope reacts to the action.
+<li>label - the text shown next to the icon.
 </ul>
 
 To respond to activation of result actions, your scope must implement
@@ -695,7 +695,7 @@ an \link unity::scopes::ActivationResponse ActivationResponse\endlink, which tel
 behave in response to the result action activation. For result actions the typical and recommended behavior is to update the card
 for the result whose action was activated.
 
-For example, here is how to update the actions of affected card in response to "thumbsup" action, so that tapping "thumbsup" action button replaces that
+For example, here is how to update the actions of an affected card in response to a "thumbsup" action, so that tapping the "thumbsup" action button replaces that
 button with "thumbsdown":
 
 \code{.cpp}
