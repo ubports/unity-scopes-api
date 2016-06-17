@@ -1,3 +1,25 @@
+unity-scopes-api (1.0.6+16.10.20160520.3-0ubuntu2) UNRELEASED; urgency=medium
+
+  * Got rid of category header background, as per design (Bug #1446216).
+  * Re-enabled license/copyright test for xenial+.
+  * Removed libjson-cpp and replaced with json-glib based implementation (Bug #1360247).
+  * Fixed Yakkety build.
+
+ -- Marcus Tomlinson <marcustomlinson@ubuntu>  Mon, 23 May 2016 09:54:28 +0200
+
+unity-scopes-api (1.0.6+16.10.20160520.3-0ubuntu1) yakkety; urgency=medium
+
+  [ CI Train Bot ]
+  * No-change rebuild.
+
+ -- Marcus Tomlinson <marcus.tomlinson@canonical.com>  Fri, 20 May 2016 14:55:39 +0000
+
+unity-scopes-api (1.0.5+16.04.20160413.1-0ubuntu2) yakkety; urgency=medium
+
+  * No-change rebuild of latest xenial trunk against current archive.
+
+ -- Łukasz 'sil2100' Zemczak <lukasz.zemczak@ubuntu.com>  Thu, 19 May 2016 19:19:30 +0200
+
 unity-scopes-api (1.0.5+16.04.20160413.1-0ubuntu1) xenial; urgency=medium
 
   [ Marcus Tomlinson ]

@@ -1,6 +1,13 @@
 Release notes
 =============
 
+Changes in version 1.0.6
+========================
+  - Got rid of category header background, as per design (Bug #1446216).
+  - Re-enabled license/copyright test for xenial+.
+  - Removed libjson-cpp and replaced with json-glib based implementation (Bug #1360247).
+  - Fixed Yakkety build.
+
 Changes in version 1.0.5
 ========================
   - Simplify debian/control munging.

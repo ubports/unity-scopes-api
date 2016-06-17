@@ -66,11 +66,11 @@ pkg_check_modules(PROCESS_CPP process-cpp>=1.0.1 REQUIRED)
 pkg_check_modules(APPARMOR REQUIRED libapparmor REQUIRED)
 pkg_check_modules(LTTNG_UST lttng-ust REQUIRED)
 pkg_check_modules(LIBURCU_BP liburcu-bp REQUIRED)
-pkg_check_modules(JSONCPP jsoncpp REQUIRED)
 pkg_check_modules(LIBACCOUNTS libaccounts-glib REQUIRED)
 pkg_check_modules(LIBSIGNON libsignon-glib REQUIRED)
 pkg_check_modules(ZMQLIB libzmq REQUIRED)
 pkg_check_modules(NET_CPP net-cpp>=1.2.0 REQUIRED)
+pkg_check_modules(JSON_GLIB json-glib-1.0 REQUIRED)
 
 find_library(ZMQPPLIB zmqpp)
 if(NOT ZMQPPLIB)
@@ -140,10 +140,10 @@ add_definitions(
 )
 
 set(OTHER_INCLUDE_DIRS ${OTHER_INCLUDE_DIRS} ${UNITY_API_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS}
-                       ${JSONCPP_INCLUDE_DIRS} ${PROCESS_CPP_INCLUDE_DIRS} ${APPARMOR_INCLUDE_DIRS}
+                       ${JSON_GLIB_INCLUDE_DIRS} ${PROCESS_CPP_INCLUDE_DIRS} ${APPARMOR_INCLUDE_DIRS}
                        ${LIBACCOUNTS_INCLUDE_DIRS} ${LIBSIGNON_INCLUDE_DIRS} ${NET_CPP_INCLUDE_DIRS})
 set(OTHER_LIBS ${OTHER_LIBS} ${UNITY_API_LDFLAGS} ${APPARMOR_LDFLAGS} ${LIBACCOUNTS_LIBRARIES}
-               ${LIBSIGNON_LIBRARIES} ${Boost_LIBRARIES} ${JSONCPP_LDFLAGS} ${PROCESS_CPP_LDFLAGS}
+               ${LIBSIGNON_LIBRARIES} ${Boost_LIBRARIES} ${JSON_GLIB_LDFLAGS} ${PROCESS_CPP_LDFLAGS}
                ${ZMQPPLIB} ${ZMQLIB_LDFLAGS} ${CAPNPLIB} ${KJLIB} ${DLLIB} ${NET_CPP_LDFLAGS} pthread)
 
 # Standard install paths

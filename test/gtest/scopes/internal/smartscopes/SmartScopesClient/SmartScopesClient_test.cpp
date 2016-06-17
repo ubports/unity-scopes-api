@@ -130,13 +130,41 @@ TEST_F(SmartScopesClientTest, remote_scopes)
     EXPECT_EQ(nullptr, scopes[2].art);
     EXPECT_FALSE(scopes[2].invisible);
     EXPECT_EQ(nullptr, scopes[2].appearance);
-    EXPECT_EQ("[{\"displayName\":\"Location\",\"id\":\"location\",\"parameters\":{\"defaultValue\":"
-              "\"London\"},\"type\":\"string\"},{\"displayName\":\"Temperature Units\",\"id\":"
-              "\"unitTemp\",\"parameters\":{\"defaultValue\":1,\"values\":[\"Celsius\",\"Fahrenheit"
-              "\"]},\"type\":\"list\"},{\"displayName\":\"Age\",\"id\":\"age\",\"parameters\":{"
-              "\"defaultValue\":23},\"type\":\"number\"},{\"displayName\":\"Enabled\",\"id\":"
-              "\"enabled\",\"parameters\":{\"defaultValue\":true},\"type\":\"boolean\"}]\n",
-              *scopes[2].settings);
+    {
+        JsonCppNode node(*scopes[2].settings);
+        Variant v = node.to_variant();
+
+        VariantMap vm = v.get_array()[0].get_dict();
+        EXPECT_EQ("Location", vm["displayName"].get_string());
+        EXPECT_EQ("location", vm["id"].get_string());
+        EXPECT_EQ("string", vm["type"].get_string());
+        VariantMap params = vm["parameters"].get_dict();
+        EXPECT_EQ("London", params["defaultValue"].get_string());
+
+        vm = v.get_array()[1].get_dict();
+        EXPECT_EQ("Temperature Units", vm["displayName"].get_string());
+        EXPECT_EQ("unitTemp", vm["id"].get_string());
+        EXPECT_EQ("list", vm["type"].get_string());
+        params = vm["parameters"].get_dict();
+        EXPECT_EQ(1, params["defaultValue"].get_int());
+        VariantArray choices = params["values"].get_array();
+        EXPECT_EQ("Celsius", choices[0].get_string());
+        EXPECT_EQ("Fahrenheit", choices[1].get_string());
+
+        vm = v.get_array()[2].get_dict();
+        EXPECT_EQ("Age", vm["displayName"].get_string());
+        EXPECT_EQ("age", vm["id"].get_string());
+        EXPECT_EQ("number", vm["type"].get_string());
+        params = vm["parameters"].get_dict();
+        EXPECT_EQ(23, params["defaultValue"].get_int());
+
+        vm = v.get_array()[3].get_dict();
+        EXPECT_EQ("Enabled", vm["displayName"].get_string());
+        EXPECT_EQ("enabled", vm["id"].get_string());
+        EXPECT_EQ("boolean", vm["type"].get_string());
+        params = vm["parameters"].get_dict();
+        EXPECT_TRUE(params["defaultValue"].get_bool());
+    }
     ASSERT_EQ(4, scopes[2].keywords.size());
     EXPECT_NE(scopes[2].keywords.end(), scopes[2].keywords.find("music"));
     EXPECT_NE(scopes[2].keywords.end(), scopes[2].keywords.find("video"));
@@ -392,10 +420,30 @@ TEST_F(SmartScopesClientTest, preview)
     EXPECT_EQ("widget_id_C", columns[2][2][0]);
 
     ASSERT_EQ(3u, widgets.size());
-
-    EXPECT_EQ("{\"id\":\"widget_id_A\",\"text\":\"First widget.\",\"title\":\"Widget A\",\"type\":\"text\"}\n", widgets[0]);
-    EXPECT_EQ("{\"id\":\"widget_id_B\",\"text\":\"Second widget.\",\"title\":\"Widget B\",\"type\":\"text\"}\n", widgets[1]);
-    EXPECT_EQ("{\"id\":\"widget_id_C\",\"text\":\"Third widget.\",\"title\":\"Widget C\",\"type\":\"text\"}\n", widgets[2]);
+    {
+        auto json = widgets[0];
+        JsonCppNode node(json);
+        EXPECT_EQ("widget_id_A", node.get_node("id")->as_string());
+        EXPECT_EQ("First widget.", node.get_node("text")->as_string());
+        EXPECT_EQ("Widget A", node.get_node("title")->as_string());
+        EXPECT_EQ("text", node.get_node("type")->as_string());
+    }
+    {
+        auto json = widgets[1];
+        JsonCppNode node(json);
+        EXPECT_EQ("widget_id_B", node.get_node("id")->as_string());
+        EXPECT_EQ("Second widget.", node.get_node("text")->as_string());
+        EXPECT_EQ("Widget B", node.get_node("title")->as_string());
+        EXPECT_EQ("text", node.get_node("type")->as_string());
+    }
+    {
+        auto json = widgets[2];
+        JsonCppNode node(json);
+        EXPECT_EQ("widget_id_C", node.get_node("id")->as_string());
+        EXPECT_EQ("Third widget.", node.get_node("text")->as_string());
+        EXPECT_EQ("Widget C", node.get_node("title")->as_string());
+        EXPECT_EQ("text", node.get_node("type")->as_string());
+    }
 }
 
 TEST_F(SmartScopesClientTest, consecutive_searches)

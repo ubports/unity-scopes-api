@@ -121,7 +121,7 @@ zmqpp::socket StopPublisher::subscribe()
             s.set(zmqpp::socket_option::linger, 0);
             s.connect(endpoint_);
             s.subscribe("");
-            return move(s);
+            return s;
         }
     }
 }
