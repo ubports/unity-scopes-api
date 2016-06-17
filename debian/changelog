@@ -1,11 +1,12 @@
-unity-scopes-api (1.0.6+16.10.20160520.3-0ubuntu2) UNRELEASED; urgency=medium
+unity-scopes-api (1.0.6+16.10.20160617-0ubuntu1) yakkety; urgency=medium
 
+  [ Marcus Tomlinson ]
   * Got rid of category header background, as per design (Bug #1446216).
   * Re-enabled license/copyright test for xenial+.
   * Removed libjson-cpp and replaced with json-glib based implementation (Bug #1360247).
   * Fixed Yakkety build.
 
- -- Marcus Tomlinson <marcustomlinson@ubuntu>  Mon, 23 May 2016 09:54:28 +0200
+ -- Pawel Stolowski <pawel.stolowski@canonical.com>  Fri, 17 Jun 2016 07:27:25 +0000
 
 unity-scopes-api (1.0.6+16.10.20160520.3-0ubuntu1) yakkety; urgency=medium
 
