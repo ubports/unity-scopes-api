@@ -204,6 +204,11 @@ struct DevNullSearchReply : public unity::scopes::SearchReply, public WaitableRe
         return true;
     }
 
+    bool push(unity::scopes::Filters const&) override
+    {
+        return true;
+    }
+
     bool push(unity::scopes::experimental::Annotation const&) override
     {
         return true;

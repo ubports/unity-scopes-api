@@ -21,6 +21,7 @@
 #include <unity/scopes/CategorisedResult.h>
 #include <unity/scopes/Category.h>
 #include <unity/scopes/FilterGroup.h>
+#include <unity/scopes/FilterOption.h>
 #include <unity/scopes/OptionSelectorFilter.h>
 #include <unity/scopes/ScopeBase.h>
 #include <unity/scopes/SearchReply.h>
@@ -49,11 +50,27 @@ public:
         filter->add_option("o2", "Option 2");
         filters.push_back(filter);
         auto active_opts = filter->active_options(query().filter_state());
-        reply->push(filters, query().filter_state()); // send unmodified state back
+
+        if (query().query_string() == "test")
+        {
+            reply->push(filters);
+        }
+        else
+        {
+            // use the deprecated push call
+            reply->push(filters, query().filter_state());
+        }
 
         auto cat = reply->register_category("cat1", "Category 1", "");
         CategorisedResult res(cat);
-        res.set_uri("uri");
+        if (active_opts.size() == 1)
+        {
+            res.set_uri("option " + (*(active_opts.begin()))->id() + " active");
+        }
+        else
+        {
+            res.set_uri("no options active");
+        }
         res.set_dnd_uri("dnd_uri");
         reply->push(res);
     }
