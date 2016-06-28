@@ -4,7 +4,7 @@ Release notes
 Changes in version 1.0.6
 ========================
   - Marked the push(Filters const&, FilterState const&) method of SearchReply and SearchListenerBase
-    as deprecated and provided push methods which take Filters argument only.
+    as deprecated and provided push methods which take the Filters argument only.
 
 Changes in version 1.0.5
 ========================

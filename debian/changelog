@@ -1,8 +1,8 @@
-unity-scopes-api (1.0.6) UNRELEASED; urgency=medium
+unity-scopes-api (1.0.6-0ubuntu1) UNRELEASED; urgency=medium
 
   * Marked the push(Filters const&, FilterState const&) method of SearchReply
     and SearchListenerBase as deprecated and provided push methods which take
-    Filters argument only.
+    the Filters argument only.
 
  -- Pawel Stolowski <pawel.stolowski@canonical.com>  Tue, 14 Jun 2016 16:51:22 +0200
 
