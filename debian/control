@@ -7,7 +7,7 @@ Source: unity-scopes-api
 Priority: optional
 Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
 Build-Depends: abigail-tools | libabigail-tools,
-               binutils,
+               binutils:native,
                capnproto,
                click-dev (>= 0.2.2),
                cmake,
@@ -39,7 +39,7 @@ Build-Depends: abigail-tools | libabigail-tools,
                pkg-config,
                python3:any,
                python3-dbusmock,
-               python-tornado,
+               python-tornado:native,
                valgrind,
 Standards-Version: 3.9.6
 XS-Testsuite: autopkgtest
