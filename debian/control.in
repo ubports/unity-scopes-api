@@ -1,7 +1,7 @@
 Source: unity-scopes-api
 Priority: optional
 Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
-Build-Depends: abigail-tools | libabigail-tools,
+Build-Depends: abigail-tools <!nocheck> | libabigail-tools <!nocheck>,
                binutils:native,
                capnproto,
                click-dev (>= 0.2.2),
