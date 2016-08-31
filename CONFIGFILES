@@ -269,7 +269,7 @@ The following keys are recognized:
   or terminate correctly. If a scope does not respond
   within the allotted time, it is killed with SIGKILL.
 
-  Only values in the range 10 to 15000 milliseconds are accepted.
+  Only values in the range 10 to 60000 milliseconds are accepted.
 
   The default value is 4000 milliseconds.
 
