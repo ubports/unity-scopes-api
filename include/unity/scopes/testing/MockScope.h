@@ -18,7 +18,9 @@
 
 #pragma once
 
+#include <unity/scopes/ActionMetadata.h>
 #include <unity/scopes/Scope.h>
+#include <unity/scopes/SearchMetadata.h>
 
 #include <unity/scopes/testing/MockObject.h>
 
