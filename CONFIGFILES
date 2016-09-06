@@ -202,7 +202,7 @@ The following keys are recognized:
   The timeout to be used when invoking a twoway operation on the registry other
   than locate().
 
-  Only values in the range 10 to 15000 milliseconds are accepted.
+  Only values in the range 10 to 60000 milliseconds are accepted.
 
   The default value is 5000 milliseconds.
 
