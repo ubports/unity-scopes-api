@@ -1,3 +1,15 @@
+unity-scopes-api (1.0.7-0ubuntu1) UNRELEASED; urgency=medium
+
+  [ Michi Henning ]
+  * Fixes for building with crossbuilder from Florian Boucault, with minor adjustments.
+
+  [ Pawel Stolowski ]
+  * Marked the push(Filters const&, FilterState const&) method of SearchReply
+    and SearchListenerBase as deprecated and provided push methods which take
+    the Filters argument only.
+
+ -- Pawel Stolowski <pawel.stolowski@canonical.com>  Tue, 28 Jun 2016 10:11:22 +0200
+
 unity-scopes-api (1.0.6+16.10.20160617-0ubuntu1) yakkety; urgency=medium
 
   [ Marcus Tomlinson ]

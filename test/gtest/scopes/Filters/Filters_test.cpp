@@ -66,12 +66,19 @@ private:
 class SearchReceiver : public SearchListenerBase, public WaitUntilFinished
 {
 public:
-    virtual void push(CategorisedResult /* result */) override {}
+    virtual void push(CategorisedResult result) override
+    {
+        result_uri = result.uri();
+    }
 
-    virtual void push(Filters const& filters, FilterState const& filter_state) override
+    virtual void push(Filters const& filters, FilterState const&) override
+    {
+        this->filters2 = filters;
+    }
+
+    virtual void push(Filters const& filters) override
     {
         this->filters = filters;
-        this->filter_state = filter_state;
     }
 
     virtual void finished(CompletionDetails const& details) override
@@ -81,7 +88,8 @@ public:
     }
 
     Filters filters;
-    FilterState filter_state;
+    Filters filters2;
+    std::string result_uri;
 };
 
 template <typename ScopeType>
@@ -135,8 +143,13 @@ TEST(Filters, scope)
     auto ctrl = scope->search("test", hints, receiver);
     receiver->wait_until_finished();
 
-    auto filter_state = receiver->filter_state; // copy filter state, it will be sent with 2nd query
+    EXPECT_EQ("no options active", receiver->result_uri);
+
+    FilterState filter_state;
     {
+        // make sure the deprecated API push method for filters still works
+        ASSERT_EQ(1u, receiver->filters2.size());
+
         auto filters = receiver->filters;
         ASSERT_EQ(1u, filters.size());
         EXPECT_EQ("f1", filters.front()->id());
@@ -159,11 +172,9 @@ TEST(Filters, scope)
     receiver->wait_until_finished();
     {
         auto filters = receiver->filters;
-        auto filter_state2 = receiver->filter_state;
+        ASSERT_EQ(1u, filters.size());
         auto selector = std::dynamic_pointer_cast<const OptionSelectorFilter>(filters.front());
-        ASSERT_EQ(1u, selector->active_options(filter_state2).size());
-        auto option1 = *(selector->active_options(filter_state2).begin());
-        EXPECT_EQ("o1", option1->id());
+        EXPECT_EQ("option o1 active", receiver->result_uri);
     }
 }
 
