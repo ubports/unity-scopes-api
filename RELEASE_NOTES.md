@@ -3,6 +3,8 @@ Release notes
 
 Changes in version 1.0.7
 ========================
+  - Fixed potential login deadlock in OnlineAccountClient.
+  - Fixes for building with Florian Boucault's crossbuilder.
   - Marked the push(Filters const&, FilterState const&) method of SearchReply and SearchListenerBase
     as deprecated and provided push methods which take the Filters argument only.
   - Fixed Yakkety build by adding missing #includes

@@ -1,7 +1,10 @@
 unity-scopes-api (1.0.7-0ubuntu1) UNRELEASED; urgency=medium
 
+  [ Marcus Tomlinson ]
+  * Fixed potential login deadlock in OnlineAccountClient.
+
   [ Michi Henning ]
-  * Fixes for building with crossbuilder from Florian Boucault, with minor adjustments.
+  * Fixes for building with Florian Boucault's crossbuilder.
 
   [ Pawel Stolowski ]
   * Marked the push(Filters const&, FilterState const&) method of SearchReply
