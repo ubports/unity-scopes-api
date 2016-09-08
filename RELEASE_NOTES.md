@@ -4,6 +4,7 @@ Release notes
 Changes in version 1.0.7
 ========================
   - Fixed potential login deadlock in OnlineAccountClient.
+  - Increased upper timeout limits to 60s to assist scope-harness testing on slow builders.
   - Fixes for building with Florian Boucault's crossbuilder.
   - Marked the push(Filters const&, FilterState const&) method of SearchReply and SearchListenerBase
     as deprecated and provided push methods which take the Filters argument only.

@@ -2,6 +2,7 @@ unity-scopes-api (1.0.7-0ubuntu1) UNRELEASED; urgency=medium
 
   [ Marcus Tomlinson ]
   * Fixed potential login deadlock in OnlineAccountClient.
+  * Increased upper timeout limits to 60s to assist scope-harness testing on slow builders.
 
   [ Michi Henning ]
   * Fixes for building with Florian Boucault's crossbuilder.
