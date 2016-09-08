@@ -170,7 +170,12 @@ bool SearchReplyImpl::push(unity::scopes::CategorisedResult const& result)
     return true;
 }
 
-bool SearchReplyImpl::push(unity::scopes::Filters const& filters, unity::scopes::FilterState const& filter_state)
+bool SearchReplyImpl::push(unity::scopes::Filters const& filters, unity::scopes::FilterState const&)
+{
+    return push(filters);
+}
+
+bool SearchReplyImpl::push(unity::scopes::Filters const& filters)
 {
     // basic consistency check
     try
@@ -186,7 +191,6 @@ bool SearchReplyImpl::push(unity::scopes::Filters const& filters, unity::scopes:
     {
         lock_guard<mutex> lock(mutex_);
         cached_filters_ = filters;
-        cached_filter_state_ = filter_state;
     }
 
     VariantMap var;
@@ -196,7 +200,6 @@ bool SearchReplyImpl::push(unity::scopes::Filters const& filters, unity::scopes:
         var["filter_groups"] = filter_groups;
     }
     var["filters"] = internal::FilterBaseImpl::serialize_filters(filters);
-    var["filter_state"] = filter_state.serialize();
     return ReplyImpl::push(var);
 }
 
@@ -260,7 +263,6 @@ void SearchReplyImpl::write_cached_results() noexcept
             departments = cached_departments_->serialize();
         }
         auto filters = internal::FilterBaseImpl::serialize_filters(cached_filters_);
-        auto filter_state = cached_filter_state_.serialize();
         VariantArray categories = cat_registry_->serialize();
         VariantArray results;
         for (auto const& r : cached_results_)
@@ -279,7 +281,6 @@ void SearchReplyImpl::write_cached_results() noexcept
         }
 
         vm["filters"] = move(filters);
-        vm["filter_state"] = move(filter_state);
 
         vm["results"] = move(results);
         string const json = Variant(move(vm)).serialize_json();
@@ -371,13 +372,6 @@ void SearchReplyImpl::push_surfacing_results_from_cache() noexcept
         }
         auto filter_array = it->second.get_array();
 
-        it = vm.find("filter_state");
-        if (it == vm.end())
-        {
-            throw unity::scopes::NotFoundException("malformed cache file", "filter_state");
-        }
-        auto filter_state_dict = it->second.get_dict();
-
         it = vm.find("results");
         if (it == vm.end())
         {
@@ -408,8 +402,7 @@ void SearchReplyImpl::push_surfacing_results_from_cache() noexcept
         }
 
         auto filters = FilterBaseImpl::deserialize_filters(move(filter_array), groups);
-        auto filter_state = FilterStateImpl::deserialize(move(filter_state_dict));
-        push(filters, filter_state);
+        push(filters);
 
         for (auto const& r : result_array)
         {

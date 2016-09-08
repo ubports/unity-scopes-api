@@ -66,6 +66,7 @@ public:
     MOCK_METHOD1(lookup_category, Category::SCPtr(std::string const&));
     MOCK_METHOD1(push, bool(CategorisedResult const&));
     MOCK_METHOD2(push, bool(Filters const&, FilterState const&));
+    MOCK_METHOD1(push, bool(Filters const&));
     MOCK_METHOD1(push, bool(experimental::Annotation const& annotation));
     MOCK_METHOD0(push_surfacing_results_from_cache, void());
 

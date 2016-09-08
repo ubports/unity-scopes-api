@@ -142,10 +142,9 @@ RangeInputFilter
  'central_label'       : string
  'filter_group' : string, optional
 
-Filters + FilterState
-=====================
+Filters
+=======
  'filter'       : array of filters (implementations of FilterBase)
- 'filter_state' : FilterState
 
 PreviewResult (returned by serialize())
 =======================================

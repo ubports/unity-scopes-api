@@ -92,6 +92,11 @@ bool BufferedSearchReplyImpl::push(unity::scopes::Filters const& filters, unity:
     return upstream_->push(filters, filter_state);
 }
 
+bool BufferedSearchReplyImpl::push(unity::scopes::Filters const& filters)
+{
+    return upstream_->push(filters);
+}
+
 void BufferedSearchReplyImpl::push_surfacing_results_from_cache() noexcept
 {
     upstream_->push_surfacing_results_from_cache();

@@ -139,7 +139,8 @@ public:
     virtual bool push(experimental::Annotation const& annotation) = 0;
 
     /**
-    \brief Sends all filters and their state to the source of a query.
+    \brief Sends all filters and their states to the source of a query.
+    \deprecated Sending filter state back to the UI is deprecated and will be removed from future releases. Please use the push(Filters const&) method instead.
     \return True if the filters were accepted, false otherwise.
     */
     virtual bool push(Filters const& filters, FilterState const& filter_state) = 0;
@@ -189,6 +190,12 @@ public:
     will be pushed (push_surfacing_results_from_cache() implicitly calls finished()).
     */
     virtual void push_surfacing_results_from_cache() = 0;
+
+    /**
+    \brief Sends all filter definitions to the source of a query.
+    \return True if the filters were accepted, false otherwise.
+    */
+    virtual bool push(Filters const& filters) = 0;
 
 protected:
     /// @cond
