@@ -71,9 +71,9 @@ RegistryConfig::RegistryConfig(string const& identity, string const& configfile)
         throw ConfigException(configfile + ": " + scoperunner_path_key + " must be an absolute path");
     }
     process_timeout_ = get_optional_int(registry_config_group, process_timeout_key, DFLT_PROCESS_TIMEOUT);
-    if (process_timeout_ < 10 || process_timeout_ > 15000)
+    if (process_timeout_ < 10 || process_timeout_ > 60000)
     {
-        throw_ex("Illegal value (" + to_string(process_timeout_) + ") for " + process_timeout_key + ": value must be 10-15000 ms");
+        throw_ex("Illegal value (" + to_string(process_timeout_) + ") for " + process_timeout_key + ": value must be 10-60000 ms");
     }
 
     KnownEntries const known_entries = {
