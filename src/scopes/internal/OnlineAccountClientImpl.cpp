@@ -545,12 +545,15 @@ void OnlineAccountClientImpl::flush_pending_session(AccountInfo* info, std::uniq
     // (ensures that accounts_ is up to date)
     std::shared_ptr<GMainLoop> event_loop;
     event_loop.reset(g_main_loop_new(main_loop_context_.get(), true), g_main_loop_unref);
-    while(info->session)
+
+    int ms_elapsed = 0;
+    while (info->session && ms_elapsed < 5000)
     {
         // We need to wait inside an event loop to allow for the main application loop to
         // process its pending events
         std::shared_ptr<GSource> source;
         source.reset(g_timeout_source_new(10), g_source_unref);
+        ms_elapsed += 10;
         g_source_set_callback(source.get(), wake_up_event_loop_cb, event_loop.get(), NULL);
         g_source_attach(source.get(), main_loop_context_.get());
 
@@ -559,6 +562,15 @@ void OnlineAccountClientImpl::flush_pending_session(AccountInfo* info, std::uniq
         g_main_loop_run(event_loop.get());
         lock.lock();
         info_lock.lock();
+    }
+
+    // If the login session is still not responding, we cancel it
+    if (info->session)
+    {
+        std::cerr << "OnlineAccountClientImpl::flush_pending_session(): login for account: "
+                  << info->account_id << " is not responding. Canceling session." << std::endl;
+        signon_auth_session_cancel(info->session.get());
+        info->session = nullptr;
     }
 }
 
