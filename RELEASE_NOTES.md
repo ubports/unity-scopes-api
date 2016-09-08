@@ -5,6 +5,8 @@ Changes in version 1.0.7
 ========================
   - Marked the push(Filters const&, FilterState const&) method of SearchReply and SearchListenerBase
     as deprecated and provided push methods which take the Filters argument only.
+  - Fixed Yakkety build by adding missing #includes
+  - Fixed arm64 build by temporarily disabling SmartScopesClient_test
 
 Changes in version 1.0.6
 ========================
