@@ -182,41 +182,6 @@ hide a section of code from address sanitzer with:
     #endif
 #endif
 
-Updating symbols files (only for Vivid)
----------------------------------------
-
-On Vivid only, we maintain symbols files, using the gcc 4.9 ABI names.
-On Wily, there is no symbols file because we don't care whether we
-use the gcc 4.9 or 5.x ABI. (The code is the same either way.) Instead,
-we use a shlibs file.
-
-For Vivid, the symbols files are generated from debian/libunity-scopes.symbols.in
-and debian/libunity-scopes-qt.symbols.in. (The soversion is substituted
-automatically into the files.)
-
-To easily spot new/removed/changed symbols in the library, the debian
-package maintains a .symbols file that lists all exported symbols
-present in a library .so. If you add new public symbols to the library,
-it's necessary to refresh the symbols file, otherwise the package will
-fail to build. The easiest way to do that is using bzr-builddeb:
-
-    $ bzr bd -- -us -uc -j8  # Don't sign source package or changes file, 8 compiles in parallel
-    $ # this will exit with an error if symbols file isn't up-to-date
-    $ cd ../build-area/unity-scopes-api-[version]
-    $ ./obj-[arch]/tools/symbol_diff
-
-This creates a diff of the symbols in /tmp/symbols.diff.
-(The demangled symbols from the debian build are in ./new_symbols.)
-
-Review any changes in /tmp/symbols.diff. If they are OK:
-
-    $ cd -
-    $ patch -p0 debian/libunity-scopes.symbols.in < /tmp/symbols.diff
-
-For changes in the qt library symbols file, use
-
-    $ patch -p0 debian/libunity-scopes-qt.symbols.in < /tmp/symbols.diff
-
 ABI compatibility
 -----------------
 
@@ -251,15 +216,25 @@ files:
     if the soname of the Qt library changes, in which case
     bileto_pre_release_hook needs a corresponding update.
 
-The version files have the format
+  - LAST_ABI_ADDITION_VERSION
+
+    The micro version at which we last added something
+    new to the libunity-scopes ABI (without breaking anything).
+
+  - LAST_ABI_ADDITION_QT-VERSION
+
+    The micro version at which we last added something
+    new to the libunity-scopes-qt ABI (without breaking anything).
+
+  The version files have the format
 
     <major>.<minor>.<micro>
 
-All three numbers must be present.
+  All three numbers must be present.
 
-The soversion for each library is derived from the corresponding
-version file so, unless the soversion changes, you don't need to
-do anything special.
+  The soversion for each library is derived from the corresponding
+  version file so, unless the soversion changes, you don't need to
+  do anything special.
 
 Versioning rules:
     
@@ -268,6 +243,13 @@ the micro version number. (Without this, we cannot
 identify from the version number whether a particular fix
 is in this build or not.) The best time to update the micro
 version is when creating a silo for landing in the archives.
+
+For changes in behavior that do *not* add anything new to the ABI, you must
+increment the micro version in VERSION or QT-VERSION, but *not* the
+version in LAST_ABI_ADDITION_VERSION or LAST_ABI_ADDITION_QT-VERSION.
+For changes that add something to the ABI (without breaking it), you *must*
+increment *both* VERSION and LAST_ABI_ADDITION_VERSION (or
+QT-VERSION and LAST_ABI_ADDITION_QT-VERSION).
 
 For ABI incompatible changes, either minor or major must be
 incremented, and the lower-order version numbers must be reset to zero.
