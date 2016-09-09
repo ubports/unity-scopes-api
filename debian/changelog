@@ -6,6 +6,7 @@ unity-scopes-api (1.0.7-0ubuntu1) UNRELEASED; urgency=medium
 
   [ Michi Henning ]
   * Fixes for building with Florian Boucault's crossbuilder.
+  * Fix for bug #1548718: Need to update micro version in shlibs file when symbols are added
 
   [ Pawel Stolowski ]
   * Marked the push(Filters const&, FilterState const&) method of SearchReply
