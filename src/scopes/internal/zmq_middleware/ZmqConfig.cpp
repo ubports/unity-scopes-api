@@ -80,21 +80,21 @@ ZmqConfig::ZmqConfig(string const& configfile) :
     }
 
     registry_timeout_ = get_optional_int(zmq_config_group, registry_timeout_key, DFLT_ZMQ_REGISTRY_TIMEOUT);
-    if (registry_timeout_ < 10 || registry_timeout_ > 15000)
+    if (registry_timeout_ < 10 || registry_timeout_ > 60000)
     {
-        throw_ex("Illegal value (" + to_string(registry_timeout_) + ") for " + registry_timeout_key + ": value must be 10-15000");
+        throw_ex("Illegal value (" + to_string(registry_timeout_) + ") for " + registry_timeout_key + ": value must be 10-60000");
     }
 
     locate_timeout_ = get_optional_int(zmq_config_group, locate_timeout_key, DFLT_ZMQ_LOCATE_TIMEOUT);
-    if (locate_timeout_ < 10 || locate_timeout_ > 15000)
+    if (locate_timeout_ < 10 || locate_timeout_ > 60000)
     {
-        throw_ex("Illegal value (" + to_string(locate_timeout_) + ") for " + locate_timeout_key + ": value must be 10-15000");
+        throw_ex("Illegal value (" + to_string(locate_timeout_) + ") for " + locate_timeout_key + ": value must be 10-60000");
     }
 
     child_scopes_timeout_ = get_optional_int(zmq_config_group, child_scopes_timeout_key, DFLT_ZMQ_CHILDSCOPES_TIMEOUT);
-    if (child_scopes_timeout_ < 10 || child_scopes_timeout_ > 15000)
+    if (child_scopes_timeout_ < 10 || child_scopes_timeout_ > 60000)
     {
-        throw_ex("Illegal value (" + to_string(child_scopes_timeout_) + ") for " + child_scopes_timeout_key + ": value must be 10-15000");
+        throw_ex("Illegal value (" + to_string(child_scopes_timeout_) + ") for " + child_scopes_timeout_key + ": value must be 10-60000");
     }
 
     registry_endpoint_dir_ = get_optional_string(zmq_config_group, registry_endpoint_dir_key);

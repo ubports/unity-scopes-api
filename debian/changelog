@@ -1,3 +1,22 @@
+unity-scopes-api (1.0.7-0ubuntu1) UNRELEASED; urgency=medium
+
+  [ Marcus Tomlinson ]
+  * Fixed potential login deadlock in OnlineAccountClient.
+  * Increased upper timeout limits to 60s to assist scope-harness testing on slow builders.
+
+  [ Michi Henning ]
+  * Fixes for building with Florian Boucault's crossbuilder.
+  * Fix for bug #1548718: Need to update micro version in shlibs file when symbols are added
+
+  [ Pawel Stolowski ]
+  * Marked the push(Filters const&, FilterState const&) method of SearchReply
+    and SearchListenerBase as deprecated and provided push methods which take
+    the Filters argument only.
+  * Fixed Yakkety build by adding missing #includes
+  * Fixed arm64 build by temporarily disabling SmartScopesClient_test
+
+ -- Pawel Stolowski <pawel.stolowski@canonical.com>  Tue, 28 Jun 2016 10:11:22 +0200
+
 unity-scopes-api (1.0.6+16.10.20160617-0ubuntu1) yakkety; urgency=medium
 
   [ Marcus Tomlinson ]

@@ -80,6 +80,10 @@ fi
 [ -n "$UNITY_SCOPES_SOVERSION" ]
 [ -n "$UNITY_SCOPES_QT_SOVERSION" ]
 
+export LAST_ABI_ADDITION_VERSION=$(cat "$dir/LAST_ABI_ADDITION_VERSION")
+export LAST_ABI_ADDITION_QT_VERSION=$(cat "$dir/LAST_ABI_ADDITION_QT-VERSION")
+[ -n "$LAST_ABI_ADDITION_VERSION" ]
+[ -n "$LAST_ABI_ADDITION_QT_VERSION" ]
 
 process()
 {
@@ -106,7 +110,7 @@ process "$dir/control.in" >"$dir/control"
         "$dir/control"
 }
 
-# Generate the install files, naming them according to the soversion.
+# Generate the install files.
 
 # Install file for binary package
 process "$dir/libunity-scopes.install.in" \
@@ -118,10 +122,11 @@ process "$dir/libunity-scopes.scope.click-hook.in" \
 
 # Shlibs file
 process "$dir/libunity-scopes.shlibs.in" \
-    >"$dir/libunity-scopes-${UNITY_SCOPES_FULL_VERSION}.shlibs"
+    >"$dir/libunity-scopes-${UNITY_SCOPES_MAJOR_MINOR}.shlibs"
 
+# Shlibs file for qt
 process "$dir/libunity-scopes-qt.shlibs.in" \
-    >"$dir/libunity-scopes-qt${UNITY_SCOPES_QT_FULL_VERSION}.shlibs"
+    >"$dir/libunity-scopes-qt${UNITY_SCOPES_QT_MAJOR_MINOR}.shlibs"
 
 # Install file for qt binary package
 process "$dir/libunity-scopes-qt.install.in" \

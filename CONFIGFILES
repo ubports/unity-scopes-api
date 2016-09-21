@@ -189,11 +189,11 @@ The following keys are recognized:
   in Registry.ini, otherwise invocations on a scope that needs to be activated
   first can fail, even though the activation succeeded.
 
-  Only values in the range 10 to 15000 milliseconds are accepted. (Values outside
+  Only values in the range 10 to 60000 milliseconds are accepted. (Values outside
   this range would either cause locate() to falsely conclude that a scope
   could not be started, or cause an unacceptably long wait time.)
 
-  Only values in the range 10 to 15000 milliseconds are accepted.
+  Only values in the range 10 to 60000 milliseconds are accepted.
 
   The default value is 5000 milliseconds.
 
@@ -202,7 +202,7 @@ The following keys are recognized:
   The timeout to be used when invoking a twoway operation on the registry other
   than locate().
 
-  Only values in the range 10 to 15000 milliseconds are accepted.
+  Only values in the range 10 to 60000 milliseconds are accepted.
 
   The default value is 5000 milliseconds.
 
@@ -212,7 +212,7 @@ The following keys are recognized:
   on a scope. These methods require more time to execute than other scope methods
   as they read from and write to disk.
 
-  Only values in the range 10 to 15000 milliseconds are accepted.
+  Only values in the range 10 to 60000 milliseconds are accepted.
 
   The default value is 2000 milliseconds.
 
@@ -269,7 +269,7 @@ The following keys are recognized:
   or terminate correctly. If a scope does not respond
   within the allotted time, it is killed with SIGKILL.
 
-  Only values in the range 10 to 15000 milliseconds are accepted.
+  Only values in the range 10 to 60000 milliseconds are accepted.
 
   The default value is 4000 milliseconds.
 
