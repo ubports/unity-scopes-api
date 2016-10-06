@@ -48,7 +48,7 @@ ConfigBase::ConfigBase(string const& configfile, string const& base_dflt_file) :
     configfile_(configfile)
 {
     const string snap_root = getenv("SNAP");
-    const string dflt_file = snap_root + base_dflt_file;
+    const string dflt_file = base_dflt_file.empty() ? "" : snap_root + base_dflt_file;
 
     if (!configfile.empty())
     {
