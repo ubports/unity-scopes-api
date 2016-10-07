@@ -37,6 +37,17 @@ TEST(Utils, uncamelcase)
     EXPECT_EQ("foo-bar", uncamelcase("foo-Bar"));
 }
 
+TEST(Utils, uncamelcase_turkish)
+{
+    char *old_locale = strdup(getenv("LC_ALL"));
+    setenv("LC_ALL", "tr_TR.UTF-8", 1);
+
+    EXPECT_EQ("small-i", uncamelcase("smallI"));
+
+    setenv("LC_ALL", old_locale, 1);
+    free(old_locale);
+}
+
 TEST(Utils, convert_to)
 {
     {
