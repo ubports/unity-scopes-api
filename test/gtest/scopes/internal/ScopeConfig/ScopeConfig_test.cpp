@@ -156,7 +156,7 @@ TEST(ScopeConfig, bad_timeout)
     catch(ConfigException const& e)
     {
         boost::regex r("unity::scopes::ConfigException: \".*\": Illegal value \\(-2\\) for IdleTimeout: "
-                       "value must be >= 0 and <= [0-9]+");
+                       "value must be >= 1 and <= [0-9]+");
         EXPECT_TRUE(boost::regex_match(e.what(), r));
     }
 }
