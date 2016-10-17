@@ -219,7 +219,7 @@ void ConfigBase::check_unknown_entries(KnownEntries const& known_entries) const
 
 void ConfigBase::to_lower(string & str)
 {
-    locale locale("");
+    locale locale("C"); // Use "C" to avoid the Turkish I problem
     const ctype<char>& ct = use_facet<ctype<char> >(locale);
     transform(str.begin(), str.end(), str.begin(),
             bind1st(std::mem_fun(&ctype<char>::tolower), &ct));
