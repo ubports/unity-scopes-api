@@ -43,10 +43,22 @@ namespace internal
 // If configfile is the empty string, we create a default instance that returns "Zmq" for the middleware
 // and throws for the other methods.
 
-ConfigBase::ConfigBase(string const& configfile, string const& dflt_file) :
+ConfigBase::ConfigBase(string const& configfile, string const& base_dflt_file) :
     parser_(nullptr),
     configfile_(configfile)
 {
+    char const* sroot = getenv("SNAP");
+    if (sroot)
+    {
+        snap_root_ = sroot;
+        if (!snap_root_.empty() && snap_root_[snap_root_.size() - 1] != '/')
+        {
+            snap_root_ += '/';
+        }
+    }
+
+    const string dflt_file = base_dflt_file.empty() ? "" : snap_root_ + base_dflt_file;
+
     if (!configfile.empty())
     {
         boost::filesystem::path path(configfile);
@@ -155,6 +167,11 @@ string ConfigBase::get_middleware(string const& group, string const& key) const
                  "\": legal values are \"Zmq\" and \"REST\"");
     }
     return val;
+}
+
+string ConfigBase::snap_root() const
+{
+    return snap_root_;
 }
 
 void ConfigBase::throw_ex(string const& reason) const

@@ -115,6 +115,10 @@ ScopeConfig::ScopeConfig(string const& configfile) :
     try
     {
         string art = parser()->get_string(scope_config_group, art_key);
+        if (!art.empty() && art[0] == '/')
+        {
+            art = snap_root() + art;
+        }
         art_.reset(new string(art));
     }
     catch (LogicException const&)
@@ -123,6 +127,10 @@ ScopeConfig::ScopeConfig(string const& configfile) :
     try
     {
         string icon = parser()->get_string(scope_config_group, icon_key);
+        if (!icon.empty() && icon[0] == '/')
+        {
+            icon = snap_root() + icon;
+        }
         icon_.reset(new string(icon));
     }
     catch (LogicException const&)

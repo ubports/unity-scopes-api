@@ -9,4 +9,4 @@ respawn limit 10 60
 
 expect stop
 
-exec @CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@/@UNITY_SCOPES_LIB@/smartscopesproxy upstart
+exec $SNAP/@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@/@UNITY_SCOPES_LIB@/smartscopesproxy upstart
