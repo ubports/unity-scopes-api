@@ -63,11 +63,11 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
     if (configfile.empty())  // Default config
     {
         registry_identity_ = DFLT_REGISTRY_ID;
-        registry_configfile_ = DFLT_REGISTRY_INI;
+        registry_configfile_ = snap_root() + DFLT_REGISTRY_INI;
         ss_registry_identity_ = DFLT_SS_REGISTRY_ID;
-        ss_configfile_ = DFLT_SS_REGISTRY_INI;
+        ss_configfile_ = snap_root() + DFLT_SS_REGISTRY_INI;
         default_middleware_ = DFLT_MIDDLEWARE;
-        default_middleware_configfile_ = DFLT_ZMQ_MIDDLEWARE_INI;
+        default_middleware_configfile_ = snap_root() + DFLT_ZMQ_MIDDLEWARE_INI;
         reap_expiry_ = DFLT_REAP_EXPIRY;
         reap_interval_ = DFLT_REAP_INTERVAL;
         cache_directory_ = default_cache_directory();
@@ -83,7 +83,7 @@ RuntimeConfig::RuntimeConfig(string const& configfile) :
         default_middleware_ = get_middleware(runtime_config_group, default_middleware_key);
         default_middleware_configfile_ = get_optional_string(runtime_config_group,
                                                              default_middleware_ + default_middleware_configfile_key,
-                                                             DFLT_MIDDLEWARE_INI);
+                                                             snap_root() + DFLT_MIDDLEWARE_INI);
         reap_expiry_ = get_optional_int(runtime_config_group, reap_expiry_key, DFLT_REAP_EXPIRY);
         if (reap_expiry_ < 1 && reap_expiry_ != -1)
         {

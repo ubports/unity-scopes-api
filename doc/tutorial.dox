@@ -1560,7 +1560,8 @@ The `IsAggregator` key must be set to `true` for aggregating scopes. The default
 
 The `IdleTimeout` key controls how long a scope can remain idle before it is told to stop by the registry (or
 killed if it does not stop within 4 seconds). The default idle timeout is 40 seconds, meaning that a
-scope will be told to stop if no query was sent to it for that amount of time.
+scope will be told to stop if no query was sent to it for that amount of time. Only values in the range 1 to
+300 seconds are accepted.
 
 `ResultTtl` determines how long results should be cached by the UI before they are considered "stale"
 and should be refreshed. `None` indicates that results remain valid indefinitely; `Small` indicates

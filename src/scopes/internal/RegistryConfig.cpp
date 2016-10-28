@@ -53,7 +53,7 @@ RegistryConfig::RegistryConfig(string const& identity, string const& configfile)
     identity_ = identity;
     mw_kind_ = get_middleware(registry_config_group, mw_kind_key);
     mw_configfile_ = get_optional_string(registry_config_group, mw_kind_ + configfile_key);
-    scope_installdir_ = get_optional_string(registry_config_group, scope_installdir_key, DFLT_SCOPE_INSTALL_DIR);
+    scope_installdir_ = get_optional_string(registry_config_group, scope_installdir_key, snap_root() + DFLT_SCOPE_INSTALL_DIR);
     oem_installdir_ = get_optional_string(registry_config_group, oem_installdir_key, DFLT_OEM_INSTALL_DIR);
     click_installdir_ = get_optional_string(registry_config_group, click_installdir_key);
     if (click_installdir_.empty())
@@ -65,7 +65,7 @@ RegistryConfig::RegistryConfig(string const& identity, string const& configfile)
         }
         click_installdir_ = string(home) + "/.local/share/unity-scopes/";
     }
-    scoperunner_path_ = get_optional_string(registry_config_group, scoperunner_path_key, DFLT_SCOPERUNNER_PATH);
+    scoperunner_path_ = get_optional_string(registry_config_group, scoperunner_path_key, snap_root() + DFLT_SCOPERUNNER_PATH);
     if (scoperunner_path_[0] != '/')
     {
         throw ConfigException(configfile + ": " + scoperunner_path_key + " must be an absolute path");

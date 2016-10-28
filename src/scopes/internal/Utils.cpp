@@ -113,7 +113,7 @@ string from_percent_encoding(string const& str)
 
 string uncamelcase(string const& str)
 {
-    const locale loc("");
+    const locale loc("C"); // Use "C" to avoid the Turkish I problem
     if (str.size() == 0)
     {
         return str;
