@@ -7,4 +7,4 @@ stop on desktop-end
 respawn
 respawn limit 10 60
 
-exec @CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@/@UNITY_SCOPES_LIB@/scoperegistry
+exec $SNAP/@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@/@UNITY_SCOPES_LIB@/scoperegistry

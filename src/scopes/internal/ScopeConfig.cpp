@@ -115,6 +115,10 @@ ScopeConfig::ScopeConfig(string const& configfile) :
     try
     {
         string art = parser()->get_string(scope_config_group, art_key);
+        if (!art.empty() && art[0] == '/')
+        {
+            art = snap_root() + art;
+        }
         art_.reset(new string(art));
     }
     catch (LogicException const&)
@@ -123,6 +127,10 @@ ScopeConfig::ScopeConfig(string const& configfile) :
     try
     {
         string icon = parser()->get_string(scope_config_group, icon_key);
+        if (!icon.empty() && icon[0] == '/')
+        {
+            icon = snap_root() + icon;
+        }
         icon_.reset(new string(icon));
     }
     catch (LogicException const&)
@@ -173,12 +181,11 @@ ScopeConfig::ScopeConfig(string const& configfile) :
 
     idle_timeout_ = get_optional_int(scope_config_group, idle_timeout_key, DFLT_SCOPE_IDLE_TIMEOUT);
 
-    // Negative values and values greater than max int (once multiplied by 1000 (s to ms)) are illegal
-    const int max_idle_timeout = std::numeric_limits<int>::max() / 1000;
-    if ((idle_timeout_ < 0 || idle_timeout_ > max_idle_timeout) && idle_timeout_ != -1)
+    // Values less than 1s and greater than 300s are illegal
+    if (idle_timeout_ < 1 || idle_timeout_ > 300)
     {
         throw_ex("Illegal value (" + std::to_string(idle_timeout_) + ") for " + idle_timeout_key +
-                 ": value must be >= 0 and <= " + std::to_string(max_idle_timeout));
+                 ": value must be >= 1 and <= 300");
     }
 
     results_ttl_type_ = ScopeMetadata::ResultsTtlType::None;

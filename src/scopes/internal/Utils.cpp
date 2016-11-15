@@ -113,7 +113,7 @@ string from_percent_encoding(string const& str)
 
 string uncamelcase(string const& str)
 {
-    const locale loc("");
+    const locale loc("C"); // Use "C" to avoid the Turkish I problem
     if (str.size() == 0)
     {
         return str;
@@ -266,7 +266,20 @@ string convert_exec_rel_to_abs(string const& id, boost::filesystem::path const& 
         }
         else
         {
-            result += custom_exec_arg + " ";
+            // The path provided is already absolute. Ensure that the SNAP env var is honored.
+
+            char const* sroot = getenv("SNAP");
+            std::string snap_root;
+            if (sroot)
+            {
+                snap_root = sroot;
+                if (!snap_root.empty() && snap_root[snap_root.size() - 1] != '/')
+                {
+                    snap_root += '/';
+                }
+            }
+
+            result += snap_root + custom_exec_arg + " ";
         }
     }
     result.resize(result.size() - 1);

@@ -59,6 +59,7 @@ public:
     virtual std::string get_middleware(std::string const& group, std::string const& key) const;
 
 protected:
+    std::string snap_root() const;
     void throw_ex(::std::string const& reason) const;
     bool path_exists(::std::string const& path) const;
 
@@ -70,6 +71,7 @@ protected:
 private:
     unity::util::IniParser::SPtr parser_;
     std::string configfile_;
+    std::string snap_root_;
 };
 
 } // namespace internal
