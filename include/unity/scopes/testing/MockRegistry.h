@@ -21,7 +21,10 @@
 #include <unity/scopes/Registry.h>
 #include <unity/scopes/testing/MockObject.h>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
 #include <gmock/gmock.h>
+#pragma GCC diagnostic pop
 
 namespace unity
 {

@@ -16,7 +16,10 @@
  * Authored by: Michi Henning <michi.henning@canonical.com>
  */
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
 #include <gtest/gtest.h>
+#pragma GCC diagnostic pop
 
 #include <unity/scopes/qt/internal/QUtils.h>
 
@@ -161,7 +164,7 @@ TEST(QUtils, qvariantmap_to_variantmap)
     qvm["string"] = "Hello";
 
     VariantMap vm = qvariantmap_to_variantmap(qvm);
-    ASSERT_EQ(2, vm.size());
+    ASSERT_EQ(2u, vm.size());
     EXPECT_EQ(42, vm["int"].get_int());
     EXPECT_EQ("Hello", vm["string"].get_string());
 }

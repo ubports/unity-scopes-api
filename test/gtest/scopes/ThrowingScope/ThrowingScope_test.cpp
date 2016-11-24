@@ -20,7 +20,10 @@
 #include <unity/scopes/QueryCtrl.h>
 #include <unity/scopes/Runtime.h>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
 #include <gtest/gtest.h>
+#pragma GCC diagnostic pop
 
 #include <condition_variable>
 #include <thread>
@@ -240,7 +243,7 @@ TEST_F(ThrowingScopeTest, no_error)
     EXPECT_EQ(CompletionDetails::CompletionStatus::OK, receiver->completion_status());
     EXPECT_EQ("", receiver->completion_msg());
     auto r = receiver->results();
-    EXPECT_EQ(1, r.size());
+    EXPECT_EQ(1u, r.size());
 }
 
 TEST_F(ThrowingScopeTest, throw_from_search)
@@ -255,7 +258,7 @@ TEST_F(ThrowingScopeTest, throw_from_search)
                   "    unity::ResourceException: exception from search",
               receiver->completion_msg());
     auto r = receiver->results();
-    EXPECT_EQ(0, r.size());
+    EXPECT_EQ(0u, r.size());
 }
 
 TEST_F(ThrowingScopeTest, throw_from_run)
@@ -267,7 +270,7 @@ TEST_F(ThrowingScopeTest, throw_from_run)
     EXPECT_EQ(CompletionDetails::CompletionStatus::Error, receiver->completion_status());
     EXPECT_EQ("QueryBase::run(): unity::ResourceException: exception from run", receiver->completion_msg());
     auto r = receiver->results();
-    EXPECT_EQ(0, r.size());
+    EXPECT_EQ(0u, r.size());
 }
 
 TEST_F(ThrowingScopeTest, throw_from_cancelled)
@@ -280,7 +283,7 @@ TEST_F(ThrowingScopeTest, throw_from_cancelled)
     receiver->wait_until_finished();
 
     auto r = receiver->results();
-    EXPECT_EQ(0, r.size());
+    EXPECT_EQ(0u, r.size());
 
     EXPECT_EQ(CompletionDetails::CompletionStatus::Cancelled, receiver->completion_status());
     // No exception string here because we short-cut the cancellation on the client side.
@@ -297,7 +300,7 @@ TEST_F(ThrowingScopeTest, throw_from_preview)
     EXPECT_EQ(CompletionDetails::CompletionStatus::OK, receiver->completion_status());
     EXPECT_EQ("", receiver->completion_msg());
     auto r = receiver->results();
-    EXPECT_EQ(1, r.size());
+    EXPECT_EQ(1u, r.size());
 
     auto plistener = make_shared<PreviewListener>();
     scope()->preview(r[0], ActionMetadata("unused", "unused"), plistener);
@@ -319,7 +322,7 @@ TEST_F(ThrowingScopeTest, throw_from_preview_run)
     EXPECT_EQ(CompletionDetails::CompletionStatus::OK, receiver->completion_status());
     EXPECT_EQ("", receiver->completion_msg());
     auto r = receiver->results();
-    EXPECT_EQ(1, r.size());
+    EXPECT_EQ(1u, r.size());
 
     auto plistener = make_shared<PreviewListener>();
     scope()->preview(r[0], ActionMetadata("unused", "unused"), plistener);
@@ -338,7 +341,7 @@ TEST_F(ThrowingScopeTest, throw_from_preview_cancelled)
     EXPECT_EQ(CompletionDetails::CompletionStatus::OK, receiver->completion_status());
     EXPECT_EQ("", receiver->completion_msg());
     auto r = receiver->results();
-    EXPECT_EQ(1, r.size());
+    EXPECT_EQ(1u, r.size());
 
     auto plistener = make_shared<PreviewListener>();
     auto ctrl = scope()->preview(r[0], ActionMetadata("unused", "unused"), plistener);
@@ -361,7 +364,7 @@ TEST_F(ThrowingScopeTest, throw_from_activate)
     EXPECT_EQ(CompletionDetails::CompletionStatus::OK, receiver->completion_status());
     EXPECT_EQ("", receiver->completion_msg());
     auto r = receiver->results();
-    EXPECT_EQ(1, r.size());
+    EXPECT_EQ(1u, r.size());
 
     auto alistener = make_shared<ActivationListener>();
     scope()->activate(r[0], ActionMetadata("unused", "unused"), alistener);
@@ -383,7 +386,7 @@ TEST_F(ThrowingScopeTest, throw_from_activation_activate)
     EXPECT_EQ(CompletionDetails::CompletionStatus::OK, receiver->completion_status());
     EXPECT_EQ("", receiver->completion_msg());
     auto r = receiver->results();
-    EXPECT_EQ(1, r.size());
+    EXPECT_EQ(1u, r.size());
 
     auto alistener = make_shared<ActivationListener>();
     scope()->activate(r[0], ActionMetadata("unused", "unused"), alistener);
@@ -403,7 +406,7 @@ TEST_F(ThrowingScopeTest, throw_from_activation_cancelled)
     EXPECT_EQ(CompletionDetails::CompletionStatus::OK, receiver->completion_status());
     EXPECT_EQ("", receiver->completion_msg());
     auto r = receiver->results();
-    EXPECT_EQ(1, r.size());
+    EXPECT_EQ(1u, r.size());
 
     auto alistener = make_shared<ActivationListener>();
     auto ctrl = scope()->activate(r[0], ActionMetadata("unused", "unused"), alistener);
@@ -426,7 +429,7 @@ TEST_F(ThrowingScopeTest, throw_from_perform_action)
     EXPECT_EQ(CompletionDetails::CompletionStatus::OK, receiver->completion_status());
     EXPECT_EQ("", receiver->completion_msg());
     auto r = receiver->results();
-    EXPECT_EQ(1, r.size());
+    EXPECT_EQ(1u, r.size());
 
     auto alistener = make_shared<ActivationListener>();
     scope()->perform_action(r[0], ActionMetadata("unused", "unused"), "", "", alistener);

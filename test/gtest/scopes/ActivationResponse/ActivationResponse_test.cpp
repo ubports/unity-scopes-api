@@ -22,7 +22,11 @@
 #include <unity/scopes/internal/ResultImpl.h>
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/UnityExceptions.h>
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
 #include <gtest/gtest.h>
+#pragma GCC diagnostic pop
 
 using namespace unity::scopes;
 using namespace unity::scopes::internal;
@@ -107,7 +111,7 @@ TEST(ActivationResponse, with_updated_widgets)
 
         ActivationResponse resp(widgets);
         EXPECT_EQ(ActivationResponse::Status::UpdatePreview, resp.status());
-        EXPECT_EQ(1, resp.updated_widgets().size());
+        EXPECT_EQ(1u, resp.updated_widgets().size());
         EXPECT_EQ("w1", resp.updated_widgets().begin()->id());
     }
 
@@ -170,7 +174,7 @@ TEST(ActivationResponse, serialize)
 
         ActivationResponse resp2 = internal::ActivationResponseImpl::create(var, runtime.get());
         EXPECT_EQ(ActivationResponse::Status::UpdatePreview, resp2.status());
-        EXPECT_EQ(1, resp2.updated_widgets().size());
+        EXPECT_EQ(1u, resp2.updated_widgets().size());
         EXPECT_EQ("w1", resp2.updated_widgets().begin()->id());
     }
 }

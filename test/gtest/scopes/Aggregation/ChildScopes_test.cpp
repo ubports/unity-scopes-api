@@ -26,7 +26,11 @@
 
 #include <boost/filesystem/operations.hpp>
 #include <fstream>
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
 #include <gtest/gtest.h>
+#pragma GCC diagnostic pop
 
 using namespace boost;
 using namespace testing;
@@ -152,7 +156,7 @@ TEST_F(ChildScopesTest, get_set_child_scopes)
 
     // 1st TestScope::find_child_scopes() returns: "A,B,C"
     ChildScopeList return_list = test_scope->child_scopes();
-    ASSERT_EQ(3, return_list.size());
+    ASSERT_EQ(3u, return_list.size());
     EXPECT_EQ("ScopeA", return_list[0].id);
     EXPECT_TRUE(return_list[0].enabled);
     EXPECT_EQ("ScopeB", return_list[1].id);
@@ -168,7 +172,7 @@ TEST_F(ChildScopesTest, get_set_child_scopes)
 
     // 2nd TestScope::find_child_scopes() returns: "D,A,B,C,E"
     return_list = test_scope->child_scopes();
-    ASSERT_EQ(5, return_list.size());
+    ASSERT_EQ(5u, return_list.size());
     EXPECT_EQ("ScopeD", return_list[0].id);
     EXPECT_FALSE(return_list[0].enabled);
     EXPECT_EQ("ScopeA", return_list[1].id);
@@ -182,7 +186,7 @@ TEST_F(ChildScopesTest, get_set_child_scopes)
 
     // 3rd+ TestScope::find_child_scopes() returns: "D,A,B"
     return_list = test_scope->child_scopes();
-    ASSERT_EQ(3, return_list.size());
+    ASSERT_EQ(3u, return_list.size());
     EXPECT_EQ("ScopeD", return_list[0].id);
     EXPECT_FALSE(return_list[0].enabled);
     EXPECT_EQ("ScopeA", return_list[1].id);
@@ -199,7 +203,7 @@ TEST_F(ChildScopesTest, get_set_child_scopes)
 
     // 3rd+ TestScope::find_child_scopes() returns: "D,A,B"
     return_list = test_scope->child_scopes();
-    ASSERT_EQ(3, return_list.size());
+    ASSERT_EQ(3u, return_list.size());
     EXPECT_EQ("ScopeD", return_list[0].id);
     EXPECT_TRUE(return_list[0].enabled);
     EXPECT_EQ("ScopeA", return_list[1].id);
@@ -216,7 +220,7 @@ TEST_F(ChildScopesTest, existing_config)
 
     // 1st TestScope::find_child_scopes() returns: "A,B,C"
     ChildScopeList return_list = test_scope->child_scopes();
-    ASSERT_EQ(3, return_list.size());
+    ASSERT_EQ(3u, return_list.size());
     EXPECT_EQ("ScopeA", return_list[0].id);
     EXPECT_FALSE(return_list[0].enabled);
     EXPECT_EQ("ScopeB", return_list[1].id);
@@ -242,7 +246,7 @@ TEST_F(ChildScopesTest, no_config_dir)
 
     // 1st TestScope::find_child_scopes() returns: "A,B,C"
     ChildScopeList return_list = test_scope->child_scopes();
-    ASSERT_EQ(3, return_list.size());
+    ASSERT_EQ(3u, return_list.size());
     EXPECT_EQ("ScopeA", return_list[0].id);
     EXPECT_TRUE(return_list[0].enabled);
     EXPECT_EQ("ScopeB", return_list[1].id);
@@ -263,7 +267,7 @@ TEST_F(ChildScopesTest, corrupted_config)
 
     // 1st TestScope::find_child_scopes() returns: "A,B,C"
     ChildScopeList return_list = test_scope->child_scopes();
-    ASSERT_EQ(3, return_list.size());
+    ASSERT_EQ(3u, return_list.size());
     EXPECT_EQ("ScopeA", return_list[0].id);
     EXPECT_TRUE(return_list[0].enabled);
     EXPECT_EQ("ScopeB", return_list[1].id);
@@ -278,7 +282,7 @@ TEST_F(ChildScopesTest, corrupted_config)
 
     // Check that nothing crashes and we simply get the list from the scope as is
     return_list = test_scope->child_scopes();
-    ASSERT_EQ(3, return_list.size());
+    ASSERT_EQ(3u, return_list.size());
     EXPECT_EQ("ScopeA", return_list[0].id);
     EXPECT_TRUE(return_list[0].enabled);
     EXPECT_EQ("ScopeB", return_list[1].id);
@@ -293,7 +297,7 @@ TEST_F(ChildScopesTest, corrupted_config)
 
     // Check that nothing crashes and we simply get the list from the scope as is
     return_list = test_scope->child_scopes();
-    ASSERT_EQ(3, return_list.size());
+    ASSERT_EQ(3u, return_list.size());
     EXPECT_EQ("ScopeA", return_list[0].id);
     EXPECT_TRUE(return_list[0].enabled);
     EXPECT_EQ("ScopeB", return_list[1].id);

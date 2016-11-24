@@ -31,8 +31,12 @@
 #include <unity/scopes/ValueSliderLabels.h>
 #include <unity/scopes/SearchMetadata.h>
 #include <unity/UnityExceptions.h>
-#include <gtest/gtest.h>
 #include <TestScope.h>
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
+#include <gtest/gtest.h>
+#pragma GCC diagnostic pop
 
 using namespace unity::scopes;
 using namespace unity::scopes::experimental;

@@ -16,7 +16,10 @@
  * Authored by: Xavi Garcia <xavi.garcia.mena@canonical.com>
  */
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
 #include <gtest/gtest.h>
+#pragma GCC diagnostic pop
 
 #include <unity/scopes/qt/QColumnLayout.h>
 #include <unity/scopes/qt/internal/QColumnLayoutImpl.h>
@@ -50,7 +53,7 @@ TEST(QColumnLayout, bindings)
     QVector<QString> retrieved_widget_ids = layout.column(0);
 
     std::vector<std::string> api_widgets = api_layout->column(0);
-    EXPECT_EQ(api_widgets.size(), retrieved_widget_ids.size());
+    EXPECT_EQ(int(api_widgets.size()), retrieved_widget_ids.size());
     EXPECT_TRUE(api_widgets.size() != 0);
     for (uint i = 0; i < api_widgets.size(); ++i)
     {
@@ -59,7 +62,7 @@ TEST(QColumnLayout, bindings)
 
     retrieved_widget_ids = layout.column(1);
     api_widgets = api_layout->column(1);
-    EXPECT_EQ(api_widgets.size(), retrieved_widget_ids.size());
+    EXPECT_EQ(int(api_widgets.size()), retrieved_widget_ids.size());
     EXPECT_TRUE(api_widgets.size() != 0);
     for (uint i = 0; i < api_widgets.size(); ++i)
     {

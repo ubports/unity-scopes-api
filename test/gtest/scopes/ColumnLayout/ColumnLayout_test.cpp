@@ -19,7 +19,11 @@
 #include <unity/scopes/ColumnLayout.h>
 #include <unity/scopes/internal/ColumnLayoutImpl.h>
 #include <unity/UnityExceptions.h>
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
 #include <gtest/gtest.h>
+#pragma GCC diagnostic pop
 
 using namespace unity::scopes;
 using namespace unity::scopes::internal;

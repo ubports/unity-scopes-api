@@ -21,7 +21,10 @@
 
 #include <unity/UnityExceptions.h>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
 #include <gtest/gtest.h>
+#pragma GCC diagnostic pop
 
 #include <condition_variable>
 
@@ -325,7 +328,7 @@ TEST_F(EchoScopeTest, no_error)
     EXPECT_EQ(CompletionDetails::CompletionStatus::OK, receiver->completion_status());
     EXPECT_EQ("", receiver->completion_msg());
     auto r = receiver->results();
-    ASSERT_EQ(1, r.size());
+    ASSERT_EQ(1u, r.size());
     EXPECT_EQ("success", r[0].title());
 }
 
@@ -413,7 +416,7 @@ TEST_F(EchoScopeTest, preview_no_error)
     EXPECT_EQ(CompletionDetails::CompletionStatus::OK, receiver->completion_status());
     EXPECT_EQ("", receiver->completion_msg());
     auto r = receiver->results();
-    ASSERT_EQ(1, r.size());
+    ASSERT_EQ(1u, r.size());
     EXPECT_EQ(r[0].title(), "success");
 
     auto plistener = make_shared<PreviewListener>();
@@ -433,7 +436,7 @@ TEST_F(EchoScopeTest, throw_from_preview_push_layout)
     EXPECT_EQ(CompletionDetails::CompletionStatus::OK, receiver->completion_status());
     EXPECT_EQ("", receiver->completion_msg());
     auto r = receiver->results();
-    ASSERT_EQ(1, r.size());
+    ASSERT_EQ(1u, r.size());
     EXPECT_EQ(r[0].title(), "success");
 
     auto plistener = make_shared<PreviewListener>("throw from preview push layout");
@@ -454,7 +457,7 @@ TEST_F(EchoScopeTest, throw_from_preview_push_widget)
     EXPECT_EQ(CompletionDetails::CompletionStatus::OK, receiver->completion_status());
     EXPECT_EQ("", receiver->completion_msg());
     auto r = receiver->results();
-    ASSERT_EQ(1, r.size());
+    ASSERT_EQ(1u, r.size());
     EXPECT_EQ(r[0].title(), "success");
 
     auto plistener = make_shared<PreviewListener>("throw from preview push widget");
@@ -475,7 +478,7 @@ TEST_F(EchoScopeTest, throw_from_preview_push_attribute)
     EXPECT_EQ(CompletionDetails::CompletionStatus::OK, receiver->completion_status());
     EXPECT_EQ("", receiver->completion_msg());
     auto r = receiver->results();
-    ASSERT_EQ(1, r.size());
+    ASSERT_EQ(1u, r.size());
     EXPECT_EQ(r[0].title(), "success");
 
     auto plistener = make_shared<PreviewListener>("throw from preview push attribute");
@@ -496,7 +499,7 @@ TEST_F(EchoScopeTest, throw_from_preview_finished)
     EXPECT_EQ(CompletionDetails::CompletionStatus::OK, receiver->completion_status());
     EXPECT_EQ("", receiver->completion_msg());
     auto r = receiver->results();
-    ASSERT_EQ(1, r.size());
+    ASSERT_EQ(1u, r.size());
     EXPECT_EQ(r[0].title(), "success");
 
     auto plistener = make_shared<PreviewListener>("throw from preview finished");
@@ -516,7 +519,7 @@ TEST_F(EchoScopeTest, activation_no_error)
     EXPECT_EQ(CompletionDetails::CompletionStatus::OK, receiver->completion_status());
     EXPECT_EQ("", receiver->completion_msg());
     auto r = receiver->results();
-    ASSERT_EQ(1, r.size());
+    ASSERT_EQ(1u, r.size());
     EXPECT_EQ(r[0].title(), "success");
 
     auto alistener = make_shared<ActivationListener>();
@@ -536,7 +539,7 @@ TEST_F(EchoScopeTest, throw_from_activation_activate)
     EXPECT_EQ(CompletionDetails::CompletionStatus::OK, receiver->completion_status());
     EXPECT_EQ("", receiver->completion_msg());
     auto r = receiver->results();
-    ASSERT_EQ(1, r.size());
+    ASSERT_EQ(1u, r.size());
     EXPECT_EQ(r[0].title(), "success");
 
     auto alistener = make_shared<ActivationListener>("throw from activation activate");
@@ -557,7 +560,7 @@ TEST_F(EchoScopeTest, throw_from_activation_finished)
     EXPECT_EQ(CompletionDetails::CompletionStatus::OK, receiver->completion_status());
     EXPECT_EQ("", receiver->completion_msg());
     auto r = receiver->results();
-    ASSERT_EQ(1, r.size());
+    ASSERT_EQ(1u, r.size());
     EXPECT_EQ(r[0].title(), "success");
 
     auto alistener = make_shared<ActivationListener>("throw from activation finished");

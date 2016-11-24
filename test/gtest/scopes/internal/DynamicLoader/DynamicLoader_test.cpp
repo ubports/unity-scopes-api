@@ -19,7 +19,10 @@
 #include <unity/scopes/internal/DynamicLoader.h>
 #include <unity/UnityExceptions.h>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
 #include <gtest/gtest.h>
+#pragma GCC diagnostic pop
 
 #include <boost/regex.hpp>  // Use Boost implementation until http://gcc.gnu.org/bugzilla/show_bug.cgi?id=53631 is fixed.
 using namespace std;

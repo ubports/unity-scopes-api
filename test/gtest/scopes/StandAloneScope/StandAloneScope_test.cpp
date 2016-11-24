@@ -22,7 +22,10 @@
 #include <unity/scopes/SearchListenerBase.h>
 #include <unity/scopes/SearchMetadata.h>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
 #include <gtest/gtest.h>
+#pragma GCC diagnostic pop
 
 #include <chrono>
 #include <condition_variable>

@@ -28,9 +28,13 @@
 #include <unity/scopes/ActionMetadata.h>
 #include <unity/UnityExceptions.h>
 #include <functional>
-#include <gtest/gtest.h>
 #include <unity/scopes/testing/Result.h>
 #include <TestScope.h>
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
+#include <gtest/gtest.h>
+#pragma GCC diagnostic pop
 
 using namespace unity::scopes;
 using namespace unity::scopes::internal;

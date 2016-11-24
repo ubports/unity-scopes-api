@@ -16,7 +16,11 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
 #include <gtest/gtest.h>
+#pragma GCC diagnostic pop
+
 #include <unity/scopes/FilterState.h>
 #include <unity/scopes/ValueSliderFilter.h>
 #include <unity/scopes/ValueSliderLabels.h>
@@ -45,7 +49,7 @@ TEST(ValueSliderFilter, basic)
         EXPECT_EQ("f1", filter1->id());
         EXPECT_EQ("Min", filter1->labels().min_label());
         EXPECT_EQ("Max", filter1->labels().max_label());
-        EXPECT_EQ(2, filter1->labels().extra_labels().size());
+        EXPECT_EQ(2u, filter1->labels().extra_labels().size());
         EXPECT_EQ("Ten", filter1->labels().extra_labels()[0].second);
         EXPECT_EQ("Fifty", filter1->labels().extra_labels()[1].second);
         EXPECT_EQ(50, filter1->default_value());
@@ -115,7 +119,7 @@ TEST(ValueSliderFilter, serialize)
     EXPECT_EQ("f1", filter2->id());
     EXPECT_EQ("Min", filter2->labels().min_label());
     EXPECT_EQ("Max", filter2->labels().max_label());
-    EXPECT_EQ(1, filter2->labels().extra_labels().size());
+    EXPECT_EQ(1u, filter2->labels().extra_labels().size());
     EXPECT_EQ(10, filter2->labels().extra_labels()[0].first);
     EXPECT_EQ("Ten", filter2->labels().extra_labels()[0].second);
     EXPECT_EQ(1, filter2->min());

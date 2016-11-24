@@ -1,21 +1,4 @@
-if (NOT DEFINED GMOCK_ROOT)
-    set(GMOCK_ROOT /usr/src/gmock)
-endif()
-
-add_subdirectory(${GMOCK_ROOT} gmock)
-
-# Selectively switch off warnings about missing field initializers when building gmock and gtest
-set_property(TARGET gmock APPEND_STRING PROPERTY COMPILE_FLAGS " -Wno-missing-field-initializers -Wno-old-style-cast")
-set_property(TARGET gmock_main APPEND_STRING PROPERTY COMPILE_FLAGS " -Wno-missing-field-initializers -Wno-old-style-cast")
-set_property(TARGET gtest APPEND_STRING PROPERTY COMPILE_FLAGS " -Wno-missing-field-initializers -Wno-old-style-cast")
-
-# Make sure we always build gtest/gmock with debug info, otherwise we don't
-# get line numbers for the code that is dragged in by the test macros.
-set_property(TARGET gmock APPEND_STRING PROPERTY COMPILE_FLAGS " -g")
-set_property(TARGET gmock_main APPEND_STRING PROPERTY COMPILE_FLAGS " -g")
-set_property(TARGET gtest APPEND_STRING PROPERTY COMPILE_FLAGS " -g")
-
-include_directories(${GMOCK_ROOT}/gtest/include)
+find_package(GMock)
 
 set(LIBGTEST gtest gmock gmock_main)
 set(TESTLIBS ${TESTLIBS} ${LIBGTEST} boost_regex)

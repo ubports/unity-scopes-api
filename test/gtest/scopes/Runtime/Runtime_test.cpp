@@ -28,7 +28,10 @@
 #include <unity/scopes/SearchMetadata.h>
 #include <unity/UnityExceptions.h>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
 #include <gtest/gtest.h>
+#pragma GCC diagnostic pop
 
 #include "PusherScope.h"
 #include "SlowCreateScope.h"
@@ -113,7 +116,7 @@ public:
         EXPECT_EQ(1, annotation_count_);
         EXPECT_EQ(2, info_count_);
 
-        EXPECT_EQ(2, details.info_list().size());
+        EXPECT_EQ(2u, details.info_list().size());
         if (details.info_list().size() == 2)
         {
             EXPECT_EQ(OperationInfo::NoInternet, details.info_list()[0].code());
@@ -201,7 +204,7 @@ public:
         EXPECT_EQ(2, data_pushes_);
         EXPECT_EQ(2, info_count_);
 
-        EXPECT_EQ(2, details.info_list().size());
+        EXPECT_EQ(2u, details.info_list().size());
         if (details.info_list().size() == 2)
         {
             EXPECT_EQ(OperationInfo::NoLocationData, details.info_list()[0].code());

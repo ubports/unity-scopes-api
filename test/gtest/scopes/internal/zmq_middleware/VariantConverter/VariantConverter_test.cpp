@@ -20,8 +20,12 @@
 #include <scopes/internal/zmq_middleware/capnproto/ValueDict.capnp.h>
 #include <unity/UnityExceptions.h>
 
-#include <gtest/gtest.h>
 #include <capnp/message.h>
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
+#include <gtest/gtest.h>
+#pragma GCC diagnostic pop
 
 using namespace std;
 using namespace unity;

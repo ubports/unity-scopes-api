@@ -21,7 +21,11 @@
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/internal/ScopeImpl.h>
 
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
 #include <gtest/gtest.h>
+#pragma GCC diagnostic pop
 
 #include "SlowSearchScope.h"
 

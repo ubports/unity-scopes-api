@@ -16,8 +16,10 @@
  * Authored by: Xavi Garcia <xavi.garcia.mena@canonical.com>
  */
 
-#include <gtest/gtest.h>
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
 #include <gmock/gmock.h>
+#pragma GCC diagnostic pop
 
 #include "BasicEventsChecker.h"
 #include "TestSetup.h"

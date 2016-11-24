@@ -25,7 +25,10 @@
 #include <unity/UnityExceptions.h>
 
 #include <boost/regex.hpp>  // Use Boost implementation until http://gcc.gnu.org/bugzilla/show_bug.cgi?id=53631 is fixed.
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
 #include <gtest/gtest.h>
+#pragma GCC diagnostic pop
 
 using namespace std;
 using namespace unity;
@@ -61,7 +64,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("display_name", m.display_name());
     EXPECT_EQ("description", m.description());
     EXPECT_EQ("author", m.author());
-    EXPECT_EQ(0, m.appearance_attributes().size());
+    EXPECT_EQ(0u, m.appearance_attributes().size());
     EXPECT_EQ(ScopeMetadata::ResultsTtlType::Medium, m.results_ttl_type());
 
     // Check that optional fields that are not set throw
@@ -144,7 +147,7 @@ TEST(ScopeMetadataImpl, basic)
     EXPECT_EQ("display_name", mi2->display_name());
     EXPECT_EQ("description", mi2->description());
     EXPECT_EQ("author", mi2->author());
-    EXPECT_EQ(0, mi2->appearance_attributes().size());
+    EXPECT_EQ(0u, mi2->appearance_attributes().size());
     EXPECT_EQ(ScopeMetadata::ResultsTtlType::Medium, mi2->results_ttl_type());
     EXPECT_EQ(0, mi2->version());
 

@@ -18,7 +18,11 @@
 
 // You may also include individual headers if you prefer.
 #include <unity-scopes.h>
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
 #include <gtest/gtest.h>
+#pragma GCC diagnostic pop
 
 #include <boost/filesystem.hpp>
 #include <condition_variable>
@@ -107,7 +111,7 @@ TEST(stress, queryThreeScopesInParallel)
     RegistryProxy r = rt->registry();
 
     auto scopes_meta = r->list();
-    EXPECT_EQ(scopes_meta.size(), 3);
+    EXPECT_EQ(3u, scopes_meta.size());
 
     const std::list<std::string> scopes {"scope1", "scope2", "scope3"};
 
@@ -131,7 +135,7 @@ TEST(stress, queryThreeScopesInParallel)
         {
             reply->wait_until_finished();
             cout << "finished query for scope " << reply->scope_id() << endl;
-            EXPECT_EQ(reply->result_count(), 20u);
+            EXPECT_EQ(20, reply->result_count());
         }
     }
 }
