@@ -1,3 +1,9 @@
+unity-scopes-api (1.0.7+17.04.20161115-0ubuntu1) zesty; urgency=medium
+
+  * Be stricter on user-configurable idle timeout (1s to 5min).
+
+ -- Marcus Tomlinson <marcus.tomlinson@canonical.com>  Tue, 15 Nov 2016 06:09:04 +0000
+
 unity-scopes-api (1.0.7+16.10.20160921-0ubuntu1) yakkety; urgency=medium
 
   [ Marcus Tomlinson ]
