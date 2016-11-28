@@ -60,7 +60,7 @@ TEST(Utils, uncamelcase_turkish)
     }
     else
     {
-        unsetenv("LX_ALL");
+        unsetenv("LC_ALL");
     }
 }
 
