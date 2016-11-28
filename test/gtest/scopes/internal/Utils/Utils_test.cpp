@@ -58,6 +58,10 @@ TEST(Utils, uncamelcase_turkish)
     {
         setenv("LC_ALL", old_locale.c_str(), 1);
     }
+    else
+    {
+        unsetenv("LX_ALL");
+    }
 }
 
 TEST(Utils, convert_to)
