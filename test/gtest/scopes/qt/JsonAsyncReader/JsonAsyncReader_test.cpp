@@ -23,7 +23,11 @@
 
 #include <QtCore/QJsonObject>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
 #include <gtest/gtest.h>
+#pragma GCC diagnostic pop
+
 #include <core/posix/exec.h>
 
 namespace posix = core::posix;
@@ -162,7 +166,7 @@ TEST_F(ExceptionsTest, user_results_ok)
     }
 
     // check that we've got 5 valid results
-    EXPECT_EQ(results.size(), 5);
+    EXPECT_EQ(5u, results.size());
 }
 
 TEST_F(ExceptionsTest, check_xml_bad_formed)

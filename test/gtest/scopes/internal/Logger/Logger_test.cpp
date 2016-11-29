@@ -19,7 +19,12 @@
 #include <unity/scopes/internal/Logger.h>
 
 #include <boost/algorithm/string.hpp>
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
 #include <gtest/gtest.h>
+#pragma GCC diagnostic pop
+
 #include <unity/UnityExceptions.h>
 
 using namespace std;

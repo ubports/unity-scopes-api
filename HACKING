@@ -205,13 +205,13 @@ files:
 
   - QT-VERSION
 
-    The full version number parts for libunity-scopes-qt.
+    The full version number for libunity-scopes-qt.
 
   - *If* the soname changes, you need to add the outdated
     versions to the "Replaces:" and "Conflicts:" entries
-    in control and control.in. (You need an extra
-    entry for each Vivid and Wily/Xenial andlater. See
-    bileto_pre_release_hook for the sed scripts that append a
+    in control.in. (You need an extra entry for each Vivid and
+    Wily/Xenial and later.)
+    See bileto_pre_release_hook for the sed scripts that append a
     line to the stanza if the soname is changed. This also may apply
     if the soname of the Qt library changes, in which case
     bileto_pre_release_hook needs a corresponding update.

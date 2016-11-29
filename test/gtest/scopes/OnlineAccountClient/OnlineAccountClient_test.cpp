@@ -28,10 +28,14 @@
 #include <boost/filesystem/operations.hpp>
 #include <condition_variable>
 #include <functional>
-#include <gtest/gtest.h>
 #include <libaccounts-glib/accounts-glib.h>
 #include <libdbustest/dbus-test.h>
 #include <thread>
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
+#include <gtest/gtest.h>
+#pragma GCC diagnostic pop
 
 using namespace unity;
 using namespace unity::scopes;
@@ -421,13 +425,13 @@ TEST_F(OnlineAccountClientTest, register_account_login_widget)
 TEST_F(OnlineAccountClientTest, refresh_services_main_loop)
 {
     auto statuses = oa_client()->get_service_statuses();
-    EXPECT_EQ(0, statuses.size());
+    EXPECT_EQ(0u, statuses.size());
 
     create_account();
     oa_client()->refresh_service_statuses();
 
     statuses = oa_client()->get_service_statuses();
-    EXPECT_EQ(1, statuses.size());
+    EXPECT_EQ(1u, statuses.size());
     EXPECT_FALSE(statuses[0].service_enabled);
 
     enable_service();
@@ -464,7 +468,7 @@ TEST_F(OnlineAccountClientTest, refresh_services_main_loop)
     oa_client()->refresh_service_statuses();
 
     statuses = oa_client()->get_service_statuses();
-    EXPECT_EQ(0, statuses.size());
+    EXPECT_EQ(0u, statuses.size());
 }
 
 TEST_F(OnlineAccountClientTest, service_update_callback)

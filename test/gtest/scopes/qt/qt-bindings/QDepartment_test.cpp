@@ -16,7 +16,10 @@
  * Authored by: Xavi Garcia <xavi.garcia.mena@canonical.com>
  */
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
 #include <gtest/gtest.h>
+#pragma GCC diagnostic pop
 
 #include <unity/scopes/qt/QCannedQuery.h>
 #include <unity/scopes/qt/QDepartment.h>
@@ -63,7 +66,7 @@ TEST(QDepartment, bindings)
     unity::scopes::DepartmentList api_list = api_dep->subdepartments();
 
     EXPECT_TRUE(qt_list.size() != 0);
-    EXPECT_EQ(qt_list.size(), api_list.size());
+    EXPECT_EQ(qt_list.size(), int(api_list.size()));
 
     std::vector<std::string> dep_ids;
     for (auto item : api_list)

@@ -16,9 +16,11 @@
  * Authored by: Xavi Garcia <xavi.garcia.mena@canonical.com>
  */
 
-#include <gtest/gtest.h>
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
 #include <gmock/gmock.h>
 #include <gmock/gmock-actions.h>
+#pragma GCC diagnostic pop
 
 #include "QMockScope.h"
 #include "QScopeBaseAPIMock.h"

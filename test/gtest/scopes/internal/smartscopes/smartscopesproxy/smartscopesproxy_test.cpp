@@ -32,7 +32,11 @@
 #include "../RaiiServer.h"
 
 #include <memory>
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
 #include <gtest/gtest.h>
+#pragma GCC diagnostic pop
 
 using namespace testing;
 using namespace unity::scopes;
@@ -136,15 +140,15 @@ TEST_F(smartscopesproxytest, ss_registry)
         EXPECT_EQ("Dummy demo scope 3.", meta.description());
         EXPECT_EQ("Mr.Fake", meta.author());
         EXPECT_FALSE(meta.invisible());
-        EXPECT_EQ(4, meta.settings_definitions().size());
+        EXPECT_EQ(4u, meta.settings_definitions().size());
         EXPECT_EQ("unitTemp", meta.settings_definitions()[1].get_dict()["id"].get_string());
         EXPECT_EQ("Temperature Units", meta.settings_definitions()[1].get_dict()["displayName"].get_string());
         EXPECT_EQ("list", meta.settings_definitions()[1].get_dict()["type"].get_string());
         EXPECT_EQ(1, meta.settings_definitions()[1].get_dict()["defaultValue"].get_int());
-        EXPECT_EQ(2, meta.settings_definitions()[1].get_dict()["displayValues"].get_array().size());
+        EXPECT_EQ(2u, meta.settings_definitions()[1].get_dict()["displayValues"].get_array().size());
         EXPECT_EQ("Celsius", meta.settings_definitions()[1].get_dict()["displayValues"].get_array()[0].get_string());
         EXPECT_EQ("Fahrenheit", meta.settings_definitions()[1].get_dict()["displayValues"].get_array()[1].get_string());
-        ASSERT_EQ(4, meta.keywords().size());
+        ASSERT_EQ(4u, meta.keywords().size());
         EXPECT_NE(meta.keywords().end(), meta.keywords().find("music"));
         EXPECT_NE(meta.keywords().end(), meta.keywords().find("video"));
         EXPECT_NE(meta.keywords().end(), meta.keywords().find("news"));
@@ -176,12 +180,12 @@ TEST_F(smartscopesproxytest, ss_registry)
         EXPECT_EQ("Dummy demo scope 3.", meta.description());
         EXPECT_EQ("Mr.Fake", meta.author());
         EXPECT_FALSE(meta.invisible());
-        EXPECT_EQ(4, meta.settings_definitions().size());
+        EXPECT_EQ(4u, meta.settings_definitions().size());
         EXPECT_EQ("unitTemp", meta.settings_definitions()[1].get_dict()["id"].get_string());
         EXPECT_EQ("Temperature Units", meta.settings_definitions()[1].get_dict()["displayName"].get_string());
         EXPECT_EQ("list", meta.settings_definitions()[1].get_dict()["type"].get_string());
         EXPECT_EQ(1, meta.settings_definitions()[1].get_dict()["defaultValue"].get_int());
-        EXPECT_EQ(2, meta.settings_definitions()[1].get_dict()["displayValues"].get_array().size());
+        EXPECT_EQ(2u, meta.settings_definitions()[1].get_dict()["displayValues"].get_array().size());
         EXPECT_EQ("Celsius", meta.settings_definitions()[1].get_dict()["displayValues"].get_array()[0].get_string());
         EXPECT_EQ("Fahrenheit", meta.settings_definitions()[1].get_dict()["displayValues"].get_array()[1].get_string());
     }
@@ -192,7 +196,7 @@ TEST_F(smartscopesproxytest, ss_registry_locale)
     // set an invalid LANGUAGE env var (should return 0 scopes)
     ::setenv("LANGUAGE", "test_FAIL", 1);
     reset_reg();
-    EXPECT_EQ(0, reg_->list().size());
+    EXPECT_EQ(0u, reg_->list().size());
 
     // set an empty LANGUAGE env var (should return 2 scopes)
     ::setenv("LANGUAGE", "", 1);
@@ -217,7 +221,7 @@ TEST_F(smartscopesproxytest, ss_registry_locale)
     // set a colon seperated LANGUAGE env var (first invalid - should return 0 scopes)
     ::setenv("LANGUAGE", "test_FAIL:test_TEST", 1);
     reset_reg();
-    EXPECT_EQ(0, reg_->list().size());
+    EXPECT_EQ(0u, reg_->list().size());
 }
 
 class Receiver : public SearchListenerBase
