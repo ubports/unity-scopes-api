@@ -404,13 +404,13 @@ std::string RegistryObject::desktop_files_dir()
 
 void RegistryObject::create_desktop_file(ScopeMetadata const& metadata)
 {
-    std::string desktop_file_path = desktop_files_dir();
-    if (!generate_desktop_files_ || desktop_file_path.empty())
+    static std::string const desktop_files_dir = RegistryObject::desktop_files_dir();
+    if (!generate_desktop_files_ || desktop_files_dir.empty())
     {
         return;
     }
 
-    desktop_file_path += "/" + metadata.scope_id() + ".desktop";
+    std::string const desktop_file_path = desktop_files_dir + "/" + metadata.scope_id() + ".desktop";
 
     std::ofstream desktop_file(desktop_file_path.c_str());
     if (!desktop_file)
