@@ -83,6 +83,12 @@ private:
     std::condition_variable cond_;
 };
 
+TEST(Registry, desktop_dir_does_not_exist)
+{
+    // Directory does not exist to start with.
+    EXPECT_FALSE(filesystem::is_directory(TEST_RUNTIME_PATH "/applications"));
+}
+
 TEST(Registry, metadata)
 {
     Runtime::UPtr rt = Runtime::create(TEST_RUNTIME_FILE);
@@ -154,6 +160,12 @@ TEST(Registry, metadata)
     EXPECT_EQ(0u, meta.keywords().size());
     EXPECT_EQ(0, meta.version());
     EXPECT_FALSE(meta.is_aggregator());
+}
+
+TEST(Registry, desktop_dir_exists)
+{
+    // Directory must have been created.
+    EXPECT_TRUE(filesystem::is_directory(TEST_RUNTIME_PATH "/applications"));
 }
 
 auto const wait_for_update_time = std::chrono::milliseconds(5000);
@@ -694,6 +706,7 @@ int main(int argc, char **argv)
 
     // Unlink in case we left the link behind from an earlier interrupted run.
     system::error_code ec;
+    filesystem::remove_all(TEST_RUNTIME_PATH "/applications", ec);
     filesystem::remove_all(TEST_RUNTIME_PATH "/scopes/testscopeC", ec);
     filesystem::remove_all(TEST_RUNTIME_PATH "/click",ec);
     filesystem::remove(TEST_RUNTIME_PATH "/scopes/testscopeD", ec);
@@ -701,7 +714,7 @@ int main(int argc, char **argv)
     filesystem::remove(TEST_RUNTIME_PATH "/scopes/testscopeB/testscopeB-settings.ini", ec);
 
     // Set the "TEST_DESKTOP_FILES_DIR" env var before forking as not to create desktop files in ~/.local
-    putenv(const_cast<char*>("TEST_DESKTOP_FILES_DIR=" TEST_RUNTIME_PATH));
+    putenv(const_cast<char*>("TEST_DESKTOP_FILES_DIR=" TEST_RUNTIME_PATH "/applications"));
 
     auto rpid = fork();
     if (rpid == 0)
