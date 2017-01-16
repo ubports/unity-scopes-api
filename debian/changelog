@@ -1,10 +1,10 @@
-unity-scopes-api (1.0.8ubuntu1) UNRELEASED; urgency=medium
+unity-scopes-api (1.0.8+17.04.20170116-0ubuntu1) zesty; urgency=medium
 
   * Create $HOME/.local/share/applications if it does not exist. lp:1645798
   * Fixed lots of compiler warnings.
   * Changed cmake files to work with new gtest.
 
- -- Michi Henning <michi.henning@canonical.com>  Mon, 16 Jan 2017 12:30:39 +1000
+ -- Michi Henning <michi@triodia.com>  Mon, 16 Jan 2017 02:42:13 +0000
 
 unity-scopes-api (1.0.7+17.04.20161115-0ubuntu1) zesty; urgency=medium
 
