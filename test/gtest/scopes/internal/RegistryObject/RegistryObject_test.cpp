@@ -24,8 +24,10 @@
 #include <unity/UnityExceptions.h>
 #include <unity/scopes/ScopeExceptions.h>
 
-#include <gtest/gtest.h>
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
 #include <gmock/gmock.h>
+#pragma GCC diagnostic pop
 
 using namespace std;
 using namespace testing;

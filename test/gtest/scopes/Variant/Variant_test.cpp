@@ -21,7 +21,10 @@
 
 #include <boost/variant.hpp>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
 #include <gtest/gtest.h>
+#pragma GCC diagnostic pop
 
 using namespace std;
 using namespace unity;
@@ -292,12 +295,12 @@ TEST(Variant, deserialize_json)
 
     v = Variant::deserialize_json("{\"foo\": \"bar\"}");
     VariantMap vm = v.get_dict();
-    EXPECT_EQ(1, vm.size());
+    EXPECT_EQ(1u, vm.size());
     EXPECT_EQ("bar", vm.at("foo").get_string());
 
     v = Variant::deserialize_json("[1, \"two\"]");
     VariantArray va = v.get_array();
-    EXPECT_EQ(2, va.size());
+    EXPECT_EQ(2u, va.size());
     EXPECT_EQ(1, va[0].get_int());
     EXPECT_EQ("two", va[1].get_string());
 }

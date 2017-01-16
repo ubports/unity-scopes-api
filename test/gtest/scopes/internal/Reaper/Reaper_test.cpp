@@ -20,7 +20,10 @@
 
 #include <unity/UnityExceptions.h>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
 #include <gtest/gtest.h>
+#pragma GCC diagnostic pop
 
 using namespace std;
 using namespace unity::scopes;
@@ -200,17 +203,17 @@ TEST(Reaper, basic)
         auto e1 = r->add([]{});
         auto e2 = r->add([]{});
         auto e3 = r->add([]{});
-        EXPECT_EQ(3, r->size());
+        EXPECT_EQ(3u, r->size());
         e2->cancel();
-        EXPECT_EQ(2, r->size());
+        EXPECT_EQ(2u, r->size());
 
         r->destroy();
 
-        EXPECT_EQ(2, r->size());
+        EXPECT_EQ(2u, r->size());
         e3->cancel();
-        EXPECT_EQ(1, r->size());
+        EXPECT_EQ(1u, r->size());
         e1->cancel();
-        EXPECT_EQ(0, r->size());
+        EXPECT_EQ(0u, r->size());
     }
 }
 
@@ -326,7 +329,7 @@ TEST(Reaper, cancel_during_expiry)
         // Now we destroy the reaper, *before* the pass at t == 6.0.
         // Because CallbackOnDestroy is set, e3 is reaped.
         r->destroy();
-        EXPECT_EQ(0, r->size());
+        EXPECT_EQ(0u, r->size());
         EXPECT_EQ(1, c1.get());
         EXPECT_EQ(0, c2.get());
         EXPECT_EQ(1, c3.get());    // Callback for e3 must have been invoked.
@@ -361,7 +364,7 @@ TEST(Reaper, wait_during_expiry)
 
         // e1 is oldest, so at the tail of the reap list.
 
-        EXPECT_EQ(2, r->size());
+        EXPECT_EQ(2u, r->size());
         EXPECT_LT(t(), 2000);
 
         this_thread::sleep_for(chrono::milliseconds(2500));  // At t == 2.0, reaper kicks in.
@@ -370,14 +373,14 @@ TEST(Reaper, wait_during_expiry)
         EXPECT_GE(t(), 2500);
         EXPECT_EQ(1, c1.get());             // Was reaped at t ~ 2.0 (tested by lambda on c1)
         EXPECT_EQ(0, c2.get());             // Expires at t ~ 2.0, but not reaped yet, because c1 has not completed
-        EXPECT_EQ(1, r->size());            // e2 must still be there
+        EXPECT_EQ(1u, r->size());            // e2 must still be there
 
         // We null out e2 while the reaping pass is still stuck in the callback for e1.
         EXPECT_LT(t(), 3000);
         e2 = nullptr;                       // Blocks until e1's callback completes at t ~ 3.0 (tested by lambda on c2)
         EXPECT_GE(t(), 3000);
         EXPECT_EQ(0, c2.get());
-        EXPECT_EQ(0, r->size());
+        EXPECT_EQ(0u, r->size());
     }
 }
 
@@ -419,7 +422,7 @@ TEST(Reaper, self_cancel)
         SelfDestroy sd(r);
         this_thread::sleep_for(chrono::milliseconds(1500));
         EXPECT_TRUE(sd.called());
-        EXPECT_EQ(0, r->size());
+        EXPECT_EQ(0u, r->size());
     }
 }
 
@@ -441,13 +444,13 @@ TEST(Reaper, no_reap_thread)
 
         e1->refresh();
         e2->cancel();
-        EXPECT_EQ(2, r->size());
+        EXPECT_EQ(2u, r->size());
         EXPECT_EQ(0, c1.get());
         EXPECT_EQ(0, c2.get());
         EXPECT_EQ(0, c3.get());
 
         r->destroy();
-        EXPECT_EQ(0, r->size());
+        EXPECT_EQ(0u, r->size());
         EXPECT_EQ(1, c1.get());
         EXPECT_EQ(0, c2.get());
         EXPECT_EQ(1, c3.get());
@@ -466,13 +469,13 @@ TEST(Reaper, no_reap_thread)
 
         e1->refresh();
         e2->cancel();
-        EXPECT_EQ(2, r->size());
+        EXPECT_EQ(2u, r->size());
         EXPECT_EQ(0, c1.get());
         EXPECT_EQ(0, c2.get());
         EXPECT_EQ(0, c3.get());
 
         r->destroy();
-        EXPECT_EQ(2, r->size());
+        EXPECT_EQ(2u, r->size());
         EXPECT_EQ(0, c1.get());
         EXPECT_EQ(0, c2.get());
         EXPECT_EQ(0, c3.get());

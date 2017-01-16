@@ -23,7 +23,10 @@
 #include <unity/UnityExceptions.h>
 
 #include <boost/regex.hpp>  // Use Boost implementation until http://gcc.gnu.org/bugzilla/show_bug.cgi?id=53631 is fixed.
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
 #include <gtest/gtest.h>
+#pragma GCC diagnostic pop
 
 using namespace unity::scopes;
 using namespace unity::scopes::internal;
@@ -65,7 +68,7 @@ TEST(ScopeConfig, basic)
         EXPECT_TRUE(cfg.is_aggregator());
 
         auto attrs = cfg.appearance_attributes();
-        EXPECT_EQ(5, attrs.size());
+        EXPECT_EQ(5u, attrs.size());
         EXPECT_TRUE(attrs["arbitrary_key"].get_bool());
         EXPECT_EQ("bar", attrs["another_one"].get_string());
         EXPECT_EQ(11, attrs["num_key"].get_int());
@@ -97,7 +100,7 @@ TEST(ScopeConfig, basic)
         EXPECT_EQ(0, cfg.version());
         EXPECT_FALSE(cfg.is_aggregator());
 
-        EXPECT_EQ(0, cfg.appearance_attributes().size());
+        EXPECT_EQ(0u, cfg.appearance_attributes().size());
 
         // Optional items that throw if not set
 
@@ -137,13 +140,13 @@ TEST(ScopeConfig, bad_child_scope_ids)
 TEST(ScopeConfig, empty_scope_ids)
 {
     ScopeConfig cfg(EMPTY_CHILD_IDS);
-    EXPECT_EQ(cfg.child_scope_ids().size(), 0);
+    EXPECT_EQ(0u, cfg.child_scope_ids().size());
 }
 
 TEST(ScopeConfig, single_scope_id)
 {
     ScopeConfig cfg(SINGLE_CHILD_ID);
-    EXPECT_EQ(cfg.child_scope_ids().size(), 1);
+    EXPECT_EQ(1u, cfg.child_scope_ids().size());
 }
 
 TEST(ScopeConfig, bad_timeout)
@@ -206,13 +209,13 @@ TEST(ScopeConfig, bad_keywords)
 TEST(ScopeConfig, empty_keywords)
 {
     ScopeConfig cfg(EMPTY_KEYWORDS);
-    EXPECT_EQ(cfg.keywords().size(), 0);
+    EXPECT_EQ(0u, cfg.keywords().size());
 }
 
 TEST(ScopeConfig, single_keyword)
 {
     ScopeConfig cfg(SINGLE_KEYWORD);
-    EXPECT_EQ(cfg.keywords().size(), 1);
+    EXPECT_EQ(1u, cfg.keywords().size());
 }
 
 TEST(ScopeConfig, empty_display_name)

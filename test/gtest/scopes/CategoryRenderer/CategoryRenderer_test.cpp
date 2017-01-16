@@ -19,7 +19,11 @@
 #include <unity/scopes/CategoryRenderer.h>
 #include <unity/UnityExceptions.h>
 #include <fstream>
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
 #include <gtest/gtest.h>
+#pragma GCC diagnostic pop
 
 using namespace unity::scopes;
 using namespace unity::scopes::internal;

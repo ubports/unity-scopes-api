@@ -16,7 +16,10 @@
  * Authored by: Xavi Garcia <xavi.garcia.mena@canonical.com>
  */
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
 #include <gtest/gtest.h>
+#pragma GCC diagnostic pop
 
 #include <unity/scopes/qt/QCannedQuery.h>
 #include <unity/scopes/qt/internal/QCannedQueryImpl.h>
@@ -49,7 +52,7 @@ TEST(QCannedQuery, bindings)
 
     unity::scopes::VariantMap api_map = api_query->serialize();
     QVariantMap qt_map = query.serialize();
-    EXPECT_EQ(api_map.size(), qt_map.size());
+    EXPECT_EQ(int(api_map.size()), qt_map.size());
     EXPECT_TRUE(qt_map.size() != 0);
     EXPECT_EQ(variantmap_to_qvariantmap(api_map), qt_map);
 

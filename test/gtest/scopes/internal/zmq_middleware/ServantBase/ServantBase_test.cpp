@@ -22,7 +22,10 @@
 #include <unity/scopes/internal/zmq_middleware/ObjectAdapter.h>
 #include <unity/UnityExceptions.h>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
 #include <gtest/gtest.h>
+#pragma GCC diagnostic pop
 
 #include <cassert>
 

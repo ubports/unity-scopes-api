@@ -24,7 +24,11 @@
 #include <unity/scopes/SearchMetadata.h>
 
 #include <boost/filesystem/operations.hpp>
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
 #include <gtest/gtest.h>
+#pragma GCC diagnostic pop
 
 #include <chrono>
 #include <condition_variable>
@@ -79,6 +83,12 @@ private:
     std::condition_variable cond_;
 };
 
+TEST(Registry, desktop_dir_does_not_exist)
+{
+    // Directory does not exist to start with.
+    EXPECT_FALSE(filesystem::is_directory(TEST_RUNTIME_PATH "/applications"));
+}
+
 TEST(Registry, metadata)
 {
     Runtime::UPtr rt = Runtime::create(TEST_RUNTIME_FILE);
@@ -96,7 +106,7 @@ TEST(Registry, metadata)
     EXPECT_EQ("scope-A.SearchHint", meta.search_hint());
     EXPECT_EQ(TEST_RUNTIME_PATH "/scopes/testscopeA", meta.scope_directory());
     auto defs = meta.settings_definitions();
-    ASSERT_EQ(2, defs.size());
+    ASSERT_EQ(2u, defs.size());
     EXPECT_EQ("locationSetting", defs[0].get_dict()["id"].get_string());
     EXPECT_EQ("Location", defs[0].get_dict()["displayName"].get_string());
     EXPECT_EQ("string", defs[0].get_dict()["type"].get_string());
@@ -144,12 +154,18 @@ TEST(Registry, metadata)
     EXPECT_EQ("scope-B.SearchHint", meta.search_hint());
     EXPECT_EQ(TEST_RUNTIME_PATH "/scopes/testscopeB", meta.scope_directory());
     defs = meta.settings_definitions();
-    EXPECT_EQ(0, defs.size());
+    EXPECT_EQ(0u, defs.size());
     EXPECT_FALSE(meta.location_data_needed());
-    EXPECT_EQ(0, meta.child_scope_ids().size());
-    EXPECT_EQ(0, meta.keywords().size());
+    EXPECT_EQ(0u, meta.child_scope_ids().size());
+    EXPECT_EQ(0u, meta.keywords().size());
     EXPECT_EQ(0, meta.version());
     EXPECT_FALSE(meta.is_aggregator());
+}
+
+TEST(Registry, desktop_dir_exists)
+{
+    // Directory must have been created.
+    EXPECT_TRUE(filesystem::is_directory(TEST_RUNTIME_PATH "/applications"));
 }
 
 auto const wait_for_update_time = std::chrono::milliseconds(5000);
@@ -211,7 +227,7 @@ TEST(Registry, scope_state_notify)
 
     auto meta = r->get_metadata("testscopeA");
     auto defs = meta.settings_definitions();
-    EXPECT_EQ(2, defs.size());
+    EXPECT_EQ(2u, defs.size());
     auto sp = meta.proxy();
 
     // testscopeA should not be running at this point
@@ -228,7 +244,7 @@ TEST(Registry, scope_state_notify)
 
     meta = r->get_metadata("testscopeB");
     defs = meta.settings_definitions();
-    EXPECT_EQ(0, defs.size());
+    EXPECT_EQ(0u, defs.size());
     sp = meta.proxy();
 
     // testscopeB should not be running at this point
@@ -478,7 +494,7 @@ TEST(Registry, list_update_notify_before_click_folder_exists)
 
     // First check that we have 2 scopes registered
     MetadataMap list = r->list();
-    EXPECT_EQ(2, list.size());
+    EXPECT_EQ(2u, list.size());
     EXPECT_NE(list.end(), list.find("testscopeA"));
     EXPECT_NE(list.end(), list.find("testscopeB"));
     EXPECT_EQ(list.end(), list.find("testscopeC"));
@@ -496,7 +512,7 @@ TEST(Registry, list_update_notify_before_click_folder_exists)
 
     // Now check that we have 3 scopes registered
     list = r->list();
-    EXPECT_EQ(3, list.size());
+    EXPECT_EQ(3u, list.size());
     EXPECT_NE(list.end(), list.find("testscopeA"));
     EXPECT_NE(list.end(), list.find("testscopeB"));
     EXPECT_NE(list.end(), list.find("testscopeC"));
@@ -540,7 +556,7 @@ TEST(Registry, list_update_notify)
 
     // First check that we have 2 scopes registered
     MetadataMap list = r->list();
-    EXPECT_EQ(2, list.size());
+    EXPECT_EQ(2u, list.size());
     EXPECT_NE(list.end(), list.find("testscopeA"));
     EXPECT_NE(list.end(), list.find("testscopeB"));
     EXPECT_EQ(list.end(), list.find("testscopeC"));
@@ -559,7 +575,7 @@ TEST(Registry, list_update_notify)
 
     // Now check that we have 3 scopes registered
     list = r->list();
-    EXPECT_EQ(3, list.size());
+    EXPECT_EQ(3u, list.size());
     EXPECT_NE(list.end(), list.find("testscopeA"));
     EXPECT_NE(list.end(), list.find("testscopeB"));
     EXPECT_NE(list.end(), list.find("testscopeC"));
@@ -617,7 +633,7 @@ TEST(Registry, list_update_notify)
 
     // Now check that we have 3 scopes registered again
     list = r->list();
-    EXPECT_EQ(3, list.size());
+    EXPECT_EQ(3u, list.size());
     EXPECT_NE(list.end(), list.find("testscopeA"));
     EXPECT_NE(list.end(), list.find("testscopeB"));
     EXPECT_EQ(list.end(), list.find("testscopeC"));
@@ -632,7 +648,7 @@ TEST(Registry, list_update_notify)
 
     // Now check that we are back to having 2 scopes registered
     list = r->list();
-    EXPECT_EQ(2, list.size());
+    EXPECT_EQ(2u, list.size());
     EXPECT_NE(list.end(), list.find("testscopeA"));
     EXPECT_NE(list.end(), list.find("testscopeB"));
     EXPECT_EQ(list.end(), list.find("testscopeC"));
@@ -645,7 +661,7 @@ TEST(Registry, list_update_notify)
 
     // Check that no scopes were registered
     list = r->list();
-    EXPECT_EQ(2, list.size());
+    EXPECT_EQ(2u, list.size());
     EXPECT_NE(list.end(), list.find("testscopeA"));
     EXPECT_NE(list.end(), list.find("testscopeB"));
     EXPECT_EQ(list.end(), list.find("testscopeC"));
@@ -660,7 +676,7 @@ TEST(Registry, list_update_notify)
 
     // Now check that we have 3 scopes registered
     list = r->list();
-    EXPECT_EQ(3, list.size());
+    EXPECT_EQ(3u, list.size());
     EXPECT_NE(list.end(), list.find("testscopeA"));
     EXPECT_NE(list.end(), list.find("testscopeB"));
     EXPECT_NE(list.end(), list.find("testscopeC"));
@@ -675,7 +691,7 @@ TEST(Registry, list_update_notify)
 
     // Now check that we are back to having 2 scopes registered
     list = r->list();
-    EXPECT_EQ(2, list.size());
+    EXPECT_EQ(2u, list.size());
     EXPECT_NE(list.end(), list.find("testscopeA"));
     EXPECT_NE(list.end(), list.find("testscopeB"));
     EXPECT_EQ(list.end(), list.find("testscopeC"));
@@ -690,6 +706,7 @@ int main(int argc, char **argv)
 
     // Unlink in case we left the link behind from an earlier interrupted run.
     system::error_code ec;
+    filesystem::remove_all(TEST_RUNTIME_PATH "/applications", ec);
     filesystem::remove_all(TEST_RUNTIME_PATH "/scopes/testscopeC", ec);
     filesystem::remove_all(TEST_RUNTIME_PATH "/click",ec);
     filesystem::remove(TEST_RUNTIME_PATH "/scopes/testscopeD", ec);
@@ -697,7 +714,7 @@ int main(int argc, char **argv)
     filesystem::remove(TEST_RUNTIME_PATH "/scopes/testscopeB/testscopeB-settings.ini", ec);
 
     // Set the "TEST_DESKTOP_FILES_DIR" env var before forking as not to create desktop files in ~/.local
-    putenv(const_cast<char*>("TEST_DESKTOP_FILES_DIR=" TEST_RUNTIME_PATH));
+    putenv(const_cast<char*>("TEST_DESKTOP_FILES_DIR=" TEST_RUNTIME_PATH "/applications"));
 
     auto rpid = fork();
     if (rpid == 0)

@@ -52,7 +52,10 @@
 
 #pragma pop_macro("BOOST_RANGE_ENABLE_CONCEPT_ASSERT")
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
 #include <gtest/gtest.h>
+#pragma GCC diagnostic pop
 
 #include <array>
 #include <cassert>
@@ -459,7 +462,7 @@ public:
     pid_t only_child_pid()
     {
         auto pids = child_pids();
-        EXPECT_EQ(1, pids.size()) << "Expected to find a single child process";
+        EXPECT_EQ(1u, pids.size()) << "Expected to find a single child process";
         return pids[0];
     }
 

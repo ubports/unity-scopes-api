@@ -29,7 +29,11 @@
 
 #include "../RaiiServer.h"
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
 #include <gtest/gtest.h>
+#pragma GCC diagnostic pop
+
 #include <memory>
 #include <thread>
 
@@ -84,7 +88,7 @@ TEST_F(SmartScopesClientTest, remote_scopes)
 
     // first try an invalid locale (should throw)
     EXPECT_THROW(ssc_->get_remote_scopes(scopes, "test_FAIL", false), std::exception);
-    ASSERT_EQ(0, scopes.size());
+    ASSERT_EQ(0u, scopes.size());
 
     // now try an empty locale
     EXPECT_TRUE(ssc_->get_remote_scopes(scopes, "", false));
@@ -165,7 +169,7 @@ TEST_F(SmartScopesClientTest, remote_scopes)
         params = vm["parameters"].get_dict();
         EXPECT_TRUE(params["defaultValue"].get_bool());
     }
-    ASSERT_EQ(4, scopes[2].keywords.size());
+    ASSERT_EQ(4u, scopes[2].keywords.size());
     EXPECT_NE(scopes[2].keywords.end(), scopes[2].keywords.find("music"));
     EXPECT_NE(scopes[2].keywords.end(), scopes[2].keywords.find("video"));
     EXPECT_NE(scopes[2].keywords.end(), scopes[2].keywords.find("news"));
@@ -265,27 +269,27 @@ TEST_F(SmartScopesClientTest, search)
 
     // check filters
     EXPECT_FALSE(filters.empty());
-    EXPECT_EQ(filters.size(), 1);
+    EXPECT_EQ(1u, filters.size());
     auto filter1 = filters.front();
     auto option_filter = std::dynamic_pointer_cast<const OptionSelectorFilter>(filter1);
     EXPECT_TRUE(option_filter != nullptr);
-    EXPECT_EQ(option_filter->label(), "Label");
-    EXPECT_EQ(option_filter->id(), "sorting_primary_filter");
-    EXPECT_EQ(option_filter->display_hints(), FilterBase::DisplayHints::Primary);
-    EXPECT_EQ(option_filter->multi_select(), false);
+    EXPECT_EQ("Label", option_filter->label());
+    EXPECT_EQ("sorting_primary_filter", option_filter->id());
+    EXPECT_EQ(FilterBase::DisplayHints::Primary, option_filter->display_hints());
+    EXPECT_FALSE(option_filter->multi_select());
 
     auto options = option_filter->options();
-    EXPECT_EQ(options.size(), 3);
-    EXPECT_EQ(options.front()->id(), "titlerank");
-    EXPECT_EQ(options.front()->label(), "Title rank");
-    EXPECT_EQ(options.back()->id(), "salesrank");
-    EXPECT_EQ(options.back()->label(), "Bestselling");
+    EXPECT_EQ(3u, options.size());
+    EXPECT_EQ("titlerank", options.front()->id());
+    EXPECT_EQ("Title rank", options.front()->label());
+    EXPECT_EQ("salesrank", options.back()->id());
+    EXPECT_EQ("Bestselling", options.back()->label());
 
     EXPECT_TRUE(option_filter->has_active_option(filter_state));
     auto active_options = option_filter->active_options(filter_state);
     EXPECT_FALSE(active_options.empty());
     auto active_option = *(active_options.begin());
-    EXPECT_EQ(active_option->id(), "salesrank");
+    EXPECT_EQ("salesrank", active_option->id());
 }
 
 TEST_F(SmartScopesClientTest, filter_groups)
@@ -326,7 +330,7 @@ TEST_F(SmartScopesClientTest, filter_groups)
 
     // check filters
     EXPECT_FALSE(filters.empty());
-    EXPECT_EQ(filters.size(), 1);
+    EXPECT_EQ(1u, filters.size());
     auto filter1 = filters.front();
     auto option_filter = std::dynamic_pointer_cast<const OptionSelectorFilter>(filter1);
     EXPECT_TRUE(option_filter != nullptr);
@@ -334,19 +338,19 @@ TEST_F(SmartScopesClientTest, filter_groups)
     EXPECT_TRUE(grp != nullptr);
     EXPECT_EQ("g1", grp->id());
     EXPECT_EQ("Group 1", grp->label());
-    EXPECT_EQ(option_filter->label(), "Label");
-    EXPECT_EQ(option_filter->id(), "sorting_primary_filter");
-    EXPECT_EQ(option_filter->display_hints(), FilterBase::DisplayHints::Primary);
-    EXPECT_EQ(option_filter->multi_select(), false);
+    EXPECT_EQ("Label", option_filter->label());
+    EXPECT_EQ("sorting_primary_filter", option_filter->id());
+    EXPECT_EQ(FilterBase::DisplayHints::Primary, option_filter->display_hints());
+    EXPECT_FALSE(option_filter->multi_select());
 
     auto options = option_filter->options();
-    EXPECT_EQ(options.size(), 2);
+    EXPECT_EQ(2u, options.size());
 
     EXPECT_TRUE(option_filter->has_active_option(filter_state));
     auto active_options = option_filter->active_options(filter_state);
     EXPECT_FALSE(active_options.empty());
     auto active_option = *(active_options.begin());
-    EXPECT_EQ(active_option->id(), "salesrank");
+    EXPECT_EQ("salesrank", active_option->id());
 }
 
 TEST_F(SmartScopesClientTest, userAgentHeader)

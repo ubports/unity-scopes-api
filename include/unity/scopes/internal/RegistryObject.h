@@ -78,11 +78,12 @@ public:
 
     StateReceiverObject::SPtr state_receiver();
 
+    static std::string desktop_files_dir();
+
 private:
     void on_process_death(core::posix::ChildProcess const& process);
     void on_state_received(std::string const& scope_id, StateReceiverObject::State const& state);
 
-    static std::string desktop_files_dir();
     void create_desktop_file(ScopeMetadata const& metadata);
     void remove_desktop_file(std::string const& scope_id);
 

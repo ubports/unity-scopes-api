@@ -21,7 +21,10 @@
 #include <unity/UnityExceptions.h>
 
 #include <boost/regex.hpp>  // Use Boost implementation until http://gcc.gnu.org/bugzilla/show_bug.cgi?id=53631 is fixed.
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
 #include <gtest/gtest.h>
+#pragma GCC diagnostic pop
 
 using namespace unity;
 using namespace unity::scopes;
@@ -34,7 +37,7 @@ TEST(IniSettingsSchema, basic)
     s->add_location_setting();
 
     auto defs = s->definitions();
-    ASSERT_EQ(9, defs.size());
+    ASSERT_EQ(9u, defs.size());
 
     EXPECT_EQ("location", defs[0].get_dict()["id"].get_string());
     EXPECT_EQ("string", defs[0].get_dict()["type"].get_string());
@@ -45,7 +48,7 @@ TEST(IniSettingsSchema, basic)
     EXPECT_EQ("list", defs[1].get_dict()["type"].get_string());
     EXPECT_EQ("Temperature Unit", defs[1].get_dict()["displayName"].get_string());
     EXPECT_EQ(1, defs[1].get_dict()["defaultValue"].get_int());
-    ASSERT_EQ(2, defs[1].get_dict()["displayValues"].get_array().size());
+    ASSERT_EQ(2u, defs[1].get_dict()["displayValues"].get_array().size());
     EXPECT_EQ("Celsius", defs[1].get_dict()["displayValues"].get_array()[0].get_string());
     EXPECT_EQ("Fahrenheit", defs[1].get_dict()["displayValues"].get_array()[1].get_string());
 
@@ -204,7 +207,7 @@ TEST_F(SetLanguage, localization)
 
         EXPECT_EQ("tempUnit", defs[1].get_dict()["id"].get_string());
         EXPECT_EQ("testTemperature Unit", defs[1].get_dict()["displayName"].get_string());
-        ASSERT_EQ(2, defs[1].get_dict()["displayValues"].get_array().size());
+        ASSERT_EQ(2u, defs[1].get_dict()["displayValues"].get_array().size());
         EXPECT_EQ("testCelsius", defs[1].get_dict()["displayValues"].get_array()[0].get_string());
         EXPECT_EQ("testFahrenheit", defs[1].get_dict()["displayValues"].get_array()[1].get_string());
     }
@@ -215,11 +218,11 @@ TEST_F(SetLanguage, localization)
         auto s = IniSettingsSchema::create(TEST_SRC_DIR "/locale_fallback.ini");
 
         auto defs = s->definitions();
-        ASSERT_EQ(1, defs.size());
+        ASSERT_EQ(1u, defs.size());
 
         EXPECT_EQ("tempUnit", defs[0].get_dict()["id"].get_string());
         EXPECT_EQ("Temperature Unit", defs[0].get_dict()["displayName"].get_string());
-        ASSERT_EQ(2, defs[0].get_dict()["displayValues"].get_array().size());
+        ASSERT_EQ(2u, defs[0].get_dict()["displayValues"].get_array().size());
         EXPECT_EQ("Celsius", defs[0].get_dict()["displayValues"].get_array()[0].get_string());
         EXPECT_EQ("Fahrenheit", defs[0].get_dict()["displayValues"].get_array()[1].get_string());
     }
@@ -235,7 +238,7 @@ TEST(IniSettingsSchema, empty_then_with_location)
     s->add_location_setting();
     {
         auto defs = s->definitions();
-        ASSERT_EQ(1, defs.size());
+        ASSERT_EQ(1u, defs.size());
 
         EXPECT_EQ("internal.location", defs[0].get_dict()["id"].get_string());
         EXPECT_EQ("Enable location data", defs[0].get_dict()["displayName"].get_string());

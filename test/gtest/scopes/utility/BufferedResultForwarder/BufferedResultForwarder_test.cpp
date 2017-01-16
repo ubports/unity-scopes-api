@@ -16,7 +16,11 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
 #include <gtest/gtest.h>
+#pragma GCC diagnostic pop
+
 #include <unity/scopes/utility/BufferedResultForwarder.h>
 #include <unity/scopes/CategoryRenderer.h>
 #include <unity/scopes/testing/MockSearchReply.h>

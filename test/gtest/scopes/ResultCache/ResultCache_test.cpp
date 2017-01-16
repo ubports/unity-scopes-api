@@ -23,7 +23,12 @@
 #include <unity/scopes/OptionSelectorFilter.h>
 
 #include <boost/filesystem.hpp>
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
 #include <gtest/gtest.h>
+#pragma GCC diagnostic pop
+
 #include <cstdint>
 
 #include "CacheScope.h"
@@ -145,7 +150,7 @@ TEST_F(CacheScopeTest, push_from_cache_without_cache_file)
     receiver->wait_until_finished();
 
     auto r = receiver->result();
-    EXPECT_EQ(r, nullptr);
+    EXPECT_EQ(nullptr, r);
 }
 
 TEST_F(CacheScopeTest, non_surfacing_query)
@@ -157,11 +162,11 @@ TEST_F(CacheScopeTest, non_surfacing_query)
     receiver->wait_until_finished();
 
     auto r = receiver->result();
-    EXPECT_EQ(r->title(), "some query");
+    EXPECT_EQ("some query", r->title());
     auto d = receiver->dept();
-    EXPECT_EQ(d->id(), "");
+    EXPECT_EQ("", d->id());
     auto sd = *d->subdepartments().begin();
-    EXPECT_EQ(sd->id(), "subsome query");
+    EXPECT_EQ("subsome query", sd->id());
 
     // Non-empty query, so there must be no cache file.
     boost::system::error_code ec;
@@ -181,13 +186,13 @@ TEST_F(CacheScopeTest, surfacing_query)
     receiver->wait_until_finished();
 
     auto r = receiver->result();
-    EXPECT_EQ(r->title(), "");
-    EXPECT_EQ(r->value("int64value").get_int64_t(), 1);
-    EXPECT_EQ(r->value("int64value2").get_int64_t(), INT64_MAX);
+    EXPECT_EQ("", r->title());
+    EXPECT_EQ(1, r->value("int64value").get_int64_t());
+    EXPECT_EQ(INT64_MAX, r->value("int64value2").get_int64_t());
     auto d = receiver->dept();
-    EXPECT_EQ(d->id(), "");
+    EXPECT_EQ("", d->id());
     auto sd = *d->subdepartments().begin();
-    EXPECT_EQ(sd->id(), "sub");
+    EXPECT_EQ("sub", sd->id());
 
     // Empty query, so there must be a cache file.
     boost::system::error_code ec;
@@ -207,11 +212,11 @@ TEST_F(CacheScopeTest, non_surfacing_query2)
     receiver->wait_until_finished();
 
     auto r = receiver->result();
-    EXPECT_EQ(r->title(), "some other query");
+    EXPECT_EQ("some other query", r->title());
     auto d = receiver->dept();
-    EXPECT_EQ(d->id(), "");
+    EXPECT_EQ("", d->id());
     auto sd = *d->subdepartments().begin();
-    EXPECT_EQ(sd->id(), "subsome other query");
+    EXPECT_EQ("subsome other query", sd->id());
 
     // Cache file must still be there.
     boost::system::error_code ec;
@@ -225,15 +230,15 @@ TEST_F(CacheScopeTest, push_from_cache)
     receiver->wait_until_finished();
 
     auto r = receiver->result();
-    EXPECT_EQ(r->title(), "");
-    EXPECT_EQ(r->value("int64value").get_int(), 1);
-    EXPECT_EQ(r->value("int64value2").get_int64_t(), INT64_MAX);
+    EXPECT_EQ("", r->title());
+    EXPECT_EQ(1, r->value("int64value").get_int());
+    EXPECT_EQ(INT64_MAX, r->value("int64value2").get_int64_t());
     auto d = receiver->dept();
-    EXPECT_EQ(d->id(), "");
+    EXPECT_EQ("", d->id());
     auto sd = *d->subdepartments().begin();
-    EXPECT_EQ(sd->id(), "sub");
+    EXPECT_EQ("sub", sd->id());
     auto filters = receiver->filters();
-    ASSERT_EQ(1, filters.size());
+    ASSERT_EQ(1u, filters.size());
     auto f = *filters.begin();
     EXPECT_EQ("option_selector", f->filter_type());
     EXPECT_EQ(nullptr, f->filter_group());
@@ -262,15 +267,15 @@ TEST_F(CacheScopeTest, push_from_cache_with_filter_group)
 
     auto r = receiver->result();
     ASSERT_TRUE(r != nullptr);
-    EXPECT_EQ(r->title(), "");
-    EXPECT_EQ(r->value("int64value").get_int(), 1);
-    EXPECT_EQ(r->value("int64value2").get_int64_t(), INT64_MAX);
+    EXPECT_EQ("", r->title());
+    EXPECT_EQ(1, r->value("int64value").get_int());
+    EXPECT_EQ(INT64_MAX, r->value("int64value2").get_int64_t());
     auto d = receiver->dept();
-    EXPECT_EQ(d->id(), "");
+    EXPECT_EQ("", d->id());
     auto sd = *d->subdepartments().begin();
-    EXPECT_EQ(sd->id(), "sub");
+    EXPECT_EQ("sub", sd->id());
     auto filters = receiver->filters();
-    ASSERT_EQ(1, filters.size());
+    ASSERT_EQ(1u, filters.size());
     auto f = *filters.begin();
     EXPECT_EQ("option_selector", f->filter_type());
     ASSERT_TRUE(f->filter_group() != nullptr);
@@ -317,14 +322,14 @@ TEST_F(CacheScopeTest, surfacing_query_2)
     receiver->wait_until_finished();
 
     auto r = receiver->result();
-    EXPECT_EQ(r->title(), "");
-    EXPECT_EQ(r->value("int64value").get_int64_t(), 1);
+    EXPECT_EQ("", r->title());
+    EXPECT_EQ(1, r->value("int64value").get_int64_t());
     auto d = receiver->dept();
-    EXPECT_EQ(d->id(), "");
+    EXPECT_EQ("", d->id());
     auto sd = *d->subdepartments().begin();
-    EXPECT_EQ(sd->id(), "sub");
+    EXPECT_EQ("sub", sd->id());
     auto filters = receiver->filters();
-    ASSERT_EQ(1, filters.size());
+    ASSERT_EQ(1u, filters.size());
     auto f = *filters.begin();
     EXPECT_EQ("option_selector", f->filter_type());
     auto osf = dynamic_pointer_cast<OptionSelectorFilter const>(f);
@@ -342,7 +347,7 @@ TEST_F(CacheScopeTest, read_failure)
     auto receiver = make_shared<Receiver>();
     scope()->search("", SearchMetadata("unused", "unused"), receiver);
     receiver->wait_until_finished();
-    EXPECT_EQ(receiver->result(), nullptr);
+    EXPECT_EQ(nullptr, receiver->result());
     ::chmod(TEST_RUNTIME_PATH "/unconfined/CacheScope/.surfacing_cache", 0600);
 
     // Cache file must still be there, but read will have failed.
@@ -362,7 +367,7 @@ TEST_F(CacheScopeTest, missing_departments)
     auto receiver = make_shared<Receiver>();
     scope()->search("", SearchMetadata("unused", "unused"), receiver);
     receiver->wait_until_finished();
-    EXPECT_EQ(receiver->result(), nullptr);
+    EXPECT_EQ(nullptr, receiver->result());
 
     // Cache file must still be there, but decode will have failed.
     boost::system::error_code ec;
@@ -376,7 +381,7 @@ TEST_F(CacheScopeTest, missing_categories)
     auto receiver = make_shared<Receiver>();
     scope()->search("", SearchMetadata("unused", "unused"), receiver);
     receiver->wait_until_finished();
-    EXPECT_EQ(receiver->result(), nullptr);
+    EXPECT_EQ(nullptr, receiver->result());
 
     // Cache file must still be there, but decode will have failed.
     boost::system::error_code ec;
@@ -390,7 +395,7 @@ TEST_F(CacheScopeTest, missing_filters)
     auto receiver = make_shared<Receiver>();
     scope()->search("", SearchMetadata("unused", "unused"), receiver);
     receiver->wait_until_finished();
-    EXPECT_EQ(receiver->result(), nullptr);
+    EXPECT_EQ(nullptr, receiver->result());
 
     // Cache file must still be there, but decode will have failed.
     boost::system::error_code ec;
@@ -404,7 +409,7 @@ TEST_F(CacheScopeTest, missing_results)
     auto receiver = make_shared<Receiver>();
     scope()->search("", SearchMetadata("unused", "unused"), receiver);
     receiver->wait_until_finished();
-    EXPECT_EQ(receiver->result(), nullptr);
+    EXPECT_EQ(nullptr, receiver->result());
 
     // Cache file must still be there, but decode will have failed.
     boost::system::error_code ec;
