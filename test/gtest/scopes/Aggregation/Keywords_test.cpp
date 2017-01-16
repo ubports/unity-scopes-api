@@ -21,7 +21,11 @@
 #include <unity/scopes/testing/ScopeMetadataBuilder.h>
 
 #include <boost/filesystem/operations.hpp>
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
 #include <gtest/gtest.h>
+#pragma GCC diagnostic pop
 
 #include "AggTestScope.h"
 
@@ -157,7 +161,7 @@ TEST_F(KeywordsTest, subsearch_disabled_child)
 
     // Should see all scopes' results here as all children are enabled by default
     auto r = receiver->results();
-    EXPECT_EQ(4, r.size());
+    EXPECT_EQ(4u, r.size());
     EXPECT_TRUE(r.find("A") != r.end());
     EXPECT_TRUE(r.find("B") != r.end());
     EXPECT_TRUE(r.find("C") != r.end());
@@ -178,7 +182,7 @@ TEST_F(KeywordsTest, subsearch_disabled_child)
 
     // Should not see scope C's results here as it has been disabled
     r = receiver->results();
-    EXPECT_EQ(3, r.size());
+    EXPECT_EQ(3u, r.size());
     EXPECT_TRUE(r.find("A") != r.end());
     EXPECT_TRUE(r.find("B") != r.end());
     EXPECT_TRUE(r.find("D") != r.end());
@@ -198,7 +202,7 @@ TEST_F(KeywordsTest, subsearch_disabled_child)
 
     // Should not see scope C and D's results here as they are disabled
     r = receiver->results();
-    EXPECT_EQ(2, r.size());
+    EXPECT_EQ(2u, r.size());
     EXPECT_TRUE(r.find("A") != r.end());
     EXPECT_TRUE(r.find("B") != r.end());
 
@@ -217,7 +221,7 @@ TEST_F(KeywordsTest, subsearch_disabled_child)
 
     // Should not see scope D's results here as it is still disabled
     r = receiver->results();
-    EXPECT_EQ(3, r.size());
+    EXPECT_EQ(3u, r.size());
     EXPECT_TRUE(r.find("A") != r.end());
     EXPECT_TRUE(r.find("B") != r.end());
     EXPECT_TRUE(r.find("C") != r.end());
@@ -237,7 +241,7 @@ TEST_F(KeywordsTest, subsearch_disabled_child)
 
     // Should see all scopes' results here as all children are enabled again
     r = receiver->results();
-    EXPECT_EQ(4, r.size());
+    EXPECT_EQ(4u, r.size());
     EXPECT_TRUE(r.find("A") != r.end());
     EXPECT_TRUE(r.find("B") != r.end());
     EXPECT_TRUE(r.find("C") != r.end());
@@ -267,7 +271,7 @@ TEST_F(KeywordsTest, subsearch_with_keywords)
 
     // Should see all scopes' results here as all children are enabled by default
     auto r = receiver->results();
-    EXPECT_EQ(4, r.size());
+    EXPECT_EQ(4u, r.size());
     EXPECT_TRUE(r.find("A") != r.end());
     EXPECT_TRUE(r.find("B") != r.end());
     EXPECT_TRUE(r.find("C") != r.end());

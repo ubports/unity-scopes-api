@@ -18,9 +18,14 @@
 
 #include <unity/scopes/internal/Utils.h>
 
-#include <boost/filesystem.hpp>
-#include <gtest/gtest.h>
 #include <unity/UnityExceptions.h>
+
+#include <boost/filesystem.hpp>
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
+#include <gtest/gtest.h>
+#pragma GCC diagnostic pop
 
 using namespace unity::scopes;
 using namespace unity::scopes::internal;
@@ -39,13 +44,24 @@ TEST(Utils, uncamelcase)
 
 TEST(Utils, uncamelcase_turkish)
 {
-    char *old_locale = strdup(getenv("LC_ALL"));
+    string old_locale;
+    char const* p = getenv("LC_ALL");
+    if (p)
+    {
+        old_locale = p;
+    }
     setenv("LC_ALL", "tr_TR.UTF-8", 1);
 
     EXPECT_EQ("small-i", uncamelcase("smallI"));
 
-    setenv("LC_ALL", old_locale, 1);
-    free(old_locale);
+    if (!old_locale.empty())
+    {
+        setenv("LC_ALL", old_locale.c_str(), 1);
+    }
+    else
+    {
+        unsetenv("LC_ALL");
+    }
 }
 
 TEST(Utils, convert_to)
@@ -170,7 +186,7 @@ TEST(Utils, split_exec_args)
 
     // Test argument splitting
     auto exec_args = split_exec_args("test", "/path\\ to/exec' 'file arg \"arg 2\" arg' '3 arg\\ 4");
-    ASSERT_EQ(5, exec_args.size());
+    ASSERT_EQ(5u, exec_args.size());
     EXPECT_STREQ("\"/path to/exec file\"", exec_args[0].c_str());
     EXPECT_STREQ("arg", exec_args[1].c_str());
     EXPECT_STREQ("\"arg 2\"", exec_args[2].c_str());

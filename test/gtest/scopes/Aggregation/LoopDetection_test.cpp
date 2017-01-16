@@ -20,7 +20,10 @@
 #include <unity/scopes/internal/RuntimeImpl.h>
 #include <unity/scopes/SearchMetadata.h>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
 #include <gtest/gtest.h>
+#pragma GCC diagnostic pop
 
 #include "AggTestScope.h"
 
@@ -124,7 +127,7 @@ TEST_F(LoopDetectionTest, no_error)
     receiver->wait_until_finished();
 
     auto r = receiver->results();
-    EXPECT_EQ(3, r.size());
+    EXPECT_EQ(3u, r.size());
     EXPECT_TRUE(r.find("A") != r.end());
     EXPECT_TRUE(r.find("B") != r.end());
     EXPECT_TRUE(r.find("C") != r.end());
@@ -141,12 +144,12 @@ TEST_F(LoopDetectionTest, diamond)
     receiver->wait_until_finished();
 
     auto r = receiver->results();
-    EXPECT_EQ(4, r.size());
+    EXPECT_EQ(4u, r.size());
     EXPECT_TRUE(r.find("A") != r.end());
     EXPECT_TRUE(r.find("B") != r.end());
     EXPECT_TRUE(r.find("C") != r.end());
     EXPECT_TRUE(r.find("D") != r.end());
-    EXPECT_EQ(2, r.find("D")->second.size());  // B, and C each forwarded to D, so there must be 2 results.
+    EXPECT_EQ(2u, r.find("D")->second.size());  // B, and C each forwarded to D, so there must be 2 results.
 }
 
 TEST_F(LoopDetectionTest, immediate_loop)
@@ -157,8 +160,8 @@ TEST_F(LoopDetectionTest, immediate_loop)
     receiver->wait_until_finished();
 
     auto r = receiver->results();
-    EXPECT_EQ(1, r.size());
-    EXPECT_EQ(3, r.find("A")->second.size());  // "A" has sent the query twice to itself, second attempt stops loop
+    EXPECT_EQ(1u, r.size());
+    EXPECT_EQ(3u, r.find("A")->second.size());  // "A" has sent the query twice to itself, second attempt stops loop
 }
 
 TEST_F(LoopDetectionTest, intermediate_loop)
@@ -171,10 +174,10 @@ TEST_F(LoopDetectionTest, intermediate_loop)
     receiver->wait_until_finished();
 
     auto r = receiver->results();
-    EXPECT_EQ(3, r.size());
-    EXPECT_EQ(2, r.find("A")->second.size());  // "A" got results from B and C
-    EXPECT_EQ(2, r.find("B")->second.size());  // "B" got results from C and A
-    EXPECT_EQ(1, r.find("C")->second.size());  // "C" got result from A
+    EXPECT_EQ(3u, r.size());
+    EXPECT_EQ(2u, r.find("A")->second.size());  // "A" got results from B and C
+    EXPECT_EQ(2u, r.find("B")->second.size());  // "B" got results from C and A
+    EXPECT_EQ(1u, r.find("C")->second.size());  // "C" got result from A
 }
 
 TEST_F(LoopDetectionTest, repeated_search_on_leaf)
@@ -188,11 +191,11 @@ TEST_F(LoopDetectionTest, repeated_search_on_leaf)
     receiver->wait_until_finished();
 
     auto r = receiver->results();
-    EXPECT_EQ(4, r.size());
-    EXPECT_EQ(1, r.find("A")->second.size());
-    EXPECT_EQ(1, r.find("B")->second.size());
-    EXPECT_EQ(1, r.find("C")->second.size());
-    EXPECT_EQ(3, r.find("D")->second.size());
+    EXPECT_EQ(4u, r.size());
+    EXPECT_EQ(1u, r.find("A")->second.size());
+    EXPECT_EQ(1u, r.find("B")->second.size());
+    EXPECT_EQ(1u, r.find("C")->second.size());
+    EXPECT_EQ(3u, r.find("D")->second.size());
 }
 
 TEST_F(LoopDetectionTest, repeated_search_on_aggregator)
@@ -206,10 +209,10 @@ TEST_F(LoopDetectionTest, repeated_search_on_aggregator)
     receiver->wait_until_finished();
 
     auto r = receiver->results();
-    EXPECT_EQ(3, r.size());
-    EXPECT_EQ(1, r.find("A")->second.size());
-    EXPECT_EQ(1, r.find("B")->second.size());
-    EXPECT_EQ(1, r.find("C")->second.size());
+    EXPECT_EQ(3u, r.size());
+    EXPECT_EQ(1u, r.find("A")->second.size());
+    EXPECT_EQ(1u, r.find("B")->second.size());
+    EXPECT_EQ(1u, r.find("C")->second.size());
 }
 
 #pragma GCC diagnostic pop

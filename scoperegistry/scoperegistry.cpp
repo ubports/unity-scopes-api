@@ -496,6 +496,13 @@ int main(int argc, char* argv[])
         string tmp_dir = string("/run/user/") + std::to_string(geteuid()) + "/scopes/leaf-net";
         make_directories(tmp_dir, 0700);
 
+        // Make sure that the directory for .desktop files exists.
+        string desktop_files_dir = RegistryObject::desktop_files_dir();
+        if (!desktop_files_dir.empty())
+        {
+            make_directories(desktop_files_dir, 0700);
+        }
+
         // Collect the registry config data.
 
         string mw_kind;

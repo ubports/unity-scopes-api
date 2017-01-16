@@ -16,7 +16,11 @@
  * Authored by: Pawel Stolowski <pawel.stolowski@canonical.com>
  */
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
 #include <gtest/gtest.h>
+#pragma GCC diagnostic pop
+
 #include <unity/scopes/CannedQuery.h>
 #include <unity/scopes/internal/CannedQueryImpl.h>
 #include <unity/scopes/OptionSelectorFilter.h>
@@ -278,7 +282,7 @@ TEST(CannedQuery, from_uri)
         filter->add_option("o1", "Option 1");
         filter->add_option("o2", "Option 2");
         auto actopts = filter->active_options(fstate);
-        EXPECT_EQ(1, actopts.size());
+        EXPECT_EQ(1u, actopts.size());
         EXPECT_EQ("o1", (*(actopts.begin()))->id());
     }
     {

@@ -19,7 +19,10 @@
 #include <unity/scopes/testing/Benchmark.h>
 #include <unity/scopes/testing/Statistics.h>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wctor-dtor-privacy"
 #include <gtest/gtest.h>
+#pragma GCC diagnostic pop
 
 #include "config.h"
 
