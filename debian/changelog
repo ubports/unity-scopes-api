@@ -1,3 +1,9 @@
+unity-scopes-api (1.0.9+ubports) xenial; urgency=medium
+
+  * Import to UBports
+
+ -- Marius Gripsgard <marius@ubports.com>  Wed, 14 Feb 2018 16:26:36 +0100
+
 unity-scopes-api (1.0.8+17.04.20170116-0ubuntu1) zesty; urgency=medium
 
   * Create $HOME/.local/share/applications if it does not exist. lp:1645798
