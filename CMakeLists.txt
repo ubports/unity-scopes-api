@@ -371,6 +371,9 @@ set_target_properties(${UNITY_SCOPES_LIB} PROPERTIES
                       LINK_FLAGS "${ldflags} -Wl,--version-script,${symbol_map}")
 set_target_properties(${UNITY_SCOPES_LIB} PROPERTIES LINK_DEPENDS ${symbol_map})
 
+# Workaround for "Operation not permitted" on bullhead
+set_target_properties(${UNITY_SCOPES_LIB} PROPERTIES LINK_FLAGS "${ldflags} -Wl,--no-as-needed")
+
 target_link_libraries(${UNITY_SCOPES_LIB} ${OTHER_LIBS})
 target_link_libraries(${UNITY_SCOPES_TEST_LIB} ${OTHER_LIBS})
 
