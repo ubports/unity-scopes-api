@@ -1,5 +1,4 @@
 add_subdirectory(lttng)
-add_subdirectory(smartscopes)
 add_subdirectory(zmq_middleware)
 set(CAPNPROTO_FILES ${CAPNPROTO_FILES} PARENT_SCOPE)
 

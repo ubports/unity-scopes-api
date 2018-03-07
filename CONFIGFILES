@@ -28,16 +28,6 @@ The following keys are recognized:
   The path to the registry configuration file. The default value is
   "/usr/lib/<arch>/unity-scopes/Registry.ini".
 
-- Smartscopes.Registry.Identity (string)
-
-  The identity of the remote registry. If not set, the default value is "SSRegistry".
-  Setting this value explicitly to the empty string disables use of the remote registry.
-
-- Smartscopes.ConfigFile (string)
-
-  The path to the smartscopes configuration file. The default value is
-  "/usr/lib/<arch>/unity-scopes/Smartscopes.ini".
-
 - Default.Middleware (string)
 
   The middleware to be used by default. The default value is "Zmq".

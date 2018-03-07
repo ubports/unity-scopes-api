@@ -1,5 +1,0 @@
-[Registry]
-Middleware = Zmq
-Zmq.ConfigFile = Zmq.ini
-Scope.InstallDir = /tmp
-Scoperunner.Path = /tmp

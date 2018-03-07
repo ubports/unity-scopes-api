@@ -301,7 +301,6 @@ add_subdirectory(include)
 add_subdirectory(src)
 add_subdirectory(scoperegistry)
 add_subdirectory(scoperunner)
-add_subdirectory(smartscopesproxy)
 add_subdirectory(data)
 add_subdirectory(test)
 add_subdirectory(demo)
@@ -365,7 +364,7 @@ set_target_properties(${UNITY_SCOPES_TEST_LIB} PROPERTIES LINK_FLAGS "${ldflags}
 # We compile with all symbols visible by default. For the shipping library, we strip
 # out all symbols that (recursively) are in the unity::scopes::internal namespace,
 # except for a few exceptions that are needed by the scoperegistry, scoperunner,
-# smartscopesproxy, and any other binaries that reach into the internal namespace.
+# and any other binaries that reach into the internal namespace.
 set(symbol_map "${CMAKE_SOURCE_DIR}/${UNITY_SCOPES_LIB}.map")
 set_target_properties(${UNITY_SCOPES_LIB} PROPERTIES
                       LINK_FLAGS "${ldflags} -Wl,--version-script,${symbol_map}")

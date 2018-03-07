@@ -41,14 +41,6 @@ class QueryBaseImpl;
 class QueryObject;
 class ScopeObject;
 
-namespace smartscopes
-{
-
-class SSQueryObject;
-class SSScopeObject;
-
-} // namespace smartscopes
-
 } // namespace internal
 
 
@@ -122,9 +114,7 @@ protected:
 
 private:
     friend class internal::QueryObject;                    // So QueryObject can call cancel()
-    friend class internal::smartscopes::SSQueryObject;     // So SSQueryObject can call cancel()
     friend class internal::ScopeObject;                    // So ScopeObject can call set_department_id()
-    friend class internal::smartscopes::SSScopeObject;     // So SSScopeObject can call set_department_id()
 };
 
 } // namespace scopes

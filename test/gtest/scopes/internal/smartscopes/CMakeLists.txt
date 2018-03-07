@@ -1,8 +1,0 @@
-add_subdirectory(HttpClient)
-if (NOT ${CMAKE_LIBRARY_ARCHITECTURE} MATCHES "aarch64")
-    add_subdirectory(SmartScopesClient)
-else()
-    message("Skipping SmartScopesClient test on aarch64 - see LP #1615004")
-endif()
-add_subdirectory(smartscopesproxy)
-add_subdirectory(SSConfig)
