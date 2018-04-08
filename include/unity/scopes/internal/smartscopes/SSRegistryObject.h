@@ -21,7 +21,6 @@
 #include <unity/scopes/internal/MiddlewareBase.h>
 #include <unity/scopes/internal/RegistryObjectBase.h>
 #include <unity/scopes/internal/SettingsDB.h>
-#include <unity/scopes/internal/smartscopes/SmartScopesClient.h>
 #include <unity/scopes/internal/smartscopes/SSConfig.h>
 
 #include <condition_variable>
@@ -59,7 +58,6 @@ public:
 
     bool has_scope(std::string const& scope_id) const;
     std::string get_base_url(std::string const& scope_id) const;
-    SmartScopesClient::SPtr get_ssclient() const;
 
     SettingsDB::SPtr get_settings_db(std::string const& scope_id) const;
 
@@ -76,8 +74,6 @@ private:
         SettingsDB::SPtr db;
         bool needs_location_data;
     };
-
-    SmartScopesClient::SPtr ssclient_;
 
     MetadataMap scopes_;
     std::map<std::string, std::string> base_urls_;

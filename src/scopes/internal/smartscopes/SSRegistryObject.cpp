@@ -47,12 +47,7 @@ SSRegistryObject::SSRegistryObject(MiddlewareBase::SPtr middleware,
                                    std::string const& ss_scope_endpoint,
                                    std::string const& sss_url,
                                    bool caching_enabled)
-    : ssclient_(std::make_shared<SmartScopesClient>(
-                    std::make_shared<HttpClientNetCpp>(ss_config.http_reply_timeout() * 1000),  // need millisecs
-                    std::make_shared<JsonCppNode>(),
-                    middleware->runtime(),
-                    sss_url))
-    , refresh_stopped_(false)
+    : refresh_stopped_(false)
     , middleware_(middleware)
     , ss_scope_endpoint_(ss_scope_endpoint)
     , regular_refresh_timeout_(ss_config.reg_refresh_rate())
@@ -77,7 +72,8 @@ SSRegistryObject::SSRegistryObject(MiddlewareBase::SPtr middleware,
     // get remote scopes then start the auto-refresh background thread
     try
     {
-        get_remote_scopes();
+	//TODO:Clean removal of smartscopes. Currently just a quick hack to get rid of network queries
+        //get_remote_scopes();
     }
     catch (std::exception const& e)
     {
@@ -176,11 +172,6 @@ std::string SSRegistryObject::get_base_url(std::string const& scope_id) const
     }
 }
 
-SmartScopesClient::SPtr SSRegistryObject::get_ssclient() const
-{
-    return ssclient_;
-}
-
 SettingsDB::SPtr SSRegistryObject::get_settings_db(std::string const& scope_id) const
 {
     std::lock_guard<std::mutex> lock(scopes_mutex_);
@@ -205,7 +196,8 @@ void SSRegistryObject::refresh_thread()
         {
             try
             {
-                get_remote_scopes();
+		//TODO: Clean removal of smartscopes. Currently just a quick hack to get rid of network queries
+                //get_remote_scopes();
             }
             catch (std::exception const& e)
             {
@@ -218,182 +210,6 @@ void SSRegistryObject::refresh_thread()
 // Must be called with refresh_mutex_ locked
 void SSRegistryObject::get_remote_scopes()
 {
-    std::vector<RemoteScope> remote_scopes;
-
-    try
-    {
-        // request remote scopes from smart scopes client
-        if (ssclient_->get_remote_scopes(remote_scopes, locale_, caching_enabled_))
-        {
-            next_refresh_timeout_ = regular_refresh_timeout_;
-        }
-        else
-        {
-            next_refresh_timeout_ = failed_refresh_timeout_;
-        }
-    }
-    catch (std::exception const&)
-    {
-        // refresh again soon as get_remote_scopes failed
-        next_refresh_timeout_ = failed_refresh_timeout_;
-        throw;
-    }
-
-    bool changed = false;
-    MetadataMap new_scopes_;
-    std::map<std::string, std::string> new_base_urls_;
-
-    // loop through all available scopes and add() each visible scope
-    for (RemoteScope const& scope : remote_scopes)
-    {
-        try
-        {
-            // construct a ScopeMetadata with remote scope info
-            std::unique_ptr<ScopeMetadataImpl> metadata(new ScopeMetadataImpl(nullptr));
-
-            metadata->set_scope_id(scope.id);
-            metadata->set_display_name(scope.name);
-            metadata->set_description(scope.description);
-            metadata->set_author(scope.author);
-
-            if (scope.icon)
-            {
-                metadata->set_icon(*scope.icon);
-            }
-
-            if (scope.art)
-            {
-                metadata->set_art(*scope.art);
-            }
-
-            if (scope.appearance)
-            {
-                metadata->set_appearance_attributes(*scope.appearance);
-            }
-
-            bool needs_location_data = scope.needs_location_data && *scope.needs_location_data;
-
-            JsonSettingsSchema::UPtr schema;
-            if (scope.settings)
-            {
-                try
-                {
-                    schema = JsonSettingsSchema::create(*scope.settings);
-                }
-                catch (ResourceException const& e)
-                {
-                    middleware_->runtime()->logger()()
-                        << "SSRegistryObject: ignoring invalid settings JSON for scope \""
-                        << scope.id << "\": " << e.what();
-                }
-            }
-            else if (needs_location_data)
-            {
-                schema = JsonSettingsSchema::create_empty();
-            }
-
-            if (schema)
-            {
-                if (needs_location_data)
-                {
-                    schema->add_location_setting();
-                }
-
-                try
-                {
-                    metadata->set_settings_definitions(schema->definitions());
-
-                    std::string settings = scope.settings? *scope.settings : "";
-
-                    // Get the previous JSON definition for this scope (if any)
-                    std::lock_guard<std::mutex> lock(scopes_mutex_);
-                    std::string prev_json = "";
-                    bool prev_needs_location_data = false;
-                    auto it = settings_defs_.find(scope.id);
-                    if (it != settings_defs_.end())
-                    {
-                        prev_json = it->second.json;
-                        prev_needs_location_data = it->second.needs_location_data;
-                    }
-
-                    // Check if the settings definitions have changed
-                    if (needs_location_data != prev_needs_location_data
-                            || (scope.settings && settings != prev_json))
-                    {
-                        // Store both JSON (for internal comparison) and DB (for external use)
-                        changed = true;
-                        std::string settings_db = RuntimeConfig::default_config_directory() + "/" + scope.id + "/settings.ini";
-                        SettingsDB::SPtr db(SettingsDB::create_from_schema(settings_db, *schema));
-                        settings_defs_[scope.id] = SSSettingsDef{settings, db, needs_location_data};
-                    }
-                }
-                catch (ResourceException const& e)
-                {
-                    middleware_->runtime()->logger()() << "SSRegistryObject: ignoring invalid settings JSON for scope \""
-                                                       << scope.id << "\": " << e.what();
-                }
-            }
-
-            metadata->set_location_data_needed(needs_location_data);
-
-            metadata->set_invisible(scope.invisible);
-
-            metadata->set_version(scope.version);
-
-            metadata->set_keywords(scope.keywords);
-
-            ScopeProxy proxy = ScopeImpl::create(middleware_->create_scope_proxy(scope.id, ss_scope_endpoint_),
-                                                 scope.id);
-
-            metadata->set_proxy(proxy);
-
-            auto meta = ScopeMetadataImpl::create(move(metadata));
-
-            // add scope info to collection
-            add(scope, std::move(meta), new_scopes_, new_base_urls_);
-        }
-        catch (std::exception const& e)
-        {
-            middleware_->runtime()->logger()() << "SSRegistryObject: skipping scope \""
-                                               << scope.id << "\": " << e.what();
-        }
-    }
-
-    // replace previous scopes with new ones
-    {
-        std::lock_guard<std::mutex> lock(scopes_mutex_);
-
-        // check if base urls or list of available scopes has changed.
-        // the urls is a map of (string, string), so rely on == operator.
-        // when comparing scopes maps, only check if scope ids are same, i.e.
-        // changes to scope metadata attributes are not detected.
-        if (new_base_urls_ != base_urls_ ||
-            new_scopes_.size() != scopes_.size())
-        {
-            changed = true;
-        }
-        else
-        {
-            for (auto const& p: new_scopes_)
-            {
-                if (scopes_.find(p.first) == scopes_.end())
-                {
-                    changed = true;
-                    break;
-                }
-            }
-        }
-
-        // replace current collection of remote scopes
-        base_urls_ = new_base_urls_;
-        scopes_ = new_scopes_;
-    }
-
-    if (changed && publisher_)
-    {
-        // Send a blank message to subscribers to inform them that the smart scopes registry has been updated
-        publisher_->send_message("");
-    }
 }
 
 bool SSRegistryObject::add(RemoteScope const& remotedata, ScopeMetadata const& metadata, MetadataMap& scopes, std::map<std::string, std::string>& urls)

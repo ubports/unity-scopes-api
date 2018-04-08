@@ -1,7 +1,6 @@
 set(SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/HttpClientNetCpp.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/SmartScope.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/SmartScopesClient.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/SSConfig.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/SSQueryCtrlObject.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/SSQueryObject.cpp
