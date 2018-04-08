@@ -45,7 +45,6 @@ namespace smartscopes
 SSRegistryObject::SSRegistryObject(MiddlewareBase::SPtr middleware,
                                    SSConfig const& ss_config,
                                    std::string const& ss_scope_endpoint,
-                                   std::string const& sss_url,
                                    bool caching_enabled)
     : refresh_stopped_(false)
     , middleware_(middleware)
@@ -67,18 +66,6 @@ SSRegistryObject::SSRegistryObject(MiddlewareBase::SPtr middleware,
         {
             locale_.resize(colon_pos);
         }
-    }
-
-    // get remote scopes then start the auto-refresh background thread
-    try
-    {
-	//TODO:Clean removal of smartscopes. Currently just a quick hack to get rid of network queries
-        //get_remote_scopes();
-    }
-    catch (std::exception const& e)
-    {
-
-        middleware_->runtime()->logger()() << "SSRegistryObject: get_remote_scopes() failed: " << e.what();
     }
 
     refresh_thread_ = std::thread(&SSRegistryObject::refresh_thread, this);
