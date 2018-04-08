@@ -46,7 +46,6 @@ public:
     SSRegistryObject(MiddlewareBase::SPtr middleware,
                      SSConfig const& ss_config,
                      std::string const& ss_scope_endpoint,
-                     std::string const& sss_url = "",
                      bool caching_enabled = true);
     virtual ~SSRegistryObject();
 
