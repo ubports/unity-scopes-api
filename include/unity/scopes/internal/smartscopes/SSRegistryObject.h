@@ -21,6 +21,7 @@
 #include <unity/scopes/internal/MiddlewareBase.h>
 #include <unity/scopes/internal/RegistryObjectBase.h>
 #include <unity/scopes/internal/SettingsDB.h>
+#include <unity/scopes/internal/smartscopes/SmartScopesClient.h>
 #include <unity/scopes/internal/smartscopes/SSConfig.h>
 
 #include <condition_variable>

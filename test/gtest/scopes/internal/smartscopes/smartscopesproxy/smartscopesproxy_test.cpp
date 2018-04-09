@@ -73,8 +73,7 @@ public:
         mw_ = rt_->factory()->find(reg_id_, mw_kind);
 
         // Instantiate a SS registry and scope objects
-        reg_ = SSRegistryObject::SPtr(new SSRegistryObject(mw_, ss_config_, mw_->get_scope_endpoint(),
-                                                           "http://127.0.0.1:" + std::to_string(server_.port_), false));
+        reg_ = SSRegistryObject::SPtr(new SSRegistryObject(mw_, ss_config_, mw_->get_scope_endpoint(), false));
         scope_ = SSScopeObject::UPtr(new SSScopeObject(scope_id_, mw_, reg_));
 
         // Add objects to the middlewares
@@ -84,8 +83,7 @@ public:
 
     void reset_reg()
     {
-        reg_.reset(new SSRegistryObject(mw_, ss_config_, mw_->get_scope_endpoint(),
-                                        "http://127.0.0.1:" + std::to_string(server_.port_), false));
+        reg_.reset(new SSRegistryObject(mw_, ss_config_, mw_->get_scope_endpoint(), false));
     }
 
     ~smartscopesproxytest()
