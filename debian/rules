@@ -5,6 +5,9 @@
 #export DH_VERBOSE=1
 export DPKG_GENSYMBOLS_CHECK_LEVEL=4
 
+export CC=gcc-6
+export CXX=g++-6
+
 # Skip tests on the archs they are known to be flaky with current configuration
 testskip_architectures := powerpc ppc64el
 
