@@ -180,34 +180,6 @@ public:
 
     void reset_url(std::string const& url = "");
     std::string url();
-
-    bool get_remote_scopes(std::vector<RemoteScope>& scopes, std::string const& locale = "", bool caching_enabled = true);
-
-    SearchHandle::UPtr search(SearchReplyHandler& handler,
-                              std::string const& base_url,
-                              std::string const& query,
-                              std::string const& department_id,
-                              std::string const& session_id,
-                              int query_id,
-                              std::string const& platform,
-                              VariantMap const& settings = VariantMap(),
-                              VariantMap const& filter_state = VariantMap(),
-                              std::string const& locale = "",
-                              LocationInfo const& location = LocationInfo(),
-                              std::string const& user_agent_hdr = "",
-                              const unsigned int limit = 0);
-
-    PreviewHandle::UPtr preview(PreviewReplyHandler const& handler,
-                                std::string const& base_url,
-                                std::string const& result,
-                                std::string const& session_id,
-                                std::string const& platform,
-                                const unsigned int widgets_api_version,
-                                VariantMap const& settings = VariantMap(),
-                                std::string const& locale = "",
-                                std::string const& country = "",
-                                std::string const& user_agent_hdr = "");
-
     unity::scopes::internal::Logger& logger() const;
 
 private:

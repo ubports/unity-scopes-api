@@ -47,7 +47,6 @@ public:
     SSRegistryObject(MiddlewareBase::SPtr middleware,
                      SSConfig const& ss_config,
                      std::string const& ss_scope_endpoint,
-                     std::string const& sss_url = "",
                      bool caching_enabled = true);
     virtual ~SSRegistryObject();
 
@@ -59,7 +58,6 @@ public:
 
     bool has_scope(std::string const& scope_id) const;
     std::string get_base_url(std::string const& scope_id) const;
-    SmartScopesClient::SPtr get_ssclient() const;
 
     SettingsDB::SPtr get_settings_db(std::string const& scope_id) const;
 
@@ -76,8 +74,6 @@ private:
         SettingsDB::SPtr db;
         bool needs_location_data;
     };
-
-    SmartScopesClient::SPtr ssclient_;
 
     MetadataMap scopes_;
     std::map<std::string, std::string> base_urls_;

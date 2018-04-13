@@ -46,7 +46,6 @@ private:
     std::string scope_id_;
     CannedQuery query_;
     SearchHandle::UPtr search_handle_;
-    SmartScopesClient::SPtr ss_client_;
     std::string base_url_;
     SearchMetadata hints_;
 };
@@ -64,7 +63,6 @@ private:
     std::string scope_id_;
     PreviewHandle::UPtr preview_handle_;
     Result result_;
-    SmartScopesClient::SPtr ss_client_;
     std::string base_url_;
     ActionMetadata hints_;
 };
@@ -96,7 +94,6 @@ public:
 
 private:
     SSRegistryObject::SPtr reg_;
-    SmartScopesClient::SPtr ss_client_;
 };
 
 }  // namespace smartscopes
