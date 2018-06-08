@@ -232,7 +232,7 @@ set(UNITY_SCOPES_FULL_VERSION ${UNITY_SCOPES_MAJOR_MINOR}.${UNITY_SCOPES_MICRO})
 
 execute_process(COMMAND lsb_release -c -s OUTPUT_VARIABLE SERIES)
 string(STRIP ${SERIES} SERIES)
-if (${SERIES} STREQUAL "vivid")
+if (SERIES STREQUAL "vivid")
     # For backward compatibility. On Vivid, the soname started counting at 3: libunity-scopes.so.3.
     math(EXPR UNITY_SCOPES_SOVERSION "${UNITY_SCOPES_MINOR} + 3")
 else()
