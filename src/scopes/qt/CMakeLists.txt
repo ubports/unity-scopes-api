@@ -91,17 +91,9 @@ add_library(
     ${SCOPES_QT_SRC}
 )
 
-qt5_use_modules(
-    ${UNITY_SCOPES_QT_LIB}
+target_link_libraries(${UNITY_SCOPES_QT_LIB} Qt5::Core)
 
-    Core
-)
-
-qt5_use_modules(
-    ${UNITY_SCOPES_QT_TEST}
-
-    Core
-)
+target_link_libraries(${UNITY_SCOPES_QT_TEST} Qt5::Core)
 
 #set(LIBS unity-scopes-qt)
 

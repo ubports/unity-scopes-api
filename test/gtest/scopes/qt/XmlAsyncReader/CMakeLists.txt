@@ -10,6 +10,6 @@ target_link_libraries(
 find_package(Qt5Core REQUIRED)
 include_directories(${Qt5Core_INCLUDE_DIRS})
 
-qt5_use_modules(XmlAsyncReader_test Core)
+target_link_libraries(XmlAsyncReader_test Qt5::Core)
 
 add_test(XmlAsyncReader XmlAsyncReader_test)
