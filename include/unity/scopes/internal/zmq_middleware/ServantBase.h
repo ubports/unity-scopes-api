@@ -23,6 +23,7 @@
 #include <unity/scopes/internal/zmq_middleware/Current.h>
 #include <unity/util/NonCopyable.h>
 
+#include <functional>
 #include <memory>
 #include <string>
 #include <unordered_map>

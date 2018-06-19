@@ -26,6 +26,7 @@
 #include <unity/scopes/Variant.h>
 
 #include <atomic>
+#include <functional>
 
 namespace unity
 {
