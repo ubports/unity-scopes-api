@@ -28,6 +28,7 @@
 
 #include <QtCore/QObject>
 
+#include <functional>
 #include <thread>
 #include <memory>
 #include <atomic>

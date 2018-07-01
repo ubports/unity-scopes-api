@@ -23,6 +23,7 @@
 #include <unity/scopes/Result.h>
 #include <unity/util/NonCopyable.h>
 
+#include <functional>
 #include <memory>
 
 namespace unity
