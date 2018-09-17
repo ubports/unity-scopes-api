@@ -1,4 +1,6 @@
 cmake_minimum_required(VERSION 2.8.10)
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Default install location. Must be set here, before setting the project.
 if (NOT DEFINED CMAKE_INSTALL_PREFIX)
