@@ -1,4 +1,6 @@
 cmake_minimum_required(VERSION 2.8.10)
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Default install location. Must be set here, before setting the project.
 if (NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -172,7 +174,7 @@ set(EXTRA_CXX_WARNINGS "-Wnon-virtual-dtor -Wctor-dtor-privacy -Wold-style-cast"
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${C_AND_CXX_WARNINGS}")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${EXTRA_C_WARNINGS}")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 ${C_AND_CXX_WARNINGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11 ${C_AND_CXX_WARNINGS}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EXTRA_C_WARNINGS}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EXTRA_CXX_WARNINGS}")
 
@@ -231,8 +233,10 @@ set(UNITY_SCOPES_MAJOR_MINOR ${UNITY_SCOPES_MAJOR}.${UNITY_SCOPES_MINOR})
 set(UNITY_SCOPES_FULL_VERSION ${UNITY_SCOPES_MAJOR_MINOR}.${UNITY_SCOPES_MICRO})
 
 execute_process(COMMAND lsb_release -c -s OUTPUT_VARIABLE SERIES)
-string(STRIP ${SERIES} SERIES)
-if (${SERIES} STREQUAL "vivid")
+if(NOT SERIES STREQUAL "")
+    string(STRIP ${SERIES} SERIES)
+endif()
+if (SERIES STREQUAL "vivid")
     # For backward compatibility. On Vivid, the soname started counting at 3: libunity-scopes.so.3.
     math(EXPR UNITY_SCOPES_SOVERSION "${UNITY_SCOPES_MINOR} + 3")
 else()

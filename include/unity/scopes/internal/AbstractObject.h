@@ -21,6 +21,7 @@
 #include <unity/util/DefinesPtrs.h>
 #include <unity/util/NonCopyable.h>
 
+#include <functional>
 #include <mutex>
 
 namespace unity

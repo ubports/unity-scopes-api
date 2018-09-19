@@ -10,7 +10,7 @@ target_link_libraries(
 find_package(Qt5Core REQUIRED)
 include_directories(${Qt5Core_INCLUDE_DIRS})
 
-qt5_use_modules(QActionMetadata_test Core)
+target_link_libraries(QActionMetadata_test Qt5::Core)
 
 add_test(QActionMetadata QActionMetadata_test)
 
@@ -29,7 +29,7 @@ target_link_libraries(
 find_package(Qt5Core REQUIRED)
 include_directories(${Qt5Core_INCLUDE_DIRS})
 
-qt5_use_modules(QCategorisedResult_test Core)
+target_link_libraries(QCategorisedResult_test Qt5::Core)
 
 add_test(QCategorisedResult QCategorisedResult_test)
 
@@ -47,7 +47,7 @@ target_link_libraries(
 find_package(Qt5Core REQUIRED)
 include_directories(${Qt5Core_INCLUDE_DIRS})
 
-qt5_use_modules(QSearchMetadata_test Core)
+target_link_libraries(QSearchMetadata_test Qt5::Core)
 
 add_test(QSearchMetadata QSearchMetadata_test)
 
@@ -66,7 +66,7 @@ target_link_libraries(
 find_package(Qt5Core REQUIRED)
 include_directories(${Qt5Core_INCLUDE_DIRS})
 
-qt5_use_modules(QCannedQuery_test Core)
+target_link_libraries(QCannedQuery_test Qt5::Core)
 
 add_test(QCannedQuery QCannedQuery_test)
 
@@ -85,7 +85,7 @@ target_link_libraries(
 find_package(Qt5Core REQUIRED)
 include_directories(${Qt5Core_INCLUDE_DIRS})
 
-qt5_use_modules(QColumnLayout_test Core)
+target_link_libraries(QColumnLayout_test Qt5::Core)
 
 add_test(QColumnLayout QColumnLayout_test)
 
@@ -104,7 +104,7 @@ target_link_libraries(
 find_package(Qt5Core REQUIRED)
 include_directories(${Qt5Core_INCLUDE_DIRS})
 
-qt5_use_modules(QDepartment_test Core)
+target_link_libraries(QDepartment_test Qt5::Core)
 
 add_test(QDepartment QDepartment_test)
 
@@ -123,7 +123,7 @@ target_link_libraries(
 find_package(Qt5Core REQUIRED)
 include_directories(${Qt5Core_INCLUDE_DIRS})
 
-qt5_use_modules(QSearchQueryBaseAPI_test Core)
+target_link_libraries(QSearchQueryBaseAPI_test Qt5::Core)
 
 add_test(QSearchQueryBaseAPI QSearchQueryBaseAPI_test)
 
@@ -142,7 +142,7 @@ target_link_libraries(
 find_package(Qt5Core REQUIRED)
 include_directories(${Qt5Core_INCLUDE_DIRS})
 
-qt5_use_modules(QPreviewQueryBaseAPI_test Core)
+target_link_libraries(QPreviewQueryBaseAPI_test Qt5::Core)
 
 add_test(QPreviewQueryBaseAPI QPreviewQueryBaseAPI_test)
 
@@ -161,7 +161,7 @@ target_link_libraries(
 find_package(Qt5Core REQUIRED)
 include_directories(${Qt5Core_INCLUDE_DIRS})
 
-qt5_use_modules(QUtils_test Core)
+target_link_libraries(QUtils_test Qt5::Core)
 
 add_test(QUtils QUtils_test)
 
@@ -180,7 +180,7 @@ target_link_libraries(
 find_package(Qt5Core REQUIRED)
 include_directories(${Qt5Core_INCLUDE_DIRS})
 
-qt5_use_modules(QVariantBuilder_test Core)
+target_link_libraries(QVariantBuilder_test Qt5::Core)
 
 add_test(QVariantBuilder QVariantBuilder_test)
 
@@ -200,7 +200,7 @@ target_link_libraries(
 find_package(Qt5Core REQUIRED)
 include_directories(${Qt5Core_INCLUDE_DIRS})
 
-qt5_use_modules(QScopeBaseAPIImpl_test Core)
+target_link_libraries(QScopeBaseAPIImpl_test Qt5::Core)
 
 add_test(QScopeBaseAPIImpl QScopeBaseAPIImpl_test)
 
@@ -219,7 +219,7 @@ target_link_libraries(
 find_package(Qt5Core REQUIRED)
 include_directories(${Qt5Core_INCLUDE_DIRS})
 
-qt5_use_modules(QScopeCreation_test Core)
+target_link_libraries(QScopeCreation_test Qt5::Core)
 
 add_test(QScopeCreation QScopeCreation_test)
 
@@ -238,6 +238,6 @@ target_link_libraries(
 find_package(Qt5Core REQUIRED)
 include_directories(${Qt5Core_INCLUDE_DIRS})
 
-qt5_use_modules(QPreviewWidget_test Core)
+target_link_libraries(QPreviewWidget_test Qt5::Core)
 
 add_test(QPreviewWidget QPreviewWidget_test)

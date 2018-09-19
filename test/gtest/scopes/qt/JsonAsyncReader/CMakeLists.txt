@@ -10,6 +10,6 @@ target_link_libraries(
 find_package(Qt5Core REQUIRED)
 include_directories(${Qt5Core_INCLUDE_DIRS})
 
-qt5_use_modules(JsonAsyncReader_test Core)
+target_link_libraries(JsonAsyncReader_test Qt5::Core)
 
 add_test(JsonAsyncReader JsonAsyncReader_test)
