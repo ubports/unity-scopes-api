@@ -203,7 +203,7 @@ static void service_update_cb(AgAccountService* account_service, gboolean enable
             g_variant_ref_sink(ag_auth_data_get_login_parameters(auth_data.get(), g_variant_builder_end(&builder))), free_variant);
 
         // Start signon process
-        signon_auth_session_process_async(info->session.get(),
+        signon_auth_session_process(info->session.get(),
                                           info->auth_params.get(),
                                           ag_auth_data_get_mechanism(auth_data.get()),
                                           nullptr,
