@@ -25,6 +25,8 @@
 #include <core/posix/signal.h>
 #include <core/posix/this_process.h>
 
+#include <libgen.h>
+
 using namespace std;
 using namespace unity::scopes;
 using namespace unity::scopes::internal;

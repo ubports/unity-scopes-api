@@ -21,6 +21,7 @@
 #include <unity/scopes/Variant.h>
 #include <string>
 #include <sstream>
+#include <sys/stat.h>
 
 #include <boost/filesystem.hpp>
 

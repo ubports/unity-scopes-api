@@ -34,6 +34,7 @@
 #include <boost/algorithm/string.hpp>
 
 #include <wordexp.h>
+#include <libgen.h>
 
 using namespace scoperegistry;
 using namespace std;

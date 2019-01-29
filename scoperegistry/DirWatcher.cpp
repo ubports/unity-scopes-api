@@ -23,6 +23,7 @@
 
 #include <sys/inotify.h>
 #include <sys/ioctl.h>
+#include <sys/select.h>
 #include <unistd.h>
 #include <string.h>
 
