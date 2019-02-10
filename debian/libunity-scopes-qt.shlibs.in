@@ -1,1 +1,0 @@
-libunity-scopes-qt @UNITY_SCOPES_QT_SOVERSION@ libunity-scopes-qt@UNITY_SCOPES_QT_SOVERSION@ (>= @LAST_ABI_ADDITION_QT_VERSION@)
